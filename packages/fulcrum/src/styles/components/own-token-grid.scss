@@ -1,28 +1,26 @@
+@import "../abstracts/variables";
 $font-size-header: 12px;
-$height-row: 4.5rem;
-
+$font-size-row: 18px;
 $width-col-token-image: 26%;
-$width-col-token-name-full: 15%;
-$width-col-position-type: 11%;
-$width-col-asset-price: 13%;
-$width-col-liquidation-price: 13%;
-$width-col-position-value: 13%;
-$width-col-profit: 11%;
-
-$width-col-actions: 11%;
-
-$width-button-action: 11%;
-
-$margin-right-column: 1.5rem;
-$margin-right-small-column: 0.5rem;
-
-$width-button-action: 7rem;
+$width-col-token-name: 14%;
+$width-col-position-type: 10%;
+$width-col-asset-unit: 10%;
+$width-col-position: 10%;
+$width-col-asset-price: 10%;
+$width-col-liquidation-price: 10%;
+$width-col-collateral: 14%;
+$width-col-position-value: 10%;
+$width-col-profit: 10%;
+$width-col-actions: 10%;
+$primary-color:  #e9f4ff;
+$primary-dark-color:  rgba(#444e5a,0.4);
 
 @mixin own-token-grid-header__col {
   font-family: "Muli", sans-serif;
   vertical-align: middle;
   font-size: $font-size-header;
   font-weight: 600;
+  line-height: 1.5;
   font-style: normal;
   font-stretch: normal;
   letter-spacing: normal;
@@ -30,182 +28,247 @@ $width-button-action: 7rem;
 }
 @mixin own-token-grid-row__col {
   font-family: "Muli", sans-serif;
-  font-size: 22px;
+  font-size: $font-size-row;
   font-weight: 800;
   color: var(--primary-text);
   font-style: normal;
   font-stretch: normal;
   line-height: 1.5;
-  display: flex;
-}
-.own-token-grid-header {
-  display: flex;
-  padding: 32px 40px 24px 40px;
-  font-family: "Muli", sans-serif;
-  &__col-token-image {
-    @include own-token-grid-header__col();
-    width: $width-col-token-image;
-  }
-  &__col-asset-price {
-    @include own-token-grid-header__col();
-    width: $width-col-asset-price;
-  }
-  &__col-liquidation-price {
-    @include own-token-grid-header__col();
-    width: $width-col-liquidation-price;
-  }
-  &__col-position-value {
-    @include own-token-grid-header__col();
-    width: $width-col-position-value;
-  }
-  &__col-profit {
-    @include own-token-grid-header__col();
-    width: $width-col-profit;
-  }
-  &__col-actions {
-    @include own-token-grid-header__col();
-    width: $width-col-actions;
-    text-align: right;
-  }
 }
 
-.own-token-grid-row {
-  display: flex;
-  align-items: center;
-  background-color: var(--primary-row);
-  padding: 23px 40px;
-  margin-bottom: 1px;
+.own-token-grid-header {
+  @include own-token-grid-header__col();
+  display: grid;
+  grid-template-columns:
+    $width-col-token-name
+    $width-col-position-type
+    $width-col-position
+    $width-col-asset-price
+    $width-col-liquidation-price
+    $width-col-collateral
+    $width-col-position-value
+    $width-col-profit
+    $width-col-actions;
+  padding: 0 40px 22px 40px;
+}
+
+.own-token-grid-row {  
   position: relative;
+  @include own-token-grid-row__col();
+  display: grid;
+  grid-template-columns:
+    $width-col-token-name
+    $width-col-position-type
+    $width-col-position
+    $width-col-asset-price
+    $width-col-liquidation-price
+    $width-col-collateral
+    $width-col-position-value
+    $width-col-profit
+    $width-col-actions;
+
+  margin-bottom: 20px;
+  align-items: center;
+  background-color: $primary-color; 
+  padding: 20px 40px;
+  margin-bottom: 2px;
+
+  [data-theme="dark"] &{
+    background-color: $primary-dark-color; 
+  }
+
   .sign-currency {
     color: #a2abb8;
     font-weight: 400;
   }
-  &__col-token-name-full {
-    @include own-token-grid-row__col();
-    width: $width-col-token-name-full;
+
+  &__body-header {
+    display: none;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 3px;
+    font-family: "Muli", sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 1.5;
+    color: #a2abb8;
+    width: 100%;
+  }
+
+  &__col-collateral {
+    display: flex;
+    position: relative;
   }
   &__col-position-type {
-    @include own-token-grid-row__col();
-    width: $width-col-position-type;
+    display: flex;
   }
-  &__col-asset-price {
-    @include own-token-grid-row__col();
-    width: $width-col-asset-price;
-  }
-  &__col-liquidation-price {
-    @include own-token-grid-row__col();
-    width: $width-col-liquidation-price;
-  }
-  &__col-position-value {
-    @include own-token-grid-row__col();
-    width: $width-col-position-value;
-  }
-  &__col-profit {
-    @include own-token-grid-row__col();
-    width: $width-col-profit;
-  }
-  &__col-action {
-    @include own-token-grid-row__col();
-    width: $width-col-actions;
-  }
-  &__buy-button {
-    display: inline-block;
-    border: 0;
-    width: $width-button-action;
-    height: 2.5rem;
-    border-radius: 100px;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: -0.3px;
-    color: #ffffff;
-    outline: none;
-    &:hover{
-      background-color: #5B88FF;
-    }
-    &:not(:disabled){
-      cursor: pointer;
-    }
-    &:disabled {
-      background-color: var(--disabled-bg);
-      color: var(--disabled-color);
-      cursor: not-allowed;
+  &__col-asset-collateral-small {
+    position: absolute;
+    font-size: 12px;
+    font-weight: 600;
+    text-indent: 13px;
+    bottom: -16px;
+    &.danger {
+      color: #ff4f4f;
     }
   }
-  &__details-button {
-    display: inline-block;
+  &__open-manage-collateral {
+    background-color: var(--bg-icon-collateral);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-left: 10px;
+    position: absolute;
+    left: 70px;
     cursor: pointer;
-    position: relative;
-    border: solid 1px #758295;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 100px;
-    background-color: rgba(0, 0, 0, 0);
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: -0.3px;
-    color: var(--primary-text);
-    outline: none;
+    .icon-collateral-fill {
+      fill: var(--icon-collateral);
+    }
+    .icon-collateral-stroke {
+      stroke: var(--icon-collateral);
+    }
+    &.danger {
+      .icon-collateral-fill {
+        fill: #ff4f4f;
+      }
+      .icon-collateral-stroke {
+        stroke: #ff4f4f;
+      }
+    }
+  }
+  &__col-collateral-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
 
-    &::after {
-      position: absolute;
-      content: "•••";
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(90deg);
-      font-size: 0.5rem;
-      letter-spacing: 0.125rem;
-      margin-top: 0.125rem;
-    }
+  &__col-action {
+    display: flex;
+    justify-content: flex-end;
   }
-  &__manage-button {
-    display: inline-block;
-    cursor: pointer;
-    border: 0;
-    width: $width-button-action;
-    height: 2.5rem;
-    border-radius: 100px;
-    background-color: #407bf7;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: -0.3px;
-    color: #ffffff;
-    outline: none;
-  }
-  &__sell-button {
+  &_button {
+    width: 82px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: "Muli", sans-serif;
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1.5;
     font-weight: 700;
-    display: inline-block;
-    cursor: pointer;
     letter-spacing: 0.05em;
     border: 0;
     border-radius: 43px;
-    background-color: #ff4f4f;
     text-transform: uppercase;
     font-style: normal;
     color: #ffffff;
     outline: none;
-    padding: 14px 34px;
-    &:hover {
-      background-color: #fe7272;
-    }
-    &:not(:disabled){
+    &:not(:disabled) {
       cursor: pointer;
     }
     &:disabled {
       background-color: var(--disabled-bg);
       color: var(--disabled-color);
       cursor: not-allowed;
+    }
+  }
+  &__sell-button {
+    background-color: #ff4f4f;
+    &:hover {
+      background-color: #fe7272;
+    }
+    &:not(:disabled) {
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-mobile-max) {
+  .own-token-grid {
+    padding: 0 15px;
+    &-row {
+      grid-template-columns: repeat(3,1fr);
+      grid-template-rows: repeat(3,1fr);
+      grid-auto-flow: column;
+      align-items: baseline;
+      padding: 18px 15px 24px;
+      row-gap: 20px;
+
+      &__body-header {
+        display: flex;
+      }
+      &__col-token-name {
+        order: 0;
+      }
+      &__col-position {
+        order: 1;
+      }
+      &__col-collateral {
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+        order: 2;
+      }
+      &__col-position-type {
+        flex-wrap: wrap;
+        order: 3;
+        .position-type-marker {
+          font-size: 10px;
+          width: 71px;
+          padding: 7px 0;
+          text-align: center;
+        }
+      }
+      &__col-asset-price {
+        order: 4;
+      }
+
+      &__col-position-value {
+        order: 5;
+      }
+      &__col-action {
+        display: flex;
+        justify-content: flex-start;
+        order: 6;
+      }
+
+      &__col-liquidation-price {
+        order: 7;
+      }
+
+      &__col-profit {
+        order: 8;
+      }
+      &__col-action {
+        align-self: flex-start;
+        padding-top: 15px;
+      }
+      &__open-manage-collateral {
+        top: 17px;
+      }
+      &__col-asset-collateral-small {
+        text-indent: 12px;
+      }
+      &_button {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .own-token-grid {
+    &-row {
+      &__open-manage-collateral {
+        left: 55px;
+      }
     }
   }
 }

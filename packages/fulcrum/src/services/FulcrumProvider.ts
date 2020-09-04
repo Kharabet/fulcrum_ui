@@ -2,14 +2,13 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
-import Web3Utils from "web3-utils";
-import moment from "moment";
-import fetch from "node-fetch";
-import request from "request-promise";
+// import Web3Utils from "web3-utils";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
+import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
+import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
@@ -32,34 +31,44 @@ import { TasksQueue } from "./TasksQueue";
 
 import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
-import { LendChaiProcessor } from "./processors/LendChaiProcessor";
-import { LendErcProcessor } from "./processors/LendErcProcessor";
-import { LendEthProcessor } from "./processors/LendEthProcessor";
-import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
-import { TradeBuyEthProcessor } from "./processors/TradeBuyEthProcessor";
-import { TradeSellErcProcessor } from "./processors/TradeSellErcProcessor";
-import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
-import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
-import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
-import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
+
+import { AbstractConnector } from '@web3-react/abstract-connector';
 
 import siteConfig from "./../config/SiteConfig.json";
+import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { TradeEvent } from "../domain/events/TradeEvent";
+import Web3, { providers } from "web3";
+import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
+import { LiquidationEvent } from "../domain/events/LiquidationEvent";
+import { EarnRewardEvent } from "../domain/events/EarnRewardEvent";
+import { PayTradingFeeEvent } from "../domain/events/PayTradingFeeEvent";
+import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
+import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
+
+const getNetworkIdByString = (networkName: string | undefined) => {
+  switch (networkName) {
+    case 'mainnet':
+      return 1;
+    case 'ropsten':
+      return 3;
+    case 'rinkeby':
+      return 4;
+    case 'kovan':
+      return 42;
+    default:
+      return 0;
+  }
+}
+const networkName = process.env.REACT_APP_ETH_NETWORK;
+const initialNetworkId = getNetworkIdByString(networkName);
 
 export class FulcrumProvider {
-  private static readonly priceGraphQueryFunction = new Map<Asset, string>([
-    [Asset.ETH, "kyber-eth-dai"],
-    [Asset.WBTC, "kyber-wbtc-dai"],
-    [Asset.LINK, "kyber-link-dai"],
-    [Asset.MKR, "kyber-mkr-dai"],
-    [Asset.ZRX, "kyber-zrx-dai"],
-    [Asset.BAT, "kyber-bat-dai"],
-    [Asset.REP, "kyber-rep-dai"],
-    [Asset.KNC, "kyber-knc-dai"]
-  ]);
 
   public static Instance: FulcrumProvider;
 
   public readonly gasLimit = "4500000";
+  public static readonly ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
   // gasBufferCoeff equal 110% gas reserve
   public readonly gasBufferCoeff = new BigNumber("1.06");
@@ -68,6 +77,10 @@ export class FulcrumProvider {
 
   public readonly gasBufferForLend = new BigNumber(10 ** 16); // 0.01 ETH
   public readonly gasBufferForTrade = new BigNumber(5 * 10 ** 16); // 0.05 ETH
+
+  public static readonly MAX_UINT = new BigNumber(2)
+    .pow(256)
+    .minus(1);
 
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
@@ -80,7 +93,7 @@ export class FulcrumProvider {
   public providerType: ProviderType = ProviderType.None;
   public providerEngine: Web3ProviderEngine | null = null;
   public web3Wrapper: Web3Wrapper | null = null;
-  public web3ProviderSettings: IWeb3ProviderSettings | null = null;
+  public web3ProviderSettings: IWeb3ProviderSettings;
   public contractsSource: ContractsSource | null = null;
   public accounts: string[] = [];
   public isLoading: boolean = false;
@@ -92,42 +105,35 @@ export class FulcrumProvider {
     this.eventEmitter.setMaxListeners(1000);
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
-    const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
-    // const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
-    const providerType: ProviderType | null = storedProvider as ProviderType || null;
-
     // singleton
     if (!FulcrumProvider.Instance) {
       FulcrumProvider.Instance = this;
     }
 
-    if (providerType) {
-      FulcrumProvider.Instance.setWeb3Provider(providerType).then(() => {
-        this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-        FulcrumProvider.Instance.eventEmitter.emit(
-          FulcrumProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
-        );
-      });
-    } else {
+
+    const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
+    const providerType: ProviderType | null = storedProvider as ProviderType || null;
+
+    this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
+    if (!providerType || providerType === ProviderType.None) {
       // setting up readonly provider
-      Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
-        // @ts-ignore
-        const web3Wrapper = providerData[0];
-        FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
-          if (web3Wrapper && web3ProviderSettings) {
-            const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
-            contractsSource.Init().then(() => {
-              this.web3Wrapper = web3Wrapper;
-              this.providerEngine = providerData[1];
-              this.web3ProviderSettings = web3ProviderSettings;
-              this.contractsSource = contractsSource;
-              this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-            });
-          }
-        });
+      Web3ConnectionFactory.setReadonlyProvider().then(() => {
+        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+        const engine = Web3ConnectionFactory.currentWeb3Engine;
+        const canWrite = Web3ConnectionFactory.canWrite;
+
+        if (web3Wrapper && this.web3ProviderSettings) {
+          const contractsSource = new ContractsSource(engine, this.web3ProviderSettings.networkId, canWrite);
+          contractsSource.Init().then(() => {
+            this.web3Wrapper = web3Wrapper;
+            this.providerEngine = engine;
+            this.contractsSource = contractsSource;
+            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
+          });
+        }
       });
     }
+
 
     return FulcrumProvider.Instance;
   }
@@ -150,61 +156,56 @@ export class FulcrumProvider {
     }
   }
 
-  public async setWeb3Provider(providerType: ProviderType) {
+  public async setWeb3Provider(connector: AbstractConnector, account?: string) {
     this.unsupportedNetwork = false;
-    await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter));
+    await Web3ConnectionFactory.setWalletProvider(connector, account);
+    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
+    await this.setWeb3ProviderFinalize(providerType);
   }
 
-  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]) { // : Promise<boolean> {
-    this.web3Wrapper = providerData[0];
-    this.providerEngine = providerData[1];
-    let canWrite = providerData[2];
-    let networkId = providerData[3];
+  public async setReadonlyWeb3Provider() {
+    await Web3ConnectionFactory.setReadonlyProvider();
+    await this.setWeb3ProviderFinalize(ProviderType.None);
+  }
 
-    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
-    if (this.web3Wrapper) {
-      if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
-        // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+  public async setWeb3ProviderFinalize(providerType: ProviderType) { // : Promise<boolean> {
+    this.web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+    this.providerEngine = Web3ConnectionFactory.currentWeb3Engine;
+    let canWrite = Web3ConnectionFactory.canWrite;
+    const networkId = Web3ConnectionFactory.networkId;
+    this.accounts = Web3ConnectionFactory.userAccount ? [Web3ConnectionFactory.userAccount] : [];
 
-        this.unsupportedNetwork = true;
-        canWrite = false; // revert back to read-only
-        networkId = await this.web3Wrapper.getNetworkIdAsync();
-        this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
-      }
+    if (this.web3Wrapper && networkId !== initialNetworkId) {
+      // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+      this.unsupportedNetwork = true;
+      canWrite = false; // revert back to read-only
     }
 
     if (this.web3Wrapper && canWrite) {
-      try {
-        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
-      } catch (e) {
-        // console.log(e);
-        this.accounts = [];
-      }
+      const web3EngineAccounts = await this.web3Wrapper.getAvailableAddressesAsync();
+      if (web3EngineAccounts.length > 0 && this.accounts.length === 0)
+        this.accounts = web3EngineAccounts;
       if (this.accounts.length === 0) {
         canWrite = false; // revert back to read-only
-      }
-    } else {
-      // this.accounts = [];
-      if (providerType === ProviderType.Bitski && networkId !== 1) {
-        this.unsupportedNetwork = true;
       }
     }
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
-      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
-      if (canWrite) {
-        this.providerType = providerType;
-      } else {
-        this.providerType = ProviderType.None;
-      }
-      FulcrumProvider.setLocalstorageItem('providerType', this.providerType);
+      const newContractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      await newContractsSource.Init();
+      this.contractsSource = newContractsSource;
+      console.log(`contractsource: ${this.contractsSource}`)
+      console.log(`contractsource can write: ${this.contractsSource.canWrite}`)
     } else {
       this.contractsSource = null;
     }
 
-    if (this.contractsSource) {
-      await this.contractsSource.Init();
-    }
+    this.providerType = canWrite
+      ? providerType
+      : ProviderType.None;
+
+    FulcrumProvider.setLocalstorageItem('providerType', this.providerType);
+
   }
 
   public async setWeb3ProviderMobileFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
@@ -214,15 +215,12 @@ export class FulcrumProvider {
     let networkId = providerData[3];
     const sellectedAccount = providerData[4];
 
-    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
       if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
         // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
 
         this.unsupportedNetwork = true;
         canWrite = false; // revert back to read-only
-        networkId = await this.web3Wrapper.getNetworkIdAsync();
-        this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
       }
     }
 
@@ -274,7 +272,7 @@ export class FulcrumProvider {
 
   public onManageCollateralConfirmed = async (request: ManageCollateralRequest) => {
     if (request) {
-      // console.dir(request);
+      TasksQueue.Instance.enqueue(new RequestTask(request));
     }
   };
 
@@ -302,115 +300,6 @@ export class FulcrumProvider {
     }
 
     return result;
-  };
-
-  public getPriceDataPoints = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint[]> => {
-    let priceDataObj: IPriceDataPoint[] = [];
-    // localStorage.removeItem(`priceData${selectedKey.asset}`);
-
-    if (this.web3Wrapper) {
-      let queriedBlocks = 0;
-      const currentBlock = await this.web3Wrapper.getBlockNumberAsync();
-      const earliestBlock = currentBlock - 17280; // ~5760 blocks per day
-      let fetchFromBlock = earliestBlock;
-      const nearestHour = new Date().setMinutes(0, 0, 0) / 1000;
-
-      const priceData = FulcrumProvider.getLocalstorageItem(`priceData${selectedKey.asset}`);
-      if (priceData) {
-        // console.log(`priceData`,priceData);
-        priceDataObj = JSON.parse(priceData);
-        if (priceDataObj.length > 0) {
-          // console.log(`priceDataObj`,priceDataObj);
-          const lastItem = priceDataObj[priceDataObj.length - 1];
-          // console.log(`lastItem`,lastItem);
-          // console.log(`nearestHour`,nearestHour);
-          if (lastItem && lastItem.timeStamp) {
-            // console.log(`lastItem.timeStamp`,lastItem.timeStamp);
-            if (lastItem.timeStamp < nearestHour) {
-              fetchFromBlock = currentBlock - (nearestHour - lastItem.timeStamp) / 15 - 240; // ~240 blocks per hour; 15 second blocks
-            } else {
-              fetchFromBlock = currentBlock;
-            }
-          }
-        }
-      }
-
-      fetchFromBlock = Math.max(fetchFromBlock, earliestBlock);
-      if (fetchFromBlock < currentBlock) {
-        let jsonData: any = {};
-        // const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
-        const functionName = `mainnet-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
-        const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=${configProviders.Covalent_ApiKey}`;
-        try {
-          const response = await fetch(url);
-          jsonData = await response.json();
-
-          queriedBlocks = currentBlock - fetchFromBlock;
-          // console.log(jsonData);
-        } catch (error) {
-          // tslint:disable-next-line
-          console.log(error);
-        }
-
-        if (jsonData && jsonData.data) {
-          const dataArray = jsonData.data;
-          dataArray.map((value: any) => {
-            if (value && value.block_signed_at__hour && value.avg_value_0) {
-              priceDataObj.push({
-                timeStamp: Math.round(new Date(value.block_signed_at__hour).getTime() / 1000),
-                price: Math.round(value.avg_value_0) / (10 ** 18),
-                liquidationPrice: 0,
-                change24h: 0
-              });
-            }
-          });
-          // console.log(result);
-
-          // remove duplicates
-          priceDataObj = priceDataObj
-            .map(e => e.timeStamp)
-            .map((e, i, final) => final.indexOf(e) === i && i)
-            .filter((e, index) => priceDataObj[index]).map((e, i) => priceDataObj[i]);
-
-          // add nearestHour if not yet available from API
-          if (priceData && priceDataObj[priceDataObj.length - 1].timeStamp !== nearestHour) {
-            priceDataObj.push({
-              timeStamp: nearestHour,
-              price: priceDataObj[priceDataObj.length - 1].price,
-              liquidationPrice: 0,
-              change24h: 0
-            });
-          }
-
-          // keep no more than 72
-          if (priceDataObj.length > 72) {
-            priceDataObj = priceDataObj.splice(-72);
-          }
-
-          // console.log(priceDataObj.length);
-          FulcrumProvider.setLocalstorageItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
-        }
-      }
-
-      // console.log(`queriedBlocks`, queriedBlocks);
-    } else {
-      // getting empty data
-      const samplesCount = 72;
-      const intervalSeconds = 3600;
-
-      const beginningTime = moment()
-        .startOf("hour")
-        .subtract(intervalSeconds, "second");
-      for (let i = 0; i < samplesCount; i++) {
-        priceDataObj.push({ timeStamp: beginningTime.unix(), price: 1, liquidationPrice: 0, change24h: 0 });
-
-        // add mutates beginningTime
-        beginningTime.add(intervalSeconds, "second");
-      }
-    }
-    // console.log(priceDataObj);
-
-    return priceDataObj;
   };
 
   public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
@@ -529,9 +418,72 @@ export class FulcrumProvider {
     return result;
   };*/
 
+  public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
+    return FulcrumProvider.MAX_UINT;
+    /*let amount = new BigNumber(0);
+
+    switch (asset) {
+      case Asset.ETH:
+      case Asset.WETH:
+      case Asset.fWETH:
+        amount = new BigNumber(10 ** 18).multipliedBy(1500);
+      case Asset.WBTC:
+      case Asset.YFI:
+        amount = new BigNumber(10 ** 8).multipliedBy(25);
+      case Asset.BZRX:
+        amount = new BigNumber(10 ** 18).multipliedBy(400000);
+      case Asset.LINK:
+        amount = new BigNumber(10 ** 18).multipliedBy(60000);
+      case Asset.ZRX:
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
+      case Asset.LEND:
+      case Asset.KNC:
+        amount = new BigNumber(10 ** 18).multipliedBy(550000);
+      case Asset.BAT:
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
+      case Asset.DAI:
+      case Asset.SAI:
+      case Asset.SUSD:
+        amount = new BigNumber(10 ** 18).multipliedBy(375000);
+      case Asset.USDC:
+      case Asset.USDT:
+        amount = new BigNumber(10 ** 6).multipliedBy(375000);
+      case Asset.REP:
+        amount = new BigNumber(10 ** 18).multipliedBy(15000);
+      case Asset.MKR:
+        amount = new BigNumber(10 ** 18).multipliedBy(1250);
+      case Asset.CHI:
+        amount = new BigNumber(10 ** 18);
+      default:
+        break;
+    }
+
+    if (amount.eq(0)) {
+      throw new Error("Invalid approval asset!");
+    }
+    
+    return amount.gt(neededAmount) ? amount : neededAmount;*/
+  }
+
+  public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
+    let result = false;
+    const assetErc20Address = this.getErc20AddressOfAsset(asset);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite && assetErc20Address) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+      if (account && tokenErc20Contract) {
+        await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, { from: account });
+        result = true;
+      }
+    }
+    return result;
+  };
+
   public getPriceDefaultDataPoint = (): IPriceDataPoint => {
     return {
-      timeStamp: moment().unix(),
+      timeStamp: Math.round((new Date()).getTime() / 1000),
       price: 0,
       liquidationPrice: 0,
       change24h: 0
@@ -549,15 +501,16 @@ export class FulcrumProvider {
       if (tokens && helperContract) {
         let swapRates;
         try {
-          swapRates = await this.getSwapToUsdRateBatch(
+          swapRates = (await this.getSwapToUsdRateBatch(
             assets,
-            process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "ropsten" ?
-              Asset.DAI :
-              Asset.SAI
-          );
+            Asset.DAI
+          ))[0];
         } catch (e) {
           //console.log(e);
         }
+        
+        //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
+        
         const reserveData = await helperContract.reserveDetails.callAsync(tokens);
         let usdSupplyAll = new BigNumber(0);
         let usdTotalLockedAll = new BigNumber(0);
@@ -645,6 +598,19 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getBorrowInterestRate = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+    if (this.contractsSource) {
+      const assetContract = await this.contractsSource.getITokenContract(asset);
+      if (assetContract) {
+        result = await assetContract.borrowInterestRate.callAsync();
+        result = result.dividedBy(10 ** 18);
+      }
+    }
+
+    return result;
+  }
+
   /*public getReserveDetails = async (asset: Asset): Promise<ReserveDetails | null> => {
     let result: ReserveDetails | null = null;
 
@@ -731,13 +697,16 @@ export class FulcrumProvider {
             // console.log(e);
           }*/
 
-          const tokenPrice = await assetContract.tokenPrice.callAsync();
+          /*const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
 
           result = tokenPrice
             .minus(checkpointPrice)
             .multipliedBy(balance)
-            .dividedBy(10 ** 36);
+            .dividedBy(10 ** 36);*/
+
+          result = (await assetContract.profitOf.callAsync(account))
+            .dividedBy(10 ** 18);
 
           /*if (swapPrice && swapPrice.gt(0)) {
             result = result
@@ -758,107 +727,105 @@ export class FulcrumProvider {
     }
   }
 
-  public getTradeBalanceAndProfit = async (selectedKey: TradeTokenKey): Promise<[BigNumber | null, BigNumber | null]> => {
-    // should return null if no data (not traded asset), new BigNumber(0) if no profit
-    let assetBalance: BigNumber | null = new BigNumber(0);
-    let profit: BigNumber | null = new BigNumber(0);
-    let account: string | null = null;
+  // public getTradeBalanceAndProfit = async (selectedKey: TradeTokenKey): Promise<[BigNumber | null, BigNumber | null]> => {
+  //   // should return null if no data (not traded asset), new BigNumber(0) if no profit
+  //   let assetBalance: BigNumber | null = new BigNumber(0);
+  //   let profit: BigNumber | null = new BigNumber(0);
+  //   let account: string | null = null;
 
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    }
+  //   if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+  //     account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+  //   }
 
-    if (account && this.contractsSource && this.contractsSource.canWrite) {
-      const balance = await this.getPTokenBalanceOfUser(selectedKey);
-      if (balance.gt(0)) {
-        const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
-        if (assetContract) {
-          const baseAsset = this.getBaseAsset(selectedKey);
-          const swapPrice = await this.getSwapToUsdRate(baseAsset);
-          const tokenPrice = await assetContract.tokenPrice.callAsync();
-          const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
+  //   if (account && this.contractsSource && this.contractsSource.canWrite) {
+  //     const balance = await this.getPTokenBalanceOfUser(selectedKey);
+  //     if (balance.gt(0)) {
+  //       const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
+  //       if (assetContract) {
+  //         const baseAsset = this.getBaseAsset(selectedKey);
+  //         const swapPrice = await this.getSwapToUsdRate(baseAsset);
+  //         const tokenPrice = await assetContract.tokenPrice.callAsync();
+  //         const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
 
-          let decimalOffset = 0;
-          if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.LONG) {
-            decimalOffset = -10;
-          }
+  //         let decimalOffset = 0;
+  //         if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.LONG) {
+  //           decimalOffset = -10;
+  //         }
 
-          assetBalance = tokenPrice
-            .multipliedBy(balance)
-            .multipliedBy(swapPrice)
-            .dividedBy(10 ** (36 - decimalOffset));
+  //         assetBalance = tokenPrice
+  //           .multipliedBy(balance)
+  //           .multipliedBy(swapPrice)
+  //           .dividedBy(10 ** (36 - decimalOffset));
 
-          profit = tokenPrice
-            .minus(checkpointPrice)
-            .multipliedBy(balance)
-            .multipliedBy(swapPrice)
-            .dividedBy(10 ** (36 - decimalOffset));
-        }
-      }
-    }
+  //         profit = tokenPrice
+  //           .minus(checkpointPrice)
+  //           .multipliedBy(balance)
+  //           .multipliedBy(swapPrice)
+  //           .dividedBy(10 ** (36 - decimalOffset));
+  //       }
+  //     }
+  //   }
 
-    return [assetBalance, profit];
-  };
+  //   return [assetBalance, profit];
+  // };
 
-  public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey, collateral: Asset): Promise<BigNumber> => {
+  public getMaxTradeValue = async (
+    tradeType: TradeType,
+    baseToken: Asset,
+    quoteToken: Asset,
+    depositToken: Asset,
+    positionType: PositionType,
+    loan?: IBorrowedFundsState
+  ): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
-        const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
-        if (assetContract) {
+        const loanToken = positionType === PositionType.LONG
+          ? quoteToken
+          : baseToken;
+        const collateralToken = positionType === PositionType.LONG
+          ? baseToken
+          : quoteToken;
 
-          const precision = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
-          let marketLiquidity = await assetContract.marketLiquidityForLoan.callAsync();
-          marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
-          if (collateral !== selectedKey.loanAsset) {
-            const swapPrice = await this.getSwapRate(selectedKey.loanAsset, collateral);
-            marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
-          }
+        const assetContract = await this.contractsSource.getITokenContract(loanToken);
+        if (!assetContract) return result;
 
-          const balance = await this.getAssetTokenBalanceOfUser(collateral);
+        const precision = AssetsDictionary.assets.get(loanToken)!.decimals || 18;
+        let marketLiquidity = await assetContract.marketLiquidity.callAsync();
+        marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
-          result = BigNumber.min(marketLiquidity, balance);
-
-          if (collateral === Asset.ETH) {
-            result = result.gt(this.gasBufferForTrade) ? result.minus(this.gasBufferForTrade) : new BigNumber(0);
-          }
-
-          /*if (collateral === Asset.ETH && selectedKey.asset === Asset.ETH && selectedKey.positionType === PositionType.LONG) {
-            const tempLongCap = new BigNumber(7 * 10**18);
-            if (result.gt(tempLongCap)) {
-              result = tempLongCap;
-            }
-          }*/
-
-        } else {
-          result = new BigNumber(0);
+        if (depositToken !== loanToken) {
+          const swapPrice = await this.getSwapRate(loanToken, depositToken);
+          marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
         }
+
+        const balance = await this.getAssetTokenBalanceOfUser(depositToken);
+
+        result = BigNumber.min(marketLiquidity, balance);
+
+        if (depositToken === Asset.ETH) {
+          result = result.gt(this.gasBufferForTrade) ? result.minus(this.gasBufferForTrade) : new BigNumber(0);
+        }
+
       }
     } else {
-      result = await this.getPTokenBalanceOfUser(selectedKey);
-    }
+      if (loan) {
+        const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
+        const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
 
-    const baseAsset = this.getBaseAsset(selectedKey);
+        const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+        const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+       
 
-    // console.log(baseAsset, selectedKey.positionType, selectedKey.unitOfAccount, result.toString());
-
-
-    let decimalOffset = 0;
-    if (baseAsset === Asset.WBTC) {
-      if (selectedKey.positionType === PositionType.SHORT) {
-        if (selectedKey.version !== 1 && selectedKey.unitOfAccount !== Asset.USDC) {
-          decimalOffset = 10;
-        }
-      } else {
-        if (tradeType === TradeType.SELL) {
-          decimalOffset = -10;
+        result = positionType === PositionType.LONG
+          ? loan.loanData!.collateral.times(collateralAssetPrecision)
+          : loan.loanData!.principal.times(loanAssetPrecision);
         }
       }
-    }
 
-    result = result.dividedBy(10 ** (18 - decimalOffset));
+    result = result.dividedBy(10 ** 18);
 
     return result;
   };
@@ -950,50 +917,50 @@ export class FulcrumProvider {
     return result.dividedBy(10 ** 18);
   };
 
-  public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
-    let result = new BigNumber(0);
+  // public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
+  //   let result = new BigNumber(0);
 
-    if (request.amount.eq(0)) {
-      return result;
-    }
+  //   if (request.amount.eq(0)) {
+  //     return result;
+  //   }
 
-    if (this.contractsSource) {
-      const key = new TradeTokenKey(
-        request.asset,
-        request.unitOfAccount,
-        request.positionType,
-        request.leverage,
-        request.isTokenized,
-        request.version
-      );
-      const assetContract = await this.contractsSource.getPTokenContract(key);
-      if (assetContract) {
-        const tokenPrice = await assetContract.tokenPrice.callAsync();
-        let amount = request.amount;
-        if (request.tradeType === TradeType.SELL) {
-          amount = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
-        }
-        const baseAsset = this.getBaseAsset(key);
-        if (request.collateral !== baseAsset) {
-          const srcToken = request.tradeType === TradeType.BUY ? request.collateral : baseAsset;
-          const destToken = request.tradeType === TradeType.BUY ? baseAsset : request.collateral;
-          const srcDecimals: number = AssetsDictionary.assets.get(srcToken)!.decimals || 18;
-          const swapPrice = await this.getSwapRate(
-            srcToken,
-            destToken,
-            amount.multipliedBy(10 ** srcDecimals)
-          );
-          amount = amount.multipliedBy(swapPrice);
-        }
-        if (request.tradeType === TradeType.BUY) {
-          amount = amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
-        }
-        result = amount;
-      }
-    }
+  //   if (this.contractsSource) {
+  //     const key = new TradeTokenKey(
+  //       request.asset,
+  //       request.collateral,
+  //       request.positionType,
+  //       request.leverage,
+  //       request.isTokenized,
+  //       request.version
+  //     );
+  //     const assetContract = await this.contractsSource.getPTokenContract(key);
+  //     if (assetContract) {
+  //       const tokenPrice = await assetContract.tokenPrice.callAsync();
+  //       let amount = request.amount;
+  //       if (request.tradeType === TradeType.SELL) {
+  //         amount = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+  //       }
+  //       const baseAsset = this.getBaseAsset(key);
+  //       if (request.collateral !== baseAsset) {
+  //         const srcToken = request.tradeType === TradeType.BUY ? request.collateral : baseAsset;
+  //         const destToken = request.tradeType === TradeType.BUY ? baseAsset : request.collateral;
+  //         const srcDecimals: number = AssetsDictionary.assets.get(srcToken)!.decimals || 18;
+  //         const swapPrice = await this.getSwapRate(
+  //           srcToken,
+  //           destToken,
+  //           amount.multipliedBy(10 ** srcDecimals)
+  //         );
+  //         amount = amount.multipliedBy(swapPrice);
+  //       }
+  //       if (request.tradeType === TradeType.BUY) {
+  //         amount = amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
+  //       }
+  //       result = amount;
+  //     }
+  //   }
 
-    return result;
-  };
+  //   return result;
+  // };
 
   public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
@@ -1014,8 +981,87 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getManageCollateralGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1000000);
+  };
+
+  public getManageCollateralParams = async (): Promise<ICollateralManagementParams> => {
+    return { minValue: 0.9 * 10 ** 18, maxValue: 3 * 10 ** 20, currentValue: 0 };
+  };
+
+  public getManageCollateralChangeEstimate = async (
+    borrowedFundsState: IBorrowedFundsState,
+    collateralAmount: BigNumber,
+    isWithdrawal: boolean
+  ): Promise<ICollateralChangeEstimate> => {
+
+    const result = {
+      collateralAmount: collateralAmount,
+      collateralizedPercent: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
+      gasEstimate: new BigNumber(0),
+      isWithdrawal: isWithdrawal
+    };
+
+    if (this.contractsSource && this.web3Wrapper && borrowedFundsState.loanData) {
+      const oracleContract = await this.contractsSource.getOracleContract();
+      const collateralAsset = this.contractsSource!.getAssetFromAddress(borrowedFundsState.loanData.collateralToken);
+      const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+      let newAmount = new BigNumber(0);
+      if (collateralAmount && collateralAmount.gt(0)) {
+        newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
+      }
+      try {
+        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+          borrowedFundsState.loanData.loanToken,
+          borrowedFundsState.loanData.collateralToken,
+          borrowedFundsState.loanData.principal,
+          isWithdrawal ?
+            new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
+            new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
+        );
+        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+      } catch (e) {
+        // console.log(e);
+        result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
+      }
+    }
+
+    return result;
+  };
+
+  public getManageCollateralExcessAmount = async (borrowedFundsState: IBorrowedFundsState): Promise<BigNumber> => {
+
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const bZxContract = await this.contractsSource.getiBZxContract();
+      if (account && bZxContract) {
+        // console.log(bZxContract.address, borrowedFundsState.loanId, account);
+        result = await bZxContract.withdrawCollateral.callAsync(
+          borrowedFundsState.loanId,
+          account,
+          FulcrumProvider.MAX_UINT,
+          {
+            from: account,
+            gas: this.gasLimit
+          }
+        );
+        const precision = AssetsDictionary.assets.get(borrowedFundsState.collateralAsset)!.decimals || 18;
+        result = result
+          .dividedBy(10 ** precision);
+        // console.log(result.toString());
+      }
+    }
+    return result;
+  };
+
+
   public gasPrice = async (): Promise<BigNumber> => {
-    let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
+    if (networkName === "kovan")
+      return new BigNumber(1).multipliedBy(10 ** 9); // 1 gwei
+    let result = new BigNumber(1000).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
@@ -1035,7 +1081,7 @@ export class FulcrumProvider {
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(12).multipliedBy(10 ** 9); // error default 8 gwei
+      result = new BigNumber(500).multipliedBy(10 ** 9); // error default 60 gwei
     }
 
     if (result.lt(lowerLimit)) {
@@ -1078,7 +1124,7 @@ export class FulcrumProvider {
     let maybeNeedsApproval = false;
     let account: string | null = null;
 
-    if (request.collateral === Asset.ETH) {
+    if (request.depositToken === Asset.ETH) {
       return false;
     }
 
@@ -1086,22 +1132,16 @@ export class FulcrumProvider {
       if (!account) {
         account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       }
+      const iTokenContract = await this.contractsSource.getITokenContract(request.depositToken);
 
-      if (account) {
-        const collateralErc20Address = this.getErc20AddressOfAsset(request.collateral);
+      if (account && iTokenContract) {
+        const collateralErc20Address = this.getErc20AddressOfAsset(request.depositToken);
         if (collateralErc20Address) {
-          const key = new TradeTokenKey(
-            request.asset,
-            request.unitOfAccount,
-            request.positionType,
-            request.leverage,
-            request.isTokenized,
-            request.version
-          );
-          const pTokenAddress = await this.contractsSource.getPTokenErc20Address(key);
+
+
           const tokenContract = await this.contractsSource.getErc20Contract(collateralErc20Address);
-          if (pTokenAddress && tokenContract) {
-            const allowance = await tokenContract.allowance.callAsync(account, pTokenAddress)
+          if (tokenContract) {
+            const allowance = await tokenContract.allowance.callAsync(account, iTokenContract.address)
             maybeNeedsApproval = allowance.lt(10 ** 50)
           }
         }
@@ -1111,188 +1151,269 @@ export class FulcrumProvider {
     return maybeNeedsApproval;
   }
 
-  public getTradeSlippageRate = async (request: TradeRequest, tradedAmountEstimate: BigNumber): Promise<BigNumber | null> => {
+  // public getTradeSlippageRate = async (request: TradeRequest, tradedAmountEstimate: BigNumber): Promise<BigNumber | null> => {
 
-    if (request.amount.eq(0) || tradedAmountEstimate.eq(0)) {
-      return new BigNumber(0);
+  //   if (request.amount.eq(0) || tradedAmountEstimate.eq(0)) {
+  //     return new BigNumber(0);
+  //   }
+
+  //   let tradeAmountActual = new BigNumber(0);
+  //   if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+  //     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+  //     if (account) {
+  //       const key = new TradeTokenKey(
+  //         request.asset,
+  //         request.unitOfAccount,
+  //         request.positionType,
+  //         request.leverage,
+  //         request.isTokenized,
+  //         request.version
+  //       );
+
+  //       const assetContract = await this.contractsSource.getPTokenContract(key);
+  //       if (assetContract) {
+  //         const baseAsset = this.getBaseAsset(key);
+  //         if (request.tradeType === TradeType.BUY) {
+  //           if (request.collateral !== Asset.ETH) {
+  //             try {
+  //               const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
+  //               if (assetErc20Address) {
+  //                 const srcDecimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+  //                 tradeAmountActual = await assetContract.mintWithToken.callAsync(
+  //                   account,
+  //                   assetErc20Address,
+  //                   new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+  //                   new BigNumber(0),
+  //                   "0x",
+  //                   {
+  //                     from: account,
+  //                     gas: "5000000",
+  //                     gasPrice: new BigNumber(0)
+  //                   }
+  //                 );
+  //                 let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+  //                 if (baseAsset === Asset.WBTC && key.positionType === PositionType.LONG) {
+  //                   destDecimals = destDecimals + 10;
+  //                 }
+  //                 tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
+  //               } else {
+  //                 return null;
+  //               }
+  //             } catch (e) {
+  //               // console.log(e);
+  //               return null;
+  //             }
+  //           } else {
+  //             try {
+  //               tradeAmountActual = await assetContract.mintWithEther.callAsync(
+  //                 account,
+  //                 {
+  //                   from: account,
+  //                   value: new BigNumber(request.amount.multipliedBy(10 ** 18).toFixed(0, 1)), // ETH -> 18 decimals,
+  //                   gas: "5000000",
+  //                   gasPrice: new BigNumber(0)
+  //                 }
+  //               );
+  //               let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+  //               if (baseAsset === Asset.WBTC && key.positionType === PositionType.LONG) {
+  //                 destDecimals = destDecimals + 10;
+  //               }
+  //               tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
+  //             } catch (e) {
+  //               // console.log(e);
+  //               return null;
+  //             }
+  //           }
+  //         } else {
+  //           if (request.collateral !== Asset.ETH) {
+  //             try {
+  //               const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
+  //               if (assetErc20Address) {
+  //                 const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+  //                 if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+  //                   // srcDecimals = srcDecimals + 10;
+  //                 }
+  //                 tradeAmountActual = await assetContract.burnToToken.callAsync(
+  //                   account,
+  //                   assetErc20Address,
+  //                   new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+  //                   new BigNumber(0),
+  //                   "0x",
+  //                   {
+  //                     from: account,
+  //                     gas: "5000000",
+  //                     gasPrice: new BigNumber(0)
+  //                   }
+  //                 );
+  //                 const destDecimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+  //                 tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
+  //               } else {
+  //                 return null;
+  //               }
+  //             } catch (e) {
+  //               // console.log(e);
+  //               return null;
+  //             }
+  //           } else {
+  //             try {
+  //               const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+  //               if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+  //                 // srcDecimals = srcDecimals + 10;
+  //               }
+  //               tradeAmountActual = await assetContract.burnToEther.callAsync(
+  //                 account,
+  //                 new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+  //                 new BigNumber(0),
+  //                 "0x",
+  //                 {
+  //                   from: account,
+  //                   gas: "5000000",
+  //                   gasPrice: new BigNumber(0)
+  //                 }
+  //               );
+  //             } catch (e) {
+  //               // console.log(e);
+  //               return null;
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   tradeAmountActual = tradeAmountActual.dividedBy(10 ** 18);
+  //   const slippage = tradeAmountActual.minus(tradedAmountEstimate).div(tradedAmountEstimate).multipliedBy(-100);
+
+  //   /*console.log(`---------`);
+  //   console.log(`tradedAmountEstimate`,tradedAmountEstimate.toString());
+  //   console.log(`tradeAmountActual`,tradeAmountActual.toString());
+  //   console.log(`slippage`,slippage.toString());*/
+
+  //   return slippage;
+  // }
+
+  public getEstimatedMarginDetails = async (request: TradeRequest): Promise<{
+    principal: BigNumber,
+    collateral: BigNumber,
+    exposureValue: BigNumber,
+    interestRate: BigNumber
+  }> => {
+
+    let result = {
+      principal: new BigNumber(0),
+      collateral: new BigNumber(0),
+      exposureValue: new BigNumber(0),
+      interestRate: new BigNumber(0)
     }
 
-    let tradeAmountActual = new BigNumber(0);
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    const isLong = request.positionType === PositionType.LONG;
 
-      if (account) {
-        const key = new TradeTokenKey(
-          request.asset,
-          request.unitOfAccount,
-          request.positionType,
-          request.leverage,
-          request.isTokenized,
-          request.version
-        );
 
-        const assetContract = await this.contractsSource.getPTokenContract(key);
-        if (assetContract) {
-          const baseAsset = this.getBaseAsset(key);
-          if (request.tradeType === TradeType.BUY) {
-            if (request.collateral !== Asset.ETH) {
-              try {
-                const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
-                if (assetErc20Address) {
-                  const srcDecimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
-                  tradeAmountActual = await assetContract.mintWithToken.callAsync(
-                    account,
-                    assetErc20Address,
-                    new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
-                    new BigNumber(0),
-                    "0x",
-                    {
-                      from: account,
-                      gas: "5000000",
-                      gasPrice: new BigNumber(0)
-                    }
-                  );
-                  let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
-                  if (baseAsset === Asset.WBTC && key.positionType === PositionType.LONG) {
-                    destDecimals = destDecimals + 10;
-                  }
-                  tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
-                } else {
-                  return null;
-                }
-              } catch (e) {
-                // console.log(e);
-                return null;
-              }
-            } else {
-              try {
-                tradeAmountActual = await assetContract.mintWithEther.callAsync(
-                  account,
-                  {
-                    from: account,
-                    value: new BigNumber(request.amount.multipliedBy(10 ** 18).toFixed(0, 1)), // ETH -> 18 decimals,
-                    gas: "5000000",
-                    gasPrice: new BigNumber(0)
-                  }
-                );
-                let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
-                if (baseAsset === Asset.WBTC && key.positionType === PositionType.LONG) {
-                  destDecimals = destDecimals + 10;
-                }
-                tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
-              } catch (e) {
-                // console.log(e);
-                return null;
-              }
-            }
-          } else {
-            if (request.collateral !== Asset.ETH) {
-              try {
-                const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
-                if (assetErc20Address) {
-                  const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
-                  if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                    // srcDecimals = srcDecimals + 10;
-                  }
-                  tradeAmountActual = await assetContract.burnToToken.callAsync(
-                    account,
-                    assetErc20Address,
-                    new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
-                    new BigNumber(0),
-                    "0x",
-                    {
-                      from: account,
-                      gas: "5000000",
-                      gasPrice: new BigNumber(0)
-                    }
-                  );
-                  const destDecimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
-                  tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
-                } else {
-                  return null;
-                }
-              } catch (e) {
-                // console.log(e);
-                return null;
-              }
-            } else {
-              try {
-                const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
-                if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                  // srcDecimals = srcDecimals + 10;
-                }
-                tradeAmountActual = await assetContract.burnToEther.callAsync(
-                  account,
-                  new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
-                  new BigNumber(0),
-                  "0x",
-                  {
-                    from: account,
-                    gas: "5000000",
-                    gasPrice: new BigNumber(0)
-                  }
-                );
-              } catch (e) {
-                // console.log(e);
-                return null;
-              }
-            }
-          }
-        }
+    const loanToken = isLong
+      ? request.quoteToken
+      : request.asset;
+    const depositToken = request.depositToken;
+    const collateralToken = isLong
+      ? request.asset
+      : request.quoteToken;
+
+    const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18;
+
+    const amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+    if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      console.log("iToken ", loanToken)
+      const tokenContract = await this.contractsSource.getITokenContract(loanToken);
+      if (!tokenContract) return result;
+      const leverageAmount = request.positionType === PositionType.LONG
+        ? new BigNumber(request.leverage - 1).times(10 ** 18)
+        : new BigNumber(request.leverage).times(10 ** 18);
+
+      const loanTokenSent = depositToken === loanToken
+        ? amountInBaseUnits
+        : new BigNumber(0);
+
+      const collateralTokenSent = depositToken === collateralToken
+        ? amountInBaseUnits
+        : new BigNumber(0);
+
+      //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
+      const collateralTokenAddress = collateralToken !== Asset.ETH
+        ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
+        : FulcrumProvider.ZERO_ADDRESS;
+
+      const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18;
+      const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18;
+      const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(collateralToken, loanToken)
+
+      try {
+        console.log("leverageAmount" + leverageAmount);
+        console.log("loanTokenSent" + loanTokenSent);
+        console.log("collateralTokenSent" + collateralTokenSent);
+        console.log("collateralTokenAddress" + collateralTokenAddress);
+        console.log("iTokenAddress" + tokenContract.address);
+
+        const marginDetails = (await tokenContract.getEstimatedMarginDetails.callAsync(
+          leverageAmount,
+          loanTokenSent,
+          collateralTokenSent,
+          collateralTokenAddress!));
+        result.principal = marginDetails[0].div(10 ** 18).times(10 ** (18 - loanTokenDecimals));
+        result.collateral = marginDetails[1].div(10 ** 18).times(10 ** (18 - collateralTokenDecimals));
+        result.exposureValue = request.positionType === PositionType.SHORT
+          ? result.collateral.times(collateralToLoanRate).minus(result.principal)
+          : result.collateral
+        result.interestRate = marginDetails[2].div(10 ** 18);
+      }
+      catch (e) {
+        console.error(e)
       }
     }
-
-    tradeAmountActual = tradeAmountActual.dividedBy(10 ** 18);
-    const slippage = tradeAmountActual.minus(tradedAmountEstimate).div(tradedAmountEstimate).multipliedBy(-100);
-
-    /*console.log(`---------`);
-    console.log(`tradedAmountEstimate`,tradedAmountEstimate.toString());
-    console.log(`tradeAmountActual`,tradeAmountActual.toString());
-    console.log(`slippage`,slippage.toString());*/
-
-    return slippage;
+    return result;
   }
+  // public getTradeFormExposure = async (request: TradeRequest): Promise<BigNumber> => {
 
-  public getTradeFormExposure = async (request: TradeRequest): Promise<BigNumber> => {
+  //   if (request.amount.eq(0)) {
+  //     return new BigNumber(0);
+  //   }
 
-    if (request.amount.eq(0)) {
-      return new BigNumber(0);
-    }
+  //   let requestAmount;
+  //   if (request.tradeType === TradeType.BUY) {
+  //     if (request.collateral !== request.asset) {
+  //       const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+  //       const swapPrice = await this.getSwapRate(
+  //         request.collateral,
+  //         request.asset,
+  //         request.amount.multipliedBy(10 ** decimals)
+  //       );
+  //       requestAmount = request.amount.multipliedBy(swapPrice);
+  //     } else {
+  //       requestAmount = request.amount;
+  //     }
+  //   } else {
+  //     const tradeTokenKey = new TradeTokenKey(
+  //       request.asset,
+  //       request.unitOfAccount,
+  //       request.positionType,
+  //       request.leverage,
+  //       request.isTokenized,
+  //       request.version
+  //     );
+  //     const pTokenBaseAsset = this.getBaseAsset(tradeTokenKey);
+  //     const pTokenPrice = await this.getPTokenPrice(tradeTokenKey);
+  //     const pTokenBaseAssetAmount = request.amount.multipliedBy(pTokenPrice);
+  //     const swapRate = await this.getSwapRate(pTokenBaseAsset, request.asset);
 
-    let requestAmount;
-    if (request.tradeType === TradeType.BUY) {
-      if (request.collateral !== request.asset) {
-        const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
-        const swapPrice = await this.getSwapRate(
-          request.collateral,
-          request.asset,
-          request.amount.multipliedBy(10 ** decimals)
-        );
-        requestAmount = request.amount.multipliedBy(swapPrice);
-      } else {
-        requestAmount = request.amount;
-      }
-    } else {
-      const tradeTokenKey = new TradeTokenKey(
-        request.asset,
-        request.unitOfAccount,
-        request.positionType,
-        request.leverage,
-        request.isTokenized,
-        request.version
-      );
-      const pTokenBaseAsset = this.getBaseAsset(tradeTokenKey);
-      const pTokenPrice = await this.getPTokenPrice(tradeTokenKey);
-      const pTokenBaseAssetAmount = request.amount.multipliedBy(pTokenPrice);
-      const swapRate = await this.getSwapRate(pTokenBaseAsset, request.asset);
+  //     requestAmount = pTokenBaseAssetAmount.multipliedBy(swapRate);
+  //   }
 
-      requestAmount = pTokenBaseAssetAmount.multipliedBy(swapRate);
-    }
+  //   return requestAmount.multipliedBy(request.leverage);
+  // }
 
-    return requestAmount.multipliedBy(request.leverage);
-  }
-
-  public static async getWeb3ProviderSettings(networkId: number | null): Promise<IWeb3ProviderSettings> {
+  public static getWeb3ProviderSettings(networkId: number): IWeb3ProviderSettings {
     // tslint:disable-next-line:one-variable-per-declaration
     let networkName, etherscanURL;
     switch (networkId) {
@@ -1384,6 +1505,131 @@ export class FulcrumProvider {
     return result;
   }
 
+  public async getLoanCloseAmount(request: TradeRequest): Promise<[BigNumber, BigNumber, string]> {
+    let result: [BigNumber, BigNumber, string] = [new BigNumber(0), new BigNumber(0), ""];
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const iBZxContract = await this.contractsSource.getiBZxContract();
+      if (account && iBZxContract) {
+
+
+        const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans())
+          .find(l => l.loanId === request.loanId);
+        if (!loan)
+          throw new Error("No loan available!");
+
+
+        let amountInBaseUnits = new BigNumber(0);
+        if (request.positionType === PositionType.LONG) {
+          const decimals: number = AssetsDictionary.assets.get(request.quoteToken)!.decimals || 18;
+          amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+        }
+        else {
+          const decimals: number = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
+          amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(request.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
+        }
+
+        let maxAmountInBaseUnits = new BigNumber(0);
+        if (loan) {
+          maxAmountInBaseUnits = loan.loanData!.collateral;
+        }
+
+        if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01)) {
+          console.log("close full amount")
+          amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
+        }
+
+        console.log(iBZxContract.address, await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
+          request.loanId,
+          account,
+          amountInBaseUnits,
+          request.returnTokenIsCollateral, // returnTokenIsCollateral
+          request.loanDataBytes));
+
+        const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+        const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI);
+        //@ts-ignore
+        result = isGasTokenEnabled && ChiTokenBalance.gt(0)
+          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(request.loanId,
+            account,
+            account,
+            amountInBaseUnits,
+            request.returnTokenIsCollateral, // returnTokenIsCollateral
+            request.loanDataBytes,
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit
+            }
+          )
+          : await iBZxContract.closeWithSwap.callAsync(
+            request.loanId,
+            account,
+            amountInBaseUnits,
+            request.returnTokenIsCollateral, // returnTokenIsCollateral
+            request.loanDataBytes,
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit
+            }
+          );
+        console.log(result);
+      }
+    }
+    return result;
+  }
+
+
+  public async getUserMarginTradeLoans(): Promise<IBorrowedFundsState[]> {
+    let result: IBorrowedFundsState[] = [];
+
+    if (!this.contractsSource) return result;
+
+    const iBZxContract = await this.contractsSource.getiBZxContract();
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+    if (!iBZxContract || !account) return result;
+
+    const loansData = await iBZxContract.getUserLoans.callAsync(
+      account,
+      new BigNumber(50),
+      1 // margin trade loans
+    );
+    // console.log(loansData);
+    const zero = new BigNumber(0);
+    result = loansData
+      .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
+      .map(e => {
+        const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+        const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+        let amountOwned = e.principal.minus(e.interestDepositRemaining);
+        if (amountOwned.lte(0)) {
+          amountOwned = new BigNumber(0);
+        } else {
+          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
+        }
+        return {
+          accountAddress: account,
+          loanId: e.loanId,
+          loanAsset: loanAsset,
+          collateralAsset: collateralAsset,
+          amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+          amountOwed: amountOwned,
+          collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
+          collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
+          interestRate: e.interestOwedPerDay.dividedBy(e.principal).multipliedBy(365),
+          interestOwedPerDay: e.interestOwedPerDay.dividedBy(10 ** loanPrecision),
+          hasManagementContract: true,
+          isInProgress: false,
+          loanData: e
+        };
+      });
+    console.log(result);
+    return result;
+  }
+
   public async getPTokenBalanceOfUser(selectedKey: TradeTokenKey): Promise<BigNumber> {
     let result = new BigNumber(0);
 
@@ -1406,12 +1652,6 @@ export class FulcrumProvider {
   public getPTokensAvailable(): TradeTokenKey[] {
     return this.contractsSource
       ? this.contractsSource.getPTokensAvailable()
-      : [];
-  }
-
-  public getPTokenErc20AddressList(): string[] {
-    return this.contractsSource
-      ? this.contractsSource.getPTokenAddresses()
       : [];
   }
 
@@ -1472,7 +1712,8 @@ export class FulcrumProvider {
       }
       if (account) {
         // @ts-ignore
-        const resp = await Web3ConnectionFactory.alchemyProvider!.alchemy!.getTokenBalances(account, addressesErc20);
+        const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider();
+        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20);
         if (resp) {
           // @ts-ignore
           result = resp.tokenBalances.filter(t => !t.error && t.tokenBalance !== "0").reduce((map, obj) => (map.set(obj.contractAddress, new BigNumber(obj.tokenBalance!)), map), new Map<string, BigNumber>());
@@ -1482,8 +1723,8 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<BigNumber[]> {
-    let result: BigNumber[] = [];
+  public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<[BigNumber[], BigNumber[], BigNumber[]]> {
+    let result: [BigNumber[], BigNumber[], BigNumber[]] = [[], [], []];
 
     if (this.contractsSource) {
       const oracleAddress = this.contractsSource.getOracleAddress();
@@ -1494,7 +1735,6 @@ export class FulcrumProvider {
       const helperContract = await this.contractsSource.getDAppHelperContract();
       if (helperContract) {
         result = await helperContract.assetRates.callAsync(
-          oracleAddress,
           usdTokenAddress,
           underlyings,
           amounts
@@ -1512,17 +1752,13 @@ export class FulcrumProvider {
 
     /*const swapRates = await this.getSwapToUsdRateBatch(
       [asset],
-      process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
-        Asset.DAI :
-        Asset.SAI
+      Asset.DAI
     );
 
-    return swapRates[0];*/
+    return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
-      process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
-        Asset.DAI :
-        Asset.SAI
+      Asset.DAI
     );
   }
 
@@ -1539,57 +1775,353 @@ export class FulcrumProvider {
   }
 
   public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
-    if (srcAsset === destAsset) {
+    if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI)
+      || (srcAsset === Asset.DAI && destAsset === Asset.USDC)) {
       return new BigNumber(1);
     }
-
+    // console.log("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0);
-
-    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
-      if (!srcAmount) {
-        srcAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
-      } else {
-        srcAmount = new BigNumber(srcAmount.toFixed(0, 1));
-      }
-
-      const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
-      const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
-      if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-        const oracleContract = await this.contractsSource.getOracleContract();
-        try {
-          const swapPriceData: BigNumber[] = await oracleContract.getTradeData.callAsync(
-            srcAssetErc20Address,
-            destAssetErc20Address,
-            srcAmount
-          );
-          result = swapPriceData[0].dividedBy(10 ** 18);
-        } catch (e) {
-          result = new BigNumber(0);
-        }
-      }
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+    if (!srcAmount) {
+      srcAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
     } else {
-      if (!srcAmount) {
-        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset);
-      }
-
-      const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
-      const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
-      if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-        const oracleContract = await this.contractsSource.getOracleContract();
-        try {
-          const swapPriceData: BigNumber[] = await oracleContract.getExpectedRate.callAsync(
-            srcAssetErc20Address,
-            destAssetErc20Address,
-            new BigNumber(srcAmount.toFixed(0, 1))
-          );
-          result = swapPriceData[0].dividedBy(10 ** 18);
-        } catch (e) {
-          // console.log(e);
-          result = new BigNumber(0);
-        }
-      }
+      srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
     }
 
+    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+      const oracleContract = await this.contractsSource.getOracleContract();
+
+
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
+      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals));
+      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18;
+      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals));
+
+      try {
+        const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
+          srcAssetErc20Address,
+          destAssetErc20Address
+        );
+        // console.log("swapPriceData- ",swapPriceData[0])
+        result = swapPriceData[0].times(srcAssetPrecision).div(destAssetPrecision).dividedBy(10 ** 18)
+          .multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
+      } catch (e) {
+        console.log(e)
+        result = new BigNumber(0);
+      }
+    }
+    return result;
+  }
+
+  public getEarnRewardHistory = async (): Promise<EarnRewardEvent[]> => {
+    let result: EarnRewardEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const earnRewardEventResponse = await fetch(etherscanApiUrl);
+    const earnRewardEventResponseJson = await earnRewardEventResponse.json();
+    if (earnRewardEventResponseJson.status !== "1") return result;
+    const events = earnRewardEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const tokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const token = this.contractsSource!.getAssetFromAddress(tokenAddress);
+      if (token === Asset.UNKNOWN) return null;
+      const loandId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return null;
+
+      const amount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new EarnRewardEvent(
+        userAddress,
+        token,
+        loandId,
+        amount.div(10 ** 18),
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result
+  }
+
+  public getPayTradingFeeHistory = async (): Promise<PayTradingFeeEvent[]> => {
+    let result: PayTradingFeeEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const payTradingFeeEventResponse = await fetch(etherscanApiUrl);
+    const payTradingFeeEventResponseJson = await payTradingFeeEventResponse.json();
+    if (payTradingFeeEventResponseJson.status !== "1") return result;
+    const events = payTradingFeeEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const tokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const token = this.contractsSource!.getAssetFromAddress(tokenAddress);
+      if (token === Asset.UNKNOWN) return null;
+      const loandId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const amount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new PayTradingFeeEvent(
+        userAddress,
+        token,
+        loandId,
+        amount.div(10 ** 18),
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result;
+  }
+
+  public getTradeHistory = async (): Promise<TradeEvent[]> => {
+    let result: TradeEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loandId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
+
+      const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
+      const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
+      const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
+      const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000);
+      const entryPrice = new BigNumber(parseInt(dataSegments[6], 16));
+      const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16));
+      const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new TradeEvent(
+        userAddress,
+        lender,
+        loandId,
+        collateralToken,
+        loanToken,
+        positionSize,
+        borrowedAmount,
+        interestRate,
+        settlementDate,
+        entryPrice,
+        entryLeverage,
+        currentLeverage,
+        timeStamp,
+        txHash
+      )
+
+    }).filter((e: any) => e);
+    return result;
+  }
+
+  public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
+    let result: CloseWithSwapEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const closeWithSwapResponse = await fetch(etherscanApiUrl);
+    const closeWithSwapResponseJson = await closeWithSwapResponse.json();
+    if (closeWithSwapResponseJson.status !== "1") return result;
+    const events = closeWithSwapResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loandId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
+
+      const closer = dataSegments[2].replace("000000000000000000000000", "0x");
+      const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
+      const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
+      const exitPrice = new BigNumber(parseInt(dataSegments[5], 16));
+      const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new CloseWithSwapEvent(
+        userAddress,
+        collateralToken,
+        loanToken,
+        lender,
+        closer,
+        loandId,
+        positionCloseSize,
+        loanCloseAmount,
+        exitPrice,
+        currentLeverage,
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result;
+  }
+
+
+  public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
+    let result: LiquidationEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const liquidationEventResponse = await fetch(etherscanApiUrl);
+    const liquidationEventResponseJson = await liquidationEventResponse.json();
+    if (liquidationEventResponseJson.status !== "1") return result;
+    const events = liquidationEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const liquidatorAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
+
+      const baseTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const quoteTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return null;
+
+      const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
+      const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
+      const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
+      const currentMargin = new BigNumber(parseInt(dataSegments[6], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new LiquidationEvent(
+        userAddress,
+        liquidatorAddress,
+        loanId,
+        lender,
+        baseToken,
+        quoteToken,
+        repayAmount,
+        collateralWithdrawAmount,
+        collateralToLoanRate,
+        currentMargin,
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result;
+  }
+
+  public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
+    let result: DepositCollateralEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const depositCollateralEventResponse = await fetch(etherscanApiUrl);
+    const depositCollateralEventResponseJson = await depositCollateralEventResponse.json();
+    if (depositCollateralEventResponseJson.status !== "1") return result;
+    const events = depositCollateralEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const depositTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const depositToken = this.contractsSource!.getAssetFromAddress(depositTokenAddress);
+      if (depositToken === Asset.UNKNOWN) return null;
+
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const depositAmount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new DepositCollateralEvent(
+        userAddress,
+        depositToken,
+        loanId,
+        depositAmount,
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result;
+  }
+
+  public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
+    let result: WithdrawCollateralEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const withdrawCollateralEventResponse = await fetch(etherscanApiUrl);
+    const withdrawCollateralEventResponseJson = await withdrawCollateralEventResponse.json();
+    if (withdrawCollateralEventResponseJson.status !== "1") return result;
+    const events = withdrawCollateralEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const withdrawTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const withdrawToken = this.contractsSource!.getAssetFromAddress(withdrawTokenAddress);
+      if (withdrawToken === Asset.UNKNOWN) return null;
+
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const withdrawAmount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new WithdrawCollateralEvent(
+        userAddress,
+        withdrawToken,
+        loanId,
+        withdrawAmount,
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
     return result;
   }
 
@@ -1671,6 +2203,10 @@ export class FulcrumProvider {
       await this.processTradeRequestTask(task, skipGas);
     }
 
+    if (task.request instanceof ManageCollateralRequest) {
+      await this.processManageCollateralRequestTask(task, skipGas);
+    }
+
     return false;
   };
 
@@ -1705,7 +2241,7 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-  }
+}
 }
 }
 } catch(e) {
@@ -1716,6 +2252,8 @@ console.log(err, added);
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
+
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.id);
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
@@ -1731,23 +2269,29 @@ console.log(err, added);
         await this.addTokenToMetaMask(task);
 
         if (taskRequest.asset === Asset.ETH) {
+          const { LendEthProcessor } = await import("./processors/LendEthProcessor");
           const processor = new LendEthProcessor();
           await processor.run(task, account, skipGas);
         } else if (taskRequest.asset === Asset.CHAI) {
+          const { LendChaiProcessor } = await import("./processors/LendChaiProcessor");
           const processor = new LendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
+          const { LendErcProcessor } = await import("./processors/LendErcProcessor");
           const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);
         }
       } else {
         if (taskRequest.asset === Asset.ETH) {
+          const { UnlendEthProcessor } = await import("./processors/UnlendEthProcessor");
           const processor = new UnlendEthProcessor();
           await processor.run(task, account, skipGas);
         } else if (taskRequest.asset === Asset.CHAI) {
+          const { UnlendChaiProcessor } = await import("./processors/UnlendChaiProcessor");
           const processor = new UnlendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
+          const { UnlendErcProcessor } = await import("./processors/UnlendErcProcessor");
           const processor = new UnlendErcProcessor();
           await processor.run(task, account, skipGas);
         }
@@ -1761,10 +2305,53 @@ console.log(err, added);
       }
       task.processingEnd(false, false, e);
     }
+    finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task);
+    }
+  };
+
+  private processManageCollateralRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.loanId);
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing loan
+      const taskRequest: ManageCollateralRequest = (task.request as ManageCollateralRequest);
+
+      await this.addTokenToMetaMask(task);
+      const { ManageCollateralProcessor } = await import("./processors/ManageCollateralProcessor");
+      const processor = new ManageCollateralProcessor();
+      await processor.run(task, account, skipGas);
+
+
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task);
+    }
   };
 
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
+
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg,
+        task.request.loanId == "0x0000000000000000000000000000000000000000000000000000000000000000" ?
+          task.request.id :
+          task.request.loanId);
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
@@ -1785,179 +2372,191 @@ console.log(err, added);
       let srcTokenAddress = ""
       let destTokenAddress = "";
 
-      if (taskRequest.version === 2) {
-        if (siteConfig.ZeroXAPIEnabledForBuys && taskRequest.tradeType === TradeType.BUY) {
-          taskAmount = taskRequest.amount;
-          zeroXTargetType = "sellAmount";
+      srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.quoteToken)!;
+      destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+      // if (taskRequest.version === 2) {
+      //   if (siteConfig.ZeroXAPIEnabledForBuys && taskRequest.tradeType === TradeType.BUY) {
+      //     taskAmount = taskRequest.amount;
+      //     zeroXTargetType = "sellAmount";
 
-          let decimals: number;
-          if (taskRequest.positionType === PositionType.LONG) {
-            decimals = AssetsDictionary.assets.get(taskRequest.unitOfAccount)!.decimals;
+      //     let decimals: number;
+      //     if (taskRequest.positionType === PositionType.LONG) {
+      //       decimals = AssetsDictionary.assets.get(taskRequest.unitOfAccount)!.decimals;
 
-            if (taskRequest.collateral === taskRequest.unitOfAccount) {
-              zeroXTargetAmount = taskAmount.times(taskRequest.leverage);
-            } else {
-              zeroXTargetAmount = taskAmount.times(taskRequest.leverage - 1);
-              const swapPrice = await this.getSwapRate(
-                taskRequest.collateral,
-                taskRequest.unitOfAccount
-              );
-              zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
-            }
-            srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
-            destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
-          } else {
-            decimals = AssetsDictionary.assets.get(taskRequest.asset)!.decimals;
+      //       if (taskRequest.collateral === taskRequest.unitOfAccount) {
+      //         zeroXTargetAmount = taskAmount.times(taskRequest.leverage);
+      //       } else {
+      //         zeroXTargetAmount = taskAmount.times(taskRequest.leverage - 1);
+      //         const swapPrice = await this.getSwapRate(
+      //           taskRequest.collateral,
+      //           taskRequest.unitOfAccount
+      //         );
+      //         zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
+      //       }
+      //       srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+      //       destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+      //     } else {
+      //       decimals = AssetsDictionary.assets.get(taskRequest.asset)!.decimals;
 
-            if (taskRequest.collateral === taskRequest.asset) {
-              zeroXTargetAmount = taskAmount.times(taskRequest.leverage + 1);
-            } else {
-              zeroXTargetAmount = taskAmount.times(taskRequest.leverage);
-              const swapPrice = await this.getSwapRate(
-                taskRequest.collateral,
-                taskRequest.asset
-              );
-              zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
-            }
-            srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
-            destTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
-          }
+      //       if (taskRequest.collateral === taskRequest.asset) {
+      //         zeroXTargetAmount = taskAmount.times(taskRequest.leverage + 1);
+      //       } else {
+      //         zeroXTargetAmount = taskAmount.times(taskRequest.leverage);
+      //         const swapPrice = await this.getSwapRate(
+      //           taskRequest.collateral,
+      //           taskRequest.asset
+      //         );
+      //         zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
+      //       }
+      //       srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+      //       destTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+      //     }
 
-          if (decimals) {
-            zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
-          }
-        } else if (siteConfig.ZeroXAPIEnabledForSells && taskRequest.tradeType === TradeType.SELL) {
-          taskAmount = taskRequest.inputAmountValue;
-          zeroXTargetType = "buyAmount";
+      //     if (decimals) {
+      //       zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
+      //     }
+      //   } else if (siteConfig.ZeroXAPIEnabledForSells && taskRequest.tradeType === TradeType.SELL) {
+      //     taskAmount = taskRequest.inputAmountValue;
+      //     zeroXTargetType = "buyAmount";
 
-          const assetContract = await this.contractsSource.getPTokenContract(new TradeTokenKey(
-            taskRequest.asset,
-            taskRequest.unitOfAccount,
-            taskRequest.positionType,
-            taskRequest.leverage,
-            taskRequest.isTokenized,
-            taskRequest.version
-          ));
-          if (!assetContract) {
-            throw new Error("pToken access error");
-          }
+      //     const assetContract = await this.contractsSource.getPTokenContract(new TradeTokenKey(
+      //       taskRequest.asset,
+      //       taskRequest.unitOfAccount,
+      //       taskRequest.positionType,
+      //       taskRequest.leverage,
+      //       taskRequest.isTokenized,
+      //       taskRequest.version
+      //     ));
+      //     if (!assetContract) {
+      //       throw new Error("pToken access error");
+      //     }
 
-          const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10 ** 18);
+      //     const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10 ** 18);
 
-          let decimals: number;
-          if (taskRequest.positionType === PositionType.LONG) {
-            decimals = AssetsDictionary.assets.get(taskRequest.unitOfAccount)!.decimals;
+      //     let decimals: number;
+      //     if (taskRequest.positionType === PositionType.LONG) {
+      //       decimals = AssetsDictionary.assets.get(taskRequest.unitOfAccount)!.decimals;
 
-            zeroXTargetAmount = taskAmount.times(currentLeverage);
-            if (taskRequest.collateral !== taskRequest.unitOfAccount) {
-              const swapPrice = await this.getSwapRate(
-                taskRequest.collateral,
-                taskRequest.unitOfAccount
-              );
-              zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
-            }
-            srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
-            destTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
-          } else {
-            decimals = AssetsDictionary.assets.get(taskRequest.asset)!.decimals;
-            zeroXTargetAmount = taskAmount.times(currentLeverage);
+      //       zeroXTargetAmount = taskAmount.times(currentLeverage);
+      //       if (taskRequest.collateral !== taskRequest.unitOfAccount) {
+      //         const swapPrice = await this.getSwapRate(
+      //           taskRequest.collateral,
+      //           taskRequest.unitOfAccount
+      //         );
+      //         zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
+      //       }
+      //       srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+      //       destTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+      //     } else {
+      //       decimals = AssetsDictionary.assets.get(taskRequest.asset)!.decimals;
+      //       zeroXTargetAmount = taskAmount.times(currentLeverage);
 
-            if (taskRequest.collateral !== taskRequest.asset) {
-              const swapPrice = await this.getSwapRate(
-                taskRequest.collateral,
-                taskRequest.asset
-              );
-              zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
-            }
-            srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
-            destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
-          }
+      //       if (taskRequest.collateral !== taskRequest.asset) {
+      //         const swapPrice = await this.getSwapRate(
+      //           taskRequest.collateral,
+      //           taskRequest.asset
+      //         );
+      //         zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
+      //       }
+      //       srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+      //       destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+      //     }
 
-          if (decimals) {
-            zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
-          }
-        }
-      }
+      //     if (decimals) {
+      //       zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
+      //     }
+      //   }
+      // }
 
-      if (zeroXTargetAmountInBaseUnits.gt(0) && zeroXTargetType !== "") {
-        /*console.log(srcTokenAddress);
-        console.log(destTokenAddress);
-        console.log(new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)).toString());*/
+      // if (zeroXTargetAmountInBaseUnits.gt(0) && zeroXTargetType !== "") {
+      //   /*console.log(srcTokenAddress);
+      //   console.log(destTokenAddress);
+      //   console.log(new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)).toString());*/
 
-        //zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmountInBaseUnits.dividedBy(2).toFixed(0, 1));
+      //   //zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmountInBaseUnits.dividedBy(2).toFixed(0, 1));
 
-        try {
+      //   try {
 
-          let urlPrefix = "";
-          if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
-            urlPrefix = "kovan.";
-          } else if (process.env.REACT_APP_ETH_NETWORK !== "mainnet") {
-            throw new Error("0x api not supported on this network");
-          }
+      //     let urlPrefix = "";
+      //     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      //       urlPrefix = "kovan.";
+      //     } else if (process.env.REACT_APP_ETH_NETWORK !== "mainnet") {
+      //       throw new Error("0x api not supported on this network");
+      //     }
+
+      //     const responseString = await fetch("https://" + urlPrefix + "api.0x.org/swap/v0/quote?sellToken=" + srcTokenAddress + "&buyToken=" + destTokenAddress + "&" + zeroXTargetType + "=" + zeroXTargetAmountInBaseUnits.toString());
+      //     const response = await responseString.json();
+      //     if (!response.protocolFee || !response.data) {
+      //       throw new Error(JSON.stringify(response));
+      //     }
+      //     //console.log(response);
+      //     //console.log(srcTokenAddress, destTokenAddress, zeroXTargetAmountInBaseUnits.toString());
+
+      //     if (response.protocolFee) { // && response.buyAmount && response.sellAmount) {
+      //       /*const SwapRate0x = new BigNumber(
+      //         new BigNumber(response.buyAmount)
+      //         .times(10**20)
+      //         .dividedBy(response.sellAmount)
+      //         .toFixed(0, 1)
+      //       ).toString();
+      //       console.log(`swapRate`, SwapRate0x);*/
+
+      //       taskRequest.zeroXFee = new BigNumber(response.protocolFee);
+      //       const Web3Utils = await import("web3-utils");
+      //       taskRequest.loanDataBytes = response.data +
+      //         //Web3Utils.padLeft(Web3Utils.numberToHex(SwapRate0x).substr(2), 64) +  
+      //         Web3Utils.padLeft(Web3Utils.numberToHex(response.protocolFee).substr(2), 64) +
+      //         Web3Utils.padLeft("0", 64);
 
 
-          const responseString = await request("https://" + urlPrefix + "api.0x.org/swap/v0/quote?sellToken=" + srcTokenAddress + "&buyToken=" + destTokenAddress + "&" + zeroXTargetType + "=" + zeroXTargetAmountInBaseUnits.toString());
-          const response = JSON.parse(responseString);
-          if (!response.protocolFee || !response.data) {
-            throw new Error(JSON.stringify(response));
-          }
-          //console.log(response);
-          //console.log(srcTokenAddress, destTokenAddress, zeroXTargetAmountInBaseUnits.toString());
+      //       // swap marketBuyOrdersFillOrKill for marketBuyOrdersNoThrow if found
+      //       taskRequest.loanDataBytes = taskRequest.loanDataBytes.replace("0x8bc8efb3", "0x78d29ac1");
+      //     } else {
+      //       throw new Error("0x payload has missing params");
+      //     }
+      //   } catch (e) {
+      //     console.log(e);
 
-          if (response.protocolFee) { // && response.buyAmount && response.sellAmount) {
-            /*const SwapRate0x = new BigNumber(
-              new BigNumber(response.buyAmount)
-              .times(10**20)
-              .dividedBy(response.sellAmount)
-              .toFixed(0, 1)
-            ).toString();
-            console.log(`swapRate`, SwapRate0x);*/
+      //     taskRequest.zeroXFee = new BigNumber(0);
+      //     taskRequest.loanDataBytes = "";
+      //   }
 
-            taskRequest.zeroXFee = new BigNumber(response.protocolFee);
-
-            taskRequest.loanDataBytes = response.data +
-              //Web3Utils.padLeft(Web3Utils.numberToHex(SwapRate0x).substr(2), 64) +  
-              Web3Utils.padLeft(Web3Utils.numberToHex(response.protocolFee).substr(2), 64) +
-              Web3Utils.padLeft("0", 64);
-
-
-            // swap marketBuyOrdersFillOrKill for marketBuyOrdersNoThrow if found
-            taskRequest.loanDataBytes = taskRequest.loanDataBytes.replace("0x8bc8efb3", "0x78d29ac1");
-          } else {
-            throw new Error("0x payload has missing params");
-          }
-        } catch (e) {
-          console.log(e);
-
-          taskRequest.zeroXFee = new BigNumber(0);
-          taskRequest.loanDataBytes = "";
-        }
-
-        //console.log(taskRequest.zeroXFee.toString());
-        //console.log(taskRequest.loanDataBytes)
-      }
+      //   //console.log(taskRequest.zeroXFee.toString());
+      //   //console.log(taskRequest.loanDataBytes)
+      // }
 
       if (taskRequest.tradeType === TradeType.BUY) {
-        if (taskRequest.collateral !== Asset.ETH) {
-          const processor = new TradeBuyErcProcessor();
-          await processor.run(task, account, skipGas);
-        } else {
-          let processor;
-          if (taskRequest.loanDataBytes && taskRequest.zeroXFee) {
-            processor = new TradeBuyErcProcessor();
-          } else {
-            processor = new TradeBuyEthProcessor();
-          }
-          await processor.run(task, account, skipGas);
-        }
+        // if (taskRequest.collateral !== Asset.ETH) {
+        //   const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
+        //   const processor = new TradeBuyErcProcessor();
+        //   await processor.run(task, account, skipGas);
+        // } else {
+        //   let processor;
+        //   if (taskRequest.loanDataBytes && taskRequest.zeroXFee) {
+        //     const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
+        //     processor = new TradeBuyErcProcessor();
+        //   } else {
+        //     const {TradeBuyProcessor} = await import("./processors/TradeBuyProcessor");
+        //     processor = new TradeBuyProcessor();
+        //   }
+        //   await processor.run(task, account, skipGas);
+        // }
+        const { TradeBuyProcessor } = await import("./processors/TradeBuyProcessor");
+        const processor = new TradeBuyProcessor();
+        await processor.run(task, account, skipGas);
       } else {
-        if (taskRequest.collateral !== Asset.ETH) {
-          const processor = new TradeSellErcProcessor();
-          await processor.run(task, account, skipGas);
-        } else {
-          const processor = new TradeSellEthProcessor();
-          await processor.run(task, account, skipGas);
-        }
+        const { TradeSellProcessor } = await import("./processors/TradeSellProcessor");
+        const processor = new TradeSellProcessor();
+        await processor.run(task, account, skipGas);
+        // if (taskRequest.collateral !== Asset.ETH) {
+        //   const { TradeSellErcProcessor } = await import("./processors/TradeSellErcProcessor");
+        //   const processor = new TradeSellErcProcessor();
+        //   await processor.run(task, account, skipGas);
+        // } else {
+        //   const { TradeSellProcessor } = await import("./processors/TradeSellProcessor");
+        //   const processor = new TradeSellProcessor();
+        //   await processor.run(task, account, skipGas);
+        // }
       }
 
       task.processingEnd(true, false, null);
@@ -1968,11 +2567,15 @@ console.log(err, added);
       }
       task.processingEnd(false, false, e);
     }
+    finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task);
+    }
   };
+
 
   public waitForTransactionMined = async (
     txHash: string,
-    request: LendRequest | TradeRequest): Promise<any> => {
+    request: LendRequest | TradeRequest | ManageCollateralRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {
       try {
@@ -1990,7 +2593,7 @@ console.log(err, added);
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest,
+    request: LendRequest | TradeRequest | ManageCollateralRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
@@ -1998,8 +2601,10 @@ console.log(err, added);
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
       if (receipt) {
         resolve(receipt);
+
+        const randomNumber = Math.floor(Math.random() * 100000) + 1;
+
         if (request instanceof LendRequest) {
-          const randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
               transactionId: randomNumber,
@@ -2015,31 +2620,43 @@ console.log(err, added);
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
           );
-        } else {
-          const randomNumber = Math.floor(Math.random() * 100000) + 1;
-          const tagManagerArgs = {
-            dataLayer: {
-              transactionId: randomNumber,
-              transactionProducts: [{
-                name: "Transaction-Trade" + request.asset,
-                sku: request.asset,
-                category: 'Trade'
-              }],
+        } else
+          if (request instanceof ManageCollateralRequest) {
+            const tagManagerArgs = {
+              dataLayer: {
+                transactionId: randomNumber,
+                transactionProducts: [{
+                  name: "Transaction-Manage-Collateral-" + request.asset,
+                  sku: request.asset,
+                  category: 'Manage-Collateral'
+                }],
+              }
             }
+            TagManager.dataLayer(tagManagerArgs)
+          } else {
+            const tagManagerArgs = {
+              dataLayer: {
+                transactionId: randomNumber,
+                transactionProducts: [{
+                  name: "Transaction-Trade" + request.asset,
+                  sku: request.asset,
+                  category: 'Trade'
+                }],
+              }
+            }
+            TagManager.dataLayer(tagManagerArgs)
+            // this.eventEmitter.emit(
+            //   FulcrumProviderEvents.TradeTransactionMined,
+            //   new TradeTransactionMinedEvent(new TradeTokenKey(
+            //     request.asset,
+            //     request.unitOfAccount,
+            //     request.positionType,
+            //     request.leverage,
+            //     request.isTokenized,
+            //     request.version
+            //   ), txHash)
+            // );
           }
-          TagManager.dataLayer(tagManagerArgs)
-          this.eventEmitter.emit(
-            FulcrumProviderEvents.TradeTransactionMined,
-            new TradeTransactionMinedEvent(new TradeTokenKey(
-              request.asset,
-              request.unitOfAccount,
-              request.positionType,
-              request.leverage,
-              request.isTokenized,
-              request.version
-            ), txHash)
-          );
-        }
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);
@@ -2054,6 +2671,11 @@ console.log(err, added);
   public sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  public isETHAsset = (asset: Asset): boolean => {
+    return asset === Asset.ETH; // || asset === Asset.WETH;
+  };
+
 }
 
 // tslint:disable-next-line

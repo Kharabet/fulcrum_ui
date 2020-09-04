@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import { Asset } from "./Asset";
 import { AssetDetails } from "./AssetDetails";
 
@@ -17,6 +16,10 @@ import usdc_logo, {ReactComponent as USDCLogo} from "../assets/images/ic_token_u
 import zrx_logo, {ReactComponent as ZRXLogo} from "../assets/images/ic_token_zrx.svg";
 import weth_logo, {ReactComponent as WETHLogo} from "../assets/images/ic_token_weth.svg";
 import chai_logo, {ReactComponent as CHAILogo} from "../assets/images/ic_token_chai.svg";
+import chi_logo, {ReactComponent as CHILogo} from "../assets/images/ic_token_chi.svg";
+import bzrx_logo, {ReactComponent as BZRXLogo} from "../assets/images/ic_token_bzrx.svg";
+import yfi_logo, {ReactComponent as YFILogo} from "../assets/images/ic_token_yfi.svg";
+import lend_logo, {ReactComponent as LENDLogo} from "../assets/images/ic_token_lend.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -31,6 +34,9 @@ import susd_bg from "../assets/images/popup_left_token_susd.svg";
 import usdt_bg from "../assets/images/popup_left_token_usdt.svg";
 import usdc_bg from "../assets/images/popup_left_token_usdc.svg";
 import zrx_bg from "../assets/images/popup_left_token_zrx.svg";
+import bzrx_bg from "../assets/images/popup_left_token_bzrx.svg";
+import yfi_bg from "../assets/images/popup_left_token_yfi.svg";
+import lend_bg from "../assets/images/popup_left_token_lend.svg";
 
 import bat_bg_btm from "../assets/images/popup_bottom_token_bat.svg";
 //import btc_bg_btm from "../assets/images/popup_bottom_token_btc.svg";
@@ -45,6 +51,9 @@ import susd_bg_btm from "../assets/images/popup_bottom_token_susd.svg";
 //import usdt_bg_btm from "../assets/images/popup_bottom_token_susd.svg";
 import usdc_bg_btm from "../assets/images/popup_bottom_token_usdc.svg";
 import zrx_bg_btm from "../assets/images/popup_bottom_token_zrx.svg";
+import bzrx_bg_btm from "../assets/images/popup_bottom_token_bzrx.svg";
+import yfi_bg_btm from "../assets/images/popup_bottom_token_yfi.svg";
+import lend_bg_btm from "../assets/images/popup_bottom_token_lend.svg";
 
 
 import bat_ts from "../assets/images/ic___token_selector___bat.svg";
@@ -60,9 +69,33 @@ import usdt_ts from "../assets/images/ic___token_selector___susd.svg";
 import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
+import bzrx_ts from "../assets/images/ic___token_selector___bzrx.svg";
+import yfi_ts from "../assets/images/ic___token_selector___yfi.svg";
+import lend_ts from "../assets/images/ic___token_selector___lend.svg";
 
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
+    [
+      Asset.CHI,
+      new AssetDetails(
+        "CHI",
+        "Chi Gastoken by 1inch",
+        "",
+        "",
+        0,
+        chi_logo,
+        CHILogo,
+        "",
+        "",
+        "",
+        "",
+        "",
+        new Map<number, string | null>([
+          [1, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"],
+          [42, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"]
+        ])
+      )
+    ],
     [
       Asset.BAT,
       new AssetDetails(
@@ -80,7 +113,8 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x0d8775f648430679a709e98d2b0cb6250d2887ef"],
-          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"]
+          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"],
+          [42, "0xac091ccf1b0c601182f3ccf3eb20f291aba39029"],
         ])
       )
     ],
@@ -101,7 +135,8 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
-          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG token instead
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG token instead
+          [42, "0xc4b7a70c3694cb1d37a18e6c6bd9271828c382a4"],
         ])
       )
     ],
@@ -123,7 +158,8 @@ export class AssetsDictionary {
         "#ffffff",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
-          [3, ""]
+          [3, ""],
+          [42, "0xfb9325e5f4fc9629525427a1c92c0f4d723500cf"],
         ])
       )
     ],
@@ -145,7 +181,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xdac17f958d2ee523a2206206994597c13d831ec7"],
           [3, ""],
-          [42, ""]
+          [42, "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996"]
         ])
       )
     ],
@@ -167,7 +203,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"],
           [3, "0xad6d458402f60fd3bd25163575031acdce07538d"],
-          [42, "0xC4375B7De8af5a38a93548eb8453a498222C4fF2"]
+          [42, "0xc4375b7de8af5a38a93548eb8453a498222c4ff2"]
         ])
       )
     ],
@@ -188,9 +224,9 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
-          [3, "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108"],
+          [3, "0xf80a32a835f79d7787e8a8ee5721d0feafd78108"],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
-          [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
+          [42, "0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8"]
         ])
       )
     ],
@@ -234,7 +270,8 @@ export class AssetsDictionary {
         "#acb5c2",
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
-          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using eng
+          [42, "0x20bdf254ca63883c3a83424753bb40185af29ce4"],
         ])
       )
     ],
@@ -255,7 +292,8 @@ export class AssetsDictionary {
         "#acb5c2",
         new Map<number, string | null>([
           [1, "0x57ab1ec28d129707052df4df418d58a2d46d5f51"],
-          [3, ""]
+          [3, ""],
+          [42, "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62"],
         ])
       )
     ],
@@ -305,6 +343,28 @@ export class AssetsDictionary {
         ])
       )
     ],
+
+    [
+      Asset.fWETH,
+      new AssetDetails(
+        "fWETH",
+        "Fake Wrapped Ether (fWETH)",
+        "ifWETH",
+        "https://fulcrum.trade/images/iETH.svg",
+        18,
+        weth_logo,
+        WETHLogo,
+        eth_bg,
+        eth_ts,
+        "#FFFFFF",
+        "#444e5a",
+        "#acb5c2",
+        new Map<number, string | null>([
+          [42, "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc"]
+        ])
+      )
+    ],
+
     [
       Asset.KNC,
       new AssetDetails(
@@ -323,7 +383,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"],
           [3, "0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6"],
-          [42, "0xad67cB4d63C9da94AcA37fDF2761AaDF780ff4a2"]
+          [42, "0x02357164ba33f299f7654cbb29da29db38ae1f44"],
         ])
       )
     ],
@@ -344,7 +404,8 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"],
-          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"] // using OMG token instead
+          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"], // using omg token instead
+          [42, "0x4893919982648ffefe4324538d54402387c20198"],
         ])
       )
     ],
@@ -365,8 +426,9 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x1985365e9f78359a9b6ad760e32412f4a445e862"],
-          [3, "0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6"], // using SNT token instead
-          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"]
+          [3, "0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6"], // using snt token instead
+          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"],
+          [42, "0x39ac2818e08d285abe548f77a0819651b8b5d213"],
         ])
       )
     ],
@@ -387,7 +449,75 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0xe41d2489571d322189246dafa5ebde1f4699f498"],
-          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"] // using LINK token instead
+          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"], // using link token instead
+          [42, "0x629b28c5aa5c953df2511d2e48d316a07eafb3e3"],
+        ])
+      )
+    ],
+
+    [
+      Asset.BZRX,
+      new AssetDetails(
+        "BZRX",
+        "bZx Protocol Token",
+        "iBZRX",
+        "https://fulcrum.trade/images/iBZRX.svg",
+        18,
+        bzrx_logo,
+        BZRXLogo,
+        bzrx_bg,
+        bzrx_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x56d811088235F11C8920698a204A5010a788f4b3"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.YFI,
+      new AssetDetails(
+        "YFI",
+        "YFI",
+        "iYFI",
+        "https://fulcrum.trade/images/iYFI.svg",
+        18,
+        yfi_logo,
+        YFILogo,
+        yfi_bg,
+        yfi_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.LEND,
+      new AssetDetails(
+        "LEND",
+        "LEND",
+        "iLEND",
+        "https://fulcrum.trade/images/iLEND.svg",
+        18,
+        lend_logo,
+        LENDLogo,
+        lend_bg,
+        lend_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
+          [3, ""],
+          [42, ""],
         ])
       )
     ]
@@ -413,7 +543,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x0d8775f648430679a709e98d2b0cb6250d2887ef"],
-          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"]
+          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"],
+          [42, "0xac091ccf1b0c601182f3ccf3eb20f291aba39029"],
         ])
       )
     ],
@@ -434,7 +565,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
-          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG token instead
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using eng token instead
+          [42, "0xc4b7a70c3694cb1d37a18e6c6bd9271828c382a4"],
         ])
       )
     ],
@@ -456,7 +588,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
-          [3, ""]
+          [3, ""],
+          [42, "0xfb9325e5f4fc9629525427a1c92c0f4d723500cf"],
         ])
       )
     ],
@@ -478,7 +611,7 @@ export class AssetsDictionaryMobile {
         new Map<number, string | null>([
           [1, "0xdac17f958d2ee523a2206206994597c13d831ec7"],
           [3, ""],
-          [42, ""]
+          [42, "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996"]
         ])
       )
     ],
@@ -500,7 +633,7 @@ export class AssetsDictionaryMobile {
         new Map<number, string | null>([
           [1, "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"],
           [3, "0xad6d458402f60fd3bd25163575031acdce07538d"],
-          [42, "0xC4375B7De8af5a38a93548eb8453a498222C4fF2"]
+          [42, "0xc4375b7de8af5a38a93548eb8453a498222c4ff2"]
         ])
       )
     ],
@@ -521,9 +654,9 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
-          [3, "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108"],
+          [3, "0xf80a32a835f79d7787e8a8ee5721d0feafd78108"],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
-          [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
+          [42, "0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8"]
         ])
       )
     ],
@@ -567,7 +700,8 @@ export class AssetsDictionaryMobile {
         "#acb5c2",
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
-          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG
+          [42, "0x20bdf254ca63883c3a83424753bb40185af29ce4"],
         ])
       )
     ],
@@ -588,7 +722,8 @@ export class AssetsDictionaryMobile {
         "#acb5c2",
         new Map<number, string | null>([
           [1, "0x57ab1ec28d129707052df4df418d58a2d46d5f51"],
-          [3, ""]
+          [3, ""],
+          [42, "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62"],
         ])
       )
     ],
@@ -638,6 +773,28 @@ export class AssetsDictionaryMobile {
         ])
       )
     ],
+
+    [
+      Asset.fWETH,
+      new AssetDetails(
+        "fWETH",
+        "Fake Wrapped Ether (fWETH)",
+        "ifWETH",
+        "https://fulcrum.trade/images/iETH.svg",
+        18,
+        weth_logo,
+        WETHLogo,
+        eth_bg,
+        eth_ts,
+        "#FFFFFF",
+        "#444e5a",
+        "#acb5c2",
+        new Map<number, string | null>([
+          [42, "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc"]
+        ])
+      )
+    ],
+
     [
       Asset.KNC,
       new AssetDetails(
@@ -656,7 +813,7 @@ export class AssetsDictionaryMobile {
         new Map<number, string | null>([
           [1, "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"],
           [3, "0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6"],
-          [42, "0xad67cB4d63C9da94AcA37fDF2761AaDF780ff4a2"]
+          [42, "0x02357164ba33f299f7654cbb29da29db38ae1f44"],
         ])
       )
     ],
@@ -677,7 +834,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"],
-          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"] // using OMG token instead
+          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"], // using OMG token instead
+          [42, "0x4893919982648ffefe4324538d54402387c20198"],
         ])
       )
     ],
@@ -699,7 +857,8 @@ export class AssetsDictionaryMobile {
         new Map<number, string | null>([
           [1, "0x1985365e9f78359a9b6ad760e32412f4a445e862"],
           [3, "0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6"], // using SNT token instead
-          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"]
+          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"],
+          [42, "0x39ac2818e08d285abe548f77a0819651b8b5d213"],
         ])
       )
     ],
@@ -720,7 +879,74 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0xe41d2489571d322189246dafa5ebde1f4699f498"],
-          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"] // using LINK token instead
+          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"], // using LINK token instead
+          [42, "0x629b28c5aa5c953df2511d2e48d316a07eafb3e3"],
+        ])
+      )
+    ],
+    [
+      Asset.BZRX,
+      new AssetDetails(
+        "BZRX",
+        "bZx Protocol Token",
+        "iBZRX",
+        "https://fulcrum.trade/images/iBZRX.svg",
+        18,
+        bzrx_logo,
+        BZRXLogo,
+        bzrx_bg_btm,
+        bzrx_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x56d811088235F11C8920698a204A5010a788f4b3"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.YFI,
+      new AssetDetails(
+        "YFI",
+        "YFI",
+        "iYFI",
+        "https://fulcrum.trade/images/iYFI.svg",
+        18,
+        yfi_logo,
+        YFILogo,
+        yfi_bg_btm,
+        yfi_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.LEND,
+      new AssetDetails(
+        "LEND",
+        "LEND",
+        "iLEND",
+        "https://fulcrum.trade/images/iLEND.svg",
+        18,
+        lend_logo,
+        LENDLogo,
+        lend_bg_btm,
+        lend_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
+          [3, ""],
+          [42, ""],
         ])
       )
     ]

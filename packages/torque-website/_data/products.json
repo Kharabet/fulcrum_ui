@@ -1,0 +1,29 @@
+[ 
+  {
+    "name": "dai"
+  },
+  {
+    "name": "usdc"
+  },
+  {
+    "name": "usdt"
+  },
+  {
+    "name": "eth"
+  },
+  {
+    "name": "wbtc"
+  },
+  {
+    "name": "link"
+  },
+  {
+    "name": "bzrx"
+  },
+  {
+    "name": "knc"
+  },
+  {
+    "name": "lend"
+  }
+]

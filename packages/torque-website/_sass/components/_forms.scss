@@ -1,0 +1,315 @@
+.form-loan {
+  width: 100%;
+  background-color: var(--bg-form);    
+  box-shadow: 0px 16px 37px var(--shadow-form);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  @media screen and (max-width: $breakpoint-md-down){
+    flex-wrap: wrap;
+  }
+  @media screen and (min-width: $breakpoint-sm-up){
+    padding: 30px 20px 40px 20px;
+  }
+  @media screen and (max-width: $breakpoint-sm-down){
+    padding: 20px;
+  }
+  .item-form {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    @media screen and (max-width: $breakpoint-md-down){
+      width: calc(50% - 32px);
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      width: calc(100% - 40px);
+      &:after{
+        content: '';
+        position: absolute;
+        right: -26px;
+        width: 17px;
+        height: 27px;
+        border-right: 2px solid #E7EBF0;
+      }
+      &.loan{
+        &:after{
+          bottom: 2px;
+          border-top-right-radius: 7px;
+          border-top: 2px solid #E7EBF0;
+        }
+      }
+      &.collateral{
+        &:after{
+          bottom: 27px;
+          border-bottom-right-radius: 7px;
+          border-bottom: 2px solid #E7EBF0;
+        }
+      }
+    }
+    > span {
+      color: #758295;
+      margin-bottom: 12px;
+      @media screen and (min-width: $breakpoint-sm-up){
+        font-size: 18px;
+      }
+      @media screen and (max-width: $breakpoint-sm-down){
+        font-size: 12px;
+      }
+    }
+    .input-with-select {
+      display: flex;
+      align-items: center;
+      background-color: var(--bg-item-form);
+      border: 2px solid var(--border-item-form);
+      padding: 10px 17px;
+      border-radius: 4px;
+      position: relative;
+      input {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--input-form);
+        height: 48px;        
+        border: none;
+        outline: none;
+        background-color: transparent;
+        &.error{
+          font-size: 14px;
+          color: #DE4A4A;
+          @media screen and (max-width: $breakpoint-sm-down){
+            font-size: 12px;
+          }
+        }
+        @media screen and (min-width: $breakpoint-xl-up){
+          width: 240px;
+        }
+        @media screen and (max-width: $breakpoint-xl-down){
+          width: 175px;
+        }
+        @media screen and (max-width: $breakpoint-md-down){
+          width: calc(100% - 110px);
+          font-size: 24px;
+        }
+        @media screen and (max-width: $breakpoint-sm-down){
+          width: calc(100% - 90px);
+          height: 30px;
+        }
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        &[type="number"] {
+          -moz-appearance: textfield;
+        }
+        &:focus,
+        &:active {
+          .input-with-select & {
+            border: 2px solid #5074eb;
+          }
+        }
+      }
+    }
+  }
+  &.active {
+    .item-connect {
+      background-color: #276bfb;
+    }
+    .connected-stroke {
+      stroke: #ffffff;
+    }
+  }
+  .item-connect {    
+    background-color: var(--bg-connect);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @media screen and (min-width: $breakpoint-lg-up){
+      margin: 35px 20px 0 20px;
+    }
+    @media screen and (max-width: $breakpoint-lg-down){
+      margin: 35px 10px 0 10px;
+    }
+    @media screen and (min-width: $breakpoint-sm-up){
+      width: 44px;
+      height: 44px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      position: absolute;
+      right: 20px;
+      top: 104px;
+      margin: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      svg{
+        width: 21px;
+        height: auto;
+      }
+    }
+  }
+  .select {
+    position: relative;
+  }
+  .select-styled {
+    padding: 4px;
+    border-radius: 26px;
+    background-color: var(--bg-selector-form);
+    color: var(--color-selected-form);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    display: flex;
+    position: relative;
+    background-repeat: no-repeat;    
+    background-position: 4px 50%;    
+    text-transform: uppercase;
+    @media screen and (min-width: $breakpoint-sm-up){
+      font-size: 14px;
+      line-height: 2.2;
+      height: 38px;
+      width: 110px;
+      background-size: 30px;
+      padding-left: 40px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      font-size: 12px;
+      line-height: 1.85;
+      height: 30px;
+      width: 90px;
+      background-size: 24px;
+      padding-left: 32px;
+    }
+    &[data-asset="dai"] {
+      background-image: url(/images/dai.svg);
+    }
+    &[data-asset="eth"] {
+      background-image: url(/images/eth.svg);
+    }
+    &.active {
+      + .select-arrow{
+        transform: rotate(180deg);
+      }
+    }
+    &:hover {
+      cursor: pointer;
+    }
+    svg {
+      width: 30px;
+      height: 30px;
+      margin-right: 6px;
+    }
+  }
+  .select-arrow{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+  }
+  .select-options {
+    display: none;
+    position: absolute;
+    box-shadow: 0px 4px 18px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 126px;
+    color: var(--color-select-form);
+    background-color: var(--bg-selector-form);
+    list-style: none;
+    left: -8px;
+    top: 47px;
+    z-index: 2;
+    text-transform: uppercase;
+    li {
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      &.hidden {
+        display: none;
+      }
+      &:last-child{
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+      svg {
+        width: 30px;
+        height: 30px;
+        margin-right: 6px;
+      }
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--border-selector-form);
+      }
+      &:hover {
+        cursor: pointer;
+        background-color: var(--bg-hover-selector-form);
+      }
+    }
+  }
+  .item-result {
+    display: flex;
+    flex-direction: column;    
+    @media screen and (min-width: $breakpoint-md-up){
+      margin-left: 45px;
+    }
+    @media screen and (max-width: $breakpoint-md-down){
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+    span {
+      font-size: 18px;
+      color: #758295;      
+      @media screen and (min-width: $breakpoint-md-up){
+        margin-bottom: 12px;
+      }
+      @media screen and (max-width: $breakpoint-md-down){
+        margin-top: 12px;
+      }
+    }
+    > div {      
+      color: #00c0ab;
+      @media screen and (min-width: $breakpoint-sm-up){
+        font-size: 50px;
+        line-height: 1.44;
+      }
+      @media screen and (max-width: $breakpoint-sm-down){
+        font-size: 34px;
+        line-height: 1.2;
+      }
+      .value-result {
+        color: #00c0ab;
+        font-weight: 800;
+        @media screen and (min-width: $breakpoint-sm-up){
+          font-size: 50px;
+          line-height: 1.44;
+        }
+        @media screen and (max-width: $breakpoint-sm-down){
+          font-size: 34px;
+          line-height: 1.2;
+        }
+      }
+    }
+  }
+  .cube {
+    position: absolute;
+    bottom: -90px;    
+    @media screen and (min-width: $breakpoint-xl-up){
+      left: 58%;
+    }
+    @media screen and (max-width: $breakpoint-xl-down){
+      left: 73%;
+    }
+    @media screen and (max-width: $breakpoint-xs-down){
+      left: 65%;
+    }
+  }
+}

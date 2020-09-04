@@ -1,0 +1,85 @@
+:root {
+  --primary-color: #283049;
+  --secondary-color: #283049;
+  --light-gray-color: #828282;
+  --dark-gray-color: #283049;
+  --primary-bg: #e9f4ff;
+  --secondary-bg: #ffffff;
+  --switch-bg: #283049;
+  --switch-button: #ffffff;    
+  --switch-button-after: #283049;
+  --primary-svg-icon: #51aaff;
+  --secondary-svg-icon: #bfe9ff;
+  --tertiary-svg-icon: #95e6ff;
+  --safe-svg-icon: #95e6ff;
+  --accordion-bg: #e9f4ff;
+  --accordion-border: #e9f4ff;
+  --btn-white-bg: #ffffff;
+  --btn-blue-border: #276bfb;
+  --btn-blue-bg: #276bfb;
+  --btn-blue-bg-hover: #5b88ff;
+  --btn-blue-color: #ffffff;
+  --bg-form: #ffffff;
+  --shadow-form: rgba(95, 109, 130, 0.2);
+  --bg-item-form: #f5f7f9;
+  --border-item-form: #e7ebf0;
+  --bg-selector-form: #ffffff;
+  --bg-hover-selector-form: #e9f4ff;
+  --border-selector-form: #f5f7f9;
+  --color-select-form: #8992a4;
+  --color-selected-form: #283049;
+  --input-form: #283049;
+  --bg-connect: #e9f4ff;
+  --bg-post: #ffffff;
+  --shadow-post: 0px 8px 16px rgba(13, 76, 211, 0.16);
+  --color-404: #000085;
+}
+
+[data-theme="dark"] {
+  --primary-color: #ffffff;
+  --secondary-color: #b9c7d6;
+  --light-gray-color: #939fac;
+  --dark-gray-color: #939fac;
+  --primary-bg: #283038;
+  --secondary-bg: #283038;
+  --switch-bg: #ffffff;
+  --switch-button: #ffcd1b;
+  --switch-button-after: #ffffff;
+  --primary-svg-icon: #001760;
+  --secondary-svg-icon: #001760;
+  --tertiary-svg-icon: #001760;
+  --safe-svg-icon: #003cda;
+  --accordion-bg: #394049;
+  --accordion-border: #3d4651;
+  --btn-white-bg: #283038;
+  --btn-blue-border: #b9c7d6;
+  --btn-blue-bg: #323b44;
+  --btn-blue-bg-hover: #b9c7d6;
+  --btn-blue-color: #a3b4c7;
+  --bg-form: #444E5A;
+  --shadow-form: rgba(21, 26, 32, 0.3);
+  --bg-item-form: #283038;
+  --border-item-form: #283038;
+  --bg-selector-form: #495460;
+  --bg-hover-selector-form: #283038;
+  --border-selector-form: #283038;
+  --color-select-form: #ffffff;
+  --color-selected-form: #ffffff;
+  --input-form: #ffffff;
+  --bg-connect: #c3cdd8;
+  --bg-post: #3d4651;
+  --shadow-post: 0px 12px 20px rgba(0, 0, 0, 0.1);
+  --color-404: #ffffff;
+}
+
+$breakpoint-xl-down: 1409px;
+$breakpoint-lg-down: 1199px;
+$breakpoint-md-down: 991px;
+$breakpoint-sm-down: 767px;
+$breakpoint-xs-down: 579px;
+
+$breakpoint-xl-up: 1410px;
+$breakpoint-lg-up: 1200px;
+$breakpoint-md-up: 992px;
+$breakpoint-sm-up: 768px;
+$breakpoint-xs-up: 580px;

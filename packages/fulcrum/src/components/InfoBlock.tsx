@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import "../styles/components/info-block.scss"
+
 export interface IInfoBlockProps {
   localstorageItemProp: string;
   onAccept?: () => void;

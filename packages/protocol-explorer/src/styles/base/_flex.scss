@@ -1,0 +1,37 @@
+.flex {
+    display: flex;
+}
+.fw-w{
+    flex-wrap: wrap;
+}
+.jc-sb {
+    justify-content: space-between;
+}
+.jc-c {
+    justify-content: center;
+}
+.jc-fe {
+    justify-content: flex-end;
+}
+.ac-c {
+    align-content: center;
+}
+.ai-c {
+    align-items: center;
+}
+.fd-c {
+    flex-direction: column;
+}
+@media screen and (max-width: $width-max-md){
+    .fd-md-c{
+        flex-direction: column;
+    }
+}
+@media screen and (max-width: $width-max-sm){
+    .fd-sm-c{
+        flex-direction: column;
+    }
+    .as-sm-fs{
+        align-self: flex-start;
+    }
+}

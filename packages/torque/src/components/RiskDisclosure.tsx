@@ -1,19 +1,16 @@
 import React, { Component } from "react";
-import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
+import { DialogHeader } from "./DialogHeader";
+
 export interface IRiskDisclosureProps {
   onClose: () => void;
 }
 
 export class RiskDisclosure extends Component<IRiskDisclosureProps> {
   public render() {
-
     return (
-      <div className="disclosure__wrapper">
-        <div className="disclosure__header">
-          <h2>DeFi Risk Disclosure</h2>
-          {<CloseIcon className="disclosure__close" onClick={this.onTokenAddressFormRequestClose} />}
-        </div>
-        <div className="disclosure__content">
+      <div className="disclosure">
+        <DialogHeader title="DeFi Risk Disclosure" onDecline={this.onTokenAddressFormRequestClose} />
+        <div className="dialog-content">
           <p>When using decentralized applications (dApps), it’s critical to remember that YOU are responsible for the security of your digital assets.</p>
           <p>Unlike mainstream financial services, our team can NOT help you recover your funds if you lose your private key.</p>
           <p>While bZx does maintain an insurance fund to protect against the improper liquidation of undercollateralized borrowers, we do NOT insure user funds in the event that the user loses access to - or control over - their private key.</p>
@@ -38,8 +35,8 @@ export class RiskDisclosure extends Component<IRiskDisclosureProps> {
           <p>Undiscovered vulnerabilities and the deployment of new dApps may cause unforeseen consequences. Users should always exercise caution when using emerging technologies.</p>
 
         </div>
-        <div className="disclosure__footer">
-          <button onClick={this.onTokenAddressFormRequestClose}>Got it!</button>
+        <div className="dialog-actions">
+          <button className="btn btn-size--small" onClick={this.onTokenAddressFormRequestClose}>Got it!</button>
         </div>
       </div>
     );

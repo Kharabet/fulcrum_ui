@@ -1,0 +1,41 @@
+body {
+  font-family: "Muli", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  p {
+    margin-bottom: 0;
+    line-height: 1.8;
+    color: var(--primary-color);
+    @media screen and (max-width: $breakpoint-xs-down) {
+      font-size: 12px;
+    }
+  }
+}
+.w-100 {
+  width: 100%;
+}
+.lend-gradient {
+  background: linear-gradient(90deg, #10adc8 0%, #1c91cb 100%);
+  border-radius: 50%;
+  display: flex;
+}
+.bzrx-gradient {
+  background: linear-gradient(315deg, #003cda 19.25%, #33dfcc 86.5%);
+  border-radius: 50%;
+  display: flex;
+}
+.lend-gradient,
+.bzrx-gradient {
+  .li-options & {
+    margin-right: 6px;
+    svg {
+      margin-right: 0 !important;
+    }
+  }
+}
+.apr-component {
+  svg {
+    width: 50px;
+    height: auto;
+  }
+}

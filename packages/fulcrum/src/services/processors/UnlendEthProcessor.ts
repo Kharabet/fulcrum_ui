@@ -15,7 +15,7 @@ export class UnlendEthProcessor {
     // Initializing loan
     const taskRequest: LendRequest = (task.request as LendRequest);
     const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1)).plus(1);
+    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(taskRequest.asset);
     if (!tokenContract) {
       throw new Error("No iToken contract available!");
@@ -31,6 +31,8 @@ export class UnlendEthProcessor {
     // no additional inits or checks
     task.processingStepNext();
 
+    console.log(tokenContract.address, await tokenContract.burnToEther.getABIEncodedTransactionData(account, amountInBaseUnits));
+
     let gasAmountBN;
 
     // Waiting for token allowance
@@ -44,7 +46,6 @@ export class UnlendEthProcessor {
 
     let txHash: string = "";
     try {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting unloan
       txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, {
@@ -54,8 +55,8 @@ export class UnlendEthProcessor {
       });
       task.setTxHash(txHash);
     }
-    finally {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    catch(e) {
+      throw e;
     }
 
     task.processingStepNext();

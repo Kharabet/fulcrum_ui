@@ -2,23 +2,25 @@ import React, { Component } from "react";
 import { OnChainIndicator } from "../components/OnChainIndicator";
 import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
-import { HeaderMenuToggle } from "./HeaderMenuToggle";
 import ic_close from "../assets/images/ic_close.svg";
 import menu_icon from "../assets/images/ic_menu.svg";
-import { TorqueProvider } from "../../../torque/src/services/TorqueProvider";
-import { ProviderType } from "../../../torque/src/domain/ProviderType";
 import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
+import { SwitchButtonInput } from "../components/SwitchButtonInput";
+import { truncate } from "fs";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
+  headerClass: string;
 }
 
 interface IHeaderOpsState {
   isMenuOpen: boolean;
+  scrollMenu: boolean;
+  heightDevice: number;
 }
 
 export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
@@ -27,48 +29,50 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     super(props);
 
     this.state = {
-      isMenuOpen: false
+      isMenuOpen: false,
+      scrollMenu: false,
+      heightDevice: 0
     };
-  }
-
-  public componentWillMount(): void {
-    var currentTheme = localStorage.getItem('theme')!;
-    if (currentTheme === null) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-      return;
-    }
-    if (currentTheme && currentTheme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
-    }
-    else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-
-    }
   }
 
   public componentDidMount(): void {
     var currentTheme = localStorage.getItem('theme')!;
-    var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]');
+    var toggleSwitch = document.querySelector<HTMLInputElement>('.header__right .theme-switch input[type="checkbox"]');
+    if (currentTheme === null) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');      
+      if (toggleSwitch) toggleSwitch.checked = true;
+    }
     if (toggleSwitch && currentTheme) {
       if (currentTheme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         localStorage.setItem('theme', 'light');
         toggleSwitch.checked = false;
       }
-      if (currentTheme === 'dark') {
+      else {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
         toggleSwitch.checked = true;
       }
     };
+    var heightDevice = document.documentElement.clientHeight;
+    if (heightDevice < 620) this.setState({ ...this.state, scrollMenu: true });
+
+    window.addEventListener("resize", this.didResize.bind(this));
+    this.didResize();
   }
 
   public componentWillUnmount(): void {
-    document.body.style.overflow = "";
+    document.body.className = ""
+  }
 
+
+  public didResize = () => {
+    var heightDevice = document.documentElement.clientHeight;
+    (heightDevice < 620) ? this.setState({ ...this.state, scrollMenu: true }) : this.setState({ ...this.state, scrollMenu: false });
+    if (this.props.isMobileMedia) {
+      (this.state.isMenuOpen) ? (!this.state.scrollMenu ? document.body.className = "hidden" : document.body.className = "scroll") : document.body.className = "";
+    }
   }
 
   public render() {
@@ -84,26 +88,22 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
         { id: 3, title: "Stats", link: "/stats", external: false },
         { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
-      ]
+      ],
+      onMenuToggle: this.onMenuToggle
     };
 
     return (
-      <header className="header">
+      <header className={`header ${this.props.headerClass}`}>
         <div className="header__row">
           <div className="header__left">
             <HeaderLogo />
           </div>
           <div className="header__center">
-            <HeaderMenu items={menu.items} />
+            <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            <div className="theme-switch-wrapper">
-              <label className="theme-switch">
-                <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} />
-                <div className="slider round"></div>
-              </label>
-            </div>
+            <SwitchButtonInput onSwitch={this.onSwitchTheme} type="theme" />
           </div>
         </div>
       </header>
@@ -119,13 +119,14 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
         { id: 3, title: "Stats", link: "/stats", external: false },
         { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
-      ]
+      ],
+      onMenuToggle: this.onMenuToggle
     };
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
 
     return (
-      <header className="header">
+      <header className={`header ${this.props.headerClass}`}>
         <div className="header__row">
           <div className="header__left">
             <HeaderLogo />
@@ -148,11 +149,11 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
                 </label>
               </div>
             </div>
-            <div className="heade_nav_menu">
-              <HeaderMenu items={menu.items} />
+            <div className="header_nav_menu">
+              <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
             </div>
             <div className="footer-container">
-              <Footer isMobileMedia={this.props.isMobileMedia}  isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
+              <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
             </div>
           </div>
         ) : null}
@@ -161,13 +162,15 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   };
 
   private onMenuToggle = () => {
-    document.body.style.overflow = !this.state.isMenuOpen ? "hidden" : "";
+    if (this.props.isMobileMedia) {
+      (!this.state.isMenuOpen) ? (!this.state.scrollMenu ? document.body.classList.add("hidden") : document.body.classList.add("scroll")) : document.body.className = "";
+    }
     this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
   };
 
-  private onSwitchTheme = () => {
-    var buttonToggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
-    if (buttonToggleSwitch.checked) {
+  private onSwitchTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const switchButton = e.currentTarget;
+    if (switchButton.checked) {
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');
     } else {

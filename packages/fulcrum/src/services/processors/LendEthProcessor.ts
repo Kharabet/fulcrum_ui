@@ -32,6 +32,8 @@ export class LendEthProcessor {
 
     let gasAmountBN;
 
+    console.log(tokenContract.address, await tokenContract.mintWithEther.getABIEncodedTransactionData(account));
+
     // Waiting for token allowance
     if (skipGas) {
       gasAmountBN = new BigNumber(600000);
@@ -43,7 +45,6 @@ export class LendEthProcessor {
 
     let txHash: string = "";
     try {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting loan
       txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, {
@@ -54,8 +55,8 @@ export class LendEthProcessor {
       });
       task.setTxHash(txHash);
     }
-    finally {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    catch(e) {
+      throw e;
     }
 
     task.processingStepNext();

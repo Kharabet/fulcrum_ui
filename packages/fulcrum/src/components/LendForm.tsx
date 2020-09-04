@@ -12,22 +12,14 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
-// import configProviders from "./../config/providers.json";
-import { EthOrWethSelector } from "./EthOrWethSelector";
 
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { AssetDropdown } from "./AssetDropdown";
 import { Preloader } from "./Preloader";
 
-// TagManager.initialize({
-//   gtmId: configProviders.Google_TrackingID,
-//   dataLayer: {
-//     name: "Lend form",
-//     status: "Initialized"
-//   },
-//   dataLayerName: 'PageDataLayer'
-// });
+import "../styles/components/lend-form.scss"
+import "../styles/components/input-amount.scss"
+
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
@@ -69,7 +61,7 @@ interface ILendFormState {
   infoMessage: string;
 }
 
-export class LendForm extends Component<ILendFormProps, ILendFormState> {
+export default class LendForm extends Component<ILendFormProps, ILendFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
@@ -213,7 +205,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    window.history.back();
+    window.history.pushState(null, "Lend Modal Closed", `/lend`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -221,7 +213,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     this._isMounted = true;
 
     await this.derivedUpdate();
-    window.history.pushState(null, "Lend Modal Opened", `/#/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
+    window.history.pushState(null, "Lend Modal Opened", `/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       // this._input.select();
@@ -264,7 +256,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         ? "Insufficient funds for gas"
         : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
           ? "Your wallet is empty"
-          : this.state.infoMessage ?  this.state.infoMessage : "";
+          : this.state.infoMessage ? this.state.infoMessage : "";
 
     const lendedAmountEstimateText =
       !this.state.lendedAmountEstimate || this.state.lendedAmountEstimate.eq(0)
@@ -278,7 +270,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
-        <div className="lend-form__image">
+        <div className={`lend-form__image ${this.props.asset === Asset.ETH ? "notice" : ""}`}>
           {this.state.iTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
@@ -295,10 +287,15 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             : this.state.assetDetails.reactLogoSvg.render()
 
           }
-          {(this.props.asset === Asset.ETH)
-            ? <span className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</span>
-            : null
+          {/*{this.props.asset === Asset.ETH && this.props.lendType === LendType.LEND &&
+            <p className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</p>
           }
+          {this.props.asset === Asset.ETH && this.props.lendType === LendType.UNLEND &&
+            <React.Fragment>
+              <p className="lend-form__notification">You can convert iETH to vBZRX, a token representing BZRX that vests over 4 years with a six month cliff. The current conversion rate is 0.0002 vBZRX per iETH, but the exchange rate will be changed to reflect market rates in the coming days.</p>
+              <p className="lend-form__notification">Read more about Lenders Rescue program <a href="https://bzx.network/blog/compensation-plan" target="_blank" rel="noopener noreferrer">here</a></p>
+            </React.Fragment>
+          }*/}
         </div>
         <div className="lend-form__form-container">
           <div className="lend-form__form-values-container">
@@ -318,12 +315,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               {amountMsg}
             </div>
 
-            <div className="lend-form__amount-container">
+            <div className="input-amount__container">
               <input
                 type="number"
                 step="any"
                 ref={this._setInputRef}
-                className="lend-form__amount-input"
+                className="input-amount__input"
                 value={!this.state.isLoading ? this.state.lendAmountText : ""}
                 onChange={this.onLendAmountChange}
               />
@@ -352,7 +349,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               }
             </div>
 
-            <div className="lend-form__group-button">
+            <div className="input-amount__group-button">
               <button data-value="0.25" onClick={this.onInsertMaxValue}>25%</button>
               <button data-value="0.5" onClick={this.onInsertMaxValue}>50%</button>
               <button data-value="0.75" onClick={this.onInsertMaxValue}>75%</button>
@@ -532,6 +529,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
     // console.log(`send amount`,sendAmount.toString());
+
+    if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
+      // indicates a 100% burn
+      sendAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS.div(10**18);
+    }
 
     this.props.onSubmit(
       new LendRequest(

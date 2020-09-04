@@ -30,15 +30,22 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       providerTypeDetails: null
     };
 
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    // FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private onProviderIsChanging = async () => {
-    await this.derivedUpdate();
+    this.setState({
+      ...this.state,
+      isLoading: true
+    });
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
+    this.setState({
+      ...this.state,
+      isLoading: true
+    });
     await this.derivedUpdate();
   };
 
@@ -134,7 +141,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
         </React.Fragment>
       );
     } else {
-      if (providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
+      if (providerTypeDetails !== null && providerTypeDetails.reactLogoSvgShort !== null) {
         return (
           <React.Fragment>
             <div className="on-chain-indicator__svg">{providerTypeDetails.reactLogoSvgShort.render()}</div>

@@ -1,171 +1,64 @@
 import React, { Component } from "react";
-import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
-import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
-import { FulcrumProvider } from "../services/FulcrumProvider";
+import { OwnTokenGridRow, IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
-import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
-import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
-import { TradeType } from "../domain/TradeType";
-import { Asset } from "../domain/Asset";
-import { PositionType } from "../domain/PositionType";
-import { BigNumber } from "@0x/utils";
-export interface IOwnTokenGridProps {
-  showMyTokensOnly: boolean;
-  selectedKey: TradeTokenKey;
+import { PreloaderChart } from "../components/PreloaderChart";
 
-  asset?: Asset;
-  positionType?: PositionType;
-  // onDetails: (key: TradeTokenKey) => void;
-  // onManageCollateral: (request: ManageCollateralRequest) => void;
-  onSelect: (key: TradeTokenKey) => void;
-  onTrade: (request: TradeRequest) => void;
+import { ReactComponent as Placeholder } from "../assets/images/history_placeholder.svg";
+import "../styles/components/own-token-grid.scss"
+
+export interface IOwnTokenGridProps {
   isMobileMedia: boolean;
+  ownRowsData: IOwnTokenGridRowProps[];
+  openedPositionsLoaded: boolean;
 }
 
 interface IOwnTokenGridState {
-  tokenRowsData: IOwnTokenGridRowProps[];
+  ownRowsData: IOwnTokenGridRowProps[];
+  isShowHistory: boolean;
 }
 
 export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridState> {
   constructor(props: IOwnTokenGridProps) {
     super(props);
-    this._isMounted = false;
     this.state = {
-      tokenRowsData: []
+      ownRowsData: [],
+      isShowHistory: false
     };
-
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
-
-  private _isMounted: boolean;
-
-  public async derivedUpdate() {
-    const tokenRowsData = await OwnTokenGrid.getRowsData(this.props);
-    this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
-  }
+  private _isMounted: boolean = false;
 
   public componentWillUnmount(): void {
     this._isMounted = false;
-
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
-
-    this.derivedUpdate();
-  }
-
-  public componentDidUpdate(
-    prevProps: Readonly<IOwnTokenGridProps>,
-    prevState: Readonly<IOwnTokenGridState>,
-    snapshot?: any
-  ): void {
-    if (
-      this.props.selectedKey !== prevProps.selectedKey ||
-      this.props.showMyTokensOnly !== prevProps.showMyTokensOnly
-    ) {
-      this.derivedUpdate();
-    }
   }
 
   public render() {
 
-    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
+    if (!this.props.ownRowsData.length) {
+      if (!this.props.openedPositionsLoaded)
+        return <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />;
+      return (
+        <div className="history-token-grid__placeholder">
+          <div>
+            <Placeholder />
+            <p>No open positions</p>
+            <a href="/trade" className="history-token-grid__link-button">Start Trading</a>
+          </div>
+        </div>);
+    }
 
-  }
-
-  private renderDesktop = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
-    if (tokenRows.length === 0) return null;
+    const ownRows = this.props.ownRowsData.map((e, i) => <OwnTokenGridRow key={i} {...e} />);
+    if (ownRows.length === 0) return null;
 
     return (
       <div className="own-token-grid">
-        <OwnTokenGridHeader
-
-          showMyTokensOnly={this.props.showMyTokensOnly}
-        />
-        {tokenRows}
+        {!this.props.isMobileMedia && <OwnTokenGridHeader />}
+        {ownRows}
       </div>
     );
   }
 
-  private renderMobile = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
-    if (tokenRows.length === 0) return null;
-
-    return (
-      <div className="own-token-cards">
-
-        <div className="own-token-cards__header">Manage</div>
-        <div className="own-token-cards__container">
-          {tokenRows}
-        </div>
-      </div>
-    );
-  }
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.selectedKey.asset,
-        this.props.selectedKey.unitOfAccount,
-        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.USDC,
-        this.props.selectedKey.positionType,
-        this.props.selectedKey.leverage,
-        new BigNumber(0),
-        this.props.selectedKey.isTokenized,
-        this.props.selectedKey.version
-      )
-    );
-  };
-
-  private static getRowsData = async (props: IOwnTokenGridProps): Promise<IOwnTokenGridRowProps[]> => {
-    const rowsData: IOwnTokenGridRowProps[] = [];
-
-    if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const pTokens = props.asset && props.positionType
-        ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == props.asset && tradeToken.positionType == props.positionType)
-        : FulcrumProvider.Instance.getPTokensAvailable()
-
-      const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
-      const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
-      for (const pToken of pTokens) {
-        // console.log(pToken);
-        const balance = pTokenBalances.get(pToken.erc20Address);
-        if (!balance) {
-          continue;
-        }
-
-        rowsData.push({
-          selectedKey: props.selectedKey,
-          currentKey: pToken,
-          // // balance: balance,
-          // onDetails: props.onDetails,
-          // onManageCollateral: props.onManageCollateral,
-          onSelect: props.onSelect,
-          onTrade: props.onTrade,
-          showMyTokensOnly: props.showMyTokensOnly
-        });
-      }
-    }
-
-    return rowsData;
-  };
-
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
-    await this.derivedUpdate();
-  };
-
-  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
-    await this.derivedUpdate();
-  };
 }

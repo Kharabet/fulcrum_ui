@@ -1,6 +1,8 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 
+import "../styles/components/change-24-h-marker.scss"
+
 export enum Change24HMarkerSize {
   SMALL = "small",
   MEDIUM = "medium",

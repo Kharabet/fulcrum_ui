@@ -1,0 +1,66 @@
+.unhealthy-chart-wrapper{
+  @media screen and (min-width: $width-min-sm){
+    width: 45%;
+  }
+  @media screen and (max-width: $width-max-sm){
+    max-width: 450px;
+    margin: 0 auto 30px auto;
+  }
+}
+.unhealthy-data-wrapper{
+  @media screen and (min-width: $width-min-sm){
+    width: 55%;
+  }
+  @media screen and (max-width: $width-max-sm){
+    width: 100%;
+  }
+}
+.liquidation-data {
+  &:first-child {
+    margin-right: 65px;
+    @media screen and (max-width: $width-max-sm){
+      margin-bottom: 15px;
+    }
+  }
+  .liquidation-data-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #8992a4;
+    margin-bottom: 8px;
+  }
+  .liquidation-data-value {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: #283038;
+  }
+}
+.unhealthy,
+.healthy {
+  width: 45%;
+  font-weight: 900;
+  display: flex;
+  justify-content: flex-end;
+  line-height: 1.8;
+  @media screen and(min-width: $width-min-sm){
+    font-size: 36px;
+  }
+  @media screen and(max-width: $width-max-sm){
+    font-size: 24px;
+  }
+  &-value {
+    font-weight: 900;
+    line-height: 1;
+    width: 55%;
+    @media screen and(min-width: $width-min-lg){
+      font-size: 100px;
+    }
+    @media screen and(max-width: $width-max-lg){
+      font-size: 72px;
+    }
+    @media screen and(max-width: $width-max-sm){
+      font-size: 48px;
+    }
+  }
+}

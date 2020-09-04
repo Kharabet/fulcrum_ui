@@ -2,15 +2,12 @@ import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
-import { WalletType } from "../domain/WalletType";
 import { BorrowForm } from "./BorrowForm";
 import { DialogHeader } from "./DialogHeader";
 
 interface IBorrowDlgState {
   isOpen: boolean;
   borrowAsset: Asset;
-  walletType: WalletType;
-  didSubmit: boolean;
 
   executorParams: { resolve: (value?: BorrowRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -19,7 +16,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, walletType: WalletType.Unknown, didSubmit: false, executorParams: null };
+    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, executorParams: null };
   }
 
   public render() {
@@ -29,22 +26,17 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.hide}
-        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title={`Borrow how much ${this.state.borrowAsset}?`} onDecline={this.onFormDecline} />
-        <BorrowForm borrowAsset={this.state.borrowAsset} walletType={this.state.walletType} didSubmit={this.state.didSubmit} toggleDidSubmit={this.toggleDidSubmit} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />
+        <BorrowForm 
+        borrowAsset={this.state.borrowAsset}  
+        onSubmit={this.onFormSubmit} 
+        onDecline={this.onFormDecline} />
       </ReactModal>
     );
   }
 
-  public toggleDidSubmit = (submit: boolean) => {
-    this.setState({
-      ...this.state,
-      didSubmit: submit
-    });
-  }
-
-  public getValue = async (walletType: WalletType, borrowAsset: Asset): Promise<BorrowRequest> => {
+  public getValue = async (borrowAsset: Asset): Promise<BorrowRequest> => {
     if (this.state.isOpen) {
       return new Promise<BorrowRequest>((resolve, reject) => reject());
     }
@@ -54,26 +46,27 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        walletType: walletType,
         borrowAsset: borrowAsset
       });
     });
   };
 
-  public hide = () => {
-    this.setState({ ...this.state, isOpen: false, executorParams: null, didSubmit: false });
+  private hide = async () => {
+    await this.setState({ ...this.state, isOpen: false, executorParams: null });
   };
 
-  private onFormSubmit = (value: BorrowRequest) => {
+  private onFormSubmit = async (value: BorrowRequest) => {
     if (this.state.executorParams) {
       this.state.executorParams.resolve(value);
     }
+    await this.hide();
   };
 
-  private onFormDecline = () => {
-    this.hide();
+  private onFormDecline = async () => {
     if (this.state.executorParams) {
-      this.state.executorParams.reject();
+            this.state.executorParams.reject(new Error("Form closed"));
+;
     }
+    await this.hide();
   };
 }

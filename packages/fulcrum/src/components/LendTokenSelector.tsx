@@ -3,6 +3,8 @@ import { Asset } from "../domain/Asset";
 import { LendRequest } from "../domain/LendRequest";
 import { LendTokenSelectorItem } from "./LendTokenSelectorItem";
 
+import "../styles/components/lend-token-selector.scss"
+
 export interface ILendTokenSelectorProps {
   onLend: (request: LendRequest) => void;
 }
@@ -15,19 +17,11 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
 
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       LendTokenSelector.assets = [
-        Asset.ETH,
-        Asset.SAI,
-        Asset.DAI
-      ];
-    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
-      LendTokenSelector.assets = [
-        Asset.ETH,
-        Asset.DAI
-      ];
-    } else {
-      LendTokenSelector.assets = [
-        Asset.ETH,
-        Asset.SAI,
+        /*Asset.ETH,
+        Asset.KNC,
+        Asset.DAI*/
+        Asset.fWETH,
+        /*Asset.SAI,*/
         Asset.DAI,
         Asset.USDC,
         Asset.USDT,
@@ -38,6 +32,29 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
         Asset.ZRX,
         // Asset.BAT,
         Asset.REP,
+        Asset.KNC
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      LendTokenSelector.assets = [
+        Asset.ETH,
+        Asset.DAI
+      ];
+    } else {
+      LendTokenSelector.assets = [
+        Asset.ETH,
+        /*Asset.SAI,*/
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        // Asset.SUSD,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
+        // Asset.BAT,
+        // Asset.REP,
         Asset.KNC
       ]
     }

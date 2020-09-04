@@ -1,0 +1,131 @@
+.calculator {
+  margin: auto;
+  max-width: 725px;
+  background-color: #ffffff;
+  border-radius: 8px;
+
+  .calculator-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    &:not(:last-child) {
+      border-bottom: 1px solid #e7ebf0;
+    }
+    @media screen and (max-width: $width-max-sm) {
+      flex-direction: column;
+    }
+    @media screen and (min-width: $width-min-xs) {
+      padding: 24px 32px 20px 32px;
+    }
+    @media screen and (max-width: $width-max-xs) {
+      padding: 30px;
+    }
+    &.balance {
+      flex-wrap: wrap;
+      flex-direction: row;
+      > .balance-item {
+        width: 100%;
+        @media screen and (min-width: $width-min-xs) {
+          width: 50%;
+        }
+      }
+    }
+    .notice {
+      text-align: center;
+      // padding: 0 25px;
+      font-size: 14px;
+      // margin: 0 auto;
+    }
+    .row-header {
+      font-weight: 800;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      color: #283049;
+      margin-bottom: 24px;
+      @media screen and (min-width: $width-min-xs) {
+        font-size: 16px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        font-size: 12px;
+      }
+    }
+    .row-container {
+      margin-bottom: 32px;
+    }
+    .row-body {
+      font-weight: 800;
+      line-height: 1;
+      color: #283049;
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      padding-top: 15px;
+      @media screen and (min-width: $width-min-xs) {
+        font-size: 36px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        font-size: 32px;
+      }
+      .value {
+        position: relative;
+      }
+      .icon {
+        display: flex;
+        svg {
+          width: 32px;
+          height: auto;
+          margin-right: 14px;
+        }
+      }
+    }
+    .row-token {
+      position: absolute;
+      top: 0;
+      left: 46px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      color: #758295;
+    }
+    .row-footer {
+      font-weight: 600;
+      line-height: 1.5;
+      color: #758295;
+      @media screen and (min-width: $width-min-xs) {
+        font-size: 18px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        font-size: 16px;
+      }
+    }
+    .reward-item {
+      @media screen and (min-width: $width-min-sm) {
+        padding-bottom: 12px;
+      }
+      .row-body,
+      .row-footer {
+        color: $green-color;
+      }
+      .row-body {
+        padding-top: 0;
+        justify-content: space-between;
+      }
+      .row-footer {
+        margin-left: 8px;
+        @media screen and (min-width: $width-min-xs) {
+          margin-bottom: -13px;
+        }
+      }
+    }
+    .reward-content {
+      display: flex;
+      align-items: center;
+      @media screen and (max-width: $width-max-xs) {
+        width: 100%;
+        margin-bottom: 24px;
+      }
+    }
+  }
+}

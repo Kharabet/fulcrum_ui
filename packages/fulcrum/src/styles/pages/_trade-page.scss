@@ -1,27 +1,11 @@
-.trade-page {
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: flex-start;
-  width: $container-desktop;
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-@media screen and (max-width: $breakpoint-desktop-max) {
-  .trade-page {
-    width: $container-laptop;
-  }
-}
+@import "../abstracts/variables";
+
 @media screen and (max-width: $breakpoint-laptop-max) {
   .trade-page {
-    width: $container-mobile;
-    padding: 0 15px;
+    padding: 0;
   }
 }
 @media only screen and (max-width: $mobile-version-width-sm) {
-  .trade-page {
-    height: 100%;
-  }
   .trade-page-header {
     width: $container-mobile;
     margin: auto;

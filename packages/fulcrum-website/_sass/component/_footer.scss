@@ -5,14 +5,39 @@ footer {
   @media (max-width: 991px) {
     padding: 45px 0;
   }
+  .social-icons {
+    margin-bottom: 43px;
+  }
   .bzx-logo {
-    @media (min-width: 768px) {
-      max-width: 140px;
+    margin-bottom: 25px;
+    max-width: 140px;
+    margin-bottom: 66px;
+
+    @media (max-width: 991px) {
+      margin-bottom: 32px;
     }
     @media (max-width: 767px) {
+      margin-bottom: 25px;
       max-width: 100px;
     }
   }
+
+  .navigation {
+    display: grid;
+    grid-template-columns: 4fr 4fr 3fr;
+    grid-template-areas: "network product company";
+
+    .network {
+      grid-area: network;
+    }
+    .products {
+      grid-area: product;
+    }
+    .company {
+      grid-area: company;
+    }
+  }
+
   .list-footer {
     a {
       display: block;
@@ -41,7 +66,8 @@ footer {
   .item-link {
     display: flex;
     &:hover {
-      circle, ellipse {
+      circle,
+      ellipse {
         fill: #5b88ff;
       }
     }

@@ -1,0 +1,102 @@
+.wrap-logo {
+  svg {
+    @media screen and (max-width: $breakpoint-md-down) {
+      max-width: 105px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down) {
+      max-width: 145px;
+      height: auto;
+    }
+  }
+}
+
+.burger-buttons {
+  position: absolute;
+  top: 35px;
+  right: 15px;
+  @media screen and (min-width: $breakpoint-sm-up) {
+    display: none;
+  }
+  #hamburger-menu-open {
+    display: flex;
+    cursor: pointer;
+  }
+  #hamburger-menu-close {
+    display: none;
+    cursor: pointer;
+  }
+}
+.header-content-menu {
+  display: flex;
+  @media screen and (max-width: $breakpoint-sm-down) {
+    display: none;
+  }
+  .bzx-logo {
+    width: 80px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .button-lg {
+    width: 215px;
+    height: 60px;
+  }
+}
+.button-app {
+  width: 60px;
+  height: 30px;
+  margin: 0;
+  position: absolute;
+  right: 70px;
+}
+.open-menu {
+  overflow: hidden;
+  .switch-menu {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    z-index: 1050;
+    display: flex;
+    outline: 0px;
+    background-color: var(--primary-bg);
+    padding-bottom: 30px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .header-content-menu {
+    display: flex;
+  }
+  .button-app {
+    display: none;
+  }
+}
+
+.active-url{
+  position: relative;
+  &:before{
+    @media screen and (min-width: $breakpoint-sm-up){
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 8px;
+      left: 0;
+      right: 0;
+      margin: auto;
+      background-color: #276bfb;
+      border-radius: 6px;
+      top: -48px;
+    }
+    @media screen and (min-width: $breakpoint-md-up){
+      top: -67px;
+    }
+  }
+}
+.nav-menu {
+  position: relative;
+  .icon-external {
+    position: absolute;
+    top: -6px;
+    left: -16px;
+  }
+}

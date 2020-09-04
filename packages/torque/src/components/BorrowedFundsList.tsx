@@ -1,108 +1,64 @@
 import React, { Component, RefObject } from "react";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IWalletDetails } from "../domain/IWalletDetails";
-import { WalletType } from "../domain/WalletType";
-import { TorqueProvider } from "../services/TorqueProvider";
 import { BorrowedFundsAwaitingListItem } from "./BorrowedFundsAwaitingListItem";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
+import { ManageCollateralDlg } from "./ManageCollateralDlg";
+import { RepayLoanDlg } from "./RepayLoanDlg";
+import { ExtendLoanDlg } from "./ExtendLoanDlg";
+import { BorrowMoreDlg } from "./BorrowMoreDlg";
+import { TorqueProvider } from "../services/TorqueProvider";
 
 export interface IBorrowedFundsListProps {
-  walletDetails: IWalletDetails;
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
-
-  onManageCollateral: (item: IBorrowedFundsState) => void;
-  onRepayLoan: (item: IBorrowedFundsState) => void;
-  onExtendLoan: (item: IBorrowedFundsState) => void;
+  manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
+  repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
+  extendLoanDlgRef: React.RefObject<ExtendLoanDlg>;
+  borrowMoreDlgRef: React.RefObject<BorrowMoreDlg>;
+  isLoading : boolean ;
 }
 
 interface IBorrowedFundsListState {
-  // colsCount: number;
 }
 
 export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorrowedFundsListState> {
-  private readonly outerRef: RefObject<HTMLDivElement>;
+
 
   constructor(props: IBorrowedFundsListProps) {
     super(props);
-
-    this.outerRef = React.createRef();
-    this.state = { /*colsCount: this.getColsCount()*/ };
   }
 
-  // public componentDidMount(): void {
-  //   window.addEventListener("resize", this.didResize.bind(this));
-  //   this.didResize();
-  // }
-  //
-  // public componentWillUnmount(): void {
-  //   window.removeEventListener("resize", this.didResize.bind(this));
-  // }
+  public componentDidMount(): void {
+  }
 
   public render() {
-    const itemsAwaiting = this.props.itemsAwaiting.filter(e =>
-      this.props.walletDetails.walletType === WalletType.Web3
-      || this.props.walletDetails.walletType === WalletType.ViewOnly
-      || TorqueProvider.Instance.isETHAsset(e.collateralAsset)
-    )
-      .map((e, index) => {
-        // const rest = index % this.state.colsCount;
-        return (
-          <BorrowedFundsAwaitingListItem
-            key={index}
-            // firstInTheRow={rest === 0}
-            // lastInTheRow={rest === (this.state.colsCount - 1)}
-            walletDetails={this.props.walletDetails}
-            itemAwaiting={e}
-          />
-        );
-      });
-    const items = this.props.items.filter(e =>
-      this.props.walletDetails.walletType === WalletType.Web3
-      || this.props.walletDetails.walletType === WalletType.ViewOnly
-      || TorqueProvider.Instance.isETHAsset(e.collateralAsset)
-    )
-      .map((e, index) => {
-      // const rest = index % this.state.colsCount;
+    const itemsAwaiting = this.props.itemsAwaiting.map((e, index) => {
       return (
-        <BorrowedFundsListItem
+        <BorrowedFundsAwaitingListItem
           key={index}
-          // firstInTheRow={rest === 0}
-          // lastInTheRow={rest === (this.state.colsCount - 1)}
-          walletDetails={this.props.walletDetails}
-          item={e}
-          onManageCollateral={this.props.onManageCollateral}
-          onRepayLoan={this.props.onRepayLoan}
-          onExtendLoan={this.props.onExtendLoan}
+          itemAwaiting={e}
         />
       );
     });
-
-    return <div className="borrowed-funds-list" ref={this.outerRef}>
+    const items = this.props.items.map((e, index) => {
+      return (
+        <BorrowedFundsListItem
+          key={index}
+          item={e}
+          borrowMoreDlgRef={this.props.borrowMoreDlgRef}
+          manageCollateralDlgRef={this.props.manageCollateralDlgRef}
+          repayLoanDlgRef={this.props.repayLoanDlgRef}
+          extendLoanDlgRef={this.props.extendLoanDlgRef}
+        />
+      );
+    });
+    
+    return <div className="borrowed-funds-list">
+      {!this.props.isLoading && itemsAwaiting.length === 0 && items.length === 0 && !TorqueProvider.Instance.isLoading
+        && <a href="/borrow" className="no-loans-msg">Looks like you don't have any loans.</a>}
       {itemsAwaiting}
       {items}
     </div>;
   }
-
-  // private didResize = () => {
-  //   const colsCount = this.getColsCount();
-  //   if (colsCount !== this.state.colsCount) {
-  //     this.setState({ ...this.state, colsCount: colsCount });
-  //   }
-  // };
-  //
-  // private getColsCount = () => {
-  //   let cols = 1;
-  //   if (this.outerRef.current) {
-  //     const widthInRem = this.convertPixelsToRem(this.outerRef.current.offsetWidth);
-  //     cols = Math.trunc((widthInRem + 2) / 23);
-  //   }
-  //   return cols;
-  // };
-  //
-  // private convertPixelsToRem = (pixels: number) => {
-  //   const remSize = getComputedStyle(document.documentElement).fontSize;
-  //   return pixels / parseFloat(remSize || "16");
-  // };
 }

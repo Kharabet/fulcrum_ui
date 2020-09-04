@@ -1,0 +1,103 @@
+.borrow-more-loan-form {
+  width: 536px;
+
+  @media only screen and (max-width: $mobile-version-max-width) {
+    width: 100%;
+  }
+
+  .outer-rail {
+    background-color: #e7ebf0;
+  }
+
+  .input-container {
+    padding: 21px 15px;
+    @media screen and (max-width: $mobile-version-max-width) {
+      padding: 10px 15px;
+    }
+    .input-row {
+      margin-bottom: 0;
+    }
+  }
+
+  &__body {
+    padding: 30px 0 15px 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    @media only screen and (max-width: $mobile-version-max-width) {
+      padding: 31px 0 20px 0;
+    }
+    &-collateralized {
+      font-weight: normal;
+      font-size: 28px;
+      line-height: 150%;
+      padding-bottom: 2px;
+      @media only screen and (max-width: $mobile-version-max-width) {
+        font-size: 26px;
+      }
+      .value {
+        font-weight: 800;
+      }
+      &.safe {
+        color: #00c0ab;
+      }
+      &.unsafe,
+      &.danger {
+        color: #de4a4a;
+      }
+      &-label {
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 150%;
+        color: #758295;
+        @media only screen and (max-width: $mobile-version-max-width) {
+          font-size: 14px;
+        }
+      }
+      &-state {
+        font-weight: 800;
+        font-size: 16px;
+        line-height: 150%;
+        align-self: flex-end;
+        @media only screen and (max-width: $mobile-version-max-width) {
+          font-size: 14px;
+        }
+        &.safe {
+          color: #00c0ab;
+        }
+        &.unsafe,
+        &.danger {
+          color: #de4a4a;
+        }
+      }
+      &-value {
+        font-weight: 600;
+        font-size: 20px;
+        line-height: 150%;
+        color: #283049;
+        .value {
+          font-weight: 800;
+        }
+      }
+    }
+    &-slider-container {
+      padding-top: 20px;
+      padding-bottom: 15px;
+    }
+  }
+
+  &__actions-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .d-flex {
+    display: flex;
+  }
+  .j-c-sb {
+    justify-content: space-between;
+  }
+  .mt-30{
+    margin-top: 30px;
+  }
+}

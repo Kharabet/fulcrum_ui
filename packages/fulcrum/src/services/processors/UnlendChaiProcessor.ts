@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { LendRequest } from "../../domain/LendRequest";
@@ -15,7 +15,7 @@ export class UnlendChaiProcessor {
     // Initializing loan
     const taskRequest: LendRequest = (task.request as LendRequest);
     const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1)).plus(1);
+    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(taskRequest.asset);
     if (!tokenContract) {
       throw new Error("No iToken contract available!");
@@ -33,6 +33,8 @@ export class UnlendChaiProcessor {
 
     let gasAmountBN;
 
+    console.log(tokenContract.address, await tokenContract.burnToChai.getABIEncodedTransactionData(account, amountInBaseUnits));
+
     skipGas = true;
 
     // Waiting for token allowance
@@ -46,8 +48,6 @@ export class UnlendChaiProcessor {
 
     let txHash: string = "";
     try {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
-
       // Submitting unloan
       txHash = await tokenContract.burnToChai.sendTransactionAsync(account, amountInBaseUnits, {
         from: account,
@@ -56,8 +56,8 @@ export class UnlendChaiProcessor {
       });
       task.setTxHash(txHash);
     }
-    finally {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    catch(e) {
+      throw e;
     }
 
     task.processingStepNext();

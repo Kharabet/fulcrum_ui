@@ -3,37 +3,63 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { DotsBar } from "./DotsBar";
-import { BorrowSelectorIconsBar } from "./BorrowSelectorIconsBar";
-import bgDai  from "../assets/images/ic_token_dai.svg";
-import bgUsdc  from "../assets/images/ic_token_usdc.svg";
-import bgUsdt  from "../assets/images/ic_token_usdt.svg";
-import bgSai  from "../assets/images/ic_token_sai.svg";
-import bgEth  from "../assets/images/ic_token_eth.svg";
-import bgBtc  from "../assets/images/ic_token_btc.svg";
-import bgRep  from "../assets/images/ic_token_rep.svg";
-import bgZrx  from "../assets/images/ic_token_zrx.svg";
-import bgKnc  from "../assets/images/ic_token_knc.svg";
-import bgLink  from "../assets/images/ic_token_link.svg";
-import bgSusd  from "../assets/images/ic_token_susd.svg";
-import ic_arrow_right from "../assets/images/ic_arrow_right.svg";
+
+import { ReactComponent as ArrowRight } from "../assets/images/ic_arrow_right.svg";
+import { Loader } from "./Loader";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { AssetDetails } from "../domain/AssetDetails";
+import { BorrowDlg } from "./BorrowDlg";
+import { ProviderType } from "../domain/ProviderType";
+import { BorrowRequest } from "../domain/BorrowRequest";
+import { RequestStatus } from "../domain/RequestStatus";
+import { RequestTask } from "../domain/RequestTask";
+import { NavService } from "../services/NavService";
+import { TxProcessingLoader } from "./TxProcessingLoader";
+
 export interface IAssetSelectorItemProps {
   asset: Asset;
-
-  onSelectAsset?: (asset: Asset) => void;
+  isLoadingTransaction: boolean;
+  borrowDlgRef: React.RefObject<BorrowDlg>;
+  doNetworkConnect: () => void;
 }
 
 interface IAssetSelectorItemState {
   interestRate: BigNumber;
+  isLoadingTransaction: boolean;
+  request: BorrowRequest | undefined;
 }
 
 export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAssetSelectorItemState> {
   constructor(props: IAssetSelectorItemProps) {
     super(props);
 
-    this.state = { interestRate: new BigNumber(0) };
+    this.state = {
+      interestRate: new BigNumber(0),
+      isLoadingTransaction: false,
+      request: undefined
+    };
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
+  }
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true })
+  }
+  private onAskToCloseProgressDlg = async (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        TorqueProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+      }, 5000)
+      return;
+    }
+
+    await this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+    NavService.Instance.History.push("/dashboard");
   }
 
   private onProviderAvailable = () => {
@@ -41,7 +67,11 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
   };
 
   public componentWillUnmount(): void {
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
   public componentDidMount(): void {
@@ -64,90 +94,66 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
   };
 
   public render() {
-    const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
-    const assetTypeImg = "asset-selector-icon";
-    const assetDiv = "asset-selector-div"
-    let assetImg:any = this.getAssestsData()
-    let isload = !this.state.interestRate.gt(0) ? "op5": '';
-    // try{
-    //   let tmpassetImg = this.getAssestsData()
-    //   assetImg = tmpassetImg.img
-    // }catch (e){}
-
-
-
+    let asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
     return (
-      <div className={`asset-selector-item ${assetTypeModifier} ${isload}`} onClick={this.onClick}>
-        {/*<DotsBar />*/}
-        <div className="asset-selector-centeredOverlay" style={ this.state.interestRate.gt(0) ? { display: `none`} : undefined}>
-          <span>Loading...</span>
-      </div>
-
-        <div className="asset-selector__interest-rate">
-          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}%` : `0%`}
-        </div>
-        <div className="asset-selector-row">
-          <div className="asset-selector__apr">APR</div>
-          <div className="asset-selector__fixed">FIXED</div>
-        </div>
-        <div className="asset-selector-row mt50">
-          <div className="asset-selector__title">{this.props.asset}</div>
-          {!this.props.onSelectAsset ? (
-            <div className="asset-selector__title--coming-soon">Web3 Only</div>
-          ) : ``}
-
-          {/*<SelectorIconsBar />*/}
-          <img className={`${assetTypeImg}`} src={assetImg.img} />
-          <img className={`${assetDiv}`} src={ic_arrow_right} />
-
-          {/*<SelectorIconsBar />*/}
-          {/*<div className={`${assetDiv}`}><BorrowSelectorIconsBar /></div>*/}
-        </div>
-      </div>
-    );
+      !this.state.interestRate.gt(0)
+        ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+        : <React.Fragment>
+          <div className="asset-selector-item">
+            {this.state.isLoadingTransaction && this.state.request &&
+              <TxProcessingLoader
+                quantityDots={3}
+                sizeDots={'small'}
+                isOverlay={true}
+                taskId={this.state.request.id}
+              />
+            }
+            <div className="asset-selector-item-content" onClick={this.onClick}>
+              <div className="asset-selector-body">
+                <div className="asset-selector-row">
+                  <div className="asset-selector__interest-rate">
+                    <span className="asset-selector__interest-rate-value">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}</span>%
+                  </div>
+                </div>
+                <div className="asset-selector-row">
+                  <div className="asset-selector__apr">APR</div>
+                  <div className="asset-selector__fixed">FIXED</div>
+                </div>
+              </div>
+              <div className="asset-selector-footer">
+                <div className="asset-selector__title">
+                  {this.props.asset}
+                </div>
+                <div className="asset-selector__icon">
+                  {asset.reactLogoSvg.render()}
+                </div>
+                <div className="asset-selector__arrow">
+                  <ArrowRight />
+                </div>
+              </div>
+            </div>
+            <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgBorrowItem }}></div>
+          </div>
+        </React.Fragment>
+    )
   }
 
-  private onClick = () => {
-    if (this.props.onSelectAsset) {
-      this.props.onSelectAsset(this.props.asset);
+  private onClick = async () => {
+
+    if (!this.props.borrowDlgRef.current) return;
+
+    if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect()
+      return
+    }
+
+    try {
+      const borrowRequest = await this.props.borrowDlgRef.current.getValue(this.props.asset);
+      await this.setState({ ...this.state, request: borrowRequest });
+      await TorqueProvider.Instance.onDoBorrow(borrowRequest);
+    } catch (error) {
+      if (error.message !== "Form closed")
+        console.error(error);
     }
   };
-  private getAssestsData = () => {
-    //console.log("assestsType = ", this.props.asset)
-    switch (this.props.asset) {
-      case Asset.DAI:
-        return { img:bgDai}
-        break;
-      case Asset.SAI:
-        return {img:bgSai}
-        break;
-      case Asset.USDC:
-        return {img:bgUsdc}
-        break;
-      case Asset.USDT:
-        return {img:bgUsdt}
-        break;
-      case Asset.ETH:
-        return {img:bgEth}
-        break;
-      case Asset.WBTC:
-        return {img:bgBtc}
-        break;
-      case Asset.LINK:
-        return {img:bgLink}
-        break;
-      case Asset.ZRX:
-        return {img:bgZrx}
-        break;
-      case Asset.REP:
-        return {img:bgRep}
-        break;
-      case Asset.KNC:
-        return { img:bgKnc}
-        break;
-      case Asset.SUSD:
-        return { img:bgSusd}
-        break;
-    }
-  }
 }

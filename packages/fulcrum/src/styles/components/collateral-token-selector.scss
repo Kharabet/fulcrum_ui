@@ -1,3 +1,5 @@
+@import "../abstracts/variables";
+
 .collateral-token-selector {
   position: absolute;
   top: 57px;
@@ -6,11 +8,12 @@
   padding: 15px 20px 20px 20px;
   box-sizing: border-box;
   width: 100%;
+  max-height: 200px;
   z-index: 100004;
   @media screen and (max-width: $mobile-version-max-width) {
     top: 50px;
   }
-  &__wrapper{
+  &__wrapper {
     width: 100vw;
     height: 100vh;
     position: absolute;
@@ -47,7 +50,7 @@
     }
     &--selected {
       background-color: #586473;
-      &:hover{
+      &:hover {
         background-color: #586473;
       }
     }
@@ -62,17 +65,17 @@
       svg {
         width: 25px;
         height: 25px;
-        .eth-svg{
+        .eth-svg {
           fill: #c8c8c8;
         }
       }
     }
   }
-  &__description{    
+  &__description {
     font-size: 12px;
     line-height: 1.5;
     font-weight: 600;
-    color: #B9C7D6;
+    color: #b9c7d6;
     letter-spacing: 0.05px;
     @media screen and (max-width: $mobile-version-max-width) {
       font-size: 10px;

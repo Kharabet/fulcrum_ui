@@ -1,0 +1,152 @@
+footer {
+  padding: 90px 0;
+  @media screen and (max-width: $width-max-sm) {
+    padding: 75px 0 60px 0;
+  }
+  .footer-menu {
+    display: flex;
+    align-items: baseline;
+    width: calc(100% / 12 * 7);
+
+    @media screen and (max-width: $width-max-sm) {
+      width: 100%;
+      order: -1;
+    }
+  }
+  .column-menu {
+    display: flex;
+    flex-wrap: wrap;
+    &:not(:last-child) {
+      width: 35%;
+    }
+    &:last-child {
+      width: 30%;
+    }
+  }
+  .title-menu {
+    line-height: 1.5;
+    width: 100%;
+    font-size: 20px;
+    margin: 13px auto 35px auto;
+    @media screen and (max-width: $width-max-sm) {
+      font-size: 16px;
+      margin: 13px auto 25px auto;
+    }
+  }
+  .list-menu {
+    a {
+      display: block;
+      font-weight: 600;
+      color: $primary-color;
+      line-height: 1.25;
+      font-size: 16px;
+      @media screen and (max-width: $width-max-md) {
+        font-size: 14px;
+      }
+      @media screen and (max-width: $width-max-sm) {
+        font-size: 12px;
+      }
+
+      &:hover {
+        color: $primary-color-hover;
+      }
+      &:not(:last-child) {
+        margin-bottom: 20px;
+        @media screen and (max-width: $width-max-sm) {
+          margin-bottom: 15px;
+        }
+      }
+    }
+  }
+}
+.footer-social {
+  width: calc(100% / 12 * 5);
+
+  @media screen and (min-width: $width-min-sm) {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  @media screen and (max-width: $width-max-sm) {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 30px;
+  }
+  .item-social {
+    @media screen and (max-width: $width-max-sm) {
+      margin: auto;
+      width: 100%;
+    }
+  }
+  .social {
+    display: flex;
+    margin-bottom: 60px;
+
+    @media screen and (max-width: $width-max-sm) {
+      margin-bottom: 30px;
+    }
+    a {
+      display: flex;
+      width: 56px;
+
+      &:not(:last-child) {
+        margin-right: 15px;
+      }
+      &:hover {
+        circle,
+        ellipse {
+          fill: $primary-color-hover;
+        }
+      }
+      svg {
+        width: 100%;
+        height: auto;
+      }
+
+      @media screen and (max-width: $width-max-md) {
+        width: 48px;
+        &:not(:last-child) {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+  .data-protocol {
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-size: 18px;
+    @media screen and (max-width: $width-max-sm) {
+      font-size: 16px;
+    }
+  }
+  .data-year {
+    flex-wrap: wrap;
+    font-size: 14px;
+    margin-top: 80px;
+    @media screen and (max-width: $width-max-md) {
+      margin-bottom: 15px;
+      margin-top: 42px;
+    }
+
+    @media screen and (max-width: $width-max-xs) {
+      font-size: 10px;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    p {
+      margin-right: 15px;
+    }
+    a {
+      color: $green-color;
+      &:not(:last-child) {
+        margin-right: 30px;
+      }
+    }
+  }
+}

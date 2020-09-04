@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 
+import "../styles/components/leverage-selector.scss"
+
 export interface ILeverageSelectorProps {
   asset: Asset
   value: number;
@@ -18,9 +20,9 @@ export class LeverageSelector extends Component<ILeverageSelectorProps> {
     }
 
     const selectorItems = values.map((e, index) => {
-      const isDisabled =
-        this.props.asset === Asset.LINK &&
-        e === 5;
+      const isDisabled = false;
+        /*this.props.asset === Asset.LINK &&
+        e === 5;*/
       if (e === this.props.value) activeIndex = index;
       return (
         <li
