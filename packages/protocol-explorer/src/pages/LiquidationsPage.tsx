@@ -67,12 +67,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         { token: Asset.DAI, color: "#F8A608" },
         { token: Asset.USDC, color: "#3574B9" },
         { token: Asset.USDT, color: "#26A17B" },
-        { token: Asset.SUSD, color: "#100E23" },
         { token: Asset.WBTC, color: "#41365B" },
         { token: Asset.LINK, color: "#2A5ADA" },
-        { token: Asset.ZRX, color: "#000004" },
-        { token: Asset.REP, color: "#5F2652" },
-        { token: Asset.KNC, color: "#49BC98" }
+        { token: Asset.YFI, color: "#2A0ADA" },
+        { token: Asset.BZRX, color: "#2A6AEA" },
+        { token: Asset.MKR, color: "#49BC98" },
+        { token: Asset.LEND, color: "#3574B9" },
+        { token: Asset.KNC, color: "#49BC98" },
+
       ]
     }
 

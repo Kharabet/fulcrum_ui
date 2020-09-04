@@ -41,17 +41,19 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       aprWidth: 2,
       utilizationWidth: 2,
     };
-    
+
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
       this.assetsShown = [
+        Asset.ETH,
         Asset.DAI,
         Asset.USDC,
         Asset.USDT,
-        Asset.SUSD,
-        Asset.ETH,
         Asset.WBTC,
         Asset.LINK,
-        Asset.ZRX,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
         Asset.KNC,
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
@@ -64,7 +66,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         Asset.WBTC,
         Asset.LINK,
         Asset.ZRX,
-        Asset.KNC,
+        Asset.KNC
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       this.assetsShown = [
