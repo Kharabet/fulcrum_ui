@@ -314,13 +314,13 @@ export default class Fulcrum {
 
         let result = [];
         reducedArray.forEach((document, index, documents) => {
-            let change24h = 0;
+            let diffWithPrevPrecents = 0;
             if (index > 0)
-                change24h = (document.allTokensStats.usdTotalLocked - documents[index - 1].allTokensStats.usdTotalLocked) / documents[index - 1].allTokensStats.usdTotalLocked;
+            diffWithPrevPrecents = (document.allTokensStats.usdTotalLocked - documents[index - 1].allTokensStats.usdTotalLocked) / documents[index - 1].allTokensStats.usdTotalLocked * 100;
             result.push({
                 timestamp: new Date(document.date).getTime(),
                 tvl: document.allTokensStats.usdTotalLocked,
-                change24h: change24h
+                diffWithPrevPrecents: diffWithPrevPrecents
             });
         });
         return result;
