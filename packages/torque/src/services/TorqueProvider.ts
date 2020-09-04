@@ -1399,9 +1399,12 @@ export class TorqueProvider {
     result = loansData
       .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
       .map(e => {
-        const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        let loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        loanAsset = this.isETHAsset(loanAsset) ? Asset.ETH : loanAsset;
+        let collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        collateralAsset = this.isETHAsset(collateralAsset) ? Asset.ETH : collateralAsset;
+
         const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
-        const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
         let amountOwned = e.principal.minus(e.interestDepositRemaining);
         if (amountOwned.lte(0)) {
@@ -1845,7 +1848,7 @@ export class TorqueProvider {
   };*/
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH; // || asset === Asset.WETH;
+    return asset === Asset.ETH || asset === Asset.WETH;
   };
 
   public isStableAsset = (asset: Asset): boolean => {
