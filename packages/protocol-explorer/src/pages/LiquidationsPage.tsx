@@ -376,7 +376,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                           </div>
                           <div className="flex w-100">
                             <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                            <span className="healthy-value healthy-color">{this.state.healthyLoansUsd.toFixed(2)}</span>
+                            <span className="healthy-value healthy-color">{this.state.healthyLoansUsd.div(10**6).toFixed(2)}m</span>
                           </div>
                         </div>
                       </div>
