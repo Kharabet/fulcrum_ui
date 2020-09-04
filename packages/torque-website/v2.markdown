@@ -3,6 +3,7 @@ featured-image: /images/ogp.png
 metadescription: "Torque is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks"
 title: Torque Crypto Loans | Borrowing Made Simple | bZx
 layout: home
+permalink: v2
 ---
 <section class="bg-primary bg-primary-image">
     {% include header.html %}
@@ -12,7 +13,7 @@ layout: home
                 <h1 class="mb-40">Borrowing Made Simple</h1>
             </div>
             <div class="col col-7 col-xl-9 col-md-12">
-                <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is a powerful DeFi platform for borrowing assets with indefinite-term loans and fixed interest rates. Get an instant, crypto-backed loan with no KYC or credit checks.</p>
+                <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is a powerful DeFi platform for borrowing assets with indefinite-term loans and fixed interest rates. Get an instant, crypto-backed loan with no KYC or credit checks. </p>
             </div>
         </div>
         <div class="row">
@@ -32,17 +33,7 @@ layout: home
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
                                         <li class="li-options" data-asset="{{ product.name }}">
-                                                                        {% if product.name == "lend" %}
-                            <div class="lend-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% elsif  product.name == "bzrx" %}
-                            <div class="bzrx-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% else %}
-                                {% include svg/{{ product.name }}.svg %}
-                            {% endif %}
+                                            {% include svg/{{ product.name }}.svg %}
                                             {{ product.name }}
                                         </li>
                                     {% endfor %}
@@ -67,17 +58,7 @@ layout: home
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
                                         <li class="li-options" data-asset="{{ product.name }}">
-                                                                        {% if product.name == "lend" %}
-                            <div class="lend-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% elsif  product.name == "bzrx" %}
-                            <div class="bzrx-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% else %}
-                                {% include svg/{{ product.name }}.svg %}
-                            {% endif %}
+                                            {% include svg/{{ product.name }}.svg %}
                                             {{ product.name }}
                                         </li>
                                     {% endfor %}
@@ -116,18 +97,8 @@ layout: home
                 <div class="apr-wrapper">
                     {% for product in site.data.products %}
                         <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="{{ product.name }}">
-                            <div class="icon-50 mr-15 mr-xl-10 mr-xs-9 ">
-                            {% if product.name == "lend" %}
-                            <div class="lend-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% elsif  product.name == "bzrx" %}
-                            <div class="bzrx-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% else %}
+                            <div class="icon-50 mr-15 mr-xl-10 mr-xs-9">
                                 {% include svg/{{ product.name }}.svg %}
-                            {% endif %}                              
                             </div>
                             <div class="wrap-apr-value">
                                 <p class="lh-100 fw-700 c-gray">{{ product.name }}</p>
@@ -366,7 +337,7 @@ layout: home
             <div class="col col-12 jc-c">
                 <h2 class="cube mb-50 mb-xs-45">
                 <span class="t-r-75 t-r-xs-50 center">{% include svg/small-cube.svg %}</span>
-                Frequently Asked Questions 
+                Frequently Asked Questions
                 </h2>
             </div>
         </div>

@@ -54,7 +54,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         Asset.BZRX,
         Asset.MKR,
         Asset.LEND,
-        Asset.KNC,
+        Asset.KNC
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assetsShown = [

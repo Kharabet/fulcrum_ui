@@ -74,6 +74,9 @@ export class ExplorerProvider {
     public isLoading: boolean = false;
     public unsupportedNetwork: boolean = false;
 
+    public static readonly MAX_UINT = new BigNumber(2)
+        .pow(256)
+        .minus(1);
 
     constructor() {
         // init
@@ -795,25 +798,26 @@ export class ExplorerProvider {
     }
 
     public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
-        let amount = new BigNumber(0);
+        return ExplorerProvider.MAX_UINT;
+        /*let amount = new BigNumber(0);
 
         switch (asset) {
             case Asset.ETH:
-            case Asset.WETH:
-            case Asset.fWETH:
-                amount = new BigNumber(10 ** 18).multipliedBy(1500);
-            case Asset.WBTC:
-            case Asset.YFI:
-                amount = new BigNumber(10 ** 8).multipliedBy(25);
-            case Asset.BZRX:
-                amount = new BigNumber(10 ** 18).multipliedBy(400000);
-            case Asset.LINK:
-                amount = new BigNumber(10 ** 18).multipliedBy(60000);
-            case Asset.ZRX:
-                amount = new BigNumber(10 ** 18).multipliedBy(750000);
-            case Asset.LEND:
-            case Asset.KNC:
-                amount = new BigNumber(10 ** 18).multipliedBy(550000);
+          case Asset.WETH:
+          case Asset.fWETH:
+            amount = new BigNumber(10 ** 18).multipliedBy(1500);
+          case Asset.WBTC:
+          case Asset.YFI:
+            amount = new BigNumber(10 ** 8).multipliedBy(25);
+          case Asset.BZRX:
+            amount = new BigNumber(10 ** 18).multipliedBy(400000);
+          case Asset.LINK:
+            amount = new BigNumber(10 ** 18).multipliedBy(60000);
+          case Asset.ZRX:
+            amount = new BigNumber(10 ** 18).multipliedBy(750000);
+          case Asset.LEND:
+          case Asset.KNC:
+            amount = new BigNumber(10 ** 18).multipliedBy(550000);
             case Asset.BAT:
                 amount = new BigNumber(10 ** 18).multipliedBy(750000);
             case Asset.DAI:
@@ -827,6 +831,8 @@ export class ExplorerProvider {
                 amount = new BigNumber(10 ** 18).multipliedBy(15000);
             case Asset.MKR:
                 amount = new BigNumber(10 ** 18).multipliedBy(1250);
+          case Asset.CHI:
+            amount = new BigNumber(10 ** 18);
             default:
                 break;
         }
@@ -835,7 +841,7 @@ export class ExplorerProvider {
             throw new Error("Invalid approval asset!");
         }
 
-        return amount.gt(neededAmount) ? amount : neededAmount;
+        return amount.gt(neededAmount) ? amount : neededAmount;*/
     }
 
     private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
