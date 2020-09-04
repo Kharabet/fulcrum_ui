@@ -53,7 +53,7 @@ export class TxProcessingLoader extends Component<ITxProcessingLoaderProps, ITxP
       if (errorMsg) {
         if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`) ||
           errorMsg.includes(`always failing transaction`)) {
-          errorMsg = "The transaction seems like it will fail. Change request parameters and try agian, please."; //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
+          errorMsg = "The transaction seems like it will fail. Change request parameters and try again, please."; //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
         } else if (errorMsg.includes("Reverted by EVM")) {
           errorMsg = "The transaction failed. Reverted by EVM"; //. Etherscan link:";
         } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
