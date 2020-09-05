@@ -513,7 +513,10 @@ export class ExplorerProvider {
             .forEach(async e => {
                 const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
                 const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
-                if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) return null;
+                if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) {
+                    console.log("unknown", loanAsset, collateralAsset)
+                    return null;
+                }
                 const loandAssetUsdRate = await this.getSwapToUsdRate(loanAsset);
                 const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
                 const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;

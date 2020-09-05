@@ -72,8 +72,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         { token: Asset.YFI, color: "#2A0ADA" },
         { token: Asset.BZRX, color: "#2A6AEA" },
         { token: Asset.MKR, color: "#49BC98" },
-        { token: Asset.LEND, color: "#3574B9" },
-        { token: Asset.KNC, color: "#49BC98" },
+        { token: Asset.LEND, color: "#3574B8" },
+        { token: Asset.KNC, color: "#49BC97" },
 
       ]
     }
@@ -178,8 +178,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     let volume30d = new BigNumber(0);
     let liquidationEventsWithUsd: { event: LiquidationEvent, repayAmountUsd: BigNumber }[] = []
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory();
-    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, true);
-    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, false);
+    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 150, true);
+    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 150, false);
     const unhealthyLoansUsd = unhealthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const healthyLoansUsd = healthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const liqudiations30d = liquidationEvents.filter((e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30))
