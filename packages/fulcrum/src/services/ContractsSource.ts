@@ -375,6 +375,9 @@ export class ContractsSource {
       case 1:
         // noinspection SpellCheckingInspection
         switch (addressErc20) {
+          case "0x77f973FCaF871459aa58cd81881Ce453759281bC":
+            asset = Asset.ETHv1;
+            break;
           case "0x56d811088235f11c8920698a204a5010a788f4b3":
             asset = Asset.BZRX;
             break;

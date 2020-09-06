@@ -533,6 +533,10 @@ export class FulcrumProvider {
             let usdSupply = new BigNumber(0);
             let usdTotalLocked = new BigNumber(0);
 
+            if (asset == Asset.ETHv1) {
+              vaultBalance = await this.getAssetTokenBalanceOfUser(Asset.WETH, "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633");
+            }
+
             const precision = new BigNumber(10 ** (18 - decimals));
             totalAssetSupply = totalAssetSupply.times(precision);
             totalAssetBorrow = totalAssetBorrow.times(precision);
@@ -1446,7 +1450,7 @@ export class FulcrumProvider {
     };
   }
 
-  public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
+  public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
       // always 0
@@ -1459,7 +1463,7 @@ export class FulcrumProvider {
       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const assetErc20Address = this.getErc20AddressOfAsset(asset);
       if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address);
+        result = await this.getErc20BalanceOfUser(assetErc20Address, account);
         result = result.multipliedBy(10 ** (18 - precision));
       }
     }
