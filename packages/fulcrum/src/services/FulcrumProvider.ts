@@ -712,6 +712,9 @@ export class FulcrumProvider {
           result = (await assetContract.profitOf.callAsync(account))
             .dividedBy(10 ** 18);
 
+          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+          result = result.multipliedBy(10 ** (18 - precision));
+
           /*if (swapPrice && swapPrice.gt(0)) {
             result = result
               .multipliedBy(swapPrice);
