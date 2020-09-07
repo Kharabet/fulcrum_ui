@@ -30,7 +30,6 @@ export default class Torque {
 
             const borrowEstimate = await iTokenContract.methods.getDepositAmountForBorrow(
                 new BigNumber(amount).multipliedBy(10 ** loanPrecision),
-                new BigNumber(2 * 10 ** 18),
                 new BigNumber(7884000), // approximately 3 months
                 collateralAssetErc20Address).call();
             result.depositAmount = new BigNumber(borrowEstimate)

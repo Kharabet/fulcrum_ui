@@ -13,7 +13,7 @@ export class ExtendLoanProcessor {
     }
 
     const taskRequest: ExtendLoanRequest = (task.request as ExtendLoanRequest);
-    const isETHBorrowAsset = taskRequest.borrowAsset === Asset.ETH;
+    const isETHBorrowAsset = TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset);
 
     if (isETHBorrowAsset) {
       //Initializing

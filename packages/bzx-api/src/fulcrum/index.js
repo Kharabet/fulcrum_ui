@@ -431,7 +431,7 @@ export default class Fulcrum {
                     usdTotalLocked = marketLiquidity.plus(vaultBalance).times(swapRates[i]).dividedBy(10 ** 18);
                     usdTotalLockedAll = usdTotalLockedAll.plus(usdTotalLocked);
                 }
-                console.log(token.name, swapRates[i])
+                
                 stats.tokensStats.push(new tokenStatsModel({
                     token: token.name,
                     liquidity: marketLiquidity.dividedBy(10 ** 18).toFixed(),

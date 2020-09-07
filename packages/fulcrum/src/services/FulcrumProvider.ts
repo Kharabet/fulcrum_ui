@@ -533,6 +533,10 @@ export class FulcrumProvider {
             let usdSupply = new BigNumber(0);
             let usdTotalLocked = new BigNumber(0);
 
+            if (asset == Asset.ETHv1) {
+              vaultBalance = await this.getAssetTokenBalanceOfUser(Asset.WETH, "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633");
+            }
+
             const precision = new BigNumber(10 ** (18 - decimals));
             totalAssetSupply = totalAssetSupply.times(precision);
             totalAssetBorrow = totalAssetBorrow.times(precision);
@@ -708,6 +712,9 @@ export class FulcrumProvider {
           result = (await assetContract.profitOf.callAsync(account))
             .dividedBy(10 ** 18);
 
+          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+          result = result.multipliedBy(10 ** (18 - precision));
+
           /*if (swapPrice && swapPrice.gt(0)) {
             result = result
               .multipliedBy(swapPrice);
@@ -811,17 +818,18 @@ export class FulcrumProvider {
 
       }
     } else {
-      if (loan) {
+      if (loan && loan.loanData) {
         const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
         const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
-
+        const currentCollateralToPrincipalRate = await this.getSwapRate(loan.collateralAsset, loan.loanAsset);
         const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
         const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
-       
 
         result = positionType === PositionType.LONG
-          ? loan.loanData!.collateral.times(collateralAssetPrecision)
-          : loan.loanData!.principal.times(loanAssetPrecision);
+          ? loan.loanData.collateral.times(collateralAssetPrecision)
+          : loan.loanData.collateral.times(collateralAssetPrecision)
+          .times(currentCollateralToPrincipalRate)
+          .minus(loan.loanData.principal.times(loanAssetPrecision));
         }
       }
 
@@ -1446,7 +1454,7 @@ export class FulcrumProvider {
     };
   }
 
-  public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
+  public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
       // always 0
@@ -1459,7 +1467,7 @@ export class FulcrumProvider {
       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const assetErc20Address = this.getErc20AddressOfAsset(asset);
       if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address);
+        result = await this.getErc20BalanceOfUser(assetErc20Address, account);
         result = result.multipliedBy(10 ** (18 - precision));
       }
     }
@@ -1516,7 +1524,7 @@ export class FulcrumProvider {
 
         const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans())
           .find(l => l.loanId === request.loanId);
-        if (!loan)
+        if (!loan || !loan.loanData)
           throw new Error("No loan available!");
 
 
@@ -1526,13 +1534,17 @@ export class FulcrumProvider {
           amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
         }
         else {
-          const decimals: number = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
-          amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(request.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
+          const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
+          const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
+  
+          const currentCollateralToPrincipalRate = await this.getSwapRate(loan.collateralAsset, loan.loanAsset);
+          const maxRequestAmount = loan.loanData.collateral.div(10 ** collateralAssetDecimals).times(currentCollateralToPrincipalRate).minus(loan.loanData.principal.div(10 ** loanAssetDecimals));
+          amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(request.amount.div(maxRequestAmount)).toFixed(0, 1));
         }
 
         let maxAmountInBaseUnits = new BigNumber(0);
         if (loan) {
-          maxAmountInBaseUnits = loan.loanData!.collateral;
+          maxAmountInBaseUnits = loan.loanData.collateral;
         }
 
         if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01)) {

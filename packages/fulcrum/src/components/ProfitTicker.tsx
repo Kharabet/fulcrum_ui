@@ -3,8 +3,9 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 
 export interface IProfitTickerProps {
-  secondDiff: number;
+  secondDiff: BigNumber;
   profit: BigNumber | null;
+  //onProfit: (profit: BigNumber) => void;
   asset: Asset;
 }
 
@@ -19,12 +20,15 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
 
   public componentDidMount(): void {
     const ms = 50;
-    const diff = this.props.secondDiff / (1000 / ms);
-    let value = this.props.profit ? this.props.profit.toNumber() : 0;
+    const diff = this.props.secondDiff.dividedBy(1000 / ms);
+    let value = this.props.profit ? this.props.profit : new BigNumber(0);
+    //int i = 0;
     setInterval(() => {
       if (this.container.current) {
-        value = value + diff;
+        value = value.plus(diff);
         this.container.current.innerHTML = value.toFixed(8);
+        // if (i % 20 == 0)
+        //   this.props.onProfit(value);
       }
     }, ms);
   }

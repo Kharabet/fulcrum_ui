@@ -264,7 +264,7 @@ export class ContractsSource {
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     await this.Init();
     let symbol;
-    if (asset === Asset.WETH) {
+    if (asset === Asset.WETH || asset === Asset.fWETH) {
       symbol = `iETH`;
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`;
@@ -347,7 +347,7 @@ export class ContractsSource {
 
   public getITokenErc20Address(asset: Asset): string | null {
     let symbol;
-    if (asset === Asset.WETH) {
+    if (asset === Asset.WETH || asset === Asset.fWETH) {
       symbol = `iETH`;
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`;
@@ -375,6 +375,9 @@ export class ContractsSource {
       case 1:
         // noinspection SpellCheckingInspection
         switch (addressErc20) {
+          case "0x77f973FCaF871459aa58cd81881Ce453759281bC":
+            asset = Asset.ETHv1;
+            break;
           case "0x56d811088235f11c8920698a204a5010a788f4b3":
             asset = Asset.BZRX;
             break;
@@ -385,7 +388,7 @@ export class ContractsSource {
             asset = Asset.LEND;
             break;
           case "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2":
-            asset = Asset.WETH;
+            asset = Asset.ETH;
             break;
           case "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359":
             asset = Asset.SAI;
