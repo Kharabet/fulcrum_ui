@@ -422,8 +422,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         let value = new BigNumber(0);
         let collateral = new BigNumber(0);
         let openPrice = new BigNumber(0);
-        let startingValue = new BigNumber(0);
-        let currentValue = new BigNumber(0);
         let liquidationPrice = new BigNumber(0);
         let profit = new BigNumber(0);
 
@@ -443,9 +441,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           collateral = (collateralAssetAmount.times(currentCollateralToPrincipalRate)).minus(loanAssetAmount);
           openPrice = loan.loanData.startRate.div(10 ** 18).times(loanAssetPrecision).div(collateralAssetPrecision);
           liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-          startingValue = ((collateralAssetAmount).times(openPrice)).minus(loanAssetAmount);
-          currentValue = ((collateralAssetAmount).times(currentCollateralToPrincipalRate)).minus(loanAssetAmount);
-          profit = currentValue.minus(startingValue);
+          profit = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.loanAsset)) {
@@ -456,8 +452,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
             openPrice = openPrice.times(loanAssetUSDStartRate)
             const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(loan.loanAsset);
-            startingValue = startingValue.times(collateralToUSDCurrentRate);
-            currentValue = currentValue.times(collateralToUSDCurrentRate);
             profit = profit.times(collateralToUSDCurrentRate);
             value = value.times(collateralToUSDCurrentRate);
             collateral = collateral.times(collateralToUSDCurrentRate);
@@ -470,9 +464,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionValue = collateralAssetAmount.times(currentCollateralToPrincipalRate).minus(loanAssetAmount);
           openPrice = new BigNumber(10 ** 36).div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision)).div(10 ** 18);
           liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-          startingValue = collateralAssetAmount.minus(loanAssetAmount.div(openPrice));
-          currentValue = collateralAssetAmount.minus(loanAssetAmount.times(currentCollateralToPrincipalRate));
-          profit = startingValue.minus(currentValue);
+          profit = openPrice.minus(new BigNumber(1).div(currentCollateralToPrincipalRate)).times(positionValue);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
@@ -484,8 +476,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
             openPrice = openPrice.times(loanAssetUSDStartRate)
             const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(loan.collateralAsset);
-            startingValue = startingValue.times(collateralToUSDCurrentRate);
-            currentValue = currentValue.times(collateralToUSDCurrentRate);
             profit = profit.times(collateralToUSDCurrentRate);
             value = value.times(collateralToUSDCurrentRate);
             collateral = collateral.times(collateralToUSDCurrentRate);
