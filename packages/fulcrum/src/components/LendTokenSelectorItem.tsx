@@ -74,33 +74,33 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     let profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
-    if (profit && profit.lt(0)) {
+    if (profit && profit.lt(0))
       profit = new BigNumber(0);
 
-      const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
+    const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
 
-      const address = FulcrumProvider.Instance.contractsSource ?
-        await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
-        "";
+    const address = FulcrumProvider.Instance.contractsSource ?
+      await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
+      "";
 
+    this._isMounted && this.setState({
+      ...this.state,
+      assetDetails: assetDetails || null,
+      interestRate,
+      profit,
+      balanceOfUser,
+      iTokenAddress: address,
+      tickerSecondDiff: balanceOfUser.times(interestRate).dividedBy(100 * 365 * 24 * 60 * 60),
+    });
+
+    if (address !== "") {
       this._isMounted && this.setState({
         ...this.state,
-        assetDetails: assetDetails || null,
-        interestRate,
-        profit,
-        balanceOfUser,
-        iTokenAddress: address,
-        tickerSecondDiff: balanceOfUser.times(interestRate).dividedBy(100 * 365 * 24 * 60 * 60),
+        isLoading: false
       });
-
-      if (address !== "") {
-        this._isMounted && this.setState({
-          ...this.state,
-          isLoading: false
-        });
-      }
-
     }
+
+  }
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
