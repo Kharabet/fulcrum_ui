@@ -76,33 +76,31 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     let profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
     if (profit && profit.lt(0)) {
       profit = new BigNumber(0);
-    } else if (profit) {
-      profit = profit
-    }
-    const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
 
-    const address = FulcrumProvider.Instance.contractsSource ?
-      await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
-      "";
+      const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
 
-    this._isMounted && this.setState({
-      ...this.state,
-      assetDetails: assetDetails || null,
-      interestRate,
-      profit,
-      balanceOfUser,
-      iTokenAddress: address,
-      tickerSecondDiff: balanceOfUser.times(interestRate).dividedBy(100 * 365 * 24 * 60 * 60),
-    });
+      const address = FulcrumProvider.Instance.contractsSource ?
+        await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
+        "";
 
-    if (address !== "") {
       this._isMounted && this.setState({
         ...this.state,
-        isLoading: false
+        assetDetails: assetDetails || null,
+        interestRate,
+        profit,
+        balanceOfUser,
+        iTokenAddress: address,
+        tickerSecondDiff: balanceOfUser.times(interestRate).dividedBy(100 * 365 * 24 * 60 * 60),
       });
-    }
 
-  }
+      if (address !== "") {
+        this._isMounted && this.setState({
+          ...this.state,
+          isLoading: false
+        });
+      }
+
+    }
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
