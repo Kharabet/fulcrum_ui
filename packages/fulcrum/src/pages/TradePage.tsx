@@ -198,8 +198,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public render() {
 
-    const tvBaseToken = this.state.selectedMarket.baseToken === Asset.WETH ? Asset.ETH : this.state.selectedMarket.baseToken;
-    const tvQuoteToken = this.state.selectedMarket.quoteToken === Asset.WETH ? Asset.ETH : this.state.selectedMarket.quoteToken;
+    const tvBaseToken = this.state.selectedMarket.baseToken === Asset.WETH ||
+      this.state.selectedMarket.baseToken === Asset.fWETH ? Asset.ETH : this.state.selectedMarket.baseToken;
+    const tvQuoteToken = this.state.selectedMarket.quoteToken === Asset.WETH ||
+      this.state.selectedMarket.quoteToken === Asset.fWETH ? Asset.ETH : this.state.selectedMarket.quoteToken;
 
     return (
       <div className="trade-page">
