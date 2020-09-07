@@ -32,7 +32,7 @@ interface ILendTokenSelectorItemState {
   profit: BigNumber | null;
   balanceOfUser: BigNumber;
   iTokenAddress: string,
-  tickerSecondDiff: number;
+  tickerSecondDiff: BigNumber;
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: LendRequest | undefined;
@@ -55,7 +55,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       profit,
       balanceOfUser,
       iTokenAddress: "",
-      tickerSecondDiff: 0,
+      tickerSecondDiff: new BigNumber(0),
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined
@@ -76,6 +76,8 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     let profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
     if (profit && profit.lt(0)) {
       profit = new BigNumber(0);
+    } else if (profit) {
+      profit = profit
     }
     const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
 
@@ -90,7 +92,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       profit,
       balanceOfUser,
       iTokenAddress: address,
-      tickerSecondDiff: balanceOfUser.toNumber() * (interestRate.toNumber() / 100) / 365 / 24 / 60 / 60,
+      tickerSecondDiff: balanceOfUser.times(interestRate).dividedBy(100 * 365 * 24 * 60 * 60),
     });
 
     if (address !== "") {
@@ -238,6 +240,14 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       </div>
     );
   }
+
+  // private onProfit = async (profit: BigNumber) => {
+  //   await FulcrumProvider.Instance.getLendProfit(this.props.asset).then(val => {
+  //     console.log("profit change\n" + new BigNumber(val!).dividedBy(profit).toFixed(8));
+  //     console.log(new Date().toLocaleString());
+
+  //   });
+  // }
 
   private renderActions = (isLendOnly: boolean) => {
     return isLendOnly ? (
