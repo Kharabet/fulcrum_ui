@@ -127,7 +127,7 @@ export const iTokenJson = {
             "name": "loanOrderData",
             "outputs": [
                 {
-                    "name": "loanOrderHash",
+                    "name": "loanId",
                     "type": "bytes32"
                 },
                 {
@@ -135,11 +135,11 @@ export const iTokenJson = {
                     "type": "uint256"
                 },
                 {
-                    "name": "initialMarginAmount",
+                    "name": "initialMargin",
                     "type": "uint256"
                 },
                 {
-                    "name": "maintenanceMarginAmount",
+                    "name": "maintenanceMargin",
                     "type": "uint256"
                 },
                 {
@@ -247,6 +247,25 @@ export const iTokenJson = {
         },
         {
             "constant": true,
+            "inputs": [
+                {
+                    "name": "user",
+                    "type": "address"
+                }
+            ],
+            "name": "profitOf",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
             "inputs": [],
             "name": "tokenizedRegistry",
             "outputs": [
@@ -287,7 +306,7 @@ export const iTokenJson = {
         {
             "constant": true,
             "inputs": [],
-            "name": "loanTokenAddress",
+            "name": "loanToken",
             "outputs": [
                 {
                     "name": "",
@@ -519,7 +538,7 @@ export const iTokenJson = {
                     "type": "uint256"
                 }
             ],
-            "name": "loanOrderHashes",
+            "name": "loanIdes",
             "outputs": [
                 {
                     "name": "",
@@ -658,7 +677,7 @@ export const iTokenJson = {
                 },
                 {
                     "indexed": false,
-                    "name": "collateralTokenAddress",
+                    "name": "collateralToken",
                     "type": "address"
                 },
                 {
@@ -869,50 +888,11 @@ export const iTokenJson = {
             "constant": false,
             "inputs": [
                 {
-                    "name": "borrowAmount",
-                    "type": "uint256"
-                },
-                {
-                    "name": "leverageAmount",
-                    "type": "uint256"
-                },
-                {
-                    "name": "initialLoanDuration",
-                    "type": "uint256"
-                },
-                {
-                    "name": "collateralTokenSent",
-                    "type": "uint256"
-                },
-                {
-                    "name": "borrower",
-                    "type": "address"
-                },
-                {
-                    "name": "collateralTokenAddress",
-                    "type": "address"
-                }
-            ],
-            "name": "borrowTokenFromDeposit",
-            "outputs": [
-                {
-                    "name": "loanOrderHash",
+                    "name": "loanId",
                     "type": "bytes32"
-                }
-            ],
-            "payable": true,
-            "stateMutability": "payable",
-            "type": "function"
-        },
-        {
-            "constant": false,
-            "inputs": [
-                {
-                    "name": "borrowAmount",
-                    "type": "uint256"
                 },
                 {
-                    "name": "leverageAmount",
+                    "name": "withdrawAmount",
                     "type": "uint256"
                 },
                 {
@@ -922,6 +902,10 @@ export const iTokenJson = {
                 {
                     "name": "collateralTokenSent",
                     "type": "uint256"
+                },
+                {
+                    "name": "collateralToken",
+                    "type": "address"
                 },
                 {
                     "name": "borrower",
@@ -932,15 +916,19 @@ export const iTokenJson = {
                     "type": "address"
                 },
                 {
-                    "name": "collateralTokenAddress",
-                    "type": "address"
+                    "name": "loanData",
+                    "type": "bytes"
                 }
             ],
-            "name": "borrowTokenFromDeposit",
+            "name": "borrow",
             "outputs": [
                 {
-                    "name": "loanOrderHash",
-                    "type": "bytes32"
+                    "name": "newPrincipal",
+                    "type": "uint256"
+                },
+                {
+                    "name": "newCollateral",
+                    "type": "uint256"
                 }
             ],
             "payable": true,
@@ -951,19 +939,15 @@ export const iTokenJson = {
             "constant": false,
             "inputs": [
                 {
-                    "name": "borrowAmount",
+                    "name": "loanId",
+                    "type": "bytes32"
+                },
+                {
+                    "name": "withdrawAmount",
                     "type": "uint256"
                 },
                 {
-                    "name": "leverageAmount",
-                    "type": "uint256"
-                },
-                {
-                    "name": "interestInitialAmount",
-                    "type": "uint256"
-                },
-                {
-                    "name": "loanTokenSent",
+                    "name": "initialLoanDuration",
                     "type": "uint256"
                 },
                 {
@@ -971,40 +955,47 @@ export const iTokenJson = {
                     "type": "uint256"
                 },
                 {
-                    "name": "tradeTokenSent",
-                    "type": "uint256"
+                    "name": "collateralToken",
+                    "type": "address"
                 },
                 {
                     "name": "borrower",
                     "type": "address"
                 },
                 {
-                    "name": "collateralTokenAddress",
+                    "name": "receiver",
                     "type": "address"
                 },
                 {
-                    "name": "tradeTokenAddress",
+                    "name": "gasTokenUser",
                     "type": "address"
+                },
+                {
+                    "name": "loanData",
+                    "type": "bytes"
                 }
             ],
-            "name": "borrowTokenAndUse",
+            "name": "borrowWithGasToken",
             "outputs": [
                 {
-                    "name": "loanOrderHash",
-                    "type": "bytes32"
+                    "name": "newPrincipal",
+                    "type": "uint256"
+                },
+                {
+                    "name": "newCollateral",
+                    "type": "uint256"
                 }
             ],
-            "payable": false,
-            "stateMutability": "nonpayable",
-            "type": "function",
-            "signature": "0x2ddbfc19"
+            "payable": true,
+            "stateMutability": "payable",
+            "type": "function"
         },
         {
             "constant": false,
             "inputs": [
                 {
-                    "name": "depositAmount",
-                    "type": "uint256"
+                    "name": "loanId",
+                    "type": "bytes32"
                 },
                 {
                     "name": "leverageAmount",
@@ -1019,31 +1010,79 @@ export const iTokenJson = {
                     "type": "uint256"
                 },
                 {
-                    "name": "tradeTokenSent",
-                    "type": "uint256"
+                    "name": "collateralToken",
+                    "type": "address"
                 },
                 {
                     "name": "trader",
                     "type": "address"
                 },
                 {
-                    "name": "depositTokenAddress",
-                    "type": "address"
-                },
-                {
-                    "name": "collateralTokenAddress",
-                    "type": "address"
-                },
-                {
-                    "name": "tradeTokenAddress",
-                    "type": "address"
+                    "name": "loanData",
+                    "type": "bytes"
                 }
             ],
-            "name": "marginTradeFromDeposit",
+            "name": "marginTrade",
             "outputs": [
                 {
-                    "name": "loanOrderHash",
+                    "name": "newPrincipal",
+                    "type": "uint256"
+                },
+                {
+                    "name": "newCollateral",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function",
+            "signature": "0xfecb8da3"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "loanId",
                     "type": "bytes32"
+                },
+                {
+                    "name": "leverageAmount",
+                    "type": "uint256"
+                },
+                {
+                    "name": "loanTokenSent",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateralTokenSent",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateralToken",
+                    "type": "address"
+                },
+                {
+                    "name": "trader",
+                    "type": "address"
+                },
+                {
+                    "name": "gasTokenUser",
+                    "type": "address"
+                },
+                {
+                    "name": "loanData",
+                    "type": "bytes"
+                }
+            ],
+            "name": "marginTradeWithGasToken",
+            "outputs": [
+                {
+                    "name": "newPrincipal",
+                    "type": "uint256"
+                },
+                {
+                    "name": "newCollateral",
+                    "type": "uint256"
                 }
             ],
             "payable": false,
@@ -1278,13 +1317,9 @@ export const iTokenJson = {
                 {
                     "name": "borrowAmount",
                     "type": "uint256"
-                },
-                {
-                    "name": "useFixedInterestModel",
-                    "type": "bool"
                 }
             ],
-            "name": "nextBorrowInterestRateWithOption",
+            "name": "nextBorrowInterestRate",
             "outputs": [
                 {
                     "name": "",
@@ -1413,15 +1448,11 @@ export const iTokenJson = {
                     "type": "uint256"
                 },
                 {
-                    "name": "leverageAmount",
-                    "type": "uint256"
-                },
-                {
                     "name": "initialLoanDuration",
                     "type": "uint256"
                 },
                 {
-                    "name": "collateralTokenAddress",
+                    "name": "collateralToken",
                     "type": "address"
                 }
             ],
@@ -1441,11 +1472,46 @@ export const iTokenJson = {
             "constant": true,
             "inputs": [
                 {
-                    "name": "depositAmount",
+                    "name": "leverageAmount",
                     "type": "uint256"
                 },
                 {
-                    "name": "leverageAmount",
+                    "name": "loanTokenSent",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateralTokenSent",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateralTokenAddress",
+                    "type": "address"
+                }
+            ],
+            "name": "getEstimatedMarginDetails",
+            "outputs": [
+                {
+                    "name": "principal",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateral",
+                    "type": "uint256"
+                },
+                {
+                    "name": "interestRate",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "name": "depositAmount",
                     "type": "uint256"
                 },
                 {
@@ -1453,7 +1519,7 @@ export const iTokenJson = {
                     "type": "uint256"
                 },
                 {
-                    "name": "collateralTokenAddress",
+                    "name": "collateralToken",
                     "type": "address"
                 }
             ],
@@ -1495,7 +1561,7 @@ export const iTokenJson = {
                 {
                     "components": [
                         {
-                            "name": "loanTokenAddress",
+                            "name": "loanToken",
                             "type": "address"
                         },
                         {
@@ -1503,7 +1569,7 @@ export const iTokenJson = {
                             "type": "address"
                         },
                         {
-                            "name": "collateralTokenAddress",
+                            "name": "collateralToken",
                             "type": "address"
                         },
                         {
@@ -1519,11 +1585,11 @@ export const iTokenJson = {
                             "type": "uint256"
                         },
                         {
-                            "name": "initialMarginAmount",
+                            "name": "initialMargin",
                             "type": "uint256"
                         },
                         {
-                            "name": "maintenanceMarginAmount",
+                            "name": "maintenanceMargin",
                             "type": "uint256"
                         },
                         {
@@ -1531,7 +1597,7 @@ export const iTokenJson = {
                             "type": "uint256"
                         },
                         {
-                            "name": "loanOrderHash",
+                            "name": "loanId",
                             "type": "bytes32"
                         }
                     ],
@@ -1545,7 +1611,7 @@ export const iTokenJson = {
                             "type": "address"
                         },
                         {
-                            "name": "collateralTokenAddressFilled",
+                            "name": "collateralTokenFilled",
                             "type": "address"
                         },
                         {
@@ -1561,7 +1627,7 @@ export const iTokenJson = {
                             "type": "uint256"
                         },
                         {
-                            "name": "collateralTokenAmountFilled",
+                            "name": "collateral",
                             "type": "uint256"
                         },
                         {
@@ -1573,7 +1639,7 @@ export const iTokenJson = {
                             "type": "uint256"
                         },
                         {
-                            "name": "loanEndUnixTimestampSec",
+                            "name": "loanEndTimestamp",
                             "type": "uint256"
                         },
                         {
@@ -1634,4 +1700,3 @@ export const iTokenJson = {
         }
     ]
 }
-
