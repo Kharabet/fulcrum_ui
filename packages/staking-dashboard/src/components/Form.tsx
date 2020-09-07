@@ -194,7 +194,15 @@ export class Form extends Component<{}, IFormState> {
 
   public onStakeClick = async (bzrx: BigNumber, vbzrx: BigNumber, bpt: BigNumber) => {
     if (this.state.selectedRepAddress === "") return;
-    const receipt = await StakingProvider.Instance.stake(bzrx, vbzrx, bpt, this.state.selectedRepAddress);
+    const bzrxAmount = bzrx.gt(this.state.bzrxBalance.times(10 ** 18)) ? this.state.bzrxBalance.times(10 ** 18) : bzrx;
+    const vbzrxAmount = vbzrx.gt(this.state.vBzrxBalance.times(10 ** 18)) ? this.state.vBzrxBalance.times(10 ** 18) : vbzrx;
+    let bptAmount;
+    if (networkName === "kovan")
+      bptAmount = bpt.gt(this.state.bptBalance.times(10 ** 6)) ? this.state.bptBalance.times(10 ** 6) : bpt;
+    else {
+      bptAmount = bpt.gt(this.state.bptBalance.times(10 ** 18)) ? this.state.bptBalance.times(10 ** 18) : bpt;
+    }
+    const receipt = await StakingProvider.Instance.stake(bzrxAmount, vbzrxAmount, bptAmount, this.state.selectedRepAddress);
     await this.derivedUpdate();
   }
 
@@ -416,15 +424,15 @@ export class Form extends Component<{}, IFormState> {
             <React.Fragment>
               <div className="calculator-row">
                 <div className="row-header">Please select representative:</div>
-                  <ul className={`group-buttons ${this.state.delegateAddress.toLowerCase() !== ZERO_ADDRESS ? "selected-delegate" : ""}`}>
+                <ul className={`group-buttons ${this.state.delegateAddress.toLowerCase() !== ZERO_ADDRESS ? "selected-delegate" : ""}`}>
                   {topRepsLi}
                 </ul>
               </div>
               {this.state.selectedRepAddress !== "" &&
                 <AddToBalance
-                  bzrxMax={Number(this.state.bzrxBalance)}
-                  vbzrxMax={Number(this.state.vBzrxBalance)}
-                  bptMax={Number(this.state.bptBalance)}
+                  bzrxMax={this.state.bzrxBalance.toNumber()}
+                  vbzrxMax={this.state.vBzrxBalance.toNumber()}
+                  bptMax={this.state.bptBalance.toNumber()}
                   stake={this.onStakeClick}
                 />
               }
