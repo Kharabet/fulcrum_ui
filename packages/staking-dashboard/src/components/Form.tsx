@@ -109,12 +109,12 @@ export class Form extends Component<{}, IFormState> {
       : (await StakingProvider.Instance.stakeableByAsset(Asset.BPT)).div(10 ** 18);
     const iEthBalance = (await StakingProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
 
-    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BZRX)).div(10 ** 18);
-    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.vBZRX)).div(10 ** 18);
+    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.BZRX)).div(10 ** 18);
+    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.vBZRX)).div(10 ** 18);
     //TODO: remove networkName
     const bptStakingBalance = networkName === "kovan"
-      ? (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BPT)).div(10 ** 6)
-      : (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BPT)).div(10 ** 18);
+      ? (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 6)
+      : (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 18);
 
     //const userData = await StakingProvider.Instance.getiETHSwapRateWithCheck();
     //const iETHSwapRate = userData[0].div(10 ** 18);
@@ -335,8 +335,8 @@ export class Form extends Component<{}, IFormState> {
                 <div className="row-container">
                   <div className="row-body">
                     <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                    <span title={this.state.bzrxStakingBalance.toFixed(18)} className="value">
-                      {this.state.bzrxStakingBalance.toFixed(2)}
+                    <span title={this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? "Your Wallet Balance less than Staking Balance" : this.state.bzrxStakingBalance.toFixed(18)} className="value">
+                      {(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxBalance : this.state.bzrxStakingBalance).toFixed(2)}
                     </span>
                     <div className="row-token">BZRX</div>
                   </div>
@@ -344,9 +344,8 @@ export class Form extends Component<{}, IFormState> {
                 <div className="row-container">
                   <div className="row-body">
                     <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-
-                    <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
-                      {Number(this.state.vBzrxStakingBalance).toFixed(2)}
+                    <span title={this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? "Your Wallet Balance less than Staking Balance" : this.state.vBzrxStakingBalance.toFixed(18)} className="value">
+                      {(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxBalance : this.state.vBzrxStakingBalance).toFixed(2)}
                     </span>
                     <div className="row-token">vBZRX</div>
                   </div>
@@ -355,7 +354,9 @@ export class Form extends Component<{}, IFormState> {
                   <div className="row-body">
                     <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer">
                       <span title={this.state.bptStakingBalance.toFixed(18)} className="icon"><BPTIcon /></span></a>
-                    <span className="value">{this.state.bptStakingBalance.toFixed(2)}</span>
+                    <span title={this.state.bptBalance.lt(this.state.bptStakingBalance) ? "Your Wallet Balance less than Staking Balance" : this.state.bptStakingBalance.toFixed(18)} className="value">
+                      {(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptBalance : this.state.bptStakingBalance).toFixed(2)}
+                    </span>
                     <div className="row-token">BPT</div>
                   </div>
                 </div>
