@@ -449,6 +449,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!.timeStamp;
             const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${loan.loanAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`);
             const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+            if (!swapToUsdHistoryRateResponse) continue;
             const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
             openPrice = openPrice.times(loanAssetUSDStartRate)
             const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(loan.loanAsset);
@@ -473,6 +474,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!.timeStamp;
             const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${loan.collateralAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`);
             const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+            if (!swapToUsdHistoryRateResponse) continue;
             const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
             openPrice = openPrice.times(loanAssetUSDStartRate)
             const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(loan.collateralAsset);
