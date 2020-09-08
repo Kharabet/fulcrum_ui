@@ -109,12 +109,12 @@ export class Form extends Component<{}, IFormState> {
       : (await StakingProvider.Instance.stakeableByAsset(Asset.BPT)).div(10 ** 18);
     const iEthBalance = (await StakingProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
 
-    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.BZRX)).div(10 ** 18);
-    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.vBZRX)).div(10 ** 18);
+    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BZRX)).div(10 ** 18);
+    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.vBZRX)).div(10 ** 18);
     //TODO: remove networkName
     const bptStakingBalance = networkName === "kovan"
-      ? (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 6)
-      : (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 18);
+      ? (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BPT)).div(10 ** 6)
+      : (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BPT)).div(10 ** 18);
 
     //const userData = await StakingProvider.Instance.getiETHSwapRateWithCheck();
     //const iETHSwapRate = userData[0].div(10 ** 18);
