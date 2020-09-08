@@ -30,17 +30,11 @@ export default class Torque {
 
             const borrowEstimate = await iTokenContract.methods.getDepositAmountForBorrow(
                 new BigNumber(amount).multipliedBy(10 ** loanPrecision),
-                new BigNumber(2 * 10 ** 18),
                 new BigNumber(7884000), // approximately 3 months
                 collateralAssetErc20Address).call();
             result.depositAmount = new BigNumber(borrowEstimate)
-                // .multipliedBy(150 + marginPremium)
-                // .dividedBy(125 + marginPremium)
-                .dividedBy(10 ** collateralPrecision);
-            result.depositAmount = result.depositAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL);
-            /*result.gasEstimate = await this.web3Wrapper.estimateGasAsync({
-              ...
-            }));*/
+                .dividedBy(10 ** collateralPrecision)
+                .multipliedBy(1.20);
         }
         await this.storage.setItem(`borrow-deposit-estimate-${borrowAssetName}_${collateralAssetName}_${amount}`, result, {ttl: 1000*60*5 /* 5 mins */ });
 

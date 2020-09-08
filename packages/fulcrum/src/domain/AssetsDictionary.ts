@@ -298,6 +298,29 @@ export class AssetsDictionary {
       )
     ],
     [
+      Asset.ETHv1,
+      new AssetDetails(
+        "ETH",
+        "Ethereum (ETH)",
+        "iETHv1",
+        "https://fulcrum.trade/images/iETH.svg",
+        18,
+        eth_logo,
+        ETHLogo,
+        eth_bg_btm,
+        eth_ts,
+        "#FFFFFF",
+        "#444e5a",
+        "#333",
+        new Map<number, string | null>([
+          [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
+          [3, "0xc778417e063141139fce010982780140aa0cd5ab"],
+          [4, "0xc778417e063141139fce010982780140aa0cd5ab"],
+          [42, "0xd0a1e359811322d97991e03f863a0c30c2cf029c"]
+        ])
+      )
+    ],
+    [
       Asset.ETH,
       new AssetDetails(
         "ETH",
@@ -724,6 +747,29 @@ export class AssetsDictionaryMobile {
           [1, "0x57ab1ec28d129707052df4df418d58a2d46d5f51"],
           [3, ""],
           [42, "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62"],
+        ])
+      )
+    ],
+    [
+      Asset.ETHv1,
+      new AssetDetails(
+        "ETH",
+        "Ethereum (ETH)",
+        "iETHv1",
+        "https://fulcrum.trade/images/iETH.svg",
+        18,
+        eth_logo,
+        ETHLogo,
+        eth_bg_btm,
+        eth_ts,
+        "#FFFFFF",
+        "#444e5a",
+        "#333",
+        new Map<number, string | null>([
+          [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
+          [3, "0xc778417e063141139fce010982780140aa0cd5ab"],
+          [4, "0xc778417e063141139fce010982780140aa0cd5ab"],
+          [42, "0xd0a1e359811322d97991e03f863a0c30c2cf029c"]
         ])
       )
     ],

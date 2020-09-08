@@ -41,7 +41,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       aprWidth: 2,
       utilizationWidth: 2,
     };
-    
+
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
       this.assetsShown = [
         Asset.ETH,
@@ -66,7 +66,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         Asset.WBTC,
         Asset.LINK,
         Asset.ZRX,
-        Asset.KNC,
+        Asset.KNC
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       this.assetsShown = [
