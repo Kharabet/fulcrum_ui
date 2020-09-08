@@ -148,7 +148,7 @@ export class ManageCollateralProcessor {
           collateralAmountInBaseUnits,                                                // depositAmount
           {
             from: account,
-            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : "3000000",
             gasPrice: await FulcrumProvider.Instance.gasPrice()
           }
         );

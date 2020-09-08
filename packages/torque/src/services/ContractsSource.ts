@@ -132,7 +132,7 @@ export class ContractsSource {
       case Asset.WETH:
         switch (this.networkId) {
           case 1:
-            address = "0x77f973fcaf871459aa58cd81881ce453759281bc";
+            address = "0xb983e01458529665007ff7e0cddecdb74b967eb6";
             break;
           case 3:
             address = "0x0c9b7891e0374ce96e8063891a2356a0fe23ee33";
@@ -155,7 +155,7 @@ export class ContractsSource {
       case Asset.USDT:
         switch (this.networkId) {
           case 1:
-            address = "0x8326645f3aa6de6420102fdb7da9e3a91855045b";
+            address = "0x7e9997a38a439b2be7ed9c9c4628391d3e055d48";
             break;
           case 42:
             address = "0x6b9f03e05423cc8d00617497890c0872ff33d4e8";
@@ -175,7 +175,7 @@ export class ContractsSource {
       case Asset.DAI:
         switch (this.networkId) {
           case 1:
-            address = "0x493c57c4763932315a328269e1adad09653b9081";
+            address = "0x6b093998d36f2c7f0cc359441fbb24cc629d5ff0";
             break;
           case 3:
             address = "0x8cca3a42105de7765c58f547e85ac98f57b25d5c";
@@ -191,7 +191,7 @@ export class ContractsSource {
       case Asset.USDC:
         switch (this.networkId) {
           case 1:
-            address = "0xf013406a0b1d544238083df0b93ad0d2cbe0f65f";
+            address = "0x32e4c68b3a4a813b710595aeba7f6b7604ab9c15";
             break;
           case 42:
             address = "0xaac9822f31e5aefb32bc228dcf259f23b49b9855";
@@ -221,7 +221,7 @@ export class ContractsSource {
       case Asset.KNC:
         switch (this.networkId) {
           case 1:
-            address = "0x1cc9567ea2eb740824a45f8026ccf8e46973234d";
+            address = "0x687642347a9282be8fd809d8309910a3f984ac5a";
             break;
           case 42:
             address = "0xde7a60c3581f0d8c8723a71c28579131984a410c";
@@ -231,7 +231,7 @@ export class ContractsSource {
       case Asset.LINK:
         switch (this.networkId) {
           case 1:
-            address = "0x1d496da96caf6b518b133736beca85d5c4f9cbc5";
+            address = "0x463538705e7d22aa7f03ebf8ab09b067e1001b54";
             break;
           case 42:
             address = "0x76754c763a23e9202cc721584fbaf6012ecd8fba";
@@ -241,7 +241,7 @@ export class ContractsSource {
       case Asset.MKR:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0x9189c499727f88f8ecc7dc4eea22c828e6aac015";
             break;
           case 42:
             address = "0x3e72500122c3afd64afe0306d7fbc7b8bd82b7d2";
@@ -261,7 +261,7 @@ export class ContractsSource {
       case Asset.WBTC:
         switch (this.networkId) {
           case 1:
-            address = "0xba9262578efef8b3aff7f60cd629d6cc8859c8b5";
+            address = "0x2ffa85f655752fb2acb210287c60b9ef335f5b6e";
             break;
           case 42:
             address = "0x73d4b4ab88eab2a1e6ce495de85c2b04c2918b69";
@@ -275,6 +275,16 @@ export class ContractsSource {
             break;
           case 42:
             address = "0xbac711d9963f0db23613f3c338a7a1af151c0696";
+            break;
+        }
+        break;
+      case Asset.USDT:
+        switch (this.networkId) {
+          case 1:
+            address = "0x7e9997a38a439b2be7ed9c9c4628391d3e055d48";
+            break;
+          case 42:
+            address = "";
             break;
         }
         break;
@@ -502,6 +512,18 @@ export class ContractsSource {
             break;
           case Asset.CHI:
             address = "0x0000000000004946c0e9f43f4dee607b0ef1fa1c";
+            break;
+          case Asset.YFI:
+            address = "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e";
+            break;
+          case Asset.USDT:
+            address = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+            break;
+          case Asset.BZRX:
+            address = "0x56d811088235F11C8920698a204A5010a788f4b3";
+            break;
+          case Asset.LEND:
+            address = "0x80fb784b7ed66730e8b1dbd9820afd29931aab03";
             break;
         }
         break;

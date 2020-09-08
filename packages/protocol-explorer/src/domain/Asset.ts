@@ -2,8 +2,6 @@ export enum Asset {
   ETH = "ETH",
   WETH = "WETH",
   fWETH = "fWETH",
-  YFI = "YFI",
-  BZRX = "BZRX",
   SAI = "SAI",
   DAI = "DAI",
   CHAI = "CHAI",
@@ -18,5 +16,8 @@ export enum Asset {
   REP = "REP",
   LEND = "LEND",
   KNC = "KNC",
+  CHI = "CHI",
+  BZRX = "BZRX",
+  YFI = "YFI",
   UNKNOWN = "UNKNOWN"
 }

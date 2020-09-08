@@ -222,12 +222,15 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               <button className="" onClick={this.onExtendLoan}>
                 Front Interest
               </button>
-              <button className="" onClick={this.onRepayLoan}
+              <button className="" onClick={this.onRepayLoan}>
+                Repay Loan
+              </button>
+              {/*<button className="" onClick={this.onRepayLoan}
                 title={isUnhealthyLoan ? "Collateral too low" : ""}
                 disabled={isUnhealthyLoan}>
 
                 Repay Loan
-              </button>
+              </button>*/}
               <button className=""
                 title={isBoorowMoreDisabled ? "Collateral too low" : ""}
                 disabled={isBoorowMoreDisabled} onClick={this.onBorrowMore}>

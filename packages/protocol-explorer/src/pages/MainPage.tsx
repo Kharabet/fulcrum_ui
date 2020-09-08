@@ -14,7 +14,7 @@ interface IMainPageProps {
 interface IMainPageState {
   periodChart: number;
   tvl: string;
-  change24h: number;
+  diffWithPrevPrecents: number;
   labels: Array<number>;
   data: Array<number>;
   change24: Array<number>;
@@ -29,7 +29,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     this.state = {
       periodChart: 1,
       tvl: '1.2',
-      change24h: 0,
+      diffWithPrevPrecents: 0,
       labels: [],
       data: [],
       change24: []
@@ -80,7 +80,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
                 <div className="tvl">TVL <span className="sign sign-currency">$ </span></div>
                 <div>
                   <span className="tvl-value">{tvl ? this.getRoundedData(tvl) : this.state.tvl}</span>
-                  {this.state.change24h !== 0 && <div className={`tvl-interest ${this.state.change24h < 0 ? `down` : ``}`}><Arrow />{Math.abs(this.state.change24h).toFixed(5)}<span className="sign">%</span></div>}
+                  {this.state.diffWithPrevPrecents !== 0 && <div className={`tvl-interest ${this.state.diffWithPrevPrecents < 0 ? `down` : ``}`}><Arrow />{Math.abs(this.state.diffWithPrevPrecents).toFixed(5)}<span className="sign">%</span></div>}
                 </div>
               </div>
               <div className="flex jc-c w-100 mb-45">
@@ -142,10 +142,10 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
           ? labels.push(`${new Date(item["timestamp"]).getHours() % 12}:${new Date(item["timestamp"]).getMinutes() < 10 ? `0${new Date(item["timestamp"]).getMinutes()}` : new Date(item["timestamp"]).getMinutes()}`)
           : labels.push(`${months[new Date(item["timestamp"]).getMonth()]} ${new Date(item["timestamp"]).getDate()}`);
         data.push(item["tvl"]);
-        change24.push(item["change24h"]);
+        change24.push(item["diffWithPrevPrecents"]);
       });
-      // console.log(responseJson.data[Object.keys(responseJson.data).length - 1].tvl);
-      this._isMounted && this.setState({ ...this.state, change24h: (100 * responseJson.data[Object.keys(responseJson.data).length - 1].tvl / responseJson.data[0].tvl) });
+      const tvlDiff = (responseJson.data[Object.keys(responseJson.data).length - 1].tvl - responseJson.data[0].tvl)/ responseJson.data[0].tvl
+      this._isMounted && this.setState({ ...this.state, diffWithPrevPrecents: (tvlDiff * 100 ) });
     } else {
       console.error(responseJson.message)
     }

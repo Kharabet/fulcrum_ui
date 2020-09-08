@@ -94,7 +94,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        address = "0xaaA601aE20077F9fae80494DDC36BB39C952c2d0";
         break;
       case 3:
         address = "0x4330762418df3555ddd1d732200b317c9239b941";
@@ -138,7 +138,7 @@ export class ContractsSource {
     let result = Asset.UNKNOWN;
 
     //@ts-ignore
-    result = ContractsSource.iTokenList.filter(e => e[1] === address)[0][4].substr(1) as Asset
+    result = ContractsSource.iTokenList.filter(e => e[1].toLowerCase() === address.toLowerCase())[0][4].substr(1) as Asset
     return result;
   }
 
@@ -211,6 +211,9 @@ export class ContractsSource {
             break;
           case "0xdd974d5c2e2928dea5f71b9825b8b646686bd200":
             asset = Asset.KNC;
+            break;
+          case "0x0000000000004946c0e9f43f4dee607b0ef1fa1c":
+            asset = Asset.CHI;
             break;
         }
         break;
@@ -295,6 +298,9 @@ export class ContractsSource {
           case "0x02357164ba33f299f7654cbb29da29db38ae1f44":
             asset = Asset.KNC;
             break;
+          case "0x0000000000004946c0e9f43f4dee607b0ef1fa1c":
+            asset = Asset.CHI;
+            break;
         }
         break;
     }
@@ -306,7 +312,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0xbfdE53F20d50E41162a6085a9A591f27c9c47652";
+        address = "0x3B55369bfeA51822eb3E85868c299E8127E13c56";
         break;
       case 3:
         address = "0x2B2db1E0bDf6485C87Bc2DddEd17E7E3D9ba675E";

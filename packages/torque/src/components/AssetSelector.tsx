@@ -26,7 +26,7 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
         Asset.WBTC,
         Asset.LINK,
         Asset.YFI,
-        Asset.BZRX,
+        //Asset.BZRX,
         Asset.MKR,
         Asset.LEND,
         Asset.KNC

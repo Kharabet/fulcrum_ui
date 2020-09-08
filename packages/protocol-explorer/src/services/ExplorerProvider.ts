@@ -74,6 +74,9 @@ export class ExplorerProvider {
     public isLoading: boolean = false;
     public unsupportedNetwork: boolean = false;
 
+    public static readonly MAX_UINT = new BigNumber(2)
+        .pow(256)
+        .minus(1);
 
     constructor() {
         // init
@@ -237,7 +240,9 @@ export class ExplorerProvider {
         if (!this.contractsSource) return result;
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
         const liquidationResponse = await fetch(etherscanApiUrl);
         const liquidationResponseJson = await liquidationResponse.json();
         if (liquidationResponseJson.status !== "1") return result;
@@ -287,7 +292,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
         const tradeEventResponse = await fetch(etherscanApiUrl);
         const tradeEventResponseJson = await tradeEventResponse.json();
         if (tradeEventResponseJson.status !== "1") return result;
@@ -341,7 +348,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
         const closeWithSwapResponse = await fetch(etherscanApiUrl);
         const closeWithSwapResponseJson = await closeWithSwapResponse.json();
         if (closeWithSwapResponseJson.status !== "1") return result;
@@ -391,7 +400,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
         const closeWithDepositResponse = await fetch(etherscanApiUrl);
         const closeWithDepositResponseJson = await closeWithDepositResponse.json();
         if (closeWithDepositResponseJson.status !== "1") return result;
@@ -439,7 +450,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
         const borrowResponse = await fetch(etherscanApiUrl);
         const borrowResponseJson = await borrowResponse.json();
         if (borrowResponseJson.status !== "1") return result;
@@ -500,7 +513,10 @@ export class ExplorerProvider {
             .forEach(async e => {
                 const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
                 const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
-                if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) return null;
+                if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) {
+                    console.log("unknown", loanAsset, collateralAsset)
+                    return null;
+                }
                 const loandAssetUsdRate = await this.getSwapToUsdRate(loanAsset);
                 const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
                 const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
@@ -530,7 +546,9 @@ export class ExplorerProvider {
         const tokenContractAddress = this.contractsSource.getITokenErc20Address(asset);
         if (!tokenContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
         const burnResponse = await fetch(etherscanApiUrl);
         const burnResponseJson = await burnResponse.json();
         if (burnResponseJson.status !== "1") return result;
@@ -566,7 +584,9 @@ export class ExplorerProvider {
         const tokenContractAddress = this.contractsSource.getITokenErc20Address(asset);
         if (!tokenContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
         const mintResponse = await fetch(etherscanApiUrl);
         const mintResponseJson = await mintResponse.json();
         if (mintResponseJson.status !== "1") return result;
@@ -795,25 +815,26 @@ export class ExplorerProvider {
     }
 
     public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
-        let amount = new BigNumber(0);
+        return ExplorerProvider.MAX_UINT;
+        /*let amount = new BigNumber(0);
 
         switch (asset) {
             case Asset.ETH:
-            case Asset.WETH:
-            case Asset.fWETH:
-                amount = new BigNumber(10 ** 18).multipliedBy(1500);
-            case Asset.WBTC:
-            case Asset.YFI:
-                amount = new BigNumber(10 ** 8).multipliedBy(25);
-            case Asset.BZRX:
-                amount = new BigNumber(10 ** 18).multipliedBy(400000);
-            case Asset.LINK:
-                amount = new BigNumber(10 ** 18).multipliedBy(60000);
-            case Asset.ZRX:
-                amount = new BigNumber(10 ** 18).multipliedBy(750000);
-            case Asset.LEND:
-            case Asset.KNC:
-                amount = new BigNumber(10 ** 18).multipliedBy(550000);
+          case Asset.WETH:
+          case Asset.fWETH:
+            amount = new BigNumber(10 ** 18).multipliedBy(1500);
+          case Asset.WBTC:
+          case Asset.YFI:
+            amount = new BigNumber(10 ** 8).multipliedBy(25);
+          case Asset.BZRX:
+            amount = new BigNumber(10 ** 18).multipliedBy(400000);
+          case Asset.LINK:
+            amount = new BigNumber(10 ** 18).multipliedBy(60000);
+          case Asset.ZRX:
+            amount = new BigNumber(10 ** 18).multipliedBy(750000);
+          case Asset.LEND:
+          case Asset.KNC:
+            amount = new BigNumber(10 ** 18).multipliedBy(550000);
             case Asset.BAT:
                 amount = new BigNumber(10 ** 18).multipliedBy(750000);
             case Asset.DAI:
@@ -827,6 +848,8 @@ export class ExplorerProvider {
                 amount = new BigNumber(10 ** 18).multipliedBy(15000);
             case Asset.MKR:
                 amount = new BigNumber(10 ** 18).multipliedBy(1250);
+          case Asset.CHI:
+            amount = new BigNumber(10 ** 18);
             default:
                 break;
         }
@@ -835,7 +858,7 @@ export class ExplorerProvider {
             throw new Error("Invalid approval asset!");
         }
 
-        return amount.gt(neededAmount) ? amount : neededAmount;
+        return amount.gt(neededAmount) ? amount : neededAmount;*/
     }
 
     private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {

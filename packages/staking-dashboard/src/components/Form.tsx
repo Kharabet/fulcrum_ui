@@ -194,7 +194,15 @@ export class Form extends Component<{}, IFormState> {
 
   public onStakeClick = async (bzrx: BigNumber, vbzrx: BigNumber, bpt: BigNumber) => {
     if (this.state.selectedRepAddress === "") return;
-    const receipt = await StakingProvider.Instance.stake(bzrx, vbzrx, bpt, this.state.selectedRepAddress);
+    const bzrxAmount = bzrx.gt(this.state.bzrxBalance.times(10 ** 18)) ? this.state.bzrxBalance.times(10 ** 18) : bzrx;
+    const vbzrxAmount = vbzrx.gt(this.state.vBzrxBalance.times(10 ** 18)) ? this.state.vBzrxBalance.times(10 ** 18) : vbzrx;
+    let bptAmount;
+    if (networkName === "kovan")
+      bptAmount = bpt.gt(this.state.bptBalance.times(10 ** 6)) ? this.state.bptBalance.times(10 ** 6) : bpt;
+    else {
+      bptAmount = bpt.gt(this.state.bptBalance.times(10 ** 18)) ? this.state.bptBalance.times(10 ** 18) : bpt;
+    }
+    const receipt = await StakingProvider.Instance.stake(bzrxAmount, vbzrxAmount, bptAmount, this.state.selectedRepAddress);
     await this.derivedUpdate();
   }
 
@@ -326,7 +334,7 @@ export class Form extends Component<{}, IFormState> {
                 <div className="row-header">Staking Balance:</div>
                 <div className="row-container">
                   <div className="row-body">
-                    <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                    <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
                     <span title={this.state.bzrxStakingBalance.toFixed(18)} className="value">
                       {this.state.bzrxStakingBalance.toFixed(2)}
                     </span>
@@ -352,7 +360,7 @@ export class Form extends Component<{}, IFormState> {
                   </div>
                 </div>
               </div>
-              <p className="notice">If you move your tokens, they will be unstaked.</p>
+              <p className="notice">If you move your tokens, they will be unstaked. Although the rewards balance is $0, your staking rewards are still accruing in the background. They will be made visible in the not too distant future.</p>
             </div>
             <div className="calculator-row">
               <div className="reward-item">
@@ -388,7 +396,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             */}
-            {this.state.claimableAmount.gt(0) &&
+            {/*{this.state.claimableAmount.gt(0) &&
               <div className="convert-button">
                 <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
                   Claim&nbsp;
@@ -404,7 +412,7 @@ export class Form extends Component<{}, IFormState> {
                   <span className="notice">The program is open to anyone negatively impacted by the protocol pause on Feb-18-2020 04:21:52 AM +UTC</span>
               </button>
             </div>
-            }
+            }*/}
             {/*<div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
@@ -416,15 +424,15 @@ export class Form extends Component<{}, IFormState> {
             <React.Fragment>
               <div className="calculator-row">
                 <div className="row-header">Please select representative:</div>
-                  <ul className={`group-buttons ${this.state.delegateAddress.toLowerCase() !== ZERO_ADDRESS ? "selected-delegate" : ""}`}>
+                <ul className={`group-buttons ${this.state.delegateAddress.toLowerCase() !== ZERO_ADDRESS ? "selected-delegate" : ""}`}>
                   {topRepsLi}
                 </ul>
               </div>
               {this.state.selectedRepAddress !== "" &&
                 <AddToBalance
-                  bzrxMax={Number(this.state.bzrxBalance)}
-                  vbzrxMax={Number(this.state.vBzrxBalance)}
-                  bptMax={Number(this.state.bptBalance)}
+                  bzrxMax={this.state.bzrxBalance.toNumber()}
+                  vbzrxMax={this.state.vBzrxBalance.toNumber()}
+                  bptMax={this.state.bptBalance.toNumber()}
                   stake={this.onStakeClick}
                 />
               }
