@@ -848,6 +848,28 @@ export class StakingProvider {
     return result;
   }
 
+  public balanceOfByAssetWalletAware = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    const tokenErc20Address = this.getErc20AddressOfAsset(asset);
+    if (!tokenErc20Address) return result;
+    const balanceOf = await bzrxStakingContract.balanceOfByAssetWalletAware.callAsync(
+      tokenErc20Address,
+      account,
+      {
+        from: account
+      });
+
+    result = balanceOf;
+    return result;
+  }
+
   public getUserEarnings = async (): Promise<BigNumber> => {
     let result = new BigNumber(0);
 

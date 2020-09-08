@@ -109,12 +109,12 @@ export class Form extends Component<{}, IFormState> {
       : (await StakingProvider.Instance.stakeableByAsset(Asset.BPT)).div(10 ** 18);
     const iEthBalance = (await StakingProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
 
-    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.BZRX)).div(10 ** 18);
-    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.vBZRX)).div(10 ** 18);
+    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BZRX)).div(10 ** 18);
+    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.vBZRX)).div(10 ** 18);
     //TODO: remove networkName
     const bptStakingBalance = networkName === "kovan"
-      ? (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 6)
-      : (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 18);
+      ? (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BPT)).div(10 ** 6)
+      : (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BPT)).div(10 ** 18);
 
     //const userData = await StakingProvider.Instance.getiETHSwapRateWithCheck();
     //const iETHSwapRate = userData[0].div(10 ** 18);
@@ -360,7 +360,7 @@ export class Form extends Component<{}, IFormState> {
                   </div>
                 </div>
               </div>
-              <p className="notice">If you move your tokens, they will be unstaked. Although the rewards balance is $0, your staking rewards are still accruing in the background. They will be made visible in the not too distant future.</p>
+              <p className="notice">The staking dashboard in its current form tracks BZRX in your wallet or deployed in the protocol. If it is transferred elsewhere your staked balance may drop.</p>
             </div>
             <div className="calculator-row">
               <div className="reward-item">
