@@ -147,8 +147,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
                 </div>
               </section>
 
-              {/* {!ExplorerProvider.Instance.unsupportedNetwork ?
-                <React.Fragment> */}
+              {!ExplorerProvider.Instance.unsupportedNetwork ?
+                <React.Fragment>
                   <section className="search-container pt-45">
                     <Search onSearch={this.onSearch} />
                   </section>
@@ -157,7 +157,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
                       <TxGrid events={this.state.events} quantityTx={10} />
                     </div>
                   </section>
-                {/* </React.Fragment> :
+                </React.Fragment> :
                 <section className="pt-75">
                   <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
                     <div style={{ cursor: `pointer` }}>
@@ -165,7 +165,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
                       </div>
                   </div>
                 </section>
-              } */}
+              }
 
             </React.Fragment>
           }
