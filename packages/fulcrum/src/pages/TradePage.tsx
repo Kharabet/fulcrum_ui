@@ -79,20 +79,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.baseTokens = [
         Asset.fWETH,
-        // Asset.DAI,
-        // Asset.USDC,
-        // Asset.SUSD,
         Asset.WBTC,
         Asset.LINK,
-        // Asset.MKR,
         Asset.ZRX,
-        // Asset.BAT,
-        // Asset.REP,
         Asset.KNC
       ];
       this.quoteTokens = [
         Asset.DAI,
-        /*Asset.SAI,*/
         Asset.USDC,
         Asset.SUSD,
         Asset.USDT
@@ -119,6 +112,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       Asset.DAI,
       Asset.USDC,
       Asset.USDT,
+      Asset.SUSD
     ]
 
     this.state = {
