@@ -394,7 +394,7 @@ export class Form extends Component<{}, IFormState> {
                 <div className="row-body">
                   <div className="reward-content">
                     <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-                    <span className="value" title={this.state.rebateRewards.toFixed(18)}>{this.state.rebateRewards.toFixed(6)}</span>
+                    <span className="value" title={this.state.rebateRewards.toFixed(18)}>{this.state.rebateRewards.toFixed(4)}</span>
                   </div>
                   <button className="button" disabled={!this.state.rebateRewards.gt(0)} onClick={this.onClaimRebateRewardsClick}>Claim Rewards</button>
                 </div>
