@@ -39,6 +39,7 @@ interface IFormState {
   otherRepsList: IRep[];
   repsList: IRep[];
   delegateAddress: string;
+  rebateRewards: BigNumber;
 }
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
@@ -67,6 +68,7 @@ export class Form extends Component<{}, IFormState> {
       otherRepsList: [],
       repsList: [],
       userEarnings: new BigNumber(0),
+      rebateRewards: new BigNumber(0),
       delegateAddress: ""
     };
 
@@ -109,19 +111,19 @@ export class Form extends Component<{}, IFormState> {
       : (await StakingProvider.Instance.stakeableByAsset(Asset.BPT)).div(10 ** 18);
     const iEthBalance = (await StakingProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
 
-    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BZRX)).div(10 ** 18);
-    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.vBZRX)).div(10 ** 18);
+    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.BZRX)).div(10 ** 18);
+    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.vBZRX)).div(10 ** 18);
     //TODO: remove networkName
     const bptStakingBalance = networkName === "kovan"
-      ? (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BPT)).div(10 ** 6)
-      : (await StakingProvider.Instance.balanceOfByAssetWalletAware(Asset.BPT)).div(10 ** 18);
+      ? (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 6)
+      : (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 18);
 
     //const userData = await StakingProvider.Instance.getiETHSwapRateWithCheck();
     //const iETHSwapRate = userData[0].div(10 ** 18);
     //const whitelistAmount = userData[1].div(10 ** 18);
 
     const userEarnings = await StakingProvider.Instance.getUserEarnings();
-
+    const rebateRewards = (await StakingProvider.Instance.getRebateRewards()).div(10 ** 18);
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
@@ -141,7 +143,8 @@ export class Form extends Component<{}, IFormState> {
       otherRepsList,
       userEarnings,
       delegateAddress,
-      selectedRepAddress
+      selectedRepAddress,
+      rebateRewards
     })
   }
 
@@ -184,6 +187,11 @@ export class Form extends Component<{}, IFormState> {
 
   public onClaimClick = async () => {
     const receipt = await StakingProvider.Instance.doClaim();
+    await this.derivedUpdate();
+  }
+
+  public onClaimRebateRewardsClick = async () => {
+    const receipt = await StakingProvider.Instance.doClaimReabteRewards();
     await this.derivedUpdate();
   }
 
@@ -301,78 +309,106 @@ export class Form extends Component<{}, IFormState> {
         <div className="container">
           <div className="calculator">
             <div className="calculator-row balance">
-              <div className="balance-item">
-                <div className="row-header">Wallet Balance:</div>
-                <div className="row-container">
-                  <div className="row-body">
-                    <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                    <span title={this.state.bzrxBalance.toFixed(18)} className="value">
-                      {this.state.bzrxBalance.toFixed(2)}
-                    </span>
-                    <div className="row-token">BZRX</div>
-                  </div>
-                </div>
-                <div className="row-container">
-                  <div className="row-body">
-                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+              <div className="balance-wrapper">
 
-                    <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                      {Number(this.state.vBzrxBalance).toFixed(2)}
-                    </span>
-                    <div className="row-token">vBZRX</div>
+                <div className="balance-item">
+                  <div className="row-header">Wallet Balance:</div>
+                  <div className="row-container">
+                    <div className="row-body">
+                      <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                      <span title={(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxStakingBalance : this.state.bzrxBalance).toFixed(18)} className="value">
+                        {(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxStakingBalance : this.state.bzrxBalance).toFixed(2)}
+                      </span>
+                      <div className="row-token">BZRX</div>
+                    </div>
+                    {this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) &&
+                      <p className="warning">Wallet Balance less than Staking Balance</p>
+                    }
                   </div>
-                </div>
-                <div className="row-container">
-                  <div className="row-body">
-                    <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
-                    <span title={this.state.bptBalance.toFixed(18)} className="value">{this.state.bptBalance.toFixed(2)}</span>
-                    <div className="row-token">BPT</div>
-                  </div>
-                </div>
-              </div>
-              <div className="balance-item">
-                <div className="row-header">Staking Balance:</div>
-                <div className="row-container">
-                  <div className="row-body">
-                    <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                    <span title={this.state.bzrxStakingBalance.toFixed(18)} className="value">
-                      {this.state.bzrxStakingBalance.toFixed(2)}
-                    </span>
-                    <div className="row-token">BZRX</div>
-                  </div>
-                </div>
-                <div className="row-container">
-                  <div className="row-body">
-                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                  <div className="row-container">
+                    <div className="row-body">
+                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
 
-                    <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
-                      {Number(this.state.vBzrxStakingBalance).toFixed(2)}
-                    </span>
-                    <div className="row-token">vBZRX</div>
+                      <span title={(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxStakingBalance : this.state.vBzrxBalance).toFixed(18)} className="value">
+                        {(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxStakingBalance : this.state.vBzrxBalance).toFixed(2)}
+                      </span>
+                      <div className="row-token">vBZRX</div>
+                    </div>
+                    {this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) &&
+                      <p className="warning">Wallet Balance less than Staking Balance</p>
+                    }
+                  </div>
+                  <div className="row-container">
+                    <div className="row-body">
+                      <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
+                      <span title={(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptStakingBalance : this.state.bptBalance).toFixed(18)} className="value">
+                        {(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptStakingBalance : this.state.bptBalance).toFixed(2)}
+                      </span>
+                      <div className="row-token">BPT</div>
+                    </div>
+                    {this.state.bptBalance.lt(this.state.bptStakingBalance) &&
+                      <p className="warning">Wallet Balance less than Staking Balance</p>
+                    }
+                  </div>
+
+                </div>
+                <div className="balance-item">
+                  <div className="row-header">Staking Balance:</div>
+                  <div className="row-container">
+                    <div className="row-body">
+                      <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                      <span title={this.state.bzrxStakingBalance.toFixed(18)} className="value">
+                        {this.state.bzrxStakingBalance.toFixed(2)}
+                      </span>
+                      <div className="row-token">BZRX</div>
+                    </div>
+                  </div>
+                  <div className="row-container">
+                    <div className="row-body">
+                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                      <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
+                        {this.state.vBzrxStakingBalance.toFixed(2)}
+                      </span>
+                      <div className="row-token">vBZRX</div>
+                    </div>
+                  </div>
+                  <div className="row-container">
+                    <div className="row-body">
+                      <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer">
+                        <span title={this.state.bptStakingBalance.toFixed(18)} className="icon"><BPTIcon /></span></a>
+                      <span title={this.state.bptStakingBalance.toFixed(18)} className="value">
+                        {this.state.bptStakingBalance.toFixed(2)}
+                      </span>
+                      <div className="row-token">BPT</div>
+                    </div>
+
                   </div>
                 </div>
-                <div className="row-container">
-                  <div className="row-body">
-                    <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer">
-                      <span title={this.state.bptStakingBalance.toFixed(18)} className="icon"><BPTIcon /></span></a>
-                    <span className="value">{this.state.bptStakingBalance.toFixed(2)}</span>
-                    <div className="row-token">BPT</div>
-                  </div>
-                </div>
+                <p className="notice">The staking dashboard in its current form tracks BZRX in your wallet or deployed in the protocol. If it is transferred elsewhere your staked balance may drop.</p>
+
               </div>
-              <p className="notice">The staking dashboard in its current form tracks BZRX in your wallet or deployed in the protocol. If it is transferred elsewhere your staked balance may drop.</p>
             </div>
-            <div className="calculator-row">
+            <div className="calculator-row rewards-container">
               <div className="reward-item">
                 <div className="row-header">My rewards balance:</div>
                 <div className="row-body">
                   <div className="reward-content">
-                    <span title={this.state.userEarnings.toFixed(18)}>${this.state.userEarnings.toFixed(2)}</span>
-                    {/* <div className="row-footer">bZxDAO-Balancer tokens</div> */}
+                    <span className="currency">$</span><span className="value" title={this.state.userEarnings.toFixed(18)}>{this.state.userEarnings.toFixed(2)}</span>
                   </div>
-                  <button title="Coming soon" disabled={true} className="button">Claim Rewards</button>
+                  <button className="button" disabled={true}>Claim Rewards</button>
                 </div>
               </div>
+              <div className="reward-item">
+                <div className="row-header">Incentive rewards balance:</div>
+                <div className="row-body">
+                  <div className="reward-content">
+                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                    <span className="value" title={this.state.rebateRewards.toFixed(18)}>{this.state.rebateRewards.toFixed(2)}</span>
+                  </div>
+                  <button className="button" disabled={!this.state.rebateRewards.gt(0)} onClick={this.onClaimRebateRewardsClick}>Claim Rewards</button>
+                </div>
+              </div>
+
             </div>
 
             {this.state.bzrxV1Balance.gt(0) &&

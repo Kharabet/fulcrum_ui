@@ -463,7 +463,7 @@ export class StakingProvider {
       tokenAmount,
       {
         from: account,
-        gas: gasAmountBN,
+        gas: gasAmountBN ? gasAmountBN.toString() : "3000000", 
         gasPrice: await this.gasPrice()
       });
 
@@ -549,7 +549,7 @@ export class StakingProvider {
         [bzrxAmount, vbzrxAmount, bptAmount],
         {
           from: account,
-          gas: gasAmountBN,
+          gas: gasAmountBN ? gasAmountBN.toString() : "3000000", 
           gasPrice: await this.gasPrice()
         })
       : await bzrxStakigContract.stakeWithDelegate.sendTransactionAsync(
@@ -558,7 +558,7 @@ export class StakingProvider {
         address,
         {
           from: account,
-          gas: gasAmountBN,
+          gas: gasAmountBN ? gasAmountBN.toString() : "3000000", 
           gasPrice: await this.gasPrice()
         })
 
@@ -610,7 +610,7 @@ export class StakingProvider {
       tokenAmount,
       {
         from: account,
-        gas: this.gasLimit,
+        gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
         gasPrice: await this.gasPrice()
       });
 
@@ -684,7 +684,7 @@ export class StakingProvider {
     const txHash = await traderCompensationContract.optin.sendTransactionAsync(
       {
         from: account,
-        gas: this.gasLimit,
+        gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
         gasPrice: await this.gasPrice()
       });
 
@@ -720,7 +720,7 @@ export class StakingProvider {
     const txHash = await traderCompensationContract.claim.sendTransactionAsync(
       {
         from: account,
-        gas: this.gasLimit,
+        gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
         gasPrice: await this.gasPrice()
       });
 
@@ -758,7 +758,7 @@ export class StakingProvider {
       true,
       {
         from: account,
-        gas: this.gasLimit,
+        gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
         gasPrice: await this.gasPrice()
       });
 
@@ -810,12 +810,12 @@ export class StakingProvider {
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.contractsSource) return result;
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
-    if (!account || !bzrxStakingContract) return result;
+    const bZxContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bZxContract) return result;
 
     const tokenErc20Address = this.getErc20AddressOfAsset(asset);
     if (!tokenErc20Address) return result;
-    const stakeable = await bzrxStakingContract.stakeableByAsset.callAsync(
+    const stakeable = await bZxContract.stakeableByAsset.callAsync(
       tokenErc20Address,
       account,
       {
@@ -904,6 +904,61 @@ export class StakingProvider {
       });
 
     return result;
+  }
+  
+  public getRebateRewards = async (): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bZxContract = await this.contractsSource.getiBZxContract();
+    if (!account || !bZxContract) return result;
+
+    result = await bZxContract.rewardsBalanceOf.callAsync(
+      account,
+      {
+        from: account
+      });
+
+    return result;
+  }
+
+  public doClaimReabteRewards = async () => {
+    let receipt = null;
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource || !this.contractsSource.canWrite) return receipt;
+
+    const bZxContract = await this.contractsSource.getiBZxContract();
+    if (!account || !bZxContract) return receipt;
+
+    let gasAmountBN;
+    let gasAmount;
+    try {
+      gasAmount = await bZxContract.claimRewards.estimateGasAsync(
+        account,
+        {
+          from: account,
+          gas: this.gasLimit,
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+
+    const txHash = await bZxContract.claimRewards.sendTransactionAsync(
+      account,
+      {
+        from: account,
+        gas: this.gasLimit,
+        gasPrice: await this.gasPrice()
+      });
+
+    const txReceipt = await this.waitForTransactionMined(txHash);
+    return txReceipt.status === 1 ? txReceipt : null;
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
