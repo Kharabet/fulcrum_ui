@@ -27,9 +27,8 @@ export default ({ config, logger }) => {
 
 
 	api.get('/interest-rates', async (req, res) => {
-		const lendRates = await fulcrum.getLendRates();
-		const borrowRates = await fulcrum.getBorrowRates();
-		res.json({lendRates, borrowRates});
+		const lendAndBorrowRates = await fulcrum.getLendAndBorrowRates();
+		res.json(lendAndBorrowRates);
 	});
 
 	api.get('/total-asset-supply', async (req, res) => {
