@@ -123,7 +123,7 @@ export class Form extends Component<{}, IFormState> {
     //const whitelistAmount = userData[1].div(10 ** 18);
 
     const userEarnings = await StakingProvider.Instance.getUserEarnings();
-    const rebateRewards = await StakingProvider.Instance.getRebateRewards();
+    const rebateRewards = (await StakingProvider.Instance.getRebateRewards()).div(10 ** 18);
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
