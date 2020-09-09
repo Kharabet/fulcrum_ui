@@ -123,7 +123,7 @@ export class TradeSellProcessor {
           "0x",
           {
             from: account,
-            gas: gasAmountBN,
+            gas: gasAmountBN ? gasAmountBN.toString() : "3000000", 
             gasPrice: await FulcrumProvider.Instance.gasPrice()
           })
         : await iBZxContract.closeWithSwap.sendTransactionAsync(
@@ -134,7 +134,7 @@ export class TradeSellProcessor {
           "0x",
           {
             from: account,
-            gas: gasAmountBN,
+            gas: gasAmountBN ? gasAmountBN.toString() : "3000000", 
             gasPrice: await FulcrumProvider.Instance.gasPrice()
           });
 
