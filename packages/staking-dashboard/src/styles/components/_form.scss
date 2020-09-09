@@ -7,6 +7,21 @@
   .calculator-row {
     display: flex;
     flex-direction: column;
+    &.rewards-container {
+      flex-direction: row;
+      justify-content: flex-start;
+
+      @media screen and (max-width: $width-max-sm) {
+        flex-direction: column;
+      }
+      button {
+        font-size: 14px;
+        line-height: 150%;
+        padding: 9px 24px;
+        height: initial;
+        min-width: initial;
+      }
+    }
     justify-content: space-between;
     &:not(:last-child) {
       border-bottom: 1px solid #e7ebf0;
@@ -101,30 +116,63 @@
       }
     }
     .reward-item {
+      width: 50%;
       @media screen and (min-width: $width-min-sm) {
         padding-bottom: 12px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        width: 100%;
+        margin-bottom: 25px;
       }
       .row-body,
       .row-footer {
         color: $green-color;
       }
       .row-body {
-        padding-top: 0;
-        justify-content: space-between;
-      }
-      .row-footer {
-        margin-left: 8px;
-        @media screen and (min-width: $width-min-xs) {
-          margin-bottom: -13px;
+        padding-top: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .currency {
+          font-weight: 600;
+        }
+        .value {
+          position: relative;
+          &:before {
+            position: absolute;
+            content: "Estimated";
+            color: #758295;
+
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 15px;
+            left: 0;
+            top: -15px;
+          }
+        }
+        
+        button {
+          margin-left: 20px;
+          @media screen and (min-width: $width-min-xs) {
+            margin-bottom: -13px;
+          }
+        }
+
+        @media screen and (max-width: $width-max-xs) {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
         }
       }
     }
     .reward-content {
       display: flex;
       align-items: center;
+      margin-bottom: 20px;
+
       @media screen and (max-width: $width-max-xs) {
-        width: 100%;
-        margin-bottom: 24px;
+        margin-bottom: 0;
       }
     }
   }

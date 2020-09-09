@@ -363,17 +363,27 @@ export class Form extends Component<{}, IFormState> {
               </div>
               <p className="notice">The staking dashboard in its current form tracks BZRX in your wallet or deployed in the protocol. If it is transferred elsewhere your staked balance may drop.</p>
             </div>
-            <div className="calculator-row">
+            <div className="calculator-row rewards-container">
               <div className="reward-item">
                 <div className="row-header">My rewards balance:</div>
                 <div className="row-body">
                   <div className="reward-content">
-                    <span title={this.state.userEarnings.toFixed(18)}>${this.state.userEarnings.toFixed(2)}</span>
-                    {/* <div className="row-footer">bZxDAO-Balancer tokens</div> */}
+                    <span className="currency">$</span><span className="value" title={this.state.userEarnings.toFixed(18)}>{this.state.userEarnings.toFixed(2)}</span>
                   </div>
-                  <button title="Coming soon" disabled={true} className="button">Claim Rewards</button>
+                  <button className="button" disabled={true}>Claim Rewards</button>
                 </div>
               </div>
+              <div className="reward-item">
+                <div className="row-header">Incentive rewards balance:</div>
+                <div className="row-body">
+                  <div className="reward-content">
+                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                    <span className="value" title={this.state.userEarnings.toFixed(18)}>{this.state.userEarnings.toFixed(2)}</span>
+                  </div>
+                  <button className="button">Claim Rewards</button>
+                </div>
+              </div>
+
             </div>
 
             {this.state.bzrxV1Balance.gt(0) &&
