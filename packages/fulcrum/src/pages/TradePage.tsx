@@ -236,8 +236,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                   isMobileMedia={this.props.isMobileMedia}
                   tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken)}
                   ownRowsData={this.state.ownRowsData.filter(e =>
-                    ((this.checkWethOrFwethToken(e.baseToken) === Asset.ETH || e.baseToken === this.state.selectedMarket.baseToken)
-                      && (this.checkWethOrFwethToken(e.quoteToken) === Asset.ETH || e.quoteToken === this.state.selectedMarket.quoteToken)))}
+                    ((this.checkWethOrFwethToken(e.baseToken) === this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) || e.baseToken === this.state.selectedMarket.baseToken)
+                      && (this.checkWethOrFwethToken(e.quoteToken) ===  this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) || e.quoteToken === this.state.selectedMarket.quoteToken)))}
                   changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
