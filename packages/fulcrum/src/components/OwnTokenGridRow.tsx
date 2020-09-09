@@ -155,7 +155,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           {this.props.positionValue.toFixed(4)}
         </div>
         <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
-          <span className="own-token-grid-row__body-header">Asset Price</span>
+          <span className="own-token-grid-row__body-header">Mid Market Price</span>
           {!this.state.isLoading
             ? <React.Fragment>
               <span className="sign-currency">$</span>{this.props.openPrice.toFixed(2)}
