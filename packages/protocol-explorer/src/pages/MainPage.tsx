@@ -144,8 +144,8 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
         data.push(item["tvl"]);
         change24.push(item["diffWithPrevPrecents"]);
       });
-      // console.log(responseJson.data[Object.keys(responseJson.data).length - 1].tvl);
-      this._isMounted && this.setState({ ...this.state, diffWithPrevPrecents: (100 * responseJson.data[Object.keys(responseJson.data).length - 1].tvl / responseJson.data[0].tvl) });
+      const tvlDiff = (responseJson.data[Object.keys(responseJson.data).length - 1].tvl - responseJson.data[0].tvl)/ responseJson.data[0].tvl
+      this._isMounted && this.setState({ ...this.state, diffWithPrevPrecents: (tvlDiff * 100 ) });
     } else {
       console.error(responseJson.message)
     }

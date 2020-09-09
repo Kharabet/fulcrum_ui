@@ -281,7 +281,34 @@ export class BZRXStakingInterimContract extends BaseContract {
             return result;
         }
     };
-    
+
+    public balanceOfByAssetWalletAware = {
+        async callAsync(
+            token: string,
+            account: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam
+        ): Promise<BigNumber> {
+            const self = (this as any) as BZRXStakingInterimContract;
+            const encodedData = self._strictEncodeArguments("balanceOfByAssetWalletAware(address,address)", [token,account]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData
+                },
+                self._web3Wrapper.getContractDefaults()
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder("balanceOfByAssetWalletAware(address,address)");
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        }
+    };
+
     public getRepVotes = {
         async callAsync(
             start: BigNumber,
