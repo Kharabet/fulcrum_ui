@@ -58,9 +58,14 @@
     }
     .notice {
       text-align: center;
-      // padding: 0 25px;
+      padding: 10px 0px;
       font-size: 14px;
-      // margin: 0 auto;
+    }
+    .warning {
+      font-size: 14px;
+      color: #FF5C5C;
+      // font-weight: 600;
+      position: absolute;
     }
     .row-header {
       font-weight: 800;
@@ -78,7 +83,7 @@
       }
     }
     .row-container {
-      margin-bottom: 32px;
+      margin-bottom: 34px;
     }
     .row-body {
       font-weight: 800;
@@ -169,12 +174,10 @@
           @media screen and (min-width: $width-min-xs) {
             margin-bottom: -13px;
           }
-        }
-
-        @media screen and (max-width: $width-max-xs) {
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
+          @media screen and (max-width: $width-max-xs) {
+            margin-top: 10px;
+            margin-left: 10px;
+          }
         }
       }
     }
