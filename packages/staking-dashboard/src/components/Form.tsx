@@ -389,23 +389,23 @@ export class Form extends Component<{}, IFormState> {
               </div>
             </div>
             <div className="calculator-row rewards-container">
+            <div className="reward-item">
+              <div className="row-header">Incentive rewards balance:</div>
+                <div className="row-body">
+                  <div className="reward-content">
+                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                    <span className="value" title={this.state.rebateRewards.toFixed(18)}>{this.state.rebateRewards.toFixed(6)}</span>
+                  </div>
+                  <button className="button" disabled={!this.state.rebateRewards.gt(0)} onClick={this.onClaimRebateRewardsClick}>Claim Rewards</button>
+                </div>
+              </div>
               <div className="reward-item">
-                <div className="row-header">My rewards balance:</div>
+                <div className="row-header">Staking rewards balance:</div>
                 <div className="row-body">
                   <div className="reward-content">
                     <span className="currency">$</span><span className="value" title={this.state.userEarnings.toFixed(18)}>{this.state.userEarnings.toFixed(2)}</span>
                   </div>
                   <button className="button" disabled={true}>Claim Rewards</button>
-                </div>
-              </div>
-              <div className="reward-item">
-                <div className="row-header">Incentive rewards balance:</div>
-                <div className="row-body">
-                  <div className="reward-content">
-                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-                    <span className="value" title={this.state.rebateRewards.toFixed(18)}>{this.state.rebateRewards.toFixed(2)}</span>
-                  </div>
-                  <button className="button" disabled={!this.state.rebateRewards.gt(0)} onClick={this.onClaimRebateRewardsClick}>Claim Rewards</button>
                 </div>
               </div>
 
