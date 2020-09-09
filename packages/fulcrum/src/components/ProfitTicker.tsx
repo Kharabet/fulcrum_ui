@@ -1,6 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 export interface IProfitTickerProps {
   secondDiff: BigNumber;
@@ -11,11 +12,13 @@ export interface IProfitTickerProps {
 
 export class ProfitTicker extends Component<IProfitTickerProps> {
 
-  private readonly container: React.RefObject<any>;
+  private readonly container: React.RefObject<HTMLDivElement>;
+  private readonly assetDecimals: number;
 
   constructor(props: IProfitTickerProps) {
     super(props);
     this.container = React.createRef();
+    this.assetDecimals = AssetsDictionary.assets.get(props.asset)!.decimals || 18;
   }
 
   public componentDidMount(): void {
@@ -26,7 +29,8 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
     setInterval(() => {
       if (this.container.current) {
         value = value.plus(diff);
-        this.container.current.innerHTML = value.toFixed(8);
+        this.container.current.setAttribute("title", value.toFixed(18));
+        this.container.current.innerHTML = this.assetDecimals <= 8 ? value.toFixed(this.assetDecimals) : value.toFixed(8);
         // if (i % 20 == 0)
         //   this.props.onProfit(value);
       }
@@ -35,7 +39,7 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
 
   public render() {
     const { profit } = this.props;
-    return ( // TODO @bshevchenko: return title attr back
+    return (
       <div
         ref={this.container}
         className="token-selector-item__profit-value"
