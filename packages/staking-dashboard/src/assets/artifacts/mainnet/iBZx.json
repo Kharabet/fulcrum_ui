@@ -3879,6 +3879,27 @@
         "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          }
+        ],
+        "name": "rewardsBalanceOf",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "rewardsBalance",
+            "type": "uint256"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
       }
     ],
     "contractName": "IBZx",
