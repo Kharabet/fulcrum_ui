@@ -3881,6 +3881,27 @@
         "type": "function"
       },
       {
+        "constant": false,
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          }
+        ],
+        "name": "claimRewards",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "claimAmount",
+            "type": "uint256"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },  
+      {
         "constant": true,
         "inputs": [
           {
