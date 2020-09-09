@@ -39,6 +39,7 @@ interface IFormState {
   otherRepsList: IRep[];
   repsList: IRep[];
   delegateAddress: string;
+  rebateRewards: BigNumber;
 }
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
@@ -67,6 +68,7 @@ export class Form extends Component<{}, IFormState> {
       otherRepsList: [],
       repsList: [],
       userEarnings: new BigNumber(0),
+      rebateRewards: new BigNumber(0),
       delegateAddress: ""
     };
 
@@ -121,7 +123,7 @@ export class Form extends Component<{}, IFormState> {
     //const whitelistAmount = userData[1].div(10 ** 18);
 
     const userEarnings = await StakingProvider.Instance.getUserEarnings();
-
+    const rebateRewards = await StakingProvider.Instance.getRebateRewards();
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
@@ -141,7 +143,8 @@ export class Form extends Component<{}, IFormState> {
       otherRepsList,
       userEarnings,
       delegateAddress,
-      selectedRepAddress
+      selectedRepAddress,
+      rebateRewards
     })
   }
 
@@ -184,6 +187,11 @@ export class Form extends Component<{}, IFormState> {
 
   public onClaimClick = async () => {
     const receipt = await StakingProvider.Instance.doClaim();
+    await this.derivedUpdate();
+  }
+  
+  public onClaimRebateRewardsClick = async () => {
+    const receipt = await StakingProvider.Instance.doClaimReabteRewards();
     await this.derivedUpdate();
   }
 
@@ -378,9 +386,9 @@ export class Form extends Component<{}, IFormState> {
                 <div className="row-body">
                   <div className="reward-content">
                     <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-                    <span className="value" title={this.state.userEarnings.toFixed(18)}>{this.state.userEarnings.toFixed(2)}</span>
+                    <span className="value" title={this.state.rebateRewards.toFixed(18)}>{this.state.rebateRewards.toFixed(2)}</span>
                   </div>
-                  <button className="button">Claim Rewards</button>
+                  <button className="button" disabled={!this.state.rebateRewards.gt(0)} onClick={this.onClaimRebateRewardsClick}>Claim Rewards</button>
                 </div>
               </div>
 
