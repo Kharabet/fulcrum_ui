@@ -25,6 +25,14 @@ export default ({ config, logger }) => {
 	const fulcrum = new Fulcrum(web3, storage, logger);
 	const torque = new Torque(web3, storage, logger);
 
+
+	api.get('/interest-rates', async (req, res) => {
+		console.log("hello world");
+		const lendRates = await fulcrum.getLendRates();
+		const borrowRates = await fulcrum.getBorrowRates();
+		res.json({lendRates, borrowRates});
+	});
+
 	api.get('/total-asset-supply', async (req, res) => {
 		const totalAssetSupply = await fulcrum.getTotalAssetSupply();
 		res.json({data: totalAssetSupply, success: true});
