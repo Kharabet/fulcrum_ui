@@ -316,39 +316,47 @@ export class Form extends Component<{}, IFormState> {
                   <div className="row-container">
                     <div className="row-body">
                       <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                      <span title={(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxStakingBalance : this.state.bzrxBalance).toFixed(18)} className="value">
+                      {/*<span title={(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxStakingBalance : this.state.bzrxBalance).toFixed(18)} className="value">
                         {(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxStakingBalance : this.state.bzrxBalance).toFixed(2)}
+                      </span>*/}
+                      <span title={this.state.bzrxBalance.toFixed(18)} className="value">
+                        {this.state.bzrxBalance.toFixed(2)}
                       </span>
                       <div className="row-token">BZRX</div>
                     </div>
-                    {this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) &&
+                    {/*this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) &&
                       <p className="warning">Wallet Balance less than Staking Balance</p>
-                    }
+                    */}
                   </div>
                   <div className="row-container">
                     <div className="row-body">
                       <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-
-                      <span title={(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxStakingBalance : this.state.vBzrxBalance).toFixed(18)} className="value">
+                      {/*<span title={(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxStakingBalance : this.state.vBzrxBalance).toFixed(18)} className="value">
                         {(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxStakingBalance : this.state.vBzrxBalance).toFixed(2)}
+                      </span>*/}
+                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                        {this.state.vBzrxBalance.toFixed(2)}
                       </span>
                       <div className="row-token">vBZRX</div>
                     </div>
-                    {this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) &&
+                    {/*this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) &&
                       <p className="warning">Wallet Balance less than Staking Balance</p>
-                    }
+                    */}
                   </div>
                   <div className="row-container">
                     <div className="row-body">
                       <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
-                      <span title={(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptStakingBalance : this.state.bptBalance).toFixed(18)} className="value">
+                      {/*<span title={(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptStakingBalance : this.state.bptBalance).toFixed(18)} className="value">
                         {(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptStakingBalance : this.state.bptBalance).toFixed(2)}
+                      </span>*/}
+                      <span title={this.state.bptBalance.toFixed(18)} className="value">
+                        {this.state.bptBalance.toFixed(2)}
                       </span>
                       <div className="row-token">BPT</div>
                     </div>
-                    {this.state.bptBalance.lt(this.state.bptStakingBalance) &&
+                    {/*this.state.bptBalance.lt(this.state.bptStakingBalance) &&
                       <p className="warning">Wallet Balance less than Staking Balance</p>
-                    }
+                    */}
                   </div>
 
                 </div>
