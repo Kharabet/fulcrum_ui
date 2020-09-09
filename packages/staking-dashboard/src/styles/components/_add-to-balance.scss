@@ -40,6 +40,10 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        @media screen and (max-width: $width-max-xs) {
+            font-size: 26px;
+        }
     }
     &__range {
         position: relative;
