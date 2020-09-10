@@ -87,8 +87,8 @@ export class Form extends Component<{}, IFormState> {
     this.isAlreadyRepresentative = await StakingProvider.Instance.checkIsRep();
 
     const delegateAddress = await StakingProvider.Instance.getDelegateAddress();
-    const repsList = await StakingProvider.Instance.getRepresentatives()
-      .then(reps => Promise.all(reps.map((rep, index) => this.getRepInfo(rep, index))));
+    const reprepesntativesBaseInfo = await StakingProvider.Instance.getRepresentatives();
+    const repsList = await this.getRepInfo(reprepesntativesBaseInfo);
     const sortedList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber());
     let topRepsList = sortedList.slice(0, 3);
     const delegate = sortedList.find(e => e.wallet.toLowerCase() === delegateAddress.toLowerCase());
@@ -247,23 +247,42 @@ export class Form extends Component<{}, IFormState> {
     });
   };
 
-  private getRepInfo = async (item: any, index: number): Promise<IRep> => {
-    const profile = await Box.getProfile(item.wallet);
-    const name = profile.name ? profile.name : this.getShortHash(item.wallet, 4);
-    const imageSrc = profile.image ?
-      `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl["/"]}`
-      : index % 3 === 0 ?
-        Representative1
-        : index % 2 === 0 ?
-          Representative2 :
-          Representative3;
+  private getRepInfo = async (repsBaseInfoList: {
+    wallet: string;
+    BZRX: BigNumber;
+    vBZRX: BigNumber;
+    LPToken: BigNumber;
+  }[]): Promise<IRep[]> => {
+    let repsList: IRep[] = [];
+    const profiles = await Box.getProfiles(repsBaseInfoList.map(e => e.wallet));
+    repsBaseInfoList.forEach((repBaseInfo: {
+      wallet: string;
+      BZRX: BigNumber;
+      vBZRX: BigNumber;
+      LPToken: BigNumber;
+    }, i: number) => {
+      const name = profiles[repBaseInfo.wallet] ? profiles[repBaseInfo.wallet].name : this.getShortHash(repBaseInfo.wallet, 4);
+      const imageSrc = profiles[repBaseInfo.wallet] ?
+        `https://ipfs.infura.io/ipfs/${profiles[repBaseInfo.wallet].image[0].contentUrl["/"]}`
+        : i % 3 === 0 ?
+          Representative1
+          : i % 2 === 0 ?
+            Representative2 :
+            Representative3;
+      repsList.push({
+        index: i,
+        wallet: repBaseInfo.wallet,
+        BZRX: repBaseInfo.BZRX,
+        vBZRX: repBaseInfo.vBZRX,
+        LPToken: repBaseInfo.LPToken,
+        name,
+        imageSrc
+      })
 
-    return {
-      ...item,
-      name,
-      imageSrc,
-      index
-    };
+    });
+
+
+    return repsList;
   };
 
   public render() {
@@ -397,8 +416,8 @@ export class Form extends Component<{}, IFormState> {
               </div>
             </div>
             <div className="calculator-row rewards-container">
-            <div className="reward-item">
-              <div className="row-header">Incentive rewards balance:</div>
+              <div className="reward-item">
+                <div className="row-header">Incentive rewards balance:</div>
                 <div className="row-body">
                   <div className="reward-content">
                     <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
