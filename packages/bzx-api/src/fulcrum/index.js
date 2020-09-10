@@ -79,16 +79,18 @@ export default class Fulcrum {
     async getLendAndBorrowRates() {
         const periodicRate = 365;
         const reserveData = await this.getReserveData();
+
         let lendRates = [];
         let borrowRates = [];
-        reserveData.forEach(item => {
+        reserveData.filter(item => item.token !== "all").forEach(item => {
             // APY = (1 + APR / n)^n - 1 
             const lendApr = item.supplyInterestRate / 100;
             const lendApy = Math.pow(1 + lendApr / periodicRate, periodicRate) - 1;
+            const tokenSymbol = item.token.toUpperCase();
             lendRates.push({
                 apr: lendApr,
                 apy: lendApy,
-                tokenSymbol: item.token
+                tokenSymbol
             });
 
             // APY = (1 + APR / n)^n - 1 
@@ -97,7 +99,7 @@ export default class Fulcrum {
             borrowRates.push({
                 apr: borrowApr,
                 apy: borrowApy,
-                tokenSymbol: item.token
+                tokenSymbol
             });
         });
 
