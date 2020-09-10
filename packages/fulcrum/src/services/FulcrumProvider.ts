@@ -1479,7 +1479,7 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+      const precision = AssetsDictionary.assets.get((asset.includes("v1") ? asset.replace("v1","") : asset) as Asset)!.decimals || 18;
       const address = await this.contractsSource.getITokenErc20Address(asset);
       if (address) {
         result = await this.getErc20BalanceOfUser(address);
@@ -1509,7 +1509,6 @@ export class FulcrumProvider {
         }
       }
     }
-
     return result;
   }
 
