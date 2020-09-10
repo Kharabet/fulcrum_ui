@@ -44,22 +44,22 @@ export const LoanRow = (props: ILoanRowProps) => {
   const getShortHash = (hash: string, count: number) => {
     return hash.substring(0, 8) + '...' + hash.substring(hash.length - count);
   }
-  if (isLoadingTransaction)
-    return (
-      <div className="table-row__image">
-        <CircleLoader></CircleLoader>
-        <TxLoaderStep taskId={props.loanId} />
-      </div>
-    )
 
   return (
     <React.Fragment>
-      <div className="table-row table-row-loan">
-        <div title={props.loanId} className="table-row-loan__id">{getShortHash(props.loanId, 45)}</div>
-        <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">{loanToken.logoSvg.render()} {props.payOffAmount.toFixed(3)}</div>
-        <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">{collateralToken.logoSvg.render()}{props.seizeAmount.toFixed(3)}</div>
-        <div className="table-row-loan__action"><button className="action" onClick={onLiquidateClick}>Liquidate</button></div>
-      </div>
+
+      {isLoadingTransaction ?
+        <div className="table-row__image">
+          <TxLoaderStep taskId={props.loanId} />
+          <CircleLoader></CircleLoader>
+        </div> :
+        <div className="table-row table-row-loan">
+          <div title={props.loanId} className="table-row-loan__id">{getShortHash(props.loanId, 45)}</div>
+          <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">{loanToken.logoSvg.render()} {props.payOffAmount.toFixed(3)}</div>
+          <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">{collateralToken.logoSvg.render()}{props.seizeAmount.toFixed(3)}</div>
+          <div className="table-row-loan__action"><button className="action" onClick={onLiquidateClick}>Liquidate</button></div>
+        </div>
+      }
     </React.Fragment>
   );
 }
