@@ -33,11 +33,11 @@ export class InfoBlock extends Component<IInfoBlockProps, IInfoBlockState> {
 
     return (
       <div className="info-block__container">
-        <div className="info-block__left">Please note:</div>
+        {/* <div className="info-block__left">Please note:</div> */}
         <div className="info-block__center">{this.props.children}</div>
-        <div className="info-block__right">
+        {/* <div className="info-block__right">
           <button className="info-block__accept" onClick={this.onAccept}>OK</button>
-        </div>
+        </div> */}
       </div>
     );
   }
