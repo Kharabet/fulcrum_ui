@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 import { ExplorerProvider } from "../services/ExplorerProvider";
+import { CircleLoader } from "./CircleLoader";
+import { TxLoaderStep } from "./TxLoaderStep";
 
 export interface ILoanRowProps {
   loanId: string;
@@ -14,11 +16,22 @@ export interface ILoanRowProps {
   onLiquidationCompleted: () => void;
 }
 
+
+export interface ILoanRow {
+  isLoadingTransaction: boolean;
+}
+
 export const LoanRow = (props: ILoanRowProps) => {
+
   const loanToken = AssetsDictionary.assets.get(props.loanToken) as AssetDetails;
   const collateralToken = AssetsDictionary.assets.get(props.collateralToken) as AssetDetails;
 
+  const [isLoadingTransaction, setLoadingTransaction] = useState(false);
+
+
+
   const onLiquidateClick = async () => {
+    setLoadingTransaction(true);
     const loanId = props.loanId;
     const decimals: number = AssetsDictionary.assets.get(props.loanToken)!.decimals || 18;
 
@@ -31,6 +44,14 @@ export const LoanRow = (props: ILoanRowProps) => {
   const getShortHash = (hash: string, count: number) => {
     return hash.substring(0, 8) + '...' + hash.substring(hash.length - count);
   }
+  if (isLoadingTransaction)
+    return (
+      <div className="table-row__image">
+        <CircleLoader></CircleLoader>
+        <TxLoaderStep taskId={props.loanId} />
+      </div>
+    )
+
   return (
     <React.Fragment>
       <div className="table-row table-row-loan">
