@@ -88,7 +88,7 @@ export class Form extends Component<{}, IFormState> {
 
     const delegateAddress = await StakingProvider.Instance.getDelegateAddress();
     const reprepesntativesBaseInfo = await StakingProvider.Instance.getRepresentatives();
-    const repsList = await this.getRepInfo(reprepesntativesBaseInfo);
+    const repsList = await this.getRepsInfo(reprepesntativesBaseInfo);
     const sortedList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber());
     let topRepsList = sortedList.slice(0, 3);
     const delegate = sortedList.find(e => e.wallet.toLowerCase() === delegateAddress.toLowerCase());
@@ -247,22 +247,25 @@ export class Form extends Component<{}, IFormState> {
     });
   };
 
-  private getRepInfo = async (repsBaseInfoList: {
+  private getRepsInfo = async (repsBaseInfoList: {
     wallet: string;
     BZRX: BigNumber;
     vBZRX: BigNumber;
     LPToken: BigNumber;
   }[]): Promise<IRep[]> => {
     let repsList: IRep[] = [];
-    const profiles = await Box.getProfiles(repsBaseInfoList.map(e => e.wallet));
+    // TODO: track CORS issue https://github.com/3box/3box-js/issues/649 
+    // const profiles = await Box.getProfiles(repsBaseInfoList.map(e => e.wallet));
+    const profiles = await (await fetch("https://cors-anywhere.herokuapp.com/https://ipfs.3box.io/profileList", { body: JSON.stringify({"addressList":repsBaseInfoList.map(e => e.wallet),"didList":[]}
+    ), method: 'POST', headers: { 'Content-Type': 'application/json' }})).json();
     repsBaseInfoList.forEach((repBaseInfo: {
       wallet: string;
       BZRX: BigNumber;
       vBZRX: BigNumber;
       LPToken: BigNumber;
     }, i: number) => {
-      const name = profiles[repBaseInfo.wallet] ? profiles[repBaseInfo.wallet].name : this.getShortHash(repBaseInfo.wallet, 4);
-      const imageSrc = profiles[repBaseInfo.wallet] ?
+      const name = profiles[repBaseInfo.wallet] && profiles[repBaseInfo.wallet].name ? profiles[repBaseInfo.wallet].name : this.getShortHash(repBaseInfo.wallet, 4);
+      const imageSrc = profiles[repBaseInfo.wallet] && profiles[repBaseInfo.wallet].image ?
         `https://ipfs.infura.io/ipfs/${profiles[repBaseInfo.wallet].image[0].contentUrl["/"]}`
         : i % 3 === 0 ?
           Representative1
@@ -278,10 +281,7 @@ export class Form extends Component<{}, IFormState> {
         name,
         imageSrc
       })
-
     });
-
-
     return repsList;
   };
 
