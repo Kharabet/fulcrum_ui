@@ -135,6 +135,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
 
     return (
+      <React.Fragment>
       <header className={`header ${this.props.headerClass}`}>
         <div className="header__row">
           <div className="header__left">
@@ -167,6 +168,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
         ) : null}
       </header>
+        {this.props.isV1ITokenInWallet &&
+          <InfoBlock localstorageItemProp="v1Balance">
+            Please use our <a href="https://legacy.fulcrum.trade/#/trade" className="disclosure-link">Legacy dApp</a> to unlend your funds from old protocol v1
+          </InfoBlock>
+        }
+      </React.Fragment>
     );
   };
 
