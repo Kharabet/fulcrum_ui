@@ -76,6 +76,34 @@ export default class Fulcrum {
         return apr;
     }
 
+    async getLendAndBorrowRates() {
+        const periodicRate = 365;
+        const reserveData = await this.getReserveData();
+        let lendRates = [];
+        let borrowRates = [];
+        reserveData.forEach(item => {
+            // APY = (1 + APR / n)^n - 1 
+            const lendApr = item.supplyInterestRate / 100;
+            const lendApy = Math.pow(1 + lendApr / periodicRate, periodicRate) - 1;
+            lendRates.push({
+                apr: lendApr,
+                apy: lendApy,
+                tokenSymbol: item.token
+            });
+
+            // APY = (1 + APR / n)^n - 1 
+            const borrowApr = item.borrowInterestRate / 100;
+            const borrowApy = Math.pow(1 + borrowApr / periodicRate, periodicRate) - 1;
+            borrowRates.push({
+                apr: borrowApr,
+                apy: borrowApy,
+                tokenSymbol: item.token
+            });
+        });
+
+        return { lendRates, borrowRates };
+    }
+
     async getTorqueBorrowRateAPR() {
         const reserveData = await this.getReserveData()
         let torqueBorrowRates = {};
@@ -421,7 +449,7 @@ export default class Fulcrum {
                 if (token.name == "ethv1") {
                     vaultBalance = await this.getAssetTokenBalanceOfUser(token.name, "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633");
                 }
-                
+
                 const precision = new BigNumber(10 ** (18 - decimals));
                 totalAssetSupply = totalAssetSupply.times(precision);
                 totalAssetBorrow = totalAssetBorrow.times(precision);
@@ -434,7 +462,7 @@ export default class Fulcrum {
                     usdTotalLocked = marketLiquidity.plus(vaultBalance).times(swapRates[i]).dividedBy(10 ** 18);
                     usdTotalLockedAll = usdTotalLockedAll.plus(usdTotalLocked);
                 }
-                
+
                 stats.tokensStats.push(new tokenStatsModel({
                     token: token.name,
                     liquidity: marketLiquidity.dividedBy(10 ** 18).toFixed(),
@@ -451,7 +479,7 @@ export default class Fulcrum {
                     usdTotalLocked: usdTotalLocked.dividedBy(10 ** 18).toFixed(),
                 }));
             }));
-            
+
             stats.allTokensStats = new allTokensStatsModel({
                 token: "all",
                 usdSupply: usdSupplyAll.dividedBy(10 ** 18).toFixed(),
