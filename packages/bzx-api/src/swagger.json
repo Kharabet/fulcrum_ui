@@ -37,19 +37,6 @@
     "https"
   ],
   "paths": {
-    "/interest-rates": {
-      "get": {
-        "tags": [
-          "Stats"
-        ],
-        "summary": "Get supply interest rates (APR and APY), specifically designed for loanscan",
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/supply-rate-apr": {
       "get": {
         "tags": [
@@ -408,6 +395,19 @@
         "produces": [
           "application/json"
         ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/interest-rates": {
+      "get": {
+        "tags": [
+          "External Integration"
+        ],
+        "summary": "Get supply interest rates (APR and APY), specifically designed for loanscan",
         "responses": {
           "200": {
             "description": "Success"
