@@ -1,8 +1,11 @@
 import React, { Component } from "react";
-// import { RequestTask } from "../domain/RequestTask";
-// import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
-// import { TasksQueue } from "../services/TasksQueue";
+
+import { RequestTask } from "../domain/RequestTask";
+import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
+import { TasksQueue } from "../services/TasksQueue";
 import { ExplorerProvider } from "../services/ExplorerProvider";
+import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
+
 import { toChecksumAddress } from "web3-utils";
 
 export interface ITitle {
@@ -15,7 +18,7 @@ export interface ITxLoaderStepProps {
 }
 
 export interface ITxLoaderStepState {
-    //requestTask: RequestTask | undefined;
+    RequestTask: RequestTask | undefined;
     complete: boolean;
     title: ITitle | null;
 }
@@ -25,7 +28,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
         super(props);
 
         this.state = {
-            //  requestTask: TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId),
+            RequestTask: TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId),
             title: { message: "Loading", isWarning: false },
             complete: false
         };
