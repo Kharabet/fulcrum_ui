@@ -307,6 +307,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.checkITokenV1Balances();
+    await this.checkGasTokenAllowance();
     await this._isMounted && this.setState({
       ...this.state,
       isLoading: false,
@@ -320,7 +321,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await this._isMounted && this.setState({ ...this.state, isRiskDisclosureModalOpen: true });
   }
   private checkITokenV1Balances = async () => {
-    const isITokenV1Present =  await [
+    const isITokenV1Present = await [
       Asset.ETHv1,
       Asset.DAIv1,
       Asset.SAIv1,
@@ -342,6 +343,16 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isV1ITokenInWallet: true
     })
 
+  }
+
+  private checkGasTokenAllowance = async () => {
+
+    const gasTokenAllowance = await FulcrumProvider.Instance.getGasTokenAllowance();
+    if (gasTokenAllowance.gt(0)){
+      localStorage.setItem('isGasTokenEnabled', 'true')
+    }else{
+      localStorage.setItem('isGasTokenEnabled', 'false')
+    }
   }
 
 }
