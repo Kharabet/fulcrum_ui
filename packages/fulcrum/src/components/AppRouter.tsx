@@ -346,13 +346,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   private checkGasTokenAllowance = async () => {
-
     const gasTokenAllowance = await FulcrumProvider.Instance.getGasTokenAllowance();
-    if (gasTokenAllowance.gt(0)){
-      localStorage.setItem('isGasTokenEnabled', 'true')
-    }else{
-      localStorage.setItem('isGasTokenEnabled', 'false')
-    }
+    localStorage.setItem('isGasTokenEnabled', gasTokenAllowance.gt(0) ? 'true' : 'false')
   }
-
 }
