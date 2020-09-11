@@ -199,7 +199,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
 
     this.getChartData(liquidationEventsWithUsd);
-    const unhealthyLoans = healthyLoansData.map((e: IActiveLoanData) => ({
+    const unhealthyLoans = unhealthyLoansData.map((e: IActiveLoanData) => ({
       loanId: e.loanData!.loanId,
       payOffAmount: e.maxLiquidatable,
       seizeAmount: e.maxSeizable,
