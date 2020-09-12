@@ -8,6 +8,7 @@
   padding: 15px 20px 20px 20px;
   box-sizing: border-box;
   width: 100%;
+  max-height: 200px;
   z-index: 100004;
   @media screen and (max-width: $mobile-version-max-width) {
     top: 50px;

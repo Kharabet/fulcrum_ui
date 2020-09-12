@@ -365,6 +365,26 @@ export class TorqueProvider {
     return result;
   }
 
+  public async getGasTokenAllowance(): Promise<BigNumber> {
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+      if (account) {
+        const assetAddress = this.getErc20AddressOfAsset(Asset.CHI);
+        if (assetAddress) {
+          const tokenContract = await this.contractsSource.getErc20Contract(assetAddress);
+          if (tokenContract) {
+            result = await tokenContract.allowance.callAsync(account, "0x55eb3dd3f738cfdda986b8eff3fa784477552c61")
+          }
+        }
+      }
+    }
+
+    return result
+  }
+
   public getBorrowDepositEstimate = async (
     borrowAsset: Asset,
     collateralAsset: Asset,
@@ -385,7 +405,7 @@ export class TorqueProvider {
         );
         result.depositAmount = borrowEstimate
           .dividedBy(10 ** collateralPrecision)
-          .multipliedBy(1.005); // safety buffer
+          .multipliedBy(1.20); // safety buffer
       }
     }
 
@@ -436,38 +456,51 @@ export class TorqueProvider {
     return result;
   }
 
-  public getLargeApprovalAmount = (asset: Asset): BigNumber => {
+  public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
+    return TorqueProvider.MAX_UINT;
+    /*let amount = new BigNumber(0);
+
     switch (asset) {
       case Asset.ETH:
       case Asset.WETH:
       case Asset.fWETH:
-        return new BigNumber(10 ** 18).multipliedBy(1500);
+        amount = new BigNumber(10 ** 18).multipliedBy(1500);
       case Asset.WBTC:
-        return new BigNumber(10 ** 8).multipliedBy(25);
+      case Asset.YFI:
+        amount = new BigNumber(10 ** 8).multipliedBy(25);
+      case Asset.BZRX:
+        amount = new BigNumber(10 ** 18).multipliedBy(400000);
       case Asset.LINK:
-        return new BigNumber(10 ** 18).multipliedBy(60000);
+        amount = new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
-        return new BigNumber(10 ** 18).multipliedBy(750000);
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
+      case Asset.LEND:
       case Asset.KNC:
-        return new BigNumber(10 ** 18).multipliedBy(550000);
+        amount = new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.BAT:
-        return new BigNumber(10 ** 18).multipliedBy(750000);
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
       case Asset.SUSD:
-        return new BigNumber(10 ** 18).multipliedBy(375000);
+        amount = new BigNumber(10 ** 18).multipliedBy(375000);
       case Asset.USDC:
       case Asset.USDT:
-        return new BigNumber(10 ** 6).multipliedBy(375000);
+        amount = new BigNumber(10 ** 6).multipliedBy(375000);
       case Asset.REP:
-        return new BigNumber(10 ** 18).multipliedBy(15000);
+        amount = new BigNumber(10 ** 18).multipliedBy(15000);
       case Asset.MKR:
-        return new BigNumber(10 ** 18).multipliedBy(1250);
+        amount = new BigNumber(10 ** 18).multipliedBy(1250);
       case Asset.CHI:
-        return new BigNumber(10 ** 18);
+        amount = new BigNumber(10 ** 18);
       default:
-        throw new Error("Invalid approval asset!");
+        break;
     }
+
+    if (amount.eq(0)) {
+      throw new Error("Invalid approval asset!");
+    }
+    
+    return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
   public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
@@ -501,7 +534,7 @@ export class TorqueProvider {
       if (account && tokenErc20Contract) {
         const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, spender);
         if (amountInBaseUnits.gt(erc20allowance)) {
-          await tokenErc20Contract.approve.sendTransactionAsync(spender, this.getLargeApprovalAmount(asset), { from: account });
+          await tokenErc20Contract.approve.sendTransactionAsync(spender, this.getLargeApprovalAmount(asset, amountInBaseUnits), { from: account });
         }
         result = true;
       }
@@ -1336,7 +1369,7 @@ export class TorqueProvider {
   }*/
 
   public gasPrice = async (): Promise<BigNumber> => {
-    let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
+    let result = new BigNumber(1000).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
@@ -1356,7 +1389,7 @@ export class TorqueProvider {
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(60).multipliedBy(10 ** 9); // error default 60 gwei
+      result = new BigNumber(1000).multipliedBy(10 ** 9); // error default 60 gwei
     }
 
     if (result.lt(lowerLimit)) {
@@ -1386,9 +1419,12 @@ export class TorqueProvider {
     result = loansData
       .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
       .map(e => {
-        const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        let loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        loanAsset = this.isETHAsset(loanAsset) ? Asset.ETH : loanAsset;
+        let collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        collateralAsset = this.isETHAsset(collateralAsset) ? Asset.ETH : collateralAsset;
+
         const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
-        const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
         let amountOwned = e.principal.minus(e.interestDepositRemaining);
         if (amountOwned.lte(0)) {
@@ -1832,7 +1868,7 @@ export class TorqueProvider {
   };*/
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH; // || asset === Asset.WETH;
+    return asset === Asset.ETH || asset === Asset.WETH;
   };
 
   public isStableAsset = (asset: Asset): boolean => {

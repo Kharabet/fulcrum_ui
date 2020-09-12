@@ -418,38 +418,51 @@ export class FulcrumProvider {
     return result;
   };*/
 
-  public getLargeApprovalAmount = (asset: Asset): BigNumber => {
+  public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
+    return FulcrumProvider.MAX_UINT;
+    /*let amount = new BigNumber(0);
+
     switch (asset) {
       case Asset.ETH:
       case Asset.WETH:
       case Asset.fWETH:
-        return new BigNumber(10**18).multipliedBy(1500);
+        amount = new BigNumber(10 ** 18).multipliedBy(1500);
       case Asset.WBTC:
-        return new BigNumber(10**8).multipliedBy(25);
+      case Asset.YFI:
+        amount = new BigNumber(10 ** 8).multipliedBy(25);
+      case Asset.BZRX:
+        amount = new BigNumber(10 ** 18).multipliedBy(400000);
       case Asset.LINK:
-        return new BigNumber(10**18).multipliedBy(60000);
+        amount = new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
-        return new BigNumber(10**18).multipliedBy(750000);
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
+      case Asset.LEND:
       case Asset.KNC:
-        return new BigNumber(10**18).multipliedBy(550000);
+        amount = new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.BAT:
-        return new BigNumber(10**18).multipliedBy(750000);
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
       case Asset.SUSD:
-      return new BigNumber(10**18).multipliedBy(375000);
+        amount = new BigNumber(10 ** 18).multipliedBy(375000);
       case Asset.USDC:
       case Asset.USDT:
-        return new BigNumber(10**6).multipliedBy(375000);
+        amount = new BigNumber(10 ** 6).multipliedBy(375000);
       case Asset.REP:
-        return new BigNumber(10**18).multipliedBy(15000);
+        amount = new BigNumber(10 ** 18).multipliedBy(15000);
       case Asset.MKR:
-        return new BigNumber(10**18).multipliedBy(1250);
+        amount = new BigNumber(10 ** 18).multipliedBy(1250);
       case Asset.CHI:
-        return new BigNumber(10 ** 18);
+        amount = new BigNumber(10 ** 18);
       default:
-        throw new Error("Invalid approval asset!");
+        break;
     }
+
+    if (amount.eq(0)) {
+      throw new Error("Invalid approval asset!");
+    }
+    
+    return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
   public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
@@ -495,6 +508,9 @@ export class FulcrumProvider {
         } catch (e) {
           //console.log(e);
         }
+
+        //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
+
         const reserveData = await helperContract.reserveDetails.callAsync(tokens);
         let usdSupplyAll = new BigNumber(0);
         let usdTotalLockedAll = new BigNumber(0);
@@ -516,6 +532,10 @@ export class FulcrumProvider {
             const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18;
             let usdSupply = new BigNumber(0);
             let usdTotalLocked = new BigNumber(0);
+
+            if (asset == Asset.ETHv1) {
+              vaultBalance = await this.getAssetTokenBalanceOfUser(Asset.WETH, "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633");
+            }
 
             const precision = new BigNumber(10 ** (18 - decimals));
             totalAssetSupply = totalAssetSupply.times(precision);
@@ -692,6 +712,9 @@ export class FulcrumProvider {
           result = (await assetContract.profitOf.callAsync(account))
             .dividedBy(10 ** 18);
 
+          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+          result = result.multipliedBy(10 ** (18 - precision));
+
           /*if (swapPrice && swapPrice.gt(0)) {
             result = result
               .multipliedBy(swapPrice);
@@ -795,19 +818,20 @@ export class FulcrumProvider {
 
       }
     } else {
-      if (loan) {
+      if (loan && loan.loanData) {
         const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
         const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
-
+        const currentCollateralToPrincipalRate = await this.getSwapRate(loan.collateralAsset, loan.loanAsset);
         const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
         const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
-       
 
         result = positionType === PositionType.LONG
-          ? loan.loanData!.collateral.times(collateralAssetPrecision)
-          : loan.loanData!.principal.times(loanAssetPrecision);
-        }
+          ? loan.loanData.collateral.times(collateralAssetPrecision)
+          : loan.loanData.collateral.times(collateralAssetPrecision)
+            .times(currentCollateralToPrincipalRate)
+            .minus(loan.loanData.principal.times(loanAssetPrecision));
       }
+    }
 
     result = result.dividedBy(10 ** 18);
 
@@ -1045,7 +1069,7 @@ export class FulcrumProvider {
   public gasPrice = async (): Promise<BigNumber> => {
     if (networkName === "kovan")
       return new BigNumber(1).multipliedBy(10 ** 9); // 1 gwei
-    let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
+    let result = new BigNumber(1000).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
@@ -1065,7 +1089,7 @@ export class FulcrumProvider {
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(60).multipliedBy(10 ** 9); // error default 60 gwei
+      result = new BigNumber(500).multipliedBy(10 ** 9); // error default 60 gwei
     }
 
     if (result.lt(lowerLimit)) {
@@ -1430,7 +1454,7 @@ export class FulcrumProvider {
     };
   }
 
-  public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
+  public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
       // always 0
@@ -1443,7 +1467,7 @@ export class FulcrumProvider {
       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const assetErc20Address = this.getErc20AddressOfAsset(asset);
       if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address);
+        result = await this.getErc20BalanceOfUser(assetErc20Address, account);
         result = result.multipliedBy(10 ** (18 - precision));
       }
     }
@@ -1455,7 +1479,7 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+      const precision = AssetsDictionary.assets.get((asset.includes("v1") ? asset.replace("v1", "") : asset) as Asset)!.decimals || 18;
       const address = await this.contractsSource.getITokenErc20Address(asset);
       if (address) {
         result = await this.getErc20BalanceOfUser(address);
@@ -1464,6 +1488,26 @@ export class FulcrumProvider {
     }
 
     return result;
+  }
+
+  public async getGasTokenAllowance(): Promise<BigNumber> {
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+      if (account) {
+        const assetAddress = this.getErc20AddressOfAsset(Asset.CHI);
+        if (assetAddress) {
+          const tokenContract = await this.contractsSource.getErc20Contract(assetAddress);
+          if (tokenContract) {
+            result = await tokenContract.allowance.callAsync(account, "0x55eb3dd3f738cfdda986b8eff3fa784477552c61")
+          }
+        }
+      }
+    }
+
+    return result
   }
 
   public async getITokenAssetBalanceOfUser(asset: Asset): Promise<BigNumber> {
@@ -1485,7 +1529,6 @@ export class FulcrumProvider {
         }
       }
     }
-
     return result;
   }
 
@@ -1500,7 +1543,7 @@ export class FulcrumProvider {
 
         const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans())
           .find(l => l.loanId === request.loanId);
-        if (!loan)
+        if (!loan || !loan.loanData)
           throw new Error("No loan available!");
 
 
@@ -1510,13 +1553,17 @@ export class FulcrumProvider {
           amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
         }
         else {
-          const decimals: number = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
-          amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(request.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
+          const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
+          const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
+
+          const currentCollateralToPrincipalRate = await this.getSwapRate(loan.collateralAsset, loan.loanAsset);
+          const maxRequestAmount = loan.loanData.collateral.div(10 ** collateralAssetDecimals).times(currentCollateralToPrincipalRate).minus(loan.loanData.principal.div(10 ** loanAssetDecimals));
+          amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(request.amount.div(maxRequestAmount)).toFixed(0, 1));
         }
 
         let maxAmountInBaseUnits = new BigNumber(0);
         if (loan) {
-          maxAmountInBaseUnits = loan.loanData!.collateral;
+          maxAmountInBaseUnits = loan.loanData.collateral;
         }
 
         if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01)) {
@@ -1806,7 +1853,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const earnRewardEventResponse = await fetch(etherscanApiUrl);
     const earnRewardEventResponseJson = await earnRewardEventResponse.json();
     if (earnRewardEventResponseJson.status !== "1") return result;
@@ -1844,7 +1893,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const payTradingFeeEventResponse = await fetch(etherscanApiUrl);
     const payTradingFeeEventResponseJson = await payTradingFeeEventResponse.json();
     if (payTradingFeeEventResponseJson.status !== "1") return result;
@@ -1881,7 +1932,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
     const tradeEventResponseJson = await tradeEventResponse.json();
     if (tradeEventResponseJson.status !== "1") return result;
@@ -1937,7 +1990,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const closeWithSwapResponse = await fetch(etherscanApiUrl);
     const closeWithSwapResponseJson = await closeWithSwapResponse.json();
     if (closeWithSwapResponseJson.status !== "1") return result;
@@ -1989,7 +2044,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const liquidationEventResponse = await fetch(etherscanApiUrl);
     const liquidationEventResponseJson = await liquidationEventResponse.json();
     if (liquidationEventResponseJson.status !== "1") return result;
@@ -2041,7 +2098,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const depositCollateralEventResponse = await fetch(etherscanApiUrl);
     const depositCollateralEventResponseJson = await depositCollateralEventResponse.json();
     if (depositCollateralEventResponseJson.status !== "1") return result;
@@ -2079,7 +2138,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const withdrawCollateralEventResponse = await fetch(etherscanApiUrl);
     const withdrawCollateralEventResponseJson = await withdrawCollateralEventResponse.json();
     if (withdrawCollateralEventResponseJson.status !== "1") return result;
@@ -2225,13 +2286,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-}
-}
-}
-} catch(e) {
-// console.log(e);
-}
-}*/
+    }
+    }
+    }
+    } catch(e) {
+    // console.log(e);
+    }
+    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

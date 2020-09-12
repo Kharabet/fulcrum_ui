@@ -1,6 +1,7 @@
 const apiUrl = "https://api.bzx.network/v1";
 
 const loader = document.querySelector('.loader');
+const _inputPrecision = 6;
 
 if (loader) {
     loader.classList.add('visible');
@@ -86,18 +87,18 @@ modal.onclick = function (event) {
 
 
 async function collateralEstimate(loanAsset, collateralAsset, amount) {
-    const requestUrl = `${apiUrl}//borrow-deposit-estimate?borrow_asset=${loanAsset}&collateral_asset=${collateralAsset}&amount=${amount}`;
+    const requestUrl = `${apiUrl}/borrow-deposit-estimate?borrow_asset=${loanAsset}&collateral_asset=${collateralAsset}&amount=${amount}`;
     const collateralEstimateResponse = await fetch(requestUrl);
     const responseJson = await collateralEstimateResponse.json();
     const errorLargeLoan = 'Loan is too large';
     return (!responseJson.success)
         ? errorLargeLoan
-        : (new Number(responseJson.data.depositAmount)).toFixed(2);
+        : parseFloat(responseJson.data.depositAmount);
 }
 async function onLoanInputChange(e) {
     const form = e.currentTarget;
     const inputLoan = form.querySelector('.input-loan');
-    const inputLoanValue = parseInt(inputLoan.value);
+    const inputLoanValue = parseFloat(inputLoan.value);
     inputLoanValue > 0
         ? form.classList.add('active')
         : form.classList.remove('active');
@@ -111,7 +112,7 @@ async function updateCollateralInput() {
     const loanAsset = form.querySelector(".item-form.loan .select-styled").dataset.asset;
     const collateralAsset = form.querySelector(".item-form.collateral .select-styled").dataset.asset;
 
-    const inputLoanValue = parseInt(inputLoan.value);
+    const inputLoanValue = parseFloat(inputLoan.value);
     if (inputLoanValue === 0 || inputLoan.value.length === 0) {
         if (inputCollateral.classList.contains('error'))
             inputCollateral.classList.remove('error')
@@ -119,10 +120,15 @@ async function updateCollateralInput() {
     }
     if (inputLoanValue > 0) {
         const collateralEstimateValue = await collateralEstimate(loanAsset, collateralAsset, inputLoanValue);
-        isNaN(collateralEstimateValue)
-            ? inputCollateral.classList.add('error')
-            : inputCollateral.classList.remove('error');
-        inputCollateral.value = collateralEstimateValue;
+        if (isNaN(collateralEstimateValue)) {
+            inputCollateral.classList.add('error')
+            inputCollateral.value = collateralEstimateValue;
+        }
+        else {
+            inputCollateral.classList.remove('error');
+            inputCollateral.value = formatPrecision(collateralEstimateValue);
+            inputCollateral.setAttribute("title", collateralEstimateValue);
+        }
     }
 }
 
@@ -238,4 +244,16 @@ async function getTorqueBorrowApr() {
         ? console.error(responseJson.message)
         : renderBorrowApr(responseJson.data);
     window.borrowAPR = responseJson.data;
+}
+
+function formatPrecision(output) {
+    const outputNumber = Number(output);
+
+    let n = Math.log(Math.abs(outputNumber)) / Math.LN10;
+    let x = 3 - n;
+    if (x < 6) x = 3;
+    if (x < -1) x = 0;
+    if (x > _inputPrecision) x = _inputPrecision;
+    var m = Math.pow(10, x);
+    return (Math.floor(outputNumber * m) / m).toString();
 }

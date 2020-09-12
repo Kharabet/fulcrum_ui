@@ -19,6 +19,9 @@ interface IAddToBalanceState {
     inputBzrxBalance: string;
     inputVBzrxBalance: string;
     inputBptBalance: string;
+    bzrxInputInBaseUnits: BigNumber;
+    vbzrxInputInBaseUnits: BigNumber;
+    bptInputInBaseUnits: BigNumber;
 }
 
 
@@ -37,7 +40,12 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
             bptBalance: props.bptMax,
             inputBzrxBalance: props.bzrxMax.toFixed(2),
             inputVBzrxBalance: props.vbzrxMax.toFixed(2),
-            inputBptBalance: props.bptMax.toFixed(2)
+            inputBptBalance: props.bptMax.toFixed(2),
+            bzrxInputInBaseUnits: new BigNumber(props.bzrxMax).times(10 ** 18),
+            vbzrxInputInBaseUnits: new BigNumber(props.vbzrxMax).times(10 ** 18),
+            bptInputInBaseUnits: networkName === "kovan"
+            ? new BigNumber(this.props.bptMax).times(10 ** 6)
+            : new BigNumber(this.props.bptMax).times(10 ** 18),
         };
     }
 
@@ -64,7 +72,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                     <label>Add to staking balance</label>
                     {this.props.bzrxMax > 0 &&
                         <div className="calc-item">
-                            <input className="add-to-balance__input" type="number" title={this.state.bzrxBalance.toFixed(18)} value={this.state.inputBzrxBalance} onChange={this.changeBzrxBalance} />
+                            <input className="add-to-balance__input" type="number" step="0.01" max={this.props.bzrxMax.toFixed(2)} title={this.state.bzrxBalance.toFixed(18)} value={this.state.inputBzrxBalance} onChange={this.changeBzrxBalance} />
                             <div className="add-to-balance__range">
                                 <input step="0.01" type="range" min="0" max={this.props.bzrxMax.toFixed(2)} value={this.state.bzrxBalance} onChange={this.changeBzrxBalance} />
                                 <div className="line"><div></div><div></div><div></div><div></div></div>
@@ -76,7 +84,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                     }
                     {this.props.vbzrxMax > 0 &&
                         <div className="calc-item">
-                            <input className="add-to-balance__input" type="number" title={this.state.vBzrxBalance.toFixed(18)} value={this.state.inputVBzrxBalance} onChange={this.changeVBzrxBalance} />
+                            <input className="add-to-balance__input" type="number" step="0.01" max={this.props.vbzrxMax.toFixed(2)} title={this.state.vBzrxBalance.toFixed(18)} value={this.state.inputVBzrxBalance} onChange={this.changeVBzrxBalance} />
                             <div className="add-to-balance__range">
                                 <input step="0.01" type="range" min="0" max={this.props.vbzrxMax.toFixed(2)} value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
                                 <div className="line"><div></div><div></div><div></div><div></div></div>
@@ -89,7 +97,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                     }
                     {this.props.bptMax > 0 &&
                         <div className="calc-item">
-                            <input className="add-to-balance__input" type="number" title={this.state.bptBalance.toFixed(18)} value={this.state.inputBptBalance} onChange={this.changeBptBalance} />
+                            <input className="add-to-balance__input" type="number" step="0.001" max={this.props.bptMax.toFixed(2)} title={this.state.bptBalance.toFixed(18)} value={this.state.inputBptBalance} onChange={this.changeBptBalance} />
                             <div className="add-to-balance__range">
                                 <input step="0.001" type="range" min="0" max={this.props.bptMax} value={this.state.bptBalance.toFixed(2)} onChange={this.changeBptBalance} />
                                 <div className="line"><div></div><div></div><div></div><div></div></div>
@@ -113,31 +121,51 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
     }
 
     private stake = () => {
-        const bzrx = new BigNumber(this.state.bzrxBalance).times(10 ** 18);
-        const vbzrx = new BigNumber(this.state.vBzrxBalance).times(10 ** 18);
-        const bpt = networkName === "kovan"
-            ? new BigNumber(this.state.bptBalance).times(10 ** 6)
-            : new BigNumber(this.state.bptBalance).times(10 ** 18);
+        const bzrx = this.state.bzrxInputInBaseUnits;
+        const vbzrx = this.state.vbzrxInputInBaseUnits;
+        const bpt = this.state.bptInputInBaseUnits;
         this.props.stake(bzrx, vbzrx, bpt);
     }
 
     private changeBzrxBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        const result = this.changeBalance(e.target.value, this.props.bzrxMax);
-        this.setState({ ...this.state, bzrxBalance: result.balance, inputBzrxBalance: result.inputBalance });
+        const maxInputValue = parseFloat(e.currentTarget.getAttribute("max")!).toFixed(2);
+        const inputValue = e.currentTarget.value;
+        const inputValueInBaseUnits = maxInputValue && maxInputValue === inputValue
+            ? new BigNumber(this.props.bzrxMax).times(10 ** 18)
+            : new BigNumber(inputValue).times(10 ** 18);
+
+        const result = this.changeBalance(inputValue, this.props.bzrxMax);
+        this.setState({ ...this.state, bzrxBalance: result.balance, inputBzrxBalance: result.inputBalance, bzrxInputInBaseUnits: inputValueInBaseUnits });
     }
 
     private changeVBzrxBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        const result = this.changeBalance(e.target.value, this.props.vbzrxMax);
-        this.setState({ ...this.state, vBzrxBalance: result.balance, inputVBzrxBalance: result.inputBalance });
+        const maxInputValue = parseFloat(e.currentTarget.getAttribute("max")!).toFixed(2);
+        const inputValue = e.currentTarget.value;
+        const inputValueInBaseUnits = maxInputValue && maxInputValue === inputValue
+            ? new BigNumber(this.props.vbzrxMax).times(10 ** 18)
+            : new BigNumber(inputValue).times(10 ** 18);
+
+        const result = this.changeBalance(inputValue, this.props.vbzrxMax);
+        this.setState({ ...this.state, vBzrxBalance: result.balance, inputVBzrxBalance: result.inputBalance, vbzrxInputInBaseUnits: inputValueInBaseUnits });
     }
 
     private changeBptBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        const result = this.changeBalance(e.target.value, this.props.bptMax);
-        this.setState({ ...this.state, bptBalance: result.balance, inputBptBalance: result.inputBalance });
+        const maxInputValue = parseFloat(e.currentTarget.getAttribute("max")!).toFixed(2);
+        const inputValue = e.currentTarget.value;
+        const inputValueInBaseUnits = maxInputValue && maxInputValue === inputValue
+            ? networkName === "kovan"
+                ? new BigNumber(this.props.bptMax).times(10 ** 6)
+                : new BigNumber(this.props.bptMax).times(10 ** 18)
+            : networkName === "kovan"
+                ? new BigNumber(inputValue).times(10 ** 6)
+                : new BigNumber(inputValue).times(10 ** 18);
+
+        const result = this.changeBalance(inputValue, this.props.bptMax);
+        this.setState({ ...this.state, bptBalance: result.balance, inputBptBalance: result.inputBalance, bptInputInBaseUnits: inputValueInBaseUnits });
     }
 
     private changeBalance = (balanceText: string, walletBalance: number) => {
-        const balance = Number(balanceText);
+        const balance = parseFloat(balanceText);
         if (balance > walletBalance)
             return {
                 balance: walletBalance,

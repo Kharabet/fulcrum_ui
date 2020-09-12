@@ -192,7 +192,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             </div>
           </div>
           <div title={`$${this.state.baseTokenPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Asset Price</span>}
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Mid Market Price</span>}
             {this.state.baseTokenPrice.gt(0) && !this.state.isLoading
               ? <React.Fragment>
                 <span className="fw-sign">$</span>{this.state.baseTokenPrice.toFixed(2)}

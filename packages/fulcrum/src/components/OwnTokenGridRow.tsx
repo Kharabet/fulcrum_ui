@@ -155,7 +155,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           {this.props.positionValue.toFixed(4)}
         </div>
         <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
-          <span className="own-token-grid-row__body-header">Asset Price</span>
+          <span className="own-token-grid-row__body-header">Mid Market Price</span>
           {!this.state.isLoading
             ? <React.Fragment>
               <span className="sign-currency">$</span>{this.props.openPrice.toFixed(2)}
@@ -183,7 +183,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               : <Preloader width="74px" />
             }
           </div>
-          <div className="own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
+          <div className={`own-token-grid-row__open-manage-collateral ${this.props.loan.collateralizedPercent.lte(.15) ? "danger" : ""}`} onClick={this.onManageClick}>
             <OpenManageCollateral />
           </div>
         </div>
@@ -210,7 +210,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           }
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
-          <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
+          <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick} disabled={this.props.loan.collateralizedPercent.lte(.15)}>
             {TradeType.SELL}
           </button>
         </div>

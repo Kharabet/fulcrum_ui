@@ -102,7 +102,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     if (switchButton.checked) {
       await TorqueProvider.Instance.checkAndSetApprovalForced(
         Asset.CHI,
-        TorqueProvider.Instance.contractsSource.getiBZxAddress().toLowerCase(),
+        "0x55eb3dd3f738cfdda986b8eff3fa784477552c61",
         new BigNumber(10 ** 18)
       );
       switchButton.setAttribute('data-isgastokenenabled', 'true');
@@ -110,7 +110,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     } else {
       await TorqueProvider.Instance.checkAndSetApprovalForced(
         Asset.CHI,
-        TorqueProvider.Instance.contractsSource.getiBZxAddress().toLowerCase(),
+        "0x55eb3dd3f738cfdda986b8eff3fa784477552c61",
         new BigNumber(0)
       );
       switchButton.setAttribute('data-isgastokenenabled', 'false');

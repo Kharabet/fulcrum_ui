@@ -182,7 +182,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     this._isMounted && this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
-      lendAmountText: maxLendAmount.decimalPlaces(this._inputPrecision).toFixed(),
+      lendAmountText: this.formatPrecision(maxLendAmount),
       lendAmount: maxLendAmount,
       maxLendAmount: maxLendAmount,
       maxTokenAmount: maxTokenAmount,
@@ -287,7 +287,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
             : this.state.assetDetails.reactLogoSvg.render()
 
           }
-          {this.props.asset === Asset.ETH && this.props.lendType === LendType.LEND &&
+          {/*{this.props.asset === Asset.ETH && this.props.lendType === LendType.LEND &&
             <p className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</p>
           }
           {this.props.asset === Asset.ETH && this.props.lendType === LendType.UNLEND &&
@@ -295,7 +295,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               <p className="lend-form__notification">You can convert iETH to vBZRX, a token representing BZRX that vests over 4 years with a six month cliff. The current conversion rate is 0.0002 vBZRX per iETH, but the exchange rate will be changed to reflect market rates in the coming days.</p>
               <p className="lend-form__notification">Read more about Lenders Rescue program <a href="https://bzx.network/blog/compensation-plan" target="_blank" rel="noopener noreferrer">here</a></p>
             </React.Fragment>
-          }
+          }*/}
         </div>
         <div className="lend-form__form-container">
           <div className="lend-form__form-values-container">
@@ -532,7 +532,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
       // indicates a 100% burn
-      sendAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS.div(10**18);
+      sendAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS.times(10 ** 18);
     }
 
     this.props.onSubmit(
@@ -568,7 +568,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest).then(lendedAmountEstimate => {
         observer.next({
           isLendAmountTouched: this.state.isLendAmountTouched || false,
-          lendAmountText: multipliedLendAmount ? multipliedLendAmount.decimalPlaces(this._inputPrecision).toFixed() : "0",
+          lendAmountText: multipliedLendAmount ? this.formatPrecision(multipliedLendAmount) : "0",
           lendAmount: multipliedLendAmount || new BigNumber(0),
           maxLendAmount: this.state.maxLendAmount || new BigNumber(0),
           lendedAmountEstimate: lendedAmountEstimate || new BigNumber(0)
@@ -606,11 +606,9 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       // handling negative values (incl. Ctrl+C)
       if (amount.isNegative()) {
         amount = amount.absoluteValue();
-        amountText = amount.decimalPlaces(this._inputPrecision).toFixed();
       }
       if (amount.gt(maxAmount)) {
         amount = maxAmount;
-        amountText = maxAmount.decimalPlaces(this._inputPrecision).toFixed();
       }
 
       if (!amount.isNaN()) {
@@ -633,7 +631,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
         FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest).then(lendedAmountEstimate => {
           observer.next({
             isLendAmountTouched: true,
-            lendAmountText: amountText,
+            lendAmountText: this.formatPrecision(amount),
             lendAmount: amount,
             maxLendAmount: this.state.maxLendAmount || new BigNumber(0),
             lendedAmountEstimate: lendedAmountEstimate,
@@ -644,4 +642,16 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       }
     });
   };
+
+  public formatPrecision(output: BigNumber): string {
+    const outputNumber = Number(output);
+
+    let n = Math.log(Math.abs(outputNumber)) / Math.LN10;
+    let x = 4 - n;
+    if (x < 6) x = 4;
+    if (x < -1) x = 0;
+    if (x > this._inputPrecision) x = this._inputPrecision;
+    var m = Math.pow(10, x);
+    return (Math.floor(outputNumber * m) / m).toString();
+  }
 }

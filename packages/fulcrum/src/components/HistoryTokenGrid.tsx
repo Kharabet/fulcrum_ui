@@ -344,7 +344,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   };
 
   public getAssetUSDRate = async (asset: Asset, date: Date) => {
-    const token = asset === Asset.fWETH ? Asset.ETH : asset;
+    const token = asset === Asset.WETH || asset === Asset.fWETH ? Asset.ETH : asset;
 
     const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${token.toLowerCase()}&date=${date.getTime()}`);
     const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;

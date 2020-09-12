@@ -59,7 +59,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x1cf226e9413addaf22412a2e182f9c0de44af002";
+        address = "0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f";
         break;
       case 3:
         address = "0xbe49f4cd73041cdf24a7b721627de577b3bab000";
@@ -79,7 +79,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633";
+        address = "0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f";
         break;
       case 3:
         address = "0xbab325bc2e78ea080f46c1a2bf9bf25f8a3c4d69";
@@ -107,11 +107,32 @@ export class ContractsSource {
   private getiTokenAddress(asset: Asset): string {
     let address: string = "";
     switch (asset) {
+      case Asset.BZRX:
+        switch (this.networkId) {
+          case 1:
+            address = "0x18240bd9c07fa6156ce3f3f61921cc82b2619157";
+            break;
+        }
+        break;
+      case Asset.YFI:
+        switch (this.networkId) {
+          case 1:
+            address = "0x7f3fe9d492a9a60aebb06d82cba23c6f32cad10b";
+            break;
+        }
+        break;
+      case Asset.LEND:
+        switch (this.networkId) {
+          case 1:
+            address = "0xab45bf58c6482b87da85d6688c4d9640e093be98";
+            break;
+        }
+        break;
       case Asset.ETH:
       case Asset.WETH:
         switch (this.networkId) {
           case 1:
-            address = "0x77f973fcaf871459aa58cd81881ce453759281bc";
+            address = "0xb983e01458529665007ff7e0cddecdb74b967eb6";
             break;
           case 3:
             address = "0x0c9b7891e0374ce96e8063891a2356a0fe23ee33";
@@ -134,7 +155,7 @@ export class ContractsSource {
       case Asset.USDT:
         switch (this.networkId) {
           case 1:
-            address = "0x8326645f3aa6de6420102fdb7da9e3a91855045b";
+            address = "0x7e9997a38a439b2be7ed9c9c4628391d3e055d48";
             break;
           case 42:
             address = "0x6b9f03e05423cc8d00617497890c0872ff33d4e8";
@@ -154,7 +175,7 @@ export class ContractsSource {
       case Asset.DAI:
         switch (this.networkId) {
           case 1:
-            address = "0x493c57c4763932315a328269e1adad09653b9081";
+            address = "0x6b093998d36f2c7f0cc359441fbb24cc629d5ff0";
             break;
           case 3:
             address = "0x8cca3a42105de7765c58f547e85ac98f57b25d5c";
@@ -170,7 +191,7 @@ export class ContractsSource {
       case Asset.USDC:
         switch (this.networkId) {
           case 1:
-            address = "0xf013406a0b1d544238083df0b93ad0d2cbe0f65f";
+            address = "0x32e4c68b3a4a813b710595aeba7f6b7604ab9c15";
             break;
           case 42:
             address = "0xaac9822f31e5aefb32bc228dcf259f23b49b9855";
@@ -200,7 +221,7 @@ export class ContractsSource {
       case Asset.KNC:
         switch (this.networkId) {
           case 1:
-            address = "0x1cc9567ea2eb740824a45f8026ccf8e46973234d";
+            address = "0x687642347a9282be8fd809d8309910a3f984ac5a";
             break;
           case 42:
             address = "0xde7a60c3581f0d8c8723a71c28579131984a410c";
@@ -210,7 +231,7 @@ export class ContractsSource {
       case Asset.LINK:
         switch (this.networkId) {
           case 1:
-            address = "0x1d496da96caf6b518b133736beca85d5c4f9cbc5";
+            address = "0x463538705e7d22aa7f03ebf8ab09b067e1001b54";
             break;
           case 42:
             address = "0x76754c763a23e9202cc721584fbaf6012ecd8fba";
@@ -220,7 +241,7 @@ export class ContractsSource {
       case Asset.MKR:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0x9189c499727f88f8ecc7dc4eea22c828e6aac015";
             break;
           case 42:
             address = "0x3e72500122c3afd64afe0306d7fbc7b8bd82b7d2";
@@ -240,7 +261,7 @@ export class ContractsSource {
       case Asset.WBTC:
         switch (this.networkId) {
           case 1:
-            address = "0xba9262578efef8b3aff7f60cd629d6cc8859c8b5";
+            address = "0x2ffa85f655752fb2acb210287c60b9ef335f5b6e";
             break;
           case 42:
             address = "0x73d4b4ab88eab2a1e6ce495de85c2b04c2918b69";
@@ -257,6 +278,16 @@ export class ContractsSource {
             break;
         }
         break;
+      case Asset.USDT:
+        switch (this.networkId) {
+          case 1:
+            address = "0x7e9997a38a439b2be7ed9c9c4628391d3e055d48";
+            break;
+          case 42:
+            address = "";
+            break;
+        }
+        break;
     }
 
     return address;
@@ -266,7 +297,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        address = "0xaaA601aE20077F9fae80494DDC36BB39C952c2d0";
         break;
       case 3:
         address = "0x115338e77339d64b3d58181aa9c0518df9d18022";
@@ -291,6 +322,15 @@ export class ContractsSource {
       case 1:
         // noinspection SpellCheckingInspection
         switch (addressErc20) {
+          case "0x56d811088235f11c8920698a204a5010a788f4b3":
+            asset = Asset.BZRX;
+            break;
+          case "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e":
+            asset = Asset.YFI;
+            break;
+          case "0x80fb784b7ed66730e8b1dbd9820afd29931aab03":
+            asset = Asset.LEND;
+            break;
           case "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2":
             asset = Asset.WETH;
             break;
@@ -472,6 +512,18 @@ export class ContractsSource {
             break;
           case Asset.CHI:
             address = "0x0000000000004946c0e9f43f4dee607b0ef1fa1c";
+            break;
+          case Asset.YFI:
+            address = "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e";
+            break;
+          case Asset.USDT:
+            address = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+            break;
+          case Asset.BZRX:
+            address = "0x56d811088235F11C8920698a204A5010a788f4b3";
+            break;
+          case Asset.LEND:
+            address = "0x80fb784b7ed66730e8b1dbd9820afd29931aab03";
             break;
         }
         break;

@@ -54,7 +54,7 @@ export class LendErcProcessor {
     try {
       // Prompting token allowance
       if (amountInBaseUnits.gt(erc20allowance)) {
-        approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.asset), { from: account });
+        approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.asset, amountInBaseUnits), { from: account });
       }
       task.processingStepNext();
       task.processingStepNext();

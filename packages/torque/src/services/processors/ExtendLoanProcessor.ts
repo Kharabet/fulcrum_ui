@@ -13,7 +13,7 @@ export class ExtendLoanProcessor {
     }
 
     const taskRequest: ExtendLoanRequest = (task.request as ExtendLoanRequest);
-    const isETHBorrowAsset = taskRequest.borrowAsset === Asset.ETH;
+    const isETHBorrowAsset = TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset);
 
     if (isETHBorrowAsset) {
       //Initializing
@@ -70,7 +70,8 @@ export class ExtendLoanProcessor {
       // Waiting for token allowance
       task.processingStepNext();
       if (depositAmountInBaseUnits.gt(erc20allowance)) {
-        await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.borrowAsset), { from: account });
+        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.borrowAsset, depositAmountInBaseUnits), { from: account });
+        await TorqueProvider.Instance.waitForTransactionMined(approveHash);
       }
     }
 

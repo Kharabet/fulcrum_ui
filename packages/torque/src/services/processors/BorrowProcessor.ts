@@ -75,7 +75,8 @@ export class BorrowProcessor {
       // Waiting for token allowance
       task.processingStepNext();
       if (depositAmountInBaseUnits.gt(erc20allowance)) {
-        await tokenErc20Contract!.approve.sendTransactionAsync(iTokenContract.address, TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.collateralAsset), { from: account });
+        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(iTokenContract.address, TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.collateralAsset, depositAmountInBaseUnits), { from: account });
+        await TorqueProvider.Instance.waitForTransactionMined(approveHash);
       }
     }
 
@@ -90,7 +91,28 @@ export class BorrowProcessor {
 
     try {
       console.log(TorqueProvider.Instance.gasLimit);
-      const gasAmount = await iTokenContract.borrow.estimateGasAsync(
+      const gasAmount =  isGasTokenEnabled && ChiTokenBalance.gt(0)
+      ? await iTokenContract.borrowWithGasToken.estimateGasAsync(
+        taskRequest.loanId,
+        borrowAmountInBaseUnits,
+        new BigNumber(7884000), // approximately 3 months
+        depositAmountInBaseUnits,
+        isETHCollateralAsset
+          ? TorqueProvider.ZERO_ADDRESS
+          : collateralAssetErc20Address,
+        account,
+        account,
+        account,                     
+        "0x",
+        {
+          from: account,
+          value: isETHCollateralAsset
+            ? depositAmountInBaseUnits
+            : undefined,
+          gas: TorqueProvider.Instance.gasLimit
+        }
+      )
+      : await iTokenContract.borrow.estimateGasAsync(
         taskRequest.loanId,
         borrowAmountInBaseUnits,
         new BigNumber(7884000), // approximately 3 months
@@ -116,6 +138,31 @@ export class BorrowProcessor {
       // throw e;
     }
 
+    console.log(iTokenContract.address, isGasTokenEnabled && ChiTokenBalance.gt(0) ?
+    iTokenContract.borrowWithGasToken.getABIEncodedTransactionData(
+      taskRequest.loanId,
+          borrowAmountInBaseUnits,      // borrowAmount
+          new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
+          depositAmountInBaseUnits,     // collateralTokenSent
+          isETHCollateralAsset
+            ? TorqueProvider.ZERO_ADDRESS
+            : collateralAssetErc20Address, // collateralToken
+
+          account,                      // borrower
+          account,                      // borrower
+          account,                      // gasTokenUser
+          "0x"
+    ) : iTokenContract.borrow.getABIEncodedTransactionData(taskRequest.loanId,
+      borrowAmountInBaseUnits,      // borrowAmount
+      new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
+      depositAmountInBaseUnits,     // collateralTokenSent
+      isETHCollateralAsset
+        ? TorqueProvider.ZERO_ADDRESS
+        : collateralAssetErc20Address, // collateralToken
+      account,                      // borrower
+      account,                      // receiver
+      "0x"));
+
     try {
       txHash = isGasTokenEnabled && ChiTokenBalance.gt(0)
         ? await iTokenContract.borrowWithGasToken.sendTransactionAsync(
@@ -136,7 +183,7 @@ export class BorrowProcessor {
             value: isETHCollateralAsset
               ? depositAmountInBaseUnits
               : undefined,
-            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : "3000000",
             gasPrice: await TorqueProvider.Instance.gasPrice()
           })
         :
@@ -156,7 +203,7 @@ export class BorrowProcessor {
             value: isETHCollateralAsset
               ? depositAmountInBaseUnits
               : undefined,
-            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : "3000000",
             gasPrice: await TorqueProvider.Instance.gasPrice()
           }
         );

@@ -67,12 +67,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         { token: Asset.DAI, color: "#F8A608" },
         { token: Asset.USDC, color: "#3574B9" },
         { token: Asset.USDT, color: "#26A17B" },
-        { token: Asset.SUSD, color: "#100E23" },
         { token: Asset.WBTC, color: "#41365B" },
         { token: Asset.LINK, color: "#2A5ADA" },
-        { token: Asset.ZRX, color: "#000004" },
-        { token: Asset.REP, color: "#5F2652" },
-        { token: Asset.KNC, color: "#49BC98" }
+        { token: Asset.YFI, color: "#2A0ADA" },
+        { token: Asset.BZRX, color: "#2A6AEA" },
+        { token: Asset.MKR, color: "#49BC98" },
+        { token: Asset.LEND, color: "#3574B8" },
+        { token: Asset.KNC, color: "#49BC97" },
+
       ]
     }
 
@@ -176,8 +178,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     let volume30d = new BigNumber(0);
     let liquidationEventsWithUsd: { event: LiquidationEvent, repayAmountUsd: BigNumber }[] = []
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory();
-    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, true);
-    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, false);
+    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, true);
+    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, false);
     const unhealthyLoansUsd = unhealthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const healthyLoansUsd = healthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const liqudiations30d = liquidationEvents.filter((e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30))
@@ -370,11 +372,11 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                         <div className="unhealthy-data-wrapper flex fd-c ai-c">
                           <div className="flex w-100 mb-15">
                             <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                            <span className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd.toFixed(2)}</span>
+                            <span title={this.state.unhealthyLoansUsd.toFixed(2)} className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd.toFixed(2)}</span>
                           </div>
                           <div className="flex w-100">
                             <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                            <span className="healthy-value healthy-color">{this.state.healthyLoansUsd.toFixed(2)}</span>
+                            <span title={this.state.healthyLoansUsd.toFixed(2)} className="healthy-value healthy-color">{this.state.healthyLoansUsd.div(10**6).toFixed(2)}m</span>
                           </div>
                         </div>
                       </div>

@@ -172,6 +172,11 @@
         line-height: 150%;
         color: #276bfb;
         outline: none;
+        &.unsafe {
+          // color: #de4a4a;
+          color: #fff;
+          background-color: #de4a4a;
+        }
         &:disabled,
         &[disabled] {
           color: #a3b0c2;

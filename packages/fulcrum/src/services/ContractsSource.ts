@@ -177,7 +177,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x1cf226e9413addaf22412a2e182f9c0de44af002";
+        address = "0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f";
         break;
       case 3:
         address = "0xbe49f4cd73041cdf24a7b721627de577b3bab000";
@@ -197,7 +197,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633";
+        address = "0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f";
         break;
       case 3:
         address = "0xbab325bc2e78ea080f46c1a2bf9bf25f8a3c4d69";
@@ -217,7 +217,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        address = "0xaaA601aE20077F9fae80494DDC36BB39C952c2d0";
         break;
       case 3:
         address = "0x4330762418df3555ddd1d732200b317c9239b941";
@@ -238,7 +238,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0xbfdE53F20d50E41162a6085a9A591f27c9c47652";
+        address = "0x3B55369bfeA51822eb3E85868c299E8127E13c56";
         break;
       case 3:
         address = "0x2B2db1E0bDf6485C87Bc2DddEd17E7E3D9ba675E";
@@ -264,7 +264,7 @@ export class ContractsSource {
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     await this.Init();
     let symbol;
-    if (asset === Asset.WETH) {
+    if (asset === Asset.WETH || asset === Asset.fWETH) {
       symbol = `iETH`;
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`;
@@ -347,7 +347,7 @@ export class ContractsSource {
 
   public getITokenErc20Address(asset: Asset): string | null {
     let symbol;
-    if (asset === Asset.WETH) {
+    if (asset === Asset.WETH || asset === Asset.fWETH) {
       symbol = `iETH`;
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`;
@@ -365,6 +365,7 @@ export class ContractsSource {
     }
     return tokenContractInfo ? tokenContractInfo.token : null;
   }
+  
   private getAssetFromAddressRaw(addressErc20: string): Asset {
     let asset: Asset = Asset.UNKNOWN;
 
@@ -374,8 +375,20 @@ export class ContractsSource {
       case 1:
         // noinspection SpellCheckingInspection
         switch (addressErc20) {
+          case "0x77f973FCaF871459aa58cd81881Ce453759281bC":
+            asset = Asset.ETHv1;
+            break;
+          case "0x56d811088235f11c8920698a204a5010a788f4b3":
+            asset = Asset.BZRX;
+            break;
+          case "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e":
+            asset = Asset.YFI;
+            break;
+          case "0x80fb784b7ed66730e8b1dbd9820afd29931aab03":
+            asset = Asset.LEND;
+            break;
           case "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2":
-            asset = Asset.WETH;
+            asset = Asset.ETH;
             break;
           case "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359":
             asset = Asset.SAI;

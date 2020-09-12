@@ -10,6 +10,9 @@ export class FooterMenu extends Component<IFooterMenuProps> {
     return (
       <div className="footer-menu">
         <div className="footer-menu__item">
+          <a href="https://legacy.fulcrum.trade/#/trade">Legacy dApp</a>
+        </div>
+        <div className="footer-menu__item">
           <a href="https://fulcrum.trade/tos/">Terms of use</a>
         </div>
         <div className="footer-menu__item">

@@ -132,6 +132,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     const sliderMin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber();
     //300%
     const sliderMax = sliderMin + 185;
+    const isUnhealthyLoan = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(115);
+    const isBoorowMoreDisabled = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(150);
 
     let sliderValue = borrowedFundsItem.collateralizedPercent.multipliedBy(100).toNumber();
     if (sliderValue > sliderMax) {
@@ -192,7 +194,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
             }
             <div className={`borrowed-funds-list-item__body-collateralized-state ${collateralizedStateSelector}`}>
               {positionSafetyText}
-              {positionSafetyText === "Danger" ? (
+              {isUnhealthyLoan ? (
                 <React.Fragment><br />Add Collateral</React.Fragment>
               ) : null}
             </div>
@@ -214,7 +216,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
         ) : (
             <div className="borrowed-funds-list-item__actions-container">
 
-              <button className="" onClick={this.onManageCollateral}>
+              <button className={isUnhealthyLoan ? "unsafe" : ""} onClick={this.onManageCollateral}>
                 Manage Collateral
               </button>
               <button className="" onClick={this.onExtendLoan}>
@@ -223,9 +225,15 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               <button className="" onClick={this.onRepayLoan}>
                 Repay Loan
               </button>
+              {/*<button className="" onClick={this.onRepayLoan}
+                title={isUnhealthyLoan ? "Collateral too low" : ""}
+                disabled={isUnhealthyLoan}>
+
+                Repay Loan
+              </button>*/}
               <button className=""
-                title={this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(150) ? "Collateral too low" : ""}
-                disabled={this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(150)} onClick={this.onBorrowMore}>
+                title={isBoorowMoreDisabled ? "Collateral too low" : ""}
+                disabled={isBoorowMoreDisabled} onClick={this.onBorrowMore}>
                 Borrow More
               </button>
             </div>
