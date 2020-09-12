@@ -112,7 +112,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         </header>
         {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
-            Please use our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a> to unlend your funds from version 1 of the protocol.
+            If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
           </InfoBlock>
         }
       </React.Fragment>
@@ -170,7 +170,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       </header>
         {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
-            Please use our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a> to unlend your funds from version 1 of the protocol.
+            If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
           </InfoBlock>
         }
       </React.Fragment>
