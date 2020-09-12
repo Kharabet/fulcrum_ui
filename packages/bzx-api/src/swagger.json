@@ -402,12 +402,25 @@
         }
       }
     },
-    "/interest-rates": {
+    "/interest-rates-fulcrum": {
       "get": {
         "tags": [
           "External Integration"
         ],
-        "summary": "Get supply interest rates (APR and APY), specifically designed for loanscan",
+        "summary": "Get Fulcrum interest rates (APR and APY), specifically designed for loanscan",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/interest-rates-torque": {
+      "get": {
+        "tags": [
+          "External Integration"
+        ],
+        "summary": "Get Torque interest rates (APR and APY), specifically designed for loanscan",
         "responses": {
           "200": {
             "description": "Success"

@@ -26,8 +26,13 @@ export default ({ config, logger }) => {
 	const torque = new Torque(web3, storage, logger);
 
 
-	api.get('/interest-rates', async (req, res) => {
-		const lendAndBorrowRates = await fulcrum.getLendAndBorrowRates();
+	api.get('/interest-rates-fulcrum', async (req, res) => {
+		const lendAndBorrowRates = await fulcrum.getLendAndBorrowRates("borrowInterestRate");
+		res.json(lendAndBorrowRates);
+	});
+
+	api.get('/interest-rates-torque', async (req, res) => {
+		const lendAndBorrowRates = await fulcrum.getLendAndBorrowRates("torqueBorrowInterestRate");
 		res.json(lendAndBorrowRates);
 	});
 
