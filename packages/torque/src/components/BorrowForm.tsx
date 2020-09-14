@@ -10,6 +10,8 @@ import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 import { Loader } from "./Loader";
+import { ReactComponent as Edit } from "../assets/images/edit.svg";
+import Slider from "rc-slider";
 
 export interface IBorrowFormProps {
   borrowAsset: Asset;
@@ -26,10 +28,14 @@ interface IBorrowFormState {
   balanceTooLow: boolean;
   didSubmit: boolean;
   isLoading: boolean;
+  isEdit: boolean;
+  minValue: number;
+  maxValue: number;
+  selectedValue: number;
+  collateralValue: string;
 }
 
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
-  private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
   private readonly _inputTextChange: Subject<string>;
@@ -45,7 +51,12 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false,
       didSubmit: false,
-      isLoading: false
+      isLoading: false,
+      isEdit: false,
+      minValue: 115,
+      maxValue: 300,
+      selectedValue: 155,
+      collateralValue: ""
     };
 
     this._inputTextChange = new Subject<string>();
@@ -66,6 +77,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this._input = input;
   };
 
+  public componentWillMount(): void {
+    let selectedValue = this.state.selectedValue.toFixed();
+    this.setState({ ...this.state, collateralValue: selectedValue });
+  }
   public componentDidUpdate(prevProps: Readonly<IBorrowFormProps>, prevState: Readonly<IBorrowFormState>, snapshot?: any): void {
     if (this.state.depositAmount !== prevState.depositAmount || this.state.collateralAsset !== prevState.collateralAsset) {
       this.changeStateLoading();
@@ -74,7 +89,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   public render() {
     return (
-      <form className="borrow-form" onSubmit={this.onSubmit}>
+      <form className="borrow-form" onSubmit={this.onSubmit} onClick={this.onClickForm}>
         <section className="borrow-form__content">
           <div className="borrow-form__input-container">
             <input
@@ -95,7 +110,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 : <React.Fragment>
                   {this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0)
                     ? <span className="borrow-form__error">Loan is too large</span>
-                    : <span title={this.state.depositAmount.toFixed()}>{this.state.depositAmount.dp(5, BigNumber.ROUND_CEIL).toString()} {this.state.collateralAsset}</span>
+                    : <span title={this.state.depositAmount.multipliedBy(1.005).toFixed()}>{this.state.depositAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL).toString()} {this.state.collateralAsset}</span>
                   }
                 </React.Fragment>
               }
@@ -105,6 +120,41 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               </div>
               }
             </div>
+          </div>
+          <div className="borrow-form__edit-collateral-by-container">
+            <div className="edit-input-wrapper">
+              <span className="lh mb-15">Collateralized</span>
+              <div className="edit-input-container">
+                {this.state.isEdit
+                  ? <React.Fragment >
+                    <div className="edit-input-collateral">
+                      <input type="number" step="any" placeholder={`Enter`} value={this.state.collateralValue} className="input-collateral" onChange={this.onCollateralAmountChange} />
+                    </div>
+                  </React.Fragment>
+                  : <React.Fragment>
+                    <span>{this.state.collateralValue}<span className="sign">%</span></span>
+                    <div className="edit-icon-collateral" onClick={this.editInput}>
+                      <Edit />
+                    </div>
+                  </React.Fragment>
+                }
+              </div>
+              {this.state.isEdit && <span className="lh">Safe</span>}
+            </div>
+            {this.state.isEdit
+              ? <React.Fragment >
+                <Slider
+                  step={0.01}
+                  min={this.state.minValue}
+                  max={this.state.maxValue}
+                  value={this.state.selectedValue}
+                  onChange={this.onChange}
+                />
+              </React.Fragment>
+              : <React.Fragment>
+                <div className="rail"></div>
+              </React.Fragment>
+            }
           </div>
         </section>
         <section className="dialog-actions">
@@ -210,7 +260,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let inputAmountText = event.target.value ? event.target.value : "";
-    if (parseFloat(inputAmountText) < 0) return;
+    if (inputAmountText === "" || parseFloat(inputAmountText) < 0 ) return;
     // setting inputAmountText to update display at the same time
     await this.setState({
       ...this.state,
@@ -243,5 +293,44 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       this.setState({ ...this.state, isLoading: false })
     }
   }
+
+  public onCollateralAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    let inputCollateralText = event.target.value ? event.target.value : "";
+    let inputCollateralValue = Number(inputCollateralText);
+
+    if (parseFloat(inputCollateralText) < 0) return;
+
+    if (this.state.minValue > inputCollateralValue) {
+      await this.setState({ ...this.state, collateralValue: inputCollateralText, selectedValue: this.state.minValue })
+    } else if (inputCollateralValue > this.state.maxValue) {
+      await this.setState({ ...this.state, collateralValue: inputCollateralText, selectedValue: this.state.maxValue })
+    } else {
+      await this.setState({ ...this.state, collateralValue: inputCollateralText, selectedValue: inputCollateralValue })
+    }
+  };
+
+  public editInput = () => {
+    this.setState({ ...this.state, isEdit: true })
+  }
+
+  public onClickForm = async (event: FormEvent<HTMLFormElement>) => {
+    if (this.state.isEdit && (event.target as Element).className !== 'input-collateral') {
+      this.setState({ ...this.state, isEdit: false })
+      if (this.state.minValue > Number(this.state.collateralValue)) {
+        await this.setState({ ...this.state, collateralValue: this.state.minValue.toFixed() })
+      } else if (Number(this.state.collateralValue) > this.state.maxValue) {
+        await this.setState({ ...this.state, collateralValue: this.state.maxValue.toFixed() })
+      }
+    }
+  }
+
+  private onChange = async (value: number) => {
+    let selectedValue = Number(value.toFixed(2));
+    this.setState({
+      ...this.state,
+      selectedValue: selectedValue,
+      collateralValue: selectedValue.toFixed(2)
+    });
+  };
 
 }
