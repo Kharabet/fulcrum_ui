@@ -321,14 +321,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await this._isMounted && this.setState({ ...this.state, isRiskDisclosureModalOpen: true });
   }
   private checkITokenV1Balances = async () => {
-    
-    const isITokenV1Present = (async (arr: Array<Asset>) => {
-      for (let asset of arr) {
-        const iTokenBalance = await FulcrumProvider.Instance.getITokenBalanceOfUser(asset);
-        if (iTokenBalance.gt(0)) return true;
-      }
-      return false;
-    })([
+    const v1AssetsArray = [
       Asset.ETHv1,
       Asset.DAIv1,
       Asset.SAIv1,
@@ -341,13 +334,22 @@ export class AppRouter extends Component<any, IAppRouterState> {
       Asset.LINKv1,
       Asset.SUSDv1,
       Asset.USDTv1,
-    ]);
-    
-    await isITokenV1Present && this._isMounted && this.setState({
-      ...this.state,
-      isV1ITokenInWallet: true
-    })
+    ]
+    for (const i in v1AssetsArray) {
+      const iTokenBalance = await FulcrumProvider.Instance.getITokenBalanceOfUser(v1AssetsArray[i]);
+      if (iTokenBalance.gt(0)) {
+        await this._isMounted && this.setState({
+          ...this.state,
+          isV1ITokenInWallet: true
+        })
+        return;
+      }
 
+    }
+    await this._isMounted && this.setState({
+      ...this.state,
+      isV1ITokenInWallet: false
+    })
   }
 
   private checkGasTokenAllowance = async () => {
