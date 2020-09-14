@@ -18,7 +18,7 @@ export interface ITxLoaderStepProps {
 }
 
 export interface ITxLoaderStepState {
-    RequestTask: RequestTask | undefined;
+    requestTask: RequestTask | undefined;
     complete: boolean;
     title: ITitle | null;
 }
@@ -28,13 +28,13 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
         super(props);
 
         this.state = {
-            RequestTask: TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId),
+            requestTask: TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId),
             title: { message: "Loading", isWarning: false },
             complete: false
         };
 
-        // TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
-        // TasksQueue.Instance.on(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
+        TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
+        TasksQueue.Instance.on(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
         this.stepDiv = React.createRef();
         this._isMounted = false;
     }
@@ -46,7 +46,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
     public componentDidMount(): void {
         this._isMounted = true;
 
-        // this.setState({ ...this.state, title: this.getTitle(this.state.requestTask) });
+        this.setState({ ...this.state, title: this.getTitle(this.state.requestTask) });
 
         const div = this.stepDiv.current;
         if (!div) return;
@@ -54,15 +54,15 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
         div.classList.add("animation-in");
     }
 
-    // public componentDidUpdate(prevProps: Readonly<ITradeTxLoaderStepProps>, prevState: Readonly<ITradeTxLoaderStepState>): void {
+    public componentDidUpdate(prevProps: Readonly<ITxLoaderStepProps>, prevState: Readonly<ITxLoaderStepState>): void {
 
-    //     const div = this.stepDiv.current;
-    //     if (!div) return;
-    //     if (prevState.requestTask && this.state.requestTask && this.getTitle(prevState.requestTask) === this.getTitle(this.state.requestTask)) return;
-    //     div.classList.remove("animation-out");
-    //     div.classList.remove("animation-in");
-    //     div.classList.add("animation-in");
-    // }
+        const div = this.stepDiv.current;
+        if (!div) return;
+        if (prevState.requestTask && this.state.requestTask && this.getTitle(prevState.requestTask) === this.getTitle(this.state.requestTask)) return;
+        div.classList.remove("animation-out");
+        div.classList.remove("animation-in");
+        div.classList.add("animation-in");
+    }
 
     public componentWillUnmount(): void {
         this._isMounted = false;
@@ -73,96 +73,95 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
             div.classList.add("animation-out");
         }
 
-        // TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
-        // TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
-        // if (this.state.requestTask)
-        //     ExplorerProvider.Instance.onTaskCancel(this.state.requestTask);
+        TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
+        TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
+        if (this.state.requestTask)
+            ExplorerProvider.Instance.onTaskCancel(this.state.requestTask);
 
     }
 
 
-    // public getTitle = (requestTask: RequestTask | undefined) => {
-    //     if (requestTask === undefined) return null;
-    //     let title = requestTask.steps.find((s, i) => i + 1 === requestTask!.stepCurrent)
-    //     if (!title)
-    //         title = requestTask.status;
+    public getTitle = (requestTask: RequestTask | undefined) => {
+        if (requestTask === undefined) return null;
+        let title = requestTask.steps.find((s, i) => i + 1 === requestTask!.stepCurrent)
+        if (!title)
+            title = requestTask.status;
 
 
-    //     let errorMsg = "";
-    //     if (requestTask.error) {
-    //         if (requestTask.error.message) {
-    //             errorMsg = requestTask.error.message;
-    //         } else if (typeof requestTask.error === "string") {
-    //             errorMsg = requestTask.error;
-    //         }
+        let errorMsg = "";
+        if (requestTask.error) {
+            if (requestTask.error.message) {
+                errorMsg = requestTask.error.message;
+            } else if (typeof requestTask.error === "string") {
+                errorMsg = requestTask.error;
+            }
 
-    //         if (errorMsg) {
-    //             if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`) ||
-    //                 errorMsg.includes(`always failing transaction`)) {
-    //                 errorMsg = "The transaction seems like it will fail. Change request parameters and try agian, please."; //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
-    //             } else if (errorMsg.includes("Reverted by EVM")) {
-    //                 errorMsg = "The transaction failed. Reverted by EVM"; //. Etherscan link:";
-    //             } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-    //                 errorMsg = "You didn't confirm in MetaMask. Please try again.";
-    //             } else if (errorMsg.includes("User denied account authorization.")) {
-    //                 errorMsg = "You didn't authorize MetaMask. Please try again.";
-    //             } else if (errorMsg.includes("Transaction rejected")) {
-    //                 errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-    //             } else {
-    //                 errorMsg = requestTask.status;
-    //             }
-    //         }
-    //     }
-    //     if (errorMsg)
-    //         title = errorMsg;
+            if (errorMsg) {
+                if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`) ||
+                    errorMsg.includes(`always failing transaction`)) {
+                    errorMsg = "The transaction seems like it will fail. Change request parameters and try agian, please."; //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
+                } else if (errorMsg.includes("Reverted by EVM")) {
+                    errorMsg = "The transaction failed. Reverted by EVM"; //. Etherscan link:";
+                } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+                    errorMsg = "You didn't confirm in MetaMask. Please try again.";
+                } else if (errorMsg.includes("User denied account authorization.")) {
+                    errorMsg = "You didn't authorize MetaMask. Please try again.";
+                } else if (errorMsg.includes("Transaction rejected")) {
+                    errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
+                } else {
+                    errorMsg = requestTask.status;
+                }
+            }
+        }
+        if (errorMsg)
+            title = errorMsg;
 
-    //     return { message: title, isWarning: errorMsg !== "" }
-    // }
+        return { message: title, isWarning: errorMsg !== "" }
+    }
 
     public render() {
 
         if (!this.state.title) return null;
         return (
             <React.Fragment>
-                {/* {this.state.requestTask && this.state.requestTask.txHash */}
-                {/* ? <a href={`${ExplorerProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash}`} target="_blank" rel="noopener noreferrer">
+                {this.state.requestTask && this.state.requestTask.txHash}
+                 ? <a href={`${ExplorerProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash}`} target="_blank" rel="noopener noreferrer">
                     <div ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
                         {this.state.title.message}
                     </div>
                 </a>
-                    :  */}
+                    :
                 <div ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
                     {this.state.title.message}
                 </div>
-                {/* } */}
             </React.Fragment >
         )
     }
 
-    // public onTasksQueueChanged = async () => {
+    public onTasksQueueChanged = async () => {
 
-    //     const task = TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId);
-    //     let title = this.getTitle(task);
-    //     if (!title && this.state.requestTask?.status == "Done")
-    //         title = { message: "Updating data", isWarning: false };
+        const task = TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId);
+        let title = this.getTitle(task);
+        if (!title && this.state.requestTask?.status == "Done")
+            title = { message: "Updating data", isWarning: false };
 
-    //     this._isMounted && this.setState({
-    //         ...this.state,
-    //         title: title
-    //     });
+        this._isMounted && this.setState({
+            ...this.state,
+            title: title
+        });
 
-    //     const div = this.stepDiv.current;
-    //     //if (div && task && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
-    //     if (div && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
-    //         div.classList.remove("animation-in");
-    //         div.classList.remove("animation-out");
-    //         div.classList.add("animation-out");
-    //     }
-    //     window.setTimeout(async () => {
-    //         await this._isMounted && this.setState({
-    //             ...this.state,
-    //             requestTask: task
-    //         });
-    //     }, 500)
-    // };
+        const div = this.stepDiv.current;
+
+        if (div && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
+            div.classList.remove("animation-in");
+            div.classList.remove("animation-out");
+            div.classList.add("animation-out");
+        }
+        window.setTimeout(async () => {
+            await this._isMounted && this.setState({
+                ...this.state,
+                requestTask: task
+            });
+        }, 500)
+    };
 }
