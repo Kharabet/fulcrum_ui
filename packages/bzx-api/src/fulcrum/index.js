@@ -76,7 +76,7 @@ export default class Fulcrum {
         return apr;
     }
 
-    async getFulcrumLendAndBorrowRates() {
+    async getFulcrumLendRates() {
         const reserveData = await this.getReserveData();
         let lendRates = [];
         let borrowRates = [];
@@ -89,17 +89,9 @@ export default class Fulcrum {
                 apy: lendApy,
                 tokenSymbol
             });
-
-            const borrowApr = item.borrowInterestRate / 100;
-            const borrowApy = this.convertAPRtoAPY(borrowApr);
-            borrowRates.push({
-                apr: borrowApr,
-                apy: borrowApy,
-                tokenSymbol
-            });
         });
 
-        return { lendRates, borrowRates };
+        return { lendRates };
     }
 
     async getTorqueBorrowRates() {
