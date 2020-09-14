@@ -27,13 +27,13 @@ export default ({ config, logger }) => {
 
 
 	api.get('/interest-rates-fulcrum', async (req, res) => {
-		const lendAndBorrowRates = await fulcrum.getLendAndBorrowRates("borrowInterestRate");
+		const lendAndBorrowRates = await fulcrum.getFulcrumLendAndBorrowRates();
 		res.json(lendAndBorrowRates);
 	});
 
 	api.get('/interest-rates-torque', async (req, res) => {
-		const lendAndBorrowRates = await fulcrum.getLendAndBorrowRates("torqueBorrowInterestRate");
-		res.json(lendAndBorrowRates);
+		const borrowRates = await fulcrum.getTorqueBorrowRates();
+		res.json(borrowRates);
 	});
 
 	api.get('/total-asset-supply', async (req, res) => {

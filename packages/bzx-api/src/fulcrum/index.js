@@ -76,17 +76,13 @@ export default class Fulcrum {
         return apr;
     }
 
-    async getLendAndBorrowRates(borrowField) {
-        const periodicRate = 365;
+    async getFulcrumLendAndBorrowRates() {
         const reserveData = await this.getReserveData();
-
         let lendRates = [];
         let borrowRates = [];
         reserveData.filter(item => item.token !== "all" && item.token !== "ethv1").forEach(item => {
-            // APY = (1 + APR / n)^n - 1 
-            console.log("item", item);
             const lendApr = item.supplyInterestRate / 100;
-            const lendApy = Math.pow(1 + lendApr / periodicRate, periodicRate) - 1;
+            const lendApy = this.convertAPRtoAPY(lendApr);
             const tokenSymbol = item.token.toUpperCase();
             lendRates.push({
                 apr: lendApr,
@@ -94,9 +90,8 @@ export default class Fulcrum {
                 tokenSymbol
             });
 
-            // APY = (1 + APR / n)^n - 1 
-            const borrowApr = item[borrowField] / 100;
-            const borrowApy = Math.pow(1 + borrowApr / periodicRate, periodicRate) - 1;
+            const borrowApr = item.borrowInterestRate / 100;
+            const borrowApy = this.convertAPRtoAPY(borrowApr);
             borrowRates.push({
                 apr: borrowApr,
                 apy: borrowApy,
@@ -105,6 +100,30 @@ export default class Fulcrum {
         });
 
         return { lendRates, borrowRates };
+    }
+
+    async getTorqueBorrowRates() {
+        const reserveData = await this.getReserveData();
+
+        let borrowRates = [];
+        reserveData.filter(item => item.token !== "all" && item.token !== "ethv1").forEach(item => {
+            const borrowApr = item.torqueBorrowInterestRate / 100;
+            const borrowApy = this.convertAPRtoAPY(borrowApr);
+            const tokenSymbol = item.token.toUpperCase();
+            borrowRates.push({
+                apr: borrowApr,
+                apy: borrowApy,
+                tokenSymbol
+            });
+        });
+
+        return { borrowRates };
+    }
+
+    convertAPRtoAPY(apr) {
+        const periodicRate = 365;
+        // APY = (1 + APR / n)^n - 1 
+        return Math.pow(1 + apr / periodicRate, periodicRate) - 1;
     }
 
     async getTorqueBorrowRateAPR() {
