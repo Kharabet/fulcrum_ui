@@ -66,6 +66,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private _isMounted: boolean;
+  private apiUrl = "https://api.bzx.network/v1";
 
   private async derivedUpdate() {
 
@@ -92,7 +93,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.quoteToken :
         this.props.baseToken
     );
-    const yieldApr = new BigNumber(40);
+
+    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`);
+    const yieldAPYJson = await yieldAPYRequest.json();
+    const yieldApr = yieldAPYJson.success && yieldAPYJson.data[this.props.baseToken.toLowerCase()]
+      ? new BigNumber(yieldAPYJson.data[this.props.baseToken.toLowerCase()]) : new BigNumber(0);
 
     this._isMounted && this.setState({
       ...this.state,
@@ -220,8 +225,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               ? <React.Fragment>
                 {this.state.interestRate.toFixed(4)}
                 <span className="fw-sign">%</span>
-                <span title={this.state.yieldApr.gt(0) ? `${this.state.yieldApr.toFixed(18)}%` : ``} className="trade-token-grid-row__yield">
-                  Yield <span>{this.state.yieldApr.toFixed(0)}%</span>
+                <span title={this.state.yieldApr.toFixed(18)} className="trade-token-grid-row__yield">
+                  Yield <span>{this.state.yieldApr.toFixed(2)}%</span>
                 </span>
               </React.Fragment>
               : <Preloader width="74px" />
