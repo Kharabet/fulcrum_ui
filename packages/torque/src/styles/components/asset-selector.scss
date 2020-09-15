@@ -35,7 +35,7 @@
     }
     .asset-selector__icon {
       display: flex;
-      svg{
+      svg {
         width: 40px;
         height: auto;
       }
@@ -128,6 +128,9 @@
       font-weight: 800;
       line-height: 1.7;
       color: #a9b5c7;
+      span {
+        font-weight: 400;
+      }
     }
     .asset-selector__apr {
       font-weight: 600;

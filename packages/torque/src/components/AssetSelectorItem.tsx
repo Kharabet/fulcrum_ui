@@ -25,6 +25,7 @@ export interface IAssetSelectorItemProps {
 
 interface IAssetSelectorItemState {
   interestRate: BigNumber;
+  yieldApr: BigNumber;
   isLoadingTransaction: boolean;
   request: BorrowRequest | undefined;
 }
@@ -35,6 +36,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
     this.state = {
       interestRate: new BigNumber(0),
+      yieldApr: new BigNumber(0),
       isLoadingTransaction: false,
       request: undefined
     };
@@ -90,7 +92,8 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   private derivedUpdate = async () => {
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.asset);
-    this.setState({ ...this.state, interestRate: interestRate });
+    const yieldApr = new BigNumber(40);
+    this.setState({ ...this.state, interestRate, yieldApr });
   };
 
   public render() {
@@ -118,6 +121,10 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
                 <div className="asset-selector-row">
                   <div className="asset-selector__apr">APR</div>
                   <div className="asset-selector__fixed">FIXED</div>
+                </div>
+                <div className="asset-selector-row">
+                  <div className="asset-selector__apr">Yield</div>
+                  <div className="asset-selector__fixed">{this.state.yieldApr.gt(0) ? this.state.yieldApr.toPrecision(2) : `0`}<span>%</span></div>
                 </div>
               </div>
               <div className="asset-selector-footer">
