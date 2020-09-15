@@ -10,6 +10,7 @@ import { Asset } from "../domain/Asset";
 import { AddToBalance } from "./AddToBalance";
 import Modal from "react-modal";
 import { FindRepresentative } from "./FindRepresentative";
+import { AnimationTx } from "./AnimationTx";
 import { IRep } from "../domain/IRep";
 
 import Representative1 from "../assets/images/representative1.png"
@@ -40,6 +41,7 @@ interface IFormState {
   repsList: IRep[];
   delegateAddress: string;
   rebateRewards: BigNumber;
+  isAnimationTx: boolean;
 }
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
@@ -69,7 +71,8 @@ export class Form extends Component<{}, IFormState> {
       repsList: [],
       userEarnings: new BigNumber(0),
       rebateRewards: new BigNumber(0),
-      delegateAddress: ""
+      delegateAddress: "",
+      isAnimationTx: false
     };
 
     this._isMounted = false;
@@ -308,6 +311,7 @@ export class Form extends Component<{}, IFormState> {
         </Modal>
         <div className="container">
           <div className="calculator">
+            {this.state.isAnimationTx && <AnimationTx />}
             <div className="calculator-row balance">
               <div className="balance-wrapper">
 

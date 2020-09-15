@@ -1,32 +1,29 @@
-.animation-tx-1 {
-  fill: #f5f7f9;
-  stroke-dasharray: 202 204;
-  stroke-dashoffset: 203;
-  stroke-linecap: round;
-  animation: animation-tx-draw 2000ms linear 0ms infinite forwards;
+.animation-title {
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  color: #283049;
+  left: 0;
+  right: 0;
+  top: 105px;
+  position: absolute;
+  text-align: center;
 }
-.animation-tx-2 {
-  fill: none;
-  stroke: #276bfb;
-  stroke-width: 6;
-  stroke-dasharray: 152 154;
-  stroke-dashoffset: 153;
-  stroke-linecap: round;
-  animation: animation-tx-draw 2000ms linear 1000ms infinite forwards;
-}
-@keyframes animation-tx-draw {
-  100% {
-    stroke-dashoffset: 0;
+.animation-tx {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+  background-color: #ffffff;
+  top: 0;
+  left: 0;
+  border-radius: 16px;
+  svg{
+    transform: rotate(-90deg);
   }
-}
-@keyframes animation-tx-fade {
-  0% {
-    stroke-opacity: 1;
-  }
-  95% {
-    stroke-opacity: 1;
-  }
-  100% {
-    stroke-opacity: 0;
+  > div{
+    display: flex;
+    transform: rotate(-90deg) translateY(-30px);
   }
 }
