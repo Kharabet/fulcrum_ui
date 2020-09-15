@@ -91,7 +91,7 @@ export default class Fulcrum {
             });
         });
 
-        return { lendRates , borrowRates: []};
+        return { lendRates, borrowRates: [] };
     }
 
     async getTorqueBorrowRates() {
