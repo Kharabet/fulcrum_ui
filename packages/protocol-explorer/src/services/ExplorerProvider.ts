@@ -33,6 +33,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { RequestTask } from "../domain/RequestTask";
 import { LiquidationRequest } from "../domain/LiquidationRequest";
 import { TasksQueue } from "../services/TasksQueue";
+import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { RequestStatus } from "../domain/RequestStatus";
 import { LiquidationTransactionMinedEvent } from "./events/LiquidationTransactionMinedEvent";
 
@@ -91,7 +92,7 @@ export class ExplorerProvider {
         this.eventEmitter = new EventEmitter();
         this.eventEmitter.setMaxListeners(1000);
 
-        // TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
+        TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
         // singleton
         if (!ExplorerProvider.Instance) {
@@ -1046,7 +1047,7 @@ export class ExplorerProvider {
 
     private processLiquidationRequestTask = async (task: RequestTask, skipGas: boolean) => {
         try {
-
+            debugger;
             this.eventEmitter.emit(ExplorerProviderEvents.AskToOpenProgressDlg, task.request.loanId);
             if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
                 throw new Error("No provider available!");

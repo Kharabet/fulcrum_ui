@@ -124,16 +124,17 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
         if (!this.state.title) return null;
         return (
             <React.Fragment>
-                {this.state.requestTask && this.state.requestTask.txHash}
-                 ? <a href={`${ExplorerProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash}`} target="_blank" rel="noopener noreferrer">
+                {this.state.requestTask && this.state.requestTask.txHash
+                    ? <a href={`${ExplorerProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash}`} target="_blank" rel="noopener noreferrer">
+                        <div ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
+                            {this.state.title.message}
+                        </div>
+                    </a>
+                    :
                     <div ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
                         {this.state.title.message}
                     </div>
-                </a>
-                    :
-                <div ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
-                    {this.state.title.message}
-                </div>
+                }
             </React.Fragment >
         )
     }

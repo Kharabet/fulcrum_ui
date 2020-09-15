@@ -70,7 +70,7 @@ export const LoanRow = (props: ILoanRowProps) => {
     changeLoadingTransaction(true, request, false, false);
     await ExplorerProvider.Instance.onLiquidationConfirmed(request);
 
-    props.onLiquidationUpdated();
+    //props.onLiquidationUpdated();
   }
 
 
@@ -98,13 +98,15 @@ export const LoanRow = (props: ILoanRowProps) => {
 
 
   const onAskToOpenProgressDlg = async (taskId: string) => {
-    if (liquidationRequest || taskId !== liquidationRequest!.loanId) return;
+    debugger;
+    if (!liquidationRequest || taskId !== liquidationRequest.loanId) return;
     changeLoadingTransaction(true, liquidationRequest, false, true);
   };
 
 
   const onAskToCloseProgressDlg = async (task: RequestTask) => {
     if (!liquidationRequest || task.request.loanId !== liquidationRequest.loanId) return;
+
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         ExplorerProvider.Instance.onTaskCancel(task);
