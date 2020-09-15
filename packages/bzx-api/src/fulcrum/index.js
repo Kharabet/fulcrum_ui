@@ -91,7 +91,7 @@ export default class Fulcrum {
             });
         });
 
-        return { lendRates };
+        return { lendRates , borrowRates: []};
     }
 
     async getTorqueBorrowRates() {
@@ -109,7 +109,7 @@ export default class Fulcrum {
             });
         });
 
-        return { borrowRates };
+        return { borrowRates, lendRates: [] };
     }
 
     convertAPRtoAPY(apr) {
