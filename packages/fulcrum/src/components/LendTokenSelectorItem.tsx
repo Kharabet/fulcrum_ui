@@ -252,7 +252,12 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       <div className="token-selector-item__actions" style={{ marginTop: `-1.5rem` }}>
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-full"
-          onClick={this.onLendClick} disabled={true}
+          onClick={this.onLendClick} disabled={
+            this.props.asset === Asset.DAI ||
+            this.props.asset === Asset.ETH ||
+            this.props.asset === Asset.USDC ||
+            this.props.asset === Asset.USDT
+          }
         >
           Lend
         </button>
@@ -261,7 +266,12 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         <div className="token-selector-item__actions">
           <button
             className="token-selector-item__lend-button token-selector-item__lend-button--size-half"
-            onClick={this.onLendClick} disabled={true}
+            onClick={this.onLendClick} disabled={
+              this.props.asset === Asset.DAI ||
+              this.props.asset === Asset.ETH ||
+              this.props.asset === Asset.USDC ||
+              this.props.asset === Asset.USDT
+            }
           >
             Lend
         </button>
