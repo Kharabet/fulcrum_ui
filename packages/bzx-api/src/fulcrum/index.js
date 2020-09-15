@@ -75,6 +75,14 @@ export default class Fulcrum {
 
         return apr;
     }
+    
+    async getYieldFarmingAPY() {
+        const reserveData = await this.getReserveData()
+        let apy = {};
+        reserveData.forEach(item => apy[item.token] = item.yieldFarmingAPR);
+
+        return apy;
+    }
 
     async getFulcrumLendRates() {
         const reserveData = await this.getReserveData();
@@ -445,6 +453,7 @@ export default class Fulcrum {
         let usdSupplyAll = new BigNumber(0);
         let stats = new statsModel();
         stats.tokensStats = [];
+        let bzrxUsdPrice = new BigNumber(0);
         if (reserveData && reserveData.totalAssetSupply.length > 0) {
             await Promise.all(iTokens.map(async (token, i) => {
                 let totalAssetSupply = new BigNumber(reserveData.totalAssetSupply[i]);
@@ -470,6 +479,9 @@ export default class Fulcrum {
                 marketLiquidity = marketLiquidity.times(precision);
                 vaultBalance = vaultBalance.times(precision);
                 if (swapRates[i]) {
+                    if (token.name == "bzrx") {
+                        bzrxUsdPrice = new BigNumber(swapRates[i]).dividedBy(10 ** 18);
+                    }
                     usdSupply = totalAssetSupply.times(swapRates[i]).dividedBy(10 ** 18);
                     usdSupplyAll = usdSupplyAll.plus(usdSupply);
 
@@ -491,9 +503,30 @@ export default class Fulcrum {
                     swapToUSDPrice: new BigNumber(swapRates[i]).dividedBy(10 ** 18).toFixed(),
                     usdSupply: usdSupply.dividedBy(10 ** 18).toFixed(),
                     usdTotalLocked: usdTotalLocked.dividedBy(10 ** 18).toFixed(),
+                    yieldFarmingAPR: new BigNumber(0)
                 }));
             }));
 
+            let totalBorrowAmountAllAssetsUsd = new BigNumber(0);
+            let totalFeesAllAssetsUsd = new BigNumber(0);
+            const yearlyPayoutBZRXBonuses = new BigNumber(267800000).times(bzrxUsdPrice);
+            stats.tokensStats.forEach((tokenStat) => {
+                const totalAssetBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(new BigNumber(tokenStat.swapToUSDPrice))
+                totalBorrowAmountAllAssetsUsd = totalBorrowAmountAllAssetsUsd.plus(totalAssetBorrowUSD)
+                const totalFeesPerAssetUSD = totalAssetBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate))
+                totalFeesAllAssetsUsd = totalFeesAllAssetsUsd.plus(totalFeesPerAssetUSD)
+            });
+
+            stats.tokensStats.forEach(tokenStat => {
+                const totalAssetBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(new BigNumber(tokenStat.swapToUSDPrice))
+                const totalFeesPerAssetUSD = totalAssetBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate))
+                const borrowYieldAPY = (
+                    totalFeesPerAssetUSD.times(0.05)
+                        .plus(yearlyPayoutBZRXBonuses.times(totalFeesPerAssetUSD).div(totalFeesAllAssetsUsd))
+                ).div(totalAssetBorrowUSD);
+
+                tokenStat.yieldFarmingAPR = isNaN(borrowYieldAPY.toFixed()) ? "0" : borrowYieldAPY.toFixed();
+            })
             stats.allTokensStats = new allTokensStatsModel({
                 token: "all",
                 usdSupply: usdSupplyAll.dividedBy(10 ** 18).toFixed(),

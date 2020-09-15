@@ -55,6 +55,11 @@ export default ({ config, logger }) => {
 		const apr = await fulcrum.getBorrowRateAPR();
 		res.json({ data: apr, success: true });
 	});
+	
+	api.get('/yield-farimng-apy', async (req, res) => {
+		const apy = await fulcrum.getYieldFarmingAPY();
+		res.json({ data: apy, success: true });
+	});
 
 	api.get('/torque-borrow-rate-apr', async (req, res) => {
 		const torqueBorrowRates = await fulcrum.getTorqueBorrowRateAPR();
