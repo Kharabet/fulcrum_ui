@@ -401,6 +401,19 @@
           }
         }
       }
+    },
+    "/interest-rates": {
+      "get": {
+        "tags": [
+          "External Integration"
+        ],
+        "summary": "Get supply interest rates (APR and APY), specifically designed for loanscan",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
     }
   }
 }

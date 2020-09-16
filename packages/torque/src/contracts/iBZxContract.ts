@@ -136,7 +136,7 @@ export class iBZxContract extends BaseContract {
       return result;
     }
   };
-  
+
   public closeWithSwapWithGasToken = {
     async sendTransactionAsync(
       loanId: string,
@@ -363,7 +363,7 @@ export class iBZxContract extends BaseContract {
       return result;
     }
   };
-  
+
   public liquidateWithGasToken = {
     async sendTransactionAsync(
       loanId: string,
@@ -472,7 +472,7 @@ export class iBZxContract extends BaseContract {
       return result;
     }
   };
-  
+
   public getActiveLoans = {
     async estimateGasAsync(
       start: BigNumber,
@@ -950,21 +950,21 @@ export class iBZxContract extends BaseContract {
     }
   };
 
-// Only returns data for loans that are active
-// loanType 0: all loans
-// loanType 1: margin trade loans
-// loanType 2: non-margin trade loans
-// only active loans are returned
-/*function getUserLoans(
-    address user,
-    uint256 start,
-    uint256 count,
-    uint256 loanType,
-    bool isLender,
-    bool unsafeOnly)
-    external
-    view
-    returns (LoanReturnData[] memory loansData);*/
+  // Only returns data for loans that are active
+  // loanType 0: all loans
+  // loanType 1: margin trade loans
+  // loanType 2: non-margin trade loans
+  // only active loans are returned
+  /*function getUserLoans(
+      address user,
+      uint256 start,
+      uint256 count,
+      uint256 loanType,
+      bool isLender,
+      bool unsafeOnly)
+      external
+      view
+      returns (LoanReturnData[] memory loansData);*/
   public getUserLoans = {
     async callAsync(
       borrower: string,
@@ -1135,7 +1135,7 @@ export class iBZxContract extends BaseContract {
           data: encodedData
         },
         self._web3Wrapper.getContractDefaults(),
-        (self as any).withdrawCollateral.estimateGasAsync.bind(self, loanId, withdrawAmount)
+        (self as any).withdrawCollateral.estimateGasAsync.bind(self, loanId, receiver, withdrawAmount)
       );
       const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
       return txHash;
@@ -1167,7 +1167,7 @@ export class iBZxContract extends BaseContract {
       loanId: string,
       receiver: string,
       withdrawAmount: BigNumber
-      ): string {
+    ): string {
       const self = (this as any) as iBZxContract;
       const abiEncodedTransactionData = self._strictEncodeArguments("withdrawCollateral(bytes32,address,uint256)", [
         loanId,

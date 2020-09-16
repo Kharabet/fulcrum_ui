@@ -100,7 +100,7 @@ export class Form extends Component<{}, IFormState> {
     }
     selectedRepAddress = delegateAddress;
     const otherRepsList = sortedList.slice(3, sortedList.length);
-    const canOptin = await StakingProvider.Instance.canOptin();
+    const canOptin = false; //await StakingProvider.Instance.canOptin();
     let claimableAmount = await StakingProvider.Instance.isClaimable();
     if (claimableAmount.gt(0)) {
       claimableAmount = claimableAmount.div(10 ** 18)
@@ -401,8 +401,8 @@ export class Form extends Component<{}, IFormState> {
               </div>
             </div>
             <div className="calculator-row rewards-container">
-            <div className="reward-item">
-              <div className="row-header">Incentive rewards balance:</div>
+              <div className="reward-item">
+                <div className="row-header">Incentive rewards balance:</div>
                 <div className="row-body">
                   <div className="reward-content">
                     <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
@@ -444,7 +444,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             */}
-            {/*{this.state.claimableAmount.gt(0) &&
+            {this.state.claimableAmount.gt(0) &&
               <div className="convert-button">
                 <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
                   Claim&nbsp;
@@ -453,7 +453,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             }
-            {this.state.canOptin &&
+            {/*{this.state.canOptin &&
             <div className="convert-button">
               <button className="button button-full-width" onClick={this.onOptinClick}>
                 Opt-in to compensation program
@@ -478,9 +478,9 @@ export class Form extends Component<{}, IFormState> {
               </div>
               {this.state.selectedRepAddress !== "" &&
                 <AddToBalance
-                  bzrxMax={this.state.bzrxBalance.toNumber()}
-                  vbzrxMax={this.state.vBzrxBalance.toNumber()}
-                  bptMax={this.state.bptBalance.toNumber()}
+                  bzrxMax={this.state.bzrxBalance}
+                  vbzrxMax={this.state.vBzrxBalance}
+                  bptMax={this.state.bptBalance}
                   stake={this.onStakeClick}
                 />
               }
