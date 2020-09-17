@@ -75,7 +75,7 @@ export default class Fulcrum {
 
         return apr;
     }
-    
+
     async getYieldFarmingAPY() {
         const reserveData = await this.getReserveData()
         let apy = {};
@@ -453,7 +453,9 @@ export default class Fulcrum {
         let usdSupplyAll = new BigNumber(0);
         let stats = new statsModel();
         stats.tokensStats = [];
-        let bzrxUsdPrice = new BigNumber(0);
+        const bzrxUsdPrice = new BigNumber(swapRates[iTokens.map(x => x.name).indexOf("bzrx")]).dividedBy(10 ** 18);
+        const monthlyReward = new BigNumber(22316666.66).times(bzrxUsdPrice);
+
         if (reserveData && reserveData.totalAssetSupply.length > 0) {
             await Promise.all(iTokens.map(async (token, i) => {
                 let totalAssetSupply = new BigNumber(reserveData.totalAssetSupply[i]);
@@ -479,15 +481,20 @@ export default class Fulcrum {
                 marketLiquidity = marketLiquidity.times(precision);
                 vaultBalance = vaultBalance.times(precision);
                 if (swapRates[i]) {
-                    if (token.name == "bzrx") {
-                        bzrxUsdPrice = new BigNumber(swapRates[i]).dividedBy(10 ** 18);
-                    }
                     usdSupply = totalAssetSupply.times(swapRates[i]).dividedBy(10 ** 18);
                     usdSupplyAll = usdSupplyAll.plus(usdSupply);
 
                     usdTotalLocked = marketLiquidity.plus(vaultBalance).times(swapRates[i]).dividedBy(10 ** 18);
                     usdTotalLockedAll = usdTotalLockedAll.plus(usdTotalLocked);
                 }
+
+                const totalPrincipalUSD = totalAssetBorrow.dividedBy(10 ** 18).times(new BigNumber(swapRates[i]).dividedBy(10 ** 18))
+                const fees = totalPrincipalUSD.times(0.09/100);
+                const rebate = fees.div(2);
+                const borrowCost = totalPrincipalUSD.times(borrowInterestRate.dividedBy(10 ** 20).div(12))
+                const reward = rebate.plus(monthlyReward);
+                const yieldMonthlyRate = (reward.minus(borrowCost)).div(totalPrincipalUSD);
+                const yieldYearlyPercents = yieldMonthlyRate.times(12).times(100)
 
                 stats.tokensStats.push(new tokenStatsModel({
                     token: token.name,
@@ -503,32 +510,10 @@ export default class Fulcrum {
                     swapToUSDPrice: new BigNumber(swapRates[i]).dividedBy(10 ** 18).toFixed(),
                     usdSupply: usdSupply.dividedBy(10 ** 18).toFixed(),
                     usdTotalLocked: usdTotalLocked.dividedBy(10 ** 18).toFixed(),
-                    yieldFarmingAPR: new BigNumber(0)
+                    yieldFarmingAPR: yieldYearlyPercents.toFixed() === "Infinity" ? "0" : yieldYearlyPercents.toFixed()
                 }));
             }));
 
-            let totalBorrowAmountAllAssetsUsd = new BigNumber(0);
-            let totalFeesAllAssetsUsd = new BigNumber(0);
-            const yearlyPayoutBZRXBonuses = new BigNumber(267800000).times(bzrxUsdPrice);
-
-            //collecting total asset borrow and interest fees for all assets 
-            stats.tokensStats.forEach((tokenStat) => {
-                const totalAssetBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(new BigNumber(tokenStat.swapToUSDPrice))
-                totalBorrowAmountAllAssetsUsd = totalBorrowAmountAllAssetsUsd.plus(totalAssetBorrowUSD)
-                const totalFeesPerAssetUSD = totalAssetBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate/100))
-                totalFeesAllAssetsUsd = totalFeesAllAssetsUsd.plus(totalFeesPerAssetUSD)
-            });
-
-            stats.tokensStats.forEach(tokenStat => {
-                const totalAssetBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(new BigNumber(tokenStat.swapToUSDPrice))
-                const totalFeesPerAssetUSD = totalAssetBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate/100))
-                const borrowYieldAPY = (
-                    totalFeesPerAssetUSD.times(0.05)
-                        .plus(yearlyPayoutBZRXBonuses.times(totalFeesPerAssetUSD).div(totalFeesAllAssetsUsd))
-                ).div(totalAssetBorrowUSD);
-
-                tokenStat.yieldFarmingAPR = isNaN(borrowYieldAPY.toFixed()) ? "0" : borrowYieldAPY.toFixed();
-            })
             stats.allTokensStats = new allTokensStatsModel({
                 token: "all",
                 usdSupply: usdSupplyAll.dividedBy(10 ** 18).toFixed(),

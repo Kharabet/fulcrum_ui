@@ -226,7 +226,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
                 {this.state.interestRate.toFixed(4)}
                 <span className="fw-sign">%</span>
                 <span title={this.state.yieldApr.toFixed(18)} className="trade-token-grid-row__yield">
-                  Yield <span>{this.state.yieldApr.toFixed(2)}%</span>
+                  Yield <span>{this.state.yieldApr.toFixed(0)}%</span>
                 </span>
               </React.Fragment>
               : <Preloader width="74px" />

@@ -132,7 +132,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
                 </div>
                 <div className="asset-selector-row">
                   <div className="asset-selector__apr">Yield</div>
-                  <div  title={this.state.yieldApr.toFixed(18)} className="asset-selector__fixed">{this.state.yieldApr.toFixed(2)}<span>%</span></div>
+                  <div  title={this.state.yieldApr.toFixed(18)} className="asset-selector__fixed">{this.state.yieldApr.toFixed(0)}<span>%</span></div>
                 </div>
               </div>
               <div className="asset-selector-footer">
