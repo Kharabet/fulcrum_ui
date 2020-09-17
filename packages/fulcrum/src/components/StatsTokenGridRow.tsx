@@ -69,10 +69,10 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
             <span className="fw-800 color-primary stats-grid-row__asset-name reserve-all">All <span>&nbsp;reserve</span></span>
           </div>
           <div title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``} className="stats-grid-row__col stats-grid-row__col-total-tvl-usd">
-            {details.usdTotalLocked ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdTotalLocked.toFixed(4))}</span></React.Fragment> : `-`}
+            {details.usdTotalLocked ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdTotalLocked.toFixed(2))}</span></React.Fragment> : `-`}
           </div>
           <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col stats-grid-row__col-total-supply-usd">
-            {details.usdSupply ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdSupply.toFixed(4))}</span></React.Fragment> : `-`}
+            {details.usdSupply ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdSupply.toFixed(2))}</span></React.Fragment> : `-`}
           </div>
           <div className="stats-grid-row__col stats-grid-row__col-total-supply"></div>
           <div className="stats-grid-row__col stats-grid-row__col-total-borrow"></div>
@@ -91,8 +91,8 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
     let customBorrowTitle;
     let customBorrowText;
     if (details.borrowInterestRate && details.torqueBorrowInterestRate) {
-      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}% / ${details.torqueBorrowInterestRate.toFixed(18)}%`;
-      customBorrowText = <React.Fragment><span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>%&nbsp;/&nbsp;<span className="fw-800 color-primary">{details.torqueBorrowInterestRate.toFixed(2)}</span>%</React.Fragment>;
+      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}%`;
+      customBorrowText = <React.Fragment><span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>%</React.Fragment>;
     } else {
       customBorrowTitle = ``;
       customBorrowText = `-`;
@@ -126,25 +126,25 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
             </div>
           )}
         <div title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``} className="stats-grid-row__col stats-grid-row__col-total-tvl-usd">
-          {details.usdTotalLocked ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdTotalLocked.toFixed(4))}</span></React.Fragment> : `-`}
+          {details.usdTotalLocked ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdTotalLocked.toFixed(2))}</span></React.Fragment> : `-`}
         </div>
         <div title={details.usdSupply ? `$${details.usdSupply.toFixed(18)}` : ``} className="stats-grid-row__col stats-grid-row__col-total-supply-usd">
-          {details.usdSupply ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdSupply.toFixed(4))}</span></React.Fragment> : `-`}
+          {details.usdSupply ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdSupply.toFixed(2))}</span></React.Fragment> : `-`}
         </div>
         <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col stats-grid-row__col-total-supply">
-          {details.totalSupply ? <span className="fw-800 color-primary">{this.numberWithCommas(details.totalSupply.toFixed(4))}</span> : `-`}
+          {details.totalSupply ? <span className="fw-800 color-primary">{this.numberWithCommas(details.totalSupply.toFixed(2))}</span> : `-`}
         </div>
         <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col stats-grid-row__col-total-borrow">
-          {details.totalBorrow ? <span className="fw-800 color-primary">{this.numberWithCommas(details.totalBorrow.toFixed(4))}</span> : `-`}
+          {details.totalBorrow ? <span className="fw-800 color-primary">{this.numberWithCommas(details.totalBorrow.toFixed(2))}</span> : `-`}
         </div>
         <div title={details.lockedAssets ? `${details.lockedAssets.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col stats-grid-row__col-locked">
-          {details.lockedAssets ? <span className="fw-800 color-primary">{this.numberWithCommas(details.lockedAssets.toFixed(4))}</span> : `-`}
+          {details.lockedAssets ? <span className="fw-800 color-primary">{this.numberWithCommas(details.lockedAssets.toFixed(2))}</span> : `-`}
         </div>
         <div title={details.liquidity ? `${details.liquidity.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col stats-grid-row__col-liquidity">
-          {details.liquidity ? <span className="fw-800 color-primary">{this.numberWithCommas(details.liquidity.toFixed(4))}</span> : `-`}
+          {details.liquidity ? <span className="fw-800 color-primary">{this.numberWithCommas(details.liquidity.toFixed(2))}</span> : `-`}
         </div>
         <div title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(18)}%` : ``} className="stats-grid-row__col stats-grid-row__col-supply-rate">
-          {details.supplyInterestRate ? <React.Fragment><span className="fw-800 color-primary">{details.supplyInterestRate.toFixed(4)}</span>%</React.Fragment> : `-`}
+          {details.supplyInterestRate ? <React.Fragment><span className="fw-800 color-primary">{details.supplyInterestRate.toFixed(2)}</span>%</React.Fragment> : `-`}
         </div>
         <div title={customBorrowTitle} className="stats-grid-row__col stats-grid-row__col-borrow-rate">
           {customBorrowText}
