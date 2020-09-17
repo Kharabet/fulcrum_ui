@@ -20,6 +20,9 @@ import { Preloader } from "./Preloader";
 import "../styles/components/lend-form.scss"
 import "../styles/components/input-amount.scss"
 
+const isMainnetProd =
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
@@ -502,22 +505,24 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       usdPrice = usdPrice.multipliedBy(usdAmount)
     }
 
-    const randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-        event: 'purchase',
-        transactionId: randomNumber,
-        transactionTotal: new BigNumber(usdPrice),
-        transactionProducts: [{
-          name: this.props.lendType + '-' + this.props.asset,
-          sku: this.props.asset,
-          category: this.props.lendType,
-          price: new BigNumber(usdPrice),
-          quantity: 1
-        }],
+    if (isMainnetProd) {
+      const randomNumber = Math.floor(Math.random() * 100000) + 1;
+      const tagManagerArgs = {
+        dataLayer: {
+          event: 'purchase',
+          transactionId: randomNumber,
+          transactionTotal: new BigNumber(usdPrice),
+          transactionProducts: [{
+            name: this.props.lendType + '-' + this.props.asset,
+            sku: this.props.asset,
+            category: this.props.lendType,
+            price: new BigNumber(usdPrice),
+            quantity: 1
+          }],
+        }
       }
+      TagManager.dataLayer(tagManagerArgs);
     }
-    TagManager.dataLayer(tagManagerArgs);
 
     let assetOrWrapped: Asset;
     if (this.props.asset === Asset.ETH) {

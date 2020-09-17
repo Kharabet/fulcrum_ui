@@ -27,6 +27,10 @@ import "../styles/components/trade-form.scss";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { InputReceive } from "./InputReceive";
 
+const isMainnetProd =
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
   inputAmountText: string;
@@ -510,22 +514,25 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       usdPrice = usdPrice.multipliedBy(usdAmount)
     }
 
-    const randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-        event: 'purchase',
-        transactionId: randomNumber,
-        transactionTotal: new BigNumber(usdPrice),
-        transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType + '-' + this.props.quoteAsset,
-          sku: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType,
-          category: this.props.positionType,
-          price: new BigNumber(usdPrice),
-          quantity: 1
-        }],
+    if (isMainnetProd) {
+      const randomNumber = Math.floor(Math.random() * 100000) + 1;
+      const tagManagerArgs = {
+        dataLayer: {
+          event: 'purchase',
+          transactionId: randomNumber,
+          transactionTotal: new BigNumber(usdPrice),
+          transactionProducts: [{
+            name: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType + '-' + this.props.quoteAsset,
+            sku: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType,
+            category: this.props.positionType,
+            price: new BigNumber(usdPrice),
+            quantity: 1
+          }],
+        }
       }
+      TagManager.dataLayer(tagManagerArgs)
     }
-    TagManager.dataLayer(tagManagerArgs)
+
     this.props.onSubmit(
       new TradeRequest(
         this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",

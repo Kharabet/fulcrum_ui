@@ -11,6 +11,10 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 import { Loader } from "./Loader";
 
+const isMainnetProd =
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
 export interface IBorrowFormProps {
   borrowAsset: Asset;
   onSubmit?: (value: BorrowRequest) => void;
@@ -166,23 +170,26 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       if (usdPrice !== null) {
         usdPrice = usdPrice.multipliedBy(usdAmount)
       }
-      const tagManagerArgs = {
-        dataLayer: {
-          event: 'purchase',
-          transactionId: randomNumber,
-          transactionTotal: new BigNumber(usdPrice),
-          transactionProducts: [{
-            name: "Borrow-" + this.props.borrowAsset,
-            sku: "Borrow-" + this.props.borrowAsset + '-' + this.state.collateralAsset,
-            category: "Borrow",
-            price: new BigNumber(usdPrice),
-            quantity: 1
-          }],
-        }
-      }
-      //console.log("tagManagerArgs = ", tagManagerArgs)
-      TagManager.dataLayer(tagManagerArgs)
 
+      if (isMainnetProd) {
+        const tagManagerArgs = {
+          dataLayer: {
+            event: 'purchase',
+            transactionId: randomNumber,
+            transactionTotal: new BigNumber(usdPrice),
+            transactionProducts: [{
+              name: "Borrow-" + this.props.borrowAsset,
+              sku: "Borrow-" + this.props.borrowAsset + '-' + this.state.collateralAsset,
+              category: "Borrow",
+              price: new BigNumber(usdPrice),
+              quantity: 1
+            }],
+          }
+        }
+        //console.log("tagManagerArgs = ", tagManagerArgs)
+        TagManager.dataLayer(tagManagerArgs)
+      }
+      
       this.props.onSubmit(
         new BorrowRequest(
           "0x0000000000000000000000000000000000000000000000000000000000000000",
