@@ -33,7 +33,6 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
         </div>
         <div className="stats-grid-header__col stats-grid-header__col-borrow-rate">
           <span className="stats-grid-header__text">Borrow Rate (APR)</span>
-          <span className="stats-grid-header__text">Fulcrum / Torque</span>
         </div>
       </div>
     );

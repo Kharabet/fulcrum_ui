@@ -524,7 +524,7 @@ export class FulcrumProvider {
             let totalAssetSupply = new BigNumber(reserveData[0][i]);
             let totalAssetBorrow = new BigNumber(reserveData[1][i]);
             let supplyInterestRate = new BigNumber(reserveData[2][i]);
-            let borrowInterestRate = new BigNumber(reserveData[3][i]);
+            let borrowInterestRate = new BigNumber(reserveData[4][i]);
             let torqueBorrowInterestRate = new BigNumber(reserveData[4][i]);
             let vaultBalance = new BigNumber(reserveData[5][i]);
             let marketLiquidity = totalAssetSupply.minus(totalAssetBorrow);
