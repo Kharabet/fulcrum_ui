@@ -510,16 +510,18 @@ export default class Fulcrum {
             let totalBorrowAmountAllAssetsUsd = new BigNumber(0);
             let totalFeesAllAssetsUsd = new BigNumber(0);
             const yearlyPayoutBZRXBonuses = new BigNumber(267800000).times(bzrxUsdPrice);
+
+            //collecting total asset borrow and interest fees for all assets 
             stats.tokensStats.forEach((tokenStat) => {
                 const totalAssetBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(new BigNumber(tokenStat.swapToUSDPrice))
                 totalBorrowAmountAllAssetsUsd = totalBorrowAmountAllAssetsUsd.plus(totalAssetBorrowUSD)
-                const totalFeesPerAssetUSD = totalAssetBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate))
+                const totalFeesPerAssetUSD = totalAssetBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate/100))
                 totalFeesAllAssetsUsd = totalFeesAllAssetsUsd.plus(totalFeesPerAssetUSD)
             });
 
             stats.tokensStats.forEach(tokenStat => {
                 const totalAssetBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(new BigNumber(tokenStat.swapToUSDPrice))
-                const totalFeesPerAssetUSD = totalAssetBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate))
+                const totalFeesPerAssetUSD = totalAssetBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate/100))
                 const borrowYieldAPY = (
                     totalFeesPerAssetUSD.times(0.05)
                         .plus(yearlyPayoutBZRXBonuses.times(totalFeesPerAssetUSD).div(totalFeesAllAssetsUsd))
