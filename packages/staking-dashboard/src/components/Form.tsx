@@ -19,6 +19,9 @@ import { IRep } from "../domain/IRep";
 import Representative1 from "../assets/images/representative1.png"
 import Representative2 from "../assets/images/representative2.png"
 import Representative3 from "../assets/images/representative3.png"
+import { BecomeRepresentativeRequest } from "../domain/BecomeRepresentativeRequest";
+import { ClaimRequest } from "../domain/ClaimRequest";
+import { ConvertRequest } from "../domain/ConvertRequest";
 
 const Box = require('3box');
 
@@ -179,8 +182,10 @@ export class Form extends Component<{}, IFormState> {
   }
 
   public onBzrxV1ToV2ConvertClick = async () => {
-    const receipt = await StakingProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
-    await this.derivedUpdate();
+
+    await StakingProvider.Instance.onRequestConfirmed(new ConvertRequest(this.state.bzrxV1Balance.times(10 ** 18)));
+    // const receipt = await StakingProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
+    // await this.derivedUpdate();
   }
   /*public onIETHtoVBZRXConvertClick = async () => {
     const swapAmountAllowed = !this.state.whitelistAmount.eq(0) && this.state.whitelistAmount.lt(this.state.iEthBalance) ?
@@ -196,18 +201,17 @@ export class Form extends Component<{}, IFormState> {
   }
 
   public onClaimClick = async () => {
-    const receipt = await StakingProvider.Instance.doClaim();
-    await this.derivedUpdate();
+    await StakingProvider.Instance.onRequestConfirmed(new ClaimRequest());
   }
 
   public onClaimRebateRewardsClick = async () => {
     const receipt = await StakingProvider.Instance.doClaimReabteRewards();
     await this.derivedUpdate();
+
   }
 
   public onBecomeRepresentativeClick = async () => {
-    const receipt = await StakingProvider.Instance.doBecomeRepresentative();
-    await this.derivedUpdate();
+    await StakingProvider.Instance.onRequestConfirmed(new BecomeRepresentativeRequest());
   }
 
   public onStakeClick = async (bzrx: BigNumber, vbzrx: BigNumber, bpt: BigNumber) => {
@@ -224,7 +228,6 @@ export class Form extends Component<{}, IFormState> {
     await StakingProvider.Instance.onRequestConfirmed(
       new StakingRequest(bzrxAmount, vbzrxAmount, bptAmount, this.state.selectedRepAddress)
     );
-    await this.derivedUpdate();
   }
 
   public setSelectedRepAddressClick = (e: React.MouseEvent<HTMLElement>) => {

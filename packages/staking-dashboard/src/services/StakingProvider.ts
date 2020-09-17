@@ -1308,6 +1308,7 @@ export class StakingProvider {
     }
     catch (e) {
       console.error(e);
+      throw (e);
     }
 
     try {
@@ -1322,6 +1323,7 @@ export class StakingProvider {
     }
     catch (e) {
       console.error(e);
+      throw (e);
     }
     return txHash;
   }
@@ -1346,6 +1348,7 @@ export class StakingProvider {
     }
     catch (e) {
       console.error(e);
+      throw (e);
     }
 
     try {
@@ -1361,6 +1364,7 @@ export class StakingProvider {
     }
     catch (e) {
       console.error(e);
+      throw (e);
     }
     return txHash;
   }
