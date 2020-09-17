@@ -4,19 +4,20 @@ import { StakingProviderEvents } from "../services/events/StakingProviderEvents"
 import { StakingRequest } from "./StakingRequest";
 import { ConvertRequest } from "./ConvertRequest";
 import { ClaimRequest } from "./ClaimRequest";
+import { ClaimReabteRewardsRequest } from "./ClaimReabteRewardsRequest";
 import { BecomeRepresentativeRequest } from "./BecomeRepresentativeRequest";
 
 export class RequestTask {
     private eventEmitter: EventEmitter | null = null;
 
-    public readonly request: StakingRequest | ConvertRequest | ClaimRequest | BecomeRepresentativeRequest;
+    public readonly request: StakingRequest | ConvertRequest | ClaimRequest | ClaimReabteRewardsRequest | BecomeRepresentativeRequest;
     public status: RequestStatus;
     public steps: string[];
     public stepCurrent: number;
     public txHash: string | null;
     public error: Error | null;
 
-    constructor(request: StakingRequest | ConvertRequest | ClaimRequest | BecomeRepresentativeRequest) {
+    constructor(request: StakingRequest | ConvertRequest | ClaimRequest | ClaimReabteRewardsRequest | BecomeRepresentativeRequest) {
         this.request = request;
         this.status = RequestStatus.AWAITING;
         this.steps = ["Preparing processing..."];

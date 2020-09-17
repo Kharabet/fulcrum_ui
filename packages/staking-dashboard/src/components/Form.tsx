@@ -21,6 +21,7 @@ import Representative2 from "../assets/images/representative2.png"
 import Representative3 from "../assets/images/representative3.png"
 import { BecomeRepresentativeRequest } from "../domain/BecomeRepresentativeRequest";
 import { ClaimRequest } from "../domain/ClaimRequest";
+import { ClaimReabteRewardsRequest } from "../domain/ClaimReabteRewardsRequest";
 import { ConvertRequest } from "../domain/ConvertRequest";
 
 const Box = require('3box');
@@ -205,9 +206,9 @@ export class Form extends Component<{}, IFormState> {
   }
 
   public onClaimRebateRewardsClick = async () => {
-    const receipt = await StakingProvider.Instance.doClaimReabteRewards();
-    await this.derivedUpdate();
-
+    // const receipt = await StakingProvider.Instance.doClaimReabteRewards();
+    // await this.derivedUpdate();
+    await StakingProvider.Instance.onRequestConfirmed(new ClaimReabteRewardsRequest());
   }
 
   public onBecomeRepresentativeClick = async () => {

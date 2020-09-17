@@ -22,8 +22,8 @@ import { RequestTask } from "../domain/RequestTask";
 import { StakingRequest } from "../domain/StakingRequest";
 import { ConvertRequest } from "../domain/ConvertRequest";
 import { ClaimRequest } from "../domain/ClaimRequest";
+import { ClaimReabteRewardsRequest } from "../domain/ClaimReabteRewardsRequest";
 import { BecomeRepresentativeRequest } from "../domain/BecomeRepresentativeRequest";
-import { BZRXStakingInterimContract } from "../contracts/BZRXStakingInterim";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -1116,6 +1116,9 @@ export class StakingProvider {
         case ClaimRequest:
           txHash = await this.processClaimRequestTask(task, account);
           break;
+        case ClaimReabteRewardsRequest:
+          txHash = await this.processClaimReabteRewardsRequestTask(task, account);
+          break;
         case BecomeRepresentativeRequest:
           txHash = await this.processBecomeRepresentativeRequestTask(task, account);
           break;
@@ -1313,6 +1316,47 @@ export class StakingProvider {
 
     try {
       txHash = await traderCompensationContract.claim.sendTransactionAsync(
+        {
+          from: account,
+          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+          gasPrice: await this.gasPrice()
+        });
+
+      task.setTxHash(txHash);
+    }
+    catch (e) {
+      console.error(e);
+      throw (e);
+    }
+    return txHash;
+  }
+
+  private processClaimReabteRewardsRequestTask = async (task: RequestTask, account: string) => {
+    const bZxContract = await this.contractsSource!.getiBZxContract();
+    if (!bZxContract) throw new Error("No ERC20 contract available!");;
+    //Submitting loan
+    task.processingStepNext();
+    let gasAmountBN;
+    let gasAmount;
+    let txHash = "";
+    try {
+      gasAmount = await bZxContract.claimRewards.estimateGasAsync(
+        account,
+        {
+          from: account,
+          gas: this.gasLimit,
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+    }
+    catch (e) {
+      console.error(e);
+      throw (e);
+    }
+
+    try {
+      txHash = await bZxContract.claimRewards.sendTransactionAsync(
+        account,
         {
           from: account,
           gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
