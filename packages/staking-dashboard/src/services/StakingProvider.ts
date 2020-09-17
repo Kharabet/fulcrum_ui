@@ -70,6 +70,7 @@ export class StakingProvider {
   public accounts: string[] = [];
   public isLoading: boolean = false;
   public unsupportedNetwork: boolean = false;
+  private requestTask: RequestTask | undefined;
 
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
@@ -1063,9 +1064,17 @@ export class StakingProvider {
   };
 
 
+  public onRequestConfirmed = async (request: StakingRequest | ConvertRequest | ClaimRequest | BecomeRepresentativeRequest) => {
+    if (request) {
+      this.processRequestTask(new RequestTask(request));
+    }
+  };
+
+
   public processRequestTask = async (task: RequestTask) => {
     try {
-      debugger;
+      this.requestTask = task;
+      task.setEventEmitter(this.eventEmitter);
       this.eventEmitter.emit(StakingProviderEvents.AskToOpenProgressDlg, task);
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
@@ -1138,8 +1147,11 @@ export class StakingProvider {
 
 
   private processStakingRequestTask = async (task: RequestTask, account: string) => {
-    let receipt = null;
-    const [bzrxAmount, vbzrxAmount, bptAmount, address] = Object.values(task.request);
+    const taskRequest = task.request as StakingRequest,
+      bzrxAmount = taskRequest.bzrxAmount,
+      vbzrxAmount = taskRequest.vbzrxAmount,
+      bptAmount = taskRequest.bptAmount,
+      address = taskRequest.address;
 
     const bzrxStakingContract = await this.contractsSource!.getBZRXStakingInterimContract();
     if (!bzrxStakingContract) throw new Error("No ERC20 contract available!");
@@ -1357,5 +1369,11 @@ export class StakingProvider {
   public sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+
+  public getRequestTask() {
+    return this.requestTask;
+  }
+
 }
 new StakingProvider();

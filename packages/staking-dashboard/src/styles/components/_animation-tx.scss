@@ -9,20 +9,25 @@
   top: 105px;
   position: absolute;
   text-align: center;
+  a {
+    color: #283049;
+  }
+  & .warning {
+    color: #ff4f4f;
+  }
 }
 .animation-tx {
   width: 100%;
-  height: 100%;
-  position: absolute;
+  height: 370px;
+  position: relative;
   z-index: 2;
   background-color: #ffffff;
-  top: 0;
   left: 0;
   border-radius: 16px;
-  svg{
+  svg {
     transform: rotate(-90deg);
   }
-  > div{
+  > div {
     display: flex;
     transform: rotate(-90deg) translateY(-30px);
   }

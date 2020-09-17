@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { TxLoaderStep } from "./TxLoaderStep";
+
 import animationData from "../config/animation-tx.json";
 
 import Lottie from 'react-lottie';
@@ -20,7 +22,8 @@ export class AnimationTx extends Component<IAnimationTxProps> {
     return (
       <React.Fragment>
         <div className="animation-tx">
-          <p className="animation-title">Processed Tokens</p>
+          <p className="animation-title">
+            <TxLoaderStep /></p>
           <Lottie options={defaultOptions} height={370} width={370} />
         </div>
       </React.Fragment>
