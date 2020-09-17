@@ -461,7 +461,7 @@ export default class Fulcrum {
                 let totalAssetSupply = new BigNumber(reserveData.totalAssetSupply[i]);
                 let totalAssetBorrow = new BigNumber(reserveData.totalAssetBorrow[i]);
                 let supplyInterestRate = new BigNumber(reserveData.supplyInterestRate[i]);
-                let borrowInterestRate = new BigNumber(reserveData.borrowInterestRate[i]);
+                let borrowInterestRate = new BigNumber(reserveData[4][i]);
                 let torqueBorrowInterestRate = new BigNumber(reserveData.torqueBorrowInterestRate[i]);
                 let vaultBalance = new BigNumber(reserveData.vaultBalance[i]);
 
@@ -510,7 +510,7 @@ export default class Fulcrum {
                     swapToUSDPrice: new BigNumber(swapRates[i]).dividedBy(10 ** 18).toFixed(),
                     usdSupply: usdSupply.dividedBy(10 ** 18).toFixed(),
                     usdTotalLocked: usdTotalLocked.dividedBy(10 ** 18).toFixed(),
-                    yieldFarmingAPR:  new BigNumber(0)
+                    yieldFarmingAPR: new BigNumber(0)
                 }));
             }));
 
@@ -523,8 +523,10 @@ export default class Fulcrum {
             });
 
             stats.tokensStats.forEach(tokenStat => {
-                const totalBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(new BigNumber(tokenStat.swapToUSDPrice))
-                const fees = totalBorrowUSD.times(0.09/100);
+                let totalBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(new BigNumber(tokenStat.swapToUSDPrice))
+                if (totalBorrowUSD.eq(0))
+                    totalBorrowUSD = new BigNumber(1);
+                const fees = totalBorrowUSD.times(0.09 / 100);
                 const rebate = fees.div(2);
                 const monthlyRewardPerToken = totalBorrowUSD.div(totalBorrowAmountAllAssetsUsd).times(monthlyReward);
                 const borrowCost = totalBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate).dividedBy(100).div(12))
