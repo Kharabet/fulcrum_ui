@@ -1096,15 +1096,33 @@ export class StakingProvider {
           "Transaction completed"
         ]);
       }
-
+      let txHash;
       switch (taskRequest.constructor) {
         case StakingRequest:
-          await this.processStakingRequestTask(task, account);
+          txHash = await this.processStakingRequestTask(task, account);
+          break;
         case ConvertRequest:
-          await this.processStakingRequestTask(task, account);
-
+          txHash = await this.processConvertRequestTask(task, account);
+          break;
+        case ClaimRequest:
+          txHash = await this.processClaimRequestTask(task, account);
+          break;
+        case BecomeRepresentativeRequest:
+          txHash = await this.processBecomeRepresentativeRequestTask(task, account);
+          break;
+        default:
+          throw new Error("Unknown request!");
       }
 
+      task.processingStepNext();
+      const txReceipt = await this.waitForTransactionMined(txHash);
+      if (!txReceipt.status) {
+        throw new Error("Reverted by EVM");
+      }
+
+      task.processingStepNext();
+      await this.sleep(this.successDisplayTimeout);
+      task.processingEnd(true, false, null);
     } catch (e) {
       if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
         // tslint:disable-next-line:no-console
@@ -1142,11 +1160,11 @@ export class StakingProvider {
         address
       );
     console.log(encoded_input);
-
     //Submitting loan
     task.processingStepNext();
     let gasAmountBN;
     let gasAmount;
+    let txHash = "";
     try {
       gasAmount = account.toLowerCase() === address.toLowerCase()
         ? await bzrxStakingContract.stake.estimateGasAsync(
@@ -1172,7 +1190,7 @@ export class StakingProvider {
     }
 
     try {
-      const txHash = account.toLowerCase() === address.toLowerCase()
+      txHash = account.toLowerCase() === address.toLowerCase()
         ? await bzrxStakingContract.stake.sendTransactionAsync(
           [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
           [bzrxAmount, vbzrxAmount, bptAmount],
@@ -1196,17 +1214,7 @@ export class StakingProvider {
       console.log(e);
       throw e;
     }
-
-    task.processingStepNext();
-    const txReceipt = await this.waitForTransactionMined(task.txHash!);
-    if (!txReceipt.status) {
-      throw new Error("Reverted by EVM");
-    }
-
-    task.processingStepNext();
-    await this.sleep(this.successDisplayTimeout);
-
-    task.processingEnd(true, false, null);
+    return txHash;
   }
 
 
@@ -1220,26 +1228,23 @@ export class StakingProvider {
     if (!assetErc20Address) throw new Error("No ERC20 contract available!");
 
     const tokenErc20Contract = await this.contractsSource!.getErc20Contract(assetErc20Address);
-
     // Detecting token allowance
     task.processingStepNext();
     const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, convertContract.address);
-
     // Prompting token allowance
     task.processingStepNext();
-
     // Waiting for token allowance
     task.processingStepNext();
     if (tokenAmount.gt(erc20allowance)) {
       const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(convertContract.address, tokenAmount, { from: account });
       await this.waitForTransactionMined(approveHash);
     }
-
     //Submitting loan
     task.processingStepNext();
 
     let gasAmountBN;
     let gasAmount;
+    let txHash = "";
     try {
       gasAmount = await convertContract.convert.estimateGasAsync(
         tokenAmount,
@@ -1256,7 +1261,7 @@ export class StakingProvider {
     }
 
     try {
-      const txHash = await convertContract.convert.sendTransactionAsync(
+      txHash = await convertContract.convert.sendTransactionAsync(
         tokenAmount,
         {
           from: account,
@@ -1268,17 +1273,84 @@ export class StakingProvider {
       console.log(e);
       throw e;
     }
+    return txHash;
+  }
 
+
+  private processClaimRequestTask = async (task: RequestTask, account: string) => {
+    const traderCompensationContract = await this.contractsSource!.getTraderCompensationContract();
+    if (!traderCompensationContract) throw new Error("No ERC20 contract available!");;
+    //Submitting loan
     task.processingStepNext();
-    const txReceipt = await this.waitForTransactionMined(task.txHash!);
-    if (!txReceipt.status) {
-      throw new Error("Reverted by EVM");
+    let gasAmountBN;
+    let gasAmount;
+    let txHash = "";
+    try {
+      gasAmount = await traderCompensationContract.claim.estimateGasAsync(
+        {
+          from: account,
+          gas: this.gasLimit,
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+    }
+    catch (e) {
+      console.error(e);
     }
 
-    task.processingStepNext();
-    await this.sleep(this.successDisplayTimeout);
+    try {
+      txHash = await traderCompensationContract.claim.sendTransactionAsync(
+        {
+          from: account,
+          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+          gasPrice: await this.gasPrice()
+        });
 
-    task.processingEnd(true, false, null);
+      task.setTxHash(txHash);
+    }
+    catch (e) {
+      console.error(e);
+    }
+    return txHash;
+  }
+
+
+  private processBecomeRepresentativeRequestTask = async (task: RequestTask, account: string) => {
+    const bzrxStakingContract = await this.contractsSource!.getBZRXStakingInterimContract();
+    if (!bzrxStakingContract) throw new Error("No ERC20 contract available!");;
+    //Submitting loan
+    task.processingStepNext();
+    let gasAmountBN;
+    let gasAmount;
+    let txHash = "";
+    try {
+      gasAmount = await bzrxStakingContract.setRepActive.estimateGasAsync(
+        true,
+        {
+          from: account,
+          gas: this.gasLimit,
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+    }
+    catch (e) {
+      console.error(e);
+    }
+
+    try {
+      txHash = await bzrxStakingContract.setRepActive.sendTransactionAsync(
+        true,
+        {
+          from: account,
+          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+          gasPrice: await this.gasPrice()
+        });
+
+      task.setTxHash(txHash);
+    }
+    catch (e) {
+      console.error(e);
+    }
+    return txHash;
   }
 
 
