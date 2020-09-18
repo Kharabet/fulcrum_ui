@@ -188,6 +188,7 @@ export class Form extends Component<{}, IFormState> {
     // const receipt = await StakingProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
     // await this.derivedUpdate();
   }
+
   /*public onIETHtoVBZRXConvertClick = async () => {
     const swapAmountAllowed = !this.state.whitelistAmount.eq(0) && this.state.whitelistAmount.lt(this.state.iEthBalance) ?
       this.state.whitelistAmount :

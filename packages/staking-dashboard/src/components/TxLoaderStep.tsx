@@ -14,7 +14,6 @@ export interface ITxLoaderStepProps {
 
 export interface ITxLoaderStepState {
   requestTask: RequestTask | undefined;
-  complete: boolean;
   title: ITitle | null;
 }
 
@@ -24,8 +23,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
 
     this.state = {
       requestTask: StakingProvider.Instance.getRequestTask(),
-      title: { message: "Loading", isWarning: false },
-      complete: false
+      title: { message: "Loading", isWarning: false }
     };
 
     StakingProvider.Instance.eventEmitter.on(StakingProviderEvents.TaskChanged, this.onTaskChanged);
