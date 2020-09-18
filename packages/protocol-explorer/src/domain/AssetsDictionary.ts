@@ -15,6 +15,7 @@ import { ReactComponent as USDT } from "../assets/images/token-usdt.svg";
 import { ReactComponent as USDC } from "../assets/images/token-usdc.svg";
 import { ReactComponent as ZRX } from "../assets/images/token-zrx.svg";
 import { ReactComponent as WETH } from "../assets/images/token-weth.svg";
+import { ReactComponent as CHI } from "../assets/images/token-chi.svg";
 import { ReactComponent as BZRX } from "../assets/images/token-bzrx.svg";
 import { ReactComponent as YFI } from "../assets/images/token-yfi.svg";
 import { ReactComponent as LEND } from "../assets/images/token-lend.svg";
@@ -314,6 +315,19 @@ export class AssetsDictionary {
           [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
           [3, ""],
           [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.CHI,
+      new AssetDetails(
+        "CHI",
+        "CHI",
+        CHI,
+        0,
+        new Map<number, string | null>([
+          [1, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"],
+          [42, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"]
         ])
       )
     ]
