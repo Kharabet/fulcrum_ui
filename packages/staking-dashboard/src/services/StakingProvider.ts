@@ -2,12 +2,7 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 import { EventEmitter } from "events";
 
-import Web3 from "web3";
-
-
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
-import constantAddress from "../config/constant.json";
-
 
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
@@ -25,13 +20,6 @@ import { ClaimRequest } from "../domain/ClaimRequest";
 import { ClaimReabteRewardsRequest } from "../domain/ClaimReabteRewardsRequest";
 import { BecomeRepresentativeRequest } from "../domain/BecomeRepresentativeRequest";
 
-const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-let configAddress: any;
-if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
-  configAddress = constantAddress.mainnet;
-} else {
-  configAddress = constantAddress.kovan;
-}
 
 
 const getNetworkIdByString = (networkName: string | undefined) => {

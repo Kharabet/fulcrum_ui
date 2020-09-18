@@ -48,11 +48,10 @@ export class Web3ConnectionFactory {
       await providerEngine.start();
       web3Wrapper = new Web3Wrapper(providerEngine);
       canWrite = true;
-      const account = await connector.getAccount();
       const chainId = (await connector.getChainId()).toString();
       networkId = chainId.includes("0x") ? parseInt(chainId, 16) : parseInt(chainId, 10);
       Web3ConnectionFactory.userAccount = web3ReactAccount
-        ? web3ReactAccount 
+        ? web3ReactAccount
         : await connector.getAccount();
 
     } catch (e) {
@@ -92,7 +91,7 @@ export class Web3ConnectionFactory {
   }
 
   public static async updateConnector(update: ConnectorUpdate) {
-    const { provider, chainId, account } = update;
+    const { chainId, account } = update;
 
     if (chainId) {
       let networkId = chainId.toString();

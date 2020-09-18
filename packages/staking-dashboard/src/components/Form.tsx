@@ -8,7 +8,6 @@ import { StakingRequest } from "../domain/StakingRequest";
 import { RequestTask } from "../domain/RequestTask";
 import { RequestStatus } from "../domain/RequestStatus";
 import { BigNumber } from "@0x/utils";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Asset } from "../domain/Asset";
 import { AddToBalance } from "./AddToBalance";
 import Modal from "react-modal";
@@ -185,7 +184,7 @@ export class Form extends Component<{}, IFormState> {
   public onBzrxV1ToV2ConvertClick = async () => {
 
     await StakingProvider.Instance.onRequestConfirmed(new ConvertRequest(this.state.bzrxV1Balance.times(10 ** 18)));
-    // const receipt = await StakingProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
+    // await StakingProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
     // await this.derivedUpdate();
   }
 
@@ -197,17 +196,17 @@ export class Form extends Component<{}, IFormState> {
     await this.derivedUpdate();
   }*/
 
-  public onOptinClick = async () => {
-    const receipt = await StakingProvider.Instance.doOptin();
-    await this.derivedUpdate();
-  }
+  // public onOptinClick = async () => {
+  //   await StakingProvider.Instance.doOptin();
+  //   await this.derivedUpdate();
+  // }
 
   public onClaimClick = async () => {
     await StakingProvider.Instance.onRequestConfirmed(new ClaimRequest());
   }
 
   public onClaimRebateRewardsClick = async () => {
-    // const receipt = await StakingProvider.Instance.doClaimReabteRewards();
+    // await StakingProvider.Instance.doClaimReabteRewards();
     // await this.derivedUpdate();
     await StakingProvider.Instance.onRequestConfirmed(new ClaimReabteRewardsRequest());
   }

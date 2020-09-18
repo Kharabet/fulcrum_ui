@@ -111,7 +111,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
   public onTaskChanged = async () => {
     const task = StakingProvider.Instance.getRequestTask();
     let title = this.getTitle(this.state.requestTask);
-    if (!title && this.state.requestTask?.status == "Done")
+    if (!title && this.state.requestTask?.status === "Done")
       title = { message: "Updating data", isWarning: false };
 
     this._isMounted && this.setState({
