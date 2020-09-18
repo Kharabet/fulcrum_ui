@@ -218,15 +218,15 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               : <Preloader width="74px" />
             }
           </div>
-          <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Interest APR</span>}
+          <div title={this.state.yieldApr.gt(0) ? `${this.state.yieldApr.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Estimated Yield</span>}
 
-            {this.state.interestRate.gt(0) && !this.state.isLoading
+            {this.state.yieldApr.gt(0) && !this.state.isLoading
               ? <React.Fragment>
-                {this.state.interestRate.toFixed(4)}
+                {this.state.yieldApr.toFixed(0)}
                 <span className="fw-sign">%</span>
-                <span title={this.state.yieldApr.toFixed(18)} className="trade-token-grid-row__yield">
-                  Est. Yield <span>{this.state.yieldApr.toFixed(0)}%</span>
+                <span title={this.state.interestRate.toFixed(18)} className="trade-token-grid-row__yield">
+                  APR <span>{this.state.interestRate.toFixed(2)}%</span>
                 </span>
               </React.Fragment>
               : <Preloader width="74px" />

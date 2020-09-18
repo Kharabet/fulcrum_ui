@@ -16,6 +16,7 @@ interface IStatsTokenGridRowState {
   usdSupply: BigNumber | null;
   usdTotalLocked: BigNumber | null;
   decimals: number;
+  yieldApr: BigNumber;
 }
 
 export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStatsTokenGridRowState> {
@@ -26,18 +27,26 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
       assetDetails: null,
       usdSupply: null,
       usdTotalLocked: null,
-      decimals: 18
+      decimals: 18,
+      yieldApr: new BigNumber(0),
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
   }
+  private apiUrl = "https://api.bzx.network/v1";
 
   private async derivedUpdate() {
     const assetDetails = await AssetsDictionary.assets.get(this.props.reserveDetails.asset!);
+    
+    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`);
+    const yieldAPYJson = await yieldAPYRequest.json();
+    const yieldApr = yieldAPYJson.success && yieldAPYJson.data[this.props.reserveDetails.asset!.toLowerCase()]
+      ? new BigNumber(yieldAPYJson.data[this.props.reserveDetails.asset!.toLowerCase()]) : new BigNumber(0);
 
     this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
+      yieldApr
     });
   }
 
@@ -90,9 +99,9 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
 
     let customBorrowTitle;
     let customBorrowText;
-    if (details.borrowInterestRate && details.torqueBorrowInterestRate) {
-      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}%`;
-      customBorrowText = <React.Fragment><span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>%</React.Fragment>;
+    if (details.borrowInterestRate && this.state.yieldApr.gt(0) && this.props.reserveDetails.asset! !== Asset.ETHv1) {
+      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}% / ${this.state.yieldApr.toFixed(18)}%`;
+      customBorrowText = <React.Fragment><span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>%&nbsp;/&nbsp;<span className="fw-800 color-primary">{this.state.yieldApr.toFixed(0)}</span>%</React.Fragment>;
     } else {
       customBorrowTitle = ``;
       customBorrowText = `-`;
