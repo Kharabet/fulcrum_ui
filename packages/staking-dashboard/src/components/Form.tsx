@@ -164,7 +164,7 @@ export class Form extends Component<{}, IFormState> {
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
   };
 
