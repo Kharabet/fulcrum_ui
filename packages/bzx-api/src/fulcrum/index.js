@@ -120,6 +120,37 @@ export default class Fulcrum {
         return { borrowRates, lendRates: [] };
     }
 
+    async getFulcrumLendAndTorqueBorrowAndYieldRates() {
+
+        const yieldAPY = await this.getYieldFarmingAPY();
+        const reserveData = await this.getReserveData();
+        let lendRates = [];
+        let borrowRates = [];
+        reserveData.filter(item => item.token !== "all" && item.token !== "ethv1").forEach(item => {
+            const tokenSymbol = item.token.toUpperCase();
+
+            const lendApr = item.supplyInterestRate / 100;
+            const lendApy = this.convertAPRtoAPY(lendApr);
+            lendRates.push({
+                apr: lendApr,
+                apy: lendApy,
+                tokenSymbol
+            });
+
+            const borrowApr = item.torqueBorrowInterestRate / 100;
+            const borrowApy = this.convertAPRtoAPY(borrowApr);
+            borrowRates.push({
+                apr: borrowApr,
+                apy: borrowApy,
+                tokenSymbol
+            });
+        });
+
+        return { lendRates, borrowRates, yieldAPY };
+
+
+    }
+
     convertAPRtoAPY(apr) {
         const periodicRate = 365;
         // APY = (1 + APR / n)^n - 1 
@@ -529,9 +560,9 @@ export default class Fulcrum {
                 const fees = totalBorrowUSD.times(0.09 / 100);
                 const rebate = fees.div(2);
                 const monthlyRewardPerToken = totalBorrowUSD.div(totalBorrowAmountAllAssetsUsd).times(monthlyReward);
-                const borrowCost = totalBorrowUSD.times(new BigNumber(tokenStat.borrowInterestRate).dividedBy(100).div(12))
+
                 const reward = rebate.plus(monthlyRewardPerToken);
-                const yieldMonthlyRate = (reward.minus(borrowCost)).div(totalBorrowUSD);
+                const yieldMonthlyRate = reward.div(totalBorrowUSD);
                 const yieldYearlyPercents = yieldMonthlyRate.times(12).times(100)
 
                 tokenStat.yieldFarmingAPR = isNaN(yieldYearlyPercents.toFixed()) || yieldYearlyPercents.toFixed() === "Infinity" ? "0" : yieldYearlyPercents.toFixed()

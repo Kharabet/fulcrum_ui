@@ -36,6 +36,11 @@ export default ({ config, logger }) => {
 		res.json(borrowRates);
 	});
 
+	api.get('/interest-rates', async (req, res) => {
+		const rates = await fulcrum.getFulcrumLendAndTorqueBorrowAndYieldRates();
+		res.json({ data: rates, success: true });
+	});
+
 	api.get('/total-asset-supply', async (req, res) => {
 		const totalAssetSupply = await fulcrum.getTotalAssetSupply();
 		res.json({ data: totalAssetSupply, success: true });
@@ -55,7 +60,7 @@ export default ({ config, logger }) => {
 		const apr = await fulcrum.getBorrowRateAPR();
 		res.json({ data: apr, success: true });
 	});
-	
+
 	api.get('/yield-farimng-apy', async (req, res) => {
 		const apy = await fulcrum.getYieldFarmingAPY();
 		res.json({ data: apy, success: true });
