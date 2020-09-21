@@ -110,6 +110,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
           </div>
         </header>
+        <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
+          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
+          </InfoBlock>
         {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
             If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
@@ -168,6 +171,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
           ) : null}
         </header>
+        <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
+          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
+          </InfoBlock>
         {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
             If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
