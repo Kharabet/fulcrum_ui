@@ -427,6 +427,19 @@
           }
         }
       }
+    },
+    "/interest-rates": {
+      "get": {
+        "tags": [
+          "External Integration"
+        ],
+        "summary": "Get Fulcrum and Torque interest rates (APR and APY) and Yield",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
     }
   }
 }
