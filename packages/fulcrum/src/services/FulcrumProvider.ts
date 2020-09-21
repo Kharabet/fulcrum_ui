@@ -46,6 +46,10 @@ import { PayTradingFeeEvent } from "../domain/events/PayTradingFeeEvent";
 import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
 import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
 
+const isMainnetProd =
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
     case 'mainnet':
@@ -524,7 +528,7 @@ export class FulcrumProvider {
             let totalAssetSupply = new BigNumber(reserveData[0][i]);
             let totalAssetBorrow = new BigNumber(reserveData[1][i]);
             let supplyInterestRate = new BigNumber(reserveData[2][i]);
-            let borrowInterestRate = new BigNumber(reserveData[3][i]);
+            let borrowInterestRate = new BigNumber(reserveData[4][i]);
             let torqueBorrowInterestRate = new BigNumber(reserveData[4][i]);
             let vaultBalance = new BigNumber(reserveData[5][i]);
             let marketLiquidity = totalAssetSupply.minus(totalAssetBorrow);
@@ -2286,13 +2290,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-    }
-    }
-    }
-    } catch(e) {
-    // console.log(e);
-    }
-    }*/
+        }
+        }
+        }
+        } catch(e) {
+        // console.log(e);
+        }
+        }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -2649,59 +2653,51 @@ console.log(err, added);
 
         const randomNumber = Math.floor(Math.random() * 100000) + 1;
 
-        if (request instanceof LendRequest) {
-          const tagManagerArgs = {
-            dataLayer: {
-              transactionId: randomNumber,
-              transactionProducts: [{
-                name: "Transaction-Lend-" + request.asset,
-                sku: request.asset,
-                category: 'Lend'
-              }],
-            }
-          }
-          TagManager.dataLayer(tagManagerArgs)
-          this.eventEmitter.emit(
-            FulcrumProviderEvents.LendTransactionMined,
-            new LendTransactionMinedEvent(request.asset, txHash)
-          );
-        } else
-          if (request instanceof ManageCollateralRequest) {
+        if (isMainnetProd) {
+          if (request instanceof LendRequest) {
             const tagManagerArgs = {
               dataLayer: {
                 transactionId: randomNumber,
                 transactionProducts: [{
-                  name: "Transaction-Manage-Collateral-" + request.asset,
+                  name: "Transaction-Lend-" + request.asset,
                   sku: request.asset,
-                  category: 'Manage-Collateral'
+                  category: 'Lend'
                 }],
               }
             }
             TagManager.dataLayer(tagManagerArgs)
-          } else {
-            const tagManagerArgs = {
-              dataLayer: {
-                transactionId: randomNumber,
-                transactionProducts: [{
-                  name: "Transaction-Trade" + request.asset,
-                  sku: request.asset,
-                  category: 'Trade'
-                }],
+            this.eventEmitter.emit(
+              FulcrumProviderEvents.LendTransactionMined,
+              new LendTransactionMinedEvent(request.asset, txHash)
+            );
+          } else
+            if (request instanceof ManageCollateralRequest) {
+              const tagManagerArgs = {
+                dataLayer: {
+                  transactionId: randomNumber,
+                  transactionProducts: [{
+                    name: "Transaction-Manage-Collateral-" + request.asset,
+                    sku: request.asset,
+                    category: 'Manage-Collateral'
+                  }],
+                }
               }
+              TagManager.dataLayer(tagManagerArgs)
+            } else {
+              const tagManagerArgs = {
+                dataLayer: {
+                  transactionId: randomNumber,
+                  transactionProducts: [{
+                    name: "Transaction-Trade" + request.asset,
+                    sku: request.asset,
+                    category: 'Trade'
+                  }],
+                }
+              }
+              TagManager.dataLayer(tagManagerArgs)
             }
-            TagManager.dataLayer(tagManagerArgs)
-            // this.eventEmitter.emit(
-            //   FulcrumProviderEvents.TradeTransactionMined,
-            //   new TradeTransactionMinedEvent(new TradeTokenKey(
-            //     request.asset,
-            //     request.unitOfAccount,
-            //     request.positionType,
-            //     request.leverage,
-            //     request.isTokenized,
-            //     request.version
-            //   ), txHash)
-            // );
-          }
+        }
+
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);

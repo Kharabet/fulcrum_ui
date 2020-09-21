@@ -72,13 +72,9 @@
   }
 
   @media only screen and (max-width: $mobile-version-max-width) {
-    .trade-page & {
-      &__container {
-        margin: 0;
-      }
-    }
     &__container {
       flex-direction: column;
+      margin: 0 15px;
     }
     &__left,
     &__center,

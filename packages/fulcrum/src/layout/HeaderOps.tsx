@@ -16,7 +16,7 @@ export interface IHeaderOpsProps {
   isLoading: boolean;
   isMobileMedia: boolean;
   headerClass: string;
-  isV1ITokenInWallet: boolean;
+  //isV1ITokenInWallet: boolean;
 }
 
 interface IHeaderOpsState {
@@ -110,11 +110,14 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
           </div>
         </header>
-        {this.props.isV1ITokenInWallet &&
+        <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
+          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
+          </InfoBlock>
+        {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
             If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
           </InfoBlock>
-        }
+        } */}
       </React.Fragment>
     );
   };
@@ -136,43 +139,46 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
     return (
       <React.Fragment>
-      <header className={`header ${this.props.headerClass}`}>
-        <div className="header__row">
-          <div className="header__left">
-            <HeaderLogo />
+        <header className={`header ${this.props.headerClass}`}>
+          <div className="header__row">
+            <div className="header__left">
+              <HeaderLogo />
+            </div>
+            <div className="header_icon" onClick={this.onMenuToggle}>
+              {!this.state.isMenuOpen ? <MenuIconOpen className="header__menu" /> : <MenuIconClose className="header__menu" />}
+            </div>
+
           </div>
-          <div className="header_icon" onClick={this.onMenuToggle}>
-            {!this.state.isMenuOpen ? <MenuIconOpen className="header__menu" /> : <MenuIconClose className="header__menu" />}
-          </div>
+          {this.state.isMenuOpen ? (
 
-        </div>
-        {this.state.isMenuOpen ? (
+            <div className={sidebarClass}>
+              <div className="header_btn">
 
-          <div className={sidebarClass}>
-            <div className="header_btn">
-
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-              <div className="theme-switch-wrapper">
-                <label className="theme-switch" htmlFor="checkbox">
-                  <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} defaultChecked={!localStorage.theme || localStorage.theme === 'dark' ? true : false} />
-                  <div className="slider round"></div>
-                </label>
+                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+                <div className="theme-switch-wrapper">
+                  <label className="theme-switch" htmlFor="checkbox">
+                    <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} defaultChecked={!localStorage.theme || localStorage.theme === 'dark' ? true : false} />
+                    <div className="slider round"></div>
+                  </label>
+                </div>
+              </div>
+              <div className="header_nav_menu">
+                <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
+              </div>
+              <div className="footer-container">
+                <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
               </div>
             </div>
-            <div className="header_nav_menu">
-              <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
-            </div>
-            <div className="footer-container">
-              <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-            </div>
-          </div>
-        ) : null}
-      </header>
-        {this.props.isV1ITokenInWallet &&
+          ) : null}
+        </header>
+        <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
+          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
+          </InfoBlock>
+        {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
             If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
           </InfoBlock>
-        }
+        } */}
       </React.Fragment>
     );
   };
