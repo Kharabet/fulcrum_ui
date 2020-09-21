@@ -1943,6 +1943,52 @@
       "type": "function"
     },
     {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "loanId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "gasTokenUser",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "closeAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "liquidateWithGasToken",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "loanCloseAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "collateralWithdrawAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "collateralToken",
+          "type": "address"
+        }
+      ],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
       "constant": true,
       "inputs": [],
       "name": "liquidationIncentivePercent",

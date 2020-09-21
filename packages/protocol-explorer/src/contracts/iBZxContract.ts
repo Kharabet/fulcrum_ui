@@ -137,8 +137,8 @@ export class iBZxContract extends BaseContract {
     }
   };
 
-  public liquidate = {
 
+  public liquidate = {
     async sendTransactionAsync(
       loanId: string,
       receiver: string,
@@ -237,6 +237,116 @@ export class iBZxContract extends BaseContract {
       return result;
     }
   };
+
+  public liquidateWithGasToken = {
+    async sendTransactionAsync(
+      loanId: string,
+      receiver: string,
+      gasTokenUser: string,
+      closeAmount: BigNumber,
+      txData: Partial<TxData> = {}
+    ): Promise<string> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("liquidateWithGasToken(bytes32,address,address,uint256)", [
+        loanId,
+        receiver,
+        gasTokenUser,
+        closeAmount
+      ]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults(),
+        (self as any).liquidateWithGasToken.estimateGasAsync.bind(
+          self,
+          loanId,
+          receiver,
+          gasTokenUser,
+          closeAmount
+        )
+      );
+      const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      return txHash;
+    },
+    async estimateGasAsync(
+      loanId: string,
+      receiver: string,
+      gasTokenUser: string,
+      closeAmount: BigNumber,
+      txData: Partial<TxData> = {}
+    ): Promise<number> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("liquidateWithGasToken(bytes32,address,address,uint256)", [
+        loanId,
+        receiver,
+        gasTokenUser,
+        closeAmount
+      ]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      return gas;
+    },
+    getABIEncodedTransactionData(
+      loanId: string,
+      receiver: string,
+      gasTokenUser: string,
+      closeAmount: BigNumber,
+    ): string {
+      const self = (this as any) as iBZxContract;
+      const abiEncodedTransactionData = self._strictEncodeArguments(
+        "liquidateWithGasToken(bytes32,address,address,uint256)",
+        [
+          loanId,
+          receiver,
+          gasTokenUser,
+          closeAmount,
+        ]
+      );
+      return abiEncodedTransactionData;
+    },
+    async callAsync(
+      loanId: string,
+      receiver: string,
+      gasTokenUser: string,
+      closeAmount: BigNumber,
+      callData: Partial<CallData> = {},
+      defaultBlock?: BlockParam
+    ): Promise<[BigNumber, BigNumber, string]> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("liquidateWithGasToken(bytes32,address,address,uint256)", [
+        loanId,
+        receiver,
+        gasTokenUser,
+        closeAmount
+      ]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder("liquidateWithGasToken(bytes32,address,address,uint256)");
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, string]>(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    }
+  };
+
 
   public getActiveLoans = {
     async estimateGasAsync(

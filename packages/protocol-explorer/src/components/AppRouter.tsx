@@ -191,6 +191,7 @@ export class AppRouter extends Component<any, IAppRouterState>  {
   };
 
   public onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.checkGasTokenAllowance();
     await this._isMounted && this.setState({
       ...this.state,
       selectedProviderType: event.providerType,
@@ -199,4 +200,8 @@ export class AppRouter extends Component<any, IAppRouterState>  {
     });
   };
 
+  private checkGasTokenAllowance = async () => {
+    const gasTokenAllowance = await ExplorerProvider.Instance.getGasTokenAllowance();
+    localStorage.setItem('isGasTokenEnabled', gasTokenAllowance.gt(0) ? 'true' : 'false')
+  }
 }
