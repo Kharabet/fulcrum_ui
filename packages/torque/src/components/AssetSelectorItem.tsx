@@ -123,7 +123,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
               <div className="asset-selector-body">
                 <div className="asset-selector-row">
 
-                  <div className="asset-selector__apr">Est. Yield</div>
+                  <div className="asset-selector__apr">Est. Yield, vBZRX</div>
                   <div title={this.state.yieldApr.toFixed(18)} className="asset-selector__interest-rate">
                     <span className="asset-selector__interest-rate-value">{this.state.yieldApr.toFixed(0)}</span>%
                   </div>
