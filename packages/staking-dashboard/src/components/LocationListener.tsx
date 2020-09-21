@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import { StakingProvider } from "../services/StakingProvider";
+import { Component } from 'react';
 
 export interface ILocationListenerProps {
   doNetworkConnect: (destinationAbbr: string) => void;

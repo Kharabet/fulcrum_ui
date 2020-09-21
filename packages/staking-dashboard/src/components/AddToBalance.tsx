@@ -71,7 +71,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                     <label>Add to staking balance</label>
                     {this.props.bzrxMax.gt(0) &&
                         <div className="calc-item">
-                            <input className="add-to-balance__input" type="BigNumber" step="0.01" max={this.props.bzrxMax.toFixed(2)} title={this.state.bzrxBalance.toFixed(18)} value={this.state.inputBzrxBalance} onChange={this.changeBzrxBalance} />
+                            <input className="add-to-balance__input" type="number" step="0.01" max={this.props.bzrxMax.toFixed(2)} title={this.state.bzrxBalance.toFixed(18)} value={this.state.inputBzrxBalance} onChange={this.changeBzrxBalance} />
                             <div className="add-to-balance__range">
                                 <input step="0.01" type="range" min="0" max={this.props.bzrxMax.toFixed(2)} value={this.state.bzrxBalance.toFixed()} onChange={this.changeBzrxBalance} />
                                 <div className="line"><div></div><div></div><div></div><div></div></div>
@@ -83,7 +83,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                     }
                     {this.props.vbzrxMax.gt(0) &&
                         <div className="calc-item">
-                            <input className="add-to-balance__input" type="BigNumber" step="0.01" max={this.props.vbzrxMax.toFixed(2)} title={this.state.vBzrxBalance.toFixed(18)} value={this.state.inputVBzrxBalance} onChange={this.changeVBzrxBalance} />
+                            <input className="add-to-balance__input" type="number" step="0.01" max={this.props.vbzrxMax.toFixed(2)} title={this.state.vBzrxBalance.toFixed(18)} value={this.state.inputVBzrxBalance} onChange={this.changeVBzrxBalance} />
                             <div className="add-to-balance__range">
                                 <input step="0.01" type="range" min="0" max={this.props.vbzrxMax.toFixed(2)} value={this.state.vBzrxBalance.toFixed()} onChange={this.changeVBzrxBalance} />
                                 <div className="line"><div></div><div></div><div></div><div></div></div>
@@ -96,7 +96,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                     }
                     {this.props.bptMax.gt(0) &&
                         <div className="calc-item">
-                            <input className="add-to-balance__input" type="BigNumber" step="0.001" max={this.props.bptMax.toFixed(2)} title={this.state.bptBalance.toFixed(18)} value={this.state.inputBptBalance} onChange={this.changeBptBalance} />
+                            <input className="add-to-balance__input" type="number" step="0.001" max={this.props.bptMax.toFixed(2)} title={this.state.bptBalance.toFixed(18)} value={this.state.inputBptBalance} onChange={this.changeBptBalance} />
                             <div className="add-to-balance__range">
                                 <input step="0.001" type="range" min="0" max={this.props.bptMax.toFixed()} value={this.state.bptBalance.toFixed(2)} onChange={this.changeBptBalance} />
                                 <div className="line"><div></div><div></div><div></div><div></div></div>
@@ -179,7 +179,8 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
     }
 
     private formatPrecision = (output: string) => {
-
+        if (output === "")
+            return "0";
         if (output.match(/^(\d+\.{1}0?)$/))
             return output;
 
