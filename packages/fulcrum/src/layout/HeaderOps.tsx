@@ -111,7 +111,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
         </header>
         <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
+          Start earning farming rewards! Each time you open a loan, repay trade you are accumulating vBZRX
           </InfoBlock>
         {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
@@ -172,7 +172,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           ) : null}
         </header>
         <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
+          Start earning farming rewards! Each time you open a loan, repay trade you are accumulating vBZRX
           </InfoBlock>
         {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">

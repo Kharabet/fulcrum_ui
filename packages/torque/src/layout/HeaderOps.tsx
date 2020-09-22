@@ -89,7 +89,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         </div>
 
         {<InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
+          Start earning farming rewards! Each time you open a loan, repay trade you are accumulating vBZRX
           </InfoBlock>
         }
       </header>
@@ -137,7 +137,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           ) : null}
         </header>
         <InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
+          Start earning farming rewards! Each time you open a loan, repay trade you are accumulating vBZRX
           </InfoBlock>
       </React.Fragment>
     );
