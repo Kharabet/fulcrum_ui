@@ -30,6 +30,10 @@ const tokenStatsModel = new mongoose.Schema({
     type: String,
     required: true
   },
+  yieldFarmingAPR: {
+    type: String,
+    required: true
+  },
   vaultBalance: {
     type: String,
     required: true
