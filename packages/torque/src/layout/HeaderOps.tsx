@@ -89,8 +89,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         </div>
 
         {<InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, repay trade you are accumulating vBZRX
-          </InfoBlock>
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your staking dashboard.
+        </InfoBlock>
         }
       </header>
     );
@@ -137,8 +137,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           ) : null}
         </header>
         <InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, repay trade you are accumulating vBZRX
-          </InfoBlock>
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your staking dashboard.
+        </InfoBlock>
       </React.Fragment>
     );
   };
