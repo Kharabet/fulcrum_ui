@@ -239,7 +239,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         //console.log("tagManagerArgs = ", tagManagerArgs)
         TagManager.dataLayer(tagManagerArgs)
       }
-      
+
       this.props.onSubmit(
         new BorrowRequest(
           "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -267,7 +267,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let inputAmountText = event.target.value ? event.target.value : "";
-    if (inputAmountText === "" || parseFloat(inputAmountText) < 0 ) return;
+    if (inputAmountText === "" || parseFloat(inputAmountText) < 0) return;
     // setting inputAmountText to update display at the same time
     await this.setState({
       ...this.state,
@@ -292,6 +292,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   private getBorrowEstimate = async (collateralAsset: Asset) => {
     const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(this.props.borrowAsset, collateralAsset, this.state.borrowAmount);
+    borrowEstimate.depositAmount = borrowEstimate.depositAmount.times(this.state.selectedValue / 155);
     return borrowEstimate;
   }
 
@@ -314,6 +315,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     } else {
       await this.setState({ ...this.state, collateralValue: inputCollateralText, selectedValue: inputCollateralValue })
     }
+    this._inputTextChange.next(this.state.inputAmountText);
   };
 
   public editInput = () => {
