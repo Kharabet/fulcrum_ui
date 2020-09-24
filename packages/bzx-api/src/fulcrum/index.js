@@ -121,34 +121,25 @@ export default class Fulcrum {
     }
 
     async getFulcrumLendAndTorqueBorrowAndYieldRates() {
-
-        const yieldAPY = await this.getYieldFarmingAPY();
         const reserveData = await this.getReserveData();
-        let lendRates = [];
-        let borrowRates = [];
+        let rates = [];
         reserveData.filter(item => item.token !== "all" && item.token !== "ethv1").forEach(item => {
             const tokenSymbol = item.token.toUpperCase();
-
+            const yieldFarmingAPR = item.yieldFarmingAPR;
             const lendApr = item.supplyInterestRate / 100;
             const lendApy = this.convertAPRtoAPY(lendApr);
-            lendRates.push({
-                apr: lendApr,
-                apy: lendApy,
-                tokenSymbol
-            });
-
             const borrowApr = item.torqueBorrowInterestRate / 100;
             const borrowApy = this.convertAPRtoAPY(borrowApr);
-            borrowRates.push({
-                apr: borrowApr,
-                apy: borrowApy,
+            rates.push({
+                lendApr,
+                lendApy,
+                borrowApr,
+                borrowApy,
+                yieldFarmingAPR,
                 tokenSymbol
             });
         });
-
-        return { lendRates, borrowRates, yieldAPY };
-
-
+        return rates;
     }
 
     convertAPRtoAPY(apr) {
