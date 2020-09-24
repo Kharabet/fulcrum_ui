@@ -29,9 +29,10 @@
     color: #fff;
     margin-top: 4px;
     .regular-link {
-      color: #003cda;
+      color: #fff;
+      font-weight: 600;
       &:hover {
-        color: #5b88ff;
+        color: #003cda;
       }
     }
     .disclosure-link {

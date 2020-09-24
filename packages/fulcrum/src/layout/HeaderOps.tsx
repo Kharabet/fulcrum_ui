@@ -111,7 +111,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
         </header>
         <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
-          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your staking dashboard.
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your <a href="https://staking.bzx.network" className="regular-link" target="blank">staking dashboard</a>.
         </InfoBlock>
         {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
@@ -172,7 +172,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           ) : null}
         </header>
         <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
-          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your staking dashboard.
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your <a href="https://staking.bzx.network" className="regular-link" target="blank">staking dashboard</a>.
         </InfoBlock>
         {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
