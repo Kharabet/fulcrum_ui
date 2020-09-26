@@ -1,0 +1,34 @@
+.animation-title {
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  color: #283049;
+  left: 0;
+  right: 0;
+  top: 105px;
+  position: absolute;
+  text-align: center;
+  a {
+    color: #283049;
+  }
+  & .warning {
+    color: #ff4f4f;
+  }
+}
+.animation-tx {
+  width: 100%;
+  height: 370px;
+  position: relative;
+  z-index: 2;
+  background-color: #ffffff;
+  left: 0;
+  border-radius: 16px;
+  svg {
+    transform: rotate(-90deg);
+  }
+  > div {
+    display: flex;
+    transform: rotate(-90deg) translateY(-30px);
+  }
+}
