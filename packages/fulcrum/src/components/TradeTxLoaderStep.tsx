@@ -68,12 +68,8 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       div.classList.remove("animation-out");
       div.classList.add("animation-out");
     }
-
     TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
     TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
-    if (this.state.requestTask)
-      FulcrumProvider.Instance.onTaskCancel(this.state.requestTask);
-
   }
 
 

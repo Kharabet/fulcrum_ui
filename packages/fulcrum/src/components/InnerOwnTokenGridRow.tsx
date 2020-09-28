@@ -8,6 +8,7 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { TasksQueue } from "../services/TasksQueue";
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
@@ -83,6 +84,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
     }
 
+
     this._isMounted && this.setState({
       ...this.state,
       valueChange,
@@ -144,8 +146,17 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     }
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
+
+    const task = await TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.loan.loanId);
+    const isLoadingTransaction = task && !task.error ? true : false;
+    const request = task ? task.request as TradeRequest | ManageCollateralRequest : undefined;
+    this.setState({
+      ...this.state,
+      isLoadingTransaction,
+      request
+    });
 
     this.derivedUpdate();
   }
