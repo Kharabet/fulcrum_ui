@@ -1,7 +1,5 @@
 import { BigNumber } from "@0x/utils";
-import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { Asset } from "./Asset";
-import { PositionType } from "./PositionType";
 
 export class ManageCollateralRequest {
   public id: number;

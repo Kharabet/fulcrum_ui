@@ -15,6 +15,8 @@ import { Preloader } from "./Preloader";
 import { RequestTask } from "../domain/RequestTask";
 import { RequestStatus } from "../domain/RequestStatus";
 
+import { CircleLoader } from "./CircleLoader";
+import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 
 export interface ITradeTokenGridRowProps {
   isMobileMedia: boolean;
@@ -238,6 +240,18 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             </button>
           </div>
         </div>
+        {this.state.isLoadingTransaction && this.state.request &&
+          this.props.positionType === this.state.request.positionType &&
+          this.state.request.tradeType === TradeType.BUY
+          ? < div className={`token-selector-item__image open-tab-tx`}>
+            <CircleLoader></CircleLoader>
+            <TradeTxLoaderStep taskId={this.state.request!.id} />
+          </div>
+          : !this.state.resultTx && this.state.request &&
+          this.props.positionType === this.state.request.positionType &&
+          this.state.request.tradeType === TradeType.BUY &&
+          <div className="close-tab-tx"></div>
+        }
       </React.Fragment>
     );
   }

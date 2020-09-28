@@ -32,14 +32,14 @@ export interface IInnerOwnTokenGridRowProps {
   isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | ManageCollateralRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
 
 }
 
 interface IInnerOwnTokenGridRowState {
   isLoading: boolean;
   isLoadingTransaction: boolean;
-  request: TradeRequest | undefined;
+  request: TradeRequest | ManageCollateralRequest | undefined;
   valueChange: BigNumber;
   resultTx: boolean;
 }
@@ -159,7 +159,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
           ? <React.Fragment>
             <div className="token-selector-item__image">
               <CircleLoader></CircleLoader>
-              <TradeTxLoaderStep taskId={this.state.request.loanId} />
+              <TradeTxLoaderStep taskId={this.state.request.id} />
             </div>
           </React.Fragment>
           : <div className={`inner-own-token-grid-row`}>
@@ -253,29 +253,18 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    const request = new TradeRequest(
+    const request = new ManageCollateralRequest(
       this.props.loan.loanId,
-      TradeType.SELL,
       this.props.baseToken,
       this.props.quoteToken,
-      this.props.quoteToken,
-      this.props.positionType,
-      this.props.leverage,
-      new BigNumber(0)
-    )
+      this.props.loan.collateralAmount,
+      false
+    );
 
     await this.setState({ ...this.state, request: request });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
 
-    this.props.onManageCollateralOpen(
-      new ManageCollateralRequest(
-        this.props.loan.loanId,
-        this.props.baseToken,
-        this.props.quoteToken,
-        this.props.loan.collateralAmount,
-        false
-      )
-    );
+    this.props.onManageCollateralOpen(request);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx);
   };
 
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
