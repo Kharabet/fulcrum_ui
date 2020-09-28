@@ -32,7 +32,7 @@ export class InfoBlock extends Component<IInfoBlockProps, IInfoBlockState> {
 
     return (
       <div className="info-block__container">
-        <div className="info-block__left">Please note:</div>
+        {/* <div className="info-block__left">Please note:</div> */}
         <div className="info-block__center">{this.props.children}</div>
         {this.props.isAccept &&
           <div className="info-block__right">
