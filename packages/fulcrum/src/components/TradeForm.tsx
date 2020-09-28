@@ -498,7 +498,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const usdAmount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken)
+    const rateUSD = await FulcrumProvider.Instance.getSwapToUsdRate(this.state.depositToken);
 
     if (!this.state.assetDetails) {
       this.props.onCancel();
@@ -511,7 +511,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
     let usdPrice = this.state.tradeAmountValue
     if (usdPrice != null) {
-      usdPrice = usdPrice.multipliedBy(usdAmount)
+      usdPrice = usdPrice.multipliedBy(rateUSD)
     }
 
     if (isMainnetProd) {
@@ -520,12 +520,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         dataLayer: {
           event: 'purchase',
           transactionId: randomNumber,
-          transactionTotal: new BigNumber(usdPrice),
+          transactionTotal: new BigNumber(usdPrice).toNumber(),
           transactionProducts: [{
             name: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType + '-' + this.props.quoteAsset,
             sku: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType,
             category: this.props.positionType,
-            price: new BigNumber(usdPrice),
+            price: new BigNumber(usdPrice).toNumber(),
             quantity: 1
           }],
         }
