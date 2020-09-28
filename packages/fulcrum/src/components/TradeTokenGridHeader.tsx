@@ -19,7 +19,7 @@ export const TradeTokenGridHeader = () => {
         <span className="trade-token-grid-header__text">Liquidation Price</span>
       </div>
       <div className="trade-token-grid-header__col-profit">
-        <span className="trade-token-grid-header__text">Estimated Yield</span>
+        <span className="trade-token-grid-header__text">Est. Yield, vBZRX</span>
       </div>
     </div>
   );
