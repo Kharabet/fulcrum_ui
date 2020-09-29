@@ -75,9 +75,6 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
 
         TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
         TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
-        if (this.state.requestTask)
-            ExplorerProvider.Instance.onTaskCancel(this.state.requestTask);
-
     }
 
 

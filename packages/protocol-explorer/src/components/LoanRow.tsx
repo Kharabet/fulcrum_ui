@@ -10,7 +10,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 import { LiquidationRequest } from "../domain/LiquidationRequest";
 import { CircleLoader } from "./CircleLoader";
 import { TxLoaderStep } from "./TxLoaderStep";
-
+import { TasksQueue } from "../services/TasksQueue";
 
 export interface ILoanRowProps {
   loanId: string;
@@ -37,6 +37,13 @@ export const LoanRow = (props: ILoanRowProps) => {
 
 
   useEffect(() => {
+    async function loadData() {
+      const task = await TasksQueue.Instance.getTasksList().find(t => t.request.loanId === props.loanId);
+      setLoadingTransaction(task && !task.error ? true : false);
+      setRequest(task ? task.request : undefined);
+    }
+    loadData();
+
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, onProviderAvailable);
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, onProviderChanged);
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.AskToOpenProgressDlg, onAskToOpenProgressDlg);
@@ -52,6 +59,7 @@ export const LoanRow = (props: ILoanRowProps) => {
 
   useEffect(() => {
     changeLoadingTransaction(false, undefined, false);
+    props.onLiquidationUpdated();
   }, [isLiquidationTxCompleted]);
 
   const onLiquidateClick = async () => {
