@@ -14,8 +14,8 @@ export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
     return (
       <div className="header-menu__item">
         {this.props.external ? (
-          <a href={this.props.link} className={`header-menu__item-link ${this.props.id === 4 ? "c-primary-blue" : "c-green"}`} target="_blank">
-            {this.props.id !== 4 ? (<span className="icon-external">
+          <a href={this.props.link} className={`header-menu__item-link ${this.props.id === 5 ? "c-primary-blue" : "c-green"}`} target="_blank">
+            {this.props.id !== 5 ? (<span className="icon-external">
               <ExternalLink />
             </span>) : null}
             <span>{this.props.title}</span>
