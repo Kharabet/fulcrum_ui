@@ -97,7 +97,7 @@ export class Form extends Component<{}, IFormState> {
     }
     selectedRepAddress = delegateAddress;
     const otherRepsList = sortedList.slice(3, sortedList.length);
-    const canOptin = await StakingProvider.Instance.canOptin();
+    const canOptin = false; //await StakingProvider.Instance.canOptin();
     let claimableAmount = await StakingProvider.Instance.isClaimable();
     if (claimableAmount.gt(0)) {
       claimableAmount = claimableAmount.div(10 ** 18)
@@ -440,7 +440,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             */}
-            {/*{this.state.claimableAmount.gt(0) &&
+            {this.state.claimableAmount.gt(0) &&
               <div className="convert-button">
                 <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
                   Claim&nbsp;
@@ -449,7 +449,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             }
-            {this.state.canOptin &&
+            {/*{this.state.canOptin &&
             <div className="convert-button">
               <button className="button button-full-width" onClick={this.onOptinClick}>
                 Opt-in to compensation program

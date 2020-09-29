@@ -9,12 +9,14 @@ import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
 import { SwitchButtonInput } from "../components/SwitchButtonInput";
 import { truncate } from "fs";
+import { InfoBlock } from "../components/InfoBlock";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
   headerClass: string;
+  isV1ITokenInWallet: boolean;
 }
 
 interface IHeaderOpsState {
@@ -40,7 +42,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     var toggleSwitch = document.querySelector<HTMLInputElement>('.header__right .theme-switch input[type="checkbox"]');
     if (currentTheme === null) {
       document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');      
+      localStorage.setItem('theme', 'dark');
       if (toggleSwitch) toggleSwitch.checked = true;
     }
     if (toggleSwitch && currentTheme) {
@@ -93,20 +95,27 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     };
 
     return (
-      <header className={`header ${this.props.headerClass}`}>
-        <div className="header__row">
-          <div className="header__left">
-            <HeaderLogo />
+      <React.Fragment>
+        <header className={`header ${this.props.headerClass}`}>
+          <div className="header__row">
+            <div className="header__left">
+              <HeaderLogo />
+            </div>
+            <div className="header__center">
+              <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
+            </div>
+            <div className="header__right">
+              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              <SwitchButtonInput onSwitch={this.onSwitchTheme} type="theme" />
+            </div>
           </div>
-          <div className="header__center">
-            <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
-          </div>
-          <div className="header__right">
-            <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            <SwitchButtonInput onSwitch={this.onSwitchTheme} type="theme" />
-          </div>
-        </div>
-      </header>
+        </header>
+        {this.props.isV1ITokenInWallet &&
+          <InfoBlock localstorageItemProp="v1Balance">
+            If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
+          </InfoBlock>
+        }
+      </React.Fragment>
     );
   };
 
@@ -126,6 +135,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
 
     return (
+      <React.Fragment>
       <header className={`header ${this.props.headerClass}`}>
         <div className="header__row">
           <div className="header__left">
@@ -158,6 +168,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
         ) : null}
       </header>
+        {this.props.isV1ITokenInWallet &&
+          <InfoBlock localstorageItemProp="v1Balance">
+            If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
+          </InfoBlock>
+        }
+      </React.Fragment>
     );
   };
 

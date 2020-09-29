@@ -15,6 +15,10 @@ import { Loader } from "./Loader";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import TagManager from "react-gtm-module";
 
+const isMainnetProd =
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
 export interface IBorrowMoreFormProps {
   loanOrderState: IBorrowedFundsState;
   onSubmit?: (value: BorrowRequest) => void;
@@ -179,22 +183,25 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       if (usdPrice !== null) {
         usdPrice = usdPrice.multipliedBy(usdAmount)
       }
-      const tagManagerArgs = {
-        dataLayer: {
-          event: 'purchase',
-          transactionId: randomNumber,
-          transactionTotal: new BigNumber(usdPrice),
-          transactionProducts: [{
-            name: "Borrow-More-" + this.props.loanOrderState.loanAsset,
-            sku: "Borrow-More-" + this.props.loanOrderState.loanAsset + '-' + this.props.loanOrderState.collateralAsset,
-            category: "Borrow More",
-            price: new BigNumber(usdPrice),
-            quantity: 1
-          }],
+
+      if (isMainnetProd) {
+        const tagManagerArgs = {
+          dataLayer: {
+            event: 'purchase',
+            transactionId: randomNumber,
+            transactionTotal: new BigNumber(usdPrice),
+            transactionProducts: [{
+              name: "Borrow-More-" + this.props.loanOrderState.loanAsset,
+              sku: "Borrow-More-" + this.props.loanOrderState.loanAsset + '-' + this.props.loanOrderState.collateralAsset,
+              category: "Borrow More",
+              price: new BigNumber(usdPrice),
+              quantity: 1
+            }],
+          }
         }
+        //console.log("tagManagerArgs = ", tagManagerArgs)
+        TagManager.dataLayer(tagManagerArgs)
       }
-      //console.log("tagManagerArgs = ", tagManagerArgs)
-      TagManager.dataLayer(tagManagerArgs)
 
       this.props.onSubmit(
         new BorrowRequest(

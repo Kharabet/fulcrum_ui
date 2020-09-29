@@ -49,7 +49,7 @@ const initialNetworkId = getNetworkIdByString(networkName);
 export class StakingProvider {
   public static Instance: StakingProvider;
 
-  public readonly gasLimit = "250000";
+  public readonly gasLimit = "500000";
 
   // gasBufferCoeff equal 110% gas reserve
   public readonly gasBufferCoeff = new BigNumber("1.03");
@@ -463,7 +463,7 @@ export class StakingProvider {
       tokenAmount,
       {
         from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : "3000000", 
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit, 
         gasPrice: await this.gasPrice()
       });
 
@@ -549,7 +549,7 @@ export class StakingProvider {
         [bzrxAmount, vbzrxAmount, bptAmount],
         {
           from: account,
-          gas: gasAmountBN ? gasAmountBN.toString() : "3000000", 
+          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit, 
           gasPrice: await this.gasPrice()
         })
       : await bzrxStakigContract.stakeWithDelegate.sendTransactionAsync(
@@ -558,7 +558,7 @@ export class StakingProvider {
         address,
         {
           from: account,
-          gas: gasAmountBN ? gasAmountBN.toString() : "3000000", 
+          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit, 
           gasPrice: await this.gasPrice()
         })
 
@@ -610,7 +610,7 @@ export class StakingProvider {
       tokenAmount,
       {
         from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
         gasPrice: await this.gasPrice()
       });
 
@@ -684,7 +684,7 @@ export class StakingProvider {
     const txHash = await traderCompensationContract.optin.sendTransactionAsync(
       {
         from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
         gasPrice: await this.gasPrice()
       });
 
@@ -720,7 +720,7 @@ export class StakingProvider {
     const txHash = await traderCompensationContract.claim.sendTransactionAsync(
       {
         from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
         gasPrice: await this.gasPrice()
       });
 
@@ -758,7 +758,7 @@ export class StakingProvider {
       true,
       {
         from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
         gasPrice: await this.gasPrice()
       });
 

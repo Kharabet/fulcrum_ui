@@ -35,6 +35,7 @@ interface ITradeTokenGridRowState {
   liquidationPrice: BigNumber;
 
   interestRate: BigNumber;
+  yieldApr: BigNumber;
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
@@ -51,6 +52,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       baseTokenPrice: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       interestRate: new BigNumber(0),
+      yieldApr: new BigNumber(0),
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
@@ -64,6 +66,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private _isMounted: boolean;
+  private apiUrl = "https://api.bzx.network/v1";
 
   private async derivedUpdate() {
 
@@ -91,10 +94,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.baseToken
     );
 
+    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`);
+    const yieldAPYJson = await yieldAPYRequest.json();
+    const yieldApr = yieldAPYJson.success && yieldAPYJson.data[this.props.baseToken.toLowerCase()]
+      ? new BigNumber(yieldAPYJson.data[this.props.baseToken.toLowerCase()]) : new BigNumber(0);
+
     this._isMounted && this.setState({
       ...this.state,
       baseTokenPrice,
-      interestRate: interestRate,
+      interestRate,
+      yieldApr,
       liquidationPrice,
       isLoading: false
     });
@@ -209,13 +218,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               : <Preloader width="74px" />
             }
           </div>
-          <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Interest APR</span>}
+          <div title={this.state.yieldApr.gt(0) ? `${this.state.yieldApr.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Estimated Yield</span>}
 
-            {this.state.interestRate.gt(0) && !this.state.isLoading
+            {this.state.yieldApr.gt(0) && !this.state.isLoading
               ? <React.Fragment>
-                {this.state.interestRate.toFixed(4)}
+                {this.state.yieldApr.toFixed(0)}
                 <span className="fw-sign">%</span>
+                <span title={this.state.interestRate.toFixed(18)} className="trade-token-grid-row__yield">
+                  APR <span>{this.state.interestRate.toFixed(2)}%</span>
+                </span>
               </React.Fragment>
               : <Preloader width="74px" />
             }

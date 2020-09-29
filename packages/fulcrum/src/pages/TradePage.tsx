@@ -234,7 +234,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 </div>
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}
-                  tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken)}
+                  tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken && e.quoteToken === this.state.selectedMarket.quoteToken )}
                   ownRowsData={this.state.ownRowsData.filter(e =>
                     ((this.checkWethOrFwethToken(e.baseToken) === this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) || e.baseToken === this.state.selectedMarket.baseToken)
                       && (this.checkWethOrFwethToken(e.quoteToken) ===  this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) || e.quoteToken === this.state.selectedMarket.quoteToken)))}

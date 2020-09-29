@@ -4,7 +4,7 @@
 
   display: flex;
   flex-direction: column;
-
+  box-sizing: content-box;
   .header__row {
     display: flex;
     flex-direction: row;
