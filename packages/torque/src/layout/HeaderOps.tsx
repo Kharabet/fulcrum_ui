@@ -39,7 +39,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       { id: 2, title: "Your Loans", link: "/dashboard", external: false },
       // { id: 3, title: "Refinance", link: "/refinance", external: false },
 
-      { id: 2, title: "Staking", link: "https://staking.bzx.network", external: true },
+      { id: 3, title: "Staking", link: "https://staking.bzx.network", external: true },
       { id: 4, title: "Lend", link: "https://app.fulcrum.trade/lend", external: true },
       { id: 5, title: "Help Center", link: "https://help.bzx.network/en/collections/2008807-torque", external: true },
     ]
