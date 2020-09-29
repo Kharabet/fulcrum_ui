@@ -34,7 +34,6 @@ export const LoanRow = (props: ILoanRowProps) => {
   const [isLoadingTransaction, setLoadingTransaction] = useState(false);
   const [liquidationRequest, setRequest] = useState<LiquidationRequest>();
   const [isLiquidationTxCompleted, setTxCompleted] = useState(false);
-  const [liquidationResultTx, setResultTx] = useState(false);
 
 
   useEffect(() => {
@@ -52,7 +51,7 @@ export const LoanRow = (props: ILoanRowProps) => {
   });
 
   useEffect(() => {
-    changeLoadingTransaction(false, undefined, false, liquidationResultTx);
+    changeLoadingTransaction(false, undefined, false);
   }, [isLiquidationTxCompleted]);
 
   const onLiquidateClick = async () => {
@@ -67,7 +66,7 @@ export const LoanRow = (props: ILoanRowProps) => {
       amountInBaseUnits);
 
     console.log(request);
-    changeLoadingTransaction(true, request, false, false);
+    changeLoadingTransaction(true, request, false);
     await ExplorerProvider.Instance.onLiquidationConfirmed(request);
 
     //props.onLiquidationUpdated();
@@ -79,11 +78,10 @@ export const LoanRow = (props: ILoanRowProps) => {
   }
 
 
-  const changeLoadingTransaction = (isLoadingTransaction: boolean, request: LiquidationRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => {
+  const changeLoadingTransaction = (isLoadingTransaction: boolean, request: LiquidationRequest | undefined, isTxCompleted: boolean) => {
     setLoadingTransaction(isLoadingTransaction);
     setRequest(request);
     setTxCompleted(isTxCompleted);
-    setResultTx(isTxCompleted);
   }
 
 
@@ -98,9 +96,8 @@ export const LoanRow = (props: ILoanRowProps) => {
 
 
   const onAskToOpenProgressDlg = async (taskId: string) => {
-    debugger;
     if (!liquidationRequest || taskId !== liquidationRequest.loanId) return;
-    changeLoadingTransaction(true, liquidationRequest, false, true);
+    changeLoadingTransaction(true, liquidationRequest, false);
   };
 
 
@@ -110,12 +107,12 @@ export const LoanRow = (props: ILoanRowProps) => {
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         ExplorerProvider.Instance.onTaskCancel(task);
-        changeLoadingTransaction(false, undefined, false, false)
+        changeLoadingTransaction(false, undefined, false)
       }, 5000)
       return;
     }
 
-    changeLoadingTransaction(isLiquidationTxCompleted, liquidationRequest, isLiquidationTxCompleted, true);
+    changeLoadingTransaction(isLiquidationTxCompleted, liquidationRequest, isLiquidationTxCompleted);
   };
 
 
