@@ -58,12 +58,12 @@ import { BorrowProcessor } from "./processors/BorrowProcessor";
 import { RepayLoanProcessor } from "./processors/RepayLoanProcessor";
 import { ExtendLoanProcessor } from "./processors/ExtendLoanProcessor";
 import { ManageCollateralProcessor } from "./processors/ManageCollateralProcessor";
-import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
-import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
-import { RefinanceCompoundRequest } from "../domain/RefinanceCompoundRequest";
-import { RefinanceCompoundProcessor } from "./processors/RefinanceCompoundProcessor";
-import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
-import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
+// import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
+// import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
+// import { RefinanceCompoundRequest } from "../domain/RefinanceCompoundRequest";
+// import { RefinanceCompoundProcessor } from "./processors/RefinanceCompoundProcessor";
+// import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
+// import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -2086,23 +2086,23 @@ export class TorqueProvider {
     }
   };
 
-  public onMigrateMakerLoan = async (request: RefinanceMakerRequest) => {
-    if (request) {
-      TasksQueue.Instance.enqueue(new RequestTask(request));
-    }
-  };
+  // public onMigrateMakerLoan = async (request: RefinanceMakerRequest) => {
+  //   if (request) {
+  //     TasksQueue.Instance.enqueue(new RequestTask(request));
+  //   }
+  // };
 
-  public onMigrateCompoundLoan = async (request: RefinanceCompoundRequest) => {
-    if (request) {
-      TasksQueue.Instance.enqueue(new RequestTask(request));
-    }
-  };
+  // public onMigrateCompoundLoan = async (request: RefinanceCompoundRequest) => {
+  //   if (request) {
+  //     TasksQueue.Instance.enqueue(new RequestTask(request));
+  //   }
+  // };
 
-  public onMigrateSoloLoan = async (request: RefinanceDydxRequest) => {
-    if (request) {
-      TasksQueue.Instance.enqueue(new RequestTask(request));
-    }
-  };
+  // public onMigrateSoloLoan = async (request: RefinanceDydxRequest) => {
+  //   if (request) {
+  //     TasksQueue.Instance.enqueue(new RequestTask(request));
+  //   }
+  // };
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
     await this.processQueue(requestTask.request.id, false, false);
@@ -2205,20 +2205,20 @@ export class TorqueProvider {
         await processor.run(task, account, skipGas);
       }
 
-      if (task.request instanceof RefinanceMakerRequest) {
-        processor = new RefinanceMakerProcessor();
-        await processor.run(task, skipGas, configAddress, web3);
-      }
+      // if (task.request instanceof RefinanceMakerRequest) {
+      //   processor = new RefinanceMakerProcessor();
+      //   await processor.run(task, skipGas, configAddress, web3);
+      // }
 
-      if (task.request instanceof RefinanceCompoundRequest) {
-        processor = new RefinanceCompoundProcessor();
-        await processor.run(task, account, skipGas);
-      }
+      // if (task.request instanceof RefinanceCompoundRequest) {
+      //   processor = new RefinanceCompoundProcessor();
+      //   await processor.run(task, account, skipGas);
+      // }
 
-      if (task.request instanceof RefinanceDydxRequest) {
-        processor = new RefinanceDydxProcessor();
-        await processor.run(task, account, skipGas);
-      }
+      // if (task.request instanceof RefinanceDydxRequest) {
+      //   processor = new RefinanceDydxProcessor();
+      //   await processor.run(task, account, skipGas);
+      // }
 
       task.processingEnd(true, false, null);
     } catch (e) {
