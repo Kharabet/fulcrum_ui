@@ -68,8 +68,11 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   }
 
   private _isMounted: boolean;
+  private _refreshInterval: any;
+  private _refreshProfitTimerMillisec: number = 1000 * 60 * 10;
 
   private async derivedUpdate() {
+    console.log("this.derivedUpdate")
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     let profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
@@ -133,7 +136,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
 
   public componentWillUnmount(): void {
     this._isMounted = false;
-
+    window.clearInterval(this._refreshInterval);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -145,6 +148,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     this._isMounted = true;
 
     this.derivedUpdate();
+    this._refreshInterval = window.setInterval(this.derivedUpdate.bind(this), this._refreshProfitTimerMillisec);
   }
 
   public componentDidUpdate(

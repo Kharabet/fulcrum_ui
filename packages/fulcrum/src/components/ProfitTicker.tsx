@@ -20,13 +20,22 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
     this.container = React.createRef();
     this.assetDecimals = AssetsDictionary.assets.get(props.asset)!.decimals || 18;
   }
+  private _timerMillisec: number = 1000;
 
   public componentDidMount(): void {
-    const ms = 50;
-    const diff = this.props.secondDiff.dividedBy(1000 / ms);
+    this.createIncrement(this._timerMillisec);
+  }
+
+  public componentDidUpdate(prevProps: Readonly<IProfitTickerProps>): void {
+    if (prevProps.secondDiff !== this.props.secondDiff)
+      this.createIncrement(this._timerMillisec);
+  }
+
+  private createIncrement = (timerMillisec: number) => {
+    const diff = this.props.secondDiff.dividedBy(1000 / timerMillisec);
     let value = this.props.profit ? this.props.profit : new BigNumber(0);
     //int i = 0;
-    setInterval(() => {
+    return setInterval(() => {
       if (this.container.current) {
         value = value.plus(diff);
         this.container.current.setAttribute("title", value.toFixed(18));
@@ -34,7 +43,7 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
         // if (i % 20 == 0)
         //   this.props.onProfit(value);
       }
-    }, ms);
+    }, timerMillisec);
   }
 
   public render() {
