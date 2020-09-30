@@ -18,3 +18,13 @@
     display: none;
   }
 }
+@media (max-width: $breakpoint-lg-down) {
+  .hidden-lg {
+    display: none;
+  }
+}
+@media screen and (max-width: $breakpoint-sm-down) {
+  .visible-sm {
+    display: inline-block !important;
+  }
+}
