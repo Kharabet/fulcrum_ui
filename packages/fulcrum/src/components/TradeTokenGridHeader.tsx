@@ -13,13 +13,13 @@ export const TradeTokenGridHeader = () => {
         <span className="trade-token-grid-header__text">Leverage</span>
       </div>
       <div className="trade-token-grid-header__col-price">
-        <span className="trade-token-grid-header__text">Asset Price</span>
+        <span className="trade-token-grid-header__text">Mid Market Price</span>
       </div>
       <div className="trade-token-grid-header__col-liquidation">
         <span className="trade-token-grid-header__text">Liquidation Price</span>
       </div>
       <div className="trade-token-grid-header__col-profit">
-        <span className="trade-token-grid-header__text">Interest APR</span>
+        <span className="trade-token-grid-header__text">Est. Yield, vBZRX</span>
       </div>
     </div>
   );

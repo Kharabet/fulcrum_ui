@@ -27,6 +27,10 @@ import "../styles/components/trade-form.scss";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { InputReceive } from "./InputReceive";
 
+const isMainnetProd =
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
   inputAmountText: string;
@@ -494,7 +498,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const usdAmount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken)
+    const rateUSD = await FulcrumProvider.Instance.getSwapToUsdRate(this.state.depositToken);
 
     if (!this.state.assetDetails) {
       this.props.onCancel();
@@ -507,25 +511,28 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
     let usdPrice = this.state.tradeAmountValue
     if (usdPrice != null) {
-      usdPrice = usdPrice.multipliedBy(usdAmount)
+      usdPrice = usdPrice.multipliedBy(rateUSD)
     }
 
-    const randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-        event: 'purchase',
-        transactionId: randomNumber,
-        transactionTotal: new BigNumber(usdPrice),
-        transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType + '-' + this.props.quoteAsset,
-          sku: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType,
-          category: this.props.positionType,
-          price: new BigNumber(usdPrice),
-          quantity: 1
-        }],
+    if (isMainnetProd) {
+      const randomNumber = Math.floor(Math.random() * 100000) + 1;
+      const tagManagerArgs = {
+        dataLayer: {
+          event: 'purchase',
+          transactionId: randomNumber,
+          transactionTotal: new BigNumber(usdPrice).toNumber(),
+          transactionProducts: [{
+            name: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType + '-' + this.props.quoteAsset,
+            sku: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType,
+            category: this.props.positionType,
+            price: new BigNumber(usdPrice).toNumber(),
+            quantity: 1
+          }],
+        }
       }
+      TagManager.dataLayer(tagManagerArgs)
     }
-    TagManager.dataLayer(tagManagerArgs)
+
     this.props.onSubmit(
       new TradeRequest(
         this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",

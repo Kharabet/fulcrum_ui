@@ -46,6 +46,10 @@ import { PayTradingFeeEvent } from "../domain/events/PayTradingFeeEvent";
 import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
 import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
 
+const isMainnetProd =
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
     case 'mainnet':
@@ -508,9 +512,9 @@ export class FulcrumProvider {
         } catch (e) {
           //console.log(e);
         }
-        
+
         //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
-        
+
         const reserveData = await helperContract.reserveDetails.callAsync(tokens);
         let usdSupplyAll = new BigNumber(0);
         let usdTotalLockedAll = new BigNumber(0);
@@ -524,7 +528,7 @@ export class FulcrumProvider {
             let totalAssetSupply = new BigNumber(reserveData[0][i]);
             let totalAssetBorrow = new BigNumber(reserveData[1][i]);
             let supplyInterestRate = new BigNumber(reserveData[2][i]);
-            let borrowInterestRate = new BigNumber(reserveData[3][i]);
+            let borrowInterestRate = new BigNumber(reserveData[4][i]);
             let torqueBorrowInterestRate = new BigNumber(reserveData[4][i]);
             let vaultBalance = new BigNumber(reserveData[5][i]);
             let marketLiquidity = totalAssetSupply.minus(totalAssetBorrow);
@@ -532,6 +536,10 @@ export class FulcrumProvider {
             const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18;
             let usdSupply = new BigNumber(0);
             let usdTotalLocked = new BigNumber(0);
+
+            if (asset == Asset.ETHv1) {
+              vaultBalance = await this.getAssetTokenBalanceOfUser(Asset.WETH, "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633");
+            }
 
             const precision = new BigNumber(10 ** (18 - decimals));
             totalAssetSupply = totalAssetSupply.times(precision);
@@ -708,6 +716,9 @@ export class FulcrumProvider {
           result = (await assetContract.profitOf.callAsync(account))
             .dividedBy(10 ** 18);
 
+          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+          result = result.multipliedBy(10 ** (18 - precision));
+
           /*if (swapPrice && swapPrice.gt(0)) {
             result = result
               .multipliedBy(swapPrice);
@@ -811,19 +822,20 @@ export class FulcrumProvider {
 
       }
     } else {
-      if (loan) {
+      if (loan && loan.loanData) {
         const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
         const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
-
+        const currentCollateralToPrincipalRate = await this.getSwapRate(loan.collateralAsset, loan.loanAsset);
         const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
         const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
-       
 
         result = positionType === PositionType.LONG
-          ? loan.loanData!.collateral.times(collateralAssetPrecision)
-          : loan.loanData!.principal.times(loanAssetPrecision);
-        }
+          ? loan.loanData.collateral.times(collateralAssetPrecision)
+          : loan.loanData.collateral.times(collateralAssetPrecision)
+            .times(currentCollateralToPrincipalRate)
+            .minus(loan.loanData.principal.times(loanAssetPrecision));
       }
+    }
 
     result = result.dividedBy(10 ** 18);
 
@@ -1446,7 +1458,7 @@ export class FulcrumProvider {
     };
   }
 
-  public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
+  public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
       // always 0
@@ -1459,7 +1471,7 @@ export class FulcrumProvider {
       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const assetErc20Address = this.getErc20AddressOfAsset(asset);
       if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address);
+        result = await this.getErc20BalanceOfUser(assetErc20Address, account);
         result = result.multipliedBy(10 ** (18 - precision));
       }
     }
@@ -1471,7 +1483,7 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+      const precision = AssetsDictionary.assets.get((asset.includes("v1") ? asset.replace("v1", "") : asset) as Asset)!.decimals || 18;
       const address = await this.contractsSource.getITokenErc20Address(asset);
       if (address) {
         result = await this.getErc20BalanceOfUser(address);
@@ -1480,6 +1492,26 @@ export class FulcrumProvider {
     }
 
     return result;
+  }
+
+  public async getGasTokenAllowance(): Promise<BigNumber> {
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+      if (account) {
+        const assetAddress = this.getErc20AddressOfAsset(Asset.CHI);
+        if (assetAddress) {
+          const tokenContract = await this.contractsSource.getErc20Contract(assetAddress);
+          if (tokenContract) {
+            result = await tokenContract.allowance.callAsync(account, "0x55eb3dd3f738cfdda986b8eff3fa784477552c61")
+          }
+        }
+      }
+    }
+
+    return result
   }
 
   public async getITokenAssetBalanceOfUser(asset: Asset): Promise<BigNumber> {
@@ -1501,7 +1533,6 @@ export class FulcrumProvider {
         }
       }
     }
-
     return result;
   }
 
@@ -1516,7 +1547,7 @@ export class FulcrumProvider {
 
         const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans())
           .find(l => l.loanId === request.loanId);
-        if (!loan)
+        if (!loan || !loan.loanData)
           throw new Error("No loan available!");
 
 
@@ -1526,13 +1557,17 @@ export class FulcrumProvider {
           amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
         }
         else {
-          const decimals: number = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
-          amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(request.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
+          const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
+          const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
+
+          const currentCollateralToPrincipalRate = await this.getSwapRate(loan.collateralAsset, loan.loanAsset);
+          const maxRequestAmount = loan.loanData.collateral.div(10 ** collateralAssetDecimals).times(currentCollateralToPrincipalRate).minus(loan.loanData.principal.div(10 ** loanAssetDecimals));
+          amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(request.amount.div(maxRequestAmount)).toFixed(0, 1));
         }
 
         let maxAmountInBaseUnits = new BigNumber(0);
         if (loan) {
-          maxAmountInBaseUnits = loan.loanData!.collateral;
+          maxAmountInBaseUnits = loan.loanData.collateral;
         }
 
         if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01)) {
@@ -1822,7 +1857,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const earnRewardEventResponse = await fetch(etherscanApiUrl);
     const earnRewardEventResponseJson = await earnRewardEventResponse.json();
     if (earnRewardEventResponseJson.status !== "1") return result;
@@ -1860,7 +1897,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const payTradingFeeEventResponse = await fetch(etherscanApiUrl);
     const payTradingFeeEventResponseJson = await payTradingFeeEventResponse.json();
     if (payTradingFeeEventResponseJson.status !== "1") return result;
@@ -1897,7 +1936,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
     const tradeEventResponseJson = await tradeEventResponse.json();
     if (tradeEventResponseJson.status !== "1") return result;
@@ -1953,7 +1994,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const closeWithSwapResponse = await fetch(etherscanApiUrl);
     const closeWithSwapResponseJson = await closeWithSwapResponse.json();
     if (closeWithSwapResponseJson.status !== "1") return result;
@@ -2005,7 +2048,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const liquidationEventResponse = await fetch(etherscanApiUrl);
     const liquidationEventResponseJson = await liquidationEventResponse.json();
     if (liquidationEventResponseJson.status !== "1") return result;
@@ -2057,7 +2102,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const depositCollateralEventResponse = await fetch(etherscanApiUrl);
     const depositCollateralEventResponseJson = await depositCollateralEventResponse.json();
     if (depositCollateralEventResponseJson.status !== "1") return result;
@@ -2095,7 +2142,9 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = networkName === "kovan"
+      ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+      : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const withdrawCollateralEventResponse = await fetch(etherscanApiUrl);
     const withdrawCollateralEventResponseJson = await withdrawCollateralEventResponse.json();
     if (withdrawCollateralEventResponseJson.status !== "1") return result;
@@ -2241,13 +2290,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-}
-}
-}
-} catch(e) {
-// console.log(e);
-}
-}*/
+        }
+        }
+        }
+        } catch(e) {
+        // console.log(e);
+        }
+        }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -2604,59 +2653,51 @@ console.log(err, added);
 
         const randomNumber = Math.floor(Math.random() * 100000) + 1;
 
-        if (request instanceof LendRequest) {
-          const tagManagerArgs = {
-            dataLayer: {
-              transactionId: randomNumber,
-              transactionProducts: [{
-                name: "Transaction-Lend-" + request.asset,
-                sku: request.asset,
-                category: 'Lend'
-              }],
-            }
-          }
-          TagManager.dataLayer(tagManagerArgs)
-          this.eventEmitter.emit(
-            FulcrumProviderEvents.LendTransactionMined,
-            new LendTransactionMinedEvent(request.asset, txHash)
-          );
-        } else
-          if (request instanceof ManageCollateralRequest) {
+        if (isMainnetProd) {
+          if (request instanceof LendRequest) {
             const tagManagerArgs = {
               dataLayer: {
                 transactionId: randomNumber,
                 transactionProducts: [{
-                  name: "Transaction-Manage-Collateral-" + request.asset,
+                  name: "Transaction-Lend-" + request.asset,
                   sku: request.asset,
-                  category: 'Manage-Collateral'
+                  category: 'Lend'
                 }],
               }
             }
             TagManager.dataLayer(tagManagerArgs)
-          } else {
-            const tagManagerArgs = {
-              dataLayer: {
-                transactionId: randomNumber,
-                transactionProducts: [{
-                  name: "Transaction-Trade" + request.asset,
-                  sku: request.asset,
-                  category: 'Trade'
-                }],
+            this.eventEmitter.emit(
+              FulcrumProviderEvents.LendTransactionMined,
+              new LendTransactionMinedEvent(request.asset, txHash)
+            );
+          } else
+            if (request instanceof ManageCollateralRequest) {
+              const tagManagerArgs = {
+                dataLayer: {
+                  transactionId: randomNumber,
+                  transactionProducts: [{
+                    name: "Transaction-Manage-Collateral-" + request.asset,
+                    sku: request.asset,
+                    category: 'Manage-Collateral'
+                  }],
+                }
               }
+              TagManager.dataLayer(tagManagerArgs)
+            } else {
+              const tagManagerArgs = {
+                dataLayer: {
+                  transactionId: randomNumber,
+                  transactionProducts: [{
+                    name: "Transaction-Trade" + request.asset,
+                    sku: request.asset,
+                    category: 'Trade'
+                  }],
+                }
+              }
+              TagManager.dataLayer(tagManagerArgs)
             }
-            TagManager.dataLayer(tagManagerArgs)
-            // this.eventEmitter.emit(
-            //   FulcrumProviderEvents.TradeTransactionMined,
-            //   new TradeTransactionMinedEvent(new TradeTokenKey(
-            //     request.asset,
-            //     request.unitOfAccount,
-            //     request.positionType,
-            //     request.leverage,
-            //     request.isTokenized,
-            //     request.version
-            //   ), txHash)
-            // );
-          }
+        }
+
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);

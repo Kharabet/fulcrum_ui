@@ -16,7 +16,7 @@ export class UnlendErcProcessor {
     // Initializing loan
     const taskRequest: LendRequest = (task.request as LendRequest);
     const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    let amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(taskRequest.asset);
     if (!tokenContract) {
       throw new Error("No iToken contract available!");
@@ -34,8 +34,8 @@ export class UnlendErcProcessor {
 
     let gasAmountBN;
 
-    if (taskRequest.asset === Asset.DAI) {
-      skipGas = true;
+    if (amountInBaseUnits.gt(FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS)) {
+      amountInBaseUnits = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
     }
 
     console.log(tokenContract.address, await tokenContract.burn.getABIEncodedTransactionData(account, amountInBaseUnits));

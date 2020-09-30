@@ -316,7 +316,7 @@ permalink: lending
     <div class="container">
         <div class="row">
         <div class="col col-12 fd-c">
-                        <a href="https://app.fulcrum.trade/#/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
+                        <a href="https://app.fulcrum.trade/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
             <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
         </div>
         </div>

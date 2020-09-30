@@ -13,7 +13,7 @@ export class RepayLoanProcessor {
     }
 
     const taskRequest: RepayLoanRequest = (task.request as RepayLoanRequest);
-    const isETHBorrowAsset = taskRequest.borrowAsset === Asset.ETH;
+    const isETHBorrowAsset = TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset);
 
     if (isETHBorrowAsset) {
       //Initializing

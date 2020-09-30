@@ -138,6 +138,31 @@ export class BorrowProcessor {
       // throw e;
     }
 
+    console.log(iTokenContract.address, isGasTokenEnabled && ChiTokenBalance.gt(0) ?
+    iTokenContract.borrowWithGasToken.getABIEncodedTransactionData(
+      taskRequest.loanId,
+          borrowAmountInBaseUnits,      // borrowAmount
+          new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
+          depositAmountInBaseUnits,     // collateralTokenSent
+          isETHCollateralAsset
+            ? TorqueProvider.ZERO_ADDRESS
+            : collateralAssetErc20Address, // collateralToken
+
+          account,                      // borrower
+          account,                      // borrower
+          account,                      // gasTokenUser
+          "0x"
+    ) : iTokenContract.borrow.getABIEncodedTransactionData(taskRequest.loanId,
+      borrowAmountInBaseUnits,      // borrowAmount
+      new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
+      depositAmountInBaseUnits,     // collateralTokenSent
+      isETHCollateralAsset
+        ? TorqueProvider.ZERO_ADDRESS
+        : collateralAssetErc20Address, // collateralToken
+      account,                      // borrower
+      account,                      // receiver
+      "0x"));
+
     try {
       txHash = isGasTokenEnabled && ChiTokenBalance.gt(0)
         ? await iTokenContract.borrowWithGasToken.sendTransactionAsync(

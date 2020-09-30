@@ -14,7 +14,7 @@ interface ILoanGridState {
 }
 
 export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
-  private quantityVisibleRow = 25;
+  private quantityVisibleRow = 50;
 
   constructor(props: any) {
     super(props);

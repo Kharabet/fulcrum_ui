@@ -37,8 +37,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     items: [
       { id: 1, title: "Borrow", link: "/borrow", external: false },
       { id: 2, title: "Your Loans", link: "/dashboard", external: false },
-     // { id: 3, title: "Refinance", link: "/refinance", external: false },
-      { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true },
+      // { id: 3, title: "Refinance", link: "/refinance", external: false },
+      { id: 4, title: "Lend", link: "https://app.fulcrum.trade/lend", external: true },
       { id: 5, title: "Help Center", link: "https://help.bzx.network/en/collections/2008807-torque", external: true },
     ]
   }
@@ -88,9 +88,10 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
         </div>
 
-        {/* <InfoBlock localstorageItemProp="torque-page-info">
-          You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
-        </InfoBlock> */}
+        {<InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your <a href="https://staking.bzx.network" className="regular-link" target="blank">staking dashboard</a>.
+        </InfoBlock>
+        }
       </header>
     );
   };
@@ -102,38 +103,43 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
 
     return (
-      <header className="header">
-        <div className="header__row">
-          <div className="header__left">
-            <HeaderLogo />
+      <React.Fragment>
+        <header className="header">
+          <div className="header__row">
+            <div className="header__left">
+              <HeaderLogo />
+            </div>
+            <div className="header_icon" onClick={this.onMenuToggle}>
+              {!this.state.isMenuOpen ? <MenuIconOpen className="header__menu" /> : <MenuIconClose className="header__menu" />}
+            </div>
+
           </div>
-          <div className="header_icon" onClick={this.onMenuToggle}>
-            {!this.state.isMenuOpen ? <MenuIconOpen className="header__menu" /> : <MenuIconClose className="header__menu" />}
-          </div>
+          {this.state.isMenuOpen ? (
 
-        </div>
-        {this.state.isMenuOpen ? (
+            <div className={sidebarClass}>
+              <div className="header_btn">
 
-          <div className={sidebarClass}>
-            <div className="header_btn">
-
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-              {/* <div className="theme-switch-wrapper">
+                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+                {/* <div className="theme-switch-wrapper">
                 <label className="theme-switch" htmlFor="checkbox">
                   <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} defaultChecked={!localStorage.theme || localStorage.theme === 'dark' ? true : false} />
                   <div className="slider round"></div>
                 </label>
               </div> */}
+              </div>
+              <div className="header_nav_menu">
+                <HeaderMenu items={this.Menu.items} />
+              </div>
+              <div className="footer-container">
+                <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+              </div>
             </div>
-            <div className="header_nav_menu">
-              <HeaderMenu items={this.Menu.items} />
-            </div>
-            <div className="footer-container">
-              <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-            </div>
-          </div>
-        ) : null}
-      </header>
+          ) : null}
+        </header>
+        <InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your <a href="https://staking.bzx.network" className="regular-link" target="blank">staking dashboard</a>.
+        </InfoBlock>
+      </React.Fragment>
     );
   };
 

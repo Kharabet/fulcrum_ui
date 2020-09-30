@@ -365,6 +365,26 @@ export class TorqueProvider {
     return result;
   }
 
+  public async getGasTokenAllowance(): Promise<BigNumber> {
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+      if (account) {
+        const assetAddress = this.getErc20AddressOfAsset(Asset.CHI);
+        if (assetAddress) {
+          const tokenContract = await this.contractsSource.getErc20Contract(assetAddress);
+          if (tokenContract) {
+            result = await tokenContract.allowance.callAsync(account, "0x55eb3dd3f738cfdda986b8eff3fa784477552c61")
+          }
+        }
+      }
+    }
+
+    return result
+  }
+
   public getBorrowDepositEstimate = async (
     borrowAsset: Asset,
     collateralAsset: Asset,
@@ -385,7 +405,7 @@ export class TorqueProvider {
         );
         result.depositAmount = borrowEstimate
           .dividedBy(10 ** collateralPrecision)
-          .multipliedBy(1.005); // safety buffer
+          .multipliedBy(1.20); // safety buffer
       }
     }
 
@@ -1399,22 +1419,25 @@ export class TorqueProvider {
     result = loansData
       .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
       .map(e => {
-        const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        let loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        loanAsset = this.isETHAsset(loanAsset) ? Asset.ETH : loanAsset;
+        let collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        collateralAsset = this.isETHAsset(collateralAsset) ? Asset.ETH : collateralAsset;
+
         const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
-        const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
         let amountOwned = e.principal.minus(e.interestDepositRemaining);
         if (amountOwned.lte(0)) {
           amountOwned = new BigNumber(0);
         } else {
-          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
+          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(3, BigNumber.ROUND_CEIL);
         }
         return {
           accountAddress: account,
           loanId: e.loanId,
           loanAsset: loanAsset,
           collateralAsset: collateralAsset,
-          amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+          amount: e.principal.dividedBy(10 ** loanPrecision).dp(3, BigNumber.ROUND_CEIL),
           amountOwed: amountOwned,
           collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
           collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
@@ -1845,7 +1868,7 @@ export class TorqueProvider {
   };*/
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH; // || asset === Asset.WETH;
+    return asset === Asset.ETH || asset === Asset.WETH;
   };
 
   public isStableAsset = (asset: Asset): boolean => {
@@ -1971,7 +1994,7 @@ export class TorqueProvider {
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(asset);
       if (iTokenContract) {
-        let borrowRate = await iTokenContract.nextBorrowInterestRate.callAsync(new BigNumber("0"));
+        let borrowRate = await iTokenContract.borrowInterestRate.callAsync();
         borrowRate = borrowRate.dividedBy(10 ** 18);
 
         /*if (borrowRate.gt(new BigNumber(16))) {

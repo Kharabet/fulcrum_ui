@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -32,7 +31,7 @@ interface ILendTokenSelectorItemState {
   profit: BigNumber | null;
   balanceOfUser: BigNumber;
   iTokenAddress: string,
-  tickerSecondDiff: number;
+  tickerSecondDiff: BigNumber;
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: LendRequest | undefined;
@@ -55,7 +54,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       profit,
       balanceOfUser,
       iTokenAddress: "",
-      tickerSecondDiff: 0,
+      tickerSecondDiff: new BigNumber(0),
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined
@@ -74,9 +73,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     let profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
-    if (profit && profit.lt(0)) {
+    if (profit && profit.lt(0))
       profit = new BigNumber(0);
-    }
+
     const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
 
     const address = FulcrumProvider.Instance.contractsSource ?
@@ -90,7 +89,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       profit,
       balanceOfUser,
       iTokenAddress: address,
-      tickerSecondDiff: balanceOfUser.toNumber() * (interestRate.toNumber() / 100) / 365 / 24 / 60 / 60,
+      tickerSecondDiff: balanceOfUser.times(interestRate).dividedBy(100 * 365 * 24 * 60 * 60),
     });
 
     if (address !== "") {
@@ -214,7 +213,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                         {!this.state.isLoading ? (<div
                           title={`${this.state.balanceOfUser.toFixed(18)} ${this.props.asset}`}
                           className="token-selector-item__profit-value token-selector-item__balance-value"
-                        >{this.state.balanceOfUser.toFixed(2)} {this.props.asset}</div>)
+                        >{this.state.balanceOfUser.toFixed(2)}</div>)
                           : (<div className="token-selector-item__interest-rate-value"><Preloader width="74px" /></div>)}
                       </div>) : null}
                     <div className="token-selector-item__profit-container">
@@ -238,6 +237,14 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       </div>
     );
   }
+
+  // private onProfit = async (profit: BigNumber) => {
+  //   await FulcrumProvider.Instance.getLendProfit(this.props.asset).then(val => {
+  //     console.log("profit change\n" + new BigNumber(val!).dividedBy(profit).toFixed(8));
+  //     console.log(new Date().toLocaleString());
+
+  //   });
+  // }
 
   private renderActions = (isLendOnly: boolean) => {
     return isLendOnly ? (

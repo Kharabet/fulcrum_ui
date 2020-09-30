@@ -79,20 +79,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.baseTokens = [
         Asset.fWETH,
-        // Asset.DAI,
-        // Asset.USDC,
-        // Asset.SUSD,
         Asset.WBTC,
         Asset.LINK,
-        // Asset.MKR,
         Asset.ZRX,
-        // Asset.BAT,
-        // Asset.REP,
         Asset.KNC
       ];
       this.quoteTokens = [
         Asset.DAI,
-        /*Asset.SAI,*/
         Asset.USDC,
         Asset.SUSD,
         Asset.USDT
@@ -119,6 +112,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       Asset.DAI,
       Asset.USDC,
       Asset.USDT,
+      Asset.SUSD
     ]
 
     this.state = {
@@ -198,8 +192,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public render() {
 
-    const tvBaseToken = this.state.selectedMarket.baseToken === Asset.WETH ? Asset.ETH : this.state.selectedMarket.baseToken;
-    const tvQuoteToken = this.state.selectedMarket.quoteToken === Asset.WETH ? Asset.ETH : this.state.selectedMarket.quoteToken;
+    const tvBaseToken = this.checkWethOrFwethToken(this.state.selectedMarket.baseToken);
+    const tvQuoteToken = this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken);
 
     return (
       <div className="trade-page">
@@ -240,8 +234,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 </div>
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}
-                  tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken)}
-                  ownRowsData={this.state.ownRowsData.filter(e => (e.baseToken === this.state.selectedMarket.baseToken && e.quoteToken === this.state.selectedMarket.quoteToken))}
+                  tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken && e.quoteToken === this.state.selectedMarket.quoteToken )}
+                  ownRowsData={this.state.ownRowsData.filter(e =>
+                    ((this.checkWethOrFwethToken(e.baseToken) === this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) || e.baseToken === this.state.selectedMarket.baseToken)
+                      && (this.checkWethOrFwethToken(e.quoteToken) ===  this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) || e.quoteToken === this.state.selectedMarket.quoteToken)))}
                   changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
@@ -291,7 +287,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     );
   }
 
+  public checkWethOrFwethToken = (token: Asset) => {
+    return token === Asset.WETH ||
+      token === Asset.fWETH ? Asset.ETH : token;
+  }
+
   public onTabSelect = async (baseToken: Asset, quoteToken: Asset) => {
+
     const marketPair = {
       baseToken,
       quoteToken
@@ -307,15 +309,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.derivedUpdate();
   };
 
-  public onManageCollateralRequested = (request: ManageCollateralRequest) => {
+  public onManageCollateralRequested = async (request: ManageCollateralRequest) => {
     if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
       return;
     }
 
     if (request) {
-      this.onTabSelect(request.asset, request.collateralAsset);
-      this._isMounted && this.setState({
+      if (this.state.showMyTokensOnly) await this.onTabSelect(request.asset, request.collateralAsset);
+      await this._isMounted && this.setState({
         ...this.state,
         isManageCollateralModalOpen: true,
         loanId: request.loanId,
@@ -348,8 +350,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
 
     if (request) {
-
-      await this.onTabSelect(request.asset, request.quoteToken);
+      if (this.state.showMyTokensOnly) await this.onTabSelect(request.asset, request.quoteToken);
       await this._isMounted && this.setState({
         ...this.state,
         isTradeModalOpen: true,
@@ -420,8 +421,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         let value = new BigNumber(0);
         let collateral = new BigNumber(0);
         let openPrice = new BigNumber(0);
-        let startingValue = new BigNumber(0);
-        let currentValue = new BigNumber(0);
         let liquidationPrice = new BigNumber(0);
         let profit = new BigNumber(0);
 
@@ -441,9 +440,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           collateral = (collateralAssetAmount.times(currentCollateralToPrincipalRate)).minus(loanAssetAmount);
           openPrice = loan.loanData.startRate.div(10 ** 18).times(loanAssetPrecision).div(collateralAssetPrecision);
           liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-          startingValue = ((collateralAssetAmount).times(openPrice)).minus(loanAssetAmount);
-          currentValue = ((collateralAssetAmount).times(currentCollateralToPrincipalRate)).minus(loanAssetAmount);
-          profit = currentValue.minus(startingValue);
+          profit = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.loanAsset)) {
@@ -451,11 +448,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!.timeStamp;
             const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${loan.loanAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`);
             const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+            if (!swapToUsdHistoryRateResponse) continue;
             const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
             openPrice = openPrice.times(loanAssetUSDStartRate)
             const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(loan.loanAsset);
-            startingValue = startingValue.times(collateralToUSDCurrentRate);
-            currentValue = currentValue.times(collateralToUSDCurrentRate);
             profit = profit.times(collateralToUSDCurrentRate);
             value = value.times(collateralToUSDCurrentRate);
             collateral = collateral.times(collateralToUSDCurrentRate);
@@ -468,21 +464,19 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionValue = collateralAssetAmount.times(currentCollateralToPrincipalRate).minus(loanAssetAmount);
           openPrice = new BigNumber(10 ** 36).div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision)).div(10 ** 18);
           liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-          startingValue = collateralAssetAmount.minus(loanAssetAmount.div(openPrice));
-          currentValue = collateralAssetAmount.minus(loanAssetAmount.times(currentCollateralToPrincipalRate));
-          profit = startingValue.minus(currentValue);
+          profit = openPrice.minus(new BigNumber(1).div(currentCollateralToPrincipalRate)).times(positionValue);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
             const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
+            if (!tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)) continue;
             const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!.timeStamp;
             const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${loan.collateralAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`);
             const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+            if (!swapToUsdHistoryRateResponse) continue;
             const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
             openPrice = openPrice.times(loanAssetUSDStartRate)
             const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(loan.collateralAsset);
-            startingValue = startingValue.times(collateralToUSDCurrentRate);
-            currentValue = currentValue.times(collateralToUSDCurrentRate);
             profit = profit.times(collateralToUSDCurrentRate);
             value = value.times(collateralToUSDCurrentRate);
             collateral = collateral.times(collateralToUSDCurrentRate);

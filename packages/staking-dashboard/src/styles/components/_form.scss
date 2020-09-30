@@ -1,4 +1,5 @@
 .calculator {
+  position: relative;
   margin: auto;
   max-width: 725px;
   background-color: #ffffff;
@@ -7,6 +8,22 @@
   .calculator-row {
     display: flex;
     flex-direction: column;
+
+    &.rewards-container {
+      flex-direction: row;
+      justify-content: flex-start;
+
+      @media screen and (max-width: $width-max-sm) {
+        flex-direction: column;
+      }
+      button {
+        font-size: 14px;
+        line-height: 150%;
+        padding: 9px 24px;
+        height: initial;
+        min-width: initial;
+      }
+    }
     justify-content: space-between;
     &:not(:last-child) {
       border-bottom: 1px solid #e7ebf0;
@@ -23,18 +40,34 @@
     &.balance {
       flex-wrap: wrap;
       flex-direction: row;
-      > .balance-item {
+      padding: 24px;
+      border-bottom: none;
+      padding-bottom: 16px;
+      .balance-item {
         width: 100%;
         @media screen and (min-width: $width-min-xs) {
           width: 50%;
         }
       }
+      .balance-wrapper {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        background: #f5f7f9;
+        border-radius: 4px;
+        padding: 24px 24px 24px 24px;
+      }
     }
     .notice {
       text-align: center;
-      // padding: 0 25px;
+      padding: 10px 0px;
       font-size: 14px;
-      // margin: 0 auto;
+    }
+    .warning {
+      font-size: 14px;
+      color: #ff5c5c;
+      // font-weight: 600;
+      position: absolute;
     }
     .row-header {
       font-weight: 800;
@@ -43,6 +76,7 @@
       align-items: center;
       color: #283049;
       margin-bottom: 24px;
+      margin-left: 15px;
       @media screen and (min-width: $width-min-xs) {
         font-size: 16px;
       }
@@ -51,7 +85,7 @@
       }
     }
     .row-container {
-      margin-bottom: 32px;
+      margin-bottom: 34px;
     }
     .row-body {
       font-weight: 800;
@@ -66,7 +100,7 @@
         font-size: 36px;
       }
       @media screen and (max-width: $width-max-xs) {
-        font-size: 32px;
+        font-size: 26px;
       }
       .value {
         position: relative;
@@ -101,30 +135,61 @@
       }
     }
     .reward-item {
+      width: 50%;
       @media screen and (min-width: $width-min-sm) {
         padding-bottom: 12px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        width: 100%;
+        margin-bottom: 25px;
       }
       .row-body,
       .row-footer {
         color: $green-color;
       }
       .row-body {
-        padding-top: 0;
-        justify-content: space-between;
-      }
-      .row-footer {
-        margin-left: 8px;
-        @media screen and (min-width: $width-min-xs) {
-          margin-bottom: -13px;
+        padding-top: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .currency {
+          font-weight: 600;
+        }
+        .value {
+          position: relative;
+          &:before {
+            position: absolute;
+            content: "Estimated";
+            color: #758295;
+
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 15px;
+            left: 0;
+            top: -15px;
+          }
+        }
+
+        button {
+          margin-left: 20px;
+          @media screen and (min-width: $width-min-xs) {
+            margin-bottom: -13px;
+          }
+          @media screen and (max-width: $width-max-xs) {
+            margin-top: 10px;
+            margin-left: 10px;
+          }
         }
       }
     }
     .reward-content {
       display: flex;
       align-items: center;
+      margin-bottom: 20px;
+
       @media screen and (max-width: $width-max-xs) {
-        width: 100%;
-        margin-bottom: 24px;
+        margin-bottom: 0;
       }
     }
   }

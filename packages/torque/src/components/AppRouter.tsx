@@ -239,6 +239,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   public onProviderChanged = async (event: ProviderChangedEvent) => {
+
+    await this.checkGasTokenAllowance();
     await this._isMounted && this.setState({
       ...this.state,
       selectedProviderType: event.providerType,
@@ -251,5 +253,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
   public onRiskDisclosureRequestOpen = async () => {
     await this._isMounted && this.setState({ ...this.state, isRiskDisclosureModalOpen: true });
+  }
+  
+  private checkGasTokenAllowance = async () => {
+    const gasTokenAllowance = await TorqueProvider.Instance.getGasTokenAllowance();
+    localStorage.setItem('isGasTokenEnabled', gasTokenAllowance.gt(0) ? 'true' : 'false')
   }
 }
