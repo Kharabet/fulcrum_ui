@@ -10,7 +10,6 @@ export const iTokenList = [
   ["1","0x463538705e7d22aa7f03ebf8ab09b067e1001b54","0x514910771AF9Ca656af840dff83E8264EcF986CA","Fulcrum LINK iToken","iLINK","1"  ],
   ["1","0x7f3fe9d492a9a60aebb06d82cba23c6f32cad10b","0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e","Fulcrum YFI iToken","iYFI","1"  ],
   ["1","0x7e9997a38a439b2be7ed9c9c4628391d3e055d48","0xdac17f958d2ee523a2206206994597c13d831ec7","Fulcrum USDT iToken","iUSDT","1"  ],
-  ["1","0x7e9997a38a439b2be7ed9c9c4628391d3e055d48","0xdac17f958d2ee523a2206206994597c13d831ec7","Fulcrum USDT iToken","iUSDT","1"  ],
 
   ["1","0x14094949152EDDBFcd073717200DA82fEd8dC960","0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359","Fulcrum SAI iToken v1","iSAIv1","1"  ],
   ["1","0x493c57c4763932315a328269e1adad09653b9081","0x6b175474e89094c44da98b954eedeac495271d0f","Fulcrum DAI iTokenv","iDAIv1","1"  ],

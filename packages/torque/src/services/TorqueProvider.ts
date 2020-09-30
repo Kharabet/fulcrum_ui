@@ -1430,14 +1430,14 @@ export class TorqueProvider {
         if (amountOwned.lte(0)) {
           amountOwned = new BigNumber(0);
         } else {
-          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
+          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(3, BigNumber.ROUND_CEIL);
         }
         return {
           accountAddress: account,
           loanId: e.loanId,
           loanAsset: loanAsset,
           collateralAsset: collateralAsset,
-          amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+          amount: e.principal.dividedBy(10 ** loanPrecision).dp(3, BigNumber.ROUND_CEIL),
           amountOwed: amountOwned,
           collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
           collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
@@ -1994,7 +1994,7 @@ export class TorqueProvider {
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(asset);
       if (iTokenContract) {
-        let borrowRate = await iTokenContract.nextBorrowInterestRate.callAsync(new BigNumber("0"));
+        let borrowRate = await iTokenContract.borrowInterestRate.callAsync();
         borrowRate = borrowRate.dividedBy(10 ** 18);
 
         /*if (borrowRate.gt(new BigNumber(16))) {

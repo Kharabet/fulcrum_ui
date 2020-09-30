@@ -18,7 +18,7 @@ export interface IProviderMenuProps {
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
   const context = useWeb3React()
-  const { connector, library, account, activate, deactivate, active, error } = context
+  const { connector, account, activate, deactivate, active, error } = context
 
   // handle logic to recognize the connector currently being activated
   //@ts-ignore
@@ -57,7 +57,6 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       const currentConnector = ProviderTypeDictionary.getConnectorByProviderType(e);
       const activating = currentConnector === activatingConnector
       const connected = currentConnector === connector && active
-      const disabled = !!activatingConnector || connected || !!error
       return < ProviderMenuListItem
         key={e}
         providerType={e}

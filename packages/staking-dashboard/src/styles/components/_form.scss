@@ -1,4 +1,5 @@
 .calculator {
+  position: relative;
   margin: auto;
   max-width: 725px;
   background-color: #ffffff;
@@ -7,6 +8,7 @@
   .calculator-row {
     display: flex;
     flex-direction: column;
+
     &.rewards-container {
       flex-direction: row;
       justify-content: flex-start;
@@ -63,7 +65,7 @@
     }
     .warning {
       font-size: 14px;
-      color: #FF5C5C;
+      color: #ff5c5c;
       // font-weight: 600;
       position: absolute;
     }
