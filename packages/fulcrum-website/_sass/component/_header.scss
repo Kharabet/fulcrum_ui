@@ -72,11 +72,11 @@
   }
 }
 
-.active-url{
+.active-url {
   position: relative;
-  &:before{
-    @media(min-width: 768px){
-      content: '';
+  &:before {
+    @media (min-width: 768px) {
+      content: "";
       position: absolute;
       width: 60px;
       height: 8px;
@@ -87,7 +87,7 @@
       border-radius: 6px;
       top: -48px;
     }
-    @media(min-width: 992px){
+    @media (min-width: 992px) {
       top: -67px;
     }
   }
@@ -98,5 +98,11 @@
     position: absolute;
     top: -6px;
     left: -16px;
+  }
+}
+
+.switch-menu {
+  @media (max-width: 1409px) {
+    width: 100%;
   }
 }
