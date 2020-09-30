@@ -32,17 +32,7 @@ layout: home
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
                                         <li class="li-options" data-asset="{{ product.name }}">
-                                                                        {% if product.name == "lend" %}
-                            <div class="lend-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% elsif  product.name == "bzrx" %}
-                            <div class="bzrx-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% else %}
-                                {% include svg/{{ product.name }}.svg %}
-                            {% endif %}
+                                            {% include svg/{{ product.name }}.svg %}
                                             {{ product.name }}
                                         </li>
                                     {% endfor %}
@@ -67,17 +57,7 @@ layout: home
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
                                         <li class="li-options" data-asset="{{ product.name }}">
-                                                                        {% if product.name == "lend" %}
-                            <div class="lend-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% elsif  product.name == "bzrx" %}
-                            <div class="bzrx-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% else %}
-                                {% include svg/{{ product.name }}.svg %}
-                            {% endif %}
+                                            {% include svg/{{ product.name }}.svg %}
                                             {{ product.name }}
                                         </li>
                                     {% endfor %}
@@ -117,17 +97,7 @@ layout: home
                     {% for product in site.data.products %}
                         <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="{{ product.name }}">
                             <div class="icon-50 mr-15 mr-xl-10 mr-xs-9 ">
-                            {% if product.name == "lend" %}
-                            <div class="lend-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% elsif  product.name == "bzrx" %}
-                            <div class="bzrx-gradient">
-                              {% include svg/{{ product.name }}.svg %}
-                            </div>
-                            {% else %}
                                 {% include svg/{{ product.name }}.svg %}
-                            {% endif %}                              
                             </div>
                             <div class="wrap-apr-value">
                                 <p class="lh-100 fw-700 c-gray">{{ product.name }}</p>
