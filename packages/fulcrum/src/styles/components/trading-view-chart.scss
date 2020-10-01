@@ -15,7 +15,12 @@
     z-index: 2;
     background-color: var(--primary-bg);
   }
-  @media only screen and (min-width: $mobile-version-max-width) {
+  @media only screen and (min-width: $breakpoint-laptop-min) and (max-height: 820px) {
+    margin-top: -25px;
+    margin-bottom: 5px;
+    height: 30vh;
+  }
+  @media only screen and (min-width: $breakpoint-desktop-min) {
     min-height: 400px;
   }
 }
