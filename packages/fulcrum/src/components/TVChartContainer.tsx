@@ -80,7 +80,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			"header_screenshot",
 			'use_localstorage_for_settings',
 			"header_fullscreen_button", "go_to_date",
-			"timeframes_toolbar"
+			//"timeframes_toolbar"
 		],
 		libraryPath: '/charting_library/',
 		chartsStorageUrl: 'https://saveload.tradingview.com',
@@ -125,6 +125,14 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			overrides: localStorage.theme === "dark" ? {
 				"paneProperties.background": "#283038"
 			} : {},
+			time_frames: [
+				{ text: "1d", resolution: "15", description: "1 Day" },
+				{ text: "1w", resolution: "60", description: "1 Week" },
+				{ text: "1m", resolution: "360", description: "1 Month" },
+				{ text: "1y", resolution: "720", description: "1 Year" },
+				{ text: "3y", resolution: "720", description: "3 Years" },
+			],
+
 			custom_css_url: this.props.custom_css_url
 		};
 	}
