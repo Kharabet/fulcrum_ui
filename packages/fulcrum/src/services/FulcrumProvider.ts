@@ -2175,16 +2175,16 @@ export class FulcrumProvider {
   }
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
-    await this.processQueue(false, false);
+    await this.processQueue(requestTask.request.id, false, false);
   };
 
   public onTaskRetry = async (requestTask: RequestTask, skipGas: boolean) => {
-    await this.processQueue(true, skipGas);
+    await this.processQueue(requestTask.request.id, true, skipGas);
   };
 
   public onTaskCancel = async (requestTask: RequestTask) => {
     await this.cancelRequestTask(requestTask);
-    await this.processQueue(false, false);
+    await this.processQueue(requestTask.request.id, false, false);
   };
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
@@ -2192,11 +2192,11 @@ export class FulcrumProvider {
       this.isProcessing = true;
 
       try {
-        const task = TasksQueue.Instance.peek();
+        const task = TasksQueue.Instance.peek(requestTask.request.id);
 
         if (task) {
           if (task.request.id === requestTask.request.id) {
-            TasksQueue.Instance.dequeue();
+            TasksQueue.Instance.dequeue(task.request.id);
           }
         }
       } finally {
@@ -2205,42 +2205,40 @@ export class FulcrumProvider {
     }
   };
 
-  private processQueue = async (force: boolean, skipGas: boolean) => {
-    if (!(this.isProcessing || this.isChecking)) {
+  private processQueue = async (taskId: number, force: boolean, skipGas: boolean) => {
+    if (!(this.isChecking)) {
       let forceOnce = force;
-      do {
-        this.isProcessing = true;
-        this.isChecking = false;
+      this.isProcessing = true;
+      this.isChecking = false;
 
-        try {
-          const task = TasksQueue.Instance.peek();
+      try {
+        const task = TasksQueue.Instance.peek(taskId);
 
-          if (task) {
-            if (task.status === RequestStatus.FAILED_SKIPGAS) {
-              task.status = RequestStatus.FAILED;
+        if (task) {
+          if (task.status === RequestStatus.FAILED_SKIPGAS) {
+            task.status = RequestStatus.FAILED;
+          }
+          if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
+            await this.processRequestTask(task, skipGas);
+            // @ts-ignore
+            if (task.status === RequestStatus.DONE) {
+              TasksQueue.Instance.dequeue(task.request.id);
             }
-            if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
-              await this.processRequestTask(task, skipGas);
-              // @ts-ignore
-              if (task.status === RequestStatus.DONE) {
-                TasksQueue.Instance.dequeue();
-              }
-            } else {
-              if (task.status === RequestStatus.FAILED && !forceOnce) {
-                this.isProcessing = false;
-                this.isChecking = false;
-                break;
-              }
+          } else {
+            if (task.status === RequestStatus.FAILED && !forceOnce) {
+              this.isProcessing = false;
+              this.isChecking = false;
             }
           }
-        } finally {
-          forceOnce = false;
-          this.isChecking = true;
-          this.isProcessing = false;
         }
-      } while (TasksQueue.Instance.any());
-      this.isChecking = false;
+      } finally {
+        forceOnce = false;
+        this.isChecking = true;
+        this.isProcessing = false;
+      }
     }
+    this.isChecking = false;
+
   };
 
   private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -2290,13 +2288,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-        }
-        }
-        }
-        } catch(e) {
-        // console.log(e);
-        }
-        }*/
+                                            }
+                                            }
+                                            }
+                                            } catch(e) {
+                                            // console.log(e);
+                                            }
+                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
