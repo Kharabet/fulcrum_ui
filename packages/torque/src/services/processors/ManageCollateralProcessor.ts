@@ -13,7 +13,7 @@ export class ManageCollateralProcessor {
 
     // Initializing loan
     const taskRequest: ManageCollateralRequest = (task.request as ManageCollateralRequest);
-    const isETHCollateralAsset = TorqueProvider.Instance.isETHAsset(taskRequest.loanOrderState.collateralAsset);
+    const isETHCollateralAsset = TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset);
 
     if (isETHCollateralAsset) {
       task.processingStart([
@@ -41,7 +41,7 @@ export class ManageCollateralProcessor {
       throw new Error("No bzxContract contract available!");
     }
 
-    const collateralPrecision = AssetsDictionary.assets.get(taskRequest.loanOrderState.collateralAsset)!.decimals || 18;
+    const collateralPrecision = AssetsDictionary.assets.get(taskRequest.collateralAsset)!.decimals || 18;
     let collateralAmountInBaseUnits = taskRequest.collateralAmount.multipliedBy(10 ** collateralPrecision);
     const collateralAmountInBaseUnitsValue = new BigNumber(collateralAmountInBaseUnits.toFixed(0, 1));
     collateralAmountInBaseUnits = new BigNumber(collateralAmountInBaseUnits.toFixed(0, 1));
@@ -51,7 +51,7 @@ export class ManageCollateralProcessor {
       let tokenErc20Contract: erc20Contract | null = null;
       let assetErc20Address: string | null = "";
       let erc20allowance = new BigNumber(0);
-      assetErc20Address = TorqueProvider.Instance.getErc20AddressOfAsset(taskRequest.loanOrderState.collateralAsset);
+      assetErc20Address = TorqueProvider.Instance.getErc20AddressOfAsset(taskRequest.collateralAsset);
       if (assetErc20Address) {
         tokenErc20Contract = await TorqueProvider.Instance.contractsSource.getErc20Contract(assetErc20Address);
       } else {
@@ -71,7 +71,7 @@ export class ManageCollateralProcessor {
       // Waiting for token allowance
       task.processingStepNext();
       if (collateralAmountInBaseUnits.gt(erc20allowance)) {
-        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.loanOrderState.collateralAsset, collateralAmountInBaseUnits), { from: account });
+        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.collateralAsset, collateralAmountInBaseUnits), { from: account });
         await TorqueProvider.Instance.waitForTransactionMined(approveHash);
       }
     }
@@ -85,7 +85,7 @@ export class ManageCollateralProcessor {
     if (!taskRequest.isWithdrawal) {
       try {
         const gasAmount = await bZxContract.depositCollateral.estimateGasAsync(
-          taskRequest.loanOrderState.loanData!.loanId,
+          taskRequest.loanId,
           collateralAmountInBaseUnits,
           {
             from: account,
@@ -103,7 +103,7 @@ export class ManageCollateralProcessor {
 
       try {
         txHash = await bZxContract.depositCollateral.sendTransactionAsync(
-          taskRequest.loanOrderState.loanData!.loanId,           // loanId
+          taskRequest.loanId,           // loanId
           collateralAmountInBaseUnits,                           // depositAmount
           {
             from: account,
@@ -124,7 +124,7 @@ export class ManageCollateralProcessor {
 
       try {
         const gasAmount = await bZxContract.withdrawCollateral.estimateGasAsync(
-          taskRequest.loanOrderState.loanData!.loanId,
+          taskRequest.loanId,
           account,
           collateralAmountInBaseUnits,
           {
@@ -141,7 +141,7 @@ export class ManageCollateralProcessor {
       try {
 
         txHash = await bZxContract.withdrawCollateral.sendTransactionAsync(
-          taskRequest.loanOrderState.loanData!.loanId,                                // loanId
+          taskRequest.loanId,                                // loanId
           account,                                                                    // trader
           collateralAmountInBaseUnits,                                                // depositAmount
           {
