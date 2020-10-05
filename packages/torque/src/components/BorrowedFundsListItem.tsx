@@ -5,8 +5,8 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TorqueProvider } from "../services/TorqueProvider";
+import { TasksQueue } from "../services/TasksQueue";
 import { Rail } from "./Rail";
-
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
@@ -55,8 +55,16 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
 
   }
+  public async componentDidMount() {
+    const task = await TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.state.borrowedFundsItem.loanId);
+    const isLoadingTransaction = task && !task.error ? true : false;
+    const request = task ? task.request as BorrowRequest | ExtendLoanRequest | ManageCollateralRequest | RepayLoanRequest : undefined;
+    this.setState({
+      ...this.state,
+      isLoadingTransaction,
+      request
+    });
 
-  public componentDidMount(): void {
     this.derivedUpdate();
   }
 

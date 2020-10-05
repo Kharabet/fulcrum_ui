@@ -8,6 +8,7 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { TasksQueue } from "../services/TasksQueue";
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
@@ -32,14 +33,14 @@ export interface IInnerOwnTokenGridRowProps {
   isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | ManageCollateralRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
 
 }
 
 interface IInnerOwnTokenGridRowState {
   isLoading: boolean;
   isLoadingTransaction: boolean;
-  request: TradeRequest | undefined;
+  request: TradeRequest | ManageCollateralRequest | undefined;
   valueChange: BigNumber;
   resultTx: boolean;
 }
@@ -82,6 +83,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       openValue = this.props.loan.loanData!.principal.times(10 ** (18 - loanAssetDecimals)).div(10 ** 18).times(this.props.openPrice);
       valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
     }
+
 
     this._isMounted && this.setState({
       ...this.state,
@@ -144,8 +146,17 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     }
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
+
+    const task = await TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.loan.loanId);
+    const isLoadingTransaction = task && !task.error ? true : false;
+    const request = task ? task.request as TradeRequest | ManageCollateralRequest : undefined;
+    this.setState({
+      ...this.state,
+      isLoadingTransaction,
+      request
+    });
 
     this.derivedUpdate();
   }
@@ -159,7 +170,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
           ? <React.Fragment>
             <div className="token-selector-item__image">
               <CircleLoader></CircleLoader>
-              <TradeTxLoaderStep taskId={this.state.request.loanId} />
+              <TradeTxLoaderStep taskId={this.state.request.id} />
             </div>
           </React.Fragment>
           : <div className={`inner-own-token-grid-row`}>
@@ -253,29 +264,18 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    const request = new TradeRequest(
+    const request = new ManageCollateralRequest(
       this.props.loan.loanId,
-      TradeType.SELL,
       this.props.baseToken,
       this.props.quoteToken,
-      this.props.quoteToken,
-      this.props.positionType,
-      this.props.leverage,
-      new BigNumber(0)
-    )
+      this.props.loan.collateralAmount,
+      false
+    );
 
     await this.setState({ ...this.state, request: request });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
 
-    this.props.onManageCollateralOpen(
-      new ManageCollateralRequest(
-        this.props.loan.loanId,
-        this.props.baseToken,
-        this.props.quoteToken,
-        this.props.loan.collateralAmount,
-        false
-      )
-    );
+    this.props.onManageCollateralOpen(request);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx);
   };
 
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
