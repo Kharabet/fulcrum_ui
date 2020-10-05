@@ -6,6 +6,7 @@ import { FulcrumProvider } from "../FulcrumProvider";
 import { PositionType } from "../../domain/PositionType";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { Asset } from "../../domain/Asset";
+import { TradeType } from "../../domain/TradeType";
 
 export class TradeSellProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -20,6 +21,7 @@ export class TradeSellProcessor {
 
     const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans())
       .find(l => l.loanId === taskRequest.loanId);
+
     if (!loan || !loan.loanData)
       throw new Error("No loan available!");
 
@@ -30,23 +32,23 @@ export class TradeSellProcessor {
       amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     }
     else {
-      const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
-      amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(taskRequest.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
+      // const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
+      // const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
+      // const currentCollateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
+      // const maxRequestAmount = loan.loanData.collateral.div(10 ** collateralAssetDecimals).times(currentCollateralToPrincipalRate).minus(loan.loanData.principal.div(10 ** loanAssetDecimals));
 
-      const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
-      const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
-
-      const currentCollateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
-      const maxRequestAmount = loan.loanData.collateral.div(10 ** collateralAssetDecimals).times(currentCollateralToPrincipalRate).minus(loan.loanData.principal.div(10 ** loanAssetDecimals));
-      amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(taskRequest.amount.div(maxRequestAmount)).toFixed(0, 1));
+      const maxTradeValueUI = await FulcrumProvider.Instance.getMaxTradeValue(TradeType.SELL,
+        loan.loanAsset,
+        loan.collateralAsset,
+        taskRequest.returnTokenIsCollateral ? loan.collateralAsset : loan.loanAsset,
+        taskRequest.positionType,
+        loan);
+      amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(taskRequest.amount.div(maxTradeValueUI)).toFixed(0, 1));
     }
 
-    let maxAmountInBaseUnits = new BigNumber(0);
-    if (loan) {
-      maxAmountInBaseUnits = loan.loanData!.collateral;
-    }
+    let maxAmountInBaseUnits = loan.loanData.collateral;
 
-    if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01)) {
+    if ((maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.05)) {
       console.log("close full amount")
       amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
     }

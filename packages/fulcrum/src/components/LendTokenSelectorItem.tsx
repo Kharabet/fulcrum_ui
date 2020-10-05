@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -252,7 +251,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       <div className="token-selector-item__actions" style={{ marginTop: `-1.5rem` }}>
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-full"
-          onClick={this.onLendClick} disabled={true}
+          onClick={this.onLendClick} disabled={this.props.asset === Asset.SAI}
         >
           Lend
         </button>
@@ -261,7 +260,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         <div className="token-selector-item__actions">
           <button
             className="token-selector-item__lend-button token-selector-item__lend-button--size-half"
-            onClick={this.onLendClick} disabled={true}
+            onClick={this.onLendClick} disabled={this.props.asset === Asset.SAI}
           >
             Lend
         </button>

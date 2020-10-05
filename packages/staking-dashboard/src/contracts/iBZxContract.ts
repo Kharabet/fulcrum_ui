@@ -1135,7 +1135,7 @@ export class iBZxContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).withdrawCollateral.estimateGasAsync.bind(self, loanId, withdrawAmount)
+                (self as any).withdrawCollateral.estimateGasAsync.bind(self, loanId, receiver, withdrawAmount)
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
@@ -1236,7 +1236,7 @@ export class iBZxContract extends BaseContract {
             return result;
         }
     };
-    
+
     public rewardsBalanceOf = {
         async callAsync(
             user: string,
@@ -1264,7 +1264,7 @@ export class iBZxContract extends BaseContract {
             return result;
         }
     };
-    
+
     public claimRewards = {
         async sendTransactionAsync(
             receiver: string,

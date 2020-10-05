@@ -16,7 +16,6 @@ import React, { Component } from "react";
 import TagManager from 'react-gtm-module';
 
 import { DashboardPage } from '../pages/DashboardPage';
-import { TransactionsPage } from '../pages/TransactionsPage';
 import { Footer } from '../layout/Footer';
 import { BrowserRouter as Router, Switch, Route, } from "react-router-dom";
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types';
