@@ -26,9 +26,6 @@ interface IFormState {
   bzrxStakingBalance: BigNumber;
   bptStakingBalance: BigNumber;
   vBzrxStakingBalance: BigNumber;
-  iEthBalance: BigNumber;
-  iETHSwapRate: BigNumber;
-  whitelistAmount: BigNumber;
   claimableAmount: BigNumber;
   userEarnings: BigNumber;
   canOptin: boolean;
@@ -56,9 +53,6 @@ export class Form extends Component<{}, IFormState> {
       bzrxStakingBalance: new BigNumber(0),
       vBzrxStakingBalance: new BigNumber(0),
       bptStakingBalance: new BigNumber(0),
-      iEthBalance: new BigNumber(0),
-      iETHSwapRate: new BigNumber(0),
-      whitelistAmount: new BigNumber(0),
       claimableAmount: new BigNumber(0),
       canOptin: false,
       isFindRepresentativeOpen: false,
@@ -85,8 +79,6 @@ export class Form extends Component<{}, IFormState> {
     let selectedRepAddress = "";
     this.isAlreadyRepresentative = await StakingProvider.Instance.checkIsRep();
 
-    //  const otherRepsList = repsList.slice(3, sortedList.length);
-
     const bzrxV1Balance = (await StakingProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
     const bzrxBalance = (await StakingProvider.Instance.stakeableByAsset(Asset.BZRX)).div(10 ** 18);
     const vBzrxBalance = (await StakingProvider.Instance.stakeableByAsset(Asset.vBZRX)).div(10 ** 18);
@@ -94,7 +86,6 @@ export class Form extends Component<{}, IFormState> {
     const bptBalance = networkName === "kovan"
       ? (await StakingProvider.Instance.stakeableByAsset(Asset.BPT)).div(10 ** 6)
       : (await StakingProvider.Instance.stakeableByAsset(Asset.BPT)).div(10 ** 18);
-    //const iEthBalance = (await StakingProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
 
     const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.BZRX)).div(10 ** 18);
     const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.vBZRX)).div(10 ** 18);
@@ -139,11 +130,6 @@ export class Form extends Component<{}, IFormState> {
 
     const userEarnings = await StakingProvider.Instance.getUserEarnings();
     const rebateRewards = (await StakingProvider.Instance.getRebateRewards()).div(10 ** 18);
-    // const canOptin = await StakingProvider.Instance.canOptin();
-    // let claimableAmount = await StakingProvider.Instance.isClaimable();
-    // if (claimableAmount.gt(0)) {
-    //   claimableAmount = claimableAmount.div(10 ** 18)
-    // }
 
     this._isMounted && this.setState({
       ...this.state,
@@ -177,13 +163,6 @@ export class Form extends Component<{}, IFormState> {
     const receipt = await StakingProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
     await this.derivedUpdate();
   }
-  /*public onIETHtoVBZRXConvertClick = async () => {
-    const swapAmountAllowed = !this.state.whitelistAmount.eq(0) && this.state.whitelistAmount.lt(this.state.iEthBalance) ?
-      this.state.whitelistAmount :
-      this.state.iEthBalance;
-    const receipt = await StakingProvider.Instance.convertIETHToVBZRX(swapAmountAllowed.times(10 ** 18));
-    await this.derivedUpdate();
-  }*/
 
   public onOptinClick = async () => {
     const receipt = await StakingProvider.Instance.doOptin();
@@ -253,28 +232,16 @@ export class Form extends Component<{}, IFormState> {
   };
 
   private getRepInfo = async (item: any, index: number): Promise<IRep> => {
-    // const profile = await (await fetch(`https://cors-anywhere.herokuapp.com/https://ipfs.3box.io/profile?address=${item.wallet}`, {
-    //   body: JSON.stringify({ "addressList": item.wallet, "didList": [] }
-    //   ), method: 'POST', headers: { 'Content-Type': 'application/json' }
-    // })).json();
     let name, imageSrc;
-    const lsItem = StakingProvider.getLocalstorageItem(`name${item.wallet}`);
-
-
-    if (!lsItem) {
-      const profile = await Box.getProfile(item.wallet);
-      name = profile.name ? profile.name : this.getShortHash(item.wallet, 4);
-      imageSrc = profile.image ?
-        `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl["/"]}`
-        : index % 3 === 0 ?
-          Representative1
-          : index % 2 === 0 ?
-            Representative2 :
-            Representative3;
-    } else {
-      name = lsItem;
-    }
-
+    const profile = await Box.getProfile(item.wallet);
+    name = profile.name ? profile.name : this.getShortHash(item.wallet, 4);
+    imageSrc = profile.image ?
+      `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl["/"]}`
+      : index % 3 === 0 ?
+        Representative1
+        : index % 2 === 0 ?
+          Representative2 :
+          Representative3;
 
     return {
       ...item,
@@ -287,7 +254,6 @@ export class Form extends Component<{}, IFormState> {
   private getRepsInfo = async (repsBaseInfoList: IRep[]): Promise<IRep[]> => {
     let repsList: IRep[] = [];
     // TODO: track CORS issue https://github.com/3box/3box-js/issues/649 
-    // const profiles = await Box.getProfiles(repsBaseInfoList.map(e => e.wallet));
     const profiles = await (await fetch("https://cors-anywhere.herokuapp.com/https://ipfs.3box.io/profileList", {
       body: JSON.stringify({ "addressList": repsBaseInfoList.map(e => e.wallet), "didList": [] }
       ), method: 'POST', headers: { 'Content-Type': 'application/json' }
@@ -320,11 +286,6 @@ export class Form extends Component<{}, IFormState> {
   };
 
   public render() {
-    // console.log(this.state.whitelistAmount.toString(), this.state.iEthBalance.toString());
-
-    /*const swapAmountAllowed = !this.state.whitelistAmount.eq(0) && this.state.whitelistAmount.lt(this.state.iEthBalance) ?
-      this.state.whitelistAmount :
-      this.state.iEthBalance;*/
 
     const etherscanURL = StakingProvider.Instance.web3ProviderSettings
       ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
