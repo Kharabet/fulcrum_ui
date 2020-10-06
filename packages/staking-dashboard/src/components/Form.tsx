@@ -93,8 +93,6 @@ export class Form extends Component<{}, IFormState> {
     const bptStakingBalance = networkName === "kovan"
       ? (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 6)
       : (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 18);
-
-
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
@@ -106,13 +104,35 @@ export class Form extends Component<{}, IFormState> {
       bptStakingBalance
     })
 
-    const repsList = await StakingProvider.Instance.getRepresentatives() as IRep[];
-    const sortedList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()).slice(0, 3);
-    const topRepsList = await Promise.all(sortedList.map((rep, index) => this.getRepInfo(rep, index)));
+    const repsList = (await StakingProvider.Instance.getRepresentatives() as IRep[]).map((rep, i) => {
+      rep.index = i;
+      rep.imageSrc = i % 3 === 0 ?
+        Representative1
+        : i % 2 === 0 ?
+          Representative2 :
+          Representative3;
+      rep.name = this.getShortHash(rep.wallet, 4);
+      return rep;
+    });
 
+    let topRepsList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()).slice(0, 3);
     this._isMounted && this.setState({
       ...this.state,
       repsList,
+      topRepsList,
+    })
+
+    const userEarnings = await StakingProvider.Instance.getUserEarnings();
+    const rebateRewards = (await StakingProvider.Instance.getRebateRewards()).div(10 ** 18);
+    this._isMounted && this.setState({
+      ...this.state,
+      userEarnings,
+      rebateRewards
+    })
+
+    topRepsList = await Promise.all(topRepsList.map((rep, index) => this.getRepInfo(rep, index)));
+    this._isMounted && this.setState({
+      ...this.state,
       topRepsList,
     })
 
@@ -126,15 +146,6 @@ export class Form extends Component<{}, IFormState> {
       ...this.state,
       delegateAddress,
       selectedRepAddress,
-    })
-
-    const userEarnings = await StakingProvider.Instance.getUserEarnings();
-    const rebateRewards = (await StakingProvider.Instance.getRebateRewards()).div(10 ** 18);
-
-    this._isMounted && this.setState({
-      ...this.state,
-      userEarnings,
-      rebateRewards
     })
 
   }
@@ -231,17 +242,13 @@ export class Form extends Component<{}, IFormState> {
     });
   };
 
-  private getRepInfo = async (item: any, index: number): Promise<IRep> => {
+  private getRepInfo = async (item: IRep, index: number): Promise<IRep> => {
     let name, imageSrc;
     const profile = await Box.getProfile(item.wallet);
-    name = profile.name ? profile.name : this.getShortHash(item.wallet, 4);
+    name = profile.name ? profile.name : item.name;
     imageSrc = profile.image ?
       `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl["/"]}`
-      : index % 3 === 0 ?
-        Representative1
-        : index % 2 === 0 ?
-          Representative2 :
-          Representative3;
+      : item.imageSrc;
 
     return {
       ...item,
@@ -252,35 +259,17 @@ export class Form extends Component<{}, IFormState> {
   };
 
   private getRepsInfo = async (repsBaseInfoList: IRep[]): Promise<IRep[]> => {
-    let repsList: IRep[] = [];
     // TODO: track CORS issue https://github.com/3box/3box-js/issues/649 
     const profiles = await (await fetch("https://cors-anywhere.herokuapp.com/https://ipfs.3box.io/profileList", {
       body: JSON.stringify({ "addressList": repsBaseInfoList.map(e => e.wallet), "didList": [] }
       ), method: 'POST', headers: { 'Content-Type': 'application/json' }
     })).json();
-    repsBaseInfoList.forEach((repBaseInfo: {
-      wallet: string;
-      BZRX: BigNumber;
-      vBZRX: BigNumber;
-      LPToken: BigNumber;
-    }, i: number) => {
-      const name = profiles[repBaseInfo.wallet] && profiles[repBaseInfo.wallet].name ? profiles[repBaseInfo.wallet].name : this.getShortHash(repBaseInfo.wallet, 4);
-      const imageSrc = profiles[repBaseInfo.wallet] && profiles[repBaseInfo.wallet].image ?
+    const repsList = repsBaseInfoList.map(repBaseInfo => {
+      repBaseInfo.name = profiles[repBaseInfo.wallet] && profiles[repBaseInfo.wallet].name ? profiles[repBaseInfo.wallet].name : this.getShortHash(repBaseInfo.wallet, 4);
+      repBaseInfo.imageSrc = profiles[repBaseInfo.wallet] && profiles[repBaseInfo.wallet].image ?
         `https://ipfs.infura.io/ipfs/${profiles[repBaseInfo.wallet].image[0].contentUrl["/"]}`
-        : i % 3 === 0 ?
-          Representative1
-          : i % 2 === 0 ?
-            Representative2 :
-            Representative3;
-      repsList.push({
-        index: i,
-        wallet: repBaseInfo.wallet,
-        BZRX: repBaseInfo.BZRX,
-        vBZRX: repBaseInfo.vBZRX,
-        LPToken: repBaseInfo.LPToken,
-        name,
-        imageSrc
-      })
+        : repBaseInfo.imageSrc;
+      return repBaseInfo;
     });
     return repsList;
   };
