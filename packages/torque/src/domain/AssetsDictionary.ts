@@ -1,25 +1,25 @@
 import { Asset } from "./Asset";
 import { AssetDetails } from "./AssetDetails";
 
-import bat_logo, {ReactComponent as BATLogo} from "../assets/images/ic_token_bat.svg";
-import btc_logo, {ReactComponent as BTCLogo} from "../assets/images/ic_token_btc.svg";
-import dai_logo, {ReactComponent as DAILogo} from "../assets/images/ic_token_dai.svg";
-import eth_logo, {ReactComponent as ETHLogo} from "../assets/images/ic_token_eth.svg";
-import knc_logo, {ReactComponent as KNCLogo} from "../assets/images/ic_token_knc.svg";
-import link_logo, {ReactComponent as LINKLogo} from "../assets/images/ic_token_link.svg";
-import mkr_logo, {ReactComponent as MKRLogo} from "../assets/images/ic_token_mkr.svg";
-import rep_logo, {ReactComponent as REPLogo} from "../assets/images/ic_token_rep.svg";
-import sai_logo, {ReactComponent as SAILogo} from "../assets/images/ic_token_sai.svg";
-import susd_logo, {ReactComponent as SUSDLogo} from "../assets/images/ic_token_susd.svg";
-import usdt_logo, {ReactComponent as USDTLogo} from "../assets/images/ic_token_usdt.svg";
-import usdc_logo, {ReactComponent as USDCLogo} from "../assets/images/ic_token_usdc.svg";
-import zrx_logo, {ReactComponent as ZRXLogo} from "../assets/images/ic_token_zrx.svg";
-import weth_logo, {ReactComponent as WETHLogo} from "../assets/images/ic_token_weth.svg";
-import chai_logo, {ReactComponent as CHAILogo} from "../assets/images/ic_token_chai.svg";
-import chi_logo, {ReactComponent as CHILogo} from "../assets/images/ic_token_chi.svg";
-import bzrx_logo, {ReactComponent as BZRXLogo} from "../assets/images/ic_token_bzrx.svg";
-import yfi_logo, {ReactComponent as YFILogo} from "../assets/images/ic_token_yfi.svg";
-import lend_logo, {ReactComponent as LENDLogo} from "../assets/images/ic_token_lend.svg";
+import bat_logo, { ReactComponent as BATLogo } from "../assets/images/ic_token_bat.svg";
+import btc_logo, { ReactComponent as BTCLogo } from "../assets/images/ic_token_btc.svg";
+import dai_logo, { ReactComponent as DAILogo } from "../assets/images/ic_token_dai.svg";
+import eth_logo, { ReactComponent as ETHLogo } from "../assets/images/ic_token_eth.svg";
+import knc_logo, { ReactComponent as KNCLogo } from "../assets/images/ic_token_knc.svg";
+import link_logo, { ReactComponent as LINKLogo } from "../assets/images/ic_token_link.svg";
+import mkr_logo, { ReactComponent as MKRLogo } from "../assets/images/ic_token_mkr.svg";
+import rep_logo, { ReactComponent as REPLogo } from "../assets/images/ic_token_rep.svg";
+import sai_logo, { ReactComponent as SAILogo } from "../assets/images/ic_token_sai.svg";
+import susd_logo, { ReactComponent as SUSDLogo } from "../assets/images/ic_token_susd.svg";
+import usdt_logo, { ReactComponent as USDTLogo } from "../assets/images/ic_token_usdt.svg";
+import usdc_logo, { ReactComponent as USDCLogo } from "../assets/images/ic_token_usdc.svg";
+import zrx_logo, { ReactComponent as ZRXLogo } from "../assets/images/ic_token_zrx.svg";
+import weth_logo, { ReactComponent as WETHLogo } from "../assets/images/ic_token_weth.svg";
+import chai_logo, { ReactComponent as CHAILogo } from "../assets/images/ic_token_chai.svg";
+import chi_logo, { ReactComponent as CHILogo } from "../assets/images/ic_token_chi.svg";
+import bzrx_logo, { ReactComponent as BZRXLogo } from "../assets/images/ic_token_bzrx.svg";
+import yfi_logo, { ReactComponent as YFILogo } from "../assets/images/ic_token_yfi.svg";
+import lend_logo, { ReactComponent as LENDLogo } from "../assets/images/ic_token_lend.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -135,7 +135,7 @@ export class AssetsDictionary {
         "#884294",
         "#FFFFFF",
         "#FFFFFF",
-        "#E9CAEE",
+        "#966AFF",
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG token instead
@@ -158,7 +158,7 @@ export class AssetsDictionary {
         "#2A5ADA",
         "#ffffff",
         "#ffffff",
-        "#B9E9FF",
+        "#03288B",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
           [3, ""],
@@ -181,7 +181,7 @@ export class AssetsDictionary {
         "#8777B1",
         "#FFFFFF",
         "#FFFFFF",
-        "#E1FFC4",
+        "#70E000",
         new Map<number, string | null>([
           [1, "0xdac17f958d2ee523a2206206994597c13d831ec7"],
           [3, ""],
@@ -227,7 +227,7 @@ export class AssetsDictionary {
         "#8777B1",
         "#FFFFFF",
         "#FFFFFF",
-        "#FFE9BE",
+        "#F8A608",
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
           [3, "0xf80a32a835f79d7787e8a8ee5721d0feafd78108"],
@@ -275,7 +275,7 @@ export class AssetsDictionary {
         "#00000000",
         "#444e5a",
         "#acb5c2",
-        "#C8E0FA",
+        "#85D3FF",
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using eng
@@ -321,7 +321,7 @@ export class AssetsDictionary {
         "#FFFFFF",
         "#444e5a",
         "#acb5c2",
-        "#ECECEC",
+        "#B0B0B0",
         new Map<number, string | null>([
           [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
           [3, "0xc778417e063141139fce010982780140aa0cd5ab"],
@@ -345,7 +345,7 @@ export class AssetsDictionary {
         "#FFFFFF",
         "#444e5a",
         "#acb5c2",
-        "#ECECEC",
+        "#B0B0B0",
         new Map<number, string | null>([
           [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
           [3, "0xc778417e063141139fce010982780140aa0cd5ab"],
@@ -369,7 +369,7 @@ export class AssetsDictionary {
         "#FFFFFF",
         "#444e5a",
         "#acb5c2",
-        "#ECECEC",
+        "#B0B0B0",
         new Map<number, string | null>([
           [42, "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc"]
         ])
@@ -390,7 +390,7 @@ export class AssetsDictionary {
         "#49BC98",
         "#FFFFFF",
         "#FFFFFF",
-        "#B4EAD9",
+        "#3BD8A7",
         new Map<number, string | null>([
           [1, "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"],
           [3, "0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6"],
@@ -413,7 +413,7 @@ export class AssetsDictionary {
         "#00BB99",
         "#FFFFFF",
         "#FFFFFF",
-        "#CAF6D7",
+        "#028858",
         new Map<number, string | null>([
           [1, "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"],
           [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"], // using omg token instead
@@ -484,7 +484,7 @@ export class AssetsDictionary {
         "#7368D0",
         "#FFFFFF",
         "#FFFFFF",
-	      "#D8D3FF",
+        "#0056D7",
         new Map<number, string | null>([
           [1, "0x56d811088235F11C8920698a204A5010a788f4b3"],
           [3, ""],
@@ -507,7 +507,7 @@ export class AssetsDictionary {
         "#7368D0",
         "#FFFFFF",
         "#FFFFFF",
-	      "#D8D3FF",
+        "#3D97FF",
         new Map<number, string | null>([
           [1, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e"],
           [3, ""],
@@ -530,7 +530,7 @@ export class AssetsDictionary {
         "#7368D0",
         "#FFFFFF",
         "#FFFFFF",
-	      "#D8D3FF",
+        "#00EFEF",
         new Map<number, string | null>([
           [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
           [3, ""],
@@ -581,7 +581,7 @@ export class AssetsDictionaryMobile {
         "#884294",
         "#FFFFFF",
         "#FFFFFF",
-        "#E9CAEE",
+        "#966AFF",
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using eng token instead
@@ -604,7 +604,7 @@ export class AssetsDictionaryMobile {
         "#2A5ADA",
         "#FFFFFF",
         "#FFFFFF",
-        "#B9E9FF",
+        "#03288B",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
           [3, ""],
@@ -627,7 +627,7 @@ export class AssetsDictionaryMobile {
         "#8777B1",
         "#FFFFFF",
         "#FFFFFF",
-        "#E1FFC4",
+        "#70E000",
         new Map<number, string | null>([
           [1, "0xdac17f958d2ee523a2206206994597c13d831ec7"],
           [3, ""],
@@ -673,7 +673,7 @@ export class AssetsDictionaryMobile {
         "#8777B1",
         "#FFFFFF",
         "#FFFFFF",
-        "#FFE9BE",
+        "#F8A608",
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
           [3, "0xf80a32a835f79d7787e8a8ee5721d0feafd78108"],
@@ -721,7 +721,7 @@ export class AssetsDictionaryMobile {
         "#00000000",
         "#444e5a",
         "#acb5c2",
-        "#C8E0FA",
+        "#85D3FF",
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG
@@ -767,7 +767,7 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         "#444e5a",
         "#333",
-        "#ECECEC",
+        "#B0B0B0",
         new Map<number, string | null>([
           [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
           [3, "0xc778417e063141139fce010982780140aa0cd5ab"],
@@ -791,7 +791,7 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         "#444e5a",
         "#acb5c2",
-        "#ECECEC",
+        "#B0B0B0",
         new Map<number, string | null>([
           [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
           [3, "0xc778417e063141139fce010982780140aa0cd5ab"],
@@ -815,7 +815,7 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         "#444e5a",
         "#acb5c2",
-        "#ECECEC",
+        "#B0B0B0",
         new Map<number, string | null>([
           [42, "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc"]
         ])
@@ -836,7 +836,7 @@ export class AssetsDictionaryMobile {
         "#49BC98",
         "#FFFFFF",
         "#FFFFFF",
-        "#B4EAD9",
+        "#3BD8A7",
         new Map<number, string | null>([
           [1, "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"],
           [3, "0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6"],
@@ -859,7 +859,7 @@ export class AssetsDictionaryMobile {
         "#00BB99",
         "#FFFFFF",
         "#FFFFFF",
-        "#CAF6D7",
+        "#028858",
         new Map<number, string | null>([
           [1, "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"],
           [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"], // using OMG token instead
@@ -929,7 +929,7 @@ export class AssetsDictionaryMobile {
         "#7368D0",
         "#FFFFFF",
         "#FFFFFF",
-	      "#D8D3FF",
+        "#0056D7",
         new Map<number, string | null>([
           [1, "0x56d811088235F11C8920698a204A5010a788f4b3"],
           [3, ""],
@@ -952,7 +952,7 @@ export class AssetsDictionaryMobile {
         "#7368D0",
         "#FFFFFF",
         "#FFFFFF",
-	      "#D8D3FF",
+        "#3D97FF",
         new Map<number, string | null>([
           [1, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e"],
           [3, ""],
@@ -975,7 +975,7 @@ export class AssetsDictionaryMobile {
         "#7368D0",
         "#FFFFFF",
         "#FFFFFF",
-	      "#D8D3FF",
+        "#00EFEF",
         new Map<number, string | null>([
           [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
           [3, ""],

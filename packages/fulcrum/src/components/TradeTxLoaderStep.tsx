@@ -3,7 +3,6 @@ import { RequestTask } from "../domain/RequestTask";
 import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
 import { TasksQueue } from "../services/TasksQueue";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { toChecksumAddress } from "web3-utils";
 
 export interface ITitle {
   message: string;
@@ -11,7 +10,7 @@ export interface ITitle {
 }
 
 export interface ITradeTxLoaderStepProps {
-  taskId: string;
+  taskId: number;
 }
 
 export interface ITradeTxLoaderStepState {
@@ -25,7 +24,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
     super(props);
 
     this.state = {
-      requestTask: TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId),
+      requestTask: TasksQueue.Instance.getTasksList().find(t => t.request.id === this.props.taskId),
       title: null,
       complete: false
     };
@@ -69,12 +68,8 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       div.classList.remove("animation-out");
       div.classList.add("animation-out");
     }
-
     TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
     TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
-    if (this.state.requestTask)
-      FulcrumProvider.Instance.onTaskCancel(this.state.requestTask);
-
   }
 
 
@@ -136,8 +131,8 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
   }
 
   public onTasksQueueChanged = async () => {
-
-    const task = TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId);
+    const taskList = TasksQueue.Instance.getTasksList();
+    const task = taskList.find(t => t.request.id === this.props.taskId);
     let title = this.getTitle(task);
     if (!title && this.state.requestTask?.status == "Done")
       title = { message: "Updating data", isWarning: false };

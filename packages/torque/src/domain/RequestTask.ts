@@ -11,14 +11,14 @@ import { RefinanceCompoundRequest } from "./RefinanceCompoundRequest";
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null;
 
-  public readonly request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | RefinanceMakerRequest | RefinanceCompoundRequest;
+  public readonly request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest;
   public status: RequestStatus;
   public steps: string[];
   public stepCurrent: number;
   public txHash: string | null;
   public error: Error | null;
 
-  constructor(request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | RefinanceMakerRequest | RefinanceCompoundRequest) {
+  constructor(request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest) {
     this.request = request;
     this.status = RequestStatus.AWAITING;
     this.steps = ["Preparing processing..."];
