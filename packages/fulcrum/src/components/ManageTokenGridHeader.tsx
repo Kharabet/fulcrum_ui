@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 export interface IManageTokenGridHeaderProps {
-  isMobileMedia: boolean;
   isShowHistory: boolean;
   updateStateisShowHistory: (updatedState: boolean) => void;
 }
@@ -29,15 +28,11 @@ export class ManageTokenGridHeader extends Component<IManageTokenGridHeaderProps
     this._isMounted = false;
   }
 
-  public componentDidUpdate(prevState: Readonly<IManageTokenGridHeaderProps>): void {
-    if (prevState.isShowHistory !== this.state.isShowHistory)
-      this.props.updateStateisShowHistory(this.state.isShowHistory);
-  }
 
   public render() {
     return (
       <React.Fragment>
-        {this.props.isMobileMedia && <div className="manage-token-grid__title">Manage</div>}
+
         <div className="manage-token-grid__group-tabs">
           <div className={`tab ${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</div>
           <div className={`tab ${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</div>
@@ -46,10 +41,12 @@ export class ManageTokenGridHeader extends Component<IManageTokenGridHeaderProps
     );
   }
   private onShowHistory = () => {
+    this.props.updateStateisShowHistory(true);
     this._isMounted && this.setState({ ...this.state, isShowHistory: true });
   };
 
   private onShowOpenPositions = () => {
+    this.props.updateStateisShowHistory(false);
     this._isMounted && this.setState({ ...this.state, isShowHistory: false });
   };
 }

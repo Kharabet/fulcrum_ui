@@ -118,7 +118,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   public async componentDidMount() {
     this._isMounted = true;
     const task = await TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.loan.loanId);
-    const isLoadingTransaction = task!.error ? true : false;
+    const isLoadingTransaction = task && task.error ? true : false;
     const request = task ? task.request as TradeRequest | ManageCollateralRequest : undefined;
     this.setState({ ...this.state, resultTx: true, isLoadingTransaction, request });
     this.derivedUpdate();

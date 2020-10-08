@@ -27,7 +27,7 @@ import { TradeEvent } from "../domain/events/TradeEvent";
 import { LiquidationEvent } from "../domain/events/LiquidationEvent";
 import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
 
-import ManageTokenGrid from '../components/ManageTokenGrid';
+import { ManageTokenGrid } from '../components/ManageTokenGrid';
 import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
 import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -51,6 +51,7 @@ interface ITradePageState {
   selectedMarket: IMarketPair;
   showMyTokensOnly: boolean;
   isTradeModalOpen: boolean;
+  isShowHistory: boolean;
   tradeType: TradeType;
   tradePositionType: PositionType;
   tradeLeverage: number;
@@ -122,6 +123,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       },
       loans: undefined,
       showMyTokensOnly: false,
+      isShowHistory: false,
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
       // defaultquoteToken: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
@@ -183,11 +185,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     const ownRowsData = await this.getOwnRowsData(this.state);
     await this._isMounted && this.setState({ ...this.state, tokenRowsData, ownRowsData });
-    let historyEvents = undefined;
-    if (this.state.showMyTokensOnly) {
-      historyEvents = await this.getHistoryEvents(this.state);
-      await this._isMounted && this.setState({ ...this.state, historyEvents });
-    }
+
+    const historyEvents = await this.getHistoryEvents(this.state);
+    await this._isMounted && this.setState({ ...this.state, historyEvents });
+
   }
 
   public render() {
@@ -207,9 +208,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             quoteTokens={this.quoteTokens}
             selectedMarket={this.state.selectedMarket}
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
+            onShowHistory={this.onShowHistory}
             onMarketSelect={this.onTabSelect}
             isMobile={this.props.isMobileMedia}
             isShowMyTokensOnly={this.state.showMyTokensOnly}
+            isShowHistory={this.state.isShowHistory}
             openedPositionsCount={this.state.openedPositionsCount}
           />
           {/* <ManageButton 
@@ -217,17 +220,19 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
             /> */}
 
-          {this.state.showMyTokensOnly ? (
+
+          {this.state.showMyTokensOnly ?
             <ManageTokenGrid
               isMobileMedia={this.props.isMobileMedia}
               ownRowsData={this.state.ownRowsData}
               historyEvents={this.state.historyEvents}
+              isShowHistory={this.state.isShowHistory}
               stablecoins={this.stablecoins}
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
               openedPositionsLoaded={this.state.openedPositionsLoaded}
-            />
-          ) : (
+            /> :
+            (
               <React.Fragment>
                 <div className="chart-wrapper">
                   <TVChartContainer symbol={`${tvBaseToken}_${tvQuoteToken}`} preset={this.props.isMobileMedia ? "mobile" : undefined} />
@@ -299,8 +304,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       baseToken,
       quoteToken
     }
-    await this._isMounted && this.setState({ ...this.state, selectedMarket: marketPair });
+    await this._isMounted && this.setState({ ...this.state, selectedMarket: marketPair, showMyTokensOnly: false });
   };
+
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
@@ -379,6 +385,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this._isMounted && this.setState({
       ...this.state,
       showMyTokensOnly: value
+    });
+  };
+
+  public onShowHistory = async (value: boolean) => {
+    await this._isMounted && this.setState({
+      ...this.state,
+      isShowHistory: value
     });
   };
 
