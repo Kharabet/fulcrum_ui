@@ -39,7 +39,10 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
   public componentDidMount(): void {
     this.getRepresentative();
   }
-
+  public componentDidUpdate(prevProps: IFindRepresentativeProps): void {
+    if (this.props.representative !== prevProps.representative)
+      this.getRepresentative();
+  }
   public render() {
     const searchValue = this.state.searchValue.toLowerCase();
     const representativeData = this.state.representative
