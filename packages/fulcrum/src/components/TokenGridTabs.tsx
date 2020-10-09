@@ -97,6 +97,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
           <div className="trade-token-grid-tab__items">
             {/* {this.props.assets.map(asset => (this.renderAsset(asset)))} */}
             <ManageTokenGridHeader
+              {...this.props}
               isShowHistory={this.state.isShowHistory}
               updateStateisShowHistory={this.updateStateisShowHistory} />
 
