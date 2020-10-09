@@ -204,9 +204,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.props.leverage - 1).times(10 ** 18))
       : new BigNumber(10 ** 38).div(new BigNumber(this.props.leverage).times(10 ** 18))
+    const maintenanceMargin = this.props.loan && this.props.loan.loanData!.maintenanceMargin || new BigNumber("15000000000000000000");
     // liq_price_before_trade = (15000000000000000000 * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     //if it's a SHORT then -> 10^36 / above
-    const liquidationPriceBeforeTrade = ((new BigNumber("15000000000000000000").times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18))).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
+    const liquidationPriceBeforeTrade = (maintenanceMargin.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18)).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
     const liquidationPrice = this.props.positionType === PositionType.LONG
       ? liquidationPriceBeforeTrade.div(10 ** 18)
       : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
