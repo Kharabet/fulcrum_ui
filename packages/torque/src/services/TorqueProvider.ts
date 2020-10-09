@@ -58,12 +58,12 @@ import { BorrowProcessor } from "./processors/BorrowProcessor";
 import { RepayLoanProcessor } from "./processors/RepayLoanProcessor";
 import { ExtendLoanProcessor } from "./processors/ExtendLoanProcessor";
 import { ManageCollateralProcessor } from "./processors/ManageCollateralProcessor";
-import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
-import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
-import { RefinanceCompoundRequest } from "../domain/RefinanceCompoundRequest";
-import { RefinanceCompoundProcessor } from "./processors/RefinanceCompoundProcessor";
-import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
-import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
+// import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
+// import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
+// import { RefinanceCompoundRequest } from "../domain/RefinanceCompoundRequest";
+// import { RefinanceCompoundProcessor } from "./processors/RefinanceCompoundProcessor";
+// import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
+// import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -363,6 +363,26 @@ export class TorqueProvider {
     }
 
     return result;
+  }
+
+  public async getGasTokenAllowance(): Promise<BigNumber> {
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+      if (account) {
+        const assetAddress = this.getErc20AddressOfAsset(Asset.CHI);
+        if (assetAddress) {
+          const tokenContract = await this.contractsSource.getErc20Contract(assetAddress);
+          if (tokenContract) {
+            result = await tokenContract.allowance.callAsync(account, "0x55eb3dd3f738cfdda986b8eff3fa784477552c61")
+          }
+        }
+      }
+    }
+
+    return result
   }
 
   public getBorrowDepositEstimate = async (
@@ -1410,14 +1430,14 @@ export class TorqueProvider {
         if (amountOwned.lte(0)) {
           amountOwned = new BigNumber(0);
         } else {
-          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
+          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(3, BigNumber.ROUND_CEIL);
         }
         return {
           accountAddress: account,
           loanId: e.loanId,
           loanAsset: loanAsset,
           collateralAsset: collateralAsset,
-          amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+          amount: e.principal.dividedBy(10 ** loanPrecision).dp(3, BigNumber.ROUND_CEIL),
           amountOwed: amountOwned,
           collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
           collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
@@ -1974,7 +1994,7 @@ export class TorqueProvider {
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(asset);
       if (iTokenContract) {
-        let borrowRate = await iTokenContract.nextBorrowInterestRate.callAsync(new BigNumber("0"));
+        let borrowRate = await iTokenContract.borrowInterestRate.callAsync();
         borrowRate = borrowRate.dividedBy(10 ** 18);
 
         /*if (borrowRate.gt(new BigNumber(16))) {
@@ -2066,35 +2086,35 @@ export class TorqueProvider {
     }
   };
 
-  public onMigrateMakerLoan = async (request: RefinanceMakerRequest) => {
-    if (request) {
-      TasksQueue.Instance.enqueue(new RequestTask(request));
-    }
-  };
+  // public onMigrateMakerLoan = async (request: RefinanceMakerRequest) => {
+  //   if (request) {
+  //     TasksQueue.Instance.enqueue(new RequestTask(request));
+  //   }
+  // };
 
-  public onMigrateCompoundLoan = async (request: RefinanceCompoundRequest) => {
-    if (request) {
-      TasksQueue.Instance.enqueue(new RequestTask(request));
-    }
-  };
+  // public onMigrateCompoundLoan = async (request: RefinanceCompoundRequest) => {
+  //   if (request) {
+  //     TasksQueue.Instance.enqueue(new RequestTask(request));
+  //   }
+  // };
 
-  public onMigrateSoloLoan = async (request: RefinanceDydxRequest) => {
-    if (request) {
-      TasksQueue.Instance.enqueue(new RequestTask(request));
-    }
-  };
+  // public onMigrateSoloLoan = async (request: RefinanceDydxRequest) => {
+  //   if (request) {
+  //     TasksQueue.Instance.enqueue(new RequestTask(request));
+  //   }
+  // };
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
-    await this.processQueue(false, false);
+    await this.processQueue(requestTask.request.id, false, false);
   };
 
   public onTaskRetry = async (requestTask: RequestTask, skipGas: boolean) => {
-    await this.processQueue(true, skipGas);
+    await this.processQueue(requestTask.request.id, true, skipGas);
   };
 
   public onTaskCancel = async (requestTask: RequestTask) => {
     await this.cancelRequestTask(requestTask);
-    await this.processQueue(false, false);
+    await this.processQueue(requestTask.request.id, false, false);
   };
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
@@ -2102,11 +2122,11 @@ export class TorqueProvider {
     this.isProcessing = true;
 
     try {
-      const task = TasksQueue.Instance.peek();
+      const task = TasksQueue.Instance.peek(requestTask.request.id);
 
       if (task) {
         if (task.request.id === requestTask.request.id) {
-          TasksQueue.Instance.dequeue();
+          TasksQueue.Instance.dequeue(task.request.id);
         }
       }
     } finally {
@@ -2115,40 +2135,37 @@ export class TorqueProvider {
     // }
   };
 
-  private processQueue = async (force: boolean, skipGas: boolean) => {
-    if (!(this.isProcessing || this.isChecking)) {
+  private processQueue = async (taskId: number, force: boolean, skipGas: boolean) => {
+    if (!this.isChecking) {
       let forceOnce = force;
-      do {
-        this.isProcessing = true;
-        this.isChecking = false;
+      this.isProcessing = true;
+      this.isChecking = false;
 
-        try {
-          const task = TasksQueue.Instance.peek();
+      try {
+        const task = TasksQueue.Instance.peek(taskId);
 
-          if (task) {
-            if (task.status === RequestStatus.FAILED_SKIPGAS) {
-              task.status = RequestStatus.FAILED;
+        if (task) {
+          if (task.status === RequestStatus.FAILED_SKIPGAS) {
+            task.status = RequestStatus.FAILED;
+          }
+          if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
+            await this.processRequestTask(task, skipGas);
+            // @ts-ignore
+            if (task.status === RequestStatus.DONE) {
+              TasksQueue.Instance.dequeue(task.request.id);
             }
-            if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
-              await this.processRequestTask(task, skipGas);
-              // @ts-ignore
-              if (task.status === RequestStatus.DONE) {
-                TasksQueue.Instance.dequeue();
-              }
-            } else {
-              if (task.status === RequestStatus.FAILED && !forceOnce) {
-                this.isProcessing = false;
-                this.isChecking = false;
-                break;
-              }
+          } else {
+            if (task.status === RequestStatus.FAILED && !forceOnce) {
+              this.isProcessing = false;
+              this.isChecking = false;
             }
           }
-        } finally {
-          forceOnce = false;
-          this.isChecking = true;
-          this.isProcessing = false;
         }
-      } while (TasksQueue.Instance.any());
+      } finally {
+        forceOnce = false;
+        this.isChecking = true;
+        this.isProcessing = false;
+      }
       this.isChecking = false;
     }
   };
@@ -2188,20 +2205,20 @@ export class TorqueProvider {
         await processor.run(task, account, skipGas);
       }
 
-      if (task.request instanceof RefinanceMakerRequest) {
-        processor = new RefinanceMakerProcessor();
-        await processor.run(task, skipGas, configAddress, web3);
-      }
+      // if (task.request instanceof RefinanceMakerRequest) {
+      //   processor = new RefinanceMakerProcessor();
+      //   await processor.run(task, skipGas, configAddress, web3);
+      // }
 
-      if (task.request instanceof RefinanceCompoundRequest) {
-        processor = new RefinanceCompoundProcessor();
-        await processor.run(task, account, skipGas);
-      }
+      // if (task.request instanceof RefinanceCompoundRequest) {
+      //   processor = new RefinanceCompoundProcessor();
+      //   await processor.run(task, account, skipGas);
+      // }
 
-      if (task.request instanceof RefinanceDydxRequest) {
-        processor = new RefinanceDydxProcessor();
-        await processor.run(task, account, skipGas);
-      }
+      // if (task.request instanceof RefinanceDydxRequest) {
+      //   processor = new RefinanceDydxProcessor();
+      //   await processor.run(task, account, skipGas);
+      // }
 
       task.processingEnd(true, false, null);
     } catch (e) {

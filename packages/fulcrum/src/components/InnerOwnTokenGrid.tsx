@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { InnerOwnTokenGridHeader } from "./InnerOwnTokenGridHeader";
 import { InnerOwnTokenGridRow } from "./InnerOwnTokenGridRow";
 import { TradeRequest } from "../domain/TradeRequest";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 
 import "../styles/components/inner-own-token-grid.scss";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
@@ -9,8 +10,8 @@ import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 export interface IInnerOwnTokenGridProps {
   isMobileMedia: boolean;
   ownRowsData: IOwnTokenGridRowProps[];
-  request: TradeRequest | undefined;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+  request: TradeRequest | ManageCollateralRequest | undefined;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | ManageCollateralRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
   isLoadingTransaction: boolean;
 }
 

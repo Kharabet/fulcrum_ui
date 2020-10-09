@@ -66,7 +66,7 @@ interface ITradePageState {
   historyEvents: IHistoryEvents | undefined;
   tradeRequestId: number;
   isLoadingTransaction: boolean;
-  request: TradeRequest | undefined,
+  request: TradeRequest | ManageCollateralRequest | undefined,
   resultTx: boolean,
   isTxCompleted: boolean,
   activePositionType: PositionType
@@ -234,10 +234,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 </div>
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}
-                  tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken)}
+                  tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken && e.quoteToken === this.state.selectedMarket.quoteToken)}
                   ownRowsData={this.state.ownRowsData.filter(e =>
                     ((this.checkWethOrFwethToken(e.baseToken) === this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) || e.baseToken === this.state.selectedMarket.baseToken)
-                      && (this.checkWethOrFwethToken(e.quoteToken) ===  this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) || e.quoteToken === this.state.selectedMarket.quoteToken)))}
+                      && (this.checkWethOrFwethToken(e.quoteToken) === this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) || e.quoteToken === this.state.selectedMarket.quoteToken)))}
                   changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
@@ -275,6 +275,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           >
             <ManageCollateralForm
               loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
+              request={this.state.request as ManageCollateralRequest}
               onSubmit={this.onManageCollateralConfirmed}
               onCancel={this.onManageCollateralRequestClose}
               isOpenModal={this.state.isManageCollateralModalOpen}
@@ -308,7 +309,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
   };
-
   public onManageCollateralRequested = async (request: ManageCollateralRequest) => {
     if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
@@ -320,20 +320,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       await this._isMounted && this.setState({
         ...this.state,
         isManageCollateralModalOpen: true,
-        loanId: request.loanId,
-        tradeRequestId: request.id
+        loanId: request.loanId
       });
     }
   };
 
-  public onManageCollateralConfirmed = (request: ManageCollateralRequest) => {
-    FulcrumProvider.Instance.onManageCollateralConfirmed(request);
-    this._isMounted && this.setState({
-      ...this.state,
-      loanId: request.loanId,
-      isManageCollateralModalOpen: false
-    });
+  public onManageCollateralConfirmed = async (request: ManageCollateralRequest) => {
+    await FulcrumProvider.Instance.onManageCollateralConfirmed(request);
+    this.onManageCollateralRequestClose();
   };
+
 
 
   public onManageCollateralRequestClose = () => {
@@ -394,7 +390,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
       this._isMounted && this.setState({ ...this.state, loans })
       for (const loan of loans) {
-
         if (!loan.loanData) continue;
 
         const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
@@ -564,7 +559,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     return tokenRowsData;
   };
 
-  public changeLoadingTransaction = (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => {
+  public changeLoadingTransaction = (isLoadingTransaction: boolean, request: TradeRequest | ManageCollateralRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => {
     this._isMounted && this.setState({ ...this.state, isLoadingTransaction: isLoadingTransaction, request: request, isTxCompleted: isTxCompleted, resultTx: resultTx })
   }
 

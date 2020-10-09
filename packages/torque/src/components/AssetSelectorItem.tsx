@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
-
+import { TasksQueue } from "../services/TasksQueue";
 import { ReactComponent as ArrowRight } from "../assets/images/ic_arrow_right.svg";
 import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -25,6 +25,7 @@ export interface IAssetSelectorItemProps {
 
 interface IAssetSelectorItemState {
   interestRate: BigNumber;
+  yieldApr: BigNumber;
   isLoadingTransaction: boolean;
   request: BorrowRequest | undefined;
 }
@@ -35,6 +36,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
     this.state = {
       interestRate: new BigNumber(0),
+      yieldApr: new BigNumber(0),
       isLoadingTransaction: false,
       request: undefined
     };
@@ -44,6 +46,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
+
+  private apiUrl = "https://api.bzx.network/v1";
+
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
     this.setState({ ...this.state, isLoadingTransaction: true })
@@ -74,7 +79,19 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
+    console.log(await TasksQueue.Instance.getTasksList());
+    const task = await TasksQueue.Instance.getTasksList().find(t => t.request instanceof BorrowRequest
+      && t.request.borrowAsset === this.props.asset
+      && t.request.loanId === "0x0000000000000000000000000000000000000000000000000000000000000000");
+    const isLoadingTransaction = task && !task.error ? true : false;
+    const request = task ? task.request as BorrowRequest : undefined;
+    this.setState({
+      ...this.state,
+      isLoadingTransaction,
+      request
+    });
+
     this.derivedUpdate();
   }
 
@@ -90,7 +107,13 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   private derivedUpdate = async () => {
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.asset);
-    this.setState({ ...this.state, interestRate: interestRate });
+    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`);
+    const yieldAPYJson = await yieldAPYRequest.json();
+    const yieldApr = yieldAPYJson.success && yieldAPYJson.data[this.props.asset.toLowerCase()]
+      ? new BigNumber(yieldAPYJson.data[this.props.asset.toLowerCase()])
+      : new BigNumber(0);
+
+    this.setState({ ...this.state, interestRate, yieldApr });
   };
 
   public render() {
@@ -111,12 +134,17 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
             <div className="asset-selector-item-content" onClick={this.onClick}>
               <div className="asset-selector-body">
                 <div className="asset-selector-row">
-                  <div className="asset-selector__interest-rate">
-                    <span className="asset-selector__interest-rate-value">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}</span>%
+
+                  <div className="asset-selector__apr">Est. Yield, vBZRX</div>
+                  <div title={this.state.yieldApr.toFixed(18)} className="asset-selector__interest-rate">
+                    <span className="asset-selector__interest-rate-value">{this.state.yieldApr.toFixed(0)}</span>%
                   </div>
                 </div>
                 <div className="asset-selector-row">
-                  <div className="asset-selector__apr">APR</div>
+                  <div className="asset-selector__apr grey">APR</div>&nbsp;
+                  <div className="asset-selector__fixed">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}<span>%</span></div>
+                </div>
+                <div className="asset-selector-row">
                   <div className="asset-selector__fixed">FIXED</div>
                 </div>
               </div>
