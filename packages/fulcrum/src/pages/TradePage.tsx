@@ -262,7 +262,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               baseToken={this.state.selectedMarket.baseToken}
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
-              quoteAsset={this.state.selectedMarket.quoteToken}
+              quoteToken={this.state.selectedMarket.quoteToken}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onTradeRequestClose}
             />
