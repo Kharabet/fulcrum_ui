@@ -28,15 +28,10 @@ export class TradeSellProcessor {
 
     let amountInBaseUnits = new BigNumber(0);
     if (isLong) {
-      const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
+      const decimals: number = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
       amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     }
     else {
-      // const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
-      // const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
-      // const currentCollateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
-      // const maxRequestAmount = loan.loanData.collateral.div(10 ** collateralAssetDecimals).times(currentCollateralToPrincipalRate).minus(loan.loanData.principal.div(10 ** loanAssetDecimals));
-
       const maxTradeValueUI = await FulcrumProvider.Instance.getMaxTradeValue(TradeType.SELL,
         loan.loanAsset,
         loan.collateralAsset,
@@ -46,7 +41,10 @@ export class TradeSellProcessor {
       amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(taskRequest.amount.div(maxTradeValueUI)).toFixed(0, 1));
     }
 
-    let maxAmountInBaseUnits = loan.loanData.collateral;
+    let maxAmountInBaseUnits = new BigNumber(0);
+    if (loan) {
+      maxAmountInBaseUnits = loan.loanData.collateral;
+    }
 
     if ((maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.05)) {
       console.log("close full amount")
