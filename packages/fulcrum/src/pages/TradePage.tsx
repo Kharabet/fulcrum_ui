@@ -56,7 +56,6 @@ interface ITradePageState {
   tradeLeverage: number;
   loanId?: string;
   loans: IBorrowedFundsState[] | undefined;
-
   isManageCollateralModalOpen: boolean;
 
   openedPositionsLoaded: boolean;
@@ -390,7 +389,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
-      this._isMounted && this.setState({ ...this.state, loans })
+      const loan = loans.find(loan =>
+        this.state.selectedMarket.baseToken === loan.loanAsset
+        && this.state.selectedMarket.quoteToken === loan.collateralAsset
+      );
+      const maintenanceMargin = loan && loan.loanData!.maintenanceMargin || new BigNumber("150000000000000000000");
+      const tokenRowsData = this.state.tokenRowsData.map(item => {
+        item.maintenanceMargin = maintenanceMargin;
+        return item;
+      });
+
+      this._isMounted && this.setState({ ...this.state, loans, tokenRowsData });
       for (const loan of loans) {
         if (!loan.loanData) continue;
 
@@ -429,7 +438,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const loanAssetAmount = loan.loanData.principal.div(10 ** 18).times(loanAssetPrecision);
         //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
         //If SHORT -> 10^36 / liquidation_collateralToLoanRate
-        const liquidation_collateralToLoanRate = (loan.loanData.maintenanceMargin.times(loan.loanData.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(loan.loanData.principal.times(loanAssetPrecision)).div(loan.loanData.collateral.times(collateralAssetPrecision)).times(10 ** 18);
+        const liquidation_collateralToLoanRate = (maintenanceMargin.times(loan.loanData.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(loan.loanData.principal.times(loanAssetPrecision)).div(loan.loanData.collateral.times(collateralAssetPrecision)).times(10 ** 18);
 
         if (positionType === PositionType.LONG) {
           positionValue = collateralAssetAmount;
@@ -536,10 +545,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
-    const currentloan = this.state.loans && this.state.loans.find(loan =>
-      loan.loanAsset == state.selectedMarket.baseToken
-      && loan.collateralAsset === state.selectedMarket.quoteToken);
-    const maintenanceMargin = currentloan && currentloan.loanData!.maintenanceMargin || new BigNumber("15000000000000000000");
+
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
       quoteToken: state.selectedMarket.quoteToken,
@@ -550,7 +556,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
-      maintenanceMargin
+      maintenanceMargin: new BigNumber(0)
     });
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
@@ -562,7 +568,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
-      maintenanceMargin
+      maintenanceMargin: new BigNumber(0)
     });
     return tokenRowsData;
   };
