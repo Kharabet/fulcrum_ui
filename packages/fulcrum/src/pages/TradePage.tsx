@@ -11,6 +11,7 @@ import { TVChartContainer } from '../components/TVChartContainer';
 import { TokenGridTabs } from "../components/TokenGridTabs";
 import { ITradeTokenGridRowProps } from "../components/TradeTokenGridRow";
 import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
+import { IHistoryTokenGridRowProps } from "../components/HistoryTokenGridRow";
 
 import { Asset } from "../domain/Asset";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
@@ -62,6 +63,7 @@ interface ITradePageState {
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
   historyEvents: IHistoryEvents | undefined;
+  historyRowsData: IHistoryTokenGridRowProps[];
   tradeRequestId: number;
   isLoadingTransaction: boolean;
   request: TradeRequest | ManageCollateralRequest | undefined,
@@ -132,6 +134,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       tokenRowsData: [],
       ownRowsData: [],
       historyEvents: undefined,
+      historyRowsData: [],
       tradeRequestId: 0,
       isLoadingTransaction: false,
       resultTx: true,
@@ -156,9 +159,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public async componentDidMount() {
+  public componentDidMount() {
     this._isMounted = true;
-    await this.getTokenRowsData(this.state);
+    this.derivedUpdate();
 
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
@@ -171,8 +174,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.getTokenRowsData(this.state);
     }
     if (prevState.isTxCompleted !== this.state.isTxCompleted ||
-      prevProps.isMobileMedia !== this.props.isMobileMedia ||
-      prevState.showMyTokensOnly !== this.state.showMyTokensOnly) {
+      prevProps.isMobileMedia !== this.props.isMobileMedia) {
       this.derivedUpdate();
     }
 
@@ -219,11 +221,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               isMobileMedia={this.props.isMobileMedia}
               ownRowsData={this.state.ownRowsData}
               historyEvents={this.state.historyEvents}
+              historyRowsData={this.state.historyRowsData}
               isShowHistory={this.state.isShowHistory}
               stablecoins={this.stablecoins}
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
               openedPositionsLoaded={this.state.openedPositionsLoaded}
+              updateHistoryRowsData={this.updateHistoryRowsData}
             /> :
             (
               <React.Fragment>
@@ -565,6 +569,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     });
     await this._isMounted && this.setState({ ...this.state, tokenRowsData })
   };
+
+  public updateHistoryRowsData = async (historyRowsData: IHistoryTokenGridRowProps[]) => {
+    await this._isMounted && this.setState({ ...this.state, historyRowsData })
+  }
 
   public changeLoadingTransaction = (isLoadingTransaction: boolean, request: TradeRequest | ManageCollateralRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => {
     this._isMounted && this.setState({ ...this.state, isLoadingTransaction: isLoadingTransaction, request: request, isTxCompleted: isTxCompleted, resultTx: resultTx })

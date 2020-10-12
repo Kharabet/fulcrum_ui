@@ -26,9 +26,11 @@ import { ReactComponent as Placeholder } from "../assets/images/history_placehol
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean;
   historyEvents: IHistoryEvents | undefined;
+  historyRowsData: IHistoryTokenGridRowProps[];
   stablecoins: Asset[];
   baseTokens: Asset[];
   quoteTokens: Asset[];
+  updateHistoryRowsData: (data: IHistoryTokenGridRowProps[]) => void;
 }
 
 interface IHistoryTokenGridState {
@@ -54,18 +56,47 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
 
   public componentDidMount(): void {
-    this.derivedUpdate();
-  }
+    if (!this.props.historyRowsData) {
+      this.getHistoryRowsData(this.state);
+    } else {
+      this.setState({
+        ...this.setState,
+        isLoading: true
+      });
+      const historyEvents = this.props.historyEvents;
+      if (!historyEvents) return;
+      const quantityEvents = Object.keys(historyEvents.groupedEvents).length;
+      if (!quantityEvents) return;
+      const quantityGrids = Math.floor(quantityEvents / this.quantityVisibleRow);
+      const isLastRow = quantityEvents === (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
 
-  public componentDidUpdate(prevProps: IHistoryTokenGridProps): void {
-    if (prevProps.historyEvents != this.props.historyEvents) {
-      this.derivedUpdate();
+      this.setState({
+        ...this.setState,
+        historyRowsData: this.props.historyRowsData,
+        quantityGrids,
+        isLastRow,
+        isLoading: false
+      });
     }
+
   }
 
-  private async derivedUpdate() {
-    const historyRowsData = await this.getHistoryRowsData(this.state);
-    await this.setState({ ...this.state, historyRowsData })
+  public componentDidUpdate(prevProps: IHistoryTokenGridProps, prevState: IHistoryTokenGridState): void {
+    if (prevProps.historyEvents !== this.props.historyEvents) {
+      this.getHistoryRowsData(this.state);
+    }
+    if (prevState.numberPagination !== this.state.numberPagination) {
+      const historyEvents = this.props.historyEvents;
+      if (!historyEvents) return;
+      const quantityEvents = Object.keys(historyEvents.groupedEvents).length;
+      if (!quantityEvents) return;
+      const isLastRow = quantityEvents === (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
+
+      this.setState({
+        ...this.setState,
+        isLastRow
+      });
+    }
   }
 
   public render() {
@@ -104,12 +135,11 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     );
   }
 
-  public getHistoryRowsData = async (state: IHistoryTokenGridState): Promise<IHistoryTokenGridRowProps[]> => {
+  public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
     this.setState({ ...this.state, isLoading: true });
     const historyRowsData: IHistoryTokenGridRowProps[] = [];
     const historyEvents = this.props.historyEvents;
-    if (!historyEvents) return [];
-
+    if (!historyEvents) return;
     const loanIds = Object.keys(historyEvents.groupedEvents);
 
     for (const loanId of loanIds) {
@@ -338,9 +368,15 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     const quantityGrids = Math.floor(quantityEvents / this.quantityVisibleRow);
     const isLastRow = quantityEvents === (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
 
-    this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow, isLoading: false });
+    await this.setState({
+      ...this.setState,
+      historyRowsData,
+      quantityGrids,
+      isLastRow,
+      isLoading: false
+    });
 
-    return historyRowsData;
+    await this.props.updateHistoryRowsData(historyRowsData);
   };
 
   public getAssetUSDRate = async (asset: Asset, date: Date) => {
