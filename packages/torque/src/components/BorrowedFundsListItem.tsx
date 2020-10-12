@@ -234,7 +234,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           </div>
           <div title={`$${this.state.liquidationPrice.toFixed()}`}
             className="borrowed-funds-list-item__body-collateralized-value">
-            Liquidation price: <span className="value">${this.state.liquidationPrice.toFixed(4)}</span>&nbsp;
+            Liq. Price:&nbsp;$<span className="value">{this.state.liquidationPrice.toFixed(2)}</span>
           </div>
         </div>
         {this.state.isInProgress ? (
