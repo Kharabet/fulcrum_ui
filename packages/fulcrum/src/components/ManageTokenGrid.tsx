@@ -20,8 +20,6 @@ export interface IManageTokenGridProps {
   openedPositionsLoaded: boolean;
 }
 
-
-
 export const ManageTokenGrid = (props: IManageTokenGridProps) => {
 
   return (
