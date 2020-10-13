@@ -161,8 +161,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public componentDidMount() {
     this._isMounted = true;
-    this.derivedUpdate();
-
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
@@ -537,7 +535,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     const events = tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents).concat(depositCollateralEvents).concat(withdrawCollateralEvents);
     //@ts-ignore
     const groupedEvents = groupBy(events.sort((a, b) => b.timeStamp.getTime() - a.timeStamp.getTime()), "loanId");
-
     const historyEvents = { groupedEvents, earnRewardEvents, payTradingFeeEvents };
     await this._isMounted && this.setState({ ...this.state, historyEvents });
 

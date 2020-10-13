@@ -50,25 +50,23 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       quantityGrids: 0,
       historyRowsData: [],
       isLastRow: false,
-      isLoading: true
+      isLoading: true,
+
     };
   }
 
 
   public componentDidMount(): void {
-    if (!this.props.historyRowsData) {
+    if (!this.props.historyRowsData.length) {
       this.getHistoryRowsData(this.state);
     } else {
-      this.setState({
-        ...this.setState,
-        isLoading: true
-      });
+      this.setState({ ...this.state, isLoading: true });
       const historyEvents = this.props.historyEvents;
       if (!historyEvents) return;
       const quantityEvents = Object.keys(historyEvents.groupedEvents).length;
       if (!quantityEvents) return;
       const quantityGrids = Math.floor(quantityEvents / this.quantityVisibleRow);
-      const isLastRow = quantityEvents === (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
+      const isLastRow = quantityEvents <= (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
 
       this.setState({
         ...this.setState,
@@ -90,7 +88,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       if (!historyEvents) return;
       const quantityEvents = Object.keys(historyEvents.groupedEvents).length;
       if (!quantityEvents) return;
-      const isLastRow = quantityEvents === (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
+      const isLastRow = quantityEvents <= (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
 
       this.setState({
         ...this.setState,
@@ -136,12 +134,12 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
+
     this.setState({ ...this.state, isLoading: true });
     const historyRowsData: IHistoryTokenGridRowProps[] = [];
     const historyEvents = this.props.historyEvents;
     if (!historyEvents) return;
     const loanIds = Object.keys(historyEvents.groupedEvents);
-
     for (const loanId of loanIds) {
       //@ts-ignore
       const events = historyEvents.groupedEvents[loanId].sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
@@ -366,7 +364,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     }
     const quantityEvents = Object.keys(historyEvents.groupedEvents).length;
     const quantityGrids = Math.floor(quantityEvents / this.quantityVisibleRow);
-    const isLastRow = quantityEvents === (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
+    const isLastRow = quantityEvents <= (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
 
     await this.setState({
       ...this.setState,
