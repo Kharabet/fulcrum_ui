@@ -88,8 +88,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 0, title: "Lend", link: "/lend", external: false },
         { id: 1, title: "Trade", link: "/trade", external: false },
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
-        { id: 3, title: "Stats", link: "/stats", external: false },
-        { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
+        { id: 3, title: "Staking", link: "https://staking.bzx.network", external: true },
+        { id: 4, title: "Stats", link: "/stats", external: false },
+        { id: 5, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
       ],
       onMenuToggle: this.onMenuToggle
     };
@@ -129,8 +130,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 0, title: "Lend", link: "/lend", external: false },
         { id: 1, title: "Trade", link: "/trade", external: false },
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
-        { id: 3, title: "Stats", link: "/stats", external: false },
-        { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
+        { id: 3, title: "Staking", link: "https://staking.bzx.network", external: true },
+        { id: 4, title: "Stats", link: "/stats", external: false },
+        { id: 5, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
       ],
       onMenuToggle: this.onMenuToggle
     };

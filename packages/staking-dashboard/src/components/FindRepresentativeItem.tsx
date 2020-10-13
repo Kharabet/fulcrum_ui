@@ -23,21 +23,29 @@ export const FindRepresentativeItem = (props: IFindRepresentativeItemProps) => {
     ? props.representative.LPToken.div(10 ** 6)
     : props.representative.LPToken.div(10 ** 18);
 
+  function formatAmount(value: BigNumber): string {
+    if (value.lt(1000)) return value.toFixed(2)
+    if (value.lt(10 ** 6)) return `${Number(value.dividedBy(1000).toFixed(2)).toString()}k`
+    if (value.lt(10 ** 9)) return `${Number(value.dividedBy(10 ** 6).toFixed(2)).toString()}m`
+    if (value.lt(10 ** 12)) return `${Number(value.dividedBy(10 ** 9).toFixed(2)).toString()}b`
+    return `${Number(value.dividedBy(10 ** 12).toFixed(2)).toString()}T`;
+  }
+
   return (
     <li className="item-find-representative" onClick={() => props.onRepClick()}>
       <img className="photo" src={props.representative.imageSrc} alt={`Representative ${props.representative.index}`} />
       <div className="name">{props.representative.name}</div>
       <div className="token" title={bzrxAmount.toFixed(18)}>
         <BzrxIcon />
-        <span>{bzrxAmount.toFixed(2)}</span>
+        <span>{formatAmount(bzrxAmount)}</span>
       </div>
       <div className="token" title={vbzrxAmount.toFixed(18)}>
         <VBzrxIcon />
-        <span>{vbzrxAmount.toFixed(2)}</span>
+        <span>{formatAmount(vbzrxAmount)}</span>
       </div>
       <div className="token" title={bptAmount.toFixed(18)}>
         <BPTIcon />
-        <span>{bptAmount.toFixed(2)}</span>
+        <span>{formatAmount(bptAmount)}</span>
       </div>
       {/*
       {props.representative.BZRX.gt(0) ?
