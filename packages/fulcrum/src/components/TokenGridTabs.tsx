@@ -98,15 +98,16 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
             {/* {this.props.assets.map(asset => (this.renderAsset(asset)))} */}
             <ManageTokenGridHeader
               {...this.props}
+              isShowMyTokensOnly={this.state.isShowMyTokensOnly}
               isShowHistory={this.state.isShowHistory}
               updateStateisShowHistory={this.updateStateisShowHistory} />
 
-            <ManageButton {...this.props} isShowMyTokensOnly={this.state.isShowMyTokensOnly} />
+            {/* <ManageButton {...this.props} isShowMyTokensOnly={this.state.isShowMyTokensOnly} /> */}
           </div>
 
-          <div className="pro-switch-wrapper">
+          {/* <div className="pro-switch-wrapper">
             <div className="pro-switch"></div>
-          </div>
+          </div> */}
           {/* {!this.props.isMobile
             ? <React.Fragment>
               <div className="pro-switch-wrapper">

@@ -3,6 +3,7 @@ import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 
 export interface IManageTokenGridHeaderProps {
   isShowHistory: boolean;
+  isShowMyTokensOnly: boolean;
   openedPositionsCount: number;
   updateStateisShowHistory: (updatedState: boolean) => void;
 }
@@ -33,16 +34,17 @@ export class ManageTokenGridHeader extends Component<IManageTokenGridHeaderProps
 
   public render() {
     return (
-      <React.Fragment>
-
-        <div className="manage-token-grid__group-tabs">
-          <div className={`tab ${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>
-            {<WalletSvg />}
-            <span>Manage</span>
-            <span className="opened-positions-count">{this.props.openedPositionsCount}</span></div>
-          <div className={`tab ${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</div>
-        </div>
-      </React.Fragment>
+      <div className="manage-token-grid__group-tabs">
+        <div className={`tab ${this.props.isShowMyTokensOnly && !this.props.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>
+          <div className="manage-tab">
+            <div className={`trade-token-grid-tab-item__col-token-image`} >
+              {<WalletSvg />}
+              <span>Manage</span>
+              <span className="opened-positions-count">{this.props.openedPositionsCount}</span>
+            </div></div> </div>
+        <div className={`tab ${this.props.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>
+          Trade history</div>
+      </div>
     );
   }
   private onShowHistory = () => {

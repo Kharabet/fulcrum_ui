@@ -7,9 +7,6 @@ import { HistoryTokenGrid } from "./HistoryTokenGrid";
 import { IHistoryTokenGridRowProps } from "./HistoryTokenGridRow";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 
-
-import "../styles/components/manage-token-grid.scss"
-
 export interface IManageTokenGridProps {
   isMobileMedia: boolean;
   isShowHistory: boolean;
