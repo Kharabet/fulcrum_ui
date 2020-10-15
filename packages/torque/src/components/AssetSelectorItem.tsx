@@ -19,13 +19,13 @@ import { TxProcessingLoader } from "./TxProcessingLoader";
 export interface IAssetSelectorItemProps {
   asset: Asset;
   isLoadingTransaction: boolean;
+  yieldApr: BigNumber
   borrowDlgRef: React.RefObject<BorrowDlg>;
   doNetworkConnect: () => void;
 }
 
 interface IAssetSelectorItemState {
   interestRate: BigNumber;
-  yieldApr: BigNumber;
   isLoadingTransaction: boolean;
   request: BorrowRequest | undefined;
 }
@@ -36,7 +36,6 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
     this.state = {
       interestRate: new BigNumber(0),
-      yieldApr: new BigNumber(0),
       isLoadingTransaction: false,
       request: undefined
     };
@@ -47,7 +46,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
-  private apiUrl = "https://api.bzx.network/v1";
+
 
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
@@ -107,13 +106,8 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   private derivedUpdate = async () => {
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.asset);
-    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`);
-    const yieldAPYJson = await yieldAPYRequest.json();
-    const yieldApr = yieldAPYJson.success && yieldAPYJson.data[this.props.asset.toLowerCase()]
-      ? new BigNumber(yieldAPYJson.data[this.props.asset.toLowerCase()])
-      : new BigNumber(0);
 
-    this.setState({ ...this.state, interestRate, yieldApr });
+    this.setState({ ...this.state, interestRate });
   };
 
   public render() {
@@ -136,8 +130,8 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
                 <div className="asset-selector-row">
 
                   <div className="asset-selector__apr">Est. Yield, vBZRX</div>
-                  <div title={this.state.yieldApr.toFixed(18)} className="asset-selector__interest-rate">
-                    <span className="asset-selector__interest-rate-value">{this.state.yieldApr.toFixed(0)}</span>%
+                  <div title={this.props.yieldApr.toFixed(18)} className="asset-selector__interest-rate">
+                    <span className="asset-selector__interest-rate-value">{this.props.yieldApr.toFixed(0)}</span>%
                   </div>
                 </div>
                 <div className="asset-selector-row">
