@@ -3,6 +3,8 @@ import { Asset } from "../domain/Asset"
 import { AssetSelectorItem } from "./AssetSelectorItem"
 import { BorrowDlg } from "./BorrowDlg"
 import { BigNumber } from "@0x/utils"
+import { TorqueProvider } from "../services/TorqueProvider";
+import { Loader } from "../components/Loader";
 
 export interface IAssetSelectorProps {
   isLoadingTransaction: boolean
@@ -62,15 +64,18 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
     assetsShown = []
   }
 
-
   const assetSelectorItems = assetsShown.map(asset => {
     const yieldApr = yieldAPYJson && yieldAPYJson!['success'] && yieldAPYJson!['data'][asset.toLowerCase()]
       ? new BigNumber(yieldAPYJson!['data'][asset.toLowerCase()])
       : new BigNumber(0);
+
     return (
       <AssetSelectorItem key={asset} yieldApr={yieldApr} asset={asset} {...props} />
     )
   })
+
+  if (!yieldAPYJson || TorqueProvider.Instance.isLoading)
+    return (<Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />)
 
   return <div className="asset-selector">{assetSelectorItems}</div>
 
