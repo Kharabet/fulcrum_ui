@@ -99,7 +99,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.WBTC,
         Asset.LINK,
         Asset.MKR,
-        Asset.LEND,
+        //Asset.LEND,
         Asset.KNC
       ];
       this.quoteTokens = [

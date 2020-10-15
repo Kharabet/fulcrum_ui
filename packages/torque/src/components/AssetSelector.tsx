@@ -15,7 +15,6 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
   const apiUrl = "https://api.bzx.network/v1";
   const [yieldAPYJson, setYieldAPYJson] = useState()
 
-
   useEffect(() => {
     async function yieldAPYJson() {
       const yieldAPYRequest = await fetch(`${apiUrl}/yield-farimng-apy`);
