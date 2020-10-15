@@ -24,11 +24,11 @@ body {
   border-radius: 50%;
   display: flex;
 }
-.lend-gradient,
-.bzrx-gradient {
-  .li-options & {
+.li-options {
+  .lend-gradient,
+  .bzrx-gradient {
     margin-right: 6px;
-    svg {
+    &svg {
       margin-right: 0 !important;
     }
   }

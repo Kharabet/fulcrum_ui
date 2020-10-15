@@ -7,6 +7,5 @@ export interface IRep {
     vBZRX: BigNumber,
     LPToken: BigNumber,
     name: string,
-    imageSrc: string,
-    isActive: boolean
+    imageSrc: string
 }

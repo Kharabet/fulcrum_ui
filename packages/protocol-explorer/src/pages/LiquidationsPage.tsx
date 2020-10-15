@@ -46,33 +46,33 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assetsShown = [
         { token: Asset.DAI, color: "#F8A608" },
-        { token: Asset.USDC, color: "#3574B9" },
-        { token: Asset.USDT, color: "#26A17B" },
+        { token: Asset.USDC, color: "#85D3FF" },
+        { token: Asset.USDT, color: "#70E000" },
         { token: Asset.SUSD, color: "#100E23" },
-        { token: Asset.fWETH, color: "#8B8B8B" },
-        { token: Asset.WBTC, color: "#41365B" },
+        { token: Asset.fWETH, color: "#B0B0B0" },
+        { token: Asset.WBTC, color: "#966AFF" },
         { token: Asset.LINK, color: "#2A5ADA" },
         { token: Asset.ZRX, color: "#000004" },
-        { token: Asset.KNC, color: "#49BC98" }
+        { token: Asset.KNC, color: "#3BD8A7" }
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       this.assetsShown = [
-        { token: Asset.ETH, color: "#33dfcc" },
-        { token: Asset.DAI, color: "#276bfb" },
+        { token: Asset.ETH, color: "#B0B0B0" },
+        { token: Asset.DAI, color: "#F8A608" },
       ];
     } else {
       this.assetsShown = [
-        { token: Asset.ETH, color: "#8B8B8B" },
+        { token: Asset.ETH, color: "#B0B0B0" },
         { token: Asset.DAI, color: "#F8A608" },
-        { token: Asset.USDC, color: "#3574B9" },
-        { token: Asset.USDT, color: "#26A17B" },
-        { token: Asset.WBTC, color: "#41365B" },
-        { token: Asset.LINK, color: "#2A5ADA" },
-        { token: Asset.YFI, color: "#2A0ADA" },
-        { token: Asset.BZRX, color: "#2A6AEA" },
-        { token: Asset.MKR, color: "#49BC98" },
-        { token: Asset.LEND, color: "#3574B8" },
-        { token: Asset.KNC, color: "#49BC97" },
+        { token: Asset.USDC, color: "#85D3FF" },
+        { token: Asset.USDT, color: "#70E000" },
+        { token: Asset.WBTC, color: "#966AFF" },
+        { token: Asset.LINK, color: "#03288B" },
+        { token: Asset.YFI, color: "#3D97FF" },
+        { token: Asset.BZRX, color: "#0056D7" },
+        { token: Asset.MKR, color: "#028858" },
+        { token: Asset.LEND, color: "#00EFEF" },
+        { token: Asset.KNC, color: "#3BD8A7" },
 
       ]
     }

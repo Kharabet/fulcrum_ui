@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { ReactComponent as LogoStaking } from "../assets/images/logo-staking.svg"
 import { ReactComponent as LogoSign } from "../assets/images/logo-sign.svg"
-import { HeaderMenu } from "./HeaderMenu";
 import { Link } from "react-router-dom";
 import { OnChainIndicator } from "../components/OnChainIndicator";
 import { FooterSocial } from "./FooterSocial";

@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
-
+import { TasksQueue } from "../services/TasksQueue";
 import { ReactComponent as ArrowRight } from "../assets/images/ic_arrow_right.svg";
 import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -79,7 +79,19 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
+    console.log(await TasksQueue.Instance.getTasksList());
+    const task = await TasksQueue.Instance.getTasksList().find(t => t.request instanceof BorrowRequest
+      && t.request.borrowAsset === this.props.asset
+      && t.request.loanId === "0x0000000000000000000000000000000000000000000000000000000000000000");
+    const isLoadingTransaction = task && !task.error ? true : false;
+    const request = task ? task.request as BorrowRequest : undefined;
+    this.setState({
+      ...this.state,
+      isLoadingTransaction,
+      request
+    });
+
     this.derivedUpdate();
   }
 
@@ -123,7 +135,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
               <div className="asset-selector-body">
                 <div className="asset-selector-row">
 
-                  <div className="asset-selector__apr">Est. Yield</div>
+                  <div className="asset-selector__apr">Est. Yield, vBZRX</div>
                   <div title={this.state.yieldApr.toFixed(18)} className="asset-selector__interest-rate">
                     <span className="asset-selector__interest-rate-value">{this.state.yieldApr.toFixed(0)}</span>%
                   </div>
