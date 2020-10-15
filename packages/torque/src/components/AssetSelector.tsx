@@ -23,7 +23,7 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
       setYieldAPYJson(yieldAPYJson)
     }
     yieldAPYJson()
-  })
+  }, [props.isLoadingTransaction])
 
   // true includes ENS support
   let assetsShown: Asset[]
