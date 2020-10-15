@@ -5,8 +5,7 @@ import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow"
 import { InnerOwnTokenGrid } from "./InnerOwnTokenGrid";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 import { TradeRequest } from "../domain/TradeRequest";
-import { CircleLoader } from "./CircleLoader";
-import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { TradeType } from "../domain/TradeType";
 
 import "../styles/components/trade-token-grid.scss";
@@ -15,9 +14,9 @@ export interface ITradeTokenGridProps {
   isMobileMedia: boolean;
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
-  request: TradeRequest | undefined;
+  request: TradeRequest | ManageCollateralRequest | undefined;
   isLoadingTransaction: boolean;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | ManageCollateralRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
   isTxCompleted: boolean;
   resultTx: boolean;
   changeGridPositionType: (activePositionType: PositionType) => void;
@@ -50,22 +49,10 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
           {tokenRows && tokenRows.map(row => {
             return (<div className="trade-token-grid-row-wrapper" key={`${row.props.baseToken}_${row.props.positionType}`}>
               {row}
-              {this.props.isLoadingTransaction && this.props.request &&
-                row.props.positionType === this.props.request.positionType &&
-                this.props.request.tradeType === TradeType.BUY
-                ? < div className={`token-selector-item__image open-tab-tx`}>
-                  <CircleLoader></CircleLoader>
-                  <TradeTxLoaderStep taskId={this.props.request!.loanId} />
-                </div>
-                : !this.props.resultTx && this.props.request &&
-                row.props.positionType === this.props.request.positionType &&
-                this.props.request.tradeType === TradeType.BUY &&
-                <div className="close-tab-tx"></div>
-              }
               <InnerOwnTokenGrid
                 ownRowsData={this.props.ownRowsData
                   .filter(e => e.positionType === row.props.positionType
-                    && !(this.props.isLoadingTransaction && e.loan.loanId == this.props.request!.loanId && this.props.request!.tradeType === TradeType.BUY))}
+                    && !(this.props.isLoadingTransaction && e.loan.loanId == this.props.request!.loanId && (this.props.request! as TradeRequest).tradeType === TradeType.BUY))}
                 isMobileMedia={this.props.isMobileMedia}
                 request={this.props.request}
                 isLoadingTransaction={this.props.isLoadingTransaction}

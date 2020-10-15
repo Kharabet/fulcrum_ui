@@ -6,6 +6,7 @@ import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { TasksQueue } from "../services/TasksQueue";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import siteConfig from "../config/SiteConfig.json";
 
@@ -15,6 +16,8 @@ import { Preloader } from "./Preloader";
 import { RequestTask } from "../domain/RequestTask";
 import { RequestStatus } from "../domain/RequestStatus";
 
+import { CircleLoader } from "./CircleLoader";
+import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 
 export interface ITradeTokenGridRowProps {
   isMobileMedia: boolean;
@@ -35,6 +38,7 @@ interface ITradeTokenGridRowState {
   liquidationPrice: BigNumber;
 
   interestRate: BigNumber;
+  yieldApr: BigNumber;
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
@@ -51,6 +55,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       baseTokenPrice: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       interestRate: new BigNumber(0),
+      yieldApr: new BigNumber(0),
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
@@ -64,6 +69,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private _isMounted: boolean;
+  private apiUrl = "https://api.bzx.network/v1";
 
   private async derivedUpdate() {
 
@@ -91,10 +97,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.baseToken
     );
 
+    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`);
+    const yieldAPYJson = await yieldAPYRequest.json();
+    const yieldApr = yieldAPYJson.success && yieldAPYJson.data[this.props.baseToken.toLowerCase()]
+      ? new BigNumber(yieldAPYJson.data[this.props.baseToken.toLowerCase()]) : new BigNumber(0);
+
     this._isMounted && this.setState({
       ...this.state,
       baseTokenPrice,
-      interestRate: interestRate,
+      interestRate,
+      yieldApr,
       liquidationPrice,
       isLoading: false
     });
@@ -135,8 +147,19 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
+
+    const task = await TasksQueue.Instance.getTasksList().find(t =>
+      t.request.loanId === "0x0000000000000000000000000000000000000000000000000000000000000000"
+      && t.request.asset === this.props.baseToken
+      && (t.request as TradeRequest).quoteToken === this.props.quoteToken
+      && (t.request as TradeRequest).positionType === this.props.positionType
+    );
+    const isLoadingTransaction = task && !task.error ? true : false;
+    const request = task ? task.request as TradeRequest : undefined;
+
+    this.setState({ ...this.state, resultTx: true, isLoadingTransaction, request });
     this.derivedUpdate();
   }
 
@@ -209,13 +232,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               : <Preloader width="74px" />
             }
           </div>
-          <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Interest APR</span>}
+          <div title={this.state.yieldApr.gt(0) ? `${this.state.yieldApr.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Est. Yield, vBZRX</span>}
 
-            {this.state.interestRate.gt(0) && !this.state.isLoading
+            {this.state.yieldApr.gt(0) && !this.state.isLoading
               ? <React.Fragment>
-                {this.state.interestRate.toFixed(4)}
+                {this.state.yieldApr.toFixed(0)}
                 <span className="fw-sign">%</span>
+                <span title={this.state.interestRate.toFixed(18)} className="trade-token-grid-row__yield">
+                  APR <span>{this.state.interestRate.toFixed(2)}%</span>
+                </span>
               </React.Fragment>
               : <Preloader width="74px" />
             }
@@ -226,6 +252,18 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             </button>
           </div>
         </div>
+        {this.state.isLoadingTransaction && this.state.request &&
+          this.props.positionType === this.state.request.positionType &&
+          this.state.request.tradeType === TradeType.BUY
+          ? < div className={`token-selector-item__image open-tab-tx`}>
+            <CircleLoader></CircleLoader>
+            <TradeTxLoaderStep taskId={this.state.request!.id} />
+          </div>
+          : !this.state.resultTx && this.state.request &&
+          this.props.positionType === this.state.request.positionType &&
+          this.state.request.tradeType === TradeType.BUY &&
+          <div className="close-tab-tx"></div>
+        }
       </React.Fragment>
     );
   }

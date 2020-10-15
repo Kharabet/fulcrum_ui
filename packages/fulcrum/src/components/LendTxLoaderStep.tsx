@@ -59,8 +59,7 @@ export class LendTxLoaderStep extends Component<ILendTxLoaderStepProps, ILendTxL
 
     TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
     TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
-    if (this.state.requestTask)
-      FulcrumProvider.Instance.onTaskCancel(this.state.requestTask);
+
   }
 
   public getTitle = (requestTask: RequestTask) => {
