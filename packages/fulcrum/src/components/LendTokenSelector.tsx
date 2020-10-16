@@ -27,10 +27,18 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
         Asset.DAI
       ];
     } else {
-      LendTokenSelector.assets = [
-        Asset.fWETH,
+      LendTokenSelector.assets =  [
+        Asset.ETH,
+        Asset.DAI,
         Asset.USDC,
+        Asset.USDT,
         Asset.WBTC,
+        Asset.LINK,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
+        Asset.KNC
       ]
     }
   }

@@ -264,7 +264,7 @@ export class ContractsSource {
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     await this.Init();
     let symbol;
-    if (asset === Asset.WETH || asset === Asset.fWETH) {
+    if (asset === Asset.WETH) {
       symbol = `iETH`;
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`;
@@ -347,7 +347,7 @@ export class ContractsSource {
 
   public getITokenErc20Address(asset: Asset): string | null {
     let symbol;
-    if (asset === Asset.WETH || asset === Asset.fWETH) {
+    if (asset === Asset.WETH) {
       symbol = `iETH`;
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`;
