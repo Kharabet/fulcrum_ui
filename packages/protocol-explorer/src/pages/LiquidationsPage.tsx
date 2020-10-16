@@ -191,6 +191,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18;
         const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${e.loanToken === Asset.fWETH ? "eth" : e.loanToken.toLowerCase()}&date=${e.timeStamp.getTime()}`);
         const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+        if (!swapToUsdHistoryRateResponse) continue;
         const repayAmountUsd = e.repayAmount.div(10 ** loanAssetDecimals).times(swapToUsdHistoryRateResponse.swapToUSDPrice);
         volume30d = volume30d.plus(repayAmountUsd);
         liquidationEventsWithUsd.push({ event: e, repayAmountUsd: repayAmountUsd });
