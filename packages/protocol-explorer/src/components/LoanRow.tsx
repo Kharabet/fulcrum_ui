@@ -33,7 +33,6 @@ export const LoanRow = (props: ILoanRowProps) => {
 
   const [isLoadingTransaction, setLoadingTransaction] = useState(false);
   const [liquidationRequest, setRequest] = useState<LiquidationRequest>();
-  const [isLiquidationTxCompleted, setTxCompleted] = useState(false);
 
 
   useEffect(() => {
@@ -57,11 +56,6 @@ export const LoanRow = (props: ILoanRowProps) => {
     };
   });
 
-  useEffect(() => {
-    changeLoadingTransaction(false, undefined, false);
-    props.onLiquidationUpdated();
-  }, [isLiquidationTxCompleted]);
-
   const onLiquidateClick = async () => {
     setLoadingTransaction(true);
     const loanId = props.loanId;
@@ -74,10 +68,9 @@ export const LoanRow = (props: ILoanRowProps) => {
       amountInBaseUnits);
 
     console.log(request);
-    changeLoadingTransaction(true, request, false);
+    changeLoadingTransaction(true, request);
     await ExplorerProvider.Instance.onLiquidationConfirmed(request);
 
-    //props.onLiquidationUpdated();
   }
 
 
@@ -86,10 +79,9 @@ export const LoanRow = (props: ILoanRowProps) => {
   }
 
 
-  const changeLoadingTransaction = (isLoadingTransaction: boolean, request: LiquidationRequest | undefined, isTxCompleted: boolean) => {
+  const changeLoadingTransaction = (isLoadingTransaction: boolean, request: LiquidationRequest | undefined) => {
     setLoadingTransaction(isLoadingTransaction);
     setRequest(request);
-    setTxCompleted(isTxCompleted);
   }
 
 
@@ -105,7 +97,7 @@ export const LoanRow = (props: ILoanRowProps) => {
 
   const onAskToOpenProgressDlg = async (taskId: string) => {
     if (!liquidationRequest || taskId !== liquidationRequest.loanId) return;
-    changeLoadingTransaction(true, liquidationRequest, false);
+    changeLoadingTransaction(true, liquidationRequest);
   };
 
 
@@ -115,12 +107,13 @@ export const LoanRow = (props: ILoanRowProps) => {
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         ExplorerProvider.Instance.onTaskCancel(task);
-        changeLoadingTransaction(false, undefined, false)
+        changeLoadingTransaction(false, undefined)
       }, 5000)
       return;
     }
 
-    changeLoadingTransaction(isLiquidationTxCompleted, liquidationRequest, isLiquidationTxCompleted);
+    props.onLiquidationUpdated();
+    changeLoadingTransaction(false, undefined);
   };
 
 
