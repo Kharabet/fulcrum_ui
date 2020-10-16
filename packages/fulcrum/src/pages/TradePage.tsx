@@ -80,15 +80,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.baseTokens = [
         Asset.fWETH,
         Asset.WBTC,
-        Asset.LINK,
-        Asset.ZRX,
-        Asset.KNC
       ];
       this.quoteTokens = [
-        Asset.DAI,
-        Asset.USDC,
-        Asset.SUSD,
-        Asset.USDT
+        Asset.USDC
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       // this.baseTokens = [
