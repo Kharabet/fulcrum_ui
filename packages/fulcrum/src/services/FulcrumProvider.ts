@@ -1024,7 +1024,7 @@ export class FulcrumProvider {
         newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
       }
       try {
-        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+        const newCurrentMargin = await oracleContract.getCurrentMargin.callAsync(
           borrowedFundsState.loanData.loanToken,
           borrowedFundsState.loanData.collateralToken,
           borrowedFundsState.loanData.principal,
@@ -1032,7 +1032,7 @@ export class FulcrumProvider {
             new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
             new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
         );
-        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+        result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18).plus(100);
       } catch (e) {
         // console.log(e);
         result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
