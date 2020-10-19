@@ -24,7 +24,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
     useEffect(() => {
         const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
-        const switchButton = document.querySelector<HTMLInputElement>('.provider-menu .gas-switch input[type="checkbox"]');
+        const switchButton = document.querySelector<HTMLInputElement>('.provider-menu__gas-token-switch input[type="checkbox"]');
         if (switchButton) {
             if (isGasTokenEnabled) {
                 switchButton.setAttribute('data-isgastokenenabled', 'true');
