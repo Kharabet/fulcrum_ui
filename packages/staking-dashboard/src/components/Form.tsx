@@ -190,14 +190,6 @@ export class Form extends Component<{}, IFormState> {
     // await this.derivedUpdate();
   }
 
-  /*public onIETHtoVBZRXConvertClick = async () => {
-    const swapAmountAllowed = !this.state.whitelistAmount.eq(0) && this.state.whitelistAmount.lt(this.state.iEthBalance) ?
-      this.state.whitelistAmount :
-      this.state.iEthBalance;
-    const receipt = await StakingProvider.Instance.convertIETHToVBZRX(swapAmountAllowed.times(10 ** 18));
-    await this.derivedUpdate();
-  }*/
-
   // public onOptinClick = async () => {
   //   await StakingProvider.Instance.doOptin();
   //   await this.derivedUpdate();
@@ -364,148 +356,136 @@ export class Form extends Component<{}, IFormState> {
             {this.state.isAnimationTx ?
               <AnimationTx /> :
               <React.Fragment>
-            <div className="calculator-row balance">
-              <div className="balance-wrapper">
+                <div className="calculator-row balance">
+                  <div className="balance-wrapper">
 
-                <div className="balance-item">
-                  <div className="row-header">Wallet Balance:</div>
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                      {/*<span title={(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxStakingBalance : this.state.bzrxBalance).toFixed(18)} className="value">
+                    <div className="balance-item">
+                      <div className="row-header">Wallet Balance:</div>
+                      <div className="row-container">
+                        <div className="row-body">
+                          <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                          {/*<span title={(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxStakingBalance : this.state.bzrxBalance).toFixed(18)} className="value">
                         {(this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) ? this.state.bzrxStakingBalance : this.state.bzrxBalance).toFixed(2)}
                       </span>*/}
-                      <span title={this.state.bzrxBalance.toFixed(18)} className="value">
-                        {this.state.bzrxBalance.toFixed(2)}
-                      </span>
-                      <div className="row-token">BZRX</div>
-                    </div>
-                    {/*this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) &&
+                          <span title={this.state.bzrxBalance.toFixed(18)} className="value">
+                            {this.state.bzrxBalance.toFixed(2)}
+                          </span>
+                          <div className="row-token">BZRX</div>
+                        </div>
+                        {/*this.state.bzrxBalance.lt(this.state.bzrxStakingBalance) &&
                       <p className="warning">Wallet Balance less than Staking Balance</p>
                     */}
-                  </div>
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-                      {/*<span title={(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxStakingBalance : this.state.vBzrxBalance).toFixed(18)} className="value">
+                      </div>
+                      <div className="row-container">
+                        <div className="row-body">
+                          <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                          {/*<span title={(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxStakingBalance : this.state.vBzrxBalance).toFixed(18)} className="value">
                         {(this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) ? this.state.vBzrxStakingBalance : this.state.vBzrxBalance).toFixed(2)}
                       </span>*/}
-                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                        {this.state.vBzrxBalance.toFixed(2)}
-                      </span>
-                      <div className="row-token">vBZRX</div>
-                    </div>
-                    {/*this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) &&
+                          <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                            {this.state.vBzrxBalance.toFixed(2)}
+                          </span>
+                          <div className="row-token">vBZRX</div>
+                        </div>
+                        {/*this.state.vBzrxBalance.lt(this.state.vBzrxStakingBalance) &&
                       <p className="warning">Wallet Balance less than Staking Balance</p>
                     */}
-                  </div>
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
-                      {/*<span title={(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptStakingBalance : this.state.bptBalance).toFixed(18)} className="value">
+                      </div>
+                      <div className="row-container">
+                        <div className="row-body">
+                          <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
+                          {/*<span title={(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptStakingBalance : this.state.bptBalance).toFixed(18)} className="value">
                         {(this.state.bptBalance.lt(this.state.bptStakingBalance) ? this.state.bptStakingBalance : this.state.bptBalance).toFixed(2)}
                       </span>*/}
-                      <span title={this.state.bptBalance.toFixed(18)} className="value">
-                        {this.state.bptBalance.toFixed(2)}
-                      </span>
-                      <div className="row-token">BPT</div>
-                    </div>
-                    {/*this.state.bptBalance.lt(this.state.bptStakingBalance) &&
+                          <span title={this.state.bptBalance.toFixed(18)} className="value">
+                            {this.state.bptBalance.toFixed(2)}
+                          </span>
+                          <div className="row-token">BPT</div>
+                        </div>
+                        {/*this.state.bptBalance.lt(this.state.bptStakingBalance) &&
                       <p className="warning">Wallet Balance less than Staking Balance</p>
                     */}
-                  </div>
+                      </div>
 
+                    </div>
+                    <div className="balance-item">
+                      <div className="row-header">Staking Balance:</div>
+                      <div className="row-container">
+                        <div className="row-body">
+                          <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                          <span title={this.state.bzrxStakingBalance.toFixed(18)} className="value">
+                            {this.state.bzrxStakingBalance.toFixed(2)}
+                          </span>
+                          <div className="row-token">BZRX</div>
+                        </div>
+                      </div>
+                      <div className="row-container">
+                        <div className="row-body">
+                          <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                          <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
+                            {this.state.vBzrxStakingBalance.toFixed(2)}
+                          </span>
+                          <div className="row-token">vBZRX</div>
+                        </div>
+                      </div>
+                      <div className="row-container">
+                        <div className="row-body">
+                          <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer">
+                            <span title={this.state.bptStakingBalance.toFixed(18)} className="icon"><BPTIcon /></span></a>
+                          <span title={this.state.bptStakingBalance.toFixed(18)} className="value">
+                            {this.state.bptStakingBalance.toFixed(2)}
+                          </span>
+                          <div className="row-token">BPT</div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <p className="notice">The staking dashboard in its current form tracks BZRX in your wallet or deployed in the protocol. If it is transferred elsewhere your staked balance may drop.</p>
+
+                  </div>
                 </div>
-                <div className="balance-item">
-                  <div className="row-header">Staking Balance:</div>
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                      <span title={this.state.bzrxStakingBalance.toFixed(18)} className="value">
-                        {this.state.bzrxStakingBalance.toFixed(2)}
-                      </span>
-                      <div className="row-token">BZRX</div>
-                    </div>
-                  </div>
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-                      <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
-                        {this.state.vBzrxStakingBalance.toFixed(2)}
-                      </span>
-                      <div className="row-token">vBZRX</div>
-                    </div>
-                  </div>
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer">
-                        <span title={this.state.bptStakingBalance.toFixed(18)} className="icon"><BPTIcon /></span></a>
-                      <span title={this.state.bptStakingBalance.toFixed(18)} className="value">
-                        {this.state.bptStakingBalance.toFixed(2)}
-                      </span>
-                      <div className="row-token">BPT</div>
-                    </div>
-
-                  </div>
-                </div>
-                <p className="notice">The staking dashboard in its current form tracks BZRX in your wallet or deployed in the protocol. If it is transferred elsewhere your staked balance may drop.</p>
-
-              </div>
-            </div>
 
                 <div className="calculator-row rewards-container">
                   <div className="reward-item">
                     <div className="row-header">Incentive rewards balance:</div>
                     <div className="row-body">
-                  <div className="reward-content">
-                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-                    <span className="value" title={this.state.rebateRewards.toFixed(18)}>{this.state.rebateRewards.toFixed(4)}</span>
+                      <div className="reward-content">
+                        <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                        <span className="value" title={this.state.rebateRewards.toFixed(18)}>{this.state.rebateRewards.toFixed(4)}</span>
+                      </div>
+                      <button className="button" disabled={!this.state.rebateRewards.gt(0)} onClick={this.onClaimRebateRewardsClick}>Claim Rewards</button>
+                    </div>
                   </div>
-                  <button className="button" disabled={!this.state.rebateRewards.gt(0)} onClick={this.onClaimRebateRewardsClick}>Claim Rewards</button>
-                </div>
-              </div>
-              <div className="reward-item">
-                <div className="row-header">Staking rewards balance:</div>
-                <div className="row-body">
-                  <div className="reward-content">
-                    <span className="currency">$</span><span className="value" title={this.state.userEarnings.toFixed(18)}>{this.state.userEarnings.toFixed(2)}</span>
+                  <div className="reward-item">
+                    <div className="row-header">Staking rewards balance:</div>
+                    <div className="row-body">
+                      <div className="reward-content">
+                        <span className="currency">$</span><span className="value" title={this.state.userEarnings.toFixed(18)}>{this.state.userEarnings.toFixed(2)}</span>
+                      </div>
+                      <button className="button" disabled={true}>Claim Rewards</button>
+                    </div>
                   </div>
-                  <button className="button" disabled={true}>Claim Rewards</button>
+
                 </div>
-              </div>
 
-            </div>
-
-            {this.state.bzrxV1Balance.gt(0) &&
-              <div className="convert-button">
-                <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
-                  Convert BZRX v1 to v2
+                {this.state.bzrxV1Balance.gt(0) &&
+                  <div className="convert-button">
+                    <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
+                      Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
-                </button>
-              </div>
-            }
+                    </button>
+                  </div>
+                }
 
-            {/*this.state.iETHSwapRate.gt(0) && swapAmountAllowed.gt(0) &&
-              <div className="convert-button">
-                <button title={`Convert ${swapAmountAllowed.toFixed(18)} iETH into ${swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onIETHtoVBZRXConvertClick}>
-                  Convert&nbsp;
-                  <span>{swapAmountAllowed.toFixed(4)}</span>
-                  &nbsp;iETH into&nbsp;
-                  <span>{swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(4)}</span>
-                  &nbsp;vBZRX
-                    <span className="notice">Make sure you read and understand iETH Buyback Program terms and conditions </span>
-                </button>
-              </div>
-            */}
                 {this.state.claimableAmount.gt(0) &&
-              <div className="convert-button">
-                <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
-                  Claim&nbsp;
+                  <div className="convert-button">
+                    <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
+                      Claim&nbsp;
                   <span>{this.state.claimableAmount.toFixed(4)}</span>
                   &nbsp;vBZRX
                 </button>
-              </div>
-            }
+                  </div>
+                }
                 {/*{this.state.canOptin &&
             <div className="convert-button">
               <button className="button button-full-width" onClick={this.onOptinClick}>
@@ -514,37 +494,37 @@ export class Form extends Component<{}, IFormState> {
               </button>
             </div>
             }*/}
-            {/*<div className="group-buttons">
+                {/*<div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
               <button title="Coming soon" className="button" disabled={true}>Claim Rewards</button>
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
             </div>*/}
-            {/*{this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0) &&*/}
-            <React.Fragment>
-              <div className="calculator-row">
-                <div className="row-header">Please select representative:</div>
-                <ul className={`group-buttons ${this.state.delegateAddress.toLowerCase() !== ZERO_ADDRESS ? "selected-delegate" : ""}`}>
-                  {topRepsLi}
-                </ul>
-              </div>
-              {this.state.selectedRepAddress !== "" &&
-                <AddToBalance
+                {/*{this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0) &&*/}
+                <React.Fragment>
+                  <div className="calculator-row">
+                    <div className="row-header">Please select representative:</div>
+                    <ul className={`group-buttons ${this.state.delegateAddress.toLowerCase() !== ZERO_ADDRESS ? "selected-delegate" : ""}`}>
+                      {topRepsLi}
+                    </ul>
+                  </div>
+                  {this.state.selectedRepAddress !== "" &&
+                    <AddToBalance
                       bzrxMax={this.state.bzrxBalance}
                       vbzrxMax={this.state.vBzrxBalance}
                       bptMax={this.state.bptBalance}
-                  stake={this.onStakeClick}
-                />
-              }
-            </React.Fragment>
-            {/*}*/}
-            <div className="calculator-row">
-              <div className="group-buttons">
-                <button className="button" onClick={this.openFindRepresentative}>Find a Representative</button>
-                <button className="button" disabled={this.isAlreadyRepresentative} onClick={this.onBecomeRepresentativeClick}>Become A Representative</button>
-              </div>
-            </div>
+                      stake={this.onStakeClick}
+                    />
+                  }
+                </React.Fragment>
+                {/*}*/}
+                <div className="calculator-row">
+                  <div className="group-buttons">
+                    <button className="button" onClick={this.openFindRepresentative}>Find a Representative</button>
+                    <button className="button" disabled={this.isAlreadyRepresentative} onClick={this.onBecomeRepresentativeClick}>Become A Representative</button>
+                  </div>
+                </div>
               </React.Fragment>
             }
 
