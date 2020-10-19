@@ -910,7 +910,7 @@ export class iTokenContract extends BaseContract {
             return result;
         },
     };
-    public flashBorrow = {
+    public flashBorrow1 = {
         async sendTransactionAsync(
             borrowAmount: BigNumber,
             borrower: string,
@@ -933,7 +933,7 @@ export class iTokenContract extends BaseContract {
                     data: encodedData,
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).flashBorrow.estimateGasAsync.bind(
+                (self as any).flashBorrow1.estimateGasAsync.bind(
                     self,
                     borrowAmount,
                     borrower,
@@ -2560,6 +2560,7 @@ export class iTokenContract extends BaseContract {
         },
         async callAsync(
             settingsTarget: string,
+            callData: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
         ): Promise<void
@@ -2607,6 +2608,501 @@ export class iTokenContract extends BaseContract {
             const abiEncoder = self._lookupAbiEncoder('wethToken()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public mintWithEther = {
+        async sendTransactionAsync(
+            receiver: string,
+            txData: Partial<TxDataPayable> = {},
+        ): Promise<string> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('mintWithEther(address)', [receiver
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).mintWithEther.estimateGasAsync.bind(
+                    self,
+                    receiver
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            receiver: string,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('mintWithEther(address)', [receiver
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            receiver: string,
+        ): string {
+            const self = this as any as iTokenContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('mintWithEther(address)', [receiver
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            receiver: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('mintWithEther(address)', [receiver
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('mintWithEther(address)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public burnToEther = {
+        async sendTransactionAsync(
+            receiver: string,
+            burnAmount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('burnToEther(address,uint256)', [receiver,
+    burnAmount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).burnToEther.estimateGasAsync.bind(
+                    self,
+                    receiver,
+                    burnAmount
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            receiver: string,
+            burnAmount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('burnToEther(address,uint256)', [receiver,
+    burnAmount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            receiver: string,
+            burnAmount: BigNumber,
+        ): string {
+            const self = this as any as iTokenContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('burnToEther(address,uint256)', [receiver,
+    burnAmount
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            receiver: string,
+            burnAmount: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('burnToEther(address,uint256)', [receiver,
+        burnAmount
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('burnToEther(address,uint256)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public mintWithChai = {
+        async sendTransactionAsync(
+            receiver: string,
+            depositAmount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('mintWithChai(address,uint256)', [receiver,
+    depositAmount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).mintWithChai.estimateGasAsync.bind(
+                    self,
+                    receiver,
+                    depositAmount
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            receiver: string,
+            depositAmount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('mintWithChai(address,uint256)', [receiver,
+    depositAmount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            receiver: string,
+            depositAmount: BigNumber,
+        ): string {
+            const self = this as any as iTokenContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('mintWithChai(address,uint256)', [receiver,
+    depositAmount
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            receiver: string,
+            depositAmount: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('mintWithChai(address,uint256)', [receiver,
+        depositAmount
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('mintWithChai(address,uint256)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public burnToChai = {
+        async sendTransactionAsync(
+            receiver: string,
+            burnAmount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('burnToChai(address,uint256)', [receiver,
+    burnAmount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).burnToChai.estimateGasAsync.bind(
+                    self,
+                    receiver,
+                    burnAmount
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            receiver: string,
+            burnAmount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('burnToChai(address,uint256)', [receiver,
+    burnAmount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            receiver: string,
+            burnAmount: BigNumber,
+        ): string {
+            const self = this as any as iTokenContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('burnToChai(address,uint256)', [receiver,
+    burnAmount
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            receiver: string,
+            burnAmount: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('burnToChai(address,uint256)', [receiver,
+        burnAmount
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('burnToChai(address,uint256)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public flashBorrow2 = {
+        async sendTransactionAsync(
+            borrowAmount: BigNumber,
+            borrower: string,
+            target: string,
+            signature: string,
+            data: string,
+            txData: Partial<TxDataPayable> = {},
+        ): Promise<string> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('flashBorrow(uint256,address,address,string,bytes)', [borrowAmount,
+    borrower,
+    target,
+    signature,
+    data
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).flashBorrow2.estimateGasAsync.bind(
+                    self,
+                    borrowAmount,
+                    borrower,
+                    target,
+                    signature,
+                    data
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            borrowAmount: BigNumber,
+            borrower: string,
+            target: string,
+            signature: string,
+            data: string,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('flashBorrow(uint256,address,address,string,bytes)', [borrowAmount,
+    borrower,
+    target,
+    signature,
+    data
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            borrowAmount: BigNumber,
+            borrower: string,
+            target: string,
+            signature: string,
+            data: string,
+        ): string {
+            const self = this as any as iTokenContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('flashBorrow(uint256,address,address,string,bytes)', [borrowAmount,
+    borrower,
+    target,
+    signature,
+    data
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            borrowAmount: BigNumber,
+            borrower: string,
+            target: string,
+            signature: string,
+            data: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<string
+        > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('flashBorrow(uint256,address,address,string,bytes)', [borrowAmount,
+        borrower,
+        target,
+        signature,
+        data
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('flashBorrow(uint256,address,address,string,bytes)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<string
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public dsr = {
+        async callAsync(
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('dsr()', []);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('dsr()');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public chaiPrice = {
+        async callAsync(
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('chaiPrice()', []);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('chaiPrice()');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
