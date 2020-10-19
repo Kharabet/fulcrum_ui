@@ -25,6 +25,9 @@
   }
 }
 .chart-wrapper {
+  &.hidden {
+    display: none;
+  }
   @media (max-width: $breakpoint-mobile-max) {
     padding-left: 15px;
     padding-right: 15px;
