@@ -242,13 +242,13 @@ export class ContractsSource {
         break;
       case 42:
         switch (addressErc20) {
-          case "0xfBE16bA4e8029B759D3c5ef8844124893f3ae470":
+          case "0xfbe16ba4e8029b759d3c5ef8844124893f3ae470":
             asset = Asset.fWETH;
             break;
-          case "0xB443f30CDd6076b1A5269dbc08b774F222d4Db4e":
+          case "0xb443f30cdd6076b1a5269dbc08b774f222d4db4e":
             asset = Asset.USDC;
             break;
-          case "0x5aE55494Ccda82f1F7c653BC2b6EbB4aD3C77Dac":
+          case "0x5ae55494ccda82f1f7c653bc2b6ebb4ad3c77dac":
             asset = Asset.WBTC;
             break;
           case "0x0000000000004946c0e9f43f4dee607b0ef1fa1c":
