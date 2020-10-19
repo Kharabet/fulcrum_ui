@@ -1,11 +1,10 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import React, { ReactFragment, Component, Suspense } from "react";
+import React, { Component, Suspense } from "react";
 
 import TagManager from 'react-gtm-module';
 import Modal from "react-modal";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import { Footer } from "../layout/Footer";
-import { HeaderHome } from "../layout/HeaderHome";
 import { HeaderOps } from "../layout/HeaderOps";
 
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -26,8 +25,6 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types';
 
 import { PreloaderChart } from '../components/PreloaderChart';
-import { Asset } from '../domain/Asset';
-
 
 
 const Intercom = React.lazy(() => import('react-intercom'));
@@ -60,7 +57,7 @@ interface IAppRouterState {
   currentPage: string;
   web3: Web3Wrapper | null;
   isMobileMedia: boolean;
-  isV1ITokenInWallet: boolean;
+  //isV1ITokenInWallet: boolean;
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -75,7 +72,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       currentPage: "",
       web3: FulcrumProvider.Instance.web3Wrapper,
       isMobileMedia: false,
-      isV1ITokenInWallet: false
+      //isV1ITokenInWallet: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -172,7 +169,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
 
                       <Route exact={true} path="/lend" render={() =>
-                        <React.Fragment><HeaderOps headerClass="lend" isV1ITokenInWallet={this.state.isV1ITokenInWallet} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                        <React.Fragment><HeaderOps headerClass="lend" isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                           <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
                             <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
 
@@ -181,7 +178,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       } />
                       {/*{!this.state.isMobileMedia ? (*/}
                       <Route exact={true} path="/trade" render={() =>
-                        <React.Fragment><HeaderOps headerClass="trade" isV1ITokenInWallet={this.state.isV1ITokenInWallet} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                        <React.Fragment><HeaderOps headerClass="trade" isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                           <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
                             <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                           </Suspense>
@@ -190,7 +187,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
 
                       <Route exact={true} path="/stats" render={() =>
-                        <React.Fragment><HeaderOps headerClass="stats" isV1ITokenInWallet={this.state.isV1ITokenInWallet} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                        <React.Fragment><HeaderOps headerClass="stats" isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                           <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
                             <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                           </Suspense>
@@ -306,7 +303,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   public onProviderChanged = async (event: ProviderChangedEvent) => {
-    await this.checkITokenV1Balances();
+    //await this.checkITokenV1Balances();
     await this.checkGasTokenAllowance();
     await this._isMounted && this.setState({
       ...this.state,
@@ -320,30 +317,37 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public onRiskDisclosureRequestOpen = async () => {
     await this._isMounted && this.setState({ ...this.state, isRiskDisclosureModalOpen: true });
   }
-  private checkITokenV1Balances = async () => {
-    const isITokenV1Present = await [
-      Asset.ETHv1,
-      Asset.DAIv1,
-      Asset.SAIv1,
-      Asset.USDCv1,
-      Asset.WBTCv1,
-      Asset.BATv1,
-      Asset.KNCv1,
-      Asset.REPv1,
-      Asset.ZRXv1,
-      Asset.LINKv1,
-      Asset.SUSDv1,
-      Asset.USDTv1,
-    ].some(async (asset: Asset) => {
-      const iTokenBalance = await FulcrumProvider.Instance.getITokenBalanceOfUser(asset);
-      return iTokenBalance.gt(0)
-    })
-    await isITokenV1Present && this._isMounted && this.setState({
-      ...this.state,
-      isV1ITokenInWallet: true
-    })
+  // private checkITokenV1Balances = async () => {
+  //   const v1AssetsArray = [
+  //     Asset.ETHv1,
+  //     Asset.DAIv1,
+  //     Asset.SAIv1,
+  //     Asset.USDCv1,
+  //     Asset.WBTCv1,
+  //     Asset.BATv1,
+  //     Asset.KNCv1,
+  //     Asset.REPv1,
+  //     Asset.ZRXv1,
+  //     Asset.LINKv1,
+  //     Asset.SUSDv1,
+  //     Asset.USDTv1,
+  //   ]
+  //   for (const i in v1AssetsArray) {
+  //     const iTokenBalance = await FulcrumProvider.Instance.getITokenBalanceOfUser(v1AssetsArray[i]);
+  //     if (iTokenBalance.gt(0)) {
+  //       await this._isMounted && this.setState({
+  //         ...this.state,
+  //         isV1ITokenInWallet: true
+  //       })
+  //       return;
+  //     }
 
-  }
+  //   }
+  //   await this._isMounted && this.setState({
+  //     ...this.state,
+  //     isV1ITokenInWallet: false
+  //   })
+  // }
 
   private checkGasTokenAllowance = async () => {
     const gasTokenAllowance = await FulcrumProvider.Instance.getGasTokenAllowance();

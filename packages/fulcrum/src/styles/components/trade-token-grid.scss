@@ -60,6 +60,7 @@
     }
     @media screen and (max-width: $breakpoint-desktop-max) {
       padding: 20px 30px 15px 30px;
+      font-size: 11px;
     }
   }
 
@@ -95,6 +96,7 @@
         width: 50%;
       }
     }
+
     &__col-position-type {
       display: flex;
     }
@@ -113,6 +115,7 @@
         }
       }
     }
+
     &__buy-button {
       border: 0;
       display: flex;
@@ -145,6 +148,17 @@
         background-color: var(--disabled-bg);
         color: var(--disabled-color);
         cursor: not-allowed;
+      }
+    }
+    &__yield {
+      position: absolute;
+      font-size: 12px;
+      font-weight: 600;
+      text-indent: 13px;
+      bottom: 15px;
+      color: #a2abb8;
+      span {
+        color: #00c0ab;
       }
     }
   }
@@ -190,13 +204,19 @@
         }
       }
     }
-    .trade-token-grid-row__title {
-      width: 100%;
-      font-size: 10px;
-      line-height: 1.5;
-      font-weight: 600;
-      color: #a2abb8;
-      margin-top: 20px;
+    .trade-token-grid-row {
+      &__title {
+        width: 100%;
+        font-size: 10px;
+        line-height: 1.5;
+        font-weight: 600;
+        color: #a2abb8;
+        margin-top: 20px;
+      }
+      &__yield {
+        font-size: 10px;
+        bottom: 13px;
+      }
     }
   }
 }

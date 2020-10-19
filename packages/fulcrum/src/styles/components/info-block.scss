@@ -5,15 +5,12 @@
     background: #2d9cdb;
     border-radius: 8px;
     padding: 15px 40px 15px 30px;
-    display: flex;
-    justify-content: space-between;
     margin-bottom: 20px;
     margin-top: -40px;
   }
 
   &__left {
     width: 110px;
-
     font-weight: bold;
     font-size: 16px;
     line-height: 150%;
@@ -22,6 +19,7 @@
 
   &__center {
     width: calc(100% - 210px);
+    display: inline-block;
 
     font-weight: normal;
     line-height: 150%;
@@ -29,9 +27,10 @@
     color: #fff;
     margin-top: 4px;
     .regular-link {
-      color: #003cda;
+      color: #fff;
+      font-weight: 600;
       &:hover {
-        color: #5b88ff;
+        color: #003cda;
       }
     }
     .disclosure-link {
@@ -48,10 +47,12 @@
   }
 
   &__right {
-    width: 100px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    float: right;
+    height: 100%;
+    @media only screen and (min-width: $breakpoint-mobile-min) {
+      display: flex;
+      align-items: center;
+    }
     button {
       border: 0;
       padding: 6px 25px;
@@ -72,17 +73,11 @@
   }
 
   @media only screen and (max-width: $mobile-version-max-width) {
-    .trade-page & {
-      &__container {
-        margin: 0;
-      }
-    }
     &__container {
-      flex-direction: column;
+      margin: 0 15px;
     }
     &__left,
-    &__center,
-    &__right {
+    &__center {
       width: 100%;
     }
   }

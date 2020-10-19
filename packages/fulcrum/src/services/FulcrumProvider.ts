@@ -46,6 +46,10 @@ import { PayTradingFeeEvent } from "../domain/events/PayTradingFeeEvent";
 import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
 import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
 
+const isMainnetProd =
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
     case 'mainnet':
@@ -524,7 +528,7 @@ export class FulcrumProvider {
             let totalAssetSupply = new BigNumber(reserveData[0][i]);
             let totalAssetBorrow = new BigNumber(reserveData[1][i]);
             let supplyInterestRate = new BigNumber(reserveData[2][i]);
-            let borrowInterestRate = new BigNumber(reserveData[3][i]);
+            let borrowInterestRate = new BigNumber(reserveData[4][i]);
             let torqueBorrowInterestRate = new BigNumber(reserveData[4][i]);
             let vaultBalance = new BigNumber(reserveData[5][i]);
             let marketLiquidity = totalAssetSupply.minus(totalAssetBorrow);
@@ -1020,7 +1024,7 @@ export class FulcrumProvider {
         newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
       }
       try {
-        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+        const newCurrentMargin: [BigNumber, BigNumber] = await oracleContract.getCurrentMargin.callAsync(
           borrowedFundsState.loanData.loanToken,
           borrowedFundsState.loanData.collateralToken,
           borrowedFundsState.loanData.principal,
@@ -1028,7 +1032,7 @@ export class FulcrumProvider {
             new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
             new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
         );
-        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+        result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18).plus(100);
       } catch (e) {
         // console.log(e);
         result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
@@ -1549,16 +1553,17 @@ export class FulcrumProvider {
 
         let amountInBaseUnits = new BigNumber(0);
         if (request.positionType === PositionType.LONG) {
-          const decimals: number = AssetsDictionary.assets.get(request.quoteToken)!.decimals || 18;
+          const decimals: number = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
           amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
         }
         else {
-          const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
-          const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
-
-          const currentCollateralToPrincipalRate = await this.getSwapRate(loan.collateralAsset, loan.loanAsset);
-          const maxRequestAmount = loan.loanData.collateral.div(10 ** collateralAssetDecimals).times(currentCollateralToPrincipalRate).minus(loan.loanData.principal.div(10 ** loanAssetDecimals));
-          amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(request.amount.div(maxRequestAmount)).toFixed(0, 1));
+          const maxTradeValueUI = await FulcrumProvider.Instance.getMaxTradeValue(TradeType.SELL,
+            loan.loanAsset,
+            loan.collateralAsset,
+            request.returnTokenIsCollateral ? loan.collateralAsset : loan.loanAsset,
+            request.positionType,
+            loan);
+          amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(request.amount.div(maxTradeValueUI)).toFixed(0, 1));
         }
 
         let maxAmountInBaseUnits = new BigNumber(0);
@@ -1623,8 +1628,11 @@ export class FulcrumProvider {
 
     const loansData = await iBZxContract.getUserLoans.callAsync(
       account,
+      new BigNumber(0),
       new BigNumber(50),
-      1 // margin trade loans
+      1, // margin trade loans
+      false,
+      false
     );
     // console.log(loansData);
     const zero = new BigNumber(0);
@@ -2171,16 +2179,16 @@ export class FulcrumProvider {
   }
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
-    await this.processQueue(false, false);
+    await this.processQueue(requestTask.request.id, false, false);
   };
 
   public onTaskRetry = async (requestTask: RequestTask, skipGas: boolean) => {
-    await this.processQueue(true, skipGas);
+    await this.processQueue(requestTask.request.id, true, skipGas);
   };
 
   public onTaskCancel = async (requestTask: RequestTask) => {
     await this.cancelRequestTask(requestTask);
-    await this.processQueue(false, false);
+    await this.processQueue(requestTask.request.id, false, false);
   };
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
@@ -2188,11 +2196,11 @@ export class FulcrumProvider {
       this.isProcessing = true;
 
       try {
-        const task = TasksQueue.Instance.peek();
+        const task = TasksQueue.Instance.peek(requestTask.request.id);
 
         if (task) {
           if (task.request.id === requestTask.request.id) {
-            TasksQueue.Instance.dequeue();
+            TasksQueue.Instance.dequeue(task.request.id);
           }
         }
       } finally {
@@ -2201,42 +2209,40 @@ export class FulcrumProvider {
     }
   };
 
-  private processQueue = async (force: boolean, skipGas: boolean) => {
-    if (!(this.isProcessing || this.isChecking)) {
+  private processQueue = async (taskId: number, force: boolean, skipGas: boolean) => {
+    if (!(this.isChecking)) {
       let forceOnce = force;
-      do {
-        this.isProcessing = true;
-        this.isChecking = false;
+      this.isProcessing = true;
+      this.isChecking = false;
 
-        try {
-          const task = TasksQueue.Instance.peek();
+      try {
+        const task = TasksQueue.Instance.peek(taskId);
 
-          if (task) {
-            if (task.status === RequestStatus.FAILED_SKIPGAS) {
-              task.status = RequestStatus.FAILED;
+        if (task) {
+          if (task.status === RequestStatus.FAILED_SKIPGAS) {
+            task.status = RequestStatus.FAILED;
+          }
+          if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
+            await this.processRequestTask(task, skipGas);
+            // @ts-ignore
+            if (task.status === RequestStatus.DONE) {
+              TasksQueue.Instance.dequeue(task.request.id);
             }
-            if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
-              await this.processRequestTask(task, skipGas);
-              // @ts-ignore
-              if (task.status === RequestStatus.DONE) {
-                TasksQueue.Instance.dequeue();
-              }
-            } else {
-              if (task.status === RequestStatus.FAILED && !forceOnce) {
-                this.isProcessing = false;
-                this.isChecking = false;
-                break;
-              }
+          } else {
+            if (task.status === RequestStatus.FAILED && !forceOnce) {
+              this.isProcessing = false;
+              this.isChecking = false;
             }
           }
-        } finally {
-          forceOnce = false;
-          this.isChecking = true;
-          this.isProcessing = false;
         }
-      } while (TasksQueue.Instance.any());
-      this.isChecking = false;
+      } finally {
+        forceOnce = false;
+        this.isChecking = true;
+        this.isProcessing = false;
+      }
     }
+    this.isChecking = false;
+
   };
 
   private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -2286,13 +2292,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-    }
-    }
-    }
-    } catch(e) {
-    // console.log(e);
-    }
-    }*/
+                                                    }
+                                                    }
+                                                    }
+                                                    } catch(e) {
+                                                    // console.log(e);
+                                                    }
+                                                    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -2649,59 +2655,51 @@ console.log(err, added);
 
         const randomNumber = Math.floor(Math.random() * 100000) + 1;
 
-        if (request instanceof LendRequest) {
-          const tagManagerArgs = {
-            dataLayer: {
-              transactionId: randomNumber,
-              transactionProducts: [{
-                name: "Transaction-Lend-" + request.asset,
-                sku: request.asset,
-                category: 'Lend'
-              }],
-            }
-          }
-          TagManager.dataLayer(tagManagerArgs)
-          this.eventEmitter.emit(
-            FulcrumProviderEvents.LendTransactionMined,
-            new LendTransactionMinedEvent(request.asset, txHash)
-          );
-        } else
-          if (request instanceof ManageCollateralRequest) {
+        if (isMainnetProd) {
+          if (request instanceof LendRequest) {
             const tagManagerArgs = {
               dataLayer: {
                 transactionId: randomNumber,
                 transactionProducts: [{
-                  name: "Transaction-Manage-Collateral-" + request.asset,
+                  name: "Transaction-Lend-" + request.asset,
                   sku: request.asset,
-                  category: 'Manage-Collateral'
+                  category: 'Lend'
                 }],
               }
             }
             TagManager.dataLayer(tagManagerArgs)
-          } else {
-            const tagManagerArgs = {
-              dataLayer: {
-                transactionId: randomNumber,
-                transactionProducts: [{
-                  name: "Transaction-Trade" + request.asset,
-                  sku: request.asset,
-                  category: 'Trade'
-                }],
+            this.eventEmitter.emit(
+              FulcrumProviderEvents.LendTransactionMined,
+              new LendTransactionMinedEvent(request.asset, txHash)
+            );
+          } else
+            if (request instanceof ManageCollateralRequest) {
+              const tagManagerArgs = {
+                dataLayer: {
+                  transactionId: randomNumber,
+                  transactionProducts: [{
+                    name: "Transaction-Manage-Collateral-" + request.asset,
+                    sku: request.asset,
+                    category: 'Manage-Collateral'
+                  }],
+                }
               }
+              TagManager.dataLayer(tagManagerArgs)
+            } else {
+              const tagManagerArgs = {
+                dataLayer: {
+                  transactionId: randomNumber,
+                  transactionProducts: [{
+                    name: "Transaction-Trade" + request.asset,
+                    sku: request.asset,
+                    category: 'Trade'
+                  }],
+                }
+              }
+              TagManager.dataLayer(tagManagerArgs)
             }
-            TagManager.dataLayer(tagManagerArgs)
-            // this.eventEmitter.emit(
-            //   FulcrumProviderEvents.TradeTransactionMined,
-            //   new TradeTransactionMinedEvent(new TradeTokenKey(
-            //     request.asset,
-            //     request.unitOfAccount,
-            //     request.positionType,
-            //     request.leverage,
-            //     request.isTokenized,
-            //     request.version
-            //   ), txHash)
-            // );
-          }
+        }
+
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);

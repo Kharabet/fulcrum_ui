@@ -17,7 +17,7 @@
       "description": "",
       "externalDocs": {
         "description": "See data on Fulcrum stats page",
-        "url": "https://app.fulcrum.trade/#/stats"
+        "url": "https://app.fulcrum.trade/stats"
       }
     },
     {
@@ -402,12 +402,38 @@
         }
       }
     },
+    "/interest-rates-fulcrum": {
+      "get": {
+        "tags": [
+          "External Integration"
+        ],
+        "summary": "Get Fulcrum interest rates (APR and APY), specifically designed for loanscan",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/interest-rates-torque": {
+      "get": {
+        "tags": [
+          "External Integration"
+        ],
+        "summary": "Get Torque interest rates (APR and APY), specifically designed for loanscan",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/interest-rates": {
       "get": {
         "tags": [
           "External Integration"
         ],
-        "summary": "Get supply interest rates (APR and APY), specifically designed for loanscan",
+        "summary": "Get Fulcrum and Torque interest rates (APR and APY) and Yield",
         "responses": {
           "200": {
             "description": "Success"
