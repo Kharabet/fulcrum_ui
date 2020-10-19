@@ -1,0 +1,196 @@
+.table-row__image {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 40px;
+    background-color: #fcfcfc;
+    text-align: right;
+    background-size: 60px 60px;
+    background-image: linear-gradient(
+        135deg,
+        #f5f7f9 25%,
+        transparent 25%,
+        transparent 50%,
+        #f5f7f9 50%,
+        #f5f7f9 75%,
+        transparent 75%,
+        transparent
+    );
+    border-bottom: 1px solid #e7ebf0;
+    animation: animate-stripes 0.6s linear infinite;
+    animation-duration: 1.25s;
+    animation-direction: reverse;
+
+    @media screen and (max-width: $width-max-lg) {
+        padding-right: 15px;
+        width: 1100px;
+    }
+    &.open-tab-tx {
+        animation: openTabTx 0.6s cubic-bezier(1, 1, 1, 1);
+        &:before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            animation: openTabTxLeft 0.6s cubic-bezier(1, 1, 1, 1);
+            border-right: 101px solid transparent;
+            border-top: 101px solid transparent;
+        }
+        &:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            animation: openTabTxRight 0.6s cubic-bezier(1, 1, 1, 1);
+            border-left: 101px solid transparent;
+            border-top: 101px solid transparent;
+        }
+    }
+
+    .transaction-step {
+        line-height: 1.4;
+        font-weight: 800;
+        color: #283049;
+        font-size: 16px;
+        padding-left: 40px;
+        @media screen and (max-width: $width-max-md) {
+            font-size: 14px;
+            padding-left: 15px;
+            width: calc(100% - 85px);
+        }
+        &.warning {
+            color: #ff4f4f;
+        }
+        @keyframes in {
+            0% {
+                opacity: 0;
+                transform: translate(0, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(0px, 0px);
+            }
+        }
+        @keyframes out {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0);
+            }
+            to {
+                opacity: 0;
+                transform: translate(0px, 20px);
+            }
+        }
+
+        &.animation-in {
+            animation: in 0.5s ease-in;
+        }
+        &.animation-out {
+            animation: out 0.5s ease-in;
+        }
+    }
+}
+
+@keyframes animate-stripes {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 60px 0;
+    }
+}
+@keyframes openTabTx {
+    0% {
+        transform: rotateX(-90deg);
+        transform-origin: top;
+    }
+    50% {
+        transform: rotateX(-45deg);
+    }
+    100% {
+        transform: rotateX(0deg);
+        transform-origin: top;
+    }
+}
+@keyframes closeTabTx {
+    0% {
+        transform: rotateX(0deg);
+        transform-origin: top;
+        height: 101px;
+    }
+    50% {
+        transform: rotateX(-45deg);
+        transform-origin: top;
+    }
+    100% {
+        transform: rotateX(-90deg);
+        transform-origin: top;
+        height: 0;
+    }
+}
+@keyframes openTabTxRight {
+    0% {
+        border-right: 30px solid var(--primary-bg);
+    }
+    100% {
+        border-right: 0px solid var(--primary-bg);
+    }
+}
+@keyframes openTabTxLeft {
+    0% {
+        border-left: 30px solid var(--primary-bg);
+    }
+    100% {
+        border-left: 0px solid var(--primary-bg);
+    }
+}
+@keyframes closeTabTxRight {
+    0% {
+        border-right: 0px solid var(--primary-bg);
+    }
+    100% {
+        border-right: 30px solid var(--primary-bg);
+    }
+}
+@keyframes closeTabTxLeft {
+    0% {
+        border-left: 0px solid var(--primary-bg);
+    }
+    100% {
+        border-left: 30px solid var(--primary-bg);
+    }
+}
+
+.opacityIn {
+    .completed & {
+        animation: opacityIn 1s cubic-bezier(1, 1, 1, 1);
+    }
+}
+
+.rightIn {
+    .completed & {
+        animation: rightIn 0.4 1s cubic-bezier(1, 1, 1, 1);
+    }
+}
+
+@keyframes opacityIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes rightIn {
+    0% {
+        transform: translate(15px, 0);
+    }
+    to {
+        transform: translate(0, 0);
+    }
+}

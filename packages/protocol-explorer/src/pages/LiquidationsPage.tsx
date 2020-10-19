@@ -21,7 +21,6 @@ import { IActiveLoanData } from "../domain/IActiveLoanData";
 import { ILoanRowProps } from "../components/LoanRow";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 
-
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void;
   isMobileMedia: boolean;
@@ -192,6 +191,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18;
         const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${e.loanToken === Asset.fWETH ? "eth" : e.loanToken.toLowerCase()}&date=${e.timeStamp.getTime()}`);
         const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+        if (!swapToUsdHistoryRateResponse) continue;
         const repayAmountUsd = e.repayAmount.div(10 ** loanAssetDecimals).times(swapToUsdHistoryRateResponse.swapToUSDPrice);
         volume30d = volume30d.plus(repayAmountUsd);
         liquidationEventsWithUsd.push({ event: e, repayAmountUsd: repayAmountUsd });
@@ -205,7 +205,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       seizeAmount: e.maxSeizable,
       loanToken: e.loanAsset,
       collateralToken: e.collateralAsset,
-      onLiquidationCompleted: this.derivedUpdate.bind(this)
+      onLiquidationUpdated: this.derivedUpdate.bind(this)
     }))
     await this.setState({
       ...this.state,
@@ -435,4 +435,5 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     tooltipEl.style.left = tooltip.caretX - tableRoot.offsetWidth / 2 + 'px';
     tooltipEl.style.top = 0 + 'px';
   }
+
 }

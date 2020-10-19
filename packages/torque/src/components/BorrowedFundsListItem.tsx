@@ -32,6 +32,7 @@ interface IBorrowedFundsListItemState {
   borrowedFundsItem: IBorrowedFundsState;
   assetDetails: AssetDetails | null;
   interestRate: BigNumber;
+  liquidationPrice: BigNumber;
   isInProgress: boolean;
   isEmpty: boolean;
   isLoadingTransaction: boolean;
@@ -45,7 +46,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     this.state = {
       borrowedFundsItem: props.item,
       assetDetails: null,
-      interestRate: new BigNumber(0),
+      interestRate: new BigNumber(0),      
+      liquidationPrice: new BigNumber(0),
       isLoadingTransaction: false,
       isInProgress: props.item.isInProgress,
       isEmpty: false,
@@ -112,10 +114,24 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
   private derivedUpdate = async () => {
     const assetDetails = AssetsDictionary.assets.get(this.props.item.loanAsset) || null;
+    
+    const loanAssetDecimals = assetDetails!.decimals || 18;
+    const collateralAssetDecimals = AssetsDictionary.assets.get(this.state.borrowedFundsItem.collateralAsset)!.decimals || 18;
+    const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+    const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+
+    const startMargin = this.state.borrowedFundsItem.loanData!.startMargin.div(10 ** 18).toNumber();
+
+    const collateralToUSDCurrentRate = await TorqueProvider.Instance.getSwapToUsdRate(this.state.borrowedFundsItem.loanAsset);
+
+    //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
+    const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)).div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision)).times(10 ** 18);
+    const liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18).times(collateralToUSDCurrentRate);
     await this.setState({
       ...this.state,
       assetDetails: assetDetails,
-      interestRate: this.props.item.interestRate
+      interestRate: this.props.item.interestRate,
+      liquidationPrice
     });
   };
 
@@ -135,13 +151,14 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     // const firstInRowModifier = this.props.firstInTheRow ? "borrowed-funds-list-item--first-in-row" : "";
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
-
+    const maintenanceMargin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber();
+    const startMargin = borrowedFundsItem.loanData!.startMargin.div(10 ** 18).toNumber();
     //115%
     const sliderMin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber();
     //300%
     const sliderMax = sliderMin + 185;
-    const isUnhealthyLoan = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(115);
-    const isBoorowMoreDisabled = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(150);
+    const isUnhealthyLoan = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(maintenanceMargin);
+    const isBoorowMoreDisabled = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(startMargin);
 
     let sliderValue = borrowedFundsItem.collateralizedPercent.multipliedBy(100).toNumber();
     if (sliderValue > sliderMax) {
@@ -214,6 +231,10 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
             className="borrowed-funds-list-item__body-collateralized-value">
             <span className="value">{borrowedFundsItem.collateralAmount.toFixed(4)}</span>&nbsp;
                   {borrowedFundsItem.collateralAsset === Asset.WETH ? Asset.ETH : borrowedFundsItem.collateralAsset}
+          </div>
+          <div title={`$${this.state.liquidationPrice.toFixed()}`}
+            className="borrowed-funds-list-item__body-collateralized-value">
+            Liq. Price:&nbsp;$<span className="value">{this.state.liquidationPrice.toFixed(2)}</span>
           </div>
         </div>
         {this.state.isInProgress ? (
