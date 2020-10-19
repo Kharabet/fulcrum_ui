@@ -473,7 +473,7 @@ export class ContractsSource {
             break;
         }*/
         switch (addressErc20) {
-          case "0xfBE16bA4e8029B759D3c5ef8844124893f3ae470":
+          case "0xfbe16ba4e8029b759d3c5ef8844124893f3ae470":
             asset = Asset.fWETH;
             break;
           case "0x7143e05608c4bc7e83a3b72a28de2497f62b7e59":
@@ -482,7 +482,7 @@ export class ContractsSource {
           case "0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8":
             asset = Asset.DAI;
             break;
-          case "0xB443f30CDd6076b1A5269dbc08b774F222d4Db4e":
+          case "0xb443f30cdd6076b1a5269dbc08b774f222d4db4e":
             asset = Asset.USDC;
             break;
           case "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996":
@@ -491,7 +491,7 @@ export class ContractsSource {
           case "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62":
             asset = Asset.SUSD;
             break;
-          case "0x5aE55494Ccda82f1F7c653BC2b6EbB4aD3C77Dac":
+          case "0x5ae55494ccda82f1f7c653bc2b6ebb4ad3c77dac":
             asset = Asset.WBTC;
             break;
           case "0xfb9325e5f4fc9629525427a1c92c0f4d723500cf":

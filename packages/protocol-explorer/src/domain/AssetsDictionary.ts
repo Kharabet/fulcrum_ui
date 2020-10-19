@@ -88,7 +88,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG token instead
-          [42, "0x5aE55494Ccda82f1F7c653BC2b6EbB4aD3C77Dac"],
+          [42, "0x5ae55494ccda82f1f7c653bc2b6ebb4ad3c77dac"],
         ])
       )
     ],
@@ -215,7 +215,7 @@ export class AssetsDictionary {
         WETH,
         18,
         new Map<number, string | null>([
-          [42, "0xfBE16bA4e8029B759D3c5ef8844124893f3ae470"]
+          [42, "0xfbe16ba4e8029b759d3c5ef8844124893f3ae470"]
         ])
       )
     ],
