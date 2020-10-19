@@ -1636,12 +1636,14 @@ export class FulcrumProvider {
     );
     // console.log(loansData);
     const zero = new BigNumber(0);
+    //@ts-ignore
     result = loansData
       .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
       .map(e => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
-        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
         const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) return;
+        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
         let amountOwned = e.principal.minus(e.interestDepositRemaining);
         if (amountOwned.lte(0)) {
@@ -1664,7 +1666,7 @@ export class FulcrumProvider {
           isInProgress: false,
           loanData: e
         };
-      });
+      }).filter(e => e);
     console.log(result);
     return result;
   }

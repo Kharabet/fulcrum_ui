@@ -22,20 +22,26 @@ interface IStatsTokenGridState {
 }
 
 export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenGridState> {
-  private static readonly assets: Asset[] = [
-    Asset.ETHv1,
-    Asset.ETH,
-    Asset.DAI,
-    Asset.USDC,
-    Asset.USDT,
-    Asset.WBTC,
-    Asset.LINK,
-    Asset.YFI,
-    Asset.BZRX,
-    Asset.MKR,
-    Asset.LEND,
-    Asset.KNC
-  ];
+  private static readonly assets: Asset[] = process.env.REACT_APP_ETH_NETWORK === "mainnet"
+    ? [
+      Asset.ETHv1,
+      Asset.ETH,
+      Asset.DAI,
+      Asset.USDC,
+      Asset.USDT,
+      Asset.WBTC,
+      Asset.LINK,
+      Asset.YFI,
+      Asset.BZRX,
+      Asset.MKR,
+      Asset.LEND,
+      Asset.KNC
+    ]
+    : [
+      Asset.fWETH,
+      Asset.USDC,
+      Asset.WBTC,
+    ];
 
   constructor(props: IStatsTokenGridProps) {
     super(props);
