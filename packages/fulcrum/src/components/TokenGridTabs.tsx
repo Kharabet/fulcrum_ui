@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
+import { ManageTokenGridHeader } from "./ManageTokenGridHeader";
 import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from "./DropdownSelect";
 import { IMarketPair } from "../pages/TradePage";
 import "../styles/components/token-grid-tabs.scss";
@@ -11,14 +12,18 @@ export interface ITokenGridTabsProps {
   baseTokens: Asset[];
   quoteTokens: Asset[];
   isShowMyTokensOnly: boolean;
+  isShowHistory: boolean;
   openedPositionsCount: number;
+
   onMarketSelect: (baseToken: Asset, quoteToken: Asset) => void;
   onShowMyTokensOnlyChange: (value: boolean) => void;
+  onShowHistory: (value: boolean) => void;
 }
 
 interface ITokenGridTabsState {
   //  isPro: boolean;
   isShowMyTokensOnly: boolean;
+  isShowHistory: boolean;
 }
 
 export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabsState> {
@@ -26,6 +31,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     super(props, context);
     this.state = {
       isShowMyTokensOnly: props.isShowMyTokensOnly,
+      isShowHistory: props.isShowHistory,
       // isPro: false
     };
     // this.onSwitchPro = this.onSwitchPro.bind(this);
@@ -90,12 +96,18 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
           </div>
           <div className="trade-token-grid-tab__items">
             {/* {this.props.assets.map(asset => (this.renderAsset(asset)))} */}
-            <ManageButton {...this.props} onShowMyTokensOnlyChange={this.showMyTokensOnlyChange} isShowMyTokensOnly={this.state.isShowMyTokensOnly} />
+            <ManageTokenGridHeader
+              {...this.props}
+              isShowMyTokensOnly={this.state.isShowMyTokensOnly}
+              isShowHistory={this.state.isShowHistory}
+              updateStateisShowHistory={this.updateStateisShowHistory} />
+
+            {/* <ManageButton {...this.props} isShowMyTokensOnly={this.state.isShowMyTokensOnly} /> */}
           </div>
 
-          <div className="pro-switch-wrapper">
+          {/* <div className="pro-switch-wrapper">
             <div className="pro-switch"></div>
-          </div>
+          </div> */}
           {/* {!this.props.isMobile
             ? <React.Fragment>
               <div className="pro-switch-wrapper">
@@ -117,18 +129,23 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     await this.setState({ ...this.state, isShowMyTokensOnly: true })
   }
 
+  public updateStateisShowHistory = async (updatedState: boolean) => {
+    this.showMyTokensOnlyChange();
+    await this.props.onShowHistory(updatedState);
+    await this.setState({ isShowHistory: updatedState })
+  }
+
   private getDropdownProps(): IDropdownSelectProps {
 
     let dropDownSelectOptions: IDropDownSelectOption[] = [];
     this.props.baseTokens.forEach(baseToken => {
-      
+
       this.props.quoteTokens.forEach(stablecoin =>
         baseToken != stablecoin && dropDownSelectOptions.push({
           baseToken: baseToken,
           quoteToken: stablecoin
         })
       );
-
 
     });
 
@@ -148,6 +165,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
       onDropdownSelect: this.onDropdownSelect.bind(this)
     }
   }
+
   // private onSwitchPro() {
   //   this.setState({ ...this.state, isPro: !this.state.isPro });
   // }
