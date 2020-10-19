@@ -2560,7 +2560,6 @@ export class iTokenContract extends BaseContract {
         },
         async callAsync(
             settingsTarget: string,
-            callData: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
         ): Promise<void
