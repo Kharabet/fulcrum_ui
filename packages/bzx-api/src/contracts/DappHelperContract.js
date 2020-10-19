@@ -1,8 +1,25 @@
 export const DappHelperJson = {
-    "name": "DAppHelper",
-    "address": "",
+    "contractName": "DAppHelper",
     "abi": [
         {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_bZxProtocol",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_legacyVault",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+        },
+        {
+            "constant": true,
             "inputs": [
                 {
                     "internalType": "address",
@@ -16,7 +33,7 @@ export const DappHelperJson = {
                 },
                 {
                     "internalType": "uint256[]",
-                    "name": "amounts",
+                    "name": "sourceAmounts",
                     "type": "uint256[]"
                 }
             ],
@@ -38,10 +55,57 @@ export const DappHelperJson = {
                     "type": "uint256[]"
                 }
             ],
+            "payable": false,
             "stateMutability": "view",
             "type": "function"
         },
         {
+            "constant": true,
+            "inputs": [],
+            "name": "bZxProtocol",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "legacyVault",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
             "inputs": [
                 {
                     "internalType": "address[]",
@@ -82,7 +146,28 @@ export const DappHelperJson = {
                     "type": "uint256[]"
                 }
             ],
+            "payable": false,
             "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_bZxProtocol",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_legacyVault",
+                    "type": "address"
+                }
+            ],
+            "name": "setAddresses",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
             "type": "function"
         }
     ]
