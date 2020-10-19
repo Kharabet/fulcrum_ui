@@ -37,8 +37,9 @@ export class TasksQueue {
     this.eventEmitter.emit(TasksQueueEvents.QueueChanged);
   }
 
-  public dequeue(): RequestTask | null {
-    const result = this.requestTasks.shift() || null;
+  public dequeue(requestId: number) {
+    const index = this.getIndex(requestId);
+    const result = index > -1 ? this.requestTasks.splice(index, 1) : null;
 
     this.eventEmitter.emit(TasksQueueEvents.Dequeued, result);
     this.eventEmitter.emit(TasksQueueEvents.QueueChanged);
@@ -46,12 +47,17 @@ export class TasksQueue {
     return result;
   }
 
-  public peek(): RequestTask | null {
-    return this.any() ? this.requestTasks[0] : null;
+  public peek(requestId: number): RequestTask | null {
+    const index = this.getIndex(requestId);
+    return this.any() && index > -1 ? this.requestTasks[index] : null;
   }
 
   public any(): boolean {
     return this.requestTasks.length > 0;
+  }
+
+  public getIndex(requestId: number): number {
+    return this.requestTasks.findIndex((task) => task.request.id === requestId);
   }
 
   public getTasksList() {

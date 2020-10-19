@@ -4,6 +4,7 @@ import "../styles/components/info-block.scss"
 
 export interface IInfoBlockProps {
   localstorageItemProp: string;
+  isAccept?: boolean;
   onAccept?: () => void;
 }
 export interface IInfoBlockState {
@@ -35,9 +36,11 @@ export class InfoBlock extends Component<IInfoBlockProps, IInfoBlockState> {
       <div className="info-block__container">
         {/* <div className="info-block__left">Please note:</div> */}
         <div className="info-block__center">{this.props.children}</div>
-        {/* <div className="info-block__right">
-          <button className="info-block__accept" onClick={this.onAccept}>OK</button>
-        </div> */}
+        {this.props.isAccept &&
+          <div className="info-block__right">
+            <button className="info-block__accept" onClick={this.onAccept}>OK</button>
+          </div>
+        }
       </div>
     );
   }
