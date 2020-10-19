@@ -266,8 +266,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
 
     const request = new ManageCollateralRequest(
       this.props.loan.loanId,
-      this.props.baseToken,
-      this.props.quoteToken,
+      this.props.loan.loanAsset,
+      this.props.loan.collateralAsset,
       this.props.loan.collateralAmount,
       false
     );
