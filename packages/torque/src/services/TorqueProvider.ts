@@ -547,16 +547,11 @@ export class TorqueProvider {
       throw new Error("contractsSource is not defined");
     }
     const iToken = await this.contractsSource.getiTokenContract(asset);
-
+    
     // @ts-ignore
-    const leverageAmount = new BigNumber(web3.utils.soliditySha3(
-      { "type": "uint256", "value": "2000000000000000000" }, // use 2000000000000000000 for 150% initial margin
-      { "type": "address", "value": collateralToken }
-    ));
-    const hash = await iToken.loanIdes.callAsync(leverageAmount);
-    const data = await iToken.loanOrderData.callAsync(hash);
-    return data[3].div(10 ** 18).plus(100);
-    return new BigNumber("150"); // TODO @bshevchenko return data[3];
+    const maintenanceMargin = await iToken.loanParamsIds.callAsync(web3.utils.soliditySha3(collateralToken, true));
+    return new BigNumber("150"); // TODO @Kharabet debug precision of maintenanceMargin;
+    return new BigNumber(maintenanceMargin);
   };
 
   public assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
