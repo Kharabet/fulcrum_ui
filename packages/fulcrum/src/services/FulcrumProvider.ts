@@ -1024,7 +1024,7 @@ export class FulcrumProvider {
         newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
       }
       try {
-        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+        const newCurrentMargin: [BigNumber, BigNumber] = await oracleContract.getCurrentMargin.callAsync(
           borrowedFundsState.loanData.loanToken,
           borrowedFundsState.loanData.collateralToken,
           borrowedFundsState.loanData.principal,
@@ -1032,7 +1032,7 @@ export class FulcrumProvider {
             new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
             new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
         );
-        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+        result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18).plus(100);
       } catch (e) {
         // console.log(e);
         result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
@@ -1628,8 +1628,11 @@ export class FulcrumProvider {
 
     const loansData = await iBZxContract.getUserLoans.callAsync(
       account,
+      new BigNumber(0),
       new BigNumber(50),
-      1 // margin trade loans
+      1, // margin trade loans
+      false,
+      false
     );
     // console.log(loansData);
     const zero = new BigNumber(0);
@@ -2291,13 +2294,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                }
-                                                }
-                                                }
-                                                } catch(e) {
-                                                // console.log(e);
-                                                }
-                                                }*/
+                                                    }
+                                                    }
+                                                    }
+                                                    } catch(e) {
+                                                    // console.log(e);
+                                                    }
+                                                    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
