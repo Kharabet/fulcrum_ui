@@ -85,7 +85,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       : new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage).times(10 ** 18))
 
     const maintenanceMargin = this.props.maintenanceMargin;
-    // liq_price_before_trade = (maintinance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
+    // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     //if it's a SHORT then -> 10^36 / above
     const liquidationPriceBeforeTrade = (maintenanceMargin.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18)).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
     let liquidationPrice = new BigNumber(0);
