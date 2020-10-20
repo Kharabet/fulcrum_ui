@@ -158,7 +158,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public async componentDidMount() {
     this._isMounted = true;
-    const tokenRowsData = this.getTokenRowsData(this.state);
+    const tokenRowsData = await this.getTokenRowsData(this.state);
     this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
 
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
@@ -178,7 +178,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
 
   private async derivedUpdate() {
-    const tokenRowsData = this.getTokenRowsData(this.state);
+    const tokenRowsData = await this.getTokenRowsData(this.state);
 
     const ownRowsData = await this.getOwnRowsData(this.state);
     await this._isMounted && this.setState({ ...this.state, tokenRowsData, ownRowsData });
@@ -543,7 +543,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     return { groupedEvents, earnRewardEvents, payTradingFeeEvents };
   }
 
-  public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
+  public getTokenRowsData = async (state: ITradePageState): Promise<ITradeTokenGridRowProps[]> => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
 
     tokenRowsData.push({
@@ -556,7 +556,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
-      maintenanceMargin: new BigNumber(0)
+      maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(state.selectedMarket.baseToken, state.selectedMarket.quoteToken)
     });
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
@@ -568,7 +568,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
-      maintenanceMargin: new BigNumber(0)
+      maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(state.selectedMarket.quoteToken, state.selectedMarket.baseToken)
     });
     return tokenRowsData;
   };

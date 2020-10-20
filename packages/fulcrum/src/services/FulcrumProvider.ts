@@ -1614,6 +1614,17 @@ export class FulcrumProvider {
     return result;
   }
 
+  public getMaintenanceMargin = async (asset: Asset, collateralAsset: Asset): Promise<BigNumber> => {
+    if (!this.contractsSource) {
+      return new BigNumber(0);
+    }
+    const iToken = await this.contractsSource.getITokenContract(asset);
+    const collateralTokenAddress = AssetsDictionary.assets.get(collateralAsset)!.addressErc20;
+    // @ts-ignore
+    const maintenanceMargin = await iToken.loanParamsIds.callAsync(web3.utils.soliditySha3(collateralTokenAddress, true));
+    return maintenanceMargin;
+    return new BigNumber("150"); // TODO @bshevchenko return data[3];
+  };
 
   public async getUserMarginTradeLoans(): Promise<IBorrowedFundsState[]> {
     let result: IBorrowedFundsState[] = [];
