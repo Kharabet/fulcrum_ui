@@ -50,14 +50,13 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    this.derivedUpdate();
   }
 
 
   public async derivedUpdate() {
     const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(StatsTokenGrid.assets);
     //console.log(reserveDetails);
-    const rowData = await StatsTokenGrid.getRowsData(reserveDetails);
+    const rowData = await StatsTokenGrid.getRowsData(reserveDetails, this.state.yieldAPYJson);
     let totalsRow: IStatsTokenGridRowProps | null = null;
     if (rowData.length > 0) {
       totalsRow = rowData.pop()!;
@@ -81,11 +80,12 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-
-    this.derivedUpdate();
+    const yieldAPYRequest = await fetch(`${StatsTokenGrid.apiUrl}/yield-farimng-apy`);
+    const yieldAPYJson = await yieldAPYRequest.json();
+    await this.setState({ ...this.state, yieldAPYJson })
   }
 
   public render() {
@@ -118,11 +118,8 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     );
   }
 
-  private static getRowsData = async (reserveDetails: ReserveDetails[]): Promise<IStatsTokenGridRowProps[]> => {
+  private static getRowsData = async (reserveDetails: ReserveDetails[], yieldAPYJson: any): Promise<IStatsTokenGridRowProps[]> => {
     const rowsData: IStatsTokenGridRowProps[] = [];
-    const yieldAPYRequest = await fetch(`${StatsTokenGrid.apiUrl}/yield-farimng-apy`);
-    const yieldAPYJson = await yieldAPYRequest.json();
-
 
     reserveDetails.forEach(e => {
       const yieldApr = e.asset && yieldAPYJson && yieldAPYJson!['success']
