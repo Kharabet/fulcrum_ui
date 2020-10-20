@@ -433,7 +433,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
         const collateralAssetAmount = loan.loanData.collateral.div(10 ** 18).times(collateralAssetPrecision);
         const loanAssetAmount = loan.loanData.principal.div(10 ** 18).times(loanAssetPrecision);
-        //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
+        //liquidation_collateralToLoanRate = ((maintinance_margin * principal / 10^20) + principal) / collateral * 10^18
         //If SHORT -> 10^36 / liquidation_collateralToLoanRate
         const liquidation_collateralToLoanRate = (maintenanceMargin.times(loan.loanData.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(loan.loanData.principal.times(loanAssetPrecision)).div(loan.loanData.collateral.times(collateralAssetPrecision)).times(10 ** 18);
 

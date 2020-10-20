@@ -124,7 +124,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     const collateralToUSDCurrentRate = await TorqueProvider.Instance.getSwapToUsdRate(this.state.borrowedFundsItem.loanAsset);
 
-    //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
+    //liquidation_collateralToLoanRate = ((maintinance_margin * principal / 10^20) + principal) / collateral * 10^18
     const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)).div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision)).times(10 ** 18);
     const liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18).times(collateralToUSDCurrentRate);
     await this.setState({
