@@ -1624,8 +1624,8 @@ export class FulcrumProvider {
     if (!iToken || !iBZxContract) return new BigNumber(0);
     const collateralTokenAddress = AssetsDictionary.assets.get(collateralAsset)!.addressErc20.get(this.web3ProviderSettings.networkId);
     // @ts-ignore
-    const hash = Web3Utils.soliditySha3(collateralTokenAddress, true)
-    const loanId = await iToken.loanParamsIds.callAsync(hash);
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true));
+    const loanId = await iToken.loanParamsIds.callAsync(id);
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
     const maintenanceMargin = loanParams[6];
     return maintenanceMargin; 
