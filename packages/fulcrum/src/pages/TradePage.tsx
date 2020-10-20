@@ -394,15 +394,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         this.state.selectedMarket.baseToken === loan.loanAsset
         && this.state.selectedMarket.quoteToken === loan.collateralAsset
       );
-      const maintenanceMargin = loan && loan.loanData!.maintenanceMargin || new BigNumber("150000000000000000000");
-      const tokenRowsData = this.state.tokenRowsData.map(item => {
-        item.maintenanceMargin = maintenanceMargin;
-        return item;
-      });
 
-      this._isMounted && this.setState({ ...this.state, loans, tokenRowsData });
       for (const loan of loans) {
         if (!loan.loanData) continue;
+
+        const maintenanceMargin = loan.loanData!.maintenanceMargin
 
         const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
         const isCollateralTokenNotInQuoteTokens = this.baseTokens.includes(loan.collateralAsset) && !this.quoteTokens.includes(loan.collateralAsset)
