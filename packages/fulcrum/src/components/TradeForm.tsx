@@ -55,7 +55,7 @@ export interface ITradeFormProps {
   baseToken: Asset;
   positionType: PositionType;
   leverage: number;
-  quoteAsset: Asset;
+  quoteToken: Asset;
 
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
@@ -174,7 +174,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(
       this.props.tradeType,
       this.props.baseToken,
-      this.props.quoteAsset,
+      this.props.quoteToken,
       this.state.depositToken,
       this.props.positionType,
       this.props.loan
@@ -183,7 +183,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
       this.props.tradeType,
       this.props.baseToken,
-      this.props.quoteAsset,
+      this.props.quoteToken,
       this.state.depositToken,
       this.props.positionType,
       this.props.leverage,
@@ -198,8 +198,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
 
     const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
-      ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteAsset)
-      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteAsset, this.props.baseToken);
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken);
 
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.props.leverage - 1).times(10 ** 18))
@@ -342,7 +342,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             </div>
             <div className="trade-form__asset-stats">
               <div className="trade-form__info_block__asset">
-                <span className="base-asset">{this.props.baseToken}</span>-{this.props.quoteAsset}
+                <span className="base-asset">{this.props.baseToken}</span>-{this.props.quoteToken}
               </div>
               <div className="trade-form__info_block__stats">
                 <div className="trade-form__info_block__stats__data">
@@ -375,7 +375,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
             <InputAmount
               inputAmountText={this.state.inputAmountText}
-              selectorAssets={[this.props.baseToken, this.props.quoteAsset]}
+              selectorAssets={[this.props.baseToken, this.props.quoteToken]}
               buttonValue={this.state.buttonValue}
               isLoading={false}
               tradeType={this.props.tradeType}
@@ -411,7 +411,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 <div className="trade-form__how-it-works">
                   <div className="hiw-icon"><QuestionIcon /></div>
                   <div className="hiw-content">
-                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. This will borrow {this.props.positionType === PositionType.LONG ? this.props.quoteAsset : this.state.assetDetails.displayName} from a Fulcrum lending pool and that {this.props.positionType === PositionType.LONG ? this.props.quoteAsset : this.state.assetDetails.displayName} is swapped into {this.props.positionType === PositionType.LONG ? this.state.assetDetails.displayName : this.props.quoteAsset} using an on-chain DEX.
+                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. This will borrow {this.props.positionType === PositionType.LONG ? this.props.quoteToken : this.state.assetDetails.displayName} from a Fulcrum lending pool and that {this.props.positionType === PositionType.LONG ? this.props.quoteToken : this.state.assetDetails.displayName} is swapped into {this.props.positionType === PositionType.LONG ? this.state.assetDetails.displayName : this.props.quoteToken} using an on-chain DEX.
                 </div>
                 </div>
               </CollapsibleContainer>
@@ -459,7 +459,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.loan!.loanId,
       this.props.tradeType,
       this.props.baseToken,
-      this.props.quoteAsset,
+      this.props.quoteToken,
       this.state.depositToken,
       this.props.positionType,
       this.props.leverage,
@@ -523,7 +523,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           transactionId: randomNumber,
           transactionTotal: new BigNumber(usdPrice).toNumber(),
           transactionProducts: [{
-            name: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType + '-' + this.props.quoteAsset,
+            name: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType + '-' + this.props.quoteToken,
             sku: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType,
             category: this.props.positionType,
             price: new BigNumber(usdPrice).toNumber(),
@@ -539,7 +539,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
         this.props.tradeType,
         this.props.baseToken,
-        this.props.quoteAsset,
+        this.props.quoteToken,
         this.state.depositToken,
         this.props.positionType,
         this.props.leverage,
@@ -552,7 +552,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
       this._isMounted && this.setState({ ...this.state, isLoading: true, isExposureLoading: true });
-      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.baseToken, this.props.quoteAsset, this.state.depositToken, this.props.positionType, this.props.loan)
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.baseToken, this.props.quoteToken, this.state.depositToken, this.props.positionType, this.props.loan)
         .then(maxTradeValue => {
           this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier)
             .then(limitedAmount => {
@@ -567,7 +567,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
       this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
-      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.baseToken, this.props.quoteAsset, this.state.depositToken, this.props.positionType, this.props.loan)
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.baseToken, this.props.quoteToken, this.state.depositToken, this.props.positionType, this.props.loan)
         .then(maxTradeValue => {
           this.getInputAmountLimitedFromText(value, maxTradeValue)
             .then(limitedAmount => {
@@ -584,7 +584,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
       this.props.tradeType,
       this.props.baseToken,
-      this.props.quoteAsset,
+      this.props.quoteToken,
       this.state.depositToken,
       this.props.positionType,
       this.props.leverage,

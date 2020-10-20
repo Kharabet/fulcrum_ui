@@ -10,6 +10,7 @@ export interface IActiveLoanData {
   maxSeizable: BigNumber;
   loanData?: {
     loanId: string;
+    endTimestamp: BigNumber;
     loanToken: string;
     collateralToken: string;
     principal: BigNumber;
@@ -21,7 +22,6 @@ export interface IActiveLoanData {
     maintenanceMargin: BigNumber;
     currentMargin: BigNumber;
     maxLoanTerm: BigNumber;
-    loanEndTimestamp: BigNumber;
     maxLiquidatable: BigNumber;
     maxSeizable: BigNumber;
   };

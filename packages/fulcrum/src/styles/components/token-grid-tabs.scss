@@ -5,10 +5,11 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    margin-bottom: 15px;
   }
   &__items {
-    display: flex;
-    align-items: center;
+    width: 100%;
+    box-shadow: inset 0px -1.5px 1px -1px var(--indicator-border);
   }
   &-item {
     &--active {
@@ -74,9 +75,11 @@
   }
   @media screen and (min-width: $breakpoint-mobile-min) {
     position: relative;
-
+    &__items {
+      margin-top: -40px;
+    }
     &__container {
-      margin-bottom: 35px;
+      margin-bottom: 10px;
     }
     &:after {
       width: calc(100vw - 17px);
@@ -108,55 +111,55 @@
     &:after {
       content: none;
     }
+
     &__selector {
       width: 100%;
       margin: 15px 0;
       padding: 0 15px;
       text-align: center;
     }
-    &__items {
-      width: 100%;
-      order: -1;
-      border-bottom: 1px solid var(--border-tab);
-      padding: 0 15px;
-      background-color: var(--bg-header);
-    }
-    &-item {
-      display: flex;
-      &.trade-token-grid-tab-item {
-        &:not(.manage-tab) {
-          width: calc(100% / 5);
-        }
-      }
-      &__col-token-image {
-        margin-left: auto;
-        margin-right: auto;
-        span {
-          &.opened-positions-count {
-            position: absolute;
-            top: -10px;
-            right: -20px;
-            margin-right: 0;
-          }
-        }
-      }
-    }
-    &.manage {
-      .trade-token-grid-tab__selector {
-        display: none;
-      }
-    }
+    // &__items {
+    //   width: 100%;
+    //   order: -1;
+    //   border-bottom: 1px solid var(--border-tab);
+    //   padding: 0 15px;
+    //   background-color: var(--bg-header);
+    // }
+    // &-item {
+    //   display: flex;
+    //   &.trade-token-grid-tab-item {
+    //     &:not(.manage-tab) {
+    //       width: calc(100% / 5);
+    //     }
+    //   }
+    //   &__col-token-image {
+    //     margin-left: auto;
+    //     margin-right: auto;
+    //     span {
+    //       &.opened-positions-count {
+    //         position: absolute;
+    //         top: -10px;
+    //         right: -20px;
+    //         margin-right: 0;
+    //       }
+    //     }
+    //   }
+    // }
+    // &.manage {
+    //   .trade-token-grid-tab__selector {
+    //     display: none;
+    //   }
+    // }
     .manage-tab {
-      width: auto;
-      position: absolute;
-      top: 25px;
-      right: 87px;
+      //width: auto;
+      // position: absolute;
+      //top: 25px;
+      // right: 87px;
       &:after {
         content: none;
       }
       svg {
-        height: 20px;
-        width: 20px;
+        display: none;
       }
     }
   }

@@ -1,8 +1,10 @@
 import React, { Component } from "react";
+import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 
 export interface IManageTokenGridHeaderProps {
-  isMobileMedia: boolean;
   isShowHistory: boolean;
+  isShowMyTokensOnly: boolean;
+  openedPositionsCount: number;
   updateStateisShowHistory: (updatedState: boolean) => void;
 }
 
@@ -29,27 +31,29 @@ export class ManageTokenGridHeader extends Component<IManageTokenGridHeaderProps
     this._isMounted = false;
   }
 
-  public componentDidUpdate(prevState: Readonly<IManageTokenGridHeaderProps>): void {
-    if (prevState.isShowHistory !== this.state.isShowHistory)
-      this.props.updateStateisShowHistory(this.state.isShowHistory);
-  }
 
   public render() {
     return (
-      <React.Fragment>
-        {this.props.isMobileMedia && <div className="manage-token-grid__title">Manage</div>}
-        <div className="manage-token-grid__group-tabs">
-          <div className={`tab ${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</div>
-          <div className={`tab ${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</div>
-        </div>
-      </React.Fragment>
+      <div className="manage-token-grid__group-tabs">
+        <div className={`tab ${this.props.isShowMyTokensOnly && !this.props.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>
+          <div className="manage-tab">
+            <div className={`trade-token-grid-tab-item__col-token-image`} >
+              {<WalletSvg />}
+              <span>Manage</span>
+              <span className="opened-positions-count">{this.props.openedPositionsCount}</span>
+            </div></div> </div>
+        <div className={`tab ${this.props.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>
+          Trade history</div>
+      </div>
     );
   }
   private onShowHistory = () => {
+    this.props.updateStateisShowHistory(true);
     this._isMounted && this.setState({ ...this.state, isShowHistory: true });
   };
 
   private onShowOpenPositions = () => {
+    this.props.updateStateisShowHistory(false);
     this._isMounted && this.setState({ ...this.state, isShowHistory: false });
   };
 }

@@ -186,7 +186,7 @@ export class ContractsSource {
         address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
         break;
       case 42:
-        address = "0xAbd9372723C735D426D0a760D047206Fe115ee6d";
+        address = "0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a";
         break;
     }
 
@@ -206,7 +206,7 @@ export class ContractsSource {
         address = "0xef52dd2d03d7a44f9dda8d450f806fa84571cf84";
         break;
       case 42:
-        address = "0xAbd9372723C735D426D0a760D047206Fe115ee6d";
+        address = "0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a";
         break;
     }
 
@@ -226,7 +226,7 @@ export class ContractsSource {
         address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
         break;
       case 42:
-        address = "0x61c1dDcD58Ac1Fc80f5C5572b48EfA032bb3736E";
+        address = "0x2F27c07D888751109753533BF299ea5813A6479D";
         break;
     }
 
@@ -264,7 +264,7 @@ export class ContractsSource {
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     await this.Init();
     let symbol;
-    if (asset === Asset.WETH || asset === Asset.fWETH) {
+    if (asset === Asset.WETH) {
       symbol = `iETH`;
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`;
@@ -347,7 +347,7 @@ export class ContractsSource {
 
   public getITokenErc20Address(asset: Asset): string | null {
     let symbol;
-    if (asset === Asset.WETH || asset === Asset.fWETH) {
+    if (asset === Asset.WETH) {
       symbol = `iETH`;
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`;
@@ -473,7 +473,7 @@ export class ContractsSource {
             break;
         }*/
         switch (addressErc20) {
-          case "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc":
+          case "0xfbe16ba4e8029b759d3c5ef8844124893f3ae470":
             asset = Asset.fWETH;
             break;
           case "0x7143e05608c4bc7e83a3b72a28de2497f62b7e59":
@@ -482,7 +482,7 @@ export class ContractsSource {
           case "0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8":
             asset = Asset.DAI;
             break;
-          case "0x20bdf254ca63883c3a83424753bb40185af29ce4":
+          case "0xb443f30cdd6076b1a5269dbc08b774f222d4db4e":
             asset = Asset.USDC;
             break;
           case "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996":
@@ -491,7 +491,7 @@ export class ContractsSource {
           case "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62":
             asset = Asset.SUSD;
             break;
-          case "0xc4b7a70c3694cb1d37a18e6c6bd9271828c382a4":
+          case "0x5ae55494ccda82f1f7c653bc2b6ebb4ad3c77dac":
             asset = Asset.WBTC;
             break;
           case "0xfb9325e5f4fc9629525427a1c92c0f4d723500cf":

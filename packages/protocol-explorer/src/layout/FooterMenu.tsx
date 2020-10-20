@@ -19,8 +19,8 @@ export const FooterMenu = () => {
           <a href="https://fulcrum.trade/">Fulcrum</a>
           <a href="https://torque.loans">Torque</a>
           <a href="https://staking.bzx.network/">Staking Dashboard</a>
+          <a href="https://explorer.bzx.network">Protocol Explorer</a>
           <a href="https://bzx.network/itokens">iTokens</a>
-          <a href="https://bzx.network/ptokens">pTokens</a>
           <a href="https://bzx.network/bzrx-token">BZRX Token</a>
         </div>
       </div>

@@ -5,7 +5,6 @@ import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { TasksQueue } from "../services/TasksQueue";
 import { ReactComponent as ArrowRight } from "../assets/images/ic_arrow_right.svg";
-import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 import { BorrowDlg } from "./BorrowDlg";
@@ -19,13 +18,13 @@ import { TxProcessingLoader } from "./TxProcessingLoader";
 export interface IAssetSelectorItemProps {
   asset: Asset;
   isLoadingTransaction: boolean;
+  yieldApr: BigNumber
   borrowDlgRef: React.RefObject<BorrowDlg>;
   doNetworkConnect: () => void;
 }
 
 interface IAssetSelectorItemState {
   interestRate: BigNumber;
-  yieldApr: BigNumber;
   isLoadingTransaction: boolean;
   request: BorrowRequest | undefined;
 }
@@ -36,7 +35,6 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
     this.state = {
       interestRate: new BigNumber(0),
-      yieldApr: new BigNumber(0),
       isLoadingTransaction: false,
       request: undefined
     };
@@ -47,7 +45,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
-  private apiUrl = "https://api.bzx.network/v1";
+
 
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
@@ -107,62 +105,54 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   private derivedUpdate = async () => {
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.asset);
-    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`);
-    const yieldAPYJson = await yieldAPYRequest.json();
-    const yieldApr = yieldAPYJson.success && yieldAPYJson.data[this.props.asset.toLowerCase()]
-      ? new BigNumber(yieldAPYJson.data[this.props.asset.toLowerCase()])
-      : new BigNumber(0);
 
-    this.setState({ ...this.state, interestRate, yieldApr });
+    this.setState({ ...this.state, interestRate });
   };
 
   public render() {
     let asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
     return (
-      !this.state.interestRate.gt(0)
-        ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
-        : <React.Fragment>
-          <div className="asset-selector-item">
-            {this.state.isLoadingTransaction && this.state.request &&
-              <TxProcessingLoader
-                quantityDots={3}
-                sizeDots={'small'}
-                isOverlay={true}
-                taskId={this.state.request.id}
-              />
-            }
-            <div className="asset-selector-item-content" onClick={this.onClick}>
-              <div className="asset-selector-body">
-                <div className="asset-selector-row">
+      this.state.interestRate.gt(0) &&
+      <div className="asset-selector-item">
+        {this.state.isLoadingTransaction && this.state.request &&
+          <TxProcessingLoader
+            quantityDots={3}
+            sizeDots={'small'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
+        }
+        <div className="asset-selector-item-content" onClick={this.onClick}>
+          <div className="asset-selector-body">
+            <div className="asset-selector-row">
 
-                  <div className="asset-selector__apr">Est. Yield, vBZRX</div>
-                  <div title={this.state.yieldApr.toFixed(18)} className="asset-selector__interest-rate">
-                    <span className="asset-selector__interest-rate-value">{this.state.yieldApr.toFixed(0)}</span>%
+              <div className="asset-selector__apr">Est. Yield, vBZRX</div>
+              <div title={this.props.yieldApr.toFixed(18)} className="asset-selector__interest-rate">
+                <span className="asset-selector__interest-rate-value">{this.props.yieldApr.toFixed(0)}</span>%
                   </div>
-                </div>
-                <div className="asset-selector-row">
-                  <div className="asset-selector__apr grey">APR</div>&nbsp;
-                  <div className="asset-selector__fixed">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}<span>%</span></div>
-                </div>
-                <div className="asset-selector-row">
-                  <div className="asset-selector__fixed">FIXED</div>
-                </div>
-              </div>
-              <div className="asset-selector-footer">
-                <div className="asset-selector__title">
-                  {this.props.asset}
-                </div>
-                <div className="asset-selector__icon">
-                  {asset.reactLogoSvg.render()}
-                </div>
-                <div className="asset-selector__arrow">
-                  <ArrowRight />
-                </div>
-              </div>
             </div>
-            <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgBorrowItem }}></div>
+            <div className="asset-selector-row">
+              <div className="asset-selector__apr grey">APR</div>&nbsp;
+                  <div className="asset-selector__fixed">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}<span>%</span></div>
+            </div>
+            <div className="asset-selector-row">
+              <div className="asset-selector__fixed">FIXED</div>
+            </div>
           </div>
-        </React.Fragment>
+          <div className="asset-selector-footer">
+            <div className="asset-selector__title">
+              {this.props.asset}
+            </div>
+            <div className="asset-selector__icon">
+              {asset.reactLogoSvg.render()}
+            </div>
+            <div className="asset-selector__arrow">
+              <ArrowRight />
+            </div>
+          </div>
+        </div>
+        <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgBorrowItem }}></div>
+      </div>
     )
   }
 
