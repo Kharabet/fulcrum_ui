@@ -152,12 +152,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
     this._isMounted = true;
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
     }
+    await this.derivedUpdate();
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
@@ -387,9 +388,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public getOwnRowsData = async (state: ITradePageState) => {
     const ownRowsData: IOwnTokenGridRowProps[] = [];
     this._isMounted && this.setState({ ...this.state, openedPositionsLoaded: false });
-
+    let loans: IBorrowedFundsState[] | undefined;
     if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
+      loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
       const loan = loans.find(loan =>
         this.state.selectedMarket.baseToken === loan.loanAsset
         && this.state.selectedMarket.quoteToken === loan.collateralAsset
@@ -507,7 +508,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       }
     }
 
-    await this._isMounted && this.setState({ ...this.state, openedPositionsCount: ownRowsData.length, openedPositionsLoaded: true, ownRowsData });
+    await this._isMounted && this.setState({ ...this.state, openedPositionsCount: ownRowsData.length, openedPositionsLoaded: true, ownRowsData, loans });
   };
 
   public getHistoryEvents = async (state: ITradePageState) => {
