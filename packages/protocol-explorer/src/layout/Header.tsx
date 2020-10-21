@@ -76,14 +76,9 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
           <div className={`mobile-menu ${this.state.isMenuOpen ? `shown` : `hidden`}`}>
             <div className="w-100">
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              <HeaderMenu />
               <div className="header-menu">
-                <Link to="/" className={`item-menu ${window.location.pathname === "/" ? `active` : ``}`} onClick={this.removeOverflow}>
-                  Stats
-                </Link>
-                <Link to="/liquidations" className={`item-menu ${window.location.pathname === "/liquidations" ? `active` : ``}`} onClick={this.removeOverflow}>
-                  Liquidations
-                </Link>
-                <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
+                <a href="https://help.bzx.network/en/" className={`item-menu c-blue`} target="_blank">
                   Help Center
                 </a>
               </div>

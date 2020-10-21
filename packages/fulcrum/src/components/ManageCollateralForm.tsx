@@ -21,8 +21,9 @@ import { PositionType } from "../domain/PositionType";
 export interface IManageCollateralFormProps {
   loan?: IBorrowedFundsState
 
+  request: ManageCollateralRequest;
   onSubmit: (request: ManageCollateralRequest) => void;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | ManageCollateralRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
   onCancel: () => void;
   isMobileMedia: boolean;
   isOpenModal: boolean;
@@ -366,31 +367,13 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
         });
       }
 
-      const request = new TradeRequest(
-        this.props.loan!.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
-        TradeType.SELL,
-        this.props.loan!.loanAsset,
-        Asset.UNKNOWN,
-        this.props.loan!.collateralAsset,
-        PositionType.LONG,
-        0,
-        new BigNumber(0)
-      )
+      const request = this.props.request;
 
+      request.isWithdrawal = this.state.loanValue > this.state.selectedValue;
+      request.collateralAmount = new BigNumber(this.state.collateralAmount);
+
+      this.props.onSubmit(request);
       this.props.changeLoadingTransaction(true, request, false, false);
-
-      this.props.onSubmit(
-        new ManageCollateralRequest(
-          this.props.loan!.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
-          this.props.loan!.loanAsset,
-          this.props.loan!.collateralAsset,
-          new BigNumber(this.state.collateralAmount),
-          this.state.loanValue > this.state.selectedValue
-        )
-      );
-
-
-
     }
   };
 

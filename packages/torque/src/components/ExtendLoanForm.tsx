@@ -142,9 +142,13 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       <form className="extend-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
           <div className="extend-loan-form__info-extended-by-container">
-            <div className="extend-loan-form__info-extended-by-msg">This date will be extended by</div>
+            <div className="extend-loan-form__info-extended-by-msg">Loan end date</div>
             <div className="extend-loan-form__info-extended-by-price">
-              {this.state.selectedValue} {this.pluralize("day", "days", this.state.selectedValue)}
+              {new Date(Date.now() + this.state.selectedValue * 24 * 60 * 60 * 1000).toLocaleDateString(undefined, {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+              })}
             </div>
           </div>
           <Slider
@@ -189,11 +193,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     );
   }
 
-  private pluralize = (singular: string,
-    plural: string, value: number) => {
-    const isPlural = value !== 1;
-    return isPlural ? plural : singular;
-  };
+  // private pluralize = (singular: string,
+  //   plural: string, value: number) => {
+  //   const isPlural = value !== 1;
+  //   return isPlural ? plural : singular;
+  // };
 
   private rxGetEstimate = (selectedValue: number): Observable<IExtendEstimate> => {
     return new Observable<IExtendEstimate>(observer => {

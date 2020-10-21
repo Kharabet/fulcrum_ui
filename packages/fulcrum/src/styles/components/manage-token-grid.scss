@@ -1,8 +1,9 @@
 @import "../abstracts/variables";
 .manage-token-grid {
   position: relative;
-    min-height: 50vh;
-  .manage-token-grid__title {
+  min-height: 50vh;
+  margin-top: 30px;
+  &__title {
     font-size: 28px;
     font-weight: 900;
     line-height: 1.4;
@@ -10,44 +11,50 @@
     color: #ffffff;
     margin: 10px auto 25px auto;
   }
-  .manage-token-grid__group-tabs {
+  &__group-tabs {
     display: flex;
     flex-wrap: wrap;
-    border-bottom: 1px solid var(--indicator-border);
     width: 100%;
     overflow: hidden;
+    justify-content: center;
+    margin-bottom: 0;
     .tab {
       display: flex;
       align-self: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 16px;
       line-height: 1.5;
       font-weight: 800;
       color: #8992a4;
-      text-transform: uppercase;
+      text-transform: capitalize;
       cursor: pointer;
       padding: 10px 20px;
+      @media screen and (min-width: $breakpoint-mobile-min) {
+        padding: 20px;
+      }
+      & path {
+        fill: #8992a4;
+      }
       &.active {
-        color: var(--primary-text);
         position: relative;
+        &,
+        & span {
+          color: var(--primary-text);
+        }
+        & path {
+          fill: var(--primary-text);
+        }
         &:after {
           content: "";
           height: 8px;
           border-radius: 4px;
           width: 100%;
           position: absolute;
-          bottom: -4px;
+          bottom: -5px;
           background-color: #276bfb;
+          z-index: 12;
         }
       }
-    }
-    @media screen and (min-width: $breakpoint-mobile-min){
-      padding-left: 25px;
-      margin-bottom: 22px;
-    }
-    @media screen and (max-width: $breakpoint-mobile-max){
-      justify-content: center;
-      margin-bottom: 32px;
     }
   }
 }

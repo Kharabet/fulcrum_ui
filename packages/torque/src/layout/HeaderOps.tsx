@@ -38,6 +38,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       { id: 1, title: "Borrow", link: "/borrow", external: false },
       { id: 2, title: "Your Loans", link: "/dashboard", external: false },
       // { id: 3, title: "Refinance", link: "/refinance", external: false },
+
+      { id: 3, title: "Staking", link: "https://staking.bzx.network", external: true },
       { id: 4, title: "Lend", link: "https://app.fulcrum.trade/lend", external: true },
       { id: 5, title: "Help Center", link: "https://help.bzx.network/en/collections/2008807-torque", external: true },
     ]
@@ -89,8 +91,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         </div>
 
         {<InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
-          </InfoBlock>
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your <a href="https://staking.bzx.network" className="regular-link" target="blank">staking dashboard</a>.
+        </InfoBlock>
         }
       </header>
     );
@@ -137,8 +139,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           ) : null}
         </header>
         <InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
-          </InfoBlock>
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your <a href="https://staking.bzx.network" className="regular-link" target="blank">staking dashboard</a>.
+        </InfoBlock>
       </React.Fragment>
     );
   };

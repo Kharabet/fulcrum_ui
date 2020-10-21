@@ -33,16 +33,17 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     StakingProvider.Instance.eventEmitter.on(StakingProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
     StakingProvider.Instance.eventEmitter.on(StakingProviderEvents.ProviderChanged, this.onProviderChanged);
   }
+  private _isMounted: boolean = false;
 
   private onProviderIsChanging = async () => {
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isLoading: true
     });
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isLoading: true
     });
@@ -50,10 +51,12 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   };
 
   public async componentDidMount() {
+    this._isMounted = true;
     await this.derivedUpdate();
   }
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
     StakingProvider.Instance.eventEmitter.removeListener(StakingProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -73,7 +76,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
 
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isLoading,
       isSupportedNetwork,

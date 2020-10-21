@@ -126,37 +126,34 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
     private changeBzrxBalance = (e: ChangeEvent<HTMLInputElement>) => {
         const maxInputValue = parseFloat(e.currentTarget.getAttribute("max")!).toFixed(2);
         const inputValue = e.currentTarget.value;
-        const bzrxInputInBaseUnits = maxInputValue && maxInputValue === inputValue
-            ? new BigNumber(this.props.bzrxMax).times(10 ** 18)
-            : new BigNumber(inputValue).times(10 ** 18);
-
         const result = this.changeBalance(inputValue, this.props.bzrxMax);
+        const bzrxInputInBaseUnits = maxInputValue && maxInputValue === result.inputBalance
+            ? new BigNumber(this.props.bzrxMax).times(10 ** 18)
+            : new BigNumber(result.inputBalance).times(10 ** 18);
         this.setState({ ...this.state, bzrxBalance: result.balance, inputBzrxBalance: result.inputBalance, bzrxInputInBaseUnits });
     }
 
     private changeVBzrxBalance = (e: ChangeEvent<HTMLInputElement>) => {
         const maxInputValue = parseFloat(e.currentTarget.getAttribute("max")!).toFixed(2);
         const inputValue = e.currentTarget.value;
-        const vbzrxInputInBaseUnits = maxInputValue && maxInputValue === inputValue
-            ? new BigNumber(this.props.vbzrxMax).times(10 ** 18)
-            : new BigNumber(inputValue).times(10 ** 18);
-
         const result = this.changeBalance(inputValue, this.props.vbzrxMax);
+        const vbzrxInputInBaseUnits = maxInputValue && maxInputValue === result.inputBalance
+            ? new BigNumber(this.props.vbzrxMax).times(10 ** 18)
+            : new BigNumber(result.inputBalance).times(10 ** 18);
         this.setState({ ...this.state, vBzrxBalance: result.balance, inputVBzrxBalance: result.inputBalance, vbzrxInputInBaseUnits });
     }
 
     private changeBptBalance = (e: ChangeEvent<HTMLInputElement>) => {
         const maxInputValue = parseFloat(e.currentTarget.getAttribute("max")!).toFixed(2);
         const inputValue = e.currentTarget.value;
-        const bptInputInBaseUnits = maxInputValue && maxInputValue === inputValue
+        const result = this.changeBalance(inputValue, this.props.bptMax);
+        const bptInputInBaseUnits = maxInputValue && maxInputValue === result.inputBalance
             ? networkName === "kovan"
                 ? new BigNumber(this.props.bptMax).times(10 ** 6)
                 : new BigNumber(this.props.bptMax).times(10 ** 18)
             : networkName === "kovan"
-                ? new BigNumber(inputValue).times(10 ** 6)
-                : new BigNumber(inputValue).times(10 ** 18);
-
-        const result = this.changeBalance(inputValue, this.props.bptMax);
+                ? new BigNumber(result.inputBalance).times(10 ** 6)
+                : new BigNumber(result.inputBalance).times(10 ** 18);
         this.setState({ ...this.state, bptBalance: result.balance, inputBptBalance: result.inputBalance, bptInputInBaseUnits });
     }
 
@@ -167,7 +164,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                 balance: walletBalance,
                 inputBalance: walletBalance.toFixed(2)
             };
-        if (balance.lt(0))
+        if (balance.lt(0) || !balanceText)
             return {
                 balance: new BigNumber(0),
                 inputBalance: "0"
@@ -179,8 +176,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
     }
 
     private formatPrecision = (output: string) => {
-        if (output === "")
-            return "0";
+
         if (output.match(/^(\d+\.{1}0?)$/))
             return output;
 

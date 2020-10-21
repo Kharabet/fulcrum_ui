@@ -88,8 +88,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 0, title: "Lend", link: "/lend", external: false },
         { id: 1, title: "Trade", link: "/trade", external: false },
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
-        { id: 3, title: "Stats", link: "/stats", external: false },
-        { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
+        { id: 3, title: "Staking", link: "https://staking.bzx.network", external: true },
+        { id: 4, title: "Stats", link: "/stats", external: false },
+        { id: 5, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
       ],
       onMenuToggle: this.onMenuToggle
     };
@@ -111,8 +112,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
         </header>
         <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
-          </InfoBlock>
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your <a href="https://staking.bzx.network" className="regular-link" target="blank">staking dashboard</a>.
+        </InfoBlock>
         {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
             If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
@@ -129,8 +130,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 0, title: "Lend", link: "/lend", external: false },
         { id: 1, title: "Trade", link: "/trade", external: false },
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
-        { id: 3, title: "Stats", link: "/stats", external: false },
-        { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
+        { id: 3, title: "Staking", link: "https://staking.bzx.network", external: true },
+        { id: 4, title: "Stats", link: "/stats", external: false },
+        { id: 5, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
       ],
       onMenuToggle: this.onMenuToggle
     };
@@ -172,8 +174,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           ) : null}
         </header>
         <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
-          Start earning farming rewards! Each time you open a loan, reapy trade trade you are accumulating vBZRX
-          </InfoBlock>
+          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position is open. Rewards are deposited weekly in your <a href="https://staking.bzx.network" className="regular-link" target="blank">staking dashboard</a>.
+        </InfoBlock>
         {/* {this.props.isV1ITokenInWallet &&
           <InfoBlock localstorageItemProp="v1Balance">
             If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.

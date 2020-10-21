@@ -10,6 +10,7 @@ export interface ITitle {
 }
 
 export interface ITxLoaderStepProps {
+  onTxHash: (txHash: string) => void;
 }
 
 export interface ITxLoaderStepState {
@@ -85,6 +86,9 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
     if (errorMsg)
       title = errorMsg;
 
+    if (requestTask.txHash)
+      this.props.onTxHash(requestTask.txHash);
+
     return { message: title, isWarning: errorMsg !== "" }
   }
 
@@ -93,17 +97,9 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
     if (!this.state.title) return null;
     return (
       <React.Fragment>
-        {this.state.requestTask && this.state.requestTask.txHash
-          ? <a href={`${StakingProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash}`} target="_blank" rel="noopener noreferrer">
-            <span ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
-              {this.state.title.message}
-            </span>
-          </a>
-          :
-          <span ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
-            {this.state.title.message}
-          </span>
-        }
+        <span ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
+          {this.state.title.message}
+        </span>
       </React.Fragment >
     )
   }

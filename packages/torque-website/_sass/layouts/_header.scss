@@ -72,11 +72,11 @@
   }
 }
 
-.active-url{
+.active-url {
   position: relative;
-  &:before{
-    @media screen and (min-width: $breakpoint-sm-up){
-      content: '';
+  &:before {
+    @media screen and (min-width: $breakpoint-sm-up) {
+      content: "";
       position: absolute;
       width: 60px;
       height: 8px;
@@ -87,7 +87,7 @@
       border-radius: 6px;
       top: -48px;
     }
-    @media screen and (min-width: $breakpoint-md-up){
+    @media screen and (min-width: $breakpoint-md-up) {
       top: -67px;
     }
   }
@@ -98,5 +98,11 @@
     position: absolute;
     top: -6px;
     left: -16px;
+  }
+}
+
+.switch-menu {
+  @media screen and (max-width: $breakpoint-xl-down) {
+    width: 100%;
   }
 }
