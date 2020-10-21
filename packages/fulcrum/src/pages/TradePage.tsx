@@ -305,6 +305,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
   };
+
   public onManageCollateralRequested = async (request: ManageCollateralRequest) => {
     if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
