@@ -1,4 +1,3 @@
-
 .svg-primary {
   fill: var(--primary-color);
 }
@@ -50,13 +49,13 @@
   width: 50px;
   height: 50px;
 }
-.wrapper-svg-blur{
+.wrapper-svg-blur {
   width: 50%;
   padding: 0 60px;
-  @media screen and (max-width: $breakpoint-lg-down){
+  @media screen and (max-width: $breakpoint-lg-down) {
     padding: 0 30px;
   }
-  @media screen and (max-width: $breakpoint-md-down){
+  @media screen and (max-width: $breakpoint-md-down) {
     width: 100%;
   }
 }
@@ -66,21 +65,21 @@
   position: relative;
   max-width: 100%;
   width: 100%;
-  svg{
+  svg {
     position: relative;
     width: 100%;
     min-width: 100%;
     height: auto;
   }
-  @media screen and (max-width: $breakpoint-lg-down){
+  @media screen and (max-width: $breakpoint-lg-down) {
     margin-left: auto;
     margin-right: auto;
   }
-  @media screen and (max-width: $breakpoint-md-down){
+  @media screen and (max-width: $breakpoint-md-down) {
     width: 440px;
   }
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     background: #404b57;
     opacity: 0.4;
@@ -93,48 +92,48 @@
     margin: auto;
   }
 }
-.left-triangle{
-  [data-theme="dark"] & {
-    fill: #B9C7D6;
+.left-triangle {
+  [data-theme='dark'] & {
+    fill: #b9c7d6;
   }
 }
-.right-triangle{
-  [data-theme="dark"] & {
-    fill: #939FAC
+.right-triangle {
+  [data-theme='dark'] & {
+    fill: #939fac;
   }
 }
-.top-cube{
-  [data-theme="dark"] & {
-    fill: #C3CDD8;
+.top-cube {
+  [data-theme='dark'] & {
+    fill: #c3cdd8;
   }
 }
-.left-cube{
-  [data-theme="dark"] & {
-    fill: #939FAC;
+.left-cube {
+  [data-theme='dark'] & {
+    fill: #939fac;
   }
 }
-.right-cube{
-  [data-theme="dark"] & {
-    fill: #495460
+.right-cube {
+  [data-theme='dark'] & {
+    fill: #495460;
   }
 }
-.gradient-susd{
+.gradient-susd {
   border-radius: 50%;
-  background-color: #342F49;
-  background: -moz-linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
-  background: -webkit-linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
-  background: -o-linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
-  background: -ms-linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
-  background: linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
+  background-color: #342f49;
+  background: -moz-linear-gradient(135deg, #342f49 15.63%, #000000 88.28%);
+  background: -webkit-linear-gradient(135deg, #342f49 15.63%, #000000 88.28%);
+  background: -o-linear-gradient(135deg, #342f49 15.63%, #000000 88.28%);
+  background: -ms-linear-gradient(135deg, #342f49 15.63%, #000000 88.28%);
+  background: linear-gradient(135deg, #342f49 15.63%, #000000 88.28%);
 }
-@media screen and (max-width: $breakpoint-sm-down){
-  .icon-sm-50{
+@media screen and (max-width: $breakpoint-sm-down) {
+  .icon-sm-50 {
     width: 50px;
     height: 50px;
   }
 }
-@media screen and (max-width: $breakpoint-xs-down){
-  .icon-xs-30{
+@media screen and (max-width: $breakpoint-xs-down) {
+  .icon-xs-30 {
     width: 30px;
     height: 30px;
   }

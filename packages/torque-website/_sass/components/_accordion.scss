@@ -12,12 +12,12 @@
       position: relative;
       z-index: 2;
       padding-right: 60px;
-      &:not(.active){
+      &:not(.active) {
         position: relative;
         z-index: 2;
         overflow: hidden;
       }
-      .accordion-position{
+      .accordion-position {
         position: absolute;
         width: 30px;
         height: 30px;
@@ -28,8 +28,9 @@
         background-color: transparent;
         transition: all 0.15s;
         border-radius: 50%;
-        &:before, &:after {
-          content: "";
+        &:before,
+        &:after {
+          content: '';
           background-color: #276bfb;
           width: 12px;
           height: 2px;
@@ -43,35 +44,33 @@
           display: flex;
           justify-content: center;
           align-content: center;
-          
         }
-        &:after{
+        &:after {
           transform: rotate(-90deg);
           transition: transform 0.15s;
         }
       }
-
     }
     .accordion-content {
-      &:not(.active){
+      &:not(.active) {
         position: relative;
         z-index: 2;
         overflow: hidden;
       }
       max-height: 0;
-      transition: max-height .3s cubic-bezier(0, 0, 1, 1);
+      transition: max-height 0.3s cubic-bezier(0, 0, 1, 1);
     }
     &.active {
       .accordion-content {
         max-height: 441px;
-        transition: max-height .3s cubic-bezier(0, 0, 1, 1);
+        transition: max-height 0.3s cubic-bezier(0, 0, 1, 1);
       }
       .accordion-toggle {
         color: #276bfb;
-        .accordion-position{
+        .accordion-position {
           background-color: var(--accordion-bg);
           transition: all 0.15s;
-          &:after{
+          &:after {
             transform: rotate(0);
           }
         }
@@ -91,7 +90,7 @@
   }
   .accordion-content {
     padding-left: 30px;
-    p{
+    p {
       padding-bottom: 30px;
     }
     @media screen and (max-width: $breakpoint-xs-down) {

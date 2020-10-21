@@ -20,12 +20,12 @@
     padding: 0 20px 25px 20px;
   }
 }
-.apr-title{
+.apr-title {
   padding-right: 30px;
-  @media screen and (min-width: $breakpoint-xl-up){
+  @media screen and (min-width: $breakpoint-xl-up) {
     width: 535px;
   }
-  @media screen and (max-width: $breakpoint-xl-down){
+  @media screen and (max-width: $breakpoint-xl-down) {
     width: 415px;
   }
   @media screen and (max-width: $breakpoint-lg-down) {
@@ -37,7 +37,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   width: 100%;
-  @media screen and (min-width: $breakpoint-lg-up){
+  @media screen and (min-width: $breakpoint-lg-up) {
     margin-top: 60px;
   }
   @media screen and (max-width: $breakpoint-lg-down) {
@@ -57,14 +57,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  p{
+  p {
     text-transform: uppercase;
   }
 }
 .apr-value-after {
   position: relative;
   &:after {
-    content: "APR";
+    content: 'APR';
     position: absolute;
     font-size: 10px;
     color: #8992a4;
@@ -95,16 +95,16 @@
   }
 }
 .item-reason {
-  display: flex;  
-  @media(min-width: $breakpoint-sm-up){
+  display: flex;
+  @media (min-width: $breakpoint-sm-up) {
     width: 50%;
     margin-bottom: 75px;
   }
-  @media(max-width: $breakpoint-sm-down){
+  @media (max-width: $breakpoint-sm-down) {
     flex-direction: column;
     margin-bottom: 45px;
   }
-  .icon-reason {    
+  .icon-reason {
     @media screen and (min-width: $breakpoint-md-up) {
       margin-right: 40px;
     }
@@ -137,32 +137,32 @@
   display: flex;
   width: 100%;
   background-color: #00a1fc;
-  @media screen and (max-width: $breakpoint-md-down){
+  @media screen and (max-width: $breakpoint-md-down) {
     flex-direction: column;
     text-align: center;
   }
-  @media screen and (max-width: $breakpoint-xs-down){
+  @media screen and (max-width: $breakpoint-xs-down) {
     font-size: 36px;
     text-align: left;
   }
   h2 {
     color: #ffffff;
     position: relative;
-    z-index: 2;    
-    @media screen and (min-width: $breakpoint-lg-up){
+    z-index: 2;
+    @media screen and (min-width: $breakpoint-lg-up) {
       padding: 40px 0 40px 40px;
     }
-    @media screen and (max-width: $breakpoint-lg-down){
+    @media screen and (max-width: $breakpoint-lg-down) {
       padding: 40px 0 40px 20px;
     }
-    @media screen and (min-width: $breakpoint-md-up){
+    @media screen and (min-width: $breakpoint-md-up) {
       width: calc(100% / 3);
       min-width: calc(100% / 3);
     }
-    @media screen and (max-width: $breakpoint-md-down){
+    @media screen and (max-width: $breakpoint-md-down) {
       padding: 30px 0;
     }
-    @media screen and (max-width: $breakpoint-sm-down){
+    @media screen and (max-width: $breakpoint-sm-down) {
       font-size: 28px;
       padding: 30px 0 30px 40px;
     }
@@ -172,51 +172,51 @@
     flex-direction: column;
     line-height: 1.2;
     position: relative;
-    @media screen and (min-width: $breakpoint-lg-up){
+    @media screen and (min-width: $breakpoint-lg-up) {
       padding: 40px 0 40px 40px;
     }
-    @media screen and (max-width: $breakpoint-lg-down){
+    @media screen and (max-width: $breakpoint-lg-down) {
       padding: 40px 0 40px 0;
     }
-    @media screen and (min-width: $breakpoint-md-up){
+    @media screen and (min-width: $breakpoint-md-up) {
       width: calc(100% / 3);
     }
-    @media screen and (max-width: $breakpoint-md-down){
+    @media screen and (max-width: $breakpoint-md-down) {
       padding: 0;
     }
-    @media screen and (max-width: $breakpoint-sm-down){
+    @media screen and (max-width: $breakpoint-sm-down) {
       padding-left: 40px;
     }
-    &:not(:last-child){
+    &:not(:last-child) {
       background-repeat: no-repeat;
       background-size: contain;
-      @media screen and (min-width: $breakpoint-md-up){
+      @media screen and (min-width: $breakpoint-md-up) {
         background-image: url(/images/bg-stats.svg);
         background-position: 100% 0;
       }
-      @media screen and (max-width: $breakpoint-md-down){
+      @media screen and (max-width: $breakpoint-md-down) {
         background-image: url(/images/bg-stats-mobile.svg);
         background-position: 0 100%;
         padding-bottom: 60px;
       }
     }
     &:last-child {
-      background-color: #8e7df7;    
-      @media screen and (min-width: $breakpoint-md-up){
+      background-color: #8e7df7;
+      @media screen and (min-width: $breakpoint-md-up) {
         border-radius: 0 16px 16px 0;
       }
-      @media screen and (max-width: $breakpoint-md-down){
+      @media screen and (max-width: $breakpoint-md-down) {
         border-radius: 0 0 16px 16px;
         padding-bottom: 30px;
       }
     }
-    > span {      
+    > span {
       color: #33dfcc;
       margin-bottom: 15px;
-      @media screen and (min-width: $breakpoint-sm-up){
+      @media screen and (min-width: $breakpoint-sm-up) {
         font-size: 16px;
       }
-      @media screen and (max-width: $breakpoint-sm-down){
+      @media screen and (max-width: $breakpoint-sm-down) {
         font-size: 14px;
       }
     }
@@ -259,56 +259,57 @@
   }
 }
 
-.triangle, .cube{
+.triangle,
+.cube {
   position: relative;
-  span{
+  span {
     position: absolute;
-    &.l-r-125{
+    &.l-r-125 {
       left: -125px;
     }
-    &.t-r-55{
+    &.t-r-55 {
       top: -55px;
     }
-    &.t-r-75{
+    &.t-r-75 {
       top: -75px;
     }
-    &.r-r-75{
+    &.r-r-75 {
       right: -75px;
     }
 
-    &.center{
+    &.center {
       left: 0;
       right: 0;
       margin: auto;
     }
-    @media screen and (max-width: $breakpoint-xs-down){
-      &.center-xs{
+    @media screen and (max-width: $breakpoint-xs-down) {
+      &.center-xs {
         left: 0;
         right: 0;
         margin: auto;
       }
-      &.t-r-xs-50{
-        top: -50px
+      &.t-r-xs-50 {
+        top: -50px;
       }
-      &.t-r-xs-75{
-        top: -75px
+      &.t-r-xs-75 {
+        top: -75px;
       }
-      &.l-r-xs-5{
+      &.l-r-xs-5 {
         left: 5px;
       }
     }
   }
 }
-.big-triangle{
-  @media screen and (max-width: $breakpoint-xs-down){
-    svg{
+.big-triangle {
+  @media screen and (max-width: $breakpoint-xs-down) {
+    svg {
       width: 42px;
     }
   }
 }
-.small-triangle{
-  @media screen and (max-width: $breakpoint-xs-down){
-    svg{
+.small-triangle {
+  @media screen and (max-width: $breakpoint-xs-down) {
+    svg {
       width: 50px;
     }
   }
