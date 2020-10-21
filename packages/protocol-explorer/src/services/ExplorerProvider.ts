@@ -923,7 +923,7 @@ export class ExplorerProvider {
         return swapRates[0][0];*/
         return this.getSwapRate(
             asset,
-            Asset.DAI
+            Asset.USDC
         );
     }
 
@@ -1104,22 +1104,21 @@ export class ExplorerProvider {
 
         try {
             const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
-            if (receipt) {
+            if (receipt && request instanceof LiquidationRequest) {
                 resolve(receipt);
 
                 const randomNumber = Math.floor(Math.random() * 100000) + 1;
 
-                if (request instanceof LiquidationRequest) {
-                    this.eventEmitter.emit(
-                        ExplorerProviderEvents.LiquidationTransactionMined,
-                        new LiquidationTransactionMinedEvent(request.loanToken, txHash)
-                    );
+                this.eventEmitter.emit(
+                    ExplorerProviderEvents.LiquidationTransactionMined,
+                    new LiquidationTransactionMinedEvent(request.loanToken, txHash)
+                );
 
-                } else {
-                    window.setTimeout(() => {
-                        this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);
-                    }, 5000);
-                }
+
+            } else {
+                window.setTimeout(() => {
+                    this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);
+                }, 5000);
             }
         }
         catch (e) {

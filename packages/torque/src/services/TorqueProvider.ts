@@ -1,10 +1,9 @@
 import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
-// import Web3 from 'web3';
 import { EventEmitter } from "events";
 
-import Web3 from "web3";
+import Web3Utils from "web3-utils";
 
 import constantAddress from "../config/constant.json";
 import { cdpManagerContract } from "../contracts/cdpManager";
@@ -65,7 +64,6 @@ import { ManageCollateralProcessor } from "./processors/ManageCollateralProcesso
 // import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
 // import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
 
-const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
 if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
   configAddress = constantAddress.mainnet;
@@ -419,7 +417,7 @@ export class TorqueProvider {
 
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      Asset.USDC
     );
   }
 
@@ -544,14 +542,17 @@ export class TorqueProvider {
 
   private getMaintenanceMargin = async (asset: Asset, collateralToken: string): Promise<BigNumber> => {
     if (!this.contractsSource) {
-      throw new Error("contractsSource is not defined");
+      return new BigNumber(0);
     }
     const iToken = await this.contractsSource.getiTokenContract(asset);
-    
+    const iBZxContract = await this.contractsSource.getiBZxContract();
+    if (!iToken || !iBZxContract) return new BigNumber(0);
     // @ts-ignore
-    const maintenanceMargin = await iToken.loanParamsIds.callAsync(web3.utils.soliditySha3(collateralToken, true));
-    return new BigNumber("150"); // TODO @Kharabet debug precision of maintenanceMargin;
-    return new BigNumber(maintenanceMargin);
+    const hash = Web3Utils.soliditySha3(collateralToken, true)
+    const loanId = await iToken.loanParamsIds.callAsync(hash);
+    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
+    const maintenanceMargin = loanParams[6];
+    return maintenanceMargin; 
   };
 
   public assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
@@ -573,7 +574,7 @@ export class TorqueProvider {
         if (current.plus(take).lt(goal)) {
           goal = goal.minus(goal.minus(current.plus(take)))
         }
-        const maintenanceMargin = await this.getMaintenanceMargin(loan.asset, deposit.underlying);
+        const maintenanceMargin = (await this.getMaintenanceMargin(loan.asset, deposit.underlying)).div(10**18).plus(100);
         loan.maintenanceMargin = maintenanceMargin
         loan.collateral.push({
           ...deposit,
@@ -1029,10 +1030,10 @@ export class TorqueProvider {
 
         ratio = rate.times(collateralAmount).div(debtAmount);
 
-        maintenanceMargin = await this.getMaintenanceMargin(
+        maintenanceMargin = (await this.getMaintenanceMargin(
           // @ts-ignore
           asset, this.contractsSource.getAddressFromAsset(collateralAsset)
-        );
+        )).div(10**18).plus(100);
       }
 
       let isDisabled = true;
@@ -1091,9 +1092,9 @@ export class TorqueProvider {
 
       const collateralAmount = refRequest.collateralAmount//.dividedBy(refRequest.debt.dividedBy(loanAmount));
       // @ts-ignore
-      const dart = web3.utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP).toString());
+      const dart = Web3Utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP).toString());
       // @ts-ignore
-      const dink = web3.utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
+      const dink = Web3Utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
 
       if (refRequest.isProxy) {
         const proxy: dsProxyJsonContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress);

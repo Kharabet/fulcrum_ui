@@ -55,7 +55,6 @@ interface ITradePageState {
   tradeLeverage: number;
   loanId?: string;
   loans: IBorrowedFundsState[] | undefined;
-
   isManageCollateralModalOpen: boolean;
 
   openedPositionsLoaded: boolean;
@@ -153,12 +152,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
     this._isMounted = true;
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
     }
+    await this.derivedUpdate();
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
@@ -248,7 +248,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           >
             <TradeForm
               stablecoins={this.quoteTokens}
-              loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
+              loan={this.state.loans?.find(e => e.loanId === this.state.loanId ||
+                (e.loanAsset === this.state.selectedMarket.baseToken
+                  && e.collateralAsset === this.state.selectedMarket.quoteToken))}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
               baseToken={this.state.selectedMarket.baseToken}
@@ -386,12 +388,18 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public getOwnRowsData = async (state: ITradePageState) => {
     const ownRowsData: IOwnTokenGridRowProps[] = [];
     this._isMounted && this.setState({ ...this.state, openedPositionsLoaded: false });
-
+    let loans: IBorrowedFundsState[] | undefined;
     if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
-      this._isMounted && this.setState({ ...this.state, loans })
+      loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
+      const loan = loans.find(loan =>
+        this.state.selectedMarket.baseToken === loan.loanAsset
+        && this.state.selectedMarket.quoteToken === loan.collateralAsset
+      );
+
       for (const loan of loans) {
         if (!loan.loanData) continue;
+
+        const maintenanceMargin = loan.loanData!.maintenanceMargin
 
         const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
         const isCollateralTokenNotInQuoteTokens = this.baseTokens.includes(loan.collateralAsset) && !this.quoteTokens.includes(loan.collateralAsset)
@@ -426,9 +434,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
         const collateralAssetAmount = loan.loanData.collateral.div(10 ** 18).times(collateralAssetPrecision);
         const loanAssetAmount = loan.loanData.principal.div(10 ** 18).times(loanAssetPrecision);
-        //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
+        //liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
         //If SHORT -> 10^36 / liquidation_collateralToLoanRate
-        const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(loan.loanData.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(loan.loanData.principal.times(loanAssetPrecision)).div(loan.loanData.collateral.times(collateralAssetPrecision)).times(10 ** 18);
+        const liquidation_collateralToLoanRate = (maintenanceMargin.times(loan.loanData.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(loan.loanData.principal.times(loanAssetPrecision)).div(loan.loanData.collateral.times(collateralAssetPrecision)).times(10 ** 18);
 
         if (positionType === PositionType.LONG) {
           positionValue = collateralAssetAmount;
@@ -436,7 +444,19 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           collateral = (collateralAssetAmount.times(currentCollateralToPrincipalRate)).minus(loanAssetAmount);
           openPrice = loan.loanData.startRate.div(10 ** 18).times(loanAssetPrecision).div(collateralAssetPrecision);
           liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-          profit = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue);
+          const tradeRequest = new TradeRequest(
+            loan.loanId,
+            TradeType.SELL,
+            loan.loanAsset,
+            loan.collateralAsset,
+            Asset.UNKNOWN,
+            positionType,
+            leverage.toNumber(),
+            await FulcrumProvider.Instance.getMaxTradeValue(TradeType.SELL, loan.loanAsset, loan.collateralAsset, Asset.UNKNOWN, positionType, loan),
+            positionType === PositionType.LONG
+          );
+          const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(tradeRequest);
+          profit = estimatedCollateralReceived[1].minus(collateralAssetAmount).div(10**collateralAssetDecimals).times(currentCollateralToPrincipalRate);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.loanAsset)) {
@@ -460,7 +480,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionValue = collateralAssetAmount.times(currentCollateralToPrincipalRate).minus(loanAssetAmount);
           openPrice = new BigNumber(10 ** 36).div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision)).div(10 ** 18);
           liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-          profit = openPrice.minus(new BigNumber(1).div(currentCollateralToPrincipalRate)).times(positionValue);
+          
+          const tradeRequest = new TradeRequest(
+            loan.loanId,
+            TradeType.SELL,
+            loan.loanAsset,
+            loan.collateralAsset,
+            Asset.UNKNOWN,
+            positionType,
+            leverage.toNumber(),
+            await FulcrumProvider.Instance.getMaxTradeValue(TradeType.SELL, loan.loanAsset, loan.collateralAsset, Asset.UNKNOWN, positionType, loan),
+            true
+          );
+          const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(tradeRequest);
+          profit = estimatedCollateralReceived[1].minus(collateralAssetAmount).div(10**collateralAssetDecimals);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
@@ -500,7 +533,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       }
     }
 
-    await this._isMounted && this.setState({ ...this.state, openedPositionsCount: ownRowsData.length, openedPositionsLoaded: true, ownRowsData });
+    await this._isMounted && this.setState({ ...this.state, openedPositionsCount: ownRowsData.length, openedPositionsLoaded: true, ownRowsData, loans });
   };
 
   public getHistoryEvents = async (state: ITradePageState) => {
@@ -536,6 +569,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public getTokenRowsData = async (state: ITradePageState) => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
+
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
       quoteToken: state.selectedMarket.quoteToken,
@@ -545,7 +579,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       changeLoadingTransaction: this.changeLoadingTransaction,
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
-      isMobileMedia: this.props.isMobileMedia
+      isMobileMedia: this.props.isMobileMedia,
+      maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(state.selectedMarket.baseToken, state.selectedMarket.quoteToken)
     });
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
@@ -556,7 +591,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       changeLoadingTransaction: this.changeLoadingTransaction,
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
-      isMobileMedia: this.props.isMobileMedia
+      isMobileMedia: this.props.isMobileMedia,
+      maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(state.selectedMarket.quoteToken, state.selectedMarket.baseToken)
     });
     await this._isMounted && this.setState({ ...this.state, tokenRowsData })
   };

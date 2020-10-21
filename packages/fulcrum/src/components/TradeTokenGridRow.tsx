@@ -26,6 +26,7 @@ export interface ITradeTokenGridRowProps {
   positionType: PositionType;
   defaultLeverage: number;
   isTxCompleted: boolean;
+  maintenanceMargin: BigNumber;
   onTrade: (request: TradeRequest) => void;
   changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxcolmpleted: boolean, resultTx: boolean) => void;
   changeGridPositionType: (activePositionType: PositionType) => void;
@@ -82,9 +83,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
       : new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage).times(10 ** 18))
-    // liq_price_before_trade = (15000000000000000000 * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
+
+    const maintenanceMargin = this.props.maintenanceMargin;
+    // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     //if it's a SHORT then -> 10^36 / above
-    const liquidationPriceBeforeTrade = ((new BigNumber("15000000000000000000").times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18))).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
+    const liquidationPriceBeforeTrade = (maintenanceMargin.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18)).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
     let liquidationPrice = new BigNumber(0);
     if (liquidationPriceBeforeTrade.gt(0))
       liquidationPrice = this.props.positionType === PositionType.LONG
