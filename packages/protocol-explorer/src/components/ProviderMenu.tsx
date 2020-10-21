@@ -142,6 +142,11 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
                 }}
             >Disconnect
       </button>
+            <div className="provider-menu__footer">
+                By connecting, you agree to the&nbsp;
+          <a href="https://fulcrum.trade/tos/">Terms of Service</a>&nbsp;and&nbsp;
+          <a href="https://fulcrum.trade/privacy/">Privacy Policy</a>
+            </div>
         </div>
     );
 }
