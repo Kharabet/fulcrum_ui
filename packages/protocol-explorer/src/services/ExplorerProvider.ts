@@ -243,6 +243,21 @@ export class ExplorerProvider {
         };
     }
 
+    public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
+        let result = false;
+        const assetErc20Address = this.getErc20AddressOfAsset(asset);
+
+        if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite && assetErc20Address) {
+            const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+            const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+            if (account && tokenErc20Contract) {
+                await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, { from: account });
+                result = true;
+            }
+        }
+        return result;
+    };
 
     public onLiquidationConfirmed = async (request: LiquidationRequest) => {
         if (request) {
@@ -725,70 +740,6 @@ export class ExplorerProvider {
         });
     }
 
-    // public liquidate = async (loanId: string, closeAmount: BigNumber, paymentAsset: Asset) => {
-    //     let receipt;
-    //     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    //     if (!this.contractsSource) return;
-
-    //     const iBZxContract = await this.contractsSource.getiBZxContract();
-    //     if (!account || !iBZxContract) return;
-
-    //     if (paymentAsset !== Asset.WETH && paymentAsset !== Asset.ETH) {
-
-    //         const assetErc20Address = this.getErc20AddressOfAsset(paymentAsset);
-    //         if (!assetErc20Address) return;
-    //         const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
-
-    //         // Detecting token allowance
-    //         const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, iBZxContract.address);
-
-    //         if (closeAmount.gt(erc20allowance)) {
-    //             const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(iBZxContract.address, this.getLargeApprovalAmount(paymentAsset, closeAmount), { from: account });
-    //             await this.waitForTransactionMined(approveHash);
-    //         }
-    //     }
-
-    //     const sendAmountForValue = paymentAsset === Asset.WETH || paymentAsset === Asset.ETH ?
-    //         closeAmount :
-    //         new BigNumber(0)
-
-    //     let gasAmountBN;
-    //     let gasAmount;
-    //     try {
-    //         gasAmount = await iBZxContract.liquidate.estimateGasAsync(
-    //             loanId,
-    //             account,
-    //             closeAmount,
-    //             {
-    //                 from: account,
-    //                 value: sendAmountForValue,
-    //                 gas: this.gasLimit,
-    //             });
-    //         gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-
-    //     }
-    //     catch (e) {
-    //         console.log(e);
-    //         // throw e;
-    //     }
-
-    //     const txHash = await iBZxContract.liquidate.sendTransactionAsync(
-    //         loanId,
-    //         account,
-    //         closeAmount,
-    //         {
-    //             from: account,
-    //             value: sendAmountForValue,
-    //             gas: this.gasLimit,
-    //             gasPrice: await this.gasPrice()
-    //         });
-
-
-    //     receipt = await this.waitForTransactionMined(txHash);
-
-    //     return receipt.status === 1 ? receipt : null;
-    // }
-
     public gasPrice = async (): Promise<BigNumber> => {
         let result = new BigNumber(500).multipliedBy(10 ** 9); // upper limit 500 gwei
         const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
@@ -1130,6 +1081,79 @@ export class ExplorerProvider {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    public async getGasTokenAllowance(): Promise<BigNumber> {
+        let result = new BigNumber(0);
+
+        if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+            const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+            if (account) {
+                const assetAddress = this.getErc20AddressOfAsset(Asset.CHI);
+                if (assetAddress) {
+                    const tokenContract = await this.contractsSource.getErc20Contract(assetAddress);
+                    if (tokenContract) {
+                        result = await tokenContract.allowance.callAsync(account, "0x55eb3dd3f738cfdda986b8eff3fa784477552c61")
+                    }
+                }
+            }
+        }
+
+        return result
+    }
+
+    private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
+        let result = new BigNumber(0);
+
+        if (this.web3Wrapper && this.contractsSource) {
+            if (!account && this.contractsSource.canWrite) {
+                account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+            }
+
+            if (account) {
+                const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);
+                if (tokenContract) {
+                    result = await tokenContract.balanceOf.callAsync(account);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public async getEthBalance(): Promise<BigNumber> {
+        let result: BigNumber = new BigNumber(0);
+
+        if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+            const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+            if (account) {
+                const balance = await this.web3Wrapper.getBalanceInWeiAsync(account);
+                result = new BigNumber(balance);
+            }
+        }
+
+        return result;
+    }
+
+    public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
+        let result: BigNumber = new BigNumber(0);
+        if (asset === Asset.UNKNOWN) {
+            // always 0
+            result = new BigNumber(0);
+        } else if (asset === Asset.ETH) {
+            // get eth (wallet) balance
+            result = await this.getEthBalance()
+        } else {
+            // get erc20 token balance
+            const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+            const assetErc20Address = this.getErc20AddressOfAsset(asset);
+            if (assetErc20Address) {
+                result = await this.getErc20BalanceOfUser(assetErc20Address, account);
+                result = result.multipliedBy(10 ** (18 - precision));
+            }
+        }
+
+        return result;
+    }
     public isETHAsset = (asset: Asset): boolean => {
         return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH;
     };
