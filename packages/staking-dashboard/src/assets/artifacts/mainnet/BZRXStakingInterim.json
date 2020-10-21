@@ -1,34 +1,6 @@
 {
-    "name": "BZRXStakingInterim",
-    "address": "",
+    "contractName": "StakingInterim",
     "abi": [
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "_BZRX",
-                    "type": "address"
-                },
-                {
-                    "internalType": "address",
-                    "name": "_vBZRX",
-                    "type": "address"
-                },
-                {
-                    "internalType": "address",
-                    "name": "_LPToken",
-                    "type": "address"
-                },
-                {
-                    "internalType": "bool",
-                    "name": "_isActive",
-                    "type": "bool"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "nonpayable",
-            "type": "constructor"
-        },
         {
             "anonymous": false,
             "inputs": [
@@ -71,6 +43,25 @@
                 }
             ],
             "name": "OwnershipTransferred",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "reward",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "duration",
+                    "type": "uint256"
+                }
+            ],
+            "name": "RewardAdded",
             "type": "event"
         },
         {
@@ -152,6 +143,32 @@
             "outputs": [
                 {
                     "internalType": "uint256",
+                    "name": "balance",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "token",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "account",
+                    "type": "address"
+                }
+            ],
+            "name": "balanceOfByAssetNormed",
+            "outputs": [
+                {
+                    "internalType": "uint256",
                     "name": "",
                     "type": "uint256"
                 }
@@ -178,8 +195,29 @@
             "outputs": [
                 {
                     "internalType": "uint256",
-                    "name": "",
+                    "name": "balance",
                     "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "name": "delegate",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
                 }
             ],
             "payable": false,
@@ -251,13 +289,73 @@
                             "type": "uint256"
                         }
                     ],
-                    "internalType": "struct BZRXStakingInterim.RepStakedTokens[]",
+                    "internalType": "struct StakingInterim.RepStakedTokens[]",
                     "name": "repStakedArr",
                     "type": "tuple[]"
                 }
             ],
             "payable": false,
             "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "iBZRX",
+            "outputs": [
+                {
+                    "internalType": "contract ILoanPool",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "implementation",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_BZRX",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_vBZRX",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_LPToken",
+                    "type": "address"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "_isActive",
+                    "type": "bool"
+                }
+            ],
+            "name": "init",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
             "type": "function"
         },
         {
@@ -293,12 +391,42 @@
         {
             "constant": true,
             "inputs": [],
+            "name": "isInit",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
             "name": "isOwner",
             "outputs": [
                 {
                     "internalType": "bool",
                     "name": "",
                     "type": "bool"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "lastTimeRewardApplicable",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
                 }
             ],
             "payable": false,
@@ -321,18 +449,23 @@
             "type": "function"
         },
         {
-            "constant": true,
-            "inputs": [],
-            "name": "normalizedRewardRate",
-            "outputs": [
+            "constant": false,
+            "inputs": [
                 {
                     "internalType": "uint256",
-                    "name": "",
+                    "name": "reward",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "duration",
                     "type": "uint256"
                 }
             ],
+            "name": "notifyRewardAmount",
+            "outputs": [],
             "payable": false,
-            "stateMutability": "view",
+            "stateMutability": "nonpayable",
             "type": "function"
         },
         {
@@ -352,19 +485,13 @@
         },
         {
             "constant": true,
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "",
-                    "type": "address"
-                }
-            ],
-            "name": "delegate",
+            "inputs": [],
+            "name": "periodFinish",
             "outputs": [
                 {
-                    "internalType": "address",
+                    "internalType": "uint256",
                     "name": "",
-                    "type": "address"
+                    "type": "uint256"
                 }
             ],
             "payable": false,
@@ -451,6 +578,36 @@
         },
         {
             "constant": true,
+            "inputs": [],
+            "name": "rewardPerTokenStored",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "rewardRate",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
             "inputs": [
                 {
                     "internalType": "address",
@@ -474,37 +631,6 @@
             "constant": true,
             "inputs": [],
             "name": "rewardsPerToken",
-            "outputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "bzrxReward",
-                    "type": "uint256"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "vbzrxReward",
-                    "type": "uint256"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "lptokenReward",
-                    "type": "uint256"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "",
-                    "type": "address"
-                }
-            ],
-            "name": "rewardsPerTokenStored",
             "outputs": [
                 {
                     "internalType": "uint256",
@@ -619,6 +745,21 @@
         },
         {
             "constant": true,
+            "inputs": [],
+            "name": "totalSupply",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
             "inputs": [
                 {
                     "internalType": "address",
@@ -627,6 +768,42 @@
                 }
             ],
             "name": "totalSupplyByAsset",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "supply",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "token",
+                    "type": "address"
+                }
+            ],
+            "name": "totalSupplyByAssetNormed",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "totalSupplyNormed",
             "outputs": [
                 {
                     "internalType": "uint256",
@@ -656,11 +833,6 @@
         {
             "constant": true,
             "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "",
-                    "type": "address"
-                },
                 {
                     "internalType": "address",
                     "name": "",

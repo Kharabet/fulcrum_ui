@@ -547,16 +547,11 @@ export class TorqueProvider {
       throw new Error("contractsSource is not defined");
     }
     const iToken = await this.contractsSource.getiTokenContract(asset);
-
+    
     // @ts-ignore
-    const leverageAmount = new BigNumber(web3.utils.soliditySha3(
-      { "type": "uint256", "value": "2000000000000000000" }, // use 2000000000000000000 for 150% initial margin
-      { "type": "address", "value": collateralToken }
-    ));
-    const hash = await iToken.loanIdes.callAsync(leverageAmount);
-    const data = await iToken.loanOrderData.callAsync(hash);
-    return data[3].div(10 ** 18).plus(100);
-    return new BigNumber("150"); // TODO @bshevchenko return data[3];
+    const maintenanceMargin = await iToken.loanParamsIds.callAsync(web3.utils.soliditySha3(collateralToken, true));
+    return new BigNumber("150"); // TODO @Kharabet debug precision of maintenanceMargin;
+    return new BigNumber(maintenanceMargin);
   };
 
   public assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
@@ -1411,8 +1406,11 @@ export class TorqueProvider {
 
     const loansData = await iBZxContract.getUserLoans.callAsync(
       account,
+      new BigNumber(0),
       new BigNumber(50),
-      2 // Torque loans
+      2, // Torque loans
+      false,
+      false
     );
     // console.log(loansData);
     const zero = new BigNumber(0);
@@ -1640,7 +1638,7 @@ export class TorqueProvider {
         newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
       }
       try {
-        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+        const newCurrentMargin: [BigNumber, BigNumber] = await oracleContract.getCurrentMargin.callAsync(
           borrowedFundsState.loanData.loanToken,
           borrowedFundsState.loanData.collateralToken,
           borrowedFundsState.loanData.principal,
@@ -1648,7 +1646,7 @@ export class TorqueProvider {
             new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
             new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
         );
-        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+        result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18).plus(100);
       } catch (e) {
         // console.log(e);
         result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
