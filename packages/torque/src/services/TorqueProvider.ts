@@ -417,7 +417,7 @@ export class TorqueProvider {
 
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      Asset.USDC
     );
   }
 

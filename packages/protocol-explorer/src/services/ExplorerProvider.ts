@@ -908,7 +908,7 @@ export class ExplorerProvider {
         return swapRates[0][0];*/
         return this.getSwapRate(
             asset,
-            Asset.DAI
+            Asset.USDC
         );
     }
 
