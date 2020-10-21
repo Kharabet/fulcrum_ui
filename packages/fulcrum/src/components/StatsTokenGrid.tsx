@@ -91,7 +91,8 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     const yieldAPYRequest = await fetch(`${StatsTokenGrid.apiUrl}/yield-farimng-apy`);
     const yieldAPYJson = await yieldAPYRequest.json();
-    await this.setState({ ...this.state, yieldAPYJson })
+    await this.setState({ ...this.state, yieldAPYJson });
+    await this.derivedUpdate();
   }
 
   public render() {
