@@ -1024,7 +1024,7 @@ export class FulcrumProvider {
         newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
       }
       try {
-        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+        const newCurrentMargin: [BigNumber, BigNumber] = await oracleContract.getCurrentMargin.callAsync(
           borrowedFundsState.loanData.loanToken,
           borrowedFundsState.loanData.collateralToken,
           borrowedFundsState.loanData.principal,
@@ -1032,7 +1032,7 @@ export class FulcrumProvider {
             new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
             new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
         );
-        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+        result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18).plus(100);
       } catch (e) {
         // console.log(e);
         result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
@@ -1628,17 +1628,22 @@ export class FulcrumProvider {
 
     const loansData = await iBZxContract.getUserLoans.callAsync(
       account,
+      new BigNumber(0),
       new BigNumber(50),
-      1 // margin trade loans
+      1, // margin trade loans
+      false,
+      false
     );
     // console.log(loansData);
     const zero = new BigNumber(0);
+    //@ts-ignore
     result = loansData
       .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
       .map(e => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
-        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
         const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) return;
+        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
         let amountOwned = e.principal.minus(e.interestDepositRemaining);
         if (amountOwned.lte(0)) {
@@ -1661,7 +1666,7 @@ export class FulcrumProvider {
           isInProgress: false,
           loanData: e
         };
-      });
+      }).filter(e => e);
     console.log(result);
     return result;
   }
@@ -2289,13 +2294,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                }
-                                                }
-                                                }
-                                                } catch(e) {
-                                                // console.log(e);
-                                                }
-                                                }*/
+                                                    }
+                                                    }
+                                                    }
+                                                    } catch(e) {
+                                                    // console.log(e);
+                                                    }
+                                                    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

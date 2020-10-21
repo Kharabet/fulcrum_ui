@@ -46,15 +46,9 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     super(props);
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assetsShown = [
-        { token: Asset.DAI, color: "#F8A608" },
         { token: Asset.USDC, color: "#85D3FF" },
-        { token: Asset.USDT, color: "#70E000" },
-        { token: Asset.SUSD, color: "#100E23" },
         { token: Asset.fWETH, color: "#B0B0B0" },
-        { token: Asset.WBTC, color: "#966AFF" },
-        { token: Asset.LINK, color: "#2A5ADA" },
-        { token: Asset.ZRX, color: "#000004" },
-        { token: Asset.KNC, color: "#3BD8A7" }
+        { token: Asset.WBTC, color: "#966AFF" }
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       this.assetsShown = [
@@ -192,6 +186,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18;
         const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${e.loanToken === Asset.fWETH ? "eth" : e.loanToken.toLowerCase()}&date=${e.timeStamp.getTime()}`);
         const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+        if (!swapToUsdHistoryRateResponse) continue;
         const repayAmountUsd = e.repayAmount.div(10 ** loanAssetDecimals).times(swapToUsdHistoryRateResponse.swapToUSDPrice);
         volume30d = volume30d.plus(repayAmountUsd);
         liquidationEventsWithUsd.push({ event: e, repayAmountUsd: repayAmountUsd });

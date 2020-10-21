@@ -15,6 +15,7 @@ import { ReactComponent as USDT } from "../assets/images/token-usdt.svg";
 import { ReactComponent as USDC } from "../assets/images/token-usdc.svg";
 import { ReactComponent as ZRX } from "../assets/images/token-zrx.svg";
 import { ReactComponent as WETH } from "../assets/images/token-weth.svg";
+import { ReactComponent as CHI } from "../assets/images/token-chi.svg";
 import { ReactComponent as BZRX } from "../assets/images/token-bzrx.svg";
 import { ReactComponent as YFI } from "../assets/images/token-yfi.svg";
 import { ReactComponent as LEND } from "../assets/images/token-lend.svg";
@@ -87,7 +88,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG token instead
-          [42, "0xc4b7a70c3694cb1d37a18e6c6bd9271828c382a4"],
+          [42, "0x5ae55494ccda82f1f7c653bc2b6ebb4ad3c77dac"],
         ])
       )
     ],
@@ -158,7 +159,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using eng
-          [42, "0x20bdf254ca63883c3a83424753bb40185af29ce4"],
+          [42, "0xB443f30CDd6076b1A5269dbc08b774F222d4Db4e"],
         ])
       )
     ],
@@ -214,7 +215,7 @@ export class AssetsDictionary {
         WETH,
         18,
         new Map<number, string | null>([
-          [42, "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc"]
+          [42, "0xfbe16ba4e8029b759d3c5ef8844124893f3ae470"]
         ])
       )
     ],
@@ -314,6 +315,19 @@ export class AssetsDictionary {
           [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
           [3, ""],
           [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.CHI,
+      new AssetDetails(
+        "CHI",
+        "CHI",
+        CHI,
+        0,
+        new Map<number, string | null>([
+          [1, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"],
+          [42, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"]
         ])
       )
     ]

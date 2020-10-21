@@ -234,15 +234,30 @@ export class ExplorerProvider {
         };
     }
 
+    public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
+        let result = false;
+        const assetErc20Address = this.getErc20AddressOfAsset(asset);
+
+        if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite && assetErc20Address) {
+            const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+            const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+            if (account && tokenErc20Contract) {
+                await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, { from: account });
+                result = true;
+            }
+        }
+        return result;
+    };
 
     public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
         let result: LiquidationEvent[] = [];
         if (!this.contractsSource) return result;
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = networkName === "kovan" 
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan"
+            ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
+            : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
         const liquidationResponse = await fetch(etherscanApiUrl);
         const liquidationResponseJson = await liquidationResponse.json();
         if (liquidationResponseJson.status !== "1") return result;
@@ -292,9 +307,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = networkName === "kovan" 
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan"
+            ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
+            : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
         const tradeEventResponse = await fetch(etherscanApiUrl);
         const tradeEventResponseJson = await tradeEventResponse.json();
         if (tradeEventResponseJson.status !== "1") return result;
@@ -348,9 +363,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = networkName === "kovan" 
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan"
+            ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
+            : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
         const closeWithSwapResponse = await fetch(etherscanApiUrl);
         const closeWithSwapResponseJson = await closeWithSwapResponse.json();
         if (closeWithSwapResponseJson.status !== "1") return result;
@@ -400,9 +415,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = networkName === "kovan" 
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan"
+            ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
+            : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
         const closeWithDepositResponse = await fetch(etherscanApiUrl);
         const closeWithDepositResponseJson = await closeWithDepositResponse.json();
         if (closeWithDepositResponseJson.status !== "1") return result;
@@ -450,9 +465,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = networkName === "kovan" 
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan"
+            ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
+            : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
         const borrowResponse = await fetch(etherscanApiUrl);
         const borrowResponseJson = await borrowResponse.json();
         if (borrowResponseJson.status !== "1") return result;
@@ -546,9 +561,9 @@ export class ExplorerProvider {
         const tokenContractAddress = this.contractsSource.getITokenErc20Address(asset);
         if (!tokenContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = networkName === "kovan" 
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan"
+            ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
+            : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
         const burnResponse = await fetch(etherscanApiUrl);
         const burnResponseJson = await burnResponse.json();
         if (burnResponseJson.status !== "1") return result;
@@ -584,9 +599,9 @@ export class ExplorerProvider {
         const tokenContractAddress = this.contractsSource.getITokenErc20Address(asset);
         if (!tokenContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = networkName === "kovan" 
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan"
+            ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
+            : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
         const mintResponse = await fetch(etherscanApiUrl);
         const mintResponseJson = await mintResponse.json();
         if (mintResponseJson.status !== "1") return result;
@@ -735,20 +750,36 @@ export class ExplorerProvider {
 
         const sendAmountForValue = paymentAsset === Asset.WETH || paymentAsset === Asset.ETH ?
             closeAmount :
-            new BigNumber(0)
-
+            new BigNumber(0);
+        const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+        const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI);
         let gasAmountBN;
         let gasAmount;
+
+
         try {
-            gasAmount = await iBZxContract.liquidate.estimateGasAsync(
-                loanId,
-                account,
-                closeAmount,
-                {
-                    from: account,
-                    value: sendAmountForValue,
-                    gas: this.gasLimit,
-                });
+            gasAmount = isGasTokenEnabled && ChiTokenBalance.gt(0)
+                ? await iBZxContract.liquidateWithGasToken.estimateGasAsync(
+                    loanId,
+                    account,
+                    account,
+                    closeAmount,
+                    {
+                        from: account,
+                        value: sendAmountForValue,
+                        gas: this.gasLimit,
+                    })
+                :
+                await iBZxContract.liquidate.estimateGasAsync(
+                    loanId,
+                    account,
+                    closeAmount,
+                    {
+                        from: account,
+                        value: sendAmountForValue,
+                        gas: this.gasLimit,
+                    });
+
             gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
 
         }
@@ -757,16 +788,28 @@ export class ExplorerProvider {
             // throw e;
         }
 
-        const txHash = await iBZxContract.liquidate.sendTransactionAsync(
-            loanId,
-            account,
-            closeAmount,
-            {
-                from: account,
-                value: sendAmountForValue,
-                gas: this.gasLimit,
-                gasPrice: await this.gasPrice()
-            });
+        const txHash = isGasTokenEnabled && ChiTokenBalance.gt(0)
+            ? await iBZxContract.liquidateWithGasToken.sendTransactionAsync(
+                loanId,
+                account,
+                account,
+                closeAmount,
+                {
+                    from: account,
+                    value: sendAmountForValue,
+                    gas: this.gasLimit,
+                    gasPrice: await this.gasPrice()
+                })
+            : await iBZxContract.liquidate.sendTransactionAsync(
+                loanId,
+                account,
+                closeAmount,
+                {
+                    from: account,
+                    value: sendAmountForValue,
+                    gas: this.gasLimit,
+                    gasPrice: await this.gasPrice()
+                });
 
 
         receipt = await this.waitForTransactionMined(txHash);
@@ -991,7 +1034,79 @@ export class ExplorerProvider {
         }
     };
 
+    public async getGasTokenAllowance(): Promise<BigNumber> {
+        let result = new BigNumber(0);
 
+        if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+            const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+            if (account) {
+                const assetAddress = this.getErc20AddressOfAsset(Asset.CHI);
+                if (assetAddress) {
+                    const tokenContract = await this.contractsSource.getErc20Contract(assetAddress);
+                    if (tokenContract) {
+                        result = await tokenContract.allowance.callAsync(account, "0x55eb3dd3f738cfdda986b8eff3fa784477552c61")
+                    }
+                }
+            }
+        }
+
+        return result
+    }
+
+    private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
+        let result = new BigNumber(0);
+
+        if (this.web3Wrapper && this.contractsSource) {
+            if (!account && this.contractsSource.canWrite) {
+                account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+            }
+
+            if (account) {
+                const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);
+                if (tokenContract) {
+                    result = await tokenContract.balanceOf.callAsync(account);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public async getEthBalance(): Promise<BigNumber> {
+        let result: BigNumber = new BigNumber(0);
+
+        if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+            const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+            if (account) {
+                const balance = await this.web3Wrapper.getBalanceInWeiAsync(account);
+                result = new BigNumber(balance);
+            }
+        }
+
+        return result;
+    }
+
+    public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
+        let result: BigNumber = new BigNumber(0);
+        if (asset === Asset.UNKNOWN) {
+            // always 0
+            result = new BigNumber(0);
+        } else if (asset === Asset.ETH) {
+            // get eth (wallet) balance
+            result = await this.getEthBalance()
+        } else {
+            // get erc20 token balance
+            const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+            const assetErc20Address = this.getErc20AddressOfAsset(asset);
+            if (assetErc20Address) {
+                result = await this.getErc20BalanceOfUser(assetErc20Address, account);
+                result = result.multipliedBy(10 ** (18 - precision));
+            }
+        }
+
+        return result;
+    }
 }
 
 new ExplorerProvider();
