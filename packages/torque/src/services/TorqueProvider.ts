@@ -1092,9 +1092,9 @@ export class TorqueProvider {
 
       const collateralAmount = refRequest.collateralAmount//.dividedBy(refRequest.debt.dividedBy(loanAmount));
       // @ts-ignore
-      const dart = Web3Utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP).toString());
+      const dart = new BigNumber(Web3Utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP)));
       // @ts-ignore
-      const dink = Web3Utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
+      const dink = new BigNumber(Web3Utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR)));
 
       if (refRequest.isProxy) {
         const proxy: dsProxyJsonContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress);
