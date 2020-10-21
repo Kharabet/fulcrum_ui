@@ -1,20 +1,20 @@
-import React, { Component } from "react";
-import { AssetDetails } from "../domain/AssetDetails";
-import { PositionType } from "../domain/PositionType";
+import React, { Component } from 'react'
+import { AssetDetails } from '../domain/AssetDetails'
+import { PositionType } from '../domain/PositionType'
 
-import "../styles/components/position-type-marker-alt.scss";
+import '../styles/components/position-type-marker-alt.scss'
 
 export interface IPositionTypeMarkerAltProps {
-  value: PositionType;
+  value: PositionType
 }
 
 export class PositionTypeMarkerAlt extends Component<IPositionTypeMarkerAltProps> {
   public render() {
     const img =
-      this.props.value === PositionType.LONG ?
-        "data:image/svg+xml;base64," +
-        btoa(
-          `<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+      this.props.value === PositionType.LONG
+        ? 'data:image/svg+xml;base64,' +
+          btoa(
+            `<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g clip-path="url(#clip0)">
           <path d="M1.00536e-06 11.5C4.50116e-07 17.8513 5.14873 23 11.5 23C17.8513 23 23 17.8513 23 11.5C23 5.14873 17.8513 -4.50116e-07 11.5 -1.00536e-06C5.14873 -1.56061e-06 1.56061e-06 5.14872 1.00536e-06 11.5Z" fill="#00C0AB"/>
           <path d="M12.105 15.7368L10.8945 15.7368L10.8945 8.47366L12.105 8.47366L12.105 15.7368Z" fill="white"/>
@@ -28,9 +28,9 @@ export class PositionTypeMarkerAlt extends Component<IPositionTypeMarkerAltProps
           </defs>
           </svg>
           `
-        )
-        : this.props.value === PositionType.SHORT ?
-          "data:image/svg+xml;base64," +
+          )
+        : this.props.value === PositionType.SHORT
+        ? 'data:image/svg+xml;base64,' +
           btoa(
             `<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M23 11.5C23 5.14873 17.8513 0 11.5 0C5.14873 0 0 5.14873 0 11.5C0 17.8513 5.14873 23 11.5 23C17.8513 23 23 17.8513 23 11.5Z" fill="#FF5353"/>
@@ -39,7 +39,7 @@ export class PositionTypeMarkerAlt extends Component<IPositionTypeMarkerAltProps
             <path d="M14.0686 11.5L14.9246 12.356L11.5007 15.7799L10.6447 14.9239L14.0686 11.5Z" fill="white"/>
             </svg>`
           )
-          : undefined;
-    return <img className="position-type-marker-alt" src={img} />;
+        : undefined
+    return <img className="position-type-marker-alt" src={img} />
   }
 }

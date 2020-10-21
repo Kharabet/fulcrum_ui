@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-
 const tokenStatsModel = new mongoose.Schema({
   token: {
     type: String,
@@ -58,7 +57,7 @@ const tokenStatsModel = new mongoose.Schema({
     type: String,
     required: true
   }
-});
+})
 
 const allTokensStatsModel = new mongoose.Schema({
   token: {
@@ -73,7 +72,7 @@ const allTokensStatsModel = new mongoose.Schema({
     type: String,
     required: true
   }
-});
+})
 
 const statsModel = new mongoose.Schema({
   date: {
@@ -91,8 +90,8 @@ const statsModel = new mongoose.Schema({
     type: allTokensStatsModel,
     required: true
   }
-});
+})
 
-module.exports.statsModel = mongoose.model('stats', statsModel);
-module.exports.tokenStatsModel = mongoose.model('token_stats', tokenStatsModel);
-module.exports.allTokensStatsModel = mongoose.model('all_token_stats', allTokensStatsModel);
+module.exports.statsModel = mongoose.model('stats', statsModel)
+module.exports.tokenStatsModel = mongoose.model('token_stats', tokenStatsModel)
+module.exports.allTokensStatsModel = mongoose.model('all_token_stats', allTokensStatsModel)

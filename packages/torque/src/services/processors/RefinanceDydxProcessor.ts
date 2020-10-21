@@ -1,7 +1,7 @@
-import { BigNumber } from "@0x/utils";
-import { RequestTask } from "../../domain/RequestTask";
-import { TorqueProvider } from "../TorqueProvider";
-import { RefinanceDydxRequest } from "../../domain/RefinanceDydxRequest";
+import { BigNumber } from '@0x/utils'
+import { RequestTask } from '../../domain/RequestTask'
+import { TorqueProvider } from '../TorqueProvider'
+import { RefinanceDydxRequest } from '../../domain/RefinanceDydxRequest'
 
 // export class RefinanceDydxProcessor {
 //   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -24,7 +24,6 @@ import { RefinanceDydxRequest } from "../../domain/RefinanceDydxRequest";
 //     const solo = await TorqueProvider.Instance.contractsSource.getSoloContract();
 //     const soloBridge = await TorqueProvider.Instance.contractsSource.getSoloBridgeContract();
 //     const isOperator = await solo.getIsLocalOperator.callAsync(account, soloBridge.address);
-
 
 //     //Preparing loan refinance
 //     task.processingStepNext();
@@ -83,7 +82,7 @@ import { RefinanceDydxRequest } from "../../domain/RefinanceDydxRequest";
 
 //     amount = amount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_DOWN);
 
-//     //Submitting loan refinance          
+//     //Submitting loan refinance
 //     task.processingStepNext();
 //     try {
 //       txHash = await soloBridge.migrateLoan.sendTransactionAsync(
@@ -104,7 +103,6 @@ import { RefinanceDydxRequest } from "../../domain/RefinanceDydxRequest";
 //       console.log(e)
 //       throw e;
 //     }
-
 
 //     //Updating the blockchain
 //     task.processingStepNext();

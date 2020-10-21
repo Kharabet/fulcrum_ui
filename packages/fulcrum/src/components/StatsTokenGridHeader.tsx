@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React, { Component } from 'react'
 
-export interface IStatsTokenGridHeaderProps {
-}
+export interface IStatsTokenGridHeaderProps {}
 
 export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> {
   public render() {
@@ -36,6 +35,6 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
           <span className="stats-grid-header__text">Borrow / Yield</span>
         </div>
       </div>
-    );
+    )
   }
 }

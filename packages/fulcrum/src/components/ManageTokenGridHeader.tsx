@@ -1,59 +1,70 @@
-import React, { Component } from "react";
-import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
+import React, { Component } from 'react'
+import { ReactComponent as WalletSvg } from '../assets/images/wallet-icon.svg'
 
 export interface IManageTokenGridHeaderProps {
-  isShowHistory: boolean;
-  isShowMyTokensOnly: boolean;
-  openedPositionsCount: number;
-  updateStateisShowHistory: (updatedState: boolean) => void;
+  isShowHistory: boolean
+  isShowMyTokensOnly: boolean
+  openedPositionsCount: number
+  updateStateisShowHistory: (updatedState: boolean) => void
 }
 
 export interface IManageTokenGridHeaderState {
-  isShowHistory: boolean;
+  isShowHistory: boolean
 }
 
-export class ManageTokenGridHeader extends Component<IManageTokenGridHeaderProps, IManageTokenGridHeaderState> {
+export class ManageTokenGridHeader extends Component<
+  IManageTokenGridHeaderProps,
+  IManageTokenGridHeaderState
+> {
   constructor(props: IManageTokenGridHeaderProps) {
-    super(props);
-    this._isMounted = false;
+    super(props)
+    this._isMounted = false
     this.state = {
-      isShowHistory: props.isShowHistory,
-    };
+      isShowHistory: props.isShowHistory
+    }
   }
 
-  private _isMounted: boolean;
+  private _isMounted: boolean
 
   public componentDidMount(): void {
-    this._isMounted = true;
+    this._isMounted = true
   }
 
   public componentWillUnmount(): void {
-    this._isMounted = false;
+    this._isMounted = false
   }
-
 
   public render() {
     return (
       <div className="manage-token-grid__group-tabs">
-        <div className={`tab ${this.props.isShowMyTokensOnly && !this.props.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>
+        <div
+          className={`tab ${
+            this.props.isShowMyTokensOnly && !this.props.isShowHistory ? `active` : ``
+          }`}
+          onClick={this.onShowOpenPositions}>
           <div className="manage-tab">
-            <div className={`trade-token-grid-tab-item__col-token-image`} >
+            <div className={`trade-token-grid-tab-item__col-token-image`}>
               {<WalletSvg />}
               <span>Manage</span>
               <span className="opened-positions-count">{this.props.openedPositionsCount}</span>
-            </div></div> </div>
-        <div className={`tab ${this.props.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>
-          Trade history</div>
+            </div>
+          </div>{' '}
+        </div>
+        <div
+          className={`tab ${this.props.isShowHistory ? `active` : ``}`}
+          onClick={this.onShowHistory}>
+          Trade history
+        </div>
       </div>
-    );
+    )
   }
   private onShowHistory = () => {
-    this.props.updateStateisShowHistory(true);
-    this._isMounted && this.setState({ ...this.state, isShowHistory: true });
-  };
+    this.props.updateStateisShowHistory(true)
+    this._isMounted && this.setState({ ...this.state, isShowHistory: true })
+  }
 
   private onShowOpenPositions = () => {
-    this.props.updateStateisShowHistory(false);
-    this._isMounted && this.setState({ ...this.state, isShowHistory: false });
-  };
+    this.props.updateStateisShowHistory(false)
+    this._isMounted && this.setState({ ...this.state, isShowHistory: false })
+  }
 }

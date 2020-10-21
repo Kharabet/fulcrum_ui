@@ -1,51 +1,53 @@
-import { BigNumber } from "@0x/utils";
-import React, { ChangeEvent, Component, ReactElement } from "react";
-import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
-import { ReactComponent as CompoundImg } from "../assets/images/compound.svg";
-import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
-import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
-import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
-import { IRefinanceLoan } from "../domain/RefinanceData";
-import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
-import { TorqueProvider } from "../services/TorqueProvider";
-import { ReactComponent as DydxImg } from "../assets/images/dydx.svg";
-import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
-import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
-import { CollateralInfo } from "./CollateralInfo";
-import { AssetDetails } from "../domain/AssetDetails";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
-import Slider from "rc-slider";
-import { NavService } from '../services/NavService';
-import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest';
-import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest';
-import { TxProcessingLoader } from "./TxProcessingLoader";
-import { RequestStatus } from "../domain/RequestStatus";
-import { RequestTask } from "../domain/RequestTask";
+import { BigNumber } from '@0x/utils'
+import React, { ChangeEvent, Component, ReactElement } from 'react'
+import { ReactComponent as Arrow } from '../assets/images/arrow.svg'
+import { ReactComponent as CompoundImg } from '../assets/images/compound.svg'
+import { ReactComponent as DownArrow } from '../assets/images/down-arrow.svg'
+import { ReactComponent as TopArrow } from '../assets/images/top-arrow.svg'
+import { ReactComponent as TorqueLogo } from '../assets/images/torque_logo.svg'
+import { IRefinanceLoan } from '../domain/RefinanceData'
+import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
+import { TorqueProvider } from '../services/TorqueProvider'
+import { ReactComponent as DydxImg } from '../assets/images/dydx.svg'
+import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
+import { ReactComponent as IconInfoActive } from '../assets/images/icon_info_active.svg'
+import { CollateralInfo } from './CollateralInfo'
+import { AssetDetails } from '../domain/AssetDetails'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Slider from 'rc-slider'
+import { NavService } from '../services/NavService'
+import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest'
+import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest'
+import { TxProcessingLoader } from './TxProcessingLoader'
+import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
 
 interface IRefinanceAssetCompoundLoanItemState {
-  isShow: boolean;
-  isShowInfoCollateralAssetDt0: boolean;
-  isShowInfoCollateralAssetDt1: boolean;
-  borrowAmount: BigNumber;
-  fixedApr: BigNumber;
-  loan: IRefinanceLoan;
-  isLoadingTransaction: boolean;
-  loanAssetDt: AssetDetails;
-  collateralAssetDt: AssetDetails;
-  collateralAssetDt2: AssetDetails | undefined;
-  head_image: ReactElement;
-  refRateMonth: number;
-  refRateYear: number;
-  request: RefinanceCompoundRequest | undefined;
+  isShow: boolean
+  isShowInfoCollateralAssetDt0: boolean
+  isShowInfoCollateralAssetDt1: boolean
+  borrowAmount: BigNumber
+  fixedApr: BigNumber
+  loan: IRefinanceLoan
+  isLoadingTransaction: boolean
+  loanAssetDt: AssetDetails
+  collateralAssetDt: AssetDetails
+  collateralAssetDt2: AssetDetails | undefined
+  head_image: ReactElement
+  refRateMonth: number
+  refRateYear: number
+  request: RefinanceCompoundRequest | undefined
 }
 
 interface IRefinanceAssetCompoundLoanItemProps {
   loan: IRefinanceLoan
-  isMobileMedia: boolean;
+  isMobileMedia: boolean
 }
 
-export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCompoundLoanItemProps, IRefinanceAssetCompoundLoanItemState> {
-
+export class RefinanceAssetCompoundLoanItem extends Component<
+  IRefinanceAssetCompoundLoanItemProps,
+  IRefinanceAssetCompoundLoanItemState
+> {
   // constructor(props: IRefinanceAssetCompoundLoanItemProps) {
   //   super(props);
   //   this.state = {
@@ -61,23 +63,18 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   //     collateralAssetDt2: this.props.loan.collateral.length > 1
   //       ? AssetsDictionary.assets.get(this.props.loan.collateral[1].asset) as AssetDetails
   //       : undefined,
-
   //     head_image: this.props.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />,
   //     refRateMonth: 0,
   //     refRateYear: 0,
   //     request: undefined
   //   };
-
   //   this._isMounted = false;
-
   //   TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
   //   TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   //   TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
   //   TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   // }
-
   // private _isMounted: boolean;
-
   // private onAskToOpenProgressDlg = async (taskId: number) => {
   //   if (!this.state.request || taskId !== this.state.request.id) return;
   //   await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: true })
@@ -92,18 +89,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   //     return;
   //   }
   //   await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-
   //   NavService.Instance.History.push("/dashboard");
   // }
-
   // private onProviderAvailable = () => {
   //   this.derivedUpdate();
   // };
-
   // private onProviderChanged = () => {
   //   this.derivedUpdate();
   // };
-
   // public componentWillUnmount(): void {
   //   this._isMounted = false;
   //   TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -111,23 +104,17 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   //   TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
   //   TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   // }
-
   // public componentDidMount(): void {
   //   this._isMounted = true;
   //   this.derivedUpdate();
   // }
-
   // public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
   //   // handling different types of empty values
   //   const amountText = event.target.value ? event.target.value : "0";
-
   //   const borrowAmount = new BigNumber(amountText);
   //   let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
-
   //   const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
   //   const refRateMonth = refRateYear / 12;
-
-
   //   if (borrowAmount.gt(0)) {
   //     const divider = refinanceLoan.balance.div(borrowAmount);
   //     refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
@@ -147,7 +134,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   //       return
   //     }
   //   }
-
   //   await await this._isMounted && this.setState({
   //     ...this.state,
   //     borrowAmount: borrowAmount,
@@ -165,11 +151,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   //     loan: refinanceLoan
   //   });
   // };
-
   // public showDetails = async () => {
   //   await this._isMounted && this.setState({ ...this.state, isShow: !this.state.isShow });
   // };
-
   // public migrateLoan = async () => {
   //   const loan = Object.assign({}, this.state.loan);
   //   let receipt, request;
@@ -183,12 +167,10 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   //     receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(request);
   //   }
   // };
-
   // private derivedUpdate = async () => {
   //   const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.state.loan.collateral[0].asset);
   //   const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
   //   const refRateMonth = refRateYear / 12;
-
   //   await this._isMounted && this.setState({
   //     ...this.state,
   //     fixedApr: interestRate,
@@ -196,23 +178,18 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   //     refRateYear
   //   });
   // };
-
   // public showInfoCollateralAssetDt0 = async () => {
   //   await this._isMounted && this.setState({ ...this.state, isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0 });
   // };
-
   // public showInfoCollateralAssetDt1 = async () => {
   //   await this._isMounted && this.setState({ ...this.state, isShowInfoCollateralAssetDt1: !this.state.isShowInfoCollateralAssetDt1 });
   // };
-
-
   // public render() {
   //   const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
   //   const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
   //   return (
-
   //     <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
-  //       </div> 
+  //       </div>
   //       //{this.state.isLoadingTransaction && this.state.request &&
   //     //     <TxProcessingLoader
   //     //       quantityDots={4}

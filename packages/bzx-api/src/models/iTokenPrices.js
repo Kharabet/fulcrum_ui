@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-
 const iTokenPriceSchema = new mongoose.Schema({
   token: {
     type: String,
@@ -25,18 +24,17 @@ const iTokenPriceSchema = new mongoose.Schema({
 })
 
 const iTokenPricesSchema = new mongoose.Schema({
-    date: {
-      type: Date,
-      default: Date.now,
-      index: true
-    },
-    iTokenPrices: {
-      type: [iTokenPriceSchema],
-      required: true,
-      default: undefined
-    }
-});
+  date: {
+    type: Date,
+    default: Date.now,
+    index: true
+  },
+  iTokenPrices: {
+    type: [iTokenPriceSchema],
+    required: true,
+    default: undefined
+  }
+})
 
-
-exports.iTokenPricesModel = mongoose.model('itoken_prices', iTokenPricesSchema);
-exports.iTokenPriceModel = mongoose.model('itoken_price', iTokenPriceSchema);
+exports.iTokenPricesModel = mongoose.model('itoken_prices', iTokenPricesSchema)
+exports.iTokenPriceModel = mongoose.model('itoken_price', iTokenPriceSchema)

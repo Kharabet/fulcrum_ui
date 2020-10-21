@@ -1,20 +1,22 @@
-import React, { Component } from "react";
-import { Header } from "../layout/Header";
-import { TableGrid } from "../components/TableGrid";
+import React, { Component } from 'react'
+import { Header } from '../layout/Header'
+import { TableGrid } from '../components/TableGrid'
 
 interface ITransactionsPageProps {
-  doNetworkConnect: () => void;
-  isMobileMedia: boolean;
+  doNetworkConnect: () => void
+  isMobileMedia: boolean
 }
-interface ITransactionsPageState {
-}
+interface ITransactionsPageState {}
 
 export class TransactionsPage extends Component<ITransactionsPageProps, ITransactionsPageState> {
   public render() {
     return (
       <React.Fragment>
         <section>
-          <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect}  />
+          <Header
+            isMobileMedia={this.props.isMobileMedia}
+            doNetworkConnect={this.props.doNetworkConnect}
+          />
           <div className="container container-sm">
             <h1>Staking Details</h1>
             <TableGrid isMobileMedia={this.props.isMobileMedia} />
@@ -24,6 +26,6 @@ export class TransactionsPage extends Component<ITransactionsPageProps, ITransac
           </div>
         </section>
       </React.Fragment>
-    );
+    )
   }
 }

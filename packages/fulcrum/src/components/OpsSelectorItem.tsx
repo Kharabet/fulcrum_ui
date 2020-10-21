@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 export interface IOpsSelectorItemProps {
-  operationName: string;
-  operationImageSrc: any;
-  operationAddress: string;
+  operationName: string
+  operationImageSrc: any
+  operationAddress: string
 }
 
 export class OpsSelectorItem extends Component<IOpsSelectorItemProps> {
@@ -21,6 +21,6 @@ export class OpsSelectorItem extends Component<IOpsSelectorItemProps> {
           </div>
         </Link>
       </div>
-    );
+    )
   }
 }

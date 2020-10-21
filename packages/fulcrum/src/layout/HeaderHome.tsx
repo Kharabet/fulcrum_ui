@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { HeaderLogo } from "./HeaderLogo";
+import React, { Component } from 'react'
+import { HeaderLogo } from './HeaderLogo'
 
 export class HeaderHome extends Component {
   public render() {
@@ -7,6 +7,6 @@ export class HeaderHome extends Component {
       <header className="header">
         <HeaderLogo />
       </header>
-    );
+    )
   }
 }

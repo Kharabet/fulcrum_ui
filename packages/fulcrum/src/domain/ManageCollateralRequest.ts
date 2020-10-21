@@ -1,29 +1,30 @@
-import { BigNumber } from "@0x/utils";
-import { Asset } from "./Asset";
+import { BigNumber } from '@0x/utils'
+import { Asset } from './Asset'
 
 export class ManageCollateralRequest {
-  public id: number;
-  public loanId: string;
-  public asset: Asset;
-  public collateralAsset: Asset;
-  public collateralAmount: BigNumber;
+  public id: number
+  public loanId: string
+  public asset: Asset
+  public collateralAsset: Asset
+  public collateralAmount: BigNumber
 
-  public isWithdrawal: boolean;
+  public isWithdrawal: boolean
 
-  constructor(loanId: string,
+  constructor(
+    loanId: string,
     asset: Asset,
     collateralAsset: Asset,
     collateralAmount: BigNumber,
-    isWithdrawal: boolean,
+    isWithdrawal: boolean
   ) {
-    this.id = Math.round(new Date().getTime() / 1000);
-    this.loanId = loanId;
-    this.asset = asset;
-    this.collateralAsset = collateralAsset;
-    this.collateralAmount = collateralAmount;
-    this.isWithdrawal = isWithdrawal;
+    this.id = Math.round(new Date().getTime() / 1000)
+    this.loanId = loanId
+    this.asset = asset
+    this.collateralAsset = collateralAsset
+    this.collateralAmount = collateralAmount
+    this.isWithdrawal = isWithdrawal
   }
   public getRequestTypeName(): string {
-    return (!this.isWithdrawal ? "Withdraw" : "Top Up") + " request";
+    return (!this.isWithdrawal ? 'Withdraw' : 'Top Up') + ' request'
   }
 }

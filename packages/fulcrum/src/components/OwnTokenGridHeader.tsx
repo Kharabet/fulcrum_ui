@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React, { Component } from 'react'
 
-export interface IOwnTokenGridHeaderProps {
-}
+export interface IOwnTokenGridHeaderProps {}
 
 export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
   public render() {
@@ -33,6 +32,6 @@ export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
           <span className="own-token-grid-header__text">Profit</span>
         </div>
       </div>
-    );
+    )
   }
 }

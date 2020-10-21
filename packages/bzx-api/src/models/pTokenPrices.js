@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-
 const pTokenPriceSchema = new mongoose.Schema({
   token: {
     type: String,
@@ -21,18 +20,17 @@ const pTokenPriceSchema = new mongoose.Schema({
 })
 
 const pTokenPricesSchema = new mongoose.Schema({
-    date: {
-      type: Date,
-      default: Date.now,
-      index: true
-    },
-    pTokenPrices: {
-      type: [pTokenPriceSchema],
-      required: true,
-      default: undefined
-    }
-});
+  date: {
+    type: Date,
+    default: Date.now,
+    index: true
+  },
+  pTokenPrices: {
+    type: [pTokenPriceSchema],
+    required: true,
+    default: undefined
+  }
+})
 
-
-exports.pTokenPricesModel = mongoose.model('ptoken_prices', pTokenPricesSchema);
-exports.pTokenPriceModel = mongoose.model('ptoken_price', pTokenPriceSchema);
+exports.pTokenPricesModel = mongoose.model('ptoken_prices', pTokenPricesSchema)
+exports.pTokenPriceModel = mongoose.model('ptoken_price', pTokenPriceSchema)

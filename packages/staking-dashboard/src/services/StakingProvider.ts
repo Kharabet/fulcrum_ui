@@ -1,382 +1,388 @@
-import { Web3ProviderEngine } from "@0x/subproviders";
-import { Web3Wrapper } from "@0x/web3-wrapper";
-import { EventEmitter } from "events";
+import { Web3ProviderEngine } from '@0x/subproviders'
+import { Web3Wrapper } from '@0x/web3-wrapper'
+import { EventEmitter } from 'events'
 
-import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
+import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 
-import { AbstractConnector } from '@web3-react/abstract-connector';
-import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
-import { ProviderType } from "../domain/ProviderType";
-import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
-import { StakingProviderEvents } from "./events/StakingProviderEvents";
-import { ContractsSource } from "./ContractsSource";
-import { BigNumber } from "@0x/utils";
-import { Asset } from "../domain/Asset";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { RequestTask } from "../domain/RequestTask";
-import { StakingRequest } from "../domain/StakingRequest";
-import { ConvertRequest } from "../domain/ConvertRequest";
-import { ClaimRequest } from "../domain/ClaimRequest";
-import { ClaimReabteRewardsRequest } from "../domain/ClaimReabteRewardsRequest";
-import { BecomeRepresentativeRequest } from "../domain/BecomeRepresentativeRequest";
-
-
+import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
+import { ProviderType } from '../domain/ProviderType'
+import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
+import { StakingProviderEvents } from './events/StakingProviderEvents'
+import { ContractsSource } from './ContractsSource'
+import { BigNumber } from '@0x/utils'
+import { Asset } from '../domain/Asset'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { RequestTask } from '../domain/RequestTask'
+import { StakingRequest } from '../domain/StakingRequest'
+import { ConvertRequest } from '../domain/ConvertRequest'
+import { ClaimRequest } from '../domain/ClaimRequest'
+import { ClaimReabteRewardsRequest } from '../domain/ClaimReabteRewardsRequest'
+import { BecomeRepresentativeRequest } from '../domain/BecomeRepresentativeRequest'
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
     case 'mainnet':
-      return 1;
+      return 1
     case 'ropsten':
-      return 3;
+      return 3
     case 'rinkeby':
-      return 4;
+      return 4
     case 'kovan':
-      return 42;
+      return 42
     default:
-      return 0;
+      return 0
   }
 }
-const networkName = process.env.REACT_APP_ETH_NETWORK;
-const initialNetworkId = getNetworkIdByString(networkName);
-
+const networkName = process.env.REACT_APP_ETH_NETWORK
+const initialNetworkId = getNetworkIdByString(networkName)
 
 export class StakingProvider {
-  public static Instance: StakingProvider;
+  public static Instance: StakingProvider
 
-  public readonly gasLimit = "500000";
+  public readonly gasLimit = '500000'
 
   // gasBufferCoeff equal 110% gas reserve
-  public readonly gasBufferCoeff = new BigNumber("1.03");
+  public readonly gasBufferCoeff = new BigNumber('1.03')
   // 5000ms
-  public readonly successDisplayTimeout = 5000;
-  public readonly eventEmitter: EventEmitter;
-  public providerType: ProviderType = ProviderType.None;
-  public providerEngine: Web3ProviderEngine | null = null;
-  public web3Wrapper: Web3Wrapper | null = null;
-  public web3ProviderSettings: IWeb3ProviderSettings;
-  public contractsSource: ContractsSource | null = null;
-  public accounts: string[] = [];
-  public isLoading: boolean = false;
-  public unsupportedNetwork: boolean = false;
-  private requestTask: RequestTask | undefined;
+  public readonly successDisplayTimeout = 5000
+  public readonly eventEmitter: EventEmitter
+  public providerType: ProviderType = ProviderType.None
+  public providerEngine: Web3ProviderEngine | null = null
+  public web3Wrapper: Web3Wrapper | null = null
+  public web3ProviderSettings: IWeb3ProviderSettings
+  public contractsSource: ContractsSource | null = null
+  public accounts: string[] = []
+  public isLoading: boolean = false
+  public unsupportedNetwork: boolean = false
+  private requestTask: RequestTask | undefined
 
-  public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
-    .pow(256)
-    .minus(1);
+  public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
 
   constructor() {
     // init
-    this.eventEmitter = new EventEmitter();
-    this.eventEmitter.setMaxListeners(1000);
+    this.eventEmitter = new EventEmitter()
+    this.eventEmitter.setMaxListeners(1000)
 
     //TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // singleton
     if (!StakingProvider.Instance) {
-      StakingProvider.Instance = this;
+      StakingProvider.Instance = this
     }
 
-    const storedProvider: any = StakingProvider.getLocalstorageItem('providerType');
-    const providerType: ProviderType | null = storedProvider as ProviderType || null;
+    const storedProvider: any = StakingProvider.getLocalstorageItem('providerType')
+    const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
-    this.web3ProviderSettings = StakingProvider.getWeb3ProviderSettings(initialNetworkId);
+    this.web3ProviderSettings = StakingProvider.getWeb3ProviderSettings(initialNetworkId)
     if (!providerType || providerType === ProviderType.None) {
-
       // StakingProvider.Instance.isLoading = true;
       // setting up readonly provider
-      this.web3ProviderSettings = StakingProvider.getWeb3ProviderSettings(initialNetworkId);
+      this.web3ProviderSettings = StakingProvider.getWeb3ProviderSettings(initialNetworkId)
       Web3ConnectionFactory.setReadonlyProvider().then(() => {
-        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
-        const engine = Web3ConnectionFactory.currentWeb3Engine;
-        const canWrite = Web3ConnectionFactory.canWrite;
+        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
+        const engine = Web3ConnectionFactory.currentWeb3Engine
+        const canWrite = Web3ConnectionFactory.canWrite
 
         if (web3Wrapper && this.web3ProviderSettings) {
-          const contractsSource = new ContractsSource(engine, this.web3ProviderSettings.networkId, canWrite);
+          const contractsSource = new ContractsSource(
+            engine,
+            this.web3ProviderSettings.networkId,
+            canWrite
+          )
           contractsSource.Init().then(() => {
-            this.web3Wrapper = web3Wrapper;
-            this.providerEngine = engine;
-            this.contractsSource = contractsSource;
-            this.eventEmitter.emit(StakingProviderEvents.ProviderAvailable);
-          });
+            this.web3Wrapper = web3Wrapper
+            this.providerEngine = engine
+            this.contractsSource = contractsSource
+            this.eventEmitter.emit(StakingProviderEvents.ProviderAvailable)
+          })
         }
-      });
+      })
     }
 
-
-
-    return StakingProvider.Instance;
+    return StakingProvider.Instance
   }
 
   public static getLocalstorageItem(item: string): string {
-    let response = "";
-    response = localStorage.getItem(item) || "";
-    return response;
+    let response = ''
+    response = localStorage.getItem(item) || ''
+    return response
   }
 
   public static setLocalstorageItem(item: string, val: string) {
-    localStorage.setItem(item, val);
+    localStorage.setItem(item, val)
   }
 
   public async setWeb3Provider(connector: AbstractConnector, account?: string) {
-
-    this.unsupportedNetwork = false;
-    await Web3ConnectionFactory.setWalletProvider(connector, account);
-    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
-    await this.setWeb3ProviderFinalize(providerType);
+    this.unsupportedNetwork = false
+    await Web3ConnectionFactory.setWalletProvider(connector, account)
+    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector)
+    await this.setWeb3ProviderFinalize(providerType)
   }
 
   public async setReadonlyWeb3Provider() {
-    await Web3ConnectionFactory.setReadonlyProvider();
-    await this.setWeb3ProviderFinalize(ProviderType.None);
-    this.isLoading = false;
+    await Web3ConnectionFactory.setReadonlyProvider()
+    await this.setWeb3ProviderFinalize(ProviderType.None)
+    this.isLoading = false
   }
 
-  public async setWeb3ProviderFinalize(providerType: ProviderType) { // : Promise<boolean> {
-    this.web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
-    this.providerEngine = Web3ConnectionFactory.currentWeb3Engine;
-    let canWrite = Web3ConnectionFactory.canWrite;
-    const networkId = Web3ConnectionFactory.networkId;
-    this.accounts = Web3ConnectionFactory.userAccount ? [Web3ConnectionFactory.userAccount] : [];
-
+  public async setWeb3ProviderFinalize(providerType: ProviderType) {
+    // : Promise<boolean> {
+    this.web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
+    this.providerEngine = Web3ConnectionFactory.currentWeb3Engine
+    let canWrite = Web3ConnectionFactory.canWrite
+    const networkId = Web3ConnectionFactory.networkId
+    this.accounts = Web3ConnectionFactory.userAccount ? [Web3ConnectionFactory.userAccount] : []
 
     if (this.web3Wrapper && networkId !== initialNetworkId) {
       // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
-      this.unsupportedNetwork = true;
-      canWrite = false; // revert back to read-only
+      this.unsupportedNetwork = true
+      canWrite = false // revert back to read-only
     }
 
     if (this.web3Wrapper && canWrite) {
-      const web3EngineAccounts = await this.web3Wrapper.getAvailableAddressesAsync();
+      const web3EngineAccounts = await this.web3Wrapper.getAvailableAddressesAsync()
       if (web3EngineAccounts.length > 0 && this.accounts.length === 0)
-        this.accounts = web3EngineAccounts;
+        this.accounts = web3EngineAccounts
       if (this.accounts.length === 0) {
-        canWrite = false; // revert back to read-only
+        canWrite = false // revert back to read-only
       }
     }
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
-      const newContractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
-      await newContractsSource.Init();
-      this.contractsSource = newContractsSource;
+      const newContractsSource = await new ContractsSource(
+        this.providerEngine,
+        this.web3ProviderSettings.networkId,
+        canWrite
+      )
+      await newContractsSource.Init()
+      this.contractsSource = newContractsSource
     } else {
-      this.contractsSource = null;
+      this.contractsSource = null
     }
 
-    this.providerType = canWrite
-      ? providerType
-      : ProviderType.None;
+    this.providerType = canWrite ? providerType : ProviderType.None
 
-    StakingProvider.setLocalstorageItem('providerType', this.providerType);
+    StakingProvider.setLocalstorageItem('providerType', this.providerType)
   }
 
-  public async setWeb3ProviderMobileFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
-    this.web3Wrapper = providerData[0];
-    this.providerEngine = providerData[1];
-    let canWrite = providerData[2];
-    let networkId = providerData[3];
-    const selectedAccount = providerData[4];
+  public async setWeb3ProviderMobileFinalize(
+    providerType: ProviderType,
+    providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]
+  ) {
+    // : Promise<boolean> {
+    this.web3Wrapper = providerData[0]
+    this.providerEngine = providerData[1]
+    let canWrite = providerData[2]
+    let networkId = providerData[3]
+    const selectedAccount = providerData[4]
 
-    this.web3ProviderSettings = await StakingProvider.getWeb3ProviderSettings(networkId);
+    this.web3ProviderSettings = await StakingProvider.getWeb3ProviderSettings(networkId)
     if (this.web3Wrapper) {
       if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
         // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
 
-        this.unsupportedNetwork = true;
-        canWrite = false; // revert back to read-only
-        networkId = await this.web3Wrapper.getNetworkIdAsync();
-        this.web3ProviderSettings = await StakingProvider.getWeb3ProviderSettings(networkId);
+        this.unsupportedNetwork = true
+        canWrite = false // revert back to read-only
+        networkId = await this.web3Wrapper.getNetworkIdAsync()
+        this.web3ProviderSettings = await StakingProvider.getWeb3ProviderSettings(networkId)
       } else {
-        this.unsupportedNetwork = false;
+        this.unsupportedNetwork = false
       }
     }
 
     if (this.web3Wrapper && canWrite) {
       try {
-        this.accounts = [selectedAccount]; // await this.web3Wrapper.getAvailableAddressesAsync() || [];
-
+        this.accounts = [selectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch (e) {
-        this.accounts = [];
+        this.accounts = []
       }
       if (this.accounts.length === 0) {
-        canWrite = false; // revert back to read-only
+        canWrite = false // revert back to read-only
       }
     } else {
       // this.accounts = [];
       if (providerType === ProviderType.Bitski && networkId !== 1) {
-        this.unsupportedNetwork = true;
+        this.unsupportedNetwork = true
       }
     }
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
-      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      this.contractsSource = await new ContractsSource(
+        this.providerEngine,
+        this.web3ProviderSettings.networkId,
+        canWrite
+      )
       //this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(this.web3ProviderSettings.networkId, this.web3Wrapper);
       if (canWrite) {
-        this.providerType = providerType;
+        this.providerType = providerType
       } else {
-        this.providerType = ProviderType.None;
+        this.providerType = ProviderType.None
       }
 
-      StakingProvider.setLocalstorageItem("providerType", providerType);
+      StakingProvider.setLocalstorageItem('providerType', providerType)
     } else {
-      this.contractsSource = null;
+      this.contractsSource = null
     }
 
     if (this.contractsSource) {
-      await this.contractsSource.Init();
+      await this.contractsSource.Init()
     }
-    StakingProvider.Instance.isLoading = false;
+    StakingProvider.Instance.isLoading = false
   }
 
   public static getWeb3ProviderSettings(networkId: number | null): IWeb3ProviderSettings {
     // tslint:disable-next-line:one-variable-per-declaration
-    let networkName, etherscanURL;
+    let networkName, etherscanURL
     switch (networkId) {
       case 1:
-        networkName = "mainnet";
-        etherscanURL = "https://etherscan.io/";
-        break;
+        networkName = 'mainnet'
+        etherscanURL = 'https://etherscan.io/'
+        break
       case 3:
-        networkName = "ropsten";
-        etherscanURL = "https://ropsten.etherscan.io/";
-        break;
+        networkName = 'ropsten'
+        etherscanURL = 'https://ropsten.etherscan.io/'
+        break
       case 4:
-        networkName = "rinkeby";
-        etherscanURL = "https://rinkeby.etherscan.io/";
-        break;
+        networkName = 'rinkeby'
+        etherscanURL = 'https://rinkeby.etherscan.io/'
+        break
       case 42:
-        networkName = "kovan";
-        etherscanURL = "https://kovan.etherscan.io/";
-        break;
+        networkName = 'kovan'
+        etherscanURL = 'https://kovan.etherscan.io/'
+        break
       default:
-        networkId = 0;
-        networkName = "local";
-        etherscanURL = "";
-        break;
+        networkId = 0
+        networkName = 'local'
+        etherscanURL = ''
+        break
     }
     return {
       networkId,
       networkName,
       etherscanURL
-    };
+    }
   }
 
   public getErc20AddressOfAsset(asset: Asset): string | null {
-    let result: string | null = null;
+    let result: string | null = null
 
-    const assetDetails = AssetsDictionary.assets.get(asset);
+    const assetDetails = AssetsDictionary.assets.get(asset)
     if (this.web3ProviderSettings && assetDetails) {
-      result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || "";
+      result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || ''
     }
-    return result;
+    return result
   }
-  
+
   public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0);
+    let result: BigNumber = new BigNumber(0)
     if (asset === Asset.UNKNOWN) {
       // always 0
-      result = new BigNumber(0);
+      result = new BigNumber(0)
     } else {
       // get erc20 token balance
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-      const assetErc20Address = this.getErc20AddressOfAsset(asset);
+      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
+      const assetErc20Address = this.getErc20AddressOfAsset(asset)
       if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address);
-        result = result.multipliedBy(10 ** (18 - precision));
+        result = await this.getErc20BalanceOfUser(assetErc20Address)
+        result = result.multipliedBy(10 ** (18 - precision))
       }
     }
 
-    return result;
+    return result
   }
 
   private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
-    let result = new BigNumber(0);
+    let result = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource) {
       if (!account && this.contractsSource.canWrite) {
-        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+        account =
+          this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
       }
 
       if (account) {
-        const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);
+        const tokenContract = await this.contractsSource.getErc20Contract(addressErc20)
         if (tokenContract) {
-          result = await tokenContract.balanceOf.callAsync(account);
+          result = await tokenContract.balanceOf.callAsync(account)
         }
       }
     }
 
-    return result;
+    return result
   }
 
-
   public gasPrice = async (): Promise<BigNumber> => {
-    let result = new BigNumber(500).multipliedBy(10 ** 9); // upper limit 120 gwei
-    const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
+    let result = new BigNumber(500).multipliedBy(10 ** 9) // upper limit 120 gwei
+    const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
 
-    const url = `https://ethgasstation.info/json/ethgasAPI.json`;
+    const url = `https://ethgasstation.info/json/ethgasAPI.json`
     try {
-      const response = await fetch(url);
-      const jsonData = await response.json();
+      const response = await fetch(url)
+      const jsonData = await response.json()
       // console.log(jsonData);
       if (jsonData.average) {
         // ethgasstation values need divide by 10 to get gwei
-        const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8);
-        const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10 ** 8);
+        const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8)
+        const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10 ** 8)
         if (gasPriceAvg.lt(result)) {
-          result = gasPriceAvg;
+          result = gasPriceAvg
         } else if (gasPriceSafeLow.lt(result)) {
-          result = gasPriceSafeLow;
+          result = gasPriceSafeLow
         }
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(60).multipliedBy(10 ** 9); // error default 60 gwei
+      result = new BigNumber(60).multipliedBy(10 ** 9) // error default 60 gwei
     }
 
     if (result.lt(lowerLimit)) {
-      result = lowerLimit;
+      result = lowerLimit
     }
 
-    return result;
+    return result
   }
 
-
-  public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
-    let amount = new BigNumber(0);
+  public getLargeApprovalAmount = (
+    asset: Asset,
+    neededAmount: BigNumber = new BigNumber(0)
+  ): BigNumber => {
+    let amount = new BigNumber(0)
 
     switch (asset) {
       case Asset.BZRX:
       case Asset.BZRXv1:
       case Asset.BPT:
-        return new BigNumber(10 ** 18).multipliedBy(25000000);
+        return new BigNumber(10 ** 18).multipliedBy(25000000)
       case Asset.ETH:
       case Asset.WETH:
-        amount = new BigNumber(10 ** 18).multipliedBy(1500);
+        amount = new BigNumber(10 ** 18).multipliedBy(1500)
       case Asset.WBTC:
-        amount = new BigNumber(10 ** 8).multipliedBy(25);
+        amount = new BigNumber(10 ** 8).multipliedBy(25)
       case Asset.LINK:
-        amount = new BigNumber(10 ** 18).multipliedBy(60000);
+        amount = new BigNumber(10 ** 18).multipliedBy(60000)
       case Asset.ZRX:
-        amount = new BigNumber(10 ** 18).multipliedBy(750000);
+        amount = new BigNumber(10 ** 18).multipliedBy(750000)
       case Asset.KNC:
-        amount = new BigNumber(10 ** 18).multipliedBy(550000);
+        amount = new BigNumber(10 ** 18).multipliedBy(550000)
       case Asset.DAI:
       case Asset.SUSD:
-        amount = new BigNumber(10 ** 18).multipliedBy(375000);
+        amount = new BigNumber(10 ** 18).multipliedBy(375000)
       case Asset.USDC:
       case Asset.USDT:
-        amount = new BigNumber(10 ** 6).multipliedBy(375000);
+        amount = new BigNumber(10 ** 6).multipliedBy(375000)
       case Asset.REP:
-        amount = new BigNumber(10 ** 18).multipliedBy(15000);
+        amount = new BigNumber(10 ** 18).multipliedBy(15000)
       case Asset.MKR:
-        amount = new BigNumber(10 ** 18).multipliedBy(1250);
+        amount = new BigNumber(10 ** 18).multipliedBy(1250)
       default:
-        break;
+        break
     }
 
     if (amount.eq(0)) {
-      throw new Error("Invalid approval asset!");
+      throw new Error('Invalid approval asset!')
     }
 
-    return amount.gt(neededAmount) ? amount : neededAmount;
+    return amount.gt(neededAmount) ? amount : neededAmount
   }
 
   // public async stake(bzrxAmount: BigNumber, vbzrxAmount: BigNumber, bptAmount: BigNumber, address: string) {
@@ -387,7 +393,6 @@ export class StakingProvider {
 
   //   const bzrxStakigContract = await this.contractsSource.getBZRXStakingInterimContract();
   //   if (!account || !bzrxStakigContract) return receipt;
-
 
   //   const bzrxErc20Address = this.getErc20AddressOfAsset(Asset.BZRX);
   //   const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.vBZRX);
@@ -483,7 +488,6 @@ export class StakingProvider {
   //   const convertContract = await this.contractsSource.getConvertContract();
   //   if (!account || !convertContract) return receipt;
 
-
   //   const assetErc20Address = this.getErc20AddressOfAsset(Asset.BZRXv1);
   //   if (!assetErc20Address) return receipt;
   //   const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
@@ -495,8 +499,6 @@ export class StakingProvider {
   //     const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(convertContract.address, tokenAmount, { from: account });
   //     await this.waitForTransactionMined(approveHash);
   //   }
-
-
 
   //   let gasAmountBN;
   //   let gasAmount;
@@ -527,77 +529,75 @@ export class StakingProvider {
   // }
 
   public canOptin = async (): Promise<boolean> => {
-    let result: boolean = false;
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    let result: boolean = false
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
-    if (!account || !traderCompensationContract) return result;
+    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract()
+    if (!account || !traderCompensationContract) return result
     try {
-      const canOptin = await traderCompensationContract.canOptin.callAsync(account);
+      const canOptin = await traderCompensationContract.canOptin.callAsync(account)
       if (canOptin) {
         result = canOptin
       }
-    }
-    catch (e) {
+    } catch (e) {
       console.error(e)
     }
-    return result;
+    return result
   }
 
   public isClaimable = async (): Promise<BigNumber> => {
-    let result: BigNumber = new BigNumber(0);
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    let result: BigNumber = new BigNumber(0)
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
-    if (!account || !traderCompensationContract) return result;
+    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract()
+    if (!account || !traderCompensationContract) return result
     try {
-      const canOptin = await traderCompensationContract.claimable.callAsync(account);
+      const canOptin = await traderCompensationContract.claimable.callAsync(account)
       if (canOptin.gt(0)) {
         result = canOptin
       }
-    }
-    catch (e) {
+    } catch (e) {
       console.error(e)
     }
-    return result;
+    return result
   }
 
   public doOptin = async () => {
-    let receipt = null;
+    let receipt = null
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return receipt;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return receipt
 
-    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
-    if (!account || !traderCompensationContract) return receipt;
+    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract()
+    if (!account || !traderCompensationContract) return receipt
 
-
-    let gasAmountBN;
-    let gasAmount;
+    let gasAmountBN
+    let gasAmount
     try {
-      gasAmount = await traderCompensationContract.optin.estimateGasAsync(
-        {
-          from: account,
-          gas: this.gasLimit,
-        });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-
-    }
-    catch (e) {
-      console.error(e);
-    }
-
-    const txHash = await traderCompensationContract.optin.sendTransactionAsync(
-      {
+      gasAmount = await traderCompensationContract.optin.estimateGasAsync({
         from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-        gasPrice: await this.gasPrice()
-      });
+        gas: this.gasLimit
+      })
+      gasAmountBN = new BigNumber(gasAmount)
+        .multipliedBy(this.gasBufferCoeff)
+        .integerValue(BigNumber.ROUND_UP)
+    } catch (e) {
+      console.error(e)
+    }
 
-    const txReceipt = await this.waitForTransactionMined(txHash);
-    return txReceipt.status === 1 ? txReceipt : null;
+    const txHash = await traderCompensationContract.optin.sendTransactionAsync({
+      from: account,
+      gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+      gasPrice: await this.gasPrice()
+    })
+
+    const txReceipt = await this.waitForTransactionMined(txHash)
+    return txReceipt.status === 1 ? txReceipt : null
   }
 
   // public doClaim = async () => {
@@ -608,7 +608,6 @@ export class StakingProvider {
 
   //   const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
   //   if (!account || !traderCompensationContract) return receipt;
-
 
   //   let gasAmountBN;
   //   let gasAmount;
@@ -635,7 +634,6 @@ export class StakingProvider {
   //   const txReceipt = await this.waitForTransactionMined(txHash);
   //   return txReceipt.status === 1 ? txReceipt : null;
   // }
-
 
   // public doBecomeRepresentative = async () => {
   //   let receipt = null;
@@ -674,162 +672,164 @@ export class StakingProvider {
   //   return txReceipt.status === 1 ? txReceipt : null;
   // }
 
-  public getRepresentatives = async (): Promise<{ wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[]> => {
-    let result: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[] = [];
+  public getRepresentatives = async (): Promise<
+    { wallet: string; BZRX: BigNumber; vBZRX: BigNumber; LPToken: BigNumber }[]
+  > => {
+    let result: { wallet: string; BZRX: BigNumber; vBZRX: BigNumber; LPToken: BigNumber }[] = []
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
-    if (!account || !bzrxStakingContract) return result;
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    if (!account || !bzrxStakingContract) return result
 
     const repVotes = await bzrxStakingContract.getRepVotes.callAsync(
       new BigNumber(0),
       new BigNumber(1000),
       {
         from: account
-      });
+      }
+    )
 
-    result = result.concat(repVotes);
-    return result;
+    result = result.concat(repVotes)
+    return result
   }
 
   public checkIsRep = async (): Promise<boolean> => {
     let result = false
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
-    if (!account || !bzrxStakingContract) return result;
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    if (!account || !bzrxStakingContract) return result
 
-    result = await bzrxStakingContract.reps.callAsync(
-      account,
-      {
-        from: account
-      });
+    result = await bzrxStakingContract.reps.callAsync(account, {
+      from: account
+    })
 
-    return result;
+    return result
   }
 
   public stakeableByAsset = async (asset: Asset): Promise<BigNumber> => {
-    let result = new BigNumber(0);
+    let result = new BigNumber(0)
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const bZxContract = await this.contractsSource.getBZRXStakingInterimContract();
-    if (!account || !bZxContract) return result;
+    const bZxContract = await this.contractsSource.getBZRXStakingInterimContract()
+    if (!account || !bZxContract) return result
 
-    const tokenErc20Address = this.getErc20AddressOfAsset(asset);
-    if (!tokenErc20Address) return result;
-    const stakeable = await bZxContract.stakeableByAsset.callAsync(
-      tokenErc20Address,
-      account,
-      {
-        from: account
-      });
+    const tokenErc20Address = this.getErc20AddressOfAsset(asset)
+    if (!tokenErc20Address) return result
+    const stakeable = await bZxContract.stakeableByAsset.callAsync(tokenErc20Address, account, {
+      from: account
+    })
 
-    result = stakeable;
-    return result;
+    result = stakeable
+    return result
   }
 
   public balanceOfByAsset = async (asset: Asset): Promise<BigNumber> => {
-    let result = new BigNumber(0);
+    let result = new BigNumber(0)
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
-    if (!account || !bzrxStakingContract) return result;
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    if (!account || !bzrxStakingContract) return result
 
-    const tokenErc20Address = this.getErc20AddressOfAsset(asset);
-    if (!tokenErc20Address) return result;
+    const tokenErc20Address = this.getErc20AddressOfAsset(asset)
+    if (!tokenErc20Address) return result
     const balanceOf = await bzrxStakingContract.balanceOfByAsset.callAsync(
       tokenErc20Address,
       account,
       {
         from: account
-      });
+      }
+    )
 
-    result = balanceOf;
-    return result;
+    result = balanceOf
+    return result
   }
 
   public balanceOfByAssetWalletAware = async (asset: Asset): Promise<BigNumber> => {
-    let result = new BigNumber(0);
+    let result = new BigNumber(0)
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
-    if (!account || !bzrxStakingContract) return result;
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    if (!account || !bzrxStakingContract) return result
 
-    const tokenErc20Address = this.getErc20AddressOfAsset(asset);
-    if (!tokenErc20Address) return result;
+    const tokenErc20Address = this.getErc20AddressOfAsset(asset)
+    if (!tokenErc20Address) return result
     const balanceOf = await bzrxStakingContract.balanceOfByAssetWalletAware.callAsync(
       tokenErc20Address,
       account,
       {
         from: account
-      });
+      }
+    )
 
-    result = balanceOf;
-    return result;
+    result = balanceOf
+    return result
   }
 
   public getUserEarnings = async (): Promise<BigNumber> => {
-    let result = new BigNumber(0);
+    let result = new BigNumber(0)
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
-    if (!account || !bzrxStakingContract) return result;
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    if (!account || !bzrxStakingContract) return result
 
-    const earnedUsdAmount = await bzrxStakingContract.earned.callAsync(
-      account,
-      {
-        from: account
-      });
+    const earnedUsdAmount = await bzrxStakingContract.earned.callAsync(account, {
+      from: account
+    })
 
-    return earnedUsdAmount.div(10 ** 18);
+    return earnedUsdAmount.div(10 ** 18)
   }
 
   public getDelegateAddress = async (): Promise<string> => {
-    let result = "";
+    let result = ''
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
-    if (!account || !bzrxStakingContract) return result;
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    if (!account || !bzrxStakingContract) return result
 
-    result = await bzrxStakingContract.delegate.callAsync(
-      account,
-      {
-        from: account
-      });
+    result = await bzrxStakingContract.delegate.callAsync(account, {
+      from: account
+    })
 
-    return result;
+    return result
   }
 
   public getRebateRewards = async (): Promise<BigNumber> => {
-    let result = new BigNumber(0);
+    let result = new BigNumber(0)
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (!this.contractsSource) return result
 
-    const bZxContract = await this.contractsSource.getiBZxContract();
-    if (!account || !bZxContract) return result;
+    const bZxContract = await this.contractsSource.getiBZxContract()
+    if (!account || !bZxContract) return result
 
-    result = await bZxContract.rewardsBalanceOf.callAsync(
-      account,
-      {
-        from: account
-      });
+    result = await bZxContract.rewardsBalanceOf.callAsync(account, {
+      from: account
+    })
 
-    return result;
+    return result
   }
 
   // public doClaimReabteRewards = async () => {
@@ -870,8 +870,13 @@ export class StakingProvider {
   // }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {
-      return new BigNumber(1);
+    if (
+      asset === Asset.DAI ||
+      asset === Asset.USDC ||
+      asset === Asset.SUSD ||
+      asset === Asset.USDT
+    ) {
+      return new BigNumber(1)
     }
 
     /*const swapRates = await this.getSwapToUsdRateBatch(
@@ -880,448 +885,447 @@ export class StakingProvider {
     );
 
     return swapRates[0][0];*/
-    return this.getSwapRate(
-      asset,
-      Asset.USDC
-    );
+    return this.getSwapRate(asset, Asset.USDC)
   }
 
-  public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
-    if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI)
-      || (srcAsset === Asset.DAI && destAsset === Asset.USDC)) {
-      return new BigNumber(1);
+  public async getSwapRate(
+    srcAsset: Asset,
+    destAsset: Asset,
+    srcAmount?: BigNumber
+  ): Promise<BigNumber> {
+    if (
+      srcAsset === destAsset ||
+      (srcAsset === Asset.USDC && destAsset === Asset.DAI) ||
+      (srcAsset === Asset.DAI && destAsset === Asset.USDC)
+    ) {
+      return new BigNumber(1)
     }
     // console.log("srcAmount 11 = "+srcAmount)
-    let result: BigNumber = new BigNumber(0);
-    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
-    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+    let result: BigNumber = new BigNumber(0)
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
     if (!srcAmount) {
-      srcAmount = StakingProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
+      srcAmount = StakingProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS
     } else {
-      srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
+      srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
     }
 
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-      const oracleContract = await this.contractsSource.getOracleContract();
+      const oracleContract = await this.contractsSource.getOracleContract()
 
-
-      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
-      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals));
-      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18;
-      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals));
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
+      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals))
+      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18
+      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals))
 
       try {
         const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
           srcAssetErc20Address,
           destAssetErc20Address
-        );
+        )
         // console.log("swapPriceData- ",swapPriceData[0])
-        result = swapPriceData[0].times(srcAssetPrecision).div(destAssetPrecision).dividedBy(10 ** 18)
-          .multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
+        result = swapPriceData[0]
+          .times(srcAssetPrecision)
+          .div(destAssetPrecision)
+          .dividedBy(10 ** 18)
+          .multipliedBy(swapPriceData[1].dividedBy(10 ** 18)) // swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
         console.log(e)
-        result = new BigNumber(0);
+        result = new BigNumber(0)
       }
     }
-    return result;
+    return result
   }
 
-  public waitForTransactionMined = async (
-    txHash: string): Promise<any> => {
-
+  public waitForTransactionMined = async (txHash: string): Promise<any> => {
     return new Promise((resolve, reject) => {
       try {
         if (!this.web3Wrapper) {
           // noinspection ExceptionCaughtLocallyJS
-          throw new Error("web3 is not available");
+          throw new Error('web3 is not available')
         }
 
-        this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, resolve, reject);
+        this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, resolve, reject)
       } catch (e) {
-        throw e;
+        throw e
       }
-    });
-  };
+    })
+  }
 
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
     resolve: (value: any) => void,
-    reject: (value: any) => void) => {
-
+    reject: (value: any) => void
+  ) => {
     try {
-      const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
+      const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash)
       if (receipt) {
-        resolve(receipt);
+        resolve(receipt)
       } else {
         window.setTimeout(() => {
-          this.waitForTransactionMinedRecursive(txHash, web3Wrapper, resolve, reject);
-        }, 5000);
+          this.waitForTransactionMinedRecursive(txHash, web3Wrapper, resolve, reject)
+        }, 5000)
       }
     } catch (e) {
-      reject(e);
+      reject(e)
     }
-  };
+  }
 
-
-  public onRequestConfirmed = async (request: StakingRequest | ConvertRequest | ClaimRequest | BecomeRepresentativeRequest) => {
+  public onRequestConfirmed = async (
+    request: StakingRequest | ConvertRequest | ClaimRequest | BecomeRepresentativeRequest
+  ) => {
     if (request) {
-      this.processRequestTask(new RequestTask(request));
+      this.processRequestTask(new RequestTask(request))
     }
-  };
-
+  }
 
   public processRequestTask = async (task: RequestTask) => {
     try {
-      this.requestTask = task;
-      task.setEventEmitter(this.eventEmitter);
-      this.eventEmitter.emit(StakingProviderEvents.AskToOpenProgressDlg, task);
+      this.requestTask = task
+      task.setEventEmitter(this.eventEmitter)
+      this.eventEmitter.emit(StakingProviderEvents.AskToOpenProgressDlg, task)
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
+        throw new Error('No provider available!')
       }
 
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const account =
+        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
       if (!account) {
-        throw new Error("Unable to get wallet address!");
+        throw new Error('Unable to get wallet address!')
       }
 
-      const taskRequest = task.request;
+      const taskRequest = task.request
 
       if (taskRequest instanceof ConvertRequest) {
         task.processingStart([
-          "Initializing",
-          "Detecting token allowance",
-          "Prompting token allowance",
-          "Waiting for token allowance",
-          "Submitting " + taskRequest.name,
-          "Updating the blockchain",
-          "Transaction completed"
-        ]);
+          'Initializing',
+          'Detecting token allowance',
+          'Prompting token allowance',
+          'Waiting for token allowance',
+          'Submitting ' + taskRequest.name,
+          'Updating the blockchain',
+          'Transaction completed'
+        ])
       } else {
         task.processingStart([
-          "Initializing",
-          "Submitting " + taskRequest.name,
-          "Updating the blockchain",
-          "Transaction completed"
-        ]);
+          'Initializing',
+          'Submitting ' + taskRequest.name,
+          'Updating the blockchain',
+          'Transaction completed'
+        ])
       }
-      let txHash;
+      let txHash
       switch (taskRequest.constructor) {
         case StakingRequest:
-          txHash = await this.processStakingRequestTask(task, account);
-          break;
+          txHash = await this.processStakingRequestTask(task, account)
+          break
         case ConvertRequest:
-          txHash = await this.processConvertRequestTask(task, account);
-          break;
+          txHash = await this.processConvertRequestTask(task, account)
+          break
         case ClaimRequest:
-          txHash = await this.processClaimRequestTask(task, account);
-          break;
+          txHash = await this.processClaimRequestTask(task, account)
+          break
         case ClaimReabteRewardsRequest:
-          txHash = await this.processClaimReabteRewardsRequestTask(task, account);
-          break;
+          txHash = await this.processClaimReabteRewardsRequestTask(task, account)
+          break
         case BecomeRepresentativeRequest:
-          txHash = await this.processBecomeRepresentativeRequestTask(task, account);
-          break;
+          txHash = await this.processBecomeRepresentativeRequestTask(task, account)
+          break
         default:
-          throw new Error("Unknown request!");
+          throw new Error('Unknown request!')
       }
 
-      task.processingStepNext();
-      const txReceipt = await this.waitForTransactionMined(txHash);
+      task.processingStepNext()
+      const txReceipt = await this.waitForTransactionMined(txHash)
       if (!txReceipt.status) {
-        throw new Error("Reverted by EVM");
+        throw new Error('Reverted by EVM')
       }
 
-      task.processingStepNext();
-      await this.sleep(this.successDisplayTimeout);
-      task.processingEnd(true, false, null);
+      task.processingStepNext()
+      await this.sleep(this.successDisplayTimeout)
+      task.processingEnd(true, false, null)
     } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
         // tslint:disable-next-line:no-console
-        console.log(e);
+        console.log(e)
       }
-      task.processingEnd(false, false, e);
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(StakingProviderEvents.AskToCloseProgressDlg, task)
     }
-    finally {
-      this.eventEmitter.emit(StakingProviderEvents.AskToCloseProgressDlg, task);
-    }
-    return false;
-  };
-
+    return false
+  }
 
   private processStakingRequestTask = async (task: RequestTask, account: string) => {
     const taskRequest = task.request as StakingRequest,
       bzrxAmount = taskRequest.bzrxAmount,
       vbzrxAmount = taskRequest.vbzrxAmount,
       bptAmount = taskRequest.bptAmount,
-      address = taskRequest.address;
+      address = taskRequest.address
 
-    const bzrxStakingContract = await this.contractsSource!.getBZRXStakingInterimContract();
-    if (!bzrxStakingContract) throw new Error("No ERC20 contract available!");
+    const bzrxStakingContract = await this.contractsSource!.getBZRXStakingInterimContract()
+    if (!bzrxStakingContract) throw new Error('No ERC20 contract available!')
 
-    const bzrxErc20Address = this.getErc20AddressOfAsset(Asset.BZRX);
-    const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.vBZRX);
-    const bptErc20Address = this.getErc20AddressOfAsset(Asset.BPT);
-    if (!bzrxErc20Address || !vbzrxErc20Address || !bptErc20Address) throw new Error("No ERC20 contract available!");;
+    const bzrxErc20Address = this.getErc20AddressOfAsset(Asset.BZRX)
+    const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.vBZRX)
+    const bptErc20Address = this.getErc20AddressOfAsset(Asset.BPT)
+    if (!bzrxErc20Address || !vbzrxErc20Address || !bptErc20Address)
+      throw new Error('No ERC20 contract available!')
 
-    const encoded_input = account.toLowerCase() === address.toLowerCase() ?
-      bzrxStakingContract.stake.getABIEncodedTransactionData(
-        [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
-        [bzrxAmount, vbzrxAmount, bptAmount]
-      ) :
-      bzrxStakingContract.stakeWithDelegate.getABIEncodedTransactionData(
-        [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
-        [bzrxAmount, vbzrxAmount, bptAmount],
-        address
-      );
-    console.log(encoded_input);
+    const encoded_input =
+      account.toLowerCase() === address.toLowerCase()
+        ? bzrxStakingContract.stake.getABIEncodedTransactionData(
+            [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+            [bzrxAmount, vbzrxAmount, bptAmount]
+          )
+        : bzrxStakingContract.stakeWithDelegate.getABIEncodedTransactionData(
+            [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+            [bzrxAmount, vbzrxAmount, bptAmount],
+            address
+          )
+    console.log(encoded_input)
     //Submitting loan
-    task.processingStepNext();
-    let gasAmountBN;
-    let gasAmount;
-    let txHash = "";
+    task.processingStepNext()
+    let gasAmountBN
+    let gasAmount
+    let txHash = ''
     try {
-      gasAmount = account.toLowerCase() === address.toLowerCase()
-        ? await bzrxStakingContract.stake.estimateGasAsync(
-          [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
-          [bzrxAmount, vbzrxAmount, bptAmount],
-          {
-            from: account,
-            gas: this.gasLimit,
-          })
-        : await bzrxStakingContract.stakeWithDelegate.estimateGasAsync(
-          [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
-          [bzrxAmount, vbzrxAmount, bptAmount],
-          address,
-          {
-            from: account,
-            gas: this.gasLimit,
-          })
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-    }
-    catch (e) {
-      console.error(e);
-      throw (e);
-    }
-
-    try {
-      txHash = account.toLowerCase() === address.toLowerCase()
-        ? await bzrxStakingContract.stake.sendTransactionAsync(
-          [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
-          [bzrxAmount, vbzrxAmount, bptAmount],
-          {
-            from: account,
-            gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-            gasPrice: await this.gasPrice()
-          })
-        : await bzrxStakingContract.stakeWithDelegate.sendTransactionAsync(
-          [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
-          [bzrxAmount, vbzrxAmount, bptAmount],
-          address,
-          {
-            from: account,
-            gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-            gasPrice: await this.gasPrice()
-          });
-
-      task.setTxHash(txHash);
+      gasAmount =
+        account.toLowerCase() === address.toLowerCase()
+          ? await bzrxStakingContract.stake.estimateGasAsync(
+              [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+              [bzrxAmount, vbzrxAmount, bptAmount],
+              {
+                from: account,
+                gas: this.gasLimit
+              }
+            )
+          : await bzrxStakingContract.stakeWithDelegate.estimateGasAsync(
+              [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+              [bzrxAmount, vbzrxAmount, bptAmount],
+              address,
+              {
+                from: account,
+                gas: this.gasLimit
+              }
+            )
+      gasAmountBN = new BigNumber(gasAmount)
+        .multipliedBy(this.gasBufferCoeff)
+        .integerValue(BigNumber.ROUND_UP)
     } catch (e) {
-      console.log(e);
-      throw e;
+      console.error(e)
+      throw e
     }
-    return txHash;
-  }
 
+    try {
+      txHash =
+        account.toLowerCase() === address.toLowerCase()
+          ? await bzrxStakingContract.stake.sendTransactionAsync(
+              [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+              [bzrxAmount, vbzrxAmount, bptAmount],
+              {
+                from: account,
+                gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+                gasPrice: await this.gasPrice()
+              }
+            )
+          : await bzrxStakingContract.stakeWithDelegate.sendTransactionAsync(
+              [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+              [bzrxAmount, vbzrxAmount, bptAmount],
+              address,
+              {
+                from: account,
+                gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+                gasPrice: await this.gasPrice()
+              }
+            )
+
+      task.setTxHash(txHash)
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+    return txHash
+  }
 
   private processConvertRequestTask = async (task: RequestTask, account: string) => {
-    const tokenAmount = (task.request as ConvertRequest).tokenAmount;
+    const tokenAmount = (task.request as ConvertRequest).tokenAmount
 
-    const convertContract = await this.contractsSource!.getConvertContract();
-    if (!convertContract) throw new Error("No ERC20 contract available!");
+    const convertContract = await this.contractsSource!.getConvertContract()
+    if (!convertContract) throw new Error('No ERC20 contract available!')
 
-    const assetErc20Address = this.getErc20AddressOfAsset(Asset.BZRXv1);
-    if (!assetErc20Address) throw new Error("No ERC20 contract available!");
+    const assetErc20Address = this.getErc20AddressOfAsset(Asset.BZRXv1)
+    if (!assetErc20Address) throw new Error('No ERC20 contract available!')
 
-    const tokenErc20Contract = await this.contractsSource!.getErc20Contract(assetErc20Address);
+    const tokenErc20Contract = await this.contractsSource!.getErc20Contract(assetErc20Address)
     // Detecting token allowance
-    task.processingStepNext();
-    const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, convertContract.address);
+    task.processingStepNext()
+    const erc20allowance = await tokenErc20Contract.allowance.callAsync(
+      account,
+      convertContract.address
+    )
     // Prompting token allowance
-    task.processingStepNext();
+    task.processingStepNext()
     // Waiting for token allowance
-    task.processingStepNext();
+    task.processingStepNext()
     if (tokenAmount.gt(erc20allowance)) {
-      const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(convertContract.address, tokenAmount, { from: account });
-      await this.waitForTransactionMined(approveHash);
+      const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(
+        convertContract.address,
+        tokenAmount,
+        { from: account }
+      )
+      await this.waitForTransactionMined(approveHash)
     }
     //Submitting loan
-    task.processingStepNext();
+    task.processingStepNext()
 
-    let gasAmountBN;
-    let gasAmount;
-    let txHash = "";
+    let gasAmountBN
+    let gasAmount
+    let txHash = ''
     try {
-      gasAmount = await convertContract.convert.estimateGasAsync(
-        tokenAmount,
-        {
-          from: account,
-          gas: this.gasLimit,
-        });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-
-    }
-    catch (e) {
-      console.error(e);
-      throw (e);
-    }
-
-    try {
-      txHash = await convertContract.convert.sendTransactionAsync(
-        tokenAmount,
-        {
-          from: account,
-          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-          gasPrice: await this.gasPrice()
-        });
-      task.setTxHash(txHash);
+      gasAmount = await convertContract.convert.estimateGasAsync(tokenAmount, {
+        from: account,
+        gas: this.gasLimit
+      })
+      gasAmountBN = new BigNumber(gasAmount)
+        .multipliedBy(this.gasBufferCoeff)
+        .integerValue(BigNumber.ROUND_UP)
     } catch (e) {
-      console.log(e);
-      throw e;
+      console.error(e)
+      throw e
     }
-    return txHash;
+
+    try {
+      txHash = await convertContract.convert.sendTransactionAsync(tokenAmount, {
+        from: account,
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+        gasPrice: await this.gasPrice()
+      })
+      task.setTxHash(txHash)
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+    return txHash
   }
 
-
   private processClaimRequestTask = async (task: RequestTask, account: string) => {
-    const traderCompensationContract = await this.contractsSource!.getTraderCompensationContract();
-    if (!traderCompensationContract) throw new Error("No ERC20 contract available!");;
+    const traderCompensationContract = await this.contractsSource!.getTraderCompensationContract()
+    if (!traderCompensationContract) throw new Error('No ERC20 contract available!')
     //Submitting loan
-    task.processingStepNext();
-    let gasAmountBN;
-    let gasAmount;
-    let txHash = "";
+    task.processingStepNext()
+    let gasAmountBN
+    let gasAmount
+    let txHash = ''
     try {
-      gasAmount = await traderCompensationContract.claim.estimateGasAsync(
-        {
-          from: account,
-          gas: this.gasLimit,
-        });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-
-    }
-    catch (e) {
-      console.error(e);
-      throw (e);
+      gasAmount = await traderCompensationContract.claim.estimateGasAsync({
+        from: account,
+        gas: this.gasLimit
+      })
+      gasAmountBN = new BigNumber(gasAmount)
+        .multipliedBy(this.gasBufferCoeff)
+        .integerValue(BigNumber.ROUND_UP)
+    } catch (e) {
+      console.error(e)
+      throw e
     }
 
     try {
-      txHash = await traderCompensationContract.claim.sendTransactionAsync(
-        {
-          from: account,
-          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-          gasPrice: await this.gasPrice()
-        });
+      txHash = await traderCompensationContract.claim.sendTransactionAsync({
+        from: account,
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+        gasPrice: await this.gasPrice()
+      })
 
-      task.setTxHash(txHash);
+      task.setTxHash(txHash)
+    } catch (e) {
+      console.error(e)
+      throw e
     }
-    catch (e) {
-      console.error(e);
-      throw (e);
-    }
-    return txHash;
+    return txHash
   }
 
   private processClaimReabteRewardsRequestTask = async (task: RequestTask, account: string) => {
-    const bZxContract = await this.contractsSource!.getiBZxContract();
-    if (!bZxContract) throw new Error("No ERC20 contract available!");;
+    const bZxContract = await this.contractsSource!.getiBZxContract()
+    if (!bZxContract) throw new Error('No ERC20 contract available!')
     //Submitting loan
-    task.processingStepNext();
-    let gasAmountBN;
-    let gasAmount;
-    let txHash = "";
+    task.processingStepNext()
+    let gasAmountBN
+    let gasAmount
+    let txHash = ''
     try {
-      gasAmount = await bZxContract.claimRewards.estimateGasAsync(
-        account,
-        {
-          from: account,
-          gas: this.gasLimit,
-        });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-
-    }
-    catch (e) {
-      console.error(e);
-      throw (e);
+      gasAmount = await bZxContract.claimRewards.estimateGasAsync(account, {
+        from: account,
+        gas: this.gasLimit
+      })
+      gasAmountBN = new BigNumber(gasAmount)
+        .multipliedBy(this.gasBufferCoeff)
+        .integerValue(BigNumber.ROUND_UP)
+    } catch (e) {
+      console.error(e)
+      throw e
     }
 
     try {
-      txHash = await bZxContract.claimRewards.sendTransactionAsync(
-        account,
-        {
-          from: account,
-          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-          gasPrice: await this.gasPrice()
-        });
+      txHash = await bZxContract.claimRewards.sendTransactionAsync(account, {
+        from: account,
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+        gasPrice: await this.gasPrice()
+      })
 
-      task.setTxHash(txHash);
+      task.setTxHash(txHash)
+    } catch (e) {
+      console.error(e)
+      throw e
     }
-    catch (e) {
-      console.error(e);
-      throw (e);
-    }
-    return txHash;
+    return txHash
   }
-
 
   private processBecomeRepresentativeRequestTask = async (task: RequestTask, account: string) => {
-    const bzrxStakingContract = await this.contractsSource!.getBZRXStakingInterimContract();
-    if (!bzrxStakingContract) throw new Error("No ERC20 contract available!");;
+    const bzrxStakingContract = await this.contractsSource!.getBZRXStakingInterimContract()
+    if (!bzrxStakingContract) throw new Error('No ERC20 contract available!')
     //Submitting loan
-    task.processingStepNext();
-    let gasAmountBN;
-    let gasAmount;
-    let txHash = "";
+    task.processingStepNext()
+    let gasAmountBN
+    let gasAmount
+    let txHash = ''
     try {
-      gasAmount = await bzrxStakingContract.setRepActive.estimateGasAsync(
-        true,
-        {
-          from: account,
-          gas: this.gasLimit,
-        });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-    }
-    catch (e) {
-      console.error(e);
-      throw (e);
+      gasAmount = await bzrxStakingContract.setRepActive.estimateGasAsync(true, {
+        from: account,
+        gas: this.gasLimit
+      })
+      gasAmountBN = new BigNumber(gasAmount)
+        .multipliedBy(this.gasBufferCoeff)
+        .integerValue(BigNumber.ROUND_UP)
+    } catch (e) {
+      console.error(e)
+      throw e
     }
 
     try {
-      txHash = await bzrxStakingContract.setRepActive.sendTransactionAsync(
-        true,
-        {
-          from: account,
-          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-          gasPrice: await this.gasPrice()
-        });
+      txHash = await bzrxStakingContract.setRepActive.sendTransactionAsync(true, {
+        from: account,
+        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
+        gasPrice: await this.gasPrice()
+      })
 
-      task.setTxHash(txHash);
+      task.setTxHash(txHash)
+    } catch (e) {
+      console.error(e)
+      throw e
     }
-    catch (e) {
-      console.error(e);
-      throw (e);
-    }
-    return txHash;
+    return txHash
   }
-
 
   public sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
-
 
   public getRequestTask() {
-    return this.requestTask;
+    return this.requestTask
   }
-
 }
-new StakingProvider();
+new StakingProvider()

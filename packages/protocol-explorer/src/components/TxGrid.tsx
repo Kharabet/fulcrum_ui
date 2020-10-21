@@ -1,31 +1,35 @@
-import React, { Component } from "react";
-import { TxRow, ITxRowProps } from "./TxRow";
-import { IconSort } from "./IconSort";
+import React, { Component } from 'react'
+import { TxRow, ITxRowProps } from './TxRow'
+import { IconSort } from './IconSort'
 interface ITxGridProps {
-  events: ITxRowProps[],
+  events: ITxRowProps[]
   quantityTx: number
 }
 
 interface ITxGridState {
-  typeSort: string;
+  typeSort: string
 }
 
 export class TxGrid extends Component<ITxGridProps, ITxGridState> {
   constructor(props: any) {
-    super(props);
+    super(props)
     this.state = {
-      typeSort: 'up',
-    };
+      typeSort: 'up'
+    }
   }
 
   public render() {
     const assetItems = this.props.events
-      .sort((a, b) => { return this.state.typeSort === 'up' ? b.age.getTime() - a.age.getTime() : a.age.getTime() - b.age.getTime() })
+      .sort((a, b) => {
+        return this.state.typeSort === 'up'
+          ? b.age.getTime() - a.age.getTime()
+          : a.age.getTime() - b.age.getTime()
+      })
       .slice(0, this.props.quantityTx)
-      .map((e: ITxRowProps, i: number) => <TxRow key={i} {...e} />);
+      .map((e: ITxRowProps, i: number) => <TxRow key={i} {...e} />)
     return (
       <React.Fragment>
-        {assetItems.length !== 0 &&
+        {assetItems.length !== 0 && (
           <div className="table table-tx">
             <div className="table-header table-header-tx">
               <div className="table-header-tx__hash">Txn Hash</div>
@@ -39,19 +43,19 @@ export class TxGrid extends Component<ITxGridProps, ITxGridState> {
             </div>
             {assetItems}
           </div>
-        }
+        )}
       </React.Fragment>
-    );
+    )
   }
 
   public sortAge = () => {
     switch (this.state.typeSort) {
       case 'down':
-        return this.setState({ ...this.state, typeSort: 'up' });
+        return this.setState({ ...this.state, typeSort: 'up' })
       case 'up':
-        return this.setState({ ...this.state, typeSort: 'down' });
+        return this.setState({ ...this.state, typeSort: 'down' })
       default:
-        return this.setState({ ...this.state, typeSort: 'down' });
+        return this.setState({ ...this.state, typeSort: 'down' })
     }
   }
 }
