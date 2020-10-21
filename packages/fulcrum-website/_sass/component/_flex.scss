@@ -28,7 +28,7 @@
 .ai-fe {
   align-items: flex-end;
 }
-.as-b{
+.as-b {
   align-self: baseline;
 }
 .as-c {
@@ -44,19 +44,19 @@
   flex-direction: row;
 }
 
-.f-1{
+.f-1 {
   flex: 1;
 }
-.f-2{
+.f-2 {
   flex: 2;
 }
-.f-3{
+.f-3 {
   flex: 3;
 }
-.fg-1{
+.fg-1 {
   flex-grow: 1;
 }
-@media(max-width: 1409px){
+@media (max-width: 1409px) {
   .ai-xl-fe {
     align-items: flex-end;
   }
@@ -68,10 +68,10 @@
   .fw-md-w {
     flex-wrap: wrap;
   }
-  .jc-md-c{
-      justify-content: center;
+  .jc-md-c {
+    justify-content: center;
   }
-  .order-md-1{
+  .order-md-1 {
     order: 1;
   }
 }
@@ -91,10 +91,10 @@
   .jc-sm-fs {
     justify-content: flex-start;
   }
-  .as-sm-a{
+  .as-sm-a {
     align-self: auto;
   }
-  .ai-sm-ih{
+  .ai-sm-ih {
     align-items: inherit;
   }
 }

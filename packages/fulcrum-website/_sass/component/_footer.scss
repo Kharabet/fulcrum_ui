@@ -25,7 +25,7 @@ footer {
   .navigation {
     display: grid;
     grid-template-columns: 4fr 4fr 3fr;
-    grid-template-areas: "network product company";
+    grid-template-areas: 'network product company';
 
     .network {
       grid-area: network;

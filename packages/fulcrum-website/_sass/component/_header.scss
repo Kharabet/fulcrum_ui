@@ -76,7 +76,7 @@
   position: relative;
   &:before {
     @media (min-width: 768px) {
-      content: "";
+      content: '';
       position: absolute;
       width: 60px;
       height: 8px;

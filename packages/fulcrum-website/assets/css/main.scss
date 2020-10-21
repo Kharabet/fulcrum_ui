@@ -1,24 +1,25 @@
 ---
 ---
+
 @import url('https://fonts.googleapis.com/css?family=Muli:400,600,700,800,900&display=swap');
 
-@import "_variables";
-@import "_reset";
-@import "_base"; 
+@import '_variables';
+@import '_reset';
+@import '_base';
 
-@import "component/_container";
-@import "component/_svg";
-@import "component/_accordion";
-@import "component/_switch";
-@import "component/_typography";
-@import "component/_flex";
-@import "component/_spacing";
-@import "component/_button";
-@import "component/_circle";
-@import "component/_footer";
-@import "component/_sections";
-@import "component/_header";
-@import "component/_privacy";
-@import "component/_input";
-@import "component/_chart";
-@import "component/_page_not_found";
+@import 'component/_container';
+@import 'component/_svg';
+@import 'component/_accordion';
+@import 'component/_switch';
+@import 'component/_typography';
+@import 'component/_flex';
+@import 'component/_spacing';
+@import 'component/_button';
+@import 'component/_circle';
+@import 'component/_footer';
+@import 'component/_sections';
+@import 'component/_header';
+@import 'component/_privacy';
+@import 'component/_input';
+@import 'component/_chart';
+@import 'component/_page_not_found';
