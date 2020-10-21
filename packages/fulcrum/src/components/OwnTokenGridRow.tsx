@@ -232,8 +232,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     event.stopPropagation();
     const request = new ManageCollateralRequest(
       this.props.loan.loanId,
-      this.props.baseToken,
-      this.props.quoteToken,
+      this.props.loan.loanAsset,
+      this.props.loan.collateralAsset,
       this.props.loan.collateralAmount,
       false
     );
