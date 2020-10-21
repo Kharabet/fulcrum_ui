@@ -835,10 +835,9 @@ export class TorqueProvider {
     const promises = []
     for (const token of loan.collateral) {
       // @ts-ignore
-      const allowance = (
-        await token.contract.allowance.callAsync(account, compoundBridge.address)
-      ).div(10 ** token.decimals)
-      if (allowance.lt(token.amount)) {
+      const allowance = await token.contract.allowance.callAsync(account, compoundBridge.address)
+      const allowedTokenAmount = allowance.div(10 ** token.decimals)
+      if (allowedTokenAmount.lt(token.amount)) {
         try {
           // @ts-ignore
           const txHash = await token.contract.approve.sendTransactionAsync(

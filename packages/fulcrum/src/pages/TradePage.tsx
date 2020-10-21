@@ -610,15 +610,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       }, {})
     }
 
+    //TODO: remove ts-ignore
     //@ts-ignore
     const events = tradeEvents
+      //@ts-ignore
       .concat(closeWithSwapEvents)
+      //@ts-ignore
       .concat(liquidationEvents)
+      //@ts-ignore
       .concat(depositCollateralEvents)
+      //@ts-ignore
       .concat(withdrawCollateralEvents)
     //@ts-ignore
     const groupedEvents = groupBy(
-      events.sort((a, b) => b.timeStamp.getTime() - a.timeStamp.getTime()),
+      events.sort((a: any, b: any) => b.timeStamp.getTime() - a.timeStamp.getTime()),
       'loanId'
     )
     const historyEvents = { groupedEvents, earnRewardEvents, payTradingFeeEvents }

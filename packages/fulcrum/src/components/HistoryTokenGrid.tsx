@@ -157,7 +157,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     for (const loanId of loanIds) {
       //@ts-ignore
       const events = historyEvents.groupedEvents[loanId].sort(
-        (a, b) => a.timeStamp.getTime() - b.timeStamp.getTime()
+        (a: any, b: any) => a.timeStamp.getTime() - b.timeStamp.getTime()
       )
       const tradeEvent = events[0] as TradeEvent
 

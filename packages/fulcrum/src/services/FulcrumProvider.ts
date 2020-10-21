@@ -1729,13 +1729,13 @@ export class FulcrumProvider {
     //@ts-ignore
     result = loansData
       .filter(
-        (e) =>
+        (e: any) =>
           (!e.principal.eq(zero) &&
             !e.currentMargin.eq(zero) &&
             !e.interestDepositRemaining.eq(zero)) ||
           account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
       )
-      .map((e) => {
+      .map((e: any) => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
         const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
         if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) return
@@ -1761,9 +1761,9 @@ export class FulcrumProvider {
           hasManagementContract: true,
           isInProgress: false,
           loanData: e
-        }
+        } as IBorrowedFundsState
       })
-      .filter((e) => e)
+      .filter((e: IBorrowedFundsState | undefined) => e)
     console.log(result)
     return result
   }
@@ -1859,7 +1859,7 @@ export class FulcrumProvider {
           result = resp.tokenBalances
             .filter((t) => !t.error && t.tokenBalance !== '0')
             .reduce(
-              (map, obj) => (map.set(obj.contractAddress, new BigNumber(obj.tokenBalance!)), map),
+              (map, obj) => (map.set(obj.address, new BigNumber(obj.tokenBalance!)), map),
               new Map<string, BigNumber>()
             )
         }
