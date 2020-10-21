@@ -444,19 +444,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           collateral = (collateralAssetAmount.times(currentCollateralToPrincipalRate)).minus(loanAssetAmount);
           openPrice = loan.loanData.startRate.div(10 ** 18).times(loanAssetPrecision).div(collateralAssetPrecision);
           liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-          const tradeRequest = new TradeRequest(
-            loan.loanId,
-            TradeType.SELL,
-            loan.loanAsset,
-            loan.collateralAsset,
-            Asset.UNKNOWN,
-            positionType,
-            leverage.toNumber(),
-            await FulcrumProvider.Instance.getMaxTradeValue(TradeType.SELL, loan.loanAsset, loan.collateralAsset, Asset.UNKNOWN, positionType, loan),
-            positionType === PositionType.LONG
-          );
-          const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(tradeRequest);
-          profit = estimatedCollateralReceived[1].minus(collateralAssetAmount).div(10**collateralAssetDecimals).times(currentCollateralToPrincipalRate);
+          profit = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.loanAsset)) {
@@ -480,20 +468,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionValue = collateralAssetAmount.times(currentCollateralToPrincipalRate).minus(loanAssetAmount);
           openPrice = new BigNumber(10 ** 36).div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision)).div(10 ** 18);
           liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-          
-          const tradeRequest = new TradeRequest(
-            loan.loanId,
-            TradeType.SELL,
-            loan.loanAsset,
-            loan.collateralAsset,
-            Asset.UNKNOWN,
-            positionType,
-            leverage.toNumber(),
-            await FulcrumProvider.Instance.getMaxTradeValue(TradeType.SELL, loan.loanAsset, loan.collateralAsset, Asset.UNKNOWN, positionType, loan),
-            true
-          );
-          const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(tradeRequest);
-          profit = estimatedCollateralReceived[1].minus(collateralAssetAmount).div(10**collateralAssetDecimals);
+          profit = openPrice.minus(new BigNumber(1).div(currentCollateralToPrincipalRate)).times(positionValue);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
