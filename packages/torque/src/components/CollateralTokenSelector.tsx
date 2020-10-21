@@ -38,23 +38,14 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
         Asset.YFI,
         Asset.BZRX,
         Asset.MKR,
-        Asset.LEND,
+        //Asset.LEND,
         Asset.KNC
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assets = [
         Asset.fWETH,
-        Asset.DAI,
         Asset.USDC,
-        Asset.USDT,
-        Asset.SUSD,
-        Asset.LINK,
-        Asset.WBTC,
-        Asset.MKR,
-        Asset.ZRX,
-        Asset.BAT,
-        Asset.REP,
-        Asset.KNC
+        Asset.WBTC
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       this.assets = [

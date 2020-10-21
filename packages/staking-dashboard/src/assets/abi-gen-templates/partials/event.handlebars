@@ -1,0 +1,6 @@
+// tslint:disable-next-line:interface-name
+export interface {{@root.contractName}}{{name}}EventArgs extends DecodedLogArgs {
+    {{#each inputs}}
+    {{name}}: {{#returnType type components}}{{/returnType}};
+    {{/each}}
+}

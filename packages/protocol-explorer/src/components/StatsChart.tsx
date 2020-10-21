@@ -58,15 +58,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assetsShown = [
-        Asset.DAI,
         Asset.USDC,
-        Asset.USDT,
-        Asset.SUSD,
         Asset.fWETH,
-        Asset.WBTC,
-        Asset.LINK,
-        Asset.ZRX,
-        Asset.KNC
+        Asset.WBTC
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       this.assetsShown = [

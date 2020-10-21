@@ -86,6 +86,7 @@ export class ExtendLoanProcessor {
         taskRequest.loanId,
         depositAmountInBaseUnits,
         false,
+        "",
         {
           from: account,
           value: isETHBorrowAsset ?
@@ -105,6 +106,7 @@ export class ExtendLoanProcessor {
         taskRequest.loanId,                                   // loanId
         depositAmountInBaseUnits,                             // depositAmount
         false,                                                // useCollateral
+        "",
         {
           from: account,
           value: isETHBorrowAsset ?
