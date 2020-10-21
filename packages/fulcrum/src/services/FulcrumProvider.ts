@@ -2,7 +2,6 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
-// import Web3Utils from "web3-utils";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
@@ -34,11 +33,12 @@ import configProviders from "../config/providers.json";
 
 import { AbstractConnector } from '@web3-react/abstract-connector';
 
+import Web3Utils  from "web3-utils";
+
 import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TradeEvent } from "../domain/events/TradeEvent";
-import Web3, { providers } from "web3";
 import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
 import { LiquidationEvent } from "../domain/events/LiquidationEvent";
 import { EarnRewardEvent } from "../domain/events/EarnRewardEvent";
@@ -1615,6 +1615,21 @@ export class FulcrumProvider {
     return result;
   }
 
+  public getMaintenanceMargin = async (asset: Asset, collateralAsset: Asset): Promise<BigNumber> => {
+    if (!this.contractsSource) {
+      return new BigNumber(0);
+    }
+    const iToken = await this.contractsSource.getITokenContract(asset);
+    const iBZxContract = await this.contractsSource.getiBZxContract();
+    if (!iToken || !iBZxContract) return new BigNumber(0);
+    const collateralTokenAddress = AssetsDictionary.assets.get(collateralAsset)!.addressErc20.get(this.web3ProviderSettings.networkId);
+    // @ts-ignore
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true));
+    const loanId = await iToken.loanParamsIds.callAsync(id);
+    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
+    const maintenanceMargin = loanParams[6];
+    return maintenanceMargin; 
+  };
 
   public async getUserMarginTradeLoans(): Promise<IBorrowedFundsState[]> {
     let result: IBorrowedFundsState[] = [];
@@ -1799,7 +1814,7 @@ export class FulcrumProvider {
     return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      Asset.USDC
     );
   }
 

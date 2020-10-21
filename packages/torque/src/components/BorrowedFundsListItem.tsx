@@ -120,12 +120,10 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
     const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
 
-    const startMargin = this.state.borrowedFundsItem.loanData!.startMargin.div(10 ** 18).toNumber();
-
     const collateralToUSDCurrentRate = await TorqueProvider.Instance.getSwapToUsdRate(this.state.borrowedFundsItem.loanAsset);
 
-    //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
-    const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)).div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision)).times(10 ** 18);
+    //liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
+    const liquidation_collateralToLoanRate = (this.props.item.loanData!.maintenanceMargin.times(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)).div(10 ** 20)).plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)).div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision)).times(10 ** 18);
     const liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18).times(collateralToUSDCurrentRate);
     await this.setState({
       ...this.state,

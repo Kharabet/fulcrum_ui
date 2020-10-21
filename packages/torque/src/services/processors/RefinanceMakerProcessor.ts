@@ -29,9 +29,9 @@ import Web3 from "web3";
 
 //     const collateralAmount = taskRequest.refLoan.collateralAmount//.dividedBy(taskRequest.refLoan.debt.dividedBy(taskRequest.loanAmount));
 //     // @ts-ignore
-//     const dart = web3.utils.toWei(taskRequest.loanAmount.dp(18, BigNumber.ROUND_UP).toString());
+//     const dart = Web3Utils.toWei(taskRequest.loanAmount.dp(18, BigNumber.ROUND_UP).toString());
 //     // @ts-ignore
-//     const dink = web3.utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
+//     const dink = Web3Utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
 
 //     let txHash = "";
 //     const isCdpCan = await cdpManager.cdpCan.callAsync(taskRequest.refLoan.proxyAddress, taskRequest.refLoan.cdpId, configAddress.Maker_Bridge_Address);
