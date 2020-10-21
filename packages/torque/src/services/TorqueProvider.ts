@@ -548,11 +548,11 @@ export class TorqueProvider {
     const iBZxContract = await this.contractsSource.getiBZxContract();
     if (!iToken || !iBZxContract) return new BigNumber(0);
     // @ts-ignore
-    const hash = Web3Utils.soliditySha3(collateralToken, true)
-    const loanId = await iToken.loanParamsIds.callAsync(hash);
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralToken, true));
+    const loanId = await iToken.loanParamsIds.callAsync(id);
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
     const maintenanceMargin = loanParams[6];
-    return maintenanceMargin; 
+    return maintenanceMargin;
   };
 
   public assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
@@ -574,7 +574,7 @@ export class TorqueProvider {
         if (current.plus(take).lt(goal)) {
           goal = goal.minus(goal.minus(current.plus(take)))
         }
-        const maintenanceMargin = (await this.getMaintenanceMargin(loan.asset, deposit.underlying)).div(10**18).plus(100);
+        const maintenanceMargin = (await this.getMaintenanceMargin(loan.asset, deposit.underlying)).div(10 ** 18).plus(100);
         loan.maintenanceMargin = maintenanceMargin
         loan.collateral.push({
           ...deposit,
@@ -1033,7 +1033,7 @@ export class TorqueProvider {
         maintenanceMargin = (await this.getMaintenanceMargin(
           // @ts-ignore
           asset, this.contractsSource.getAddressFromAsset(collateralAsset)
-        )).div(10**18).plus(100);
+        )).div(10 ** 18).plus(100);
       }
 
       let isDisabled = true;
@@ -1092,9 +1092,9 @@ export class TorqueProvider {
 
       const collateralAmount = refRequest.collateralAmount//.dividedBy(refRequest.debt.dividedBy(loanAmount));
       // @ts-ignore
-      const dart = Web3Utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP).toString());
+      const dart = new BigNumber(Web3Utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP)));
       // @ts-ignore
-      const dink = Web3Utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
+      const dink = new BigNumber(Web3Utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR)));
 
       if (refRequest.isProxy) {
         const proxy: dsProxyJsonContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress);
