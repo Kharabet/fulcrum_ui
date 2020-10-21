@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Observable, Subject } from "rxjs";
-import { switchMap, debounceTime } from "rxjs/operators";
+import { switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { GroupButton } from "./GroupButton";
 import { Line } from "react-chartjs-2";
@@ -39,7 +39,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       utilization: [],
       tvlWidth: 2,
       aprWidth: 2,
-      utilizationWidth: 2,
+      utilizationWidth: 2
     };
 
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
@@ -149,7 +149,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
 
   public render() {
     const asset = AssetsDictionary.assets.get(this.state.asset) as AssetDetails;
-
     const getData = (canvas: any) => {
       const ctx: any = canvas.getContext("2d");
 
@@ -196,6 +195,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
 
     const options = {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
         xAxes: [{
           ticks: {
@@ -296,7 +296,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         </div>
         <div className="wrapper-chartjs-token">
           <div id="chartjs" onMouseLeave={() => this.leaveChart()}>
-            <Line ref="chart" data={chartData} options={options} height={this.props.isMobileMedia ? 300 : 110} />
+            <Line ref="chart" data={chartData} options={options} />
           </div>
           <div id="chartjs-tooltip" className="chartjs-tooltip-token">
             <table>

@@ -268,20 +268,7 @@ export class StakingProvider {
     }
     return result;
   }
-  public async getITokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
-    let result = new BigNumber(0);
-
-    if (this.contractsSource) {
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-      const address = await this.contractsSource.getITokenErc20Address(asset);
-      if (address) {
-        result = await this.getErc20BalanceOfUser(address);
-        result = result.multipliedBy(10 ** (18 - precision));
-      }
-    }
-
-    return result;
-  }
+  
   public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
@@ -895,7 +882,7 @@ export class StakingProvider {
     return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      Asset.USDC
     );
   }
 

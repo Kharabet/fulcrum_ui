@@ -30,6 +30,12 @@ import { Asset } from "../domain/Asset";
 import { ITxRowProps } from "../components/TxRow";
 import { IActiveLoanData } from "../domain/IActiveLoanData";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { RequestTask } from "../domain/RequestTask";
+import { LiquidationRequest } from "../domain/LiquidationRequest";
+import { TasksQueue } from "../services/TasksQueue";
+import { TasksQueueEvents } from "./events/TasksQueueEvents";
+import { RequestStatus } from "../domain/RequestStatus";
+import { LiquidationTransactionMinedEvent } from "./events/LiquidationTransactionMinedEvent";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -63,7 +69,8 @@ export class ExplorerProvider {
     public readonly gasLimit = "4500000";
     public readonly gasBufferCoeff = new BigNumber("1.06");
     public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1);
-
+    // 5000ms
+    public readonly successDisplayTimeout = 5000;
     public readonly eventEmitter: EventEmitter;
     public providerType: ProviderType = ProviderType.None;
     public providerEngine: Web3ProviderEngine | null = null;
@@ -73,6 +80,8 @@ export class ExplorerProvider {
     public accounts: string[] = [];
     public isLoading: boolean = false;
     public unsupportedNetwork: boolean = false;
+    private isProcessing: boolean = false;
+    private isChecking: boolean = false;
 
     public static readonly MAX_UINT = new BigNumber(2)
         .pow(256)
@@ -83,7 +92,7 @@ export class ExplorerProvider {
         this.eventEmitter = new EventEmitter();
         this.eventEmitter.setMaxListeners(1000);
 
-        // TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
+        TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
         // singleton
         if (!ExplorerProvider.Instance) {
@@ -248,6 +257,12 @@ export class ExplorerProvider {
             }
         }
         return result;
+    };
+
+    public onLiquidationConfirmed = async (request: LiquidationRequest) => {
+        if (request) {
+            TasksQueue.Instance.enqueue(new RequestTask(request));
+        }
     };
 
     public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
@@ -725,98 +740,6 @@ export class ExplorerProvider {
         });
     }
 
-    public liquidate = async (loanId: string, closeAmount: BigNumber, paymentAsset: Asset) => {
-        let receipt;
-        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-        if (!this.contractsSource) return;
-
-        const iBZxContract = await this.contractsSource.getiBZxContract();
-        if (!account || !iBZxContract) return;
-
-        if (paymentAsset !== Asset.WETH && paymentAsset !== Asset.ETH) {
-
-            const assetErc20Address = this.getErc20AddressOfAsset(paymentAsset);
-            if (!assetErc20Address) return;
-            const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
-
-            // Detecting token allowance
-            const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, iBZxContract.address);
-
-            if (closeAmount.gt(erc20allowance)) {
-                const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(iBZxContract.address, this.getLargeApprovalAmount(paymentAsset, closeAmount), { from: account });
-                await this.waitForTransactionMined(approveHash);
-            }
-        }
-
-        const sendAmountForValue = paymentAsset === Asset.WETH || paymentAsset === Asset.ETH ?
-            closeAmount :
-            new BigNumber(0);
-        const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
-        const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI);
-        let gasAmountBN;
-        let gasAmount;
-
-
-        try {
-            gasAmount = isGasTokenEnabled && ChiTokenBalance.gt(0)
-                ? await iBZxContract.liquidateWithGasToken.estimateGasAsync(
-                    loanId,
-                    account,
-                    account,
-                    closeAmount,
-                    {
-                        from: account,
-                        value: sendAmountForValue,
-                        gas: this.gasLimit,
-                    })
-                :
-                await iBZxContract.liquidate.estimateGasAsync(
-                    loanId,
-                    account,
-                    closeAmount,
-                    {
-                        from: account,
-                        value: sendAmountForValue,
-                        gas: this.gasLimit,
-                    });
-
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-
-        }
-        catch (e) {
-            console.log(e);
-            // throw e;
-        }
-
-        const txHash = isGasTokenEnabled && ChiTokenBalance.gt(0)
-            ? await iBZxContract.liquidateWithGasToken.sendTransactionAsync(
-                loanId,
-                account,
-                account,
-                closeAmount,
-                {
-                    from: account,
-                    value: sendAmountForValue,
-                    gas: this.gasLimit,
-                    gasPrice: await this.gasPrice()
-                })
-            : await iBZxContract.liquidate.sendTransactionAsync(
-                loanId,
-                account,
-                closeAmount,
-                {
-                    from: account,
-                    value: sendAmountForValue,
-                    gas: this.gasLimit,
-                    gasPrice: await this.gasPrice()
-                });
-
-
-        receipt = await this.waitForTransactionMined(txHash);
-
-        return receipt.status === 1 ? receipt : null;
-    }
-
     public gasPrice = async (): Promise<BigNumber> => {
         let result = new BigNumber(500).multipliedBy(10 ** 9); // upper limit 500 gwei
         const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
@@ -951,7 +874,7 @@ export class ExplorerProvider {
         return swapRates[0][0];*/
         return this.getSwapRate(
             asset,
-            Asset.DAI
+            Asset.USDC
         );
     }
 
@@ -994,8 +917,121 @@ export class ExplorerProvider {
         return result;
     }
 
+
+    private onTaskEnqueued = async (requestTask: RequestTask) => {
+        await this.processQueue(requestTask.request.id, false, false);
+    };
+
+    public onTaskRetry = async (requestTask: RequestTask, skipGas: boolean) => {
+        await this.processQueue(requestTask.request.id, true, skipGas);
+    };
+
+    public onTaskCancel = async (requestTask: RequestTask) => {
+        await this.cancelRequestTask(requestTask);
+        await this.processQueue(requestTask.request.id, false, false);
+    };
+
+    private cancelRequestTask = async (requestTask: RequestTask) => {
+        if (!(this.isProcessing || this.isChecking)) {
+            this.isProcessing = true;
+
+            try {
+                const task = TasksQueue.Instance.peek(requestTask.request.id);
+
+                if (task) {
+                    if (task.request.id === requestTask.request.id) {
+                        TasksQueue.Instance.dequeue(task.request.id);
+                    }
+                }
+            } finally {
+                this.isProcessing = false;
+            }
+        }
+    };
+
+    private processQueue = async (taskId: number, force: boolean, skipGas: boolean) => {
+        if (!(this.isChecking)) {
+            let forceOnce = force;
+            this.isProcessing = true;
+            this.isChecking = false;
+
+            try {
+                const task = TasksQueue.Instance.peek(taskId);
+
+                if (task) {
+                    if (task.status === RequestStatus.FAILED_SKIPGAS) {
+                        task.status = RequestStatus.FAILED;
+                    }
+                    if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
+                        await this.processRequestTask(task, skipGas);
+                        // @ts-ignore
+                        if (task.status === RequestStatus.DONE) {
+                            TasksQueue.Instance.dequeue(task.request.id);
+                        }
+                    } else {
+                        if (task.status === RequestStatus.FAILED && !forceOnce) {
+                            this.isProcessing = false;
+                            this.isChecking = false;
+                        }
+                    }
+                }
+            } finally {
+                forceOnce = false;
+                this.isChecking = true;
+                this.isProcessing = false;
+            };
+            this.isChecking = false;
+        }
+    };
+
+    private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
+        if (task.request instanceof LiquidationRequest) {
+            await this.processLiquidationRequestTask(task, skipGas);
+        }
+
+        return false;
+    };
+
+
+    private processLiquidationRequestTask = async (task: RequestTask, skipGas: boolean) => {
+        try {
+            debugger;
+            this.eventEmitter.emit(ExplorerProviderEvents.AskToOpenProgressDlg, task.request.loanId);
+            if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+                throw new Error("No provider available!");
+            }
+
+            const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+            if (!account) {
+                throw new Error("Unable to get wallet address!");
+            }
+
+            // Initializing loan
+            const taskRequest: LiquidationRequest = (task.request as LiquidationRequest);
+
+            const { LiquidationProcessor } = await import("./processors/LiquidationProcessor");
+            const processor = new LiquidationProcessor();
+            await processor.run(task, account, skipGas);
+
+
+            task.processingEnd(true, false, null);
+        } catch (e) {
+            if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+                // tslint:disable-next-line:no-console
+                console.log(e);
+            }
+            task.processingEnd(false, false, e);
+        }
+        finally {
+            this.eventEmitter.emit(ExplorerProviderEvents.AskToCloseProgressDlg, task);
+        }
+    };
+
+
     public waitForTransactionMined = async (
-        txHash: string): Promise<any> => {
+        txHash: string,
+        request: LiquidationRequest
+    ): Promise<any> => {
 
         return new Promise((resolve, reject) => {
             try {
@@ -1003,7 +1039,7 @@ export class ExplorerProvider {
                     throw new Error("web3 is not available");
                 }
 
-                this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, resolve, reject);
+                this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, request, resolve, reject);
             } catch (e) {
                 throw e;
             }
@@ -1013,19 +1049,26 @@ export class ExplorerProvider {
     private waitForTransactionMinedRecursive = async (
         txHash: string,
         web3Wrapper: Web3Wrapper,
+        request: LiquidationRequest,
         resolve: (value: any) => void,
         reject: (value: any) => void) => {
 
         try {
             const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
-            if (receipt) {
+            if (receipt && request instanceof LiquidationRequest) {
                 resolve(receipt);
 
                 const randomNumber = Math.floor(Math.random() * 100000) + 1;
 
+                this.eventEmitter.emit(
+                    ExplorerProviderEvents.LiquidationTransactionMined,
+                    new LiquidationTransactionMinedEvent(request.loanToken, txHash)
+                );
+
+
             } else {
                 window.setTimeout(() => {
-                    this.waitForTransactionMinedRecursive(txHash, web3Wrapper, resolve, reject);
+                    this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);
                 }, 5000);
             }
         }
@@ -1033,6 +1076,10 @@ export class ExplorerProvider {
             reject(e);
         }
     };
+
+    public sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     public async getGasTokenAllowance(): Promise<BigNumber> {
         let result = new BigNumber(0);
@@ -1107,6 +1154,10 @@ export class ExplorerProvider {
 
         return result;
     }
+    public isETHAsset = (asset: Asset): boolean => {
+        return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH;
+    };
+
 }
 
 new ExplorerProvider();
