@@ -475,7 +475,7 @@ export default class Fulcrum {
         let stats = new statsModel();
         stats.tokensStats = [];
         const bzrxUsdPrice = new BigNumber(swapRates[iTokens.map(x => x.name).indexOf("bzrx")]).dividedBy(10 ** 18);
-        const monthlyReward = new BigNumber(22316666.66).times(bzrxUsdPrice);
+        const monthlyReward = new BigNumber(10300000).times(bzrxUsdPrice);
 
         if (reserveData && reserveData.totalAssetSupply.length > 0) {
             await Promise.all(iTokens.map(async (token, i) => {

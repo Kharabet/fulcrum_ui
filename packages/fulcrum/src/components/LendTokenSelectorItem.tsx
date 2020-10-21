@@ -9,6 +9,7 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { LendTransactionMinedEvent } from "../services/events/LendTransactionMinedEvent";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { TasksQueue } from "../services/TasksQueue";
 import { ProfitTicker } from "./ProfitTicker";
 import { Preloader } from "./Preloader";
 import { CircleLoader } from "./CircleLoader";
@@ -68,8 +69,11 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   }
 
   private _isMounted: boolean;
+  private _refreshInterval: any;
+  private _refreshProfitTimerMillisec: number = 1000 * 60 * 10;
 
   private async derivedUpdate() {
+    console.log("this.derivedUpdate")
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     let profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
@@ -114,7 +118,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     this.setState({ ...this.state, isLoadingTransaction: true })
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
-    if (!this.state.request || task.request.loanId !== this.state.request.loanId) return;
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
@@ -133,7 +137,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
 
   public componentWillUnmount(): void {
     this._isMounted = false;
-
+    window.clearInterval(this._refreshInterval);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -141,10 +145,18 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.LendTransactionMined, this.onLendTransactionMined);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
+    const task = await TasksQueue.Instance.getTasksList().find(t =>
+      t.request instanceof LendRequest &&
+      t.request.asset === this.props.asset
+    );
+    const isLoadingTransaction = task && !task.error ? true : false;
+    const request = task ? task.request as LendRequest : undefined;
 
+    this.setState({ ...this.state, isLoadingTransaction, request });
     this.derivedUpdate();
+    this._refreshInterval = window.setInterval(this.derivedUpdate.bind(this), this._refreshProfitTimerMillisec);
   }
 
   public componentDidUpdate(

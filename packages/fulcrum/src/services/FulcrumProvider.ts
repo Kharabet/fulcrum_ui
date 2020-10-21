@@ -2,7 +2,6 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
-// import Web3Utils from "web3-utils";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
@@ -34,11 +33,12 @@ import configProviders from "../config/providers.json";
 
 import { AbstractConnector } from '@web3-react/abstract-connector';
 
+import Web3Utils  from "web3-utils";
+
 import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TradeEvent } from "../domain/events/TradeEvent";
-import Web3, { providers } from "web3";
 import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
 import { LiquidationEvent } from "../domain/events/LiquidationEvent";
 import { EarnRewardEvent } from "../domain/events/EarnRewardEvent";
@@ -1024,7 +1024,7 @@ export class FulcrumProvider {
         newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
       }
       try {
-        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+        const newCurrentMargin: [BigNumber, BigNumber] = await oracleContract.getCurrentMargin.callAsync(
           borrowedFundsState.loanData.loanToken,
           borrowedFundsState.loanData.collateralToken,
           borrowedFundsState.loanData.principal,
@@ -1032,7 +1032,7 @@ export class FulcrumProvider {
             new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
             new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
         );
-        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+        result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18).plus(100);
       } catch (e) {
         // console.log(e);
         result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
@@ -1553,16 +1553,17 @@ export class FulcrumProvider {
 
         let amountInBaseUnits = new BigNumber(0);
         if (request.positionType === PositionType.LONG) {
-          const decimals: number = AssetsDictionary.assets.get(request.quoteToken)!.decimals || 18;
+          const decimals: number = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
           amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
         }
         else {
-          const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
-          const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
-
-          const currentCollateralToPrincipalRate = await this.getSwapRate(loan.collateralAsset, loan.loanAsset);
-          const maxRequestAmount = loan.loanData.collateral.div(10 ** collateralAssetDecimals).times(currentCollateralToPrincipalRate).minus(loan.loanData.principal.div(10 ** loanAssetDecimals));
-          amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(request.amount.div(maxRequestAmount)).toFixed(0, 1));
+          const maxTradeValueUI = await FulcrumProvider.Instance.getMaxTradeValue(TradeType.SELL,
+            loan.loanAsset,
+            loan.collateralAsset,
+            request.returnTokenIsCollateral ? loan.collateralAsset : loan.loanAsset,
+            request.positionType,
+            loan);
+          amountInBaseUnits = new BigNumber(loan.loanData.collateral.times(request.amount.div(maxTradeValueUI)).toFixed(0, 1));
         }
 
         let maxAmountInBaseUnits = new BigNumber(0);
@@ -1614,6 +1615,21 @@ export class FulcrumProvider {
     return result;
   }
 
+  public getMaintenanceMargin = async (asset: Asset, collateralAsset: Asset): Promise<BigNumber> => {
+    if (!this.contractsSource) {
+      return new BigNumber(0);
+    }
+    const iToken = await this.contractsSource.getITokenContract(asset);
+    const iBZxContract = await this.contractsSource.getiBZxContract();
+    if (!iToken || !iBZxContract) return new BigNumber(0);
+    const collateralTokenAddress = AssetsDictionary.assets.get(collateralAsset)!.addressErc20.get(this.web3ProviderSettings.networkId);
+    // @ts-ignore
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true));
+    const loanId = await iToken.loanParamsIds.callAsync(id);
+    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
+    const maintenanceMargin = loanParams[6];
+    return maintenanceMargin; 
+  };
 
   public async getUserMarginTradeLoans(): Promise<IBorrowedFundsState[]> {
     let result: IBorrowedFundsState[] = [];
@@ -1627,17 +1643,22 @@ export class FulcrumProvider {
 
     const loansData = await iBZxContract.getUserLoans.callAsync(
       account,
+      new BigNumber(0),
       new BigNumber(50),
-      1 // margin trade loans
+      1, // margin trade loans
+      false,
+      false
     );
     // console.log(loansData);
     const zero = new BigNumber(0);
+    //@ts-ignore
     result = loansData
       .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
       .map(e => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
-        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
         const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) return;
+        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
         let amountOwned = e.principal.minus(e.interestDepositRemaining);
         if (amountOwned.lte(0)) {
@@ -1660,7 +1681,7 @@ export class FulcrumProvider {
           isInProgress: false,
           loanData: e
         };
-      });
+      }).filter(e => e);
     console.log(result);
     return result;
   }
@@ -1793,7 +1814,7 @@ export class FulcrumProvider {
     return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      Asset.USDC
     );
   }
 
@@ -2175,16 +2196,16 @@ export class FulcrumProvider {
   }
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
-    await this.processQueue(false, false);
+    await this.processQueue(requestTask.request.id, false, false);
   };
 
   public onTaskRetry = async (requestTask: RequestTask, skipGas: boolean) => {
-    await this.processQueue(true, skipGas);
+    await this.processQueue(requestTask.request.id, true, skipGas);
   };
 
   public onTaskCancel = async (requestTask: RequestTask) => {
     await this.cancelRequestTask(requestTask);
-    await this.processQueue(false, false);
+    await this.processQueue(requestTask.request.id, false, false);
   };
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
@@ -2192,11 +2213,11 @@ export class FulcrumProvider {
       this.isProcessing = true;
 
       try {
-        const task = TasksQueue.Instance.peek();
+        const task = TasksQueue.Instance.peek(requestTask.request.id);
 
         if (task) {
           if (task.request.id === requestTask.request.id) {
-            TasksQueue.Instance.dequeue();
+            TasksQueue.Instance.dequeue(task.request.id);
           }
         }
       } finally {
@@ -2205,42 +2226,40 @@ export class FulcrumProvider {
     }
   };
 
-  private processQueue = async (force: boolean, skipGas: boolean) => {
-    if (!(this.isProcessing || this.isChecking)) {
+  private processQueue = async (taskId: number, force: boolean, skipGas: boolean) => {
+    if (!(this.isChecking)) {
       let forceOnce = force;
-      do {
-        this.isProcessing = true;
-        this.isChecking = false;
+      this.isProcessing = true;
+      this.isChecking = false;
 
-        try {
-          const task = TasksQueue.Instance.peek();
+      try {
+        const task = TasksQueue.Instance.peek(taskId);
 
-          if (task) {
-            if (task.status === RequestStatus.FAILED_SKIPGAS) {
-              task.status = RequestStatus.FAILED;
+        if (task) {
+          if (task.status === RequestStatus.FAILED_SKIPGAS) {
+            task.status = RequestStatus.FAILED;
+          }
+          if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
+            await this.processRequestTask(task, skipGas);
+            // @ts-ignore
+            if (task.status === RequestStatus.DONE) {
+              TasksQueue.Instance.dequeue(task.request.id);
             }
-            if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
-              await this.processRequestTask(task, skipGas);
-              // @ts-ignore
-              if (task.status === RequestStatus.DONE) {
-                TasksQueue.Instance.dequeue();
-              }
-            } else {
-              if (task.status === RequestStatus.FAILED && !forceOnce) {
-                this.isProcessing = false;
-                this.isChecking = false;
-                break;
-              }
+          } else {
+            if (task.status === RequestStatus.FAILED && !forceOnce) {
+              this.isProcessing = false;
+              this.isChecking = false;
             }
           }
-        } finally {
-          forceOnce = false;
-          this.isChecking = true;
-          this.isProcessing = false;
         }
-      } while (TasksQueue.Instance.any());
-      this.isChecking = false;
+      } finally {
+        forceOnce = false;
+        this.isChecking = true;
+        this.isProcessing = false;
+      }
     }
+    this.isChecking = false;
+
   };
 
   private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -2290,13 +2309,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-        }
-        }
-        }
-        } catch(e) {
-        // console.log(e);
-        }
-        }*/
+                                                    }
+                                                    }
+                                                    }
+                                                    } catch(e) {
+                                                    // console.log(e);
+                                                    }
+                                                    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

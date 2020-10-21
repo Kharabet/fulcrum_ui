@@ -1,5 +1,5 @@
 .provider-menu {
-  padding: 50px 60px 40px 60px;
+  padding: 40px 60px 40px 60px;
   background-color: #444e5a;
   max-width: 630px;
   box-sizing: border-box;
@@ -7,7 +7,7 @@
     font-size: 22px;
     font-weight: 600;
     line-height: 1.5;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     text-align: center;
     color: #a2abb8;
   }
@@ -15,9 +15,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 20px;
+    padding-bottom: 15px;
     border-bottom: 1px solid #586473;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     &-logo {
       display: flex;
       align-items: center;
@@ -30,7 +30,7 @@
     &-text {
       font-weight: normal;
       font-size: 16px;
-      line-height: 150%;
+      line-height: 130%;
       color: #e9f4ff;
     }
     &-switch {
@@ -41,7 +41,7 @@
     color: var(--trade-header-color);
 
     display: flex;
-    margin-top: 20px;
+    // margin-top: 20px;
     flex-wrap: wrap;
     max-width: 280px;
 
@@ -72,7 +72,7 @@
     flex-direction: column;
     flex-direction: row;
     /* width: 50%; */
-    padding: 18px 30px;
+    padding: 10px 30px;
     flex-wrap: wrap;
     background-color: #3d4651;
     width: 250px;
@@ -84,7 +84,7 @@
     &--selected {
       background-color: #444e5a;
       border: 1px solid #586473;
-      padding: 10px 30px;
+      padding: 8px 30px;
       &:hover {
         background-color: initial;
       }
@@ -94,12 +94,12 @@
         .provider-name {
           font-weight: 800;
           font-size: 15px;
-          line-height: 180%;
+          line-height: 150%;
           color: #fff;
         }
         .address {
           font-size: 13px;
-          line-height: 180%;
+          line-height: 120%;
           color: #758295;
         }
       }
@@ -131,8 +131,8 @@
     background: #586473;
     border-radius: 43px;
     text-align: center;
-    padding: 20px 50px;
-    margin: 30px auto;
+    padding: 15.5px 50px;
+    margin: 30px auto 10px;
     &:hover {
       transition: all 0.1s;
       background-color: #758295;

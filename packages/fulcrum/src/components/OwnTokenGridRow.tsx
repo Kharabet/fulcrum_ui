@@ -8,6 +8,7 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { TasksQueue } from "../services/TasksQueue";
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
@@ -31,13 +32,13 @@ export interface IOwnTokenGridRowProps {
   isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | ManageCollateralRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
 }
 
 interface IOwnTokenGridRowState {
   isLoading: boolean;
   isLoadingTransaction: boolean;
-  request: TradeRequest | undefined;
+  request: TradeRequest | ManageCollateralRequest | undefined;
   resultTx: boolean;
 }
 
@@ -114,9 +115,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     // FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
-
+    const task = await TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.loan.loanId);
+    const isLoadingTransaction = task && task.error ? true : false;
+    const request = task ? task.request as TradeRequest | ManageCollateralRequest : undefined;
+    this.setState({ ...this.state, resultTx: true, isLoadingTransaction, request });
     this.derivedUpdate();
   }
 
@@ -135,7 +139,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       ? <React.Fragment>
         <div className="token-selector-item__image">
           <CircleLoader></CircleLoader>
-          <TradeTxLoaderStep taskId={this.state.request.loanId} />
+          <TradeTxLoaderStep taskId={this.state.request.id} />
         </div>
       </React.Fragment>
       : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
@@ -151,7 +155,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           </span>
         </div>
         <div title={this.props.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
-    <span className="own-token-grid-row__body-header">Position({this.props.baseToken}/{this.props.quoteToken})</span>
+          <span className="own-token-grid-row__body-header">Position({this.props.baseToken}/{this.props.quoteToken})</span>
           {this.props.positionValue.toFixed(4)}
         </div>
         <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
@@ -226,28 +230,18 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-    const request = new TradeRequest(
+    const request = new ManageCollateralRequest(
       this.props.loan.loanId,
-      TradeType.SELL,
-      this.props.baseToken,
-      this.props.quoteToken,
-      Asset.UNKNOWN,
-      this.props.positionType,
-      this.props.leverage,
-      new BigNumber(0)
-    )
+      this.props.loan.loanAsset,
+      this.props.loan.collateralAsset,
+      this.props.loan.collateralAmount,
+      false
+    );
 
     await this.setState({ ...this.state, request: request });
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
-
     this.props.onManageCollateralOpen(
-      new ManageCollateralRequest(
-        this.props.loan.loanId,
-        this.props.baseToken,
-        this.props.quoteToken,
-        this.props.loan.collateralAmount,
-        false
-      )
+      request
     );
   };
 

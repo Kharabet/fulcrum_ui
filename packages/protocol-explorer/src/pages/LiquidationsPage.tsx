@@ -21,7 +21,6 @@ import { IActiveLoanData } from "../domain/IActiveLoanData";
 import { ILoanRowProps } from "../components/LoanRow";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 
-
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void;
   isMobileMedia: boolean;
@@ -46,34 +45,28 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     super(props);
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assetsShown = [
-        { token: Asset.DAI, color: "#F8A608" },
-        { token: Asset.USDC, color: "#3574B9" },
-        { token: Asset.USDT, color: "#26A17B" },
-        { token: Asset.SUSD, color: "#100E23" },
-        { token: Asset.fWETH, color: "#8B8B8B" },
-        { token: Asset.WBTC, color: "#41365B" },
-        { token: Asset.LINK, color: "#2A5ADA" },
-        { token: Asset.ZRX, color: "#000004" },
-        { token: Asset.KNC, color: "#49BC98" }
+        { token: Asset.USDC, color: "#85D3FF" },
+        { token: Asset.fWETH, color: "#B0B0B0" },
+        { token: Asset.WBTC, color: "#966AFF" }
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       this.assetsShown = [
-        { token: Asset.ETH, color: "#33dfcc" },
-        { token: Asset.DAI, color: "#276bfb" },
+        { token: Asset.ETH, color: "#B0B0B0" },
+        { token: Asset.DAI, color: "#F8A608" },
       ];
     } else {
       this.assetsShown = [
-        { token: Asset.ETH, color: "#8B8B8B" },
+        { token: Asset.ETH, color: "#B0B0B0" },
         { token: Asset.DAI, color: "#F8A608" },
-        { token: Asset.USDC, color: "#3574B9" },
-        { token: Asset.USDT, color: "#26A17B" },
-        { token: Asset.WBTC, color: "#41365B" },
-        { token: Asset.LINK, color: "#2A5ADA" },
-        { token: Asset.YFI, color: "#2A0ADA" },
-        { token: Asset.BZRX, color: "#2A6AEA" },
-        { token: Asset.MKR, color: "#49BC98" },
-        { token: Asset.LEND, color: "#3574B8" },
-        { token: Asset.KNC, color: "#49BC97" },
+        { token: Asset.USDC, color: "#85D3FF" },
+        { token: Asset.USDT, color: "#70E000" },
+        { token: Asset.WBTC, color: "#966AFF" },
+        { token: Asset.LINK, color: "#03288B" },
+        { token: Asset.YFI, color: "#3D97FF" },
+        { token: Asset.BZRX, color: "#0056D7" },
+        { token: Asset.MKR, color: "#028858" },
+        { token: Asset.LEND, color: "#00EFEF" },
+        { token: Asset.KNC, color: "#3BD8A7" },
 
       ]
     }
@@ -192,6 +185,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18;
         const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${e.loanToken === Asset.fWETH ? "eth" : e.loanToken.toLowerCase()}&date=${e.timeStamp.getTime()}`);
         const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+        if (!swapToUsdHistoryRateResponse) continue;
         const repayAmountUsd = e.repayAmount.div(10 ** loanAssetDecimals).times(swapToUsdHistoryRateResponse.swapToUSDPrice);
         volume30d = volume30d.plus(repayAmountUsd);
         liquidationEventsWithUsd.push({ event: e, repayAmountUsd: repayAmountUsd });
@@ -205,7 +199,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       seizeAmount: e.maxSeizable,
       loanToken: e.loanAsset,
       collateralToken: e.collateralAsset,
-      onLiquidationCompleted: this.derivedUpdate.bind(this)
+      onLiquidationUpdated: this.derivedUpdate.bind(this)
     }))
     await this.setState({
       ...this.state,
@@ -376,7 +370,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                           </div>
                           <div className="flex w-100">
                             <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                            <span title={this.state.healthyLoansUsd.toFixed(2)} className="healthy-value healthy-color">{this.state.healthyLoansUsd.div(10**6).toFixed(2)}m</span>
+                            <span title={this.state.healthyLoansUsd.toFixed(2)} className="healthy-value healthy-color">{this.state.healthyLoansUsd.div(10 ** 6).toFixed(2)}m</span>
                           </div>
                         </div>
                       </div>
@@ -435,4 +429,5 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     tooltipEl.style.left = tooltip.caretX - tableRoot.offsetWidth / 2 + 'px';
     tooltipEl.style.top = 0 + 'px';
   }
+
 }

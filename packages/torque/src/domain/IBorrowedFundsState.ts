@@ -16,6 +16,7 @@ export interface IBorrowedFundsState {
   isInProgress: boolean;
   loanData?: {
     loanId: string;
+    endTimestamp: BigNumber;
     loanToken: string;
     collateralToken: string;
     principal: BigNumber;
@@ -27,7 +28,6 @@ export interface IBorrowedFundsState {
     maintenanceMargin: BigNumber;
     currentMargin: BigNumber;
     maxLoanTerm: BigNumber;
-    loanEndTimestamp: BigNumber;
     maxLiquidatable: BigNumber;
     maxSeizable: BigNumber;
   };

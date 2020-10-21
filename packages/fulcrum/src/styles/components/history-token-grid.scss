@@ -19,7 +19,7 @@ $width-col-fee-reward-desktop: 16%;
 
 .history-token-grid {
   @media screen and (max-width: $breakpoint-mobile-max) {
-    padding: 15px;
+    padding: 0 15px;
   }
   &__placeholder {
     display: flex;

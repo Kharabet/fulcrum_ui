@@ -350,7 +350,7 @@ permalink: v2
                             <span class="accordion-position"></span>
                         </h4>
                         <div class="accordion-content" aria-hidden="false">
-                            <p>There are no fees involved with opening the loan. You just pay the interest.</p>
+                            <p>When opening a loan there is a 0.09% origination fee on the principle. Interest is also paid for the life of the loan.</p>
                         </div>
                     </div>
                     <div class="accordion-item">

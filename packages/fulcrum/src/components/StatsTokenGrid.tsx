@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
 import { StatsTokenGridHeader } from "./StatsTokenGridHeader";
 import { ReserveDetails } from "../domain/ReserveDetails";
@@ -19,47 +20,56 @@ export interface IStatsTokenGridProps {
 interface IStatsTokenGridState {
   tokenRowsData: IStatsTokenGridRowProps[] | null;
   totalsRow: IStatsTokenGridRowProps | null;
+  yieldAPYJson: any
 }
 
 export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenGridState> {
-  private static readonly assets: Asset[] = [
-    Asset.ETHv1,
-    Asset.ETH,
-    Asset.DAI,
-    Asset.USDC,
-    Asset.USDT,
-    Asset.WBTC,
-    Asset.LINK,
-    Asset.YFI,
-    Asset.BZRX,
-    Asset.MKR,
-    Asset.LEND,
-    Asset.KNC
-  ];
+  private static readonly assets: Asset[] = process.env.REACT_APP_ETH_NETWORK === "mainnet"
+    ? [
+      Asset.ETHv1,
+      Asset.ETH,
+      Asset.DAI,
+      Asset.USDC,
+      Asset.USDT,
+      Asset.WBTC,
+      Asset.LINK,
+      Asset.YFI,
+      Asset.BZRX,
+      Asset.MKR,
+      Asset.LEND,
+      Asset.KNC
+    ]
+    : [
+      Asset.fWETH,
+      Asset.USDC,
+      Asset.WBTC,
+    ];
 
+  private static readonly apiUrl: string = "https://api.bzx.network/v1";
   constructor(props: IStatsTokenGridProps) {
     super(props);
 
     this.state = {
       tokenRowsData: null,
-      totalsRow: null
+      totalsRow: null,
+      yieldAPYJson: undefined
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    this.derivedUpdate();
   }
+
 
   public async derivedUpdate() {
     const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(StatsTokenGrid.assets);
     //console.log(reserveDetails);
-    const rowData = await StatsTokenGrid.getRowsData(reserveDetails);
+    const rowData = await StatsTokenGrid.getRowsData(reserveDetails, this.state.yieldAPYJson);
     let totalsRow: IStatsTokenGridRowProps | null = null;
     if (rowData.length > 0) {
       totalsRow = rowData.pop()!;
       this.setState({
         ...this.state,
         tokenRowsData: rowData,
-        totalsRow: totalsRow
+        totalsRow
       });
     }
   }
@@ -76,11 +86,13 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-
-    this.derivedUpdate();
+    const yieldAPYRequest = await fetch(`${StatsTokenGrid.apiUrl}/yield-farimng-apy`);
+    const yieldAPYJson = await yieldAPYRequest.json();
+    await this.setState({ ...this.state, yieldAPYJson });
+    await this.derivedUpdate();
   }
 
   public render() {
@@ -95,6 +107,8 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
         </React.Fragment>
       );
     }
+
+
 
     let tokenRows = this.state.tokenRowsData.map(e => <StatsTokenGridRow key={e.reserveDetails.asset!} {...e} />);
     let totalsRow = (<StatsTokenGridRow key={this.state.totalsRow.reserveDetails.asset!} {...this.state.totalsRow} />);
@@ -111,13 +125,18 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     );
   }
 
-  private static getRowsData = async (reserveDetails: ReserveDetails[]): Promise<IStatsTokenGridRowProps[]> => {
+  private static getRowsData = async (reserveDetails: ReserveDetails[], yieldAPYJson: any): Promise<IStatsTokenGridRowProps[]> => {
     const rowsData: IStatsTokenGridRowProps[] = [];
 
-    // console.log(reserveDetails);
     reserveDetails.forEach(e => {
+      const yieldApr = e.asset && yieldAPYJson && yieldAPYJson!['success']
+        && yieldAPYJson!['data'][e.asset.toLowerCase()]
+        ? new BigNumber(yieldAPYJson!['data'][e.asset.toLowerCase()])
+        : new BigNumber(0);
+
       rowsData.push({
-        reserveDetails: e
+        reserveDetails: e,
+        yieldApr: yieldApr
       });
     });
 

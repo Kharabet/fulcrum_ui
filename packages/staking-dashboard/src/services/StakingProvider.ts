@@ -268,20 +268,7 @@ export class StakingProvider {
     }
     return result;
   }
-  public async getITokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
-    let result = new BigNumber(0);
-
-    if (this.contractsSource) {
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-      const address = await this.contractsSource.getITokenErc20Address(asset);
-      if (address) {
-        result = await this.getErc20BalanceOfUser(address);
-        result = result.multipliedBy(10 ** (18 - precision));
-      }
-    }
-
-    return result;
-  }
+  
   public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
@@ -390,81 +377,6 @@ export class StakingProvider {
     }
 
     return amount.gt(neededAmount) ? amount : neededAmount;
-  }
-
-  public getiETHSwapRateWithCheck = async (): Promise<[BigNumber, BigNumber]> => {
-    let result: [BigNumber, BigNumber] = [new BigNumber(0), new BigNumber(0)];
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return result;
-
-    const buyBackContract = await this.contractsSource.getiETHBuyBackContract();
-    if (!account || !buyBackContract) return result;
-    try {
-      const rate = await buyBackContract.iETHSwapRateWithCheck.callAsync(account);
-      if (!rate.eq(0)) {
-        result = [
-          rate,
-          await buyBackContract.whitelist.callAsync(account)
-        ];
-      }
-    }
-    catch (e) {
-      console.error(e)
-    }
-    return result;
-  }
-
-
-  public async convertIETHToVBZRX(tokenAmount: BigNumber) {
-    let receipt = null;
-
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return receipt;
-
-    const buyBackContract = await this.contractsSource.getiETHBuyBackContract();
-    if (!account || !buyBackContract) return receipt;
-
-
-    const assetErc20Address = this.contractsSource.getITokenErc20Address(Asset.ETH);
-    if (!assetErc20Address) return receipt;
-    const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
-
-    // Detecting token allowance
-    const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, buyBackContract.address);
-
-    if (tokenAmount.gt(erc20allowance)) {
-      const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(buyBackContract.address, tokenAmount, { from: account });
-      await this.waitForTransactionMined(approveHash);
-    }
-
-
-
-    let gasAmountBN;
-    let gasAmount;
-    try {
-      gasAmount = await buyBackContract.convert.estimateGasAsync(
-        tokenAmount,
-        {
-          from: account,
-          gas: this.gasLimit,
-        });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-
-    }
-    catch (e) {
-      console.error(e);
-    }
-
-    const txHash = await buyBackContract.convert.sendTransactionAsync(
-      tokenAmount,
-      {
-        from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-        gasPrice: await this.gasPrice()
-      });
-
-    const txReceipt = await this.waitForTransactionMined(txHash);
-    return txReceipt.status === 1 ? txReceipt : null;
   }
 
   // public async stake(bzrxAmount: BigNumber, vbzrxAmount: BigNumber, bptAmount: BigNumber, address: string) {
@@ -970,7 +882,7 @@ export class StakingProvider {
     return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      Asset.USDC
     );
   }
 

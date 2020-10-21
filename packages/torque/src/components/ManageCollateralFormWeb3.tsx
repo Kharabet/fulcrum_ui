@@ -440,7 +440,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
       this.props.onSubmit(
         new ManageCollateralRequest(
-          this.props.loanOrderState,
+          this.props.loanOrderState.loanId,
+          this.props.loanOrderState.collateralAsset,
           new BigNumber(this.state.collateralAmount),
           this.state.loanValue > this.state.selectedValue
         )

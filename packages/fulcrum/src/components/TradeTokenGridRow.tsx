@@ -6,6 +6,7 @@ import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { TasksQueue } from "../services/TasksQueue";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import siteConfig from "../config/SiteConfig.json";
 
@@ -15,6 +16,8 @@ import { Preloader } from "./Preloader";
 import { RequestTask } from "../domain/RequestTask";
 import { RequestStatus } from "../domain/RequestStatus";
 
+import { CircleLoader } from "./CircleLoader";
+import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 
 export interface ITradeTokenGridRowProps {
   isMobileMedia: boolean;
@@ -23,6 +26,7 @@ export interface ITradeTokenGridRowProps {
   positionType: PositionType;
   defaultLeverage: number;
   isTxCompleted: boolean;
+  maintenanceMargin: BigNumber;
   onTrade: (request: TradeRequest) => void;
   changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxcolmpleted: boolean, resultTx: boolean) => void;
   changeGridPositionType: (activePositionType: PositionType) => void;
@@ -79,9 +83,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
       : new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage).times(10 ** 18))
-    // liq_price_before_trade = (15000000000000000000 * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
+
+    const maintenanceMargin = this.props.maintenanceMargin;
+    // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     //if it's a SHORT then -> 10^36 / above
-    const liquidationPriceBeforeTrade = ((new BigNumber("15000000000000000000").times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18))).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
+    const liquidationPriceBeforeTrade = (maintenanceMargin.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18)).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
     let liquidationPrice = new BigNumber(0);
     if (liquidationPriceBeforeTrade.gt(0))
       liquidationPrice = this.props.positionType === PositionType.LONG
@@ -144,8 +150,19 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
+
+    const task = await TasksQueue.Instance.getTasksList().find(t =>
+      t.request.loanId === "0x0000000000000000000000000000000000000000000000000000000000000000"
+      && t.request.asset === this.props.baseToken
+      && (t.request as TradeRequest).quoteToken === this.props.quoteToken
+      && (t.request as TradeRequest).positionType === this.props.positionType
+    );
+    const isLoadingTransaction = task && !task.error ? true : false;
+    const request = task ? task.request as TradeRequest : undefined;
+
+    this.setState({ ...this.state, resultTx: true, isLoadingTransaction, request });
     this.derivedUpdate();
   }
 
@@ -238,6 +255,18 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             </button>
           </div>
         </div>
+        {this.state.isLoadingTransaction && this.state.request &&
+          this.props.positionType === this.state.request.positionType &&
+          this.state.request.tradeType === TradeType.BUY
+          ? < div className={`token-selector-item__image open-tab-tx`}>
+            <CircleLoader></CircleLoader>
+            <TradeTxLoaderStep taskId={this.state.request!.id} />
+          </div>
+          : !this.state.resultTx && this.state.request &&
+          this.props.positionType === this.state.request.positionType &&
+          this.state.request.tradeType === TradeType.BUY &&
+          <div className="close-tab-tx"></div>
+        }
       </React.Fragment>
     );
   }

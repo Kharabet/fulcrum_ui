@@ -3,8 +3,6 @@ import { convertContract } from "../contracts/convert";
 import { erc20Contract } from "../contracts/erc20";
 import { BZRXStakingInterimContract } from "../contracts/BZRXStakingInterim";
 import { BigNumber } from "@0x/utils";
-import { Asset } from "../domain/Asset";
-import { iETHBuyBackContract } from "../contracts/iETHBuyBack";
 import { traderCompensationContract } from "../contracts/traderCompensation";
 import { iBZxContract } from "../contracts/iBZxContract";
 
@@ -22,14 +20,12 @@ interface ITokenContractInfo {
 }
 export class ContractsSource {
   private readonly provider: any;
-  private static iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
 
   private static isInit = false;
 
   private static convertJson: any;
   private static erc20Json: any;
   private static BZRXStakingInterimJson: any;
-  private static iETHBuyBack: any;
   private static traderCompensation: any;
   private static iBZxJson: any;
   private static oracleJson: any;
@@ -51,28 +47,10 @@ export class ContractsSource {
     ContractsSource.convertJson = await import(`./../assets/artifacts/${ethNetwork}/convert.json`);
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     ContractsSource.BZRXStakingInterimJson = await import(`./../assets/artifacts/${ethNetwork}/BZRXStakingInterim.json`);
-    ContractsSource.iETHBuyBack = await import(`./../assets/artifacts/${ethNetwork}/iETHBuyBack.json`);
     ContractsSource.traderCompensation = await import(`./../assets/artifacts/${ethNetwork}/traderCompensation.json`);
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
     ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
 
-    const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
-    iTokenList.forEach((val: any, index: any) => {
-      // tslint:disable:no-console
-      // console.log(val);
-      const t = {
-        token: val[1],
-        asset: val[2],
-        name: val[3],
-        symbol: val[4],
-        index: new BigNumber(index),
-        version: parseInt(val[5], 10)
-      };
-      // tslint:disable:no-console
-      // console.log(t);
-
-      ContractsSource.iTokensContractInfos.set(val[4], t);
-    });
     ContractsSource.isInit = true;
   }
 
@@ -89,7 +67,7 @@ export class ContractsSource {
         address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
         break;
       case 42:
-        address = "0x61c1dDcD58Ac1Fc80f5C5572b48EfA032bb3736E";
+        address = "0x2F27c07D888751109753533BF299ea5813A6479D";
         break;
     }
 
@@ -109,7 +87,7 @@ export class ContractsSource {
         address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
         break;
       case 42:
-        address = "0xAbd9372723C735D426D0a760D047206Fe115ee6d";
+        address = "0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a";
         break;
     }
 
@@ -212,25 +190,6 @@ export class ContractsSource {
     return address;
   }
 
-  public getiETHBuyBackAddress(): string {
-    let address: string = "";
-    switch (this.networkId) {
-      case 1:
-        address = "0x80a603401bc2a9b84bbb1b3275d4a65d54381d79";
-        break;
-      case 3:
-        address = "";
-        break;
-      case 4:
-        address = "";
-        break;
-      case 42:
-        address = "0x7DC4b88f28b1a70c17912C06B70c4Bed3c2cF75b";
-        break;
-    }
-    return address;
-  }
-
   public getTraderCompensationAddress(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -250,12 +209,6 @@ export class ContractsSource {
     return address;
   }
 
-  public getITokenErc20Address(asset: Asset): string | null {
-    let symbol;
-    symbol = `i${asset}`;
-    const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null;
-    return tokenContractInfo ? tokenContractInfo.token : null;
-  }
   
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
@@ -290,14 +243,6 @@ export class ContractsSource {
     );
   }
 
-  private async getiETHBuyBackContractRaw(): Promise<iETHBuyBackContract> {
-    await this.Init();
-    return new iETHBuyBackContract(
-      ContractsSource.iETHBuyBack.abi,
-      this.getiETHBuyBackAddress().toLowerCase(),
-      this.provider
-    );
-  }
   private async getTraderCompensationContractRaw(): Promise<traderCompensationContract> {
     await this.Init();
     return new traderCompensationContract(
@@ -320,7 +265,6 @@ export class ContractsSource {
   public getTraderCompensationContract = _.memoize(this.getTraderCompensationContractRaw);
   public getConvertContract = _.memoize(this.getConvertContractRaw);
   public getBZRXStakingInterimContract = _.memoize(this.getBZRXStakingInterimContractRaw);
-  public getiETHBuyBackContract = _.memoize(this.getiETHBuyBackContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getOracleContract = _.memoize(this.getOracleContractRaw);
 }
