@@ -25,7 +25,7 @@
       display: flex;
       svg {
         width: 100px;
-        [data-theme="light"] & path {
+        [data-theme='light'] & path {
           fill: #283049;
         }
       }

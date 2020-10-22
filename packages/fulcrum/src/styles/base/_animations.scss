@@ -1,52 +1,52 @@
 @keyframes animationDotsLoader {
-    0% {
-        transform: scale(1);
-        background-color: #a9b5c7;
-        opacity: 0.5;
-    }
-    10% {
-        transform: scale(1.8);
-        background-color: #276bfb;
-        opacity: 1;
-    }
-    20% {
-        transform: scale(1.8);
-        background-color: #276bfb;
-        opacity: 1;
-    }
-    25% {
-        transform: scale(1);
-        background-color: #a9b5c7;
-        opacity: 0.5;
-    }
+  0% {
+    transform: scale(1);
+    background-color: #a9b5c7;
+    opacity: 0.5;
+  }
+  10% {
+    transform: scale(1.8);
+    background-color: #276bfb;
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1.8);
+    background-color: #276bfb;
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1);
+    background-color: #a9b5c7;
+    opacity: 0.5;
+  }
 }
 @keyframes translateContainer {
-    from {
-        transform: translateX(-74px);
-    }
-    to {
-        transform: translateX(1px);
-    }
+  from {
+    transform: translateX(-74px);
+  }
+  to {
+    transform: translateX(1px);
+  }
 }
 @keyframes translateItem {
-    from {
-        transform: translateX(-25px);
-    }
-    to {
-        transform: translateX(74px);
-    }
+  from {
+    transform: translateX(-25px);
+  }
+  to {
+    transform: translateX(74px);
+  }
 }
 @keyframes animationProvider {
-    0% {
-      transform: scale(1);
-      background-color: #a9b5c7;
-    }
-    10% {
-      transform: scale(1.8);
-      background-color: #00c0ab;
-    }
-    20% {
-      transform: scale(1);
-      background-color: #a9b5c7;
-    }
+  0% {
+    transform: scale(1);
+    background-color: #a9b5c7;
   }
+  10% {
+    transform: scale(1.8);
+    background-color: #00c0ab;
+  }
+  20% {
+    transform: scale(1);
+    background-color: #a9b5c7;
+  }
+}

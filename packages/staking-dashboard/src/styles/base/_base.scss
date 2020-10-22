@@ -1,5 +1,5 @@
 * {
-  font-family: "Muli", sans-serif;
+  font-family: 'Muli', sans-serif;
   box-sizing: border-box;
   margin: 0;
 }
@@ -18,7 +18,8 @@ body {
     background-image: url(../../assets/images/bg-before.svg), url(../../assets/images/bg-after.svg);
   }
   @media screen and (max-width: $width-max-sm) {
-    background-image: url(../../assets/images/bg-before-mobile.svg), url(../../assets/images/bg-after-mobile.svg);
+    background-image: url(../../assets/images/bg-before-mobile.svg),
+      url(../../assets/images/bg-after-mobile.svg);
   }
 }
 

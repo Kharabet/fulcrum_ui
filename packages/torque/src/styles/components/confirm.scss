@@ -24,7 +24,7 @@
         margin-right: 10px;
       }
     }
-    .dialog-content{
+    .dialog-content {
       padding-top: 42px;
     }
     .dialog-actions {
@@ -34,17 +34,17 @@
     }
   }
 }
-@media screen and (max-width: $mobile-version-max-width){
+@media screen and (max-width: $mobile-version-max-width) {
   .confirm-wrapper {
     .confirm {
       width: calc(100% - 60px);
-      p{
+      p {
         font-size: 14px;
       }
       .btn {
         height: 42px;
       }
-      .dialog-content{
+      .dialog-content {
         padding-top: 30px;
       }
       .dialog-actions {

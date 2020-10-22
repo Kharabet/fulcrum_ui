@@ -21,8 +21,8 @@
   .button {
     margin-bottom: 20px;
   }
-  &.selected-delegate{
-    .no-active{
+  &.selected-delegate {
+    .no-active {
       background: #e7ebf0;
       cursor: not-allowed;
       &:hover {
@@ -31,7 +31,7 @@
       .name {
         color: #ffffff;
       }
-      .photo{
+      .photo {
         filter: grayscale(100%);
       }
     }
@@ -50,7 +50,7 @@
     padding: 0 10px;
   }
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     height: 1px;
     width: 100%;
@@ -171,11 +171,11 @@
     background-color: transparent;
     border-color: #5b88ff;
   }
-  &.active{
-    border: 2px solid #276BFB;
+  &.active {
+    border: 2px solid #276bfb;
     position: relative;
-    &:before{
-      content: "";
+    &:before {
+      content: '';
       position: absolute;
       left: 50%;
       transform: translate(-50%, 0%);
@@ -183,7 +183,7 @@
       border-left: 5px solid transparent;
       border-left: 7px solid transparent;
       border-right: 7px solid transparent;
-      border-top: 6px solid #276BFB;
+      border-top: 6px solid #276bfb;
     }
   }
   .photo {

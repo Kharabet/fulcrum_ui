@@ -21,12 +21,11 @@
     > div,
     > a {
       box-sizing: border-box;
-      @media screen and (min-width: $width-min-sm){
+      @media screen and (min-width: $width-min-sm) {
         padding-left: 30px;
       }
-      @media screen and (max-width: $width-max-sm){
+      @media screen and (max-width: $width-max-sm) {
         padding-left: 15px;
-
       }
     }
   }
@@ -52,12 +51,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    &__hash{
+    &__hash {
       width: 20%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-
     }
     &__age {
       width: 12%;
@@ -79,11 +77,11 @@
     }
   }
   .table-row-tx {
-    @media screen and (min-width: $width-min-sm){
+    @media screen and (min-width: $width-min-sm) {
       padding-top: 20px;
       padding-bottom: 20px;
     }
-    @media screen and (max-width: $width-max-sm){
+    @media screen and (max-width: $width-max-sm) {
       padding-top: 13px;
       padding-bottom: 13px;
     }
@@ -141,7 +139,7 @@
   .table-row-loan,
   .table-header-loan {
     &__id {
-      width: 45%;      
+      width: 45%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

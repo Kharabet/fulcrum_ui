@@ -2,7 +2,6 @@
   display: inline-block;
   vertical-align: middle;
 
-
   border-radius: 4px;
   background: #586473;
 
@@ -14,7 +13,6 @@
   padding: 2px 7px;
   border-radius: 4px;
   cursor: pointer;
-
 
   list-style: none;
 
@@ -28,6 +26,6 @@
 
   &--selected {
     border-style: none;
-    background: #00C0AB;
+    background: #00c0ab;
   }
 }

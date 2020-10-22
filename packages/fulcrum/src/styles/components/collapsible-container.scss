@@ -1,7 +1,7 @@
 .collapsible-container {
   color: #a9b5c7;
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     display: none;
   }
 }
@@ -22,7 +22,7 @@
     color: #ffffff;
     position: relative;
     &:after {
-      content: "";
+      content: '';
       position: absolute;
       right: -13px;
       top: calc(50% - 2px);

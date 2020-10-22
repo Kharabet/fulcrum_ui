@@ -1,21 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Muli:wght@200;600;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Muli:wght@200;600;800;900&display=swap');
 
-@import "base/variables";
-@import "base/base";
-@import "base/typography";
-@import "base/flex";
-@import "base/modal";
+@import 'base/variables';
+@import 'base/base';
+@import 'base/typography';
+@import 'base/flex';
+@import 'base/modal';
 
-@import "components/buttons";
-@import "components/grid";
-@import "components/form";
-@import "components/on-chain-indicator";
-@import "components/provider-menu";
-@import "components/loader";
-@import "components/add-to-balance";
-@import "components/representative";
-@import "components/animation-tx";
+@import 'components/buttons';
+@import 'components/grid';
+@import 'components/form';
+@import 'components/on-chain-indicator';
+@import 'components/provider-menu';
+@import 'components/loader';
+@import 'components/add-to-balance';
+@import 'components/representative';
+@import 'components/animation-tx';
 
-@import "layout/footer";
+@import 'layout/footer';
 
-@import "layout/header";
+@import 'layout/header';

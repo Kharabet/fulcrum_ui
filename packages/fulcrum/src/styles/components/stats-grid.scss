@@ -94,7 +94,7 @@ $margin-right-column: 1rem;
   }
 }
 @media screen and (min-width: 960px) {
-  .stats-grid-row{
+  .stats-grid-row {
     padding: 26px 0;
     margin-bottom: 1px;
   }
@@ -169,42 +169,42 @@ $margin-right-column: 1rem;
           padding-top: 36px;
           &:before {
             width: 120px;
-            content: "Borrow Rate (APR)  Fulcrum / Torque";
+            content: 'Borrow Rate (APR)  Fulcrum / Torque';
           }
         }
         .stats-grid-row__col-locked {
           padding-top: 20px;
           &:before {
-            content: "Vault Locked";
+            content: 'Vault Locked';
           }
         }
         .stats-grid-row__col-liquidity {
           padding-top: 20px;
           &:before {
-            content: "Total Available";
+            content: 'Total Available';
           }
         }
         .stats-grid-row__col-total-borrow {
           padding-top: 20px;
           &:before {
-            content: "Total Borrowed";
+            content: 'Total Borrowed';
           }
         }
         .stats-grid-row__col-supply-rate {
           padding-top: 36px;
           &:before {
-            content: "Supply Rate (APR)";
+            content: 'Supply Rate (APR)';
             top: 6px;
           }
         }
         .stats-grid-row__col-total-supply {
           padding-top: 20px;
           &:before {
-            content: "Total Supply";
+            content: 'Total Supply';
           }
         }
       }
-      &:last-child{
+      &:last-child {
         order: -1;
       }
     }
@@ -223,13 +223,13 @@ $margin-right-column: 1rem;
     .stats-grid-row__col-total-tvl-usd {
       padding-top: 20px;
       &:before {
-        content: "TVL (USD)";
+        content: 'TVL (USD)';
       }
     }
     .stats-grid-row__col-total-supply-usd {
       padding-top: 20px;
       &:before {
-        content: "Total Supply (USD)";
+        content: 'Total Supply (USD)';
       }
     }
 

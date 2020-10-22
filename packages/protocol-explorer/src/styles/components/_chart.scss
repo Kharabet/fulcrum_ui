@@ -24,7 +24,7 @@
     top: 4px;
   }
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     background-color: #edf5ff;
 
@@ -69,7 +69,7 @@
     }
   }
   .chartjs-tooltip-value {
-    font-family: "Muli", sans-serif;
+    font-family: 'Muli', sans-serif;
     color: #283038;
     font-size: 30px;
     @media screen and (max-width: $width-max-sm) {
@@ -80,7 +80,7 @@
     }
   }
   .chartjs-tooltip-time {
-    font-family: "Muli", sans-serif;
+    font-family: 'Muli', sans-serif;
     font-size: 14px;
     color: #8992a4;
     text-align: left;
@@ -90,7 +90,7 @@
   }
   .chartjs-tooltip-change24 {
     position: relative;
-    font-family: "Muli", sans-serif;
+    font-family: 'Muli', sans-serif;
     span {
       font-size: 16px;
       font-weight: 700;
@@ -98,7 +98,7 @@
         font-size: 12px;
       }
       &:before {
-        content: "";
+        content: '';
         width: 0;
         height: 0;
         border-style: solid;
@@ -109,7 +109,7 @@
     }
 
     &:before {
-      content: "";
+      content: '';
       width: 1px;
       position: absolute;
       @media screen and(min-width: $width-min-sm) {
@@ -120,7 +120,7 @@
       }
     }
     &:after {
-      content: "";
+      content: '';
       border-radius: 50%;
       position: absolute;
       @media screen and(min-width: $width-min-sm) {
@@ -332,13 +332,13 @@
         }
       }
       &:before {
-        content: "";
+        content: '';
         width: 1px;
         height: 35px;
         position: absolute;
       }
       &:after {
-        content: "";
+        content: '';
         width: 13px;
         height: 13px;
         border-radius: 50%;
@@ -435,7 +435,7 @@
 
       position: absolute;
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         bottom: -12px;
         left: 0;
@@ -457,7 +457,7 @@
         }
       }
       .chartjs-bar-tooltip-value {
-        font-family: "Muli", sans-serif;
+        font-family: 'Muli', sans-serif;
         font-size: 14px;
         font-weight: 700;
         color: #283049;
@@ -477,7 +477,7 @@
 .wrapper-chartjs-doughnut {
   position: relative;
   #chartjs-doughnut-tooltip {
-    font-family: "Muli", sans-serif;
+    font-family: 'Muli', sans-serif;
 
     background-color: rgb(40, 48, 73);
     color: #ffffff;
@@ -494,7 +494,7 @@
         right: 100%;
         top: 50%;
         border: solid transparent;
-        content: " ";
+        content: ' ';
         height: 0;
         width: 0;
         position: absolute;

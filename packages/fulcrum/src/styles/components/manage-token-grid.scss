@@ -1,4 +1,4 @@
-@import "../abstracts/variables";
+@import '../abstracts/variables';
 .manage-token-grid {
   position: relative;
   min-height: 50vh;
@@ -45,7 +45,7 @@
           fill: var(--primary-text);
         }
         &:after {
-          content: "";
+          content: '';
           height: 8px;
           border-radius: 4px;
           width: 100%;

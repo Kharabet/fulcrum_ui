@@ -1,5 +1,5 @@
-@import "../abstracts/mixins";
-@import "../abstracts/variables";
+@import '../abstracts/mixins';
+@import '../abstracts/variables';
 
 $font-size-header: 12px;
 $font-size-row: 22px;
@@ -188,7 +188,7 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: "Muli", sans-serif;
+    font-family: 'Muli', sans-serif;
     font-size: $font-size-button;
     line-height: 1.5;
     font-weight: 700;

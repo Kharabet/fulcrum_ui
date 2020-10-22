@@ -1,22 +1,22 @@
 h1,
 .h1 {
-    font-weight: 700;
-    font-size: 32px;
-    line-height: 1.4;
-    color: #283049;
-    margin: 0;
-    @media screen and (max-width: $width-max-sm) {
-        font-size: 26px;
-    }
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.4;
+  color: #283049;
+  margin: 0;
+  @media screen and (max-width: $width-max-sm) {
+    font-size: 26px;
+  }
 }
 
 .green-color {
-    color: $green-color;
+  color: $green-color;
 }
 .light-gray-color {
-    color: #828282;
+  color: #828282;
 }
 
 .ta-c {
-    text-align: center;
+  text-align: center;
 }

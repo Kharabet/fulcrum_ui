@@ -89,7 +89,7 @@
     }
   }
   &:not(.empty)::after {
-    content: "";
+    content: '';
 
     position: absolute;
     right: 13px;
