@@ -404,21 +404,36 @@ export class TorqueProvider {
   public getBorrowDepositEstimate = async (
     borrowAsset: Asset,
     collateralAsset: Asset,
-    amount: BigNumber
+    amount: BigNumber,
+    collaterizationPercent: BigNumber
   ): Promise<IBorrowEstimate> => {
     const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) }
 
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset)
+      const iBZxContract = await this.contractsSource.getiBZxContract()
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || ''
-      if (amount.gt(0) && iTokenContract && collateralAssetErc20Address) {
+      if (amount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
         const loanPrecision = AssetsDictionary.assets.get(borrowAsset)!.decimals || 18
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
+        const loanToken = AssetsDictionary.assets
+          .get(borrowAsset)!
+          .addressErc20.get(this.web3ProviderSettings.networkId)
+        const collateralToken = AssetsDictionary.assets
+          .get(collateralAsset)!
+          .addressErc20.get(this.web3ProviderSettings.networkId)
         const borrowEstimate = await iTokenContract.getDepositAmountForBorrow.callAsync(
           amount.multipliedBy(10 ** loanPrecision),
           new BigNumber(7884000), // approximately 3 months
           collateralAssetErc20Address
         )
+        // const borrowEstimate = await iBZxContract.getRequiredCollateral.callAsync(
+        //   loanToken!,
+        //   collateralToken!,
+        //   amount.multipliedBy(10 ** loanPrecision),
+        //   collaterizationPercent.minus(100).times(10 ** 18),
+        //   true
+        // )
         result.depositAmount = borrowEstimate.dividedBy(10 ** collateralPrecision).multipliedBy(1.2) // safety buffer
       }
     }
@@ -604,8 +619,30 @@ export class TorqueProvider {
     const id = new BigNumber(Web3Utils.soliditySha3(collateralToken, true))
     const loanId = await iToken.loanParamsIds.callAsync(id)
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
-    const maintenanceMargin = loanParams[6]
+    const maintenanceMargin = loanParams[6] // an unhealthy loan when current margin is at or below this value
     return maintenanceMargin
+  }
+
+  public getMinInitialMargin = async (asset: Asset, collateralAsset: Asset): Promise<BigNumber> => {
+    let result: BigNumber = new BigNumber(150)
+    if (!this.contractsSource) {
+      return result
+    }
+    const iToken = await this.contractsSource.getiTokenContract(asset)
+    const iBZxContract = await this.contractsSource.getiBZxContract()
+    if (!iToken || !iBZxContract) {
+      return result
+    }
+    const collateralTokenAddress =
+      AssetsDictionary.assets
+        .get(collateralAsset)!
+        .addressErc20.get(this.web3ProviderSettings.networkId) || ''
+    // @ts-ignore
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
+    const loanId = await iToken.loanParamsIds.callAsync(id)
+    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
+    result = loanParams[5].div(10 ** 18).plus(100) // the minimum allowed initial margin
+    return result
   }
 
   public assignCollateral = async (
