@@ -1,19 +1,32 @@
-import React, { Component } from "react";
-import { DialogHeader } from "./DialogHeader";
+import React, { Component } from 'react'
+import { DialogHeader } from './DialogHeader'
 
 export interface IRiskDisclosureProps {
-  onClose: () => void;
+  onClose: () => void
 }
 
 export class RiskDisclosure extends Component<IRiskDisclosureProps> {
   public render() {
     return (
       <div className="disclosure">
-        <DialogHeader title="DeFi Risk Disclosure" onDecline={this.onTokenAddressFormRequestClose} />
+        <DialogHeader
+          title="DeFi Risk Disclosure"
+          onDecline={this.onTokenAddressFormRequestClose}
+        />
         <div className="dialog-content">
-          <p>When using decentralized applications (dApps), it’s critical to remember that YOU are responsible for the security of your digital assets.</p>
-          <p>Unlike mainstream financial services, our team can NOT help you recover your funds if you lose your private key.</p>
-          <p>While bZx does maintain an insurance fund to protect against the improper liquidation of undercollateralized borrowers, we do NOT insure user funds in the event that the user loses access to - or control over - their private key.</p>
+          <p>
+            When using decentralized applications (dApps), it’s critical to remember that YOU are
+            responsible for the security of your digital assets.
+          </p>
+          <p>
+            Unlike mainstream financial services, our team can NOT help you recover your funds if
+            you lose your private key.
+          </p>
+          <p>
+            While bZx does maintain an insurance fund to protect against the improper liquidation of
+            undercollateralized borrowers, we do NOT insure user funds in the event that the user
+            loses access to - or control over - their private key.
+          </p>
           <p>Here are our safety guidelines for using dApps:</p>
           <h3>Secure your digital assets carefully</h3>
           <ul>
@@ -27,21 +40,41 @@ export class RiskDisclosure extends Component<IRiskDisclosureProps> {
           </ul>
           <h3>Do your own research</h3>
           <ul>
-            <li>ALWAYS evaluate the smart contracts (Read our audits <a href="https://bzx.network/pdfs/CertiK%20Verification%20Report%20for%20bZx.pdf">here</a> and <a href="https://bzx.network/pdfs/CertiK_Review_Report_for_bZx_v2.pdf">here</a>)</li>
+            <li>
+              ALWAYS evaluate the smart contracts (Read our audits{' '}
+              <a href="https://bzx.network/pdfs/CertiK%20Verification%20Report%20for%20bZx.pdf">
+                here
+              </a>{' '}
+              and <a href="https://bzx.network/pdfs/CertiK_Review_Report_for_bZx_v2.pdf">here</a>)
+            </li>
             <li>NEVER invest more than you can afford to lose</li>
           </ul>
-          <p>To learn more about how to protect yourself from phishing, please read our article on <a href="https://help.bzx.network/en/articles/3750994-how-to-stay-safe-when-using-fulcrum-and-torque">How to stay safe when using Fulcrum and Torque.</a></p>
-          <p>We have done our best to make this an effective resource for beginners wanting to learn how to secure their digital assets against the basic risks associated with dApps, however, it’s important to consider that using emerging technologies constitutes a risk unto itself.</p>
-          <p>Undiscovered vulnerabilities and the deployment of new dApps may cause unforeseen consequences. Users should always exercise caution when using emerging technologies.</p>
-
+          <p>
+            To learn more about how to protect yourself from phishing, please read our article on{' '}
+            <a href="https://help.bzx.network/en/articles/3750994-how-to-stay-safe-when-using-fulcrum-and-torque">
+              How to stay safe when using Fulcrum and Torque.
+            </a>
+          </p>
+          <p>
+            We have done our best to make this an effective resource for beginners wanting to learn
+            how to secure their digital assets against the basic risks associated with dApps,
+            however, it’s important to consider that using emerging technologies constitutes a risk
+            unto itself.
+          </p>
+          <p>
+            Undiscovered vulnerabilities and the deployment of new dApps may cause unforeseen
+            consequences. Users should always exercise caution when using emerging technologies.
+          </p>
         </div>
         <div className="dialog-actions">
-          <button className="btn btn-size--small" onClick={this.onTokenAddressFormRequestClose}>Got it!</button>
+          <button className="btn btn-size--small" onClick={this.onTokenAddressFormRequestClose}>
+            Got it!
+          </button>
         </div>
       </div>
-    );
+    )
   }
   public onTokenAddressFormRequestClose = () => {
-    this.props.onClose();
-  };
+    this.props.onClose()
+  }
 }

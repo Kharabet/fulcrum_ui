@@ -1,7 +1,7 @@
 {
   "name": "dsProxyJson",
   "address": "",
-  "abi":[
+  "abi": [
     {
       "constant": false,
       "inputs": [

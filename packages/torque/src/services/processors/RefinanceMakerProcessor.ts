@@ -1,11 +1,11 @@
-import { BigNumber } from "@0x/utils";
-import { RequestTask } from "../../domain/RequestTask";
-import { TorqueProvider } from "../TorqueProvider";
-import { RefinanceMakerRequest } from "../../domain/RefinanceMakerRequest";
-import { cdpManagerContract } from "../../contracts/cdpManager";
-import { dsProxyJsonContract } from "../../contracts/dsProxyJson";
-import { makerBridgeContract } from "../../contracts/makerBridge";
-import Web3 from "web3";
+import { BigNumber } from '@0x/utils'
+import { RequestTask } from '../../domain/RequestTask'
+import { TorqueProvider } from '../TorqueProvider'
+import { RefinanceMakerRequest } from '../../domain/RefinanceMakerRequest'
+import { cdpManagerContract } from '../../contracts/cdpManager'
+import { dsProxyJsonContract } from '../../contracts/dsProxyJson'
+import { makerBridgeContract } from '../../contracts/makerBridge'
+import Web3 from 'web3'
 
 // export class RefinanceMakerProcessor {
 //   public run = async (task: RequestTask, skipGas: boolean, configAddress: any, web3: Web3) => {
@@ -54,11 +54,10 @@ import Web3 from "web3";
 //         const proxyActionsAddress = taskRequest.refLoan.isInstaProxy ?
 //           configAddress.Insta_Proxy_Actions : configAddress.proxy_Actions_Address;
 
-//         //Submitting loan refinance          
+//         //Submitting loan refinance
 //         task.processingStepNext();
 //         // if proxy use then use this function for cdpAllow
 //         try {
-
 
 //           txHash = await proxy.execute.sendTransactionAsync(proxyActionsAddress, allowData, {
 //             from: taskRequest.refLoan.accountAddress,
@@ -84,7 +83,7 @@ import Web3 from "web3";
 //         // @ts-ignore
 //         const data = web3.eth.abi.encodeFunctionCall(proxyMigrationABI.default, params);
 //         const bridgeActionsAddress = configAddress.Bridge_Action_Address;
-//         //Submitting loan refinance          
+//         //Submitting loan refinance
 //         task.processingStepNext();
 //         try {
 //           if (taskRequest.refLoan.isInstaProxy) {
@@ -113,7 +112,7 @@ import Web3 from "web3";
 //       }
 //       const makerBridge: makerBridgeContract = await TorqueProvider.Instance.contractsSource.getMakerBridge(configAddress.Maker_Bridge_Address);
 
-//       //Submitting loan refinance          
+//       //Submitting loan refinance
 //       task.processingStepNext();
 //       try {
 //         txHash = await makerBridge.migrateLoan.sendTransactionAsync([taskRequest.refLoan.cdpId], [new BigNumber(dart)], [new BigNumber(dink)], [new BigNumber(dink)], [new BigNumber(dart)], { from: taskRequest.refLoan.accountAddress });

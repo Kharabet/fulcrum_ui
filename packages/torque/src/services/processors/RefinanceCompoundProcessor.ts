@@ -1,7 +1,7 @@
-import { BigNumber } from "@0x/utils";
-import { RequestTask } from "../../domain/RequestTask";
-import { TorqueProvider } from "../TorqueProvider";
-import { RefinanceCompoundRequest } from "../../domain/RefinanceCompoundRequest";
+import { BigNumber } from '@0x/utils'
+import { RequestTask } from '../../domain/RequestTask'
+import { TorqueProvider } from '../TorqueProvider'
+import { RefinanceCompoundRequest } from '../../domain/RefinanceCompoundRequest'
 
 // export class RefinanceCompoundProcessor {
 //   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -52,7 +52,6 @@ import { RefinanceCompoundRequest } from "../../domain/RefinanceCompoundRequest"
 //     loan.usdValue = loan.usdValue.div(divider);
 //     loan.balance = loan.balance.div(divider);
 
-
 //     await TorqueProvider.Instance.assignCollateral([loan], TorqueProvider.Instance.compoundDeposits);
 
 //     const assets: string[] = [];
@@ -76,8 +75,7 @@ import { RefinanceCompoundRequest } from "../../domain/RefinanceCompoundRequest"
 
 //     let txHash = "";
 
-
-//     //Submitting loan refinance          
+//     //Submitting loan refinance
 //     task.processingStepNext();
 //     try {
 //       txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
@@ -97,7 +95,6 @@ import { RefinanceCompoundRequest } from "../../domain/RefinanceCompoundRequest"
 //       console.log(e)
 //       throw e;
 //     }
-
 
 //     //Updating the blockchain
 //     task.processingStepNext();

@@ -1,4 +1,4 @@
-@import "../abstracts/variables";
+@import '../abstracts/variables';
 
 $width-col-token-date: 12%;
 $width-col-token-asset: 11%;
@@ -139,9 +139,9 @@ $width-col-fee-reward-desktop: 16%;
     display: flex;
     flex-wrap: wrap;
     padding: 0 20px 22px 20px;
-    font-family: "Muli", sans-serif;
+    font-family: 'Muli', sans-serif;
     .history-token-grid-header__col {
-      font-family: "Muli", sans-serif;
+      font-family: 'Muli', sans-serif;
       font-size: 12px;
       font-weight: 600;
       line-height: 1.5;
@@ -161,7 +161,7 @@ $width-col-fee-reward-desktop: 16%;
   }
   .history-token-grid-row,
   .history-token-grid-row-inner {
-    font-family: "Muli", sans-serif;
+    font-family: 'Muli', sans-serif;
     background-color: var(--history-row);
     display: flex;
     flex-wrap: wrap;
@@ -176,7 +176,7 @@ $width-col-fee-reward-desktop: 16%;
     .history-token-grid-row__col,
     .history-token-grid-row-inner__col {
       display: flex;
-      font-family: "Muli", sans-serif;
+      font-family: 'Muli', sans-serif;
       font-size: 18px;
       font-weight: 800;
       color: var(--primary-text);
@@ -237,7 +237,7 @@ $width-col-fee-reward-desktop: 16%;
             border-bottom: 1px dashed #8992a4;
             display: inline-block;
             &:after {
-              content: "";
+              content: '';
               position: absolute;
               right: -13px;
               top: calc(50% - 2px);
@@ -250,7 +250,7 @@ $width-col-fee-reward-desktop: 16%;
             span {
               color: var(--primary-text);
               &:after {
-                content: "";
+                content: '';
                 position: absolute;
                 right: -13px;
                 top: calc(50% - 2px);
@@ -296,7 +296,7 @@ $width-col-fee-reward-desktop: 16%;
     &:not(:last-child) {
       position: relative;
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         bottom: 0;
         left: 15px;

@@ -2,7 +2,7 @@
   background-size: 1920px 1440px;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url("../../assets/images/bg.png");
+  background-image: url('../../assets/images/bg.png');
   height: 100%;
   .pages-wrap {
     justify-content: space-between;
@@ -14,7 +14,6 @@
     }
   }
 }
-
 
 .landing-page {
   .landing-page__main {
@@ -67,7 +66,7 @@
 
             $border: 0.5rem;
             &:before {
-              content: "";
+              content: '';
               position: absolute;
               top: 0;
               right: 0;

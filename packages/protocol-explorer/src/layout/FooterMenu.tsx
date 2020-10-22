@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 export const FooterMenu = () => {
   return (
     <div className="footer-menu">
@@ -32,9 +32,11 @@ export const FooterMenu = () => {
           <a href="https://angel.co/company/bzx-1/jobs">Careers</a>
           <a href="https://bzx.network/press">Press</a>
           <a href="https://bzx.network/media-assets">Media assets</a>
-          <a href="#" className="contact-us-button">Contact us</a>
+          <a href="#" className="contact-us-button">
+            Contact us
+          </a>
         </div>
       </div>
     </div>
-  );
+  )
 }

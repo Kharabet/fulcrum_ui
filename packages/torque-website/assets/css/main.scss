@@ -3,27 +3,27 @@
 
 @import url('https://fonts.googleapis.com/css?family=Muli:400,600,700,800,900&display=swap');
 
-@import "_variables";
-@import "_reset";
-@import "_base"; 
+@import '_variables';
+@import '_reset';
+@import '_base';
 
-@import "components/_flex";
-@import "components/_container";
-@import "components/_spacing";
-@import "components/_typography";
-@import "components/_switch";
-@import "components/_svg";
-@import "components/_accordion";
-@import "components/_button";
-@import "components/_forms";
-@import "components/_backgrounds";
-@import "components/_visibility";
-@import "components/_modal";
-@import "components/_loader";
+@import 'components/_flex';
+@import 'components/_container';
+@import 'components/_spacing';
+@import 'components/_typography';
+@import 'components/_switch';
+@import 'components/_svg';
+@import 'components/_accordion';
+@import 'components/_button';
+@import 'components/_forms';
+@import 'components/_backgrounds';
+@import 'components/_visibility';
+@import 'components/_modal';
+@import 'components/_loader';
 
-@import "layouts/_header";
-@import "layouts/_footer";
-@import "layouts/_sections";
+@import 'layouts/_header';
+@import 'layouts/_footer';
+@import 'layouts/_sections';
 
-@import "pages/_404";
-@import "pages/_additional";
+@import 'pages/_404';
+@import 'pages/_additional';

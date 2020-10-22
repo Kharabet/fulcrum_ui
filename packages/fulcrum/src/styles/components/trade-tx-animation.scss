@@ -8,7 +8,7 @@
     transform: rotateX(-90deg);
     animation: closeTabTx 0.6s cubic-bezier(1, 1, 1, 1);
     &:before {
-      content: "";
+      content: '';
       position: absolute;
       bottom: 0;
       left: 0;
@@ -17,7 +17,7 @@
       border-top: 101px solid transparent;
     }
     &:after {
-      content: "";
+      content: '';
       position: absolute;
       bottom: 0;
       right: 0;
@@ -41,16 +41,16 @@
     background-color: var(--secondary-row);
     margin-bottom: 1px;
     position: relative;
-    @media screen and (min-width: $breakpoint-mobile-min){
+    @media screen and (min-width: $breakpoint-mobile-min) {
       padding-left: 40px;
     }
-    @media screen and (max-width: $breakpoint-mobile-max){
+    @media screen and (max-width: $breakpoint-mobile-max) {
       padding-left: 15px;
     }
     &.open-tab-tx {
       animation: openTabTx 0.6s cubic-bezier(1, 1, 1, 1);
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         bottom: 0;
         left: 0;
@@ -59,7 +59,7 @@
         border-top: 101px solid transparent;
       }
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         bottom: 0;
         right: 0;
@@ -73,11 +73,11 @@
       line-height: 1.4;
       font-weight: 800;
       color: #00c0ab;
-      @media screen and (min-width: $breakpoint-mobile-min){
+      @media screen and (min-width: $breakpoint-mobile-min) {
         font-size: 22px;
         padding-left: 40px;
       }
-      @media screen and (max-width: $breakpoint-mobile-max){
+      @media screen and (max-width: $breakpoint-mobile-max) {
         font-size: 14px;
         padding-left: 15px;
         width: calc(100% - 85px);

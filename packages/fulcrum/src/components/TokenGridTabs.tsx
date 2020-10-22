@@ -1,42 +1,41 @@
-import React, { Component } from "react";
-import { Asset } from "../domain/Asset";
-import { ManageTokenGridHeader } from "./ManageTokenGridHeader";
-import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from "./DropdownSelect";
-import { IMarketPair } from "../pages/TradePage";
-import "../styles/components/token-grid-tabs.scss";
-import { ManageButton } from "./ManageButton";
+import React, { Component } from 'react'
+import { Asset } from '../domain/Asset'
+import { ManageTokenGridHeader } from './ManageTokenGridHeader'
+import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from './DropdownSelect'
+import { IMarketPair } from '../pages/TradePage'
+import '../styles/components/token-grid-tabs.scss'
+import { ManageButton } from './ManageButton'
 
 export interface ITokenGridTabsProps {
-  selectedMarket: IMarketPair;
-  isMobile: boolean;
-  baseTokens: Asset[];
-  quoteTokens: Asset[];
-  isShowMyTokensOnly: boolean;
-  isShowHistory: boolean;
-  openedPositionsCount: number;
+  selectedMarket: IMarketPair
+  isMobile: boolean
+  baseTokens: Asset[]
+  quoteTokens: Asset[]
+  isShowMyTokensOnly: boolean
+  isShowHistory: boolean
+  openedPositionsCount: number
 
-  onMarketSelect: (baseToken: Asset, quoteToken: Asset) => void;
-  onShowMyTokensOnlyChange: (value: boolean) => void;
-  onShowHistory: (value: boolean) => void;
+  onMarketSelect: (baseToken: Asset, quoteToken: Asset) => void
+  onShowMyTokensOnlyChange: (value: boolean) => void
+  onShowHistory: (value: boolean) => void
 }
 
 interface ITokenGridTabsState {
   //  isPro: boolean;
-  isShowMyTokensOnly: boolean;
-  isShowHistory: boolean;
+  isShowMyTokensOnly: boolean
+  isShowHistory: boolean
 }
 
 export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabsState> {
   constructor(props: ITokenGridTabsProps, context?: any) {
-    super(props, context);
+    super(props, context)
     this.state = {
       isShowMyTokensOnly: props.isShowMyTokensOnly,
-      isShowHistory: props.isShowHistory,
+      isShowHistory: props.isShowHistory
       // isPro: false
-    };
+    }
     // this.onSwitchPro = this.onSwitchPro.bind(this);
   }
-
 
   // private renderAsset = (asset: Asset) => {
   //   const assetDetails = AssetsDictionary.assets.get(asset);
@@ -61,7 +60,6 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   //   );
   // }
 
-
   // private async onSelectClick(event: React.MouseEvent<HTMLElement>, asset: Asset) {
   //   event.stopPropagation();
 
@@ -75,21 +73,20 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     //   this.showMyTokensOnlyChange();
     //   return;
     // }
-    const baseToken = baseTokenString as Asset;
-    const quoteToken = quoteTokenString as Asset;
+    const baseToken = baseTokenString as Asset
+    const quoteToken = quoteTokenString as Asset
 
     await this.setState({ ...this.state, isShowMyTokensOnly: false })
-    await this.props.onShowMyTokensOnlyChange(false);
-    await this.props.onMarketSelect(baseToken, quoteToken);
+    await this.props.onShowMyTokensOnlyChange(false)
+    await this.props.onMarketSelect(baseToken, quoteToken)
   }
-
 
   public render() {
     // var selectedAsset = AssetsDictionary.assets.get(this.props.selectedTabAsset);
     // var displayName = !!selectedAsset ? selectedAsset.displayName : "manage";
 
     return (
-      <div className={`trade-token-grid-tab`} >
+      <div className={`trade-token-grid-tab`}>
         <div className="trade-token-grid-tab__container">
           <div className="trade-token-grid-tab__selector">
             <DropdownSelect {...this.getDropdownProps()} />
@@ -100,7 +97,8 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               {...this.props}
               isShowMyTokensOnly={this.state.isShowMyTokensOnly}
               isShowHistory={this.state.isShowHistory}
-              updateStateisShowHistory={this.updateStateisShowHistory} />
+              updateStateisShowHistory={this.updateStateisShowHistory}
+            />
 
             {/* <ManageButton {...this.props} isShowMyTokensOnly={this.state.isShowMyTokensOnly} /> */}
           </div>
@@ -125,39 +123,39 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   }
 
   public showMyTokensOnlyChange = async () => {
-    await this.props.onShowMyTokensOnlyChange(true);
+    await this.props.onShowMyTokensOnlyChange(true)
     await this.setState({ ...this.state, isShowMyTokensOnly: true })
   }
 
   public updateStateisShowHistory = async (updatedState: boolean) => {
-    this.showMyTokensOnlyChange();
-    await this.props.onShowHistory(updatedState);
+    this.showMyTokensOnlyChange()
+    await this.props.onShowHistory(updatedState)
     await this.setState({ isShowHistory: updatedState })
   }
 
   private getDropdownProps(): IDropdownSelectProps {
-
-    let dropDownSelectOptions: IDropDownSelectOption[] = [];
-    this.props.baseTokens.forEach(baseToken => {
-
-      this.props.quoteTokens.forEach(stablecoin =>
-        baseToken != stablecoin && dropDownSelectOptions.push({
-          baseToken: baseToken,
-          quoteToken: stablecoin
-        })
-      );
-
-    });
+    let dropDownSelectOptions: IDropDownSelectOption[] = []
+    this.props.baseTokens.forEach((baseToken) => {
+      this.props.quoteTokens.forEach(
+        (stablecoin) =>
+          baseToken != stablecoin &&
+          dropDownSelectOptions.push({
+            baseToken: baseToken,
+            quoteToken: stablecoin
+          })
+      )
+    })
 
     // dropDownSelectOptions.push({
     //   value: "manage",
     //   displayName: "Manage"
     // });
 
-    let activeDropDownOption = dropDownSelectOptions.find(option =>
-      option.baseToken === this.props.selectedMarket.baseToken &&
-      option.quoteToken === this.props.selectedMarket.quoteToken
-    );
+    let activeDropDownOption = dropDownSelectOptions.find(
+      (option) =>
+        option.baseToken === this.props.selectedMarket.baseToken &&
+        option.quoteToken === this.props.selectedMarket.quoteToken
+    )
 
     return {
       options: dropDownSelectOptions,

@@ -1,114 +1,114 @@
 .button {
-    font-family: "Muli", sans-serif;
-    line-height: 1.5;
-    text-decoration: none;
-    border-radius: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  font-family: 'Muli', sans-serif;
+  line-height: 1.5;
+  text-decoration: none;
+  border-radius: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .button-primary {
-    background-color: #00c0ab;
-    color: #ffffff;
-    &:hover {
-        color: #fff;
-        background-color: #33dfcc;
-        box-shadow: 0px 13px 36px rgba(15, 204, 183, 0.4);
-    }
+  background-color: #00c0ab;
+  color: #ffffff;
+  &:hover {
+    color: #fff;
+    background-color: #33dfcc;
+    box-shadow: 0px 13px 36px rgba(15, 204, 183, 0.4);
+  }
 }
 .button-secondary {
-    background-color: #003cda;
-    &:hover {
-        color: #fff;
-        background-color: #5b88ff;
-        box-shadow: 0px 13px 36px rgba(0, 82, 255, 0.4);
-    }
-    color: #ffffff;
+  background-color: #003cda;
+  &:hover {
+    color: #fff;
+    background-color: #5b88ff;
+    box-shadow: 0px 13px 36px rgba(0, 82, 255, 0.4);
+  }
+  color: #ffffff;
 }
 .button-white {
-    border: 3px solid #b9c7d6;
-    background-color: var(--btn-white-bg);
-    color: #b9c7d6;
-    &:hover {
-        background-color: #b9c7d6;
-        color: #ffffff;
-        path{
-            stroke: #ffffff;
-        }
+  border: 3px solid #b9c7d6;
+  background-color: var(--btn-white-bg);
+  color: #b9c7d6;
+  &:hover {
+    background-color: #b9c7d6;
+    color: #ffffff;
+    path {
+      stroke: #ffffff;
     }
+  }
 }
 .button-green {
-    border: 2px solid #00c0ab;
-    background-color: var(--btn-green-bg);
-    color: var(--btn-green-color);
-    &:hover {
-        background-color: #33dfcc;
-        border-color: #33dfcc;
-        color: #ffffff;
-    }
+  border: 2px solid #00c0ab;
+  background-color: var(--btn-green-bg);
+  color: var(--btn-green-color);
+  &:hover {
+    background-color: #33dfcc;
+    border-color: #33dfcc;
+    color: #ffffff;
+  }
 }
 .button-lg {
-    width: 250px;
-    font-weight: 700;
-    @media (min-width: 768px) {
-        height: 80px;
-        font-size: 26px;
-    }
-    @media (max-width: 767px) {
-        height: 65px;
-        font-size: 20px;
-    }
+  width: 250px;
+  font-weight: 700;
+  @media (min-width: 768px) {
+    height: 80px;
+    font-size: 26px;
+  }
+  @media (max-width: 767px) {
+    height: 65px;
+    font-size: 20px;
+  }
 }
 .button-md {
-    font-weight: 600;
-    @media (min-width: 768px) {
-        width: 250px;
-        height: 70px;
-        font-size: 22px;
-    }
-    @media (max-width: 767px) {
-        width: 145px;
-        height: 55px;
-        font-size: 16px;
-    }
+  font-weight: 600;
+  @media (min-width: 768px) {
+    width: 250px;
+    height: 70px;
+    font-size: 22px;
+  }
+  @media (max-width: 767px) {
+    width: 145px;
+    height: 55px;
+    font-size: 16px;
+  }
 }
 .button-sm {
-    width: 180px;
-    height: 50px;
-    font-size: 16px;
-    font-weight: 600;
+  width: 180px;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
 }
 .button-xs {
-    width: 66px;
-    height: 36px;
-    min-height: 36px;
-    font-weight: 600;
+  width: 66px;
+  height: 36px;
+  min-height: 36px;
+  font-weight: 600;
 }
 .button-group-gains {
-    background-color: var(--secondary-bg);
-    border-radius: 29px;
-    display: flex;
-    padding: 1px;
-    .button-gains {
-        font-family: "Muli", sans-serif;
-        color: var(--earn-color-hover);
-        font-size: 15px;
-        line-height: 1.5;
-        font-weight: 700;
-        cursor: pointer;
-        @media (min-width: 768px) {
-            width: 46px;
-            height: 46px;
-        }
-        @media (max-width: 767px) {
-            width: 38px;
-            height: 38px;
-        }
-        &.active {
-            background-color: #276bfb;
-            color: #ffffff;
-            border-radius: 50%;
-        }
+  background-color: var(--secondary-bg);
+  border-radius: 29px;
+  display: flex;
+  padding: 1px;
+  .button-gains {
+    font-family: 'Muli', sans-serif;
+    color: var(--earn-color-hover);
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 700;
+    cursor: pointer;
+    @media (min-width: 768px) {
+      width: 46px;
+      height: 46px;
     }
+    @media (max-width: 767px) {
+      width: 38px;
+      height: 38px;
+    }
+    &.active {
+      background-color: #276bfb;
+      color: #ffffff;
+      border-radius: 50%;
+    }
+  }
 }

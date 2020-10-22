@@ -25,7 +25,7 @@
       right: 0;
       top: 0;
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         height: 19px;
         width: 19px;
@@ -36,7 +36,7 @@
         border-radius: 50%;
       }
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         background-color: var(--switch-button-after);
         width: 19px;

@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 interface IFooterMenuProps {
-  isRiskDisclosureModalOpen: () => void;
+  isRiskDisclosureModalOpen: () => void
 }
 
 export class FooterMenu extends Component<IFooterMenuProps> {
@@ -25,11 +25,9 @@ export class FooterMenu extends Component<IFooterMenuProps> {
           <a href="https://bzx.network/faq-fulcrum.html">FAQ</a>
         </div>
         <div className="footer-menu__item">
-          <Link to="/stats">
-            Stats
-              </Link>
+          <Link to="/stats">Stats</Link>
         </div>
       </div>
-    );
+    )
   }
 }

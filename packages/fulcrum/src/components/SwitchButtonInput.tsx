@@ -1,8 +1,8 @@
-import React from 'react';
+import React from 'react'
 
 export interface ISwitchButtonInputProps {
-  onSwitch: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  type: string;
+  onSwitch: (e: React.ChangeEvent<HTMLInputElement>) => void
+  type: string
 }
 
 export const SwitchButtonInput = (props: ISwitchButtonInputProps) => {

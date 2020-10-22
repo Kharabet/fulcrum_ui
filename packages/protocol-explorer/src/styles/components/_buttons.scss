@@ -1,5 +1,5 @@
 button {
-  font-family: "Muli", sans-serif;
+  font-family: 'Muli', sans-serif;
   cursor: pointer;
   border: none;
   outline: none;
@@ -18,7 +18,7 @@ button {
 }
 .group-button {
   display: flex;
-  @media screen and (max-width: $width-max-sm){
+  @media screen and (max-width: $width-max-sm) {
     margin-top: 30px;
   }
   button {

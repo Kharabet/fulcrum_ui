@@ -1,5 +1,5 @@
-@import "../abstracts/mixins";
-@import "../abstracts/variables";
+@import '../abstracts/mixins';
+@import '../abstracts/variables';
 
 .trade-form {
   @include clearfix();
@@ -112,7 +112,7 @@
   }
 
   &__kv-container--w_dots {
-    background-image: url("../../assets/images/dotted_line.png");
+    background-image: url('../../assets/images/dotted_line.png');
     background-repeat: repeat-x;
     background-position-y: 1.25rem;
   }
@@ -377,7 +377,7 @@
       align-items: flex-start;
       position: relative;
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         border: 16px solid transparent;
         border-top: 16px solid #ffffff;
@@ -501,7 +501,7 @@
     }
 
     &__kv-container--w_dots {
-      background-image: url("../../assets/images/dotted_line.png");
+      background-image: url('../../assets/images/dotted_line.png');
       background-repeat: repeat-x;
       background-position-y: 1.25rem;
     }

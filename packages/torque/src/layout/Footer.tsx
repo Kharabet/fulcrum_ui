@@ -1,9 +1,9 @@
-import React, { Component } from "react";
-import { FooterMenu } from "./FooterMenu";
-import { FooterVersion } from "./FooterVersion";
+import React, { Component } from 'react'
+import { FooterMenu } from './FooterMenu'
+import { FooterVersion } from './FooterVersion'
 
 interface IFooterProps {
-  isRiskDisclosureModalOpen: () => void;
+  isRiskDisclosureModalOpen: () => void
 }
 
 export class Footer extends Component<IFooterProps> {
@@ -11,8 +11,8 @@ export class Footer extends Component<IFooterProps> {
     return (
       <footer className="footer">
         <FooterVersion />
-        <FooterMenu  {...this.props}/>
+        <FooterMenu {...this.props} />
       </footer>
-    );
+    )
   }
 }

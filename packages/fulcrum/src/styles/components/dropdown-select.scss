@@ -1,4 +1,4 @@
-@import "../abstracts/variables.scss";
+@import '../abstracts/variables.scss';
 
 .styled-select {
   background-color: var(--select-bg);
@@ -28,7 +28,7 @@
     }
   }
   &:after {
-    content: "";
+    content: '';
     width: 0;
     height: 0;
     border: 5px solid transparent;
@@ -128,7 +128,7 @@
     font-size: 14px;
   }
 
-  [class*="icon"] {
+  [class*='icon'] {
     position: absolute;
     top: 9px;
     height: 28px;
@@ -183,7 +183,7 @@
     &:only-child {
       border-radius: 4px;
     }
-    &[rel="hide"] {
+    &[rel='hide'] {
       display: none;
     }
   }

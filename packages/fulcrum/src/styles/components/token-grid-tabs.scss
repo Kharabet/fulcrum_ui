@@ -1,4 +1,4 @@
-@import "../abstracts/variables";
+@import '../abstracts/variables';
 
 .trade-token-grid-tab {
   &__container {
@@ -69,7 +69,7 @@
     }
   }
   .manage-tab {
-    [data-theme="light"] & svg path {
+    [data-theme='light'] & svg path {
       fill: #c8c8c8;
     }
   }

@@ -104,7 +104,7 @@
                 margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
               }
 
-              &[type="number"] {
+              &[type='number'] {
                 -moz-appearance: textfield; /* Firefox */
               }
             }
@@ -281,7 +281,7 @@
             &:after {
               position: absolute;
               // z-index: -1;
-              content: "";
+              content: '';
               right: calc(50% - 10px);
               bottom: -10px;
               border-style: solid;
@@ -400,7 +400,7 @@
           padding: 20px 50px;
           border: none;
           outline: none;
-          font-family: "Muli", sans-serif;
+          font-family: 'Muli', sans-serif;
           font-weight: 800;
           font-size: 16px;
           line-height: 140%;
@@ -430,8 +430,13 @@
         &:hover {
           background-color: transparent;
           border: 1px solid #a9b5c7;
-          .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount,
-          .refinance-asset__main-block .refinance-asset-selector__torque .refinance-asset-selector__cdp {
+          .refinance-asset__main-block
+            .refinance-asset-selector__non-torque
+            .refinance__input-container
+            .input-amount,
+          .refinance-asset__main-block
+            .refinance-asset-selector__torque
+            .refinance-asset-selector__cdp {
             background-color: #f5f7f9;
           }
           .refinance-asset-selector__collateral-slider {

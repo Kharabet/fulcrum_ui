@@ -1,7 +1,7 @@
 .container {
   margin-left: auto;
   margin-right: auto;
-  &.container-lg {    
+  &.container-lg {
     @media screen and (min-width: $breakpoint-xl-up) {
       width: 1170px;
     }
@@ -12,7 +12,7 @@
       width: 100%;
     }
   }
-  &.container-md {    
+  &.container-md {
     @media screen and (min-width: $breakpoint-xl-up) {
       width: 940px;
     }
@@ -23,7 +23,7 @@
       width: 100%;
     }
   }
-  &.container-sm {    
+  &.container-sm {
     @media screen and(min-width: $breakpoint-sm-up) {
       width: 760px;
     }
@@ -86,7 +86,7 @@
   .col-xl-10 {
     width: calc(100% / 12 * 10);
   }
-  .col-xl-11{
+  .col-xl-11 {
     width: calc(100% / 12 * 11);
   }
   .col-xl-12 {

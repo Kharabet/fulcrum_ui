@@ -1,4 +1,4 @@
-.grid-wrapper{
+.grid-wrapper {
   overflow-x: scroll;
   &::-webkit-scrollbar {
     display: none;
@@ -21,7 +21,7 @@
   .grid-body {
     display: flex;
     align-items: center;
-   
+
     @media screen and (min-width: $width-min-sm) {
       padding: 20px 30px;
       .tx {
@@ -58,7 +58,6 @@
         width: 10%;
       }
     }
-    
   }
   .grid-header {
     border-bottom: 2px solid #33dfcc;

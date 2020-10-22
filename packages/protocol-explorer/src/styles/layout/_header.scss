@@ -102,7 +102,7 @@ header {
     &.active {
       position: relative;
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         left: 0;
         background-color: $primary-color;

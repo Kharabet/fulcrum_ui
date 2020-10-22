@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import packageJson from "../../package.json";
+import React, { Component } from 'react'
+import packageJson from '../../package.json'
 
 export class FooterVersion extends Component {
   public render() {
@@ -10,6 +10,6 @@ export class FooterVersion extends Component {
           Powered by <a href="//bzx.network">bZx</a>
         </div>
       </div>
-    );
+    )
   }
 }

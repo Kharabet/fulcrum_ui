@@ -20,7 +20,7 @@
   padding-top: 20px;
   padding-bottom: 20px;
 
-  font-family: "Muli", sans-serif;
+  font-family: 'Muli', sans-serif;
   font-style: normal;
   font-weight: normal;
   font-size: 12px;
@@ -60,7 +60,7 @@
 }
 
 @media screen and (max-width: $breakpoint-mobile-max) {
-  .footer-container{
+  .footer-container {
     width: 100%;
   }
   .footer {
@@ -90,10 +90,10 @@
       flex-wrap: wrap;
       justify-content: center;
       width: 100%;
-      .footer-menu__item{
-        width: 33%; 
+      .footer-menu__item {
+        width: 33%;
         margin: 0;
-        text-align: center; 
+        text-align: center;
         margin-bottom: 15px;
       }
       .footer-menu__item:not(:first-child) {

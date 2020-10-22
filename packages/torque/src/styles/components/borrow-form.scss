@@ -27,7 +27,7 @@
       -webkit-appearance: none;
       margin: 0;
     }
-    &[type="number"] {
+    &[type='number'] {
       -moz-appearance: textfield;
     }
     &:hover,
@@ -132,7 +132,7 @@
       align-items: center;
 
       &:after {
-        content: "%";
+        content: '%';
         position: absolute;
         font-size: 20px;
         color: #758295;
@@ -157,7 +157,7 @@
     .lh {
       line-height: 2.375 !important;
     }
-    .mb-15{
+    .mb-15 {
       margin-bottom: 15px;
     }
   }
@@ -181,7 +181,7 @@
       }
     }
   }
-  &__error{
+  &__error {
     color: #de4a4a;
   }
 }

@@ -114,7 +114,7 @@ blockquote {
 }
 blockquote:before,
 blockquote:after {
-  content: "";
+  content: '';
   content: none;
 }
 table {
@@ -129,8 +129,8 @@ td {
   vertical-align: middle;
 }
 button {
-    background-color: transparent;
-    border: none;
-    outline: none;
-    padding: 0;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
 }

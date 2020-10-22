@@ -31,7 +31,7 @@ $checkmark-symbol-color: #000000;
     border-radius: $checkmark-border-radius;
 
     &:after {
-      content: "";
+      content: '';
       position: absolute;
       display: none;
 
@@ -48,7 +48,7 @@ $checkmark-symbol-color: #000000;
     }
   }
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     display: none;
 
     &:checked + .cb-checkmark {

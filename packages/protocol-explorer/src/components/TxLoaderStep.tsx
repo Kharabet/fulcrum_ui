@@ -1,165 +1,190 @@
-import React, { Component } from "react";
+import React, { Component } from 'react'
 
-import { RequestTask } from "../domain/RequestTask";
-import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
-import { TasksQueue } from "../services/TasksQueue";
-import { ExplorerProvider } from "../services/ExplorerProvider";
-import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
+import { RequestTask } from '../domain/RequestTask'
+import { TasksQueueEvents } from '../services/events/TasksQueueEvents'
+import { TasksQueue } from '../services/TasksQueue'
+import { ExplorerProvider } from '../services/ExplorerProvider'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 
-import { toChecksumAddress } from "web3-utils";
+import { toChecksumAddress } from 'web3-utils'
 
 export interface ITitle {
-    message: string;
-    isWarning: boolean;
+  message: string
+  isWarning: boolean
 }
 
 export interface ITxLoaderStepProps {
-    taskId: string;
+  taskId: string
 }
 
 export interface ITxLoaderStepState {
-    requestTask: RequestTask | undefined;
-    complete: boolean;
-    title: ITitle | null;
+  requestTask: RequestTask | undefined
+  complete: boolean
+  title: ITitle | null
 }
 
 export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepState> {
-    constructor(props: ITxLoaderStepProps) {
-        super(props);
+  constructor(props: ITxLoaderStepProps) {
+    super(props)
 
-        this.state = {
-            requestTask: TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId),
-            title: { message: "Loading", isWarning: false },
-            complete: false
-        };
-
-        TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
-        TasksQueue.Instance.on(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
-        this.stepDiv = React.createRef();
-        this._isMounted = false;
+    this.state = {
+      requestTask: TasksQueue.Instance.getTasksList().find(
+        (t) => t.request.loanId === this.props.taskId
+      ),
+      title: { message: 'Loading', isWarning: false },
+      complete: false
     }
 
-    private _isMounted: boolean;
+    TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged)
+    TasksQueue.Instance.on(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged)
+    this.stepDiv = React.createRef()
+    this._isMounted = false
+  }
 
-    private stepDiv: React.RefObject<HTMLDivElement>;
+  private _isMounted: boolean
 
-    public componentDidMount(): void {
-        this._isMounted = true;
+  private stepDiv: React.RefObject<HTMLDivElement>
 
-        this.setState({ ...this.state, title: this.getTitle(this.state.requestTask) });
+  public componentDidMount(): void {
+    this._isMounted = true
 
-        const div = this.stepDiv.current;
-        if (!div) return;
-        div.classList.remove("animation-in");
-        div.classList.add("animation-in");
+    this.setState({ ...this.state, title: this.getTitle(this.state.requestTask) })
+
+    const div = this.stepDiv.current
+    if (!div) return
+    div.classList.remove('animation-in')
+    div.classList.add('animation-in')
+  }
+
+  public componentDidUpdate(
+    prevProps: Readonly<ITxLoaderStepProps>,
+    prevState: Readonly<ITxLoaderStepState>
+  ): void {
+    const div = this.stepDiv.current
+    if (!div) return
+    if (
+      prevState.requestTask &&
+      this.state.requestTask &&
+      this.getTitle(prevState.requestTask) === this.getTitle(this.state.requestTask)
+    )
+      return
+    div.classList.remove('animation-out')
+    div.classList.remove('animation-in')
+    div.classList.add('animation-in')
+  }
+
+  public componentWillUnmount(): void {
+    this._isMounted = false
+
+    const div = this.stepDiv.current
+    if (div) {
+      div.classList.remove('animation-out')
+      div.classList.add('animation-out')
     }
 
-    public componentDidUpdate(prevProps: Readonly<ITxLoaderStepProps>, prevState: Readonly<ITxLoaderStepState>): void {
+    TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged)
+    TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged)
+  }
 
-        const div = this.stepDiv.current;
-        if (!div) return;
-        if (prevState.requestTask && this.state.requestTask && this.getTitle(prevState.requestTask) === this.getTitle(this.state.requestTask)) return;
-        div.classList.remove("animation-out");
-        div.classList.remove("animation-in");
-        div.classList.add("animation-in");
-    }
+  public getTitle = (requestTask: RequestTask | undefined) => {
+    if (requestTask === undefined) return null
+    let title = requestTask.steps.find((s, i) => i + 1 === requestTask!.stepCurrent)
+    if (!title) title = requestTask.status
 
-    public componentWillUnmount(): void {
-        this._isMounted = false;
+    let errorMsg = ''
+    if (requestTask.error) {
+      if (requestTask.error.message) {
+        errorMsg = requestTask.error.message
+      } else if (typeof requestTask.error === 'string') {
+        errorMsg = requestTask.error
+      }
 
-        const div = this.stepDiv.current;
-        if (div) {
-            div.classList.remove("animation-out");
-            div.classList.add("animation-out");
+      if (errorMsg) {
+        if (
+          errorMsg.includes(
+            `Request for method "eth_estimateGas" not handled by any subprovider`
+          ) ||
+          errorMsg.includes(`always failing transaction`)
+        ) {
+          errorMsg =
+            'The transaction seems like it will fail. Change request parameters and try agian, please.' //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
+        } else if (errorMsg.includes('Reverted by EVM')) {
+          errorMsg = 'The transaction failed. Reverted by EVM' //. Etherscan link:";
+        } else if (errorMsg.includes('MetaMask Tx Signature: User denied transaction signature.')) {
+          errorMsg = "You didn't confirm in MetaMask. Please try again."
+        } else if (errorMsg.includes('User denied account authorization.')) {
+          errorMsg = "You didn't authorize MetaMask. Please try again."
+        } else if (errorMsg.includes('Transaction rejected')) {
+          errorMsg = "You didn't confirm in Gnosis Safe. Please try again."
+        } else {
+          errorMsg = requestTask.status
         }
-
-        TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
-        TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
+      }
     }
+    if (errorMsg) title = errorMsg
 
+    return { message: title, isWarning: errorMsg !== '' }
+  }
 
-    public getTitle = (requestTask: RequestTask | undefined) => {
-        if (requestTask === undefined) return null;
-        let title = requestTask.steps.find((s, i) => i + 1 === requestTask!.stepCurrent)
-        if (!title)
-            title = requestTask.status;
+  public render() {
+    if (!this.state.title) return null
+    return (
+      <React.Fragment>
+        {this.state.requestTask && this.state.requestTask.txHash ? (
+          <a
+            href={`${ExplorerProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${
+              this.state.requestTask!.txHash
+            }`}
+            target="_blank"
+            rel="noopener noreferrer">
+            <div
+              ref={this.stepDiv}
+              className={`transaction-step ${this.state.title.isWarning ? 'warning' : ''}`}>
+              {this.state.title.message}
+            </div>
+          </a>
+        ) : (
+          <div
+            ref={this.stepDiv}
+            className={`transaction-step ${this.state.title.isWarning ? 'warning' : ''}`}>
+            {this.state.title.message}
+          </div>
+        )}
+      </React.Fragment>
+    )
+  }
 
+  public onTasksQueueChanged = async () => {
+    const task = TasksQueue.Instance.getTasksList().find(
+      (t) => t.request.loanId === this.props.taskId
+    )
+    let title = this.getTitle(task)
+    if (!title && this.state.requestTask?.status == 'Done')
+      title = { message: 'Updating data', isWarning: false }
 
-        let errorMsg = "";
-        if (requestTask.error) {
-            if (requestTask.error.message) {
-                errorMsg = requestTask.error.message;
-            } else if (typeof requestTask.error === "string") {
-                errorMsg = requestTask.error;
-            }
+    this._isMounted &&
+      this.setState({
+        ...this.state,
+        title: title
+      })
 
-            if (errorMsg) {
-                if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`) ||
-                    errorMsg.includes(`always failing transaction`)) {
-                    errorMsg = "The transaction seems like it will fail. Change request parameters and try agian, please."; //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
-                } else if (errorMsg.includes("Reverted by EVM")) {
-                    errorMsg = "The transaction failed. Reverted by EVM"; //. Etherscan link:";
-                } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-                    errorMsg = "You didn't confirm in MetaMask. Please try again.";
-                } else if (errorMsg.includes("User denied account authorization.")) {
-                    errorMsg = "You didn't authorize MetaMask. Please try again.";
-                } else if (errorMsg.includes("Transaction rejected")) {
-                    errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-                } else {
-                    errorMsg = requestTask.status;
-                }
-            }
-        }
-        if (errorMsg)
-            title = errorMsg;
+    const div = this.stepDiv.current
 
-        return { message: title, isWarning: errorMsg !== "" }
+    if (
+      div &&
+      this.state.requestTask &&
+      this.getTitle(task) !== this.getTitle(this.state.requestTask)
+    ) {
+      div.classList.remove('animation-in')
+      div.classList.remove('animation-out')
+      div.classList.add('animation-out')
     }
-
-    public render() {
-
-        if (!this.state.title) return null;
-        return (
-            <React.Fragment>
-                {this.state.requestTask && this.state.requestTask.txHash
-                    ? <a href={`${ExplorerProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash}`} target="_blank" rel="noopener noreferrer">
-                        <div ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
-                            {this.state.title.message}
-                        </div>
-                    </a>
-                    :
-                    <div ref={this.stepDiv} className={`transaction-step ${this.state.title.isWarning ? "warning" : ""}`}>
-                        {this.state.title.message}
-                    </div>
-                }
-            </React.Fragment >
-        )
-    }
-
-    public onTasksQueueChanged = async () => {
-
-        const task = TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId);
-        let title = this.getTitle(task);
-        if (!title && this.state.requestTask?.status == "Done")
-            title = { message: "Updating data", isWarning: false };
-
-        this._isMounted && this.setState({
-            ...this.state,
-            title: title
-        });
-
-        const div = this.stepDiv.current;
-
-        if (div && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
-            div.classList.remove("animation-in");
-            div.classList.remove("animation-out");
-            div.classList.add("animation-out");
-        }
-        window.setTimeout(async () => {
-            await this._isMounted && this.setState({
-                ...this.state,
-                requestTask: task
-            });
-        }, 500)
-    };
+    window.setTimeout(async () => {
+      ;(await this._isMounted) &&
+        this.setState({
+          ...this.state,
+          requestTask: task
+        })
+    }, 500)
+  }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 
 export const TradeTokenGridHeader = () => {
   return (
@@ -22,5 +22,5 @@ export const TradeTokenGridHeader = () => {
         <span className="trade-token-grid-header__text">Est. Yield, vBZRX</span>
       </div>
     </div>
-  );
+  )
 }

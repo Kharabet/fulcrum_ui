@@ -1,58 +1,58 @@
-import { BigNumber } from "@0x/utils";
-import React, { ChangeEvent, Component } from "react";
-import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
-import { ReactComponent as MakerImg } from "../assets/images/maker.svg";
-import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
-import { Asset } from "../domain/Asset";
-import { RefinanceData } from "../domain/RefinanceData";
-import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
-import { TorqueProvider } from "../services/TorqueProvider";
-import { CollateralInfo } from "./CollateralInfo";
-import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
-import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
-import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
-import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { AssetDetails } from "../domain/AssetDetails";
-import Slider from "rc-slider";
-import { NavService } from '../services/NavService';
-import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
-import { Confirm } from "./Confirm";
-import { RequestTask } from "../domain/RequestTask";
-import { RequestStatus } from "../domain/RequestStatus";
-import { TxProcessingLoader } from "./TxProcessingLoader";
-
+import { BigNumber } from '@0x/utils'
+import React, { ChangeEvent, Component } from 'react'
+import { ReactComponent as Arrow } from '../assets/images/arrow.svg'
+import { ReactComponent as MakerImg } from '../assets/images/maker.svg'
+import { ReactComponent as TorqueLogo } from '../assets/images/torque_logo.svg'
+import { Asset } from '../domain/Asset'
+import { RefinanceData } from '../domain/RefinanceData'
+import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
+import { TorqueProvider } from '../services/TorqueProvider'
+import { CollateralInfo } from './CollateralInfo'
+import { ReactComponent as DownArrow } from '../assets/images/down-arrow.svg'
+import { ReactComponent as TopArrow } from '../assets/images/top-arrow.svg'
+import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
+import { ReactComponent as IconInfoActive } from '../assets/images/icon_info_active.svg'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { AssetDetails } from '../domain/AssetDetails'
+import Slider from 'rc-slider'
+import { NavService } from '../services/NavService'
+import { RefinanceMakerRequest } from '../domain/RefinanceMakerRequest'
+import { Confirm } from './Confirm'
+import { RequestTask } from '../domain/RequestTask'
+import { RequestStatus } from '../domain/RequestStatus'
+import { TxProcessingLoader } from './TxProcessingLoader'
 
 export interface IRefinanceAssetSelectorItemProps {
-  isMobileMedia: boolean;
-  asset: Asset;
-  refinanceData: RefinanceData;
+  isMobileMedia: boolean
+  asset: Asset
+  refinanceData: RefinanceData
 }
 
 interface IRefinanceAssetSelectorItemState {
-  isShow: boolean;
-  isShowInfoCollateralAssetDt0: boolean;
-  loan: RefinanceData;
-  borrowAmount: BigNumber;
-  fixedApr: BigNumber;
-  isLoadingTransaction: boolean;
-  loanAssetDt: AssetDetails;
-  collateralAssetDt: AssetDetails;
-  refRateMonth: number;
-  refRateYear: number;
-  isShowConfirm: boolean;
-  request: RefinanceMakerRequest | undefined;
+  isShow: boolean
+  isShowInfoCollateralAssetDt0: boolean
+  loan: RefinanceData
+  borrowAmount: BigNumber
+  fixedApr: BigNumber
+  isLoadingTransaction: boolean
+  loanAssetDt: AssetDetails
+  collateralAssetDt: AssetDetails
+  refRateMonth: number
+  refRateYear: number
+  isShowConfirm: boolean
+  request: RefinanceMakerRequest | undefined
 }
 
-export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
-
+export class RefinanceAssetSelectorItem extends Component<
+  IRefinanceAssetSelectorItemProps,
+  IRefinanceAssetSelectorItemState
+> {
   // constructor(props: IRefinanceAssetSelectorItemProps) {
   //   super(props);
   //   this.state = {
   //     isShow: false,
   //     isShowInfoCollateralAssetDt0: false,
   //     borrowAmount: new BigNumber(0),
-
   //     fixedApr: new BigNumber(0),
   //     loan: props.refinanceData,
   //     isLoadingTransaction: false,
@@ -69,9 +69,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //   TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
   //   TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   // }
-
   // private _isMounted: boolean;
-
   // private onAskToOpenProgressDlg = async (taskId: number) => {
   //   if (!this.state.request || taskId !== this.state.request.id) return;
   //   await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: true })
@@ -86,18 +84,14 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //     return;
   //   }
   //   await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-
   //   NavService.Instance.History.push("/dashboard");
   // }
-
   // private onProviderAvailable = () => {
   //   this.derivedUpdate();
   // };
-
   // private onProviderChanged = () => {
   //   this.derivedUpdate();
   // };
-
   // public componentWillUnmount(): void {
   //   this._isMounted = false;
   //   TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -105,7 +99,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //   TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
   //   TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   // }
-
   // public componentDidMount(): void {
   //   this._isMounted = true;
   //   this.derivedUpdate();
@@ -114,7 +107,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //     borrowAmount: this.state.loan.debt
   //   });
   // }
-
   // public componentDidUpdate(
   //   prevProps: Readonly<IRefinanceAssetSelectorItemProps>,
   //   prevState: Readonly<IRefinanceAssetSelectorItemState>,
@@ -124,7 +116,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //     this.derivedUpdate();
   //   }
   // }
-
   // private derivedUpdate = async () => {
   //   // @ts-ignore
   //   const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.state.loan.collateralType]);
@@ -138,11 +129,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //     borrowAmount: this.state.loan.debt
   //   });
   // };
-
   // public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
   //   // handling different types of empty values
   //   const amountText = event.target.value ? event.target.value : "0";
-
   //   const borrowAmount = new BigNumber(amountText)
   //   const refinanceData = Object.assign({}, this.state.loan);
   //   if (borrowAmount.lt(this.props.refinanceData.debt)) {
@@ -152,7 +141,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //   }
   //   const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
   //   const refRateMonth = refRateYear / 12;
-
   //   await this._isMounted && this.setState({
   //     ...this.state,
   //     borrowAmount: borrowAmount,
@@ -161,10 +149,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //     refRateYear
   //   });
   // };
-
   // public changeCollaterization = async (value: number): Promise<RefinanceData> => {
   //   const newCollaterizationPercent = new BigNumber(value);
-
   //   const refinanceData = Object.assign({}, this.state.loan);
   //   const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(this.state.borrowAmount));
   //   const collaterralWithRatio = collateralAmount.multipliedBy(newCollaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
@@ -173,27 +159,21 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //   refinanceData.isDisabled = newCollaterizationPercent.lte(this.props.refinanceData.maintenanceMargin);
   //   return refinanceData;
   // }
-
   // public onCollaterizationChange = async (value: number) => {
-
   //   if (Math.abs(this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
   //   const updatedLoan = await this.changeCollaterization(value)
-
   //   await this._isMounted && this.setState({
   //     ...this.state,
   //     loan: updatedLoan
   //   });
   // };
-
   // public onDecline = async () => {
   //   await await this._isMounted && this.setState({ ...this.state, isShowConfirm: false });
   // }
-
   // public onConfirm = async () => {
   //   await await this._isMounted && this.setState({ ...this.state, isShowConfirm: false, borrowAmount: this.props.refinanceData.debt });
   //   await this.checkCdpManager();
   // }
-
   // public onSubmit = async () => {
   //   const left = this.state.loan.debt.minus(this.state.borrowAmount);
   //   const isDust = !(this.state.borrowAmount.dp(3, BigNumber.ROUND_DOWN).isEqualTo(this.state.loan.debt.dp(3, BigNumber.ROUND_DOWN)) || left.gt(this.props.refinanceData.dust));
@@ -203,34 +183,27 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //   }
   //   await this.checkCdpManager();
   // }
-
   // private checkCdpManager = async () => {
   //   const request = new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount)
   //   await await this._isMounted && this.setState({ ...this.state, request: request });
   //   await TorqueProvider.Instance.onMigrateMakerLoan(request);
   // };
-
   // public showInfoCollateralAssetDt0 = async () => {
   //   await this._isMounted && this.setState({ ...this.state, isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0 });
   // };
   // public showDetails = async () => {
   //   await this._isMounted && this.setState({ ...this.state, isShow: !this.state.isShow });
   // };
-
   // public render() {
-
   //   const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
   //   const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
-
   //   if (!this.props.refinanceData.isShowCard) return null;
-
   //   // return (
   //   //   <div className={`refinance-asset-selector-item ` + (this.state.isShowConfirm ? `disabled-hover` : ``) + (this.state.isShowInfoCollateralAssetDt0 ? `inactive` : ``)}>
   //   //     {this.state.isShowConfirm &&
   //   //       <Confirm onDecline={this.onDecline} onConfirm={this.onConfirm}>
   //   //         <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
   //   //       </Confirm>}
-
   //   //     {this.state.isLoadingTransaction && this.state.request &&
   //   //       <TxProcessingLoader
   //   //         quantityDots={4}
@@ -239,7 +212,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //   //         taskId={this.state.request.id}
   //   //       />
   //   //     }
-
   //   //     <div className="refinance-asset__main-block">
   //   //       <div className="refinance-asset-selector__non-torque">
   //   //         <div className="refinance-asset-selector__non-torque-logo">
@@ -261,7 +233,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //   //             placeholder={`Amount`}
   //   //             onChange={this.loanAmountChange}
   //   //           />
-
   //   //           <div className="refinance-details-msg--warning">
   //   //             {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
   //   //             {this.state.borrowAmount.gt(this.props.refinanceData.debt) ? "Please enter value less than or equal to " + this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
@@ -313,7 +284,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   //   //         {this.state.isShow &&
   //   //           <div className="refinance-asset-selector__collateral-container">
   //   //             <div className="refinance-asset-selector__collateral">
-
   //   //               <div className="collateral-value">
   //   //                 <div title={this.state.loan.collateralAmount.toFixed()} className={`value ${this.state.loan.isDisabled ? "red" : ""}`}>
   //   //                   {this.state.loan.collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}

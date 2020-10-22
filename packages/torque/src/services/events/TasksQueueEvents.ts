@@ -1,7 +1,6 @@
 export enum TasksQueueEvents {
-    QueueChanged = "QueueChanged",
-    Enqueued = "Enqueued",
-    Dequeued = "Dequeued",
-    TaskChanged = "TaskChanged"
-  }
-  
+  QueueChanged = 'QueueChanged',
+  Enqueued = 'Enqueued',
+  Dequeued = 'Dequeued',
+  TaskChanged = 'TaskChanged'
+}

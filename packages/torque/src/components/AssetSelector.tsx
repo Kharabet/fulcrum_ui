@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"
-import { Asset } from "../domain/Asset"
-import { AssetSelectorItem } from "./AssetSelectorItem"
-import { BorrowDlg } from "./BorrowDlg"
-import { BigNumber } from "@0x/utils"
-import { TorqueProvider } from "../services/TorqueProvider";
-import { Loader } from "../components/Loader";
+import React, { useState, useEffect } from 'react'
+import { Asset } from '../domain/Asset'
+import { AssetSelectorItem } from './AssetSelectorItem'
+import { BorrowDlg } from './BorrowDlg'
+import { BigNumber } from '@0x/utils'
+import { TorqueProvider } from '../services/TorqueProvider'
+import { Loader } from '../components/Loader'
 
 export interface IAssetSelectorProps {
   isLoadingTransaction: boolean
@@ -13,13 +13,12 @@ export interface IAssetSelectorProps {
 }
 
 export const AssetSelector = (props: IAssetSelectorProps) => {
-
-  const apiUrl = "https://api.bzx.network/v1";
+  const apiUrl = 'https://api.bzx.network/v1'
   const [yieldAPYJson, setYieldAPYJson] = useState()
 
   useEffect(() => {
     async function yieldAPYJson() {
-      const yieldAPYRequest = await fetch(`${apiUrl}/yield-farimng-apy`);
+      const yieldAPYRequest = await fetch(`${apiUrl}/yield-farimng-apy`)
       const yieldAPYJson = await yieldAPYRequest.json()
       setYieldAPYJson(yieldAPYJson)
     }
@@ -29,7 +28,7 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
   // true includes ENS support
   let assetsShown: Asset[]
 
-  if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+  if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
     assetsShown = [
       Asset.ETH,
       Asset.DAI,
@@ -42,35 +41,26 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
       Asset.MKR,
       Asset.LEND,
       Asset.KNC
-    ];
-  } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
-    assetsShown = [
-      Asset.USDC,
-      Asset.fWETH,
-      Asset.WBTC
-    ];
-  } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
-    assetsShown = [
-      Asset.DAI,
-      Asset.ETH,
-    ];
+    ]
+  } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+    assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
+  } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
+    assetsShown = [Asset.DAI, Asset.ETH]
   } else {
     assetsShown = []
   }
 
-  const assetSelectorItems = assetsShown.map(asset => {
-    const yieldApr = yieldAPYJson && yieldAPYJson!['success'] && yieldAPYJson!['data'][asset.toLowerCase()]
-      ? new BigNumber(yieldAPYJson!['data'][asset.toLowerCase()])
-      : new BigNumber(0);
+  const assetSelectorItems = assetsShown.map((asset) => {
+    const yieldApr =
+      yieldAPYJson && yieldAPYJson!['success'] && yieldAPYJson!['data'][asset.toLowerCase()]
+        ? new BigNumber(yieldAPYJson!['data'][asset.toLowerCase()])
+        : new BigNumber(0)
 
-    return (
-      <AssetSelectorItem key={asset} yieldApr={yieldApr} asset={asset} {...props} />
-    )
+    return <AssetSelectorItem key={asset} yieldApr={yieldApr} asset={asset} {...props} />
   })
 
   if (!yieldAPYJson || TorqueProvider.Instance.isLoading)
-    return (<Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />)
+    return <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
 
   return <div className="asset-selector">{assetSelectorItems}</div>
-
 }

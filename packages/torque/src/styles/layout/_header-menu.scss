@@ -18,23 +18,23 @@
 }
 
 .header-menu__item {
-  @media screen and (min-width: $breakpoint-desktop-min){
+  @media screen and (min-width: $breakpoint-desktop-min) {
     margin-right: 40px;
-    &:last-child{
+    &:last-child {
       margin-left: 30px;
       margin-right: 0;
     }
   }
-  @media screen and (max-width: $breakpoint-desktop-max){
+  @media screen and (max-width: $breakpoint-desktop-max) {
     margin-right: 45px;
   }
-  
+
   a {
     position: relative;
 
     text-decoration: none;
     text-align: center;
-    font-family: "Muli", sans-serif;
+    font-family: 'Muli', sans-serif;
     font-style: normal;
     font-weight: 600;
     font-size: 18px;
@@ -49,14 +49,13 @@
       top: -6px;
       left: -16px;
     }
-    &:hover .icon-external svg path{
+    &:hover .icon-external svg path {
       stroke: #33dfcc;
     }
 
-
     &.header-menu__item-link--active {
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         width: 60px;
         height: 8px;

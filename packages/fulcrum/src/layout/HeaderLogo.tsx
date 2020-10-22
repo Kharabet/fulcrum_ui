@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
-import { ReactComponent as FulcrumLogo } from "../assets/images/fulcrum_logo.svg";
-import { ReactComponent as FulcrumLogoSign } from "../assets/images/fulcrum_logo_partial.svg";
+import { ReactComponent as FulcrumLogo } from '../assets/images/fulcrum_logo.svg'
+import { ReactComponent as FulcrumLogoSign } from '../assets/images/fulcrum_logo_partial.svg'
 
 export class HeaderLogo extends Component {
   public render() {
@@ -17,6 +17,6 @@ export class HeaderLogo extends Component {
           </div>
         </Link>
       </div>
-    );
+    )
   }
 }

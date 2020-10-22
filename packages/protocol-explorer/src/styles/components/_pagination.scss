@@ -1,22 +1,22 @@
 .pagination {
-    display: flex;
-    justify-content: center;
-    padding: 25px 0;
-    div {
-        padding: 4px 14px;
-        background-color: $sign-color;
-        border-radius: 20px;
-        &:not(.disabled) {
-            cursor: pointer;
-        }
-        &.disabled {
-            background-color: $healthy-color;
-        }
-        &.prev {
-            transform: rotate(180deg);
-        }
-        &.next {
-            margin-left: 7px;
-        }
+  display: flex;
+  justify-content: center;
+  padding: 25px 0;
+  div {
+    padding: 4px 14px;
+    background-color: $sign-color;
+    border-radius: 20px;
+    &:not(.disabled) {
+      cursor: pointer;
     }
+    &.disabled {
+      background-color: $healthy-color;
+    }
+    &.prev {
+      transform: rotate(180deg);
+    }
+    &.next {
+      margin-left: 7px;
+    }
+  }
 }

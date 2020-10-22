@@ -1,71 +1,85 @@
-import { BigNumber } from "@0x/utils";
-import { iTokenContract } from "../../contracts/iTokenContract";
-import { AssetsDictionary } from "../../domain/AssetsDictionary";
-import { LendRequest } from "../../domain/LendRequest";
-import { RequestTask } from "../../domain/RequestTask";
-import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
-import { FulcrumProvider } from "../FulcrumProvider";
+import { BigNumber } from '@0x/utils'
+import { iTokenContract } from '../../contracts/iTokenContract'
+import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import { LendRequest } from '../../domain/LendRequest'
+import { RequestTask } from '../../domain/RequestTask'
+import { FulcrumProviderEvents } from '../events/FulcrumProviderEvents'
+import { FulcrumProvider } from '../FulcrumProvider'
 
 export class LendEthProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
-    if (!(FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite)) {
-      throw new Error("No provider available!");
+    if (
+      !(
+        FulcrumProvider.Instance.contractsSource &&
+        FulcrumProvider.Instance.contractsSource.canWrite
+      )
+    ) {
+      throw new Error('No provider available!')
     }
 
     // Initializing loan
-    const taskRequest: LendRequest = (task.request as LendRequest);
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)); // ETH -> 18 decimals
-    const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(taskRequest.asset);
+    const taskRequest: LendRequest = task.request as LendRequest
+    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)) // ETH -> 18 decimals
+    const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(
+      taskRequest.asset
+    )
     if (!tokenContract) {
-      throw new Error("No iToken contract available!");
+      throw new Error('No iToken contract available!')
     }
 
     task.processingStart([
-      "Initializing",
-      "Submitting loan",
-      "Updating the blockchain",
-      "Transaction completed"
-    ]);
+      'Initializing',
+      'Submitting loan',
+      'Updating the blockchain',
+      'Transaction completed'
+    ])
 
     // no additional inits or checks
-    task.processingStepNext();
+    task.processingStepNext()
 
-    let gasAmountBN;
+    let gasAmountBN
 
-    console.log(tokenContract.address, await tokenContract.mintWithEther.getABIEncodedTransactionData(account));
+    console.log(
+      tokenContract.address,
+      await tokenContract.mintWithEther.getABIEncodedTransactionData(account)
+    )
 
     // Waiting for token allowance
     if (skipGas) {
-      gasAmountBN = new BigNumber(600000);
+      gasAmountBN = new BigNumber(600000)
     } else {
       // estimating gas amount
-      const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: FulcrumProvider.Instance.gasLimit });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+      const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, {
+        from: account,
+        value: amountInBaseUnits,
+        gas: FulcrumProvider.Instance.gasLimit
+      })
+      gasAmountBN = new BigNumber(gasAmount)
+        .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
+        .integerValue(BigNumber.ROUND_UP)
     }
 
-    let txHash: string = "";
+    let txHash: string = ''
     try {
-
       // Submitting loan
       txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, {
         from: account,
         value: amountInBaseUnits,
         gas: gasAmountBN.toString(),
         gasPrice: await FulcrumProvider.Instance.gasPrice()
-      });
-      task.setTxHash(txHash);
-    }
-    catch(e) {
-      throw e;
+      })
+      task.setTxHash(txHash)
+    } catch (e) {
+      throw e
     }
 
-    task.processingStepNext();
-    const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);
+    task.processingStepNext()
+    const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request)
     if (!txReceipt.status) {
-      throw new Error("Reverted by EVM");
+      throw new Error('Reverted by EVM')
     }
 
-    task.processingStepNext();
-    await FulcrumProvider.Instance.sleep(FulcrumProvider.Instance.successDisplayTimeout);
+    task.processingStepNext()
+    await FulcrumProvider.Instance.sleep(FulcrumProvider.Instance.successDisplayTimeout)
   }
 }

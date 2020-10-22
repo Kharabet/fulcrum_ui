@@ -1,29 +1,29 @@
-@import url("https://fonts.googleapis.com/css2?family=Muli:wght@200;600;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Muli:wght@200;600;800;900&display=swap');
 
-@import "base/variables";
+@import 'base/variables';
 
-@import "components/asset-selector";
-@import "components/buttons";
-@import "components/search";
-@import "components/table";
-@import "components/tvl";
-@import "components/chart";
-@import "components/on-chain-indicator";
-@import "components/provider-menu";
-@import "components/loader";
-@import "components/circle-loader";
-@import "components/tx-animation";
-@import "components/pagination";
-@import "components/switch-wrapper";
+@import 'components/asset-selector';
+@import 'components/buttons';
+@import 'components/search';
+@import 'components/table';
+@import 'components/tvl';
+@import 'components/chart';
+@import 'components/on-chain-indicator';
+@import 'components/provider-menu';
+@import 'components/loader';
+@import 'components/circle-loader';
+@import 'components/tx-animation';
+@import 'components/pagination';
+@import 'components/switch-wrapper';
 
-@import "layout/footer";
-@import "layout/header";
+@import 'layout/footer';
+@import 'layout/header';
 
-@import "pages/liquidation";
+@import 'pages/liquidation';
 
-@import "base/base";
-@import "base/typography";
-@import "base/spacing";
-@import "base/flex";
-@import "base/general";
-@import "base/modal";
+@import 'base/base';
+@import 'base/typography';
+@import 'base/spacing';
+@import 'base/flex';
+@import 'base/general';
+@import 'base/modal';

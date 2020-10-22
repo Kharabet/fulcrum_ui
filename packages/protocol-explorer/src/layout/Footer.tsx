@@ -1,6 +1,6 @@
-import React from "react";
-import { FooterMenu } from "./FooterMenu";
-import { FooterSocial } from "./FooterSocial";
+import React from 'react'
+import { FooterMenu } from './FooterMenu'
+import { FooterSocial } from './FooterSocial'
 
 export const Footer = () => {
   return (
@@ -12,5 +12,5 @@ export const Footer = () => {
         </div>
       </div>
     </footer>
-  );
+  )
 }
