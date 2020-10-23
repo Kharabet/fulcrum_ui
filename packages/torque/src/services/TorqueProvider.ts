@@ -34,6 +34,7 @@ import { IExtendEstimate } from '../domain/IExtendEstimate'
 import { IExtendState } from '../domain/IExtendState'
 import { IRepayEstimate } from '../domain/IRepayEstimate'
 import { IRepayState } from '../domain/IRepayState'
+import { ILoanParams } from '../domain/ILoanParams'
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { ProviderType } from '../domain/ProviderType'
@@ -416,25 +417,14 @@ export class TorqueProvider {
       if (amount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
         const loanPrecision = AssetsDictionary.assets.get(borrowAsset)!.decimals || 18
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
-        const loanToken = AssetsDictionary.assets
-          .get(borrowAsset)!
-          .addressErc20.get(this.web3ProviderSettings.networkId)
-        const collateralToken = AssetsDictionary.assets
-          .get(collateralAsset)!
-          .addressErc20.get(this.web3ProviderSettings.networkId)
+
         const borrowEstimate = await iTokenContract.getDepositAmountForBorrow.callAsync(
           amount.multipliedBy(10 ** loanPrecision),
           new BigNumber(7884000), // approximately 3 months
           collateralAssetErc20Address
         )
-        // const borrowEstimate = await iBZxContract.getRequiredCollateral.callAsync(
-        //   loanToken!,
-        //   collateralToken!,
-        //   amount.multipliedBy(10 ** loanPrecision),
-        //   collaterizationPercent.minus(100).times(10 ** 18),
-        //   true
-        // )
-        result.depositAmount = borrowEstimate.dividedBy(10 ** collateralPrecision).multipliedBy(1.2) // safety buffer
+
+        result.depositAmount = borrowEstimate.dividedBy(10 ** collateralPrecision) // safety buffer
       }
     }
 
@@ -621,6 +611,37 @@ export class TorqueProvider {
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
     const maintenanceMargin = loanParams[6] // an unhealthy loan when current margin is at or below this value
     return maintenanceMargin
+  }
+
+  private getLoanParams = async (
+    asset: Asset,
+    collateralAsset: Asset
+  ): Promise<ILoanParams | null> => {
+    if (!this.contractsSource) {
+      return null
+    }
+    const iToken = await this.contractsSource.getiTokenContract(asset)
+    const iBZxContract = await this.contractsSource.getiBZxContract()
+    const collateralTokenAddress =
+      AssetsDictionary.assets
+        .get(collateralAsset)!
+        .addressErc20.get(this.web3ProviderSettings.networkId) || ''
+    if (!iToken || !collateralTokenAddress || !iBZxContract) return null
+    // @ts-ignore
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
+    const loanId = await iToken.loanParamsIds.callAsync(id)
+    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
+    const result = {
+      loanId: loanParams[0],
+      active: loanParams[1],
+      owner: loanParams[2],
+      loanToken: loanParams[3],
+      collateralToken: loanParams[4],
+      minInitialMargin: loanParams[5],
+      maintenanceMargin: loanParams[6],
+      maxLoanTerm: loanParams[7]
+    } as ILoanParams
+    return result
   }
 
   public getMinInitialMargin = async (asset: Asset, collateralAsset: Asset): Promise<BigNumber> => {

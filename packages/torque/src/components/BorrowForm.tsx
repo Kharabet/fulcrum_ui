@@ -64,7 +64,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       isEdit: false,
       minValue: 115,
       maxValue: 300,
-      selectedValue: 150,
+      selectedValue: 0,
       collateralValue: ''
     }
 
@@ -96,7 +96,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       this.state.collateralAsset
     )
 
-    this.setState({ ...this.state, collateralValue: selectedValue.toFixed() })
+    this.setState({
+      ...this.state,
+      selectedValue: selectedValue.toNumber(),
+      collateralValue: selectedValue.toFixed()
+    })
   }
   public componentDidUpdate(
     prevProps: Readonly<IBorrowFormProps>,
@@ -354,7 +358,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       this.props.borrowAsset,
       collateralAsset
     )
-
+    console.log(this.state.selectedValue)
     borrowEstimate.depositAmount = borrowEstimate.depositAmount
       .times(this.state.selectedValue)
       .div(minInitialMargin)
