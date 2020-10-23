@@ -1,7 +1,7 @@
+import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import { Asset } from '../domain/Asset'
 import { AssetDropdown } from './AssetDropdown'
-import { BigNumber } from '@0x/utils'
 
 interface IInputReceiveProps {
   receiveAmout: BigNumber
@@ -12,7 +12,7 @@ interface IInputReceiveProps {
 
 interface IInputReceiveState {}
 
-export class InputReceive extends Component<IInputReceiveProps, IInputReceiveState> {
+export default class InputReceive extends Component<IInputReceiveProps, IInputReceiveState> {
   constructor(props: IInputReceiveProps) {
     super(props)
   }
