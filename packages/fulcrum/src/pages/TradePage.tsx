@@ -480,7 +480,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         if (positionType === PositionType.LONG) {
           positionValue = collateralAssetAmount
           value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
-          collateral = collateralAssetAmount
+          collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
+          // .minus(loanAssetAmount)
+
+          const longsDiff = collateralAssetAmount
             .times(currentCollateralToPrincipalRate)
             .minus(loanAssetAmount)
           openPrice = loan.loanData.startRate
@@ -488,7 +491,32 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             .times(loanAssetPrecision)
             .div(collateralAssetPrecision)
           liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
-          profit = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue)
+
+          const tradeRequest = new TradeRequest(
+            loan.loanId,
+            TradeType.SELL,
+            loan.loanAsset,
+            loan.collateralAsset,
+            Asset.UNKNOWN,
+            positionType,
+            leverage.toNumber(),
+            await FulcrumProvider.Instance.getMaxTradeValue(
+              TradeType.SELL,
+              loan.loanAsset,
+              loan.collateralAsset,
+              Asset.UNKNOWN,
+              positionType,
+              loan
+            ),
+            positionType === PositionType.LONG
+          )
+          const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+            tradeRequest
+          )
+          profit = estimatedCollateralReceived[1]
+            .div(10 ** collateralAssetDecimals)
+            .times(currentCollateralToPrincipalRate)
+            .minus(longsDiff)
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.loanAsset)) {
@@ -511,20 +539,48 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             liquidationPrice = liquidationPrice.times(collateralToUSDCurrentRate)
           }
         } else {
-          value = collateralAssetAmount.minus(loanAssetAmount.div(currentCollateralToPrincipalRate))
           collateral = collateralAssetAmount
-          positionValue = collateralAssetAmount
+
+          const shortsDiff = collateralAssetAmount
             .times(currentCollateralToPrincipalRate)
             .minus(loanAssetAmount)
+
+          positionValue = collateralAssetAmount
+            .times(currentCollateralToPrincipalRate)
+            .minus(shortsDiff)
+
+          value = positionValue.div(currentCollateralToPrincipalRate)
           openPrice = new BigNumber(10 ** 36)
             .div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision))
             .div(10 ** 18)
           liquidationPrice = new BigNumber(10 ** 36)
             .div(liquidation_collateralToLoanRate)
             .div(10 ** 18)
-          profit = openPrice
-            .minus(new BigNumber(1).div(currentCollateralToPrincipalRate))
-            .times(positionValue)
+
+          const tradeRequest = new TradeRequest(
+            loan.loanId,
+            TradeType.SELL,
+            loan.loanAsset,
+            loan.collateralAsset,
+            Asset.UNKNOWN,
+            positionType,
+            leverage.toNumber(),
+            await FulcrumProvider.Instance.getMaxTradeValue(
+              TradeType.SELL,
+              loan.loanAsset,
+              loan.collateralAsset,
+              Asset.UNKNOWN,
+              positionType,
+              loan
+            ),
+            true
+          )
+          const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+            tradeRequest
+          )
+          profit = estimatedCollateralReceived[1]
+            .div(10 ** collateralAssetDecimals)
+            .minus(shortsDiff)
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
