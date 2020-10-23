@@ -64,7 +64,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       isEdit: false,
       minValue: 115,
       maxValue: 300,
-      selectedValue: 155,
+      selectedValue: 0,
       collateralValue: ''
     }
 
@@ -90,9 +90,19 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this._input = input
   }
 
-  public componentWillMount(): void {
-    let selectedValue = this.state.selectedValue.toFixed()
-    this.setState({ ...this.state, collateralValue: selectedValue })
+  public async componentWillMount() {
+    const selectedValue: BigNumber = (
+      await TorqueProvider.Instance.getMinInitialMargin(
+        this.props.borrowAsset,
+        this.state.collateralAsset
+      )
+    ).plus(30)
+
+    this.setState({
+      ...this.state,
+      selectedValue: selectedValue.toNumber(),
+      collateralValue: selectedValue.toFixed()
+    })
   }
   public componentDidUpdate(
     prevProps: Readonly<IBorrowFormProps>,
@@ -168,6 +178,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                       />
                     </div>
                   </React.Fragment>
+                ) : this.state.collateralValue === '' ? (
+                  <div className="loader-container">
+                    <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
+                  </div>
                 ) : (
                   <React.Fragment>
                     <span>
@@ -234,7 +248,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       TorqueProvider.Instance.getBorrowDepositEstimate(
         this.props.borrowAsset,
         this.state.collateralAsset,
-        selectedValue
+        selectedValue,
+        new BigNumber(this.state.selectedValue)
       ).then((value) => {
         observer.next(value)
       })
@@ -342,11 +357,17 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(
       this.props.borrowAsset,
       collateralAsset,
-      this.state.borrowAmount
+      this.state.borrowAmount,
+      new BigNumber(this.state.selectedValue)
     )
-    borrowEstimate.depositAmount = borrowEstimate.depositAmount.times(
-      this.state.selectedValue / 155
+    const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
+      this.props.borrowAsset,
+      collateralAsset
     )
+    console.log(this.state.selectedValue)
+    borrowEstimate.depositAmount = borrowEstimate.depositAmount
+      .times(this.state.selectedValue)
+      .div(minInitialMargin)
     return borrowEstimate
   }
 

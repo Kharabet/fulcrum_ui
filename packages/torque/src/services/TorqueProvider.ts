@@ -34,6 +34,7 @@ import { IExtendEstimate } from '../domain/IExtendEstimate'
 import { IExtendState } from '../domain/IExtendState'
 import { IRepayEstimate } from '../domain/IRepayEstimate'
 import { IRepayState } from '../domain/IRepayState'
+import { ILoanParams } from '../domain/ILoanParams'
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { ProviderType } from '../domain/ProviderType'
@@ -404,22 +405,26 @@ export class TorqueProvider {
   public getBorrowDepositEstimate = async (
     borrowAsset: Asset,
     collateralAsset: Asset,
-    amount: BigNumber
+    amount: BigNumber,
+    collaterizationPercent: BigNumber
   ): Promise<IBorrowEstimate> => {
     const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) }
 
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset)
+      const iBZxContract = await this.contractsSource.getiBZxContract()
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || ''
-      if (amount.gt(0) && iTokenContract && collateralAssetErc20Address) {
+      if (amount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
         const loanPrecision = AssetsDictionary.assets.get(borrowAsset)!.decimals || 18
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
+
         const borrowEstimate = await iTokenContract.getDepositAmountForBorrow.callAsync(
           amount.multipliedBy(10 ** loanPrecision),
           new BigNumber(7884000), // approximately 3 months
           collateralAssetErc20Address
         )
-        result.depositAmount = borrowEstimate.dividedBy(10 ** collateralPrecision).multipliedBy(1.2) // safety buffer
+
+        result.depositAmount = borrowEstimate.dividedBy(10 ** collateralPrecision) // safety buffer
       }
     }
 
@@ -592,20 +597,52 @@ export class TorqueProvider {
 
   private getMaintenanceMargin = async (
     asset: Asset,
-    collateralToken: string
+    collateralAsset: Asset
   ): Promise<BigNumber> => {
+    const loanParam = await this.getLoanParams(asset, collateralAsset)
+    if (!loanParam) {
+      return new BigNumber(15).times(10 ** 18) // fallback value
+    }
+    return loanParam.maintenanceMargin
+  }
+
+  public getMinInitialMargin = async (asset: Asset, collateralAsset: Asset): Promise<BigNumber> => {
+    const loanParam = await this.getLoanParams(asset, collateralAsset)
+    if (!loanParam) {
+      return new BigNumber(120) // fallback percent
+    }
+    return loanParam.minInitialMargin.div(10 ** 18).plus(100)
+  }
+
+  private getLoanParams = async (
+    asset: Asset,
+    collateralAsset: Asset
+  ): Promise<ILoanParams | null> => {
     if (!this.contractsSource) {
-      return new BigNumber(0)
+      return null
     }
     const iToken = await this.contractsSource.getiTokenContract(asset)
     const iBZxContract = await this.contractsSource.getiBZxContract()
-    if (!iToken || !iBZxContract) return new BigNumber(0)
+    const collateralTokenAddress =
+      AssetsDictionary.assets
+        .get(collateralAsset)!
+        .addressErc20.get(this.web3ProviderSettings.networkId) || ''
+    if (!iToken || !collateralTokenAddress || !iBZxContract) return null
     // @ts-ignore
-    const id = new BigNumber(Web3Utils.soliditySha3(collateralToken, true))
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
     const loanId = await iToken.loanParamsIds.callAsync(id)
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
-    const maintenanceMargin = loanParams[6]
-    return maintenanceMargin
+    const result = {
+      loanId: loanParams[0],
+      active: loanParams[1],
+      owner: loanParams[2],
+      loanToken: loanParams[3],
+      collateralToken: loanParams[4],
+      minInitialMargin: loanParams[5],
+      maintenanceMargin: loanParams[6],
+      maxLoanTerm: loanParams[7]
+    } as ILoanParams
+    return result
   }
 
   public assignCollateral = async (
@@ -630,7 +667,7 @@ export class TorqueProvider {
         if (current.plus(take).lt(goal)) {
           goal = goal.minus(goal.minus(current.plus(take)))
         }
-        const maintenanceMargin = (await this.getMaintenanceMargin(loan.asset, deposit.underlying))
+        const maintenanceMargin = (await this.getMaintenanceMargin(loan.asset, deposit.asset))
           .div(10 ** 18)
           .plus(100)
         loan.maintenanceMargin = maintenanceMargin
@@ -1142,7 +1179,7 @@ export class TorqueProvider {
           await this.getMaintenanceMargin(
             // @ts-ignore
             asset,
-            this.contractsSource.getAddressFromAsset(collateralAsset)
+            collateralAsset
           )
         )
           .div(10 ** 18)
