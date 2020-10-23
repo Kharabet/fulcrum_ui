@@ -37,6 +37,10 @@ button {
   font-family: 'Muli', sans-serif;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 a {
   cursor: pointer;
   text-decoration: none;

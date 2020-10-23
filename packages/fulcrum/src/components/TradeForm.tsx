@@ -363,6 +363,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       submitButtonText += ` ${this.props.baseToken}`
     }
 
+    const canSubmit = this.state.inputAmountValue.gt(0)
+
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
@@ -448,6 +450,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                   : ``
               }
               type="submit"
+              disabled={!canSubmit}
               className={`trade-form__submit-button ${submitClassName}`}>
               {this.state.isExposureLoading || this.state.isLoading ? (
                 <Preloader width="75px" />
