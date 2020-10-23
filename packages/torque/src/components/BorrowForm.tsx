@@ -91,10 +91,12 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public async componentWillMount() {
-    const selectedValue: BigNumber = await TorqueProvider.Instance.getMinInitialMargin(
-      this.props.borrowAsset,
-      this.state.collateralAsset
-    )
+    const selectedValue: BigNumber = (
+      await TorqueProvider.Instance.getMinInitialMargin(
+        this.props.borrowAsset,
+        this.state.collateralAsset
+      )
+    ).plus(30)
 
     this.setState({
       ...this.state,
@@ -176,6 +178,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                       />
                     </div>
                   </React.Fragment>
+                ) : this.state.collateralValue === '' ? (
+                  <div className="loader-container">
+                    <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
+                  </div>
                 ) : (
                   <React.Fragment>
                     <span>
