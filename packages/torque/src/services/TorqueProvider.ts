@@ -597,20 +597,21 @@ export class TorqueProvider {
 
   private getMaintenanceMargin = async (
     asset: Asset,
-    collateralToken: string
+    collateralAsset: Asset
   ): Promise<BigNumber> => {
-    if (!this.contractsSource) {
-      return new BigNumber(0)
+    const loanParam = await this.getLoanParams(asset, collateralAsset)
+    if (!loanParam) {
+      return new BigNumber(15).times(10 ** 18) // fallback value
     }
-    const iToken = await this.contractsSource.getiTokenContract(asset)
-    const iBZxContract = await this.contractsSource.getiBZxContract()
-    if (!iToken || !iBZxContract) return new BigNumber(0)
-    // @ts-ignore
-    const id = new BigNumber(Web3Utils.soliditySha3(collateralToken, true))
-    const loanId = await iToken.loanParamsIds.callAsync(id)
-    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
-    const maintenanceMargin = loanParams[6] // an unhealthy loan when current margin is at or below this value
-    return maintenanceMargin
+    return loanParam.maintenanceMargin
+  }
+
+  public getMinInitialMargin = async (asset: Asset, collateralAsset: Asset): Promise<BigNumber> => {
+    const loanParam = await this.getLoanParams(asset, collateralAsset)
+    if (!loanParam) {
+      return new BigNumber(120) // fallback percent
+    }
+    return loanParam.minInitialMargin.div(10 ** 18).plus(100)
   }
 
   private getLoanParams = async (
@@ -644,28 +645,6 @@ export class TorqueProvider {
     return result
   }
 
-  public getMinInitialMargin = async (asset: Asset, collateralAsset: Asset): Promise<BigNumber> => {
-    let result: BigNumber = new BigNumber(150)
-    if (!this.contractsSource) {
-      return result
-    }
-    const iToken = await this.contractsSource.getiTokenContract(asset)
-    const iBZxContract = await this.contractsSource.getiBZxContract()
-    if (!iToken || !iBZxContract) {
-      return result
-    }
-    const collateralTokenAddress =
-      AssetsDictionary.assets
-        .get(collateralAsset)!
-        .addressErc20.get(this.web3ProviderSettings.networkId) || ''
-    // @ts-ignore
-    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
-    const loanId = await iToken.loanParamsIds.callAsync(id)
-    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
-    result = loanParams[5].div(10 ** 18).plus(100) // the minimum allowed initial margin
-    return result
-  }
-
   public assignCollateral = async (
     loans: IRefinanceLoan[],
     deposits: IRefinanceToken[],
@@ -688,7 +667,7 @@ export class TorqueProvider {
         if (current.plus(take).lt(goal)) {
           goal = goal.minus(goal.minus(current.plus(take)))
         }
-        const maintenanceMargin = (await this.getMaintenanceMargin(loan.asset, deposit.underlying))
+        const maintenanceMargin = (await this.getMaintenanceMargin(loan.asset, deposit.asset))
           .div(10 ** 18)
           .plus(100)
         loan.maintenanceMargin = maintenanceMargin
@@ -1200,7 +1179,7 @@ export class TorqueProvider {
           await this.getMaintenanceMargin(
             // @ts-ignore
             asset,
-            this.contractsSource.getAddressFromAsset(collateralAsset)
+            collateralAsset
           )
         )
           .div(10 ** 18)
