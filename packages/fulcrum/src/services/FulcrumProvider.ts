@@ -857,10 +857,7 @@ export class FulcrumProvider {
         result =
           positionType === PositionType.LONG
             ? loan.loanData.collateral.times(collateralAssetPrecision)
-            : loan.loanData.collateral
-                .times(collateralAssetPrecision)
-                .times(currentCollateralToPrincipalRate)
-                .minus(loan.loanData.principal.times(loanAssetPrecision))
+            : loan.loanData.principal.times(loanAssetPrecision)
       }
     }
 
@@ -1420,11 +1417,8 @@ export class FulcrumProvider {
         result.principal = marginDetails[0].div(10 ** loanTokenDecimals)
         result.collateral = marginDetails[1].div(10 ** collateralTokenDecimals)
 
-        const shortsDiff = result.collateral.times(collateralToLoanRate).minus(result.principal)
         result.exposureValue =
-          request.positionType === PositionType.SHORT
-            ? result.collateral.times(collateralToLoanRate).minus(shortsDiff)
-            : result.collateral
+          request.positionType === PositionType.SHORT ? result.principal : result.collateral
         result.interestRate = marginDetails[2].div(10 ** 18)
       } catch (e) {
         console.error(e)
