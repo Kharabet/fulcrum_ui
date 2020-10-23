@@ -260,12 +260,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             overlayClassName="modal-overlay-div">
             <TradeForm
               stablecoins={this.quoteTokens}
-              loan={this.state.loans?.find(
-                (e) =>
-                  e.loanId === this.state.loanId ||
-                  (e.loanAsset === this.state.selectedMarket.baseToken &&
-                    e.collateralAsset === this.state.selectedMarket.quoteToken)
-              )}
+              loan={this.state.loans?.find((e) => e.loanId === this.state.loanId)}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
               baseToken={this.state.selectedMarket.baseToken}
@@ -483,7 +478,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
           // .minus(loanAssetAmount)
 
-          const longsDiff = collateralAssetAmount
+          const deposited = collateralAssetAmount
             .times(currentCollateralToPrincipalRate)
             .minus(loanAssetAmount)
           openPrice = loan.loanData.startRate
@@ -516,7 +511,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           profit = estimatedCollateralReceived[1]
             .div(10 ** collateralAssetDecimals)
             .times(currentCollateralToPrincipalRate)
-            .minus(longsDiff)
+            .minus(deposited)
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.loanAsset)) {
@@ -544,7 +539,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           const shortsDiff = collateralAssetAmount
             .times(currentCollateralToPrincipalRate)
             .minus(loanAssetAmount)
-
+          const deposited = collateralAssetAmount.minus(
+            loanAssetAmount.div(currentCollateralToPrincipalRate)
+          )
           positionValue = collateralAssetAmount
             .times(currentCollateralToPrincipalRate)
             .minus(shortsDiff)
@@ -580,7 +577,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           )
           profit = estimatedCollateralReceived[1]
             .div(10 ** collateralAssetDecimals)
-            .minus(shortsDiff)
+            .minus(deposited)
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
