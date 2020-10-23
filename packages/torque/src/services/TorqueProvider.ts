@@ -2060,7 +2060,7 @@ export class TorqueProvider {
   };*/
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH || asset === Asset.WETH
+    return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
   }
 
   public isStableAsset = (asset: Asset): boolean => {
