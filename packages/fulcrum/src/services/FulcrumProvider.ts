@@ -1939,7 +1939,7 @@ export class FulcrumProvider {
     );
 
     return swapRates[0][0];*/
-    return this.getSwapRate(asset, Asset.USDC)
+    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
   private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {

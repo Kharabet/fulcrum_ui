@@ -69,6 +69,11 @@ import { ManageCollateralProcessor } from './processors/ManageCollateralProcesso
 // import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
 // import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
 
+const isMainnetProd =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+  
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
   configAddress = constantAddress.mainnet
@@ -442,7 +447,7 @@ export class TorqueProvider {
       return new BigNumber(1)
     }
 
-    return this.getSwapRate(asset, Asset.USDC)
+    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
   public async getSwapRate(

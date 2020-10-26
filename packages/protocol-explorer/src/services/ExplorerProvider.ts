@@ -36,6 +36,11 @@ import { TasksQueueEvents } from './events/TasksQueueEvents'
 import { RequestStatus } from '../domain/RequestStatus'
 import { LiquidationTransactionMinedEvent } from './events/LiquidationTransactionMinedEvent'
 
+const isMainnetProd =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+  
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
@@ -927,7 +932,7 @@ export class ExplorerProvider {
         );
     
         return swapRates[0][0];*/
-    return this.getSwapRate(asset, Asset.USDC)
+    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
   public async getSwapRate(

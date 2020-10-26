@@ -20,6 +20,11 @@ import { ClaimRequest } from '../domain/ClaimRequest'
 import { ClaimReabteRewardsRequest } from '../domain/ClaimReabteRewardsRequest'
 import { BecomeRepresentativeRequest } from '../domain/BecomeRepresentativeRequest'
 
+const isMainnetProd =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
     case 'mainnet':
@@ -885,7 +890,7 @@ export class StakingProvider {
     );
 
     return swapRates[0][0];*/
-    return this.getSwapRate(asset, Asset.USDC)
+    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
   public async getSwapRate(
