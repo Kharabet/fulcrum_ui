@@ -43,9 +43,21 @@ var HistoryProvider = /** @class */ (function () {
     }
     HistoryProvider.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate) {
         var _this = this;
+        var kyberResolution = "";
+        switch (resolution) {
+            case '1D':
+                kyberResolution = 'D';
+                break;
+            case '1W':
+                kyberResolution = 'W';
+                break;
+            case '1M':
+                kyberResolution = 'M';
+                break;
+        }
         var requestParams = {
             symbol: symbolInfo.ticker || '',
-            resolution: resolution,
+            resolution: kyberResolution || resolution,
             from: rangeStartDate,
             to: rangeEndDate,
         };
