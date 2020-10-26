@@ -504,7 +504,7 @@ export class FulcrumProvider {
 
     if (resetRequiredAssets.includes(asset)) {
       const allowance = await tokenErc20Contract.allowance.callAsync(account, spender)
-      if (amountInBaseUnits.gt(allowance)) {
+      if (allowance.gt(0) && amountInBaseUnits.gt(allowance)) {
         const zeroApprovHash = await tokenErc20Contract.approve.sendTransactionAsync(
           spender,
           new BigNumber(0),
