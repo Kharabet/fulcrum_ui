@@ -62,7 +62,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       didSubmit: false,
       isLoading: false,
       isEdit: false,
-      minValue: 115,
+      minValue: 120,
       maxValue: 300,
       selectedValue: 0,
       collateralValue: ''
@@ -91,15 +91,15 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public async componentWillMount() {
-    const selectedValue: BigNumber = (
-      await TorqueProvider.Instance.getMinInitialMargin(
-        this.props.borrowAsset,
-        this.state.collateralAsset
-      )
-    ).plus(30)
+    const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
+      this.props.borrowAsset,
+      this.state.collateralAsset
+    )
+    const selectedValue: BigNumber = minInitialMargin.plus(30)
 
     this.setState({
       ...this.state,
+      minValue: minInitialMargin.toNumber(),
       selectedValue: selectedValue.toNumber(),
       collateralValue: selectedValue.toFixed()
     })
