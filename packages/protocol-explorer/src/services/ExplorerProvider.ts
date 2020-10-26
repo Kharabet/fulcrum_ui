@@ -87,11 +87,34 @@ export class ExplorerProvider {
   private isChecking: boolean = false
 
   public static readonly MAX_UINT = new BigNumber(2).pow(256).minus(1)
+  public readonly assetsShown: Asset[]
 
   constructor() {
     // init
     this.eventEmitter = new EventEmitter()
     this.eventEmitter.setMaxListeners(1000)
+
+    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+      this.assetsShown = [
+        Asset.ETH,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
+        Asset.KNC
+      ]
+    } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+      this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
+    } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
+      this.assetsShown = [Asset.DAI, Asset.ETH]
+    } else {
+      this.assetsShown = []
+    }
 
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued)
 
@@ -589,6 +612,8 @@ export class ExplorerProvider {
       isUnhealthy
     )
 
+    const mappedAssetsShown = this.assetsShown.map((asset) => this.wethToEth(asset))
+    const usdPrices = await this.getSwapToUsdRatesOffChain(mappedAssetsShown)
     loansData.forEach(async (e) => {
       const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
       const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
@@ -596,7 +621,8 @@ export class ExplorerProvider {
         console.log('unknown', loanAsset, collateralAsset)
         return null
       }
-      const loandAssetUsdRate = await this.getSwapToUsdRate(loanAsset, true)
+      const assetIndex = mappedAssetsShown.indexOf(this.wethToEth(loanAsset))
+      const loandAssetUsdRate = usdPrices[assetIndex]
       const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18
       const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
       let amountOwned = e.principal.minus(e.interestDepositRemaining)
@@ -929,7 +955,7 @@ export class ExplorerProvider {
     if (offChain) {
       return this.getSwapToUsdRateOffChain(asset)
     }
-    
+
     return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
@@ -984,13 +1010,29 @@ export class ExplorerProvider {
 
   public getSwapToUsdRateOffChain = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
+    const token = this.isETHAsset(asset) ? Asset.ETH : asset
     const swapToUsdHistoryRateRequest = await fetch('https://api.bzx.network/v1/oracle-rates-usd')
-    const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
+    const swapToUsdHistoryRateResponse = await swapToUsdHistoryRateRequest.json()
     if (
       swapToUsdHistoryRateResponse.success &&
-      swapToUsdHistoryRateResponse.data[asset.toLowerCase()]
+      swapToUsdHistoryRateResponse.data[token.toLowerCase()]
     ) {
-      result = new BigNumber(swapToUsdHistoryRateResponse.data[asset.toLowerCase()])
+      result = new BigNumber(swapToUsdHistoryRateResponse.data[token.toLowerCase()])
+    }
+    return result
+  }
+
+  public getSwapToUsdRatesOffChain = async (assets: Asset[]): Promise<BigNumber[]> => {
+    let result = Array<BigNumber>(assets.length).fill(new BigNumber(0))
+    const swapToUsdHistoryRateRequest = await fetch('https://api.bzx.network/v1/oracle-rates-usd')
+    const swapToUsdHistoryRateResponse = await swapToUsdHistoryRateRequest.json()
+    if (swapToUsdHistoryRateResponse.success) {
+      result = assets.map((asset) => {
+        const token = this.isETHAsset(asset) ? Asset.ETH : asset
+        return swapToUsdHistoryRateResponse.data[token.toLowerCase()]
+          ? new BigNumber(swapToUsdHistoryRateResponse.data[token.toLowerCase()])
+          : new BigNumber(0)
+      })
     }
     return result
   }
@@ -1237,6 +1279,9 @@ export class ExplorerProvider {
   }
   public isETHAsset = (asset: Asset): boolean => {
     return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
+  }
+  public wethToEth = (asset: Asset): Asset => {
+    return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH ? Asset.ETH : asset
   }
 }
 
