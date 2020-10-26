@@ -40,7 +40,7 @@ const isMainnetProd =
   process.env.NODE_ENV &&
   process.env.NODE_ENV !== 'development' &&
   process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-  
+
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
@@ -596,7 +596,7 @@ export class ExplorerProvider {
         console.log('unknown', loanAsset, collateralAsset)
         return null
       }
-      const loandAssetUsdRate = await this.getSwapToUsdRate(loanAsset)
+      const loandAssetUsdRate = await this.getSwapToUsdRate(loanAsset, true)
       const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18
       const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
       let amountOwned = e.principal.minus(e.interestDepositRemaining)
@@ -915,7 +915,7 @@ export class ExplorerProvider {
     return result
   }
 
-  public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
+  public async getSwapToUsdRate(asset: Asset, offChain = false): Promise<BigNumber> {
     if (
       asset === Asset.SAI ||
       asset === Asset.DAI ||
@@ -926,12 +926,10 @@ export class ExplorerProvider {
       return new BigNumber(1)
     }
 
-    /*const swapRates = await this.getSwapToUsdRateBatch(
-          [asset],
-          Asset.DAI
-        );
+    if (offChain) {
+      return this.getSwapToUsdRateOffChain(asset)
+    }
     
-        return swapRates[0][0];*/
     return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
@@ -980,6 +978,19 @@ export class ExplorerProvider {
         console.log(e)
         result = new BigNumber(0)
       }
+    }
+    return result
+  }
+
+  public getSwapToUsdRateOffChain = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0)
+    const swapToUsdHistoryRateRequest = await fetch('https://api.bzx.network/v1/oracle-rates-usd')
+    const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
+    if (
+      swapToUsdHistoryRateResponse.success &&
+      swapToUsdHistoryRateResponse.data[asset.toLowerCase()]
+    ) {
+      result = new BigNumber(swapToUsdHistoryRateResponse.data[asset.toLowerCase()])
     }
     return result
   }
