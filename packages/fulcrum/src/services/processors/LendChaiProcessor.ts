@@ -67,10 +67,10 @@ export class LendChaiProcessor {
     try {
       // Prompting token allowance
       if (amountInBaseUnits.gt(erc20allowance)) {
-        approvePromise = tokenErc20Contract.approve.sendTransactionAsync(
+        approvePromise = FulcrumProvider.Instance.setApproval(
           tokenContract.address,
-          FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.asset, amountInBaseUnits),
-          { from: account }
+          taskRequest.asset,
+          FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.asset, amountInBaseUnits)
         )
       }
       task.processingStepNext()
