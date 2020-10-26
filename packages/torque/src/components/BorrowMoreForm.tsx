@@ -60,7 +60,10 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     this._input = input
   }
 
-  public componentDidMount(): void {}
+  public async componentDidMount() {
+    const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(this.props.loanOrderState.loanAsset, this.props.loanOrderState.collateralAsset)
+    this.setState({borrowMoreColalterizationMin: minInitialMargin.plus(30)})
+  }
 
   public render() {
     const assetDetails =
@@ -153,7 +156,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             {loan.collateralizedPercent
               .times(100)
               .plus(100)
-              .lte(150) || !Number(this.state.inputAmountText) ? (
+              .lte(this.state.borrowMoreColalterizationMin) || !Number(this.state.inputAmountText) ? (
               <button type="button" className="btn btn-size--small" onClick={this.props.onDecline}>
                 Close
               </button>
