@@ -611,7 +611,8 @@ export class TorqueProvider {
     if (!loanParam) {
       return new BigNumber(120) // fallback percent
     }
-    return loanParam.minInitialMargin.div(10 ** 18).plus(100)
+    const percents = loanParam.minInitialMargin.div(10 ** 18).plus(100)
+    return percents
   }
 
   private getLoanParams = async (
@@ -2097,7 +2098,7 @@ export class TorqueProvider {
   };*/
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
+    return asset === Asset.ETH || asset === Asset.WETH
   }
 
   public isStableAsset = (asset: Asset): boolean => {
