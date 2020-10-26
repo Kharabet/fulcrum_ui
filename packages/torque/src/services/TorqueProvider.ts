@@ -535,31 +535,48 @@ export class TorqueProvider {
     return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
-  public checkAndSetApprovalForced = async (
-    asset: Asset,
+  public setApproval = async (
     spender: string,
+    asset: Asset,
     amountInBaseUnits: BigNumber
-  ): Promise<boolean> => {
-    let result = false
+  ): Promise<string> => {
+    const resetRequiredAssets = [Asset.USDT] // these assets require to set approve to 0 before approve larger amount than the current spend limit
+    let result = ''
     const assetErc20Address = this.getErc20AddressOfAsset(asset)
 
     if (
-      this.web3Wrapper &&
-      this.contractsSource &&
-      this.contractsSource.canWrite &&
-      assetErc20Address
+      !this.web3Wrapper ||
+      !this.contractsSource ||
+      !this.contractsSource.canWrite ||
+      !assetErc20Address
     ) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
-      const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
+      return result
+    }
 
-      if (account && tokenErc20Contract) {
-        await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, {
-          from: account
-        })
-        result = true
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
+
+    if (!account || !tokenErc20Contract) {
+      return result
+    }
+
+    if (resetRequiredAssets.includes(asset)) {
+      const allowance = await tokenErc20Contract.allowance.callAsync(account, spender)
+      if (amountInBaseUnits.gt(allowance)) {
+        const zeroApprovHash = await tokenErc20Contract.approve.sendTransactionAsync(
+          spender,
+          new BigNumber(0),
+          { from: account }
+        )
+        await this.waitForTransactionMined(zeroApprovHash)
       }
     }
+
+    result = await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, {
+      from: account
+    })
+
     return result
   }
 
