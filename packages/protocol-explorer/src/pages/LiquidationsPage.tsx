@@ -231,9 +231,23 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18
         const collateralAssetDecimals =
           AssetsDictionary.assets.get(e.collateralToken)!.decimals || 18
-        const swapToUSDPrice = this.stablecoins.includes(e.loanToken)
+        let swapToUSDPrice = this.stablecoins.includes(e.loanToken)
           ? new BigNumber(1)
           : new BigNumber(10 ** 36).div(e.collateralToLoanRate).div(10 ** collateralAssetDecimals)
+
+        if (
+          !this.stablecoins.includes(e.loanToken) &&
+          !this.stablecoins.includes(e.collateralToken)
+        ) {
+          const swapToUsdHistoryRateRequest = await fetch(
+            `https://api.bzx.network/v1/asset-history-price?asset=${
+              e.loanToken === Asset.fWETH ? 'eth' : e.loanToken.toLowerCase()
+            }&date=${e.timeStamp.getTime()}`
+          )
+          const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
+          if (!swapToUsdHistoryRateResponse) continue
+          swapToUSDPrice = swapToUsdHistoryRateResponse.swapToUSDPrice
+        }
         const repayAmountUsd = e.repayAmount.div(10 ** loanAssetDecimals).times(swapToUSDPrice)
         volume30d = volume30d.plus(repayAmountUsd)
         liquidationEventsWithUsd.push({ event: e, repayAmountUsd: repayAmountUsd })
