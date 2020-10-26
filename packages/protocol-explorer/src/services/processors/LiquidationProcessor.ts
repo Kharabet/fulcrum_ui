@@ -72,13 +72,10 @@ export class LiquidationProcessor {
       // Waiting for token allowance
       task.processingStepNext()
       if (taskRequest.closeAmount.gt(erc20allowance)) {
-        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(
+        const approveHash = await ExplorerProvider.Instance.setApproval(
           iBZxContract.address,
-          ExplorerProvider.Instance.getLargeApprovalAmount(
-            taskRequest.loanToken,
-            taskRequest.closeAmount
-          ),
-          { from: account }
+          taskRequest.loanToken,
+          taskRequest.closeAmount
         )
         await ExplorerProvider.Instance.waitForTransactionMined(approveHash, taskRequest)
       }
