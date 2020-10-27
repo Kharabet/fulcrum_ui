@@ -157,22 +157,23 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === 'None')) {
       this.props.doNetworkConnect()
     }
-    await this.derivedUpdate()
+    
+    await this.getTokenRowsData(this.state)
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<ITradePageProps>,
     prevState: Readonly<ITradePageState>,
     snapshot?: any
-  ): void {
+  ) {
     if (prevState.selectedMarket !== this.state.selectedMarket) {
-      this.getTokenRowsData(this.state)
+      await this.getTokenRowsData(this.state)
     }
     if (
       prevState.isTxCompleted !== this.state.isTxCompleted ||
       prevProps.isMobileMedia !== this.props.isMobileMedia
     ) {
-      this.derivedUpdate()
+      await this.getOwnRowsData(this.state)
     }
   }
 
@@ -305,11 +306,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   private onProviderAvailable = async () => {
-    await this.derivedUpdate()
+    // await this.derivedUpdate()
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
-    await this.derivedUpdate()
+    !this.state.isShowHistory 
+    ? await this.getOwnRowsData(this.state)
+    : await this.getHistoryEvents(this.state)
   }
 
   public onManageCollateralRequested = async (request: ManageCollateralRequest) => {
@@ -397,6 +400,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public onShowHistory = async (value: boolean) => {
+    await this.getHistoryEvents(this.state)
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
@@ -414,13 +418,21 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       FulcrumProvider.Instance.contractsSource.canWrite
     ) {
       loans = await FulcrumProvider.Instance.getUserMarginTradeLoans()
-      const loan = loans.find(
-        (loan) =>
+      const selectedMarketLoans = loans.filter(
+        (loan) =>(
           this.state.selectedMarket.baseToken === loan.loanAsset &&
-          this.state.selectedMarket.quoteToken === loan.collateralAsset
+          this.state.selectedMarket.quoteToken === loan.collateralAsset) || (
+            this.state.selectedMarket.baseToken === loan.collateralAsset &&
+          this.state.selectedMarket.quoteToken === loan.loanAsset
+          )
       )
 
-      for (const loan of loans) {
+      const selectMarketBaseToQuoteTokenRate = await FulcrumProvider.Instance.getSwapRate(
+        this.state.selectedMarket.baseToken,
+        this.state.selectedMarket.quoteToken
+      )
+
+      for (const loan of selectedMarketLoans) {
         if (!loan.loanData) continue
 
         const maintenanceMargin = loan.loanData!.maintenanceMargin
@@ -443,10 +455,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         let leverage = new BigNumber(10 ** 38).div(loan.loanData.startMargin.times(10 ** 18))
         if (positionType === PositionType.LONG) leverage = leverage.plus(1)
 
-        const currentCollateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(
-          loan.collateralAsset,
-          loan.loanAsset
-        )
+        const currentCollateralToPrincipalRate = this.state.selectedMarket.baseToken === loan.collateralAsset
+        ? selectMarketBaseToQuoteTokenRate
+        : new BigNumber(1).div(selectMarketBaseToQuoteTokenRate)
+
         let positionValue = new BigNumber(0)
         let value = new BigNumber(0)
         let collateral = new BigNumber(0)

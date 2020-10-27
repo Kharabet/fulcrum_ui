@@ -1,5 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
+import siteConfig from '../config/SiteConfig.json'
 import { Asset } from '../domain/Asset'
 import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'
@@ -8,13 +9,12 @@ import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { TasksQueue } from '../services/TasksQueue'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
-import siteConfig from '../config/SiteConfig.json'
 
+import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
 import { LeverageSelector } from './LeverageSelector'
 import { PositionTypeMarker } from './PositionTypeMarker'
 import { Preloader } from './Preloader'
-import { RequestTask } from '../domain/RequestTask'
-import { RequestStatus } from '../domain/RequestStatus'
 
 import { CircleLoader } from './CircleLoader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
@@ -73,10 +73,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.onProviderAvailable
     )
     FulcrumProvider.Instance.eventEmitter.on(
-      FulcrumProviderEvents.ProviderChanged,
-      this.onProviderChanged
-    )
-    FulcrumProvider.Instance.eventEmitter.on(
       FulcrumProviderEvents.AskToOpenProgressDlg,
       this.onAskToOpenProgressDlg
     )
@@ -90,32 +86,35 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private apiUrl = 'https://api.bzx.network/v1'
 
   private async derivedUpdate() {
-    const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken)
-
     const collateralToPrincipalRate =
       this.props.positionType === PositionType.LONG
         ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
         : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken)
 
-    let initialMargin =
+    const baseTokenPrice =
+      this.props.positionType === PositionType.LONG
+        ? collateralToPrincipalRate
+        : new BigNumber(1).div(collateralToPrincipalRate)
+    const initialMargin =
       this.props.positionType === PositionType.LONG
         ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
         : new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage).times(10 ** 18))
 
     const maintenanceMargin = this.props.maintenanceMargin
     // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
-    //if it's a SHORT then -> 10^36 / above
+    // if it's a SHORT then -> 10^36 / above
     const liquidationPriceBeforeTrade = maintenanceMargin
       .times(collateralToPrincipalRate.times(10 ** 18))
       .div(10 ** 20)
       .plus(collateralToPrincipalRate.times(10 ** 18))
       .div(new BigNumber(10 ** 20).plus(initialMargin).div(10 ** 20))
     let liquidationPrice = new BigNumber(0)
-    if (liquidationPriceBeforeTrade.gt(0))
+    if (liquidationPriceBeforeTrade.gt(0)) {
       liquidationPrice =
         this.props.positionType === PositionType.LONG
           ? liquidationPriceBeforeTrade.div(10 ** 18)
           : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18)
+    }
 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(
       this.props.positionType === PositionType.LONG ? this.props.quoteToken : this.props.baseToken
@@ -140,10 +139,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private onProviderAvailable = async () => {
-    await this.derivedUpdate()
-  }
-
-  private onProviderChanged = async () => {
     await this.derivedUpdate()
   }
 
@@ -191,10 +186,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.off(
       FulcrumProviderEvents.ProviderAvailable,
       this.onProviderAvailable
-    )
-    FulcrumProvider.Instance.eventEmitter.off(
-      FulcrumProviderEvents.ProviderChanged,
-      this.onProviderChanged
     )
     FulcrumProvider.Instance.eventEmitter.off(
       FulcrumProviderEvents.AskToOpenProgressDlg,
@@ -304,7 +295,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             {this.props.isMobileMedia && (
               <span className="trade-token-grid-row__title">Mid Market Price</span>
             )}
-            {this.state.baseTokenPrice.gt(0) && !this.state.isLoading ? (
+            {this.state.baseTokenPrice.gt(0) && this.state.baseTokenPrice.toFixed() !== "Infinity" && !this.state.isLoading ? (
               <React.Fragment>
                 <span className="fw-sign">$</span>
                 {this.state.baseTokenPrice.toFixed(2)}
@@ -364,7 +355,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.state.request.tradeType === TradeType.BUY ? (
           <div className={`token-selector-item__image open-tab-tx`}>
             <CircleLoader></CircleLoader>
-            <TradeTxLoaderStep taskId={this.state.request!.id} />
+            <TradeTxLoaderStep taskId={this.state.request.id} />
           </div>
         ) : (
           !this.state.resultTx &&

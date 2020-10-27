@@ -115,28 +115,26 @@ export class FulcrumProvider {
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId)
-    if (!providerType || providerType === ProviderType.None) {
-      // setting up readonly provider
-      Web3ConnectionFactory.setReadonlyProvider().then(() => {
-        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
-        const engine = Web3ConnectionFactory.currentWeb3Engine
-        const canWrite = Web3ConnectionFactory.canWrite
+    // setting up readonly provider
+    Web3ConnectionFactory.setReadonlyProvider().then(() => {
+      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
+      const engine = Web3ConnectionFactory.currentWeb3Engine
+      const canWrite = Web3ConnectionFactory.canWrite
 
-        if (web3Wrapper && this.web3ProviderSettings) {
-          const contractsSource = new ContractsSource(
-            engine,
-            this.web3ProviderSettings.networkId,
-            canWrite
-          )
-          contractsSource.Init().then(() => {
-            this.web3Wrapper = web3Wrapper
-            this.providerEngine = engine
-            this.contractsSource = contractsSource
-            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable)
-          })
-        }
-      })
-    }
+      if (web3Wrapper && this.web3ProviderSettings) {
+        const contractsSource = new ContractsSource(
+          engine,
+          this.web3ProviderSettings.networkId,
+          canWrite
+        )
+        contractsSource.Init().then(() => {
+          this.web3Wrapper = web3Wrapper
+          this.providerEngine = engine
+          this.contractsSource = contractsSource
+          this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable)
+        })
+      }
+    })
 
     return FulcrumProvider.Instance
   }
@@ -865,10 +863,7 @@ export class FulcrumProvider {
         const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18
         const collateralAssetDecimals =
           AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18
-        const currentCollateralToPrincipalRate = await this.getSwapRate(
-          loan.collateralAsset,
-          loan.loanAsset
-        )
+          
         const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
         const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
 
