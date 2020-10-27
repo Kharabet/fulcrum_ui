@@ -25,8 +25,8 @@ import { TradeExpectedResult } from './TradeExpectedResult'
 
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import '../styles/components/trade-form.scss'
-import { InputReceive } from './InputReceive'
 import { ChiSwitch } from './ChiSwitch'
+import { InputReceive } from './InputReceive'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
