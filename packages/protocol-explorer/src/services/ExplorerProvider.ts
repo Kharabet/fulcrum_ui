@@ -34,9 +34,7 @@ import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { TasksQueue } from '../services/TasksQueue'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
 import { RequestStatus } from '../domain/RequestStatus'
-import { LiquidationTransactionMinedEvent } from './events/LiquidationTransactionMinedEvent'
 import { RolloverRequest } from '../domain/RolloverRequest'
-import { RolloverTransactionMinedEvent } from './events/RolloverTransactionMinedEvent'
 import { IRolloverData } from '../domain/IRolloverData'
 
 const isMainnetProd =
@@ -1237,20 +1235,9 @@ export class ExplorerProvider {
   ) => {
     try {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash)
-      if (receipt && request && request instanceof LiquidationRequest) {
+      if (receipt) {
         resolve(receipt)
-
-        this.eventEmitter.emit(
-          ExplorerProviderEvents.LiquidationTransactionMined,
-          new LiquidationTransactionMinedEvent(request.loanToken, txHash)
-        )
-      } else if (receipt && request && request instanceof RolloverRequest) {
-        resolve(receipt)
-
-        this.eventEmitter.emit(
-          ExplorerProviderEvents.RolloverTransactionMined,
-          new RolloverTransactionMinedEvent(txHash)
-        )
+      
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject)
