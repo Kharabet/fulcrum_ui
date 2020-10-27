@@ -127,30 +127,28 @@ export class ExplorerProvider {
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId)
-    if (!providerType || providerType === ProviderType.None) {
-      // ExplorerProvider.Instance.isLoading = true;
-      // setting up readonly provider
-      this.web3ProviderSettings = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId)
-      Web3ConnectionFactory.setReadonlyProvider().then(() => {
-        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
-        const engine = Web3ConnectionFactory.currentWeb3Engine
-        const canWrite = Web3ConnectionFactory.canWrite
+    // ExplorerProvider.Instance.isLoading = true;
+    // setting up readonly provider
+    this.web3ProviderSettings = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId)
+    Web3ConnectionFactory.setReadonlyProvider().then(() => {
+      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
+      const engine = Web3ConnectionFactory.currentWeb3Engine
+      const canWrite = Web3ConnectionFactory.canWrite
 
-        if (web3Wrapper && this.web3ProviderSettings) {
-          const contractsSource = new ContractsSource(
-            engine,
-            this.web3ProviderSettings.networkId,
-            canWrite
-          )
-          contractsSource.Init().then(() => {
-            this.web3Wrapper = web3Wrapper
-            this.providerEngine = engine
-            this.contractsSource = contractsSource
-            this.eventEmitter.emit(ExplorerProviderEvents.ProviderAvailable)
-          })
-        }
-      })
-    }
+      if (web3Wrapper && this.web3ProviderSettings) {
+        const contractsSource = new ContractsSource(
+          engine,
+          this.web3ProviderSettings.networkId,
+          canWrite
+        )
+        contractsSource.Init().then(() => {
+          this.web3Wrapper = web3Wrapper
+          this.providerEngine = engine
+          this.contractsSource = contractsSource
+          this.eventEmitter.emit(ExplorerProviderEvents.ProviderAvailable)
+        })
+      }
+    })
 
     return ExplorerProvider.Instance
   }

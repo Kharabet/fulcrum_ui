@@ -189,22 +189,6 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       return
     }
 
-    const provider = ExplorerProvider.getLocalstorageItem('providerType')
-
-    if (
-      !provider ||
-      provider === 'None' ||
-      !ExplorerProvider.Instance.contractsSource ||
-      !ExplorerProvider.Instance.contractsSource.canWrite
-    ) {
-      this.props.doNetworkConnect()
-      ;(await this._isMounted) &&
-        this.setState({
-          events: []
-        })
-      return
-    }
-
     let volume30d = new BigNumber(0)
     let liquidationEventsWithUsd: { event: LiquidationEvent; repayAmountUsd: BigNumber }[] = []
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory()
@@ -261,7 +245,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       seizeAmount: e.maxSeizable,
       loanToken: e.loanAsset,
       collateralToken: e.collateralAsset,
-      onLiquidationUpdated: this.derivedUpdate.bind(this)
+      onLiquidationUpdated: this.derivedUpdate.bind(this),
+      doNetworkConnect: this.props.doNetworkConnect
     }))
     await this.setState({
       ...this.state,
@@ -282,7 +267,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   private onProviderChanged = () => {
-    this.derivedUpdate()
+    // this.derivedUpdate()
   }
 
   private onProviderAvailable = () => {
@@ -303,6 +288,12 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   public componentDidMount(): void {
     this._isMounted = true
+
+    this._isMounted &&
+      this.setState({
+        ...this.state,
+        isDataLoading: true
+      })
 
     this.derivedUpdate()
   }
