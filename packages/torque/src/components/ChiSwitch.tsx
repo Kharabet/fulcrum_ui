@@ -19,9 +19,9 @@ export const ChiSwitch = () => {
     if (checked) {
       const allowance = await TorqueProvider.Instance.getGasTokenAllowance()
       if (!allowance.gt(0)) {
-        await TorqueProvider.Instance.checkAndSetApprovalForced(
-          Asset.CHI,
+        await TorqueProvider.Instance.setApproval(
           '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+          Asset.CHI,
           new BigNumber(10 ** 18)
         )
       }
