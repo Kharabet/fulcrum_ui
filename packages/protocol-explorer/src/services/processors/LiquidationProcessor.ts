@@ -4,6 +4,7 @@ import { LiquidationRequest } from '../../domain/LiquidationRequest'
 
 import { ExplorerProvider } from '../ExplorerProvider'
 import { erc20Contract } from '../../contracts/erc20'
+import { Asset } from '../../domain/Asset'
 
 export class LiquidationProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -72,13 +73,10 @@ export class LiquidationProcessor {
       // Waiting for token allowance
       task.processingStepNext()
       if (taskRequest.closeAmount.gt(erc20allowance)) {
-        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(
+        const approveHash = await ExplorerProvider.Instance.setApproval(
           iBZxContract.address,
-          ExplorerProvider.Instance.getLargeApprovalAmount(
-            taskRequest.loanToken,
-            taskRequest.closeAmount
-          ),
-          { from: account }
+          taskRequest.loanToken,
+          taskRequest.closeAmount
         )
         await ExplorerProvider.Instance.waitForTransactionMined(approveHash, taskRequest)
       }
@@ -92,17 +90,33 @@ export class LiquidationProcessor {
     let gasAmountBN = new BigNumber(0)
     let txHash: string = ''
 
+    const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
+    const chiTokenBalance = await ExplorerProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+
     try {
-      const gasAmount = await iBZxContract.liquidate.estimateGasAsync(
-        taskRequest.loanId,
-        account,
-        taskRequest.closeAmount,
-        {
-          from: account,
-          value: sendAmountForValue,
-          gas: ExplorerProvider.Instance.gasLimit
-        }
-      )
+      const gasAmount =
+        isGasTokenEnabled && chiTokenBalance.gt(0)
+          ? await iBZxContract.liquidateWithGasToken.estimateGasAsync(
+              taskRequest.loanId,
+              account,
+              account,
+              taskRequest.closeAmount,
+              {
+                from: account,
+                value: sendAmountForValue,
+                gas: ExplorerProvider.Instance.gasLimit
+              }
+            )
+          : await iBZxContract.liquidate.estimateGasAsync(
+              taskRequest.loanId,
+              account,
+              taskRequest.closeAmount,
+              {
+                from: account,
+                value: sendAmountForValue,
+                gas: ExplorerProvider.Instance.gasLimit
+              }
+            )
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(ExplorerProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
@@ -112,17 +126,31 @@ export class LiquidationProcessor {
     }
 
     try {
-      const txHash = await iBZxContract.liquidate.sendTransactionAsync(
-        taskRequest.loanId,
-        account,
-        taskRequest.closeAmount,
-        {
-          from: account,
-          value: sendAmountForValue,
-          gas: ExplorerProvider.Instance.gasLimit,
-          gasPrice: await ExplorerProvider.Instance.gasPrice()
-        }
-      )
+      txHash =
+        isGasTokenEnabled && chiTokenBalance.gt(0)
+          ? await iBZxContract.liquidateWithGasToken.sendTransactionAsync(
+              taskRequest.loanId,
+              account,
+              account,
+              taskRequest.closeAmount,
+              {
+                from: account,
+                value: sendAmountForValue,
+                gas: ExplorerProvider.Instance.gasLimit,
+                gasPrice: await ExplorerProvider.Instance.gasPrice()
+              }
+            )
+          : await iBZxContract.liquidate.sendTransactionAsync(
+              taskRequest.loanId,
+              account,
+              taskRequest.closeAmount,
+              {
+                from: account,
+                value: sendAmountForValue,
+                gas: ExplorerProvider.Instance.gasLimit,
+                gasPrice: await ExplorerProvider.Instance.gasPrice()
+              }
+            )
 
       task.setTxHash(txHash)
     } catch (e) {

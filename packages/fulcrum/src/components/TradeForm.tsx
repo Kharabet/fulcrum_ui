@@ -5,28 +5,26 @@ import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { ReactComponent as QuestionIcon } from '../assets/images/ic__question_mark.svg'
-import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
 import { Asset } from '../domain/Asset'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary, AssetsDictionaryMobile } from '../domain/AssetsDictionary'
 import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'
-import { TradeTokenKey } from '../domain/TradeTokenKey'
 import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
+import { ChiSwitch } from './ChiSwitch'
 import { CollapsibleContainer } from './CollapsibleContainer'
 import { InputAmount } from './InputAmount'
+import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import { TradeExpectedResult } from './TradeExpectedResult'
 
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import '../styles/components/trade-form.scss'
-import { ChiSwitch } from './ChiSwitch'
-import { InputReceive } from './InputReceive'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -203,13 +201,13 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
         : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken)
 
-    let initialMargin =
+    const initialMargin =
       this.props.positionType === PositionType.LONG
         ? new BigNumber(10 ** 38).div(new BigNumber(this.props.leverage - 1).times(10 ** 18))
         : new BigNumber(10 ** 38).div(new BigNumber(this.props.leverage).times(10 ** 18))
     const maintenanceMargin =
       this.props.loan && this.props.loan.loanData
-        ? this.props.loan.loanData!.maintenanceMargin
+        ? this.props.loan.loanData.maintenanceMargin
         : this.props.positionType === PositionType.LONG
         ? await FulcrumProvider.Instance.getMaintenanceMargin(
             this.props.quoteToken,
@@ -220,7 +218,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             this.props.quoteToken
           )
     // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
-    //if it's a SHORT then -> 10^36 / above
+    // if it's a SHORT then -> 10^36 / above
     const liquidationPriceBeforeTrade = maintenanceMargin
       .times(collateralToPrincipalRate.times(10 ** 18))
       .div(10 ** 20)
@@ -231,9 +229,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? liquidationPriceBeforeTrade.div(10 ** 18)
         : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18)
 
-    let exposureValue,
-      interestRate,
-      principal = new BigNumber(0)
+    let exposureValue = new BigNumber(0)
+    let interestRate = new BigNumber(0)
     // const interestRate = new BigNumber(0);//await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     if (this.props.tradeType === TradeType.SELL) {
       interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.baseToken)
@@ -321,8 +318,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           )
       } else {
         // this.derivedUpdate();
-        if (this.props.tradeType === TradeType.SELL)
+        if (this.props.tradeType === TradeType.SELL) {
+          // TODO: need to handle this with a feedback to the user?
           this.getLoanCloseAmount(this.state.returnedAsset)
+        }
       }
     }
   }
@@ -336,8 +335,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.tradeType === TradeType.BUY
         ? 'trade-form__submit-button--buy'
         : 'trade-form__submit-button--sell'
-
-    const tokenNameBase = this.state.assetDetails.displayName
 
     // const amountMsg =
     //   this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
@@ -368,6 +365,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     } else {
       submitButtonText += ` ${this.props.baseToken}`
     }
+
+    const canSubmit = this.state.inputAmountValue.gt(0)
 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
@@ -454,6 +453,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                   : ``
               }
               type="submit"
+              disabled={!canSubmit}
               className={`trade-form__submit-button ${submitClassName}`}>
               {this.state.isExposureLoading || this.state.isLoading ? (
                 <Preloader width="75px" />
@@ -572,11 +572,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   public onCollateralChange = async (asset: Asset) => {
-    this._isMounted && this.setState({ ...this.state, depositToken: asset })
-
-    await this.onInsertMaxValue(1)
-
-    // this._inputSetMax.next();
+    this._isMounted &&
+      this.setState({ ...this.state, depositToken: asset }, () => {
+        this.onInsertMaxValue(1)
+      })
   }
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
@@ -593,10 +592,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.onCancel()
       return
     }
-    let usdPrice = this.state.tradeAmountValue
-    if (usdPrice !== new BigNumber(0)) {
-      usdPrice = usdPrice.multipliedBy(rateUSD)
-    }
+
+    const usdPrice = this.state.tradeAmountValue.multipliedBy(rateUSD)
 
     if (isMainnetProd) {
       const randomNumber = Math.floor(Math.random() * 100000) + 1

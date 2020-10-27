@@ -19,6 +19,7 @@ export interface ILoanRowProps {
   loanToken: Asset
   collateralToken: Asset
   onLiquidationUpdated: () => void
+  doNetworkConnect: () => void
 }
 
 export interface ILoanRow {
@@ -43,14 +44,6 @@ export const LoanRow = (props: ILoanRowProps) => {
     loadData()
 
     ExplorerProvider.Instance.eventEmitter.on(
-      ExplorerProviderEvents.ProviderAvailable,
-      onProviderAvailable
-    )
-    ExplorerProvider.Instance.eventEmitter.on(
-      ExplorerProviderEvents.ProviderChanged,
-      onProviderChanged
-    )
-    ExplorerProvider.Instance.eventEmitter.on(
       ExplorerProviderEvents.AskToOpenProgressDlg,
       onAskToOpenProgressDlg
     )
@@ -60,14 +53,6 @@ export const LoanRow = (props: ILoanRowProps) => {
     )
 
     return () => {
-      ExplorerProvider.Instance.eventEmitter.off(
-        ExplorerProviderEvents.ProviderAvailable,
-        onProviderAvailable
-      )
-      ExplorerProvider.Instance.eventEmitter.off(
-        ExplorerProviderEvents.ProviderChanged,
-        onProviderChanged
-      )
       ExplorerProvider.Instance.eventEmitter.off(
         ExplorerProviderEvents.AskToOpenProgressDlg,
         onAskToOpenProgressDlg
@@ -80,6 +65,18 @@ export const LoanRow = (props: ILoanRowProps) => {
   })
 
   const onLiquidateClick = async () => {
+    const provider = ExplorerProvider.getLocalstorageItem('providerType')
+
+    if (
+      !provider ||
+      provider === 'None' ||
+      !ExplorerProvider.Instance.contractsSource ||
+      !ExplorerProvider.Instance.contractsSource.canWrite
+    ) {
+      props.doNetworkConnect()
+      return
+    }
+
     setLoadingTransaction(true)
     const loanId = props.loanId
     const decimals: number = AssetsDictionary.assets.get(props.loanToken)!.decimals || 18
@@ -108,14 +105,6 @@ export const LoanRow = (props: ILoanRowProps) => {
   ) => {
     setLoadingTransaction(isLoadingTransaction)
     setRequest(request)
-  }
-
-  const onProviderAvailable = () => {
-    props.onLiquidationUpdated()
-  }
-
-  const onProviderChanged = () => {
-    props.onLiquidationUpdated()
   }
 
   const onAskToOpenProgressDlg = async (taskId: string) => {

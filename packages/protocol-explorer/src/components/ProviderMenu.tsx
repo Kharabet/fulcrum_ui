@@ -105,17 +105,17 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     const switchButton = e.currentTarget
     if (!ExplorerProvider.Instance.contractsSource) return
     if (switchButton.checked) {
-      await ExplorerProvider.Instance.checkAndSetApprovalForced(
-        Asset.CHI,
+      await ExplorerProvider.Instance.setApproval(
         '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+        Asset.CHI,
         new BigNumber(10 ** 18)
       )
       switchButton.setAttribute('data-isgastokenenabled', 'true')
       localStorage.setItem('isGasTokenEnabled', 'true')
     } else {
-      await ExplorerProvider.Instance.checkAndSetApprovalForced(
-        Asset.CHI,
+      await ExplorerProvider.Instance.setApproval(
         '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+        Asset.CHI,
         new BigNumber(0)
       )
       switchButton.setAttribute('data-isgastokenenabled', 'false')

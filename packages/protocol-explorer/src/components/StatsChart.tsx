@@ -6,6 +6,7 @@ import { GroupButton } from './GroupButton'
 import { Line } from 'react-chartjs-2'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { AssetDetails } from '../domain/AssetDetails'
+import { ExplorerProvider } from '../services/ExplorerProvider'
 
 interface IStatsChartProps {
   isMobileMedia: boolean
@@ -27,7 +28,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
   private readonly activeLabelUpdate: Subject<string>
 
   private apiUrl = 'https://api.bzx.network/v1'
-  private readonly assetsShown: Asset[]
+  private readonly assetsShown: Asset[] = ExplorerProvider.Instance.assetsShown
   constructor(props: any) {
     super(props)
     this.state = {
@@ -40,28 +41,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       tvlWidth: 2,
       aprWidth: 2,
       utilizationWidth: 2
-    }
-
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
-      this.assetsShown = [
-        Asset.ETH,
-        Asset.DAI,
-        Asset.USDC,
-        Asset.USDT,
-        Asset.WBTC,
-        Asset.LINK,
-        Asset.YFI,
-        Asset.BZRX,
-        Asset.MKR,
-        Asset.LEND,
-        Asset.KNC
-      ]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
-      this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
-      this.assetsShown = [Asset.DAI, Asset.ETH]
-    } else {
-      this.assetsShown = []
     }
 
     this.activeLabelUpdate = new Subject<string>()

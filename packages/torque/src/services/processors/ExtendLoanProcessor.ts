@@ -78,13 +78,14 @@ export class ExtendLoanProcessor {
       // Waiting for token allowance
       task.processingStepNext()
       if (depositAmountInBaseUnits.gt(erc20allowance)) {
-        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(
-          TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(),
+        const spender = TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase()
+        const approveHash = await TorqueProvider.Instance.setApproval(
+          spender,
+          taskRequest.borrowAsset,
           TorqueProvider.Instance.getLargeApprovalAmount(
             taskRequest.borrowAsset,
             depositAmountInBaseUnits
-          ),
-          { from: account }
+          )
         )
         await TorqueProvider.Instance.waitForTransactionMined(approveHash)
       }

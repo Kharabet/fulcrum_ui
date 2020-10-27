@@ -36,6 +36,11 @@ import { TasksQueueEvents } from './events/TasksQueueEvents'
 import { RequestStatus } from '../domain/RequestStatus'
 import { LiquidationTransactionMinedEvent } from './events/LiquidationTransactionMinedEvent'
 
+const isMainnetProd =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
@@ -82,11 +87,34 @@ export class ExplorerProvider {
   private isChecking: boolean = false
 
   public static readonly MAX_UINT = new BigNumber(2).pow(256).minus(1)
+  public readonly assetsShown: Asset[]
 
   constructor() {
     // init
     this.eventEmitter = new EventEmitter()
     this.eventEmitter.setMaxListeners(1000)
+
+    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+      this.assetsShown = [
+        Asset.ETH,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
+        Asset.KNC
+      ]
+    } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+      this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
+    } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
+      this.assetsShown = [Asset.DAI, Asset.ETH]
+    } else {
+      this.assetsShown = []
+    }
 
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued)
 
@@ -99,30 +127,28 @@ export class ExplorerProvider {
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId)
-    if (!providerType || providerType === ProviderType.None) {
-      // ExplorerProvider.Instance.isLoading = true;
-      // setting up readonly provider
-      this.web3ProviderSettings = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId)
-      Web3ConnectionFactory.setReadonlyProvider().then(() => {
-        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
-        const engine = Web3ConnectionFactory.currentWeb3Engine
-        const canWrite = Web3ConnectionFactory.canWrite
+    // ExplorerProvider.Instance.isLoading = true;
+    // setting up readonly provider
+    this.web3ProviderSettings = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId)
+    Web3ConnectionFactory.setReadonlyProvider().then(() => {
+      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
+      const engine = Web3ConnectionFactory.currentWeb3Engine
+      const canWrite = Web3ConnectionFactory.canWrite
 
-        if (web3Wrapper && this.web3ProviderSettings) {
-          const contractsSource = new ContractsSource(
-            engine,
-            this.web3ProviderSettings.networkId,
-            canWrite
-          )
-          contractsSource.Init().then(() => {
-            this.web3Wrapper = web3Wrapper
-            this.providerEngine = engine
-            this.contractsSource = contractsSource
-            this.eventEmitter.emit(ExplorerProviderEvents.ProviderAvailable)
-          })
-        }
-      })
-    }
+      if (web3Wrapper && this.web3ProviderSettings) {
+        const contractsSource = new ContractsSource(
+          engine,
+          this.web3ProviderSettings.networkId,
+          canWrite
+        )
+        contractsSource.Init().then(() => {
+          this.web3Wrapper = web3Wrapper
+          this.providerEngine = engine
+          this.contractsSource = contractsSource
+          this.eventEmitter.emit(ExplorerProviderEvents.ProviderAvailable)
+        })
+      }
+    })
 
     return ExplorerProvider.Instance
   }
@@ -241,31 +267,48 @@ export class ExplorerProvider {
     }
   }
 
-  public checkAndSetApprovalForced = async (
-    asset: Asset,
+  public setApproval = async (
     spender: string,
+    asset: Asset,
     amountInBaseUnits: BigNumber
-  ): Promise<boolean> => {
-    let result = false
+  ): Promise<string> => {
+    const resetRequiredAssets = [Asset.USDT, Asset.KNC, Asset.LEND] // these assets require to set approve to 0 before approve larger amount than the current spend limit
+    let result = ''
     const assetErc20Address = this.getErc20AddressOfAsset(asset)
 
     if (
-      this.web3Wrapper &&
-      this.contractsSource &&
-      this.contractsSource.canWrite &&
-      assetErc20Address
+      !this.web3Wrapper ||
+      !this.contractsSource ||
+      !this.contractsSource.canWrite ||
+      !assetErc20Address
     ) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
-      const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
+      return result
+    }
 
-      if (account && tokenErc20Contract) {
-        await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, {
-          from: account
-        })
-        result = true
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
+
+    if (!account || !tokenErc20Contract) {
+      return result
+    }
+
+    if (resetRequiredAssets.includes(asset)) {
+      const allowance = await tokenErc20Contract.allowance.callAsync(account, spender)
+      if (allowance.gt(0) && amountInBaseUnits.gt(allowance)) {
+        const zeroApprovHash = await tokenErc20Contract.approve.sendTransactionAsync(
+          spender,
+          new BigNumber(0),
+          { from: account }
+        )
+        await this.waitForTransactionMined(zeroApprovHash)
       }
     }
+
+    result = await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, {
+      from: account
+    })
+
     return result
   }
 
@@ -567,6 +610,8 @@ export class ExplorerProvider {
       isUnhealthy
     )
 
+    const mappedAssetsShown = this.assetsShown.map((asset) => this.wethToEth(asset))
+    const usdPrices = await this.getSwapToUsdRatesOffChain(mappedAssetsShown)
     loansData.forEach(async (e) => {
       const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
       const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
@@ -574,7 +619,8 @@ export class ExplorerProvider {
         console.log('unknown', loanAsset, collateralAsset)
         return null
       }
-      const loandAssetUsdRate = await this.getSwapToUsdRate(loanAsset)
+      const assetIndex = mappedAssetsShown.indexOf(this.wethToEth(loanAsset))
+      const loandAssetUsdRate = usdPrices[assetIndex]
       const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18
       const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
       let amountOwned = e.principal.minus(e.interestDepositRemaining)
@@ -893,7 +939,7 @@ export class ExplorerProvider {
     return result
   }
 
-  public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
+  public async getSwapToUsdRate(asset: Asset, offChain = false): Promise<BigNumber> {
     if (
       asset === Asset.SAI ||
       asset === Asset.DAI ||
@@ -904,13 +950,11 @@ export class ExplorerProvider {
       return new BigNumber(1)
     }
 
-    /*const swapRates = await this.getSwapToUsdRateBatch(
-          [asset],
-          Asset.DAI
-        );
-    
-        return swapRates[0][0];*/
-    return this.getSwapRate(asset, Asset.USDC)
+    if (offChain) {
+      return this.getSwapToUsdRateOffChain(asset)
+    }
+
+    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
   public async getSwapRate(
@@ -958,6 +1002,35 @@ export class ExplorerProvider {
         console.log(e)
         result = new BigNumber(0)
       }
+    }
+    return result
+  }
+
+  public getSwapToUsdRateOffChain = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0)
+    const token = this.isETHAsset(asset) ? Asset.ETH : asset
+    const swapToUsdHistoryRateRequest = await fetch('https://api.bzx.network/v1/oracle-rates-usd')
+    const swapToUsdHistoryRateResponse = await swapToUsdHistoryRateRequest.json()
+    if (
+      swapToUsdHistoryRateResponse.success &&
+      swapToUsdHistoryRateResponse.data[token.toLowerCase()]
+    ) {
+      result = new BigNumber(swapToUsdHistoryRateResponse.data[token.toLowerCase()])
+    }
+    return result
+  }
+
+  public getSwapToUsdRatesOffChain = async (assets: Asset[]): Promise<BigNumber[]> => {
+    let result = Array<BigNumber>(assets.length).fill(new BigNumber(0))
+    const swapToUsdHistoryRateRequest = await fetch('https://api.bzx.network/v1/oracle-rates-usd')
+    const swapToUsdHistoryRateResponse = await swapToUsdHistoryRateRequest.json()
+    if (swapToUsdHistoryRateResponse.success) {
+      result = assets.map((asset) => {
+        const token = this.isETHAsset(asset) ? Asset.ETH : asset
+        return swapToUsdHistoryRateResponse.data[token.toLowerCase()]
+          ? new BigNumber(swapToUsdHistoryRateResponse.data[token.toLowerCase()])
+          : new BigNumber(0)
+      })
     }
     return result
   }
@@ -1076,7 +1149,7 @@ export class ExplorerProvider {
 
   public waitForTransactionMined = async (
     txHash: string,
-    request: LiquidationRequest
+    request?: LiquidationRequest
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
       try {
@@ -1094,13 +1167,13 @@ export class ExplorerProvider {
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LiquidationRequest,
+    request: LiquidationRequest | undefined,
     resolve: (value: any) => void,
     reject: (value: any) => void
   ) => {
     try {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash)
-      if (receipt && request instanceof LiquidationRequest) {
+      if (receipt && request && request instanceof LiquidationRequest) {
         resolve(receipt)
 
         const randomNumber = Math.floor(Math.random() * 100000) + 1
@@ -1204,6 +1277,9 @@ export class ExplorerProvider {
   }
   public isETHAsset = (asset: Asset): boolean => {
     return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
+  }
+  public wethToEth = (asset: Asset): Asset => {
+    return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH ? Asset.ETH : asset
   }
 }
 

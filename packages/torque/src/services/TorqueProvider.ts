@@ -69,6 +69,11 @@ import { ManageCollateralProcessor } from './processors/ManageCollateralProcesso
 // import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
 // import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
 
+const isMainnetProd =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+  
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
   configAddress = constantAddress.mainnet
@@ -442,7 +447,7 @@ export class TorqueProvider {
       return new BigNumber(1)
     }
 
-    return this.getSwapRate(asset, Asset.USDC)
+    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
   public async getSwapRate(
@@ -535,31 +540,48 @@ export class TorqueProvider {
     return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
-  public checkAndSetApprovalForced = async (
-    asset: Asset,
+  public setApproval = async (
     spender: string,
+    asset: Asset,
     amountInBaseUnits: BigNumber
-  ): Promise<boolean> => {
-    let result = false
+  ): Promise<string> => {
+    const resetRequiredAssets = [Asset.USDT, Asset.KNC, Asset.LEND] // these assets require to set approve to 0 before approve larger amount than the current spend limit
+    let result = ''
     const assetErc20Address = this.getErc20AddressOfAsset(asset)
 
     if (
-      this.web3Wrapper &&
-      this.contractsSource &&
-      this.contractsSource.canWrite &&
-      assetErc20Address
+      !this.web3Wrapper ||
+      !this.contractsSource ||
+      !this.contractsSource.canWrite ||
+      !assetErc20Address
     ) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
-      const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
+      return result
+    }
 
-      if (account && tokenErc20Contract) {
-        await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, {
-          from: account
-        })
-        result = true
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
+
+    if (!account || !tokenErc20Contract) {
+      return result
+    }
+
+    if (resetRequiredAssets.includes(asset)) {
+      const allowance = await tokenErc20Contract.allowance.callAsync(account, spender)
+      if (allowance.gt(0) && amountInBaseUnits.gt(allowance)) {
+        const zeroApprovHash = await tokenErc20Contract.approve.sendTransactionAsync(
+          spender,
+          new BigNumber(0),
+          { from: account }
+        )
+        await this.waitForTransactionMined(zeroApprovHash)
       }
     }
+
+    result = await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, {
+      from: account
+    })
+
     return result
   }
 
@@ -611,7 +633,8 @@ export class TorqueProvider {
     if (!loanParam) {
       return new BigNumber(120) // fallback percent
     }
-    return loanParam.minInitialMargin.div(10 ** 18).plus(100)
+    const percents = loanParam.minInitialMargin.div(10 ** 18).plus(100)
+    return percents
   }
 
   private getLoanParams = async (
@@ -2097,7 +2120,7 @@ export class TorqueProvider {
   };*/
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
+    return asset === Asset.ETH || asset === Asset.WETH
   }
 
   public isStableAsset = (asset: Asset): boolean => {

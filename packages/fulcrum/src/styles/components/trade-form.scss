@@ -283,6 +283,18 @@
       }
     }
   }
+  .trade-form__submit-button--buy:disabled,
+  .trade-form__submit-button--sell:disabled {
+    background-color: #a9b5c7;
+
+    .container-loader {
+      background-color: #eee;
+
+      .item-loader {
+        background-color: #fff;
+      }
+    }
+  }
   .input-receive {
     &__title {
       font-weight: 600;

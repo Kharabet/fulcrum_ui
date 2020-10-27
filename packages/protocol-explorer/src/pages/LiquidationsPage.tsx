@@ -39,6 +39,7 @@ interface ILiquidationsPageState {
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
   private _isMounted: boolean
 
+  private readonly stablecoins: Asset[] = [Asset.DAI, Asset.USDC, Asset.USDT]
   private readonly assetsShown: { token: Asset; color: string }[]
 
   constructor(props: any) {
@@ -188,22 +189,6 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       return
     }
 
-    const provider = ExplorerProvider.getLocalstorageItem('providerType')
-
-    if (
-      !provider ||
-      provider === 'None' ||
-      !ExplorerProvider.Instance.contractsSource ||
-      !ExplorerProvider.Instance.contractsSource.canWrite
-    ) {
-      this.props.doNetworkConnect()
-      ;(await this._isMounted) &&
-        this.setState({
-          events: []
-        })
-      return
-    }
-
     let volume30d = new BigNumber(0)
     let liquidationEventsWithUsd: { event: LiquidationEvent; repayAmountUsd: BigNumber }[] = []
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory()
@@ -228,16 +213,26 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       )
       for (const e of tokenLiqudiations30d) {
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18
-        const swapToUsdHistoryRateRequest = await fetch(
-          `https://api.bzx.network/v1/asset-history-price?asset=${
-            e.loanToken === Asset.fWETH ? 'eth' : e.loanToken.toLowerCase()
-          }&date=${e.timeStamp.getTime()}`
-        )
-        const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
-        if (!swapToUsdHistoryRateResponse) continue
-        const repayAmountUsd = e.repayAmount
-          .div(10 ** loanAssetDecimals)
-          .times(swapToUsdHistoryRateResponse.swapToUSDPrice)
+        const collateralAssetDecimals =
+          AssetsDictionary.assets.get(e.collateralToken)!.decimals || 18
+        let swapToUSDPrice = this.stablecoins.includes(e.loanToken)
+          ? new BigNumber(1)
+          : new BigNumber(10 ** 36).div(e.collateralToLoanRate).div(10 ** collateralAssetDecimals)
+
+        if (
+          !this.stablecoins.includes(e.loanToken) &&
+          !this.stablecoins.includes(e.collateralToken)
+        ) {
+          const swapToUsdHistoryRateRequest = await fetch(
+            `https://api.bzx.network/v1/asset-history-price?asset=${
+              e.loanToken === Asset.fWETH ? 'eth' : e.loanToken.toLowerCase()
+            }&date=${e.timeStamp.getTime()}`
+          )
+          const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
+          if (!swapToUsdHistoryRateResponse) continue
+          swapToUSDPrice = swapToUsdHistoryRateResponse.swapToUSDPrice
+        }
+        const repayAmountUsd = e.repayAmount.div(10 ** loanAssetDecimals).times(swapToUSDPrice)
         volume30d = volume30d.plus(repayAmountUsd)
         liquidationEventsWithUsd.push({ event: e, repayAmountUsd: repayAmountUsd })
       }
@@ -250,7 +245,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       seizeAmount: e.maxSeizable,
       loanToken: e.loanAsset,
       collateralToken: e.collateralAsset,
-      onLiquidationUpdated: this.derivedUpdate.bind(this)
+      onLiquidationUpdated: this.derivedUpdate.bind(this),
+      doNetworkConnect: this.props.doNetworkConnect
     }))
     await this.setState({
       ...this.state,
@@ -271,7 +267,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   private onProviderChanged = () => {
-    this.derivedUpdate()
+    // this.derivedUpdate()
   }
 
   private onProviderAvailable = () => {
@@ -292,6 +288,12 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   public componentDidMount(): void {
     this._isMounted = true
+
+    this._isMounted &&
+      this.setState({
+        ...this.state,
+        isDataLoading: true
+      })
 
     this.derivedUpdate()
   }

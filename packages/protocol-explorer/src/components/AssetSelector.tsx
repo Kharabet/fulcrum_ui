@@ -3,6 +3,7 @@ import { AssetSelectorItem } from './AssetSelectorItem'
 import { Asset } from '../domain/Asset'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { AssetDetails } from '../domain/AssetDetails'
+import { ExplorerProvider } from '../services/ExplorerProvider'
 
 export interface IAssetSelectorProps {}
 
@@ -12,34 +13,13 @@ export interface IAssetSelectorState {
 }
 
 export class AssetSelector extends Component<IAssetSelectorProps, IAssetSelectorState> {
-  private assetsShown: Asset[]
+  private assetsShown: Asset[] = ExplorerProvider.Instance.assetsShown
   private apiUrl = 'https://api.bzx.network/v1'
   constructor(props: any) {
     super(props)
     this.state = {
       apr: [],
       tvl: []
-    }
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
-      this.assetsShown = [
-        Asset.ETH,
-        Asset.DAI,
-        Asset.USDC,
-        Asset.USDT,
-        Asset.WBTC,
-        Asset.LINK,
-        Asset.YFI,
-        Asset.BZRX,
-        Asset.MKR,
-        Asset.LEND,
-        Asset.KNC
-      ]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
-      this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
-      this.assetsShown = [Asset.DAI, Asset.ETH]
-    } else {
-      this.assetsShown = []
     }
   }
 

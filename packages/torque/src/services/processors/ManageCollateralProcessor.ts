@@ -4,6 +4,7 @@ import { ManageCollateralRequest } from '../../domain/ManageCollateralRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { TorqueProvider } from '../TorqueProvider'
 import { erc20Contract } from '../../contracts/erc20'
+import { Asset } from '../../domain/Asset'
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -84,13 +85,14 @@ export class ManageCollateralProcessor {
       // Waiting for token allowance
       task.processingStepNext()
       if (collateralAmountInBaseUnits.gt(erc20allowance)) {
-        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(
-          TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(),
+        const spender = TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase()
+        const approveHash = await TorqueProvider.Instance.setApproval(
+          spender,
+          taskRequest.collateralAsset,
           TorqueProvider.Instance.getLargeApprovalAmount(
             taskRequest.collateralAsset,
             collateralAmountInBaseUnits
-          ),
-          { from: account }
+          )
         )
         await TorqueProvider.Instance.waitForTransactionMined(approveHash)
       }

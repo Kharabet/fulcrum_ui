@@ -1,16 +1,16 @@
 import * as React from 'react'
 import {
-  widget,
   ChartingLibraryWidgetOptions,
-  LanguageCode,
   IChartingLibraryWidget,
-  StudyOverrides
+  LanguageCode,
+  StudyOverrides,
+  widget
 } from '../charting_library/charting_library.min'
 import { PreloaderChart } from './PreloaderChart'
 
 import '../styles/components/trading-view-chart.scss'
 
-export interface ChartContainerProps {
+export interface IChartContainerProps {
   symbol: ChartingLibraryWidgetOptions['symbol']
   interval: ChartingLibraryWidgetOptions['interval']
 
@@ -33,7 +33,7 @@ export interface ChartContainerProps {
   custom_css_url: ChartingLibraryWidgetOptions['custom_css_url']
 }
 
-export interface ChartContainerState {
+export interface IChartContainerState {
   preset: ChartingLibraryWidgetOptions['preset']
   ready: boolean
 }
@@ -47,22 +47,22 @@ function getLanguageFromURL(): LanguageCode | null {
 }
 
 export class TVChartContainer extends React.PureComponent<
-  Partial<ChartContainerProps>,
-  ChartContainerState
+  Partial<IChartContainerProps>,
+  IChartContainerState
 > {
-  //private readonly baseSymbol: string;
+  // private readonly baseSymbol: string;
 
-  constructor(props: ChartContainerProps, context?: any) {
+  constructor(props: IChartContainerProps, context?: any) {
     super(props, context)
     this.state = {
       preset: this.props.preset,
       ready: true
     }
-    var that = this
-    //	this.baseSymbol = "DAI";
-    this.observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if (mutation.type == 'attributes') {
+    const that = this
+    // this.baseSymbol = "DAI";
+    this.observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes') {
           that.updateWidget()
         }
       })
@@ -70,7 +70,7 @@ export class TVChartContainer extends React.PureComponent<
   }
   private observer: MutationObserver
 
-  public static defaultProps: ChartContainerProps = {
+  public static defaultProps: IChartContainerProps = {
     symbol: 'ETH',
     interval: '30',
     containerId: 'tv_chart_container',
@@ -85,7 +85,7 @@ export class TVChartContainer extends React.PureComponent<
       'use_localstorage_for_settings',
       'header_fullscreen_button',
       'go_to_date'
-      //"timeframes_toolbar"
+      // 'timeframes_toolbar'
     ],
     libraryPath: '/charting_library/',
     chartsStorageUrl: 'https://saveload.tradingview.com',
@@ -149,7 +149,7 @@ export class TVChartContainer extends React.PureComponent<
   }
   public componentDidMount(): void {
     this.observer.observe(document.documentElement, {
-      attributes: true //configure it to listen to attribute changes
+      attributes: true // configure it to listen to attribute changes
     })
     const widgetOptions: ChartingLibraryWidgetOptions = this.GetWidgetOptions()
     const tvWidget = new widget(widgetOptions)
@@ -160,12 +160,12 @@ export class TVChartContainer extends React.PureComponent<
   }
 
   public changePair(symbol: string) {
-    var widget = this.tvWidget
+    const tvWidget = this.tvWidget
     this.setState({ ...this.state, ready: true })
-    if (widget) {
-      widget.onChartReady(() => {
-        if (widget) {
-          const chart = widget.chart()
+    if (tvWidget) {
+      tvWidget.onChartReady(() => {
+        if (tvWidget) {
+          const chart = tvWidget.chart()
           chart.setSymbol(symbol, function e() {})
           this.setState({ ...this.state, ready: false })
         }
@@ -181,10 +181,11 @@ export class TVChartContainer extends React.PureComponent<
     this.observer.disconnect()
   }
 
-  public componentDidUpdate(prevProps: Readonly<ChartContainerProps>): void {
-    if (this.props.symbol && prevProps.symbol !== this.props.symbol)
+  public componentDidUpdate(prevProps: Readonly<IChartContainerProps>): void {
+    if (this.props.symbol && prevProps.symbol !== this.props.symbol) {
       this.changePair(this.props.symbol)
-    if (prevProps.theme !== this.props.theme || this.props.preset != prevProps.preset) {
+    }
+    if (prevProps.theme !== this.props.theme || this.props.preset !== prevProps.preset) {
       this.updateWidget()
     }
   }
