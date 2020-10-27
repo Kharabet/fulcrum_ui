@@ -863,7 +863,7 @@ export class FulcrumProvider {
         const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18
         const collateralAssetDecimals =
           AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18
-          
+
         const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
         const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
 
@@ -1793,6 +1793,89 @@ export class FulcrumProvider {
       })
       .filter((e: IBorrowedFundsState | undefined) => e)
     console.log(result)
+    return result
+  }
+
+  public async getUserMarginTradeLoansByPair(
+    baseToken: Asset,
+    quoteToken: Asset
+  ): Promise<{ loans: IBorrowedFundsState[]; allUsersLoansCount: number }> {
+    const result: { loans: IBorrowedFundsState[]; allUsersLoansCount: number } = {
+      loans: [],
+      allUsersLoansCount: 0
+    }
+
+    if (!this.contractsSource) return result
+
+    const iBZxContract = await this.contractsSource.getiBZxContract()
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+
+    const baseTokenAddress =
+      AssetsDictionary.assets
+        .get(baseToken)
+        ?.addressErc20.get(this.web3ProviderSettings.networkId) || ''
+    const quoteTokenAddress =
+      AssetsDictionary.assets
+        .get(quoteToken)
+        ?.addressErc20.get(this.web3ProviderSettings.networkId) || ''
+
+    if (!iBZxContract || !account || !baseTokenAddress || !quoteTokenAddress) return result
+
+    const loansData = await iBZxContract.getUserLoans.callAsync(
+      account,
+      new BigNumber(0),
+      new BigNumber(50),
+      1, // margin trade loans
+      false,
+      false
+    )
+    const zero = new BigNumber(0)
+    const healthyUserLoans = loansData.filter(
+      (e: any) =>
+        (!e.principal.eq(zero) &&
+          !e.currentMargin.eq(zero) &&
+          !e.interestDepositRemaining.eq(zero)) ||
+        account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+    )
+    const loansByPair: IBorrowedFundsState[] = []
+    healthyUserLoans
+      .filter(
+        (e: any) =>
+          (e.loanToken === baseTokenAddress && e.collateralToken === quoteTokenAddress) ||
+          (e.loanToken === quoteTokenAddress && e.collateralToken === baseTokenAddress)
+      )
+      .forEach((e: any) => {
+        const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
+        const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
+        if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) return
+        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18
+        const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
+        let amountOwned = e.principal.minus(e.interestDepositRemaining)
+        if (amountOwned.lte(0)) {
+          amountOwned = new BigNumber(0)
+        } else {
+          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL)
+        }
+        loansByPair.push({
+          accountAddress: account,
+          loanId: e.loanId,
+          loanAsset: loanAsset,
+          collateralAsset: collateralAsset,
+          amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+          amountOwed: amountOwned,
+          collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
+          collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
+          interestRate: e.interestOwedPerDay.dividedBy(e.principal).multipliedBy(365),
+          interestOwedPerDay: e.interestOwedPerDay.dividedBy(10 ** loanPrecision),
+          hasManagementContract: true,
+          isInProgress: false,
+          loanData: e
+        } as IBorrowedFundsState)
+      })
+
+    result.allUsersLoansCount = healthyUserLoans.length
+    result.loans = loansByPair
     return result
   }
 
