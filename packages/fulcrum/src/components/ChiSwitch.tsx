@@ -1,9 +1,11 @@
+import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
+import { Asset } from '../domain/Asset'
+import { FulcrumProvider } from '../services/FulcrumProvider'
+import '../styles/components/chi-switch.scss'
 import { CheckBox } from './CheckBox'
 
-export interface IChiSwitchProps {}
-
-export const ChiSwitch = (props: IChiSwitchProps) => {
+export const ChiSwitch = () => {
   const [isGasTokenEnabled, setChecked] = useState(
     localStorage.getItem('isGasTokenEnabled') === 'true'
   )
@@ -12,9 +14,19 @@ export const ChiSwitch = (props: IChiSwitchProps) => {
     localStorage.setItem('isGasTokenEnabled', isGasTokenEnabled.toString())
   }, [isGasTokenEnabled])
 
-  function onChange(event: ChangeEvent<HTMLInputElement>): void {
-    const value = event.target.checked
-    setChecked(value)
+  async function onChange(event: ChangeEvent<HTMLInputElement>) {
+    const checked = event.target.checked
+    if (checked) {
+      const allowance = await FulcrumProvider.Instance.getGasTokenAllowance()
+      if (!allowance.gt(0)) {
+        await FulcrumProvider.Instance.checkAndSetApprovalForced(
+          Asset.CHI,
+          '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+          new BigNumber(10 ** 18)
+        )
+      }
+    }
+    setChecked(checked)
   }
 
   return (
