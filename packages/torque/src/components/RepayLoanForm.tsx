@@ -9,6 +9,7 @@ import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { IRepayEstimate } from '../domain/IRepayEstimate'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
 import { TorqueProvider } from '../services/TorqueProvider'
+import { ChiSwitch } from './ChiSwitch'
 import { InputAmount } from './InputAmount'
 
 export interface IRepayLoanFormProps {
@@ -106,7 +107,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         }
       )
     }
-    if (prevState.interestAmount !== this.state.interestAmount)
+    prevState.interestAmount !== this.state.interestAmount &&
       this.updateRepayAmount(this.state.interestAmount)
   }
 
@@ -131,6 +132,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
             </div>
           ) : null}
         </section>
+        <ChiSwitch />
         <section className="dialog-actions">
           <div className="repay-loan-form__actions-container">
             <button
@@ -240,14 +242,15 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
   public updateRepayAmount = (value: number) => {
     if (value !== 0) {
-      let repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(this.state.interestAmount)
-      let repayAmountText = repayAmount.toString()
+      const repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(
+        this.state.interestAmount
+      )
 
       this.setState(
         {
           ...this.state,
           repayAmount: repayAmount,
-          repayAmountText: repayAmountText
+          repayAmountText: repayAmount.toString()
         },
         () => {
           // emitting next event for processing with rx.js
