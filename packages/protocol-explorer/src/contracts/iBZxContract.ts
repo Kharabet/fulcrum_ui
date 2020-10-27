@@ -3217,7 +3217,7 @@ export class iBZxContract extends BaseContract {
       loanDataBytes: string,
       callData: Partial<CallData> = {},
       defaultBlock?: BlockParam
-    ): Promise<void> {
+    ): Promise<[string, BigNumber]> {
       const self = (this as any) as iBZxContract
       const encodedData = self._strictEncodeArguments('rollover(bytes32,bytes)', [
         loanId,
@@ -3235,7 +3235,7 @@ export class iBZxContract extends BaseContract {
       BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('rollover(bytes32,bytes)')
       // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<void>(rawCallResult)
+      const result = abiEncoder.strictDecodeReturnValue<[string, BigNumber]>(rawCallResult)
       // tslint:enable boolean-naming
       return result
     }

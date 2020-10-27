@@ -8,7 +8,7 @@ export interface IActiveLoanData {
   amountOwedUsd: BigNumber
   maxLiquidatable: BigNumber
   maxSeizable: BigNumber
-  loanData?: {
+  loanData: {
     loanId: string
     endTimestamp: BigNumber
     loanToken: string

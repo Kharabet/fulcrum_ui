@@ -7,39 +7,36 @@ import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { RequestTask } from '../domain/RequestTask'
 import { RequestStatus } from '../domain/RequestStatus'
-import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { CircleLoader } from './CircleLoader'
 import { TxLoaderStep } from './TxLoaderStep'
 import { TasksQueue } from '../services/TasksQueue'
 
-export interface ILoanRowProps {
+export interface IRolloverRowProps {
   loanId: string
-  payOffAmount: BigNumber
-  seizeAmount: BigNumber
-  loanToken: Asset
-  collateralToken: Asset
-  onLiquidationUpdated: () => void
+  rebateAsset: Asset
+  gasRebate: BigNumber
+  onRolloverUpdated: () => void
   doNetworkConnect: () => void
 }
 
-export interface ILoanRow {
+export interface IRolloverRow {
   isLoadingTransaction: boolean
 }
 
-export const LoanRow = (props: ILoanRowProps) => {
-  const loanToken = AssetsDictionary.assets.get(props.loanToken) as AssetDetails
-  const collateralToken = AssetsDictionary.assets.get(props.collateralToken) as AssetDetails
+export const RolloverRow = (props: IRolloverRowProps) => {
+    const rebateToken = AssetsDictionary.assets.get(props.rebateAsset) as AssetDetails
 
   const [isLoadingTransaction, setLoadingTransaction] = useState(false)
-  const [liquidationRequest, setRequest] = useState<LiquidationRequest>()
+  const [rolloverRequest, setRequest] = useState<RolloverRequest>()
 
   useEffect(() => {
     async function loadData() {
-      const task = TasksQueue.Instance.getTasksList().find(
-        (t: RequestTask) => t.request instanceof LiquidationRequest && t.request.loanId === props.loanId
+      const task =TasksQueue.Instance.getTasksList().find(
+        (t: RequestTask) => t.request instanceof RolloverRequest && t.request.loanId === props.loanId
       )
       setLoadingTransaction(task && !task.error ? true : false)
-      setRequest(task && task.request instanceof LiquidationRequest ? task.request : undefined)
+      setRequest(task && task.request instanceof RolloverRequest ? task.request : undefined)
     }
     loadData()
 
@@ -64,7 +61,7 @@ export const LoanRow = (props: ILoanRowProps) => {
     }
   })
 
-  const onLiquidateClick = async () => {
+  const onRolloverClick = async () => {
     const provider = ExplorerProvider.getLocalstorageItem('providerType')
 
     if (
@@ -79,20 +76,12 @@ export const LoanRow = (props: ILoanRowProps) => {
 
     setLoadingTransaction(true)
     const loanId = props.loanId
-    const decimals: number = AssetsDictionary.assets.get(props.loanToken)!.decimals || 18
 
-    const amountInBaseUnits = new BigNumber(
-      props.payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
-    )
-    const request = new LiquidationRequest(
-      loanId || '0x0000000000000000000000000000000000000000000000000000000000000000',
-      props.loanToken,
-      amountInBaseUnits
-    )
+    const request = new RolloverRequest(loanId)
 
     console.log(request)
     changeLoadingTransaction(true, request)
-    await ExplorerProvider.Instance.onLiquidationConfirmed(request)
+    await ExplorerProvider.Instance.onRolloverConfirmed(request)
   }
 
   const getShortHash = (hash: string, count: number) => {
@@ -101,19 +90,19 @@ export const LoanRow = (props: ILoanRowProps) => {
 
   const changeLoadingTransaction = (
     isLoadingTransaction: boolean,
-    request: LiquidationRequest | undefined
+    request: RolloverRequest | undefined
   ) => {
     setLoadingTransaction(isLoadingTransaction)
     setRequest(request)
   }
 
   const onAskToOpenProgressDlg = async (taskId: string) => {
-    if (!liquidationRequest || taskId !== liquidationRequest.loanId) return
-    changeLoadingTransaction(true, liquidationRequest)
+    if (!rolloverRequest || taskId !== rolloverRequest.loanId) return
+    changeLoadingTransaction(true, rolloverRequest)
   }
 
   const onAskToCloseProgressDlg = async (task: RequestTask) => {
-    if (!liquidationRequest || task.request.loanId !== liquidationRequest.loanId) return
+    if (!rolloverRequest || task.request.loanId !== rolloverRequest.loanId) return
 
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
@@ -123,7 +112,7 @@ export const LoanRow = (props: ILoanRowProps) => {
       return
     }
 
-    props.onLiquidationUpdated()
+    props.onRolloverUpdated()
     changeLoadingTransaction(false, undefined)
   }
 
@@ -139,16 +128,15 @@ export const LoanRow = (props: ILoanRowProps) => {
           <div title={props.loanId} className="table-row-loan__id">
             {getShortHash(props.loanId, 45)}
           </div>
-          <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">
-            {loanToken.logoSvg.render()} {props.payOffAmount.toFixed(3)}
+          <div className="table-row-loan__amount">
+            {rebateToken.logoSvg.render()}
           </div>
-          <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">
-            {collateralToken.logoSvg.render()}
-            {props.seizeAmount.toFixed(3)}
+          <div title={props.gasRebate.toFixed()} className="table-row-loan__collateral">
+            {props.gasRebate.toFixed(2)}
           </div>
           <div className="table-row-loan__action">
-            <button className="action" onClick={onLiquidateClick}>
-              Liquidate
+            <button className="action" onClick={onRolloverClick}>
+              Rollover
             </button>
           </div>
         </div>

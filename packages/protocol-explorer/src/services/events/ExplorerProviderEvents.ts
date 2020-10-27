@@ -3,6 +3,7 @@ export enum ExplorerProviderEvents {
   ProviderChanged = 'ProviderChanged',
   ProviderIsChanging = 'ProviderIsChanging',
   LiquidationTransactionMined = 'LiquidationTransactionMined',
+  RolloverTransactionMined = 'RolloverTransactionMined',
   AskToOpenProgressDlg = 'AskToOpenProgressDlg',
   AskToCloseProgressDlg = 'AskToCloseProgressDlg'
 }

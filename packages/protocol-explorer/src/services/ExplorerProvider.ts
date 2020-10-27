@@ -35,6 +35,9 @@ import { TasksQueue } from '../services/TasksQueue'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
 import { RequestStatus } from '../domain/RequestStatus'
 import { LiquidationTransactionMinedEvent } from './events/LiquidationTransactionMinedEvent'
+import { RolloverRequest } from '../domain/RolloverRequest'
+import { RolloverTransactionMinedEvent } from './events/RolloverTransactionMinedEvent'
+import { IRolloverData } from '../domain/IRolloverData'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -313,6 +316,12 @@ export class ExplorerProvider {
   }
 
   public onLiquidationConfirmed = async (request: LiquidationRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
+  public onRolloverConfirmed = async (request: RolloverRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
@@ -641,6 +650,26 @@ export class ExplorerProvider {
     })
 
     return result
+  }
+
+  public getRollovers = async (start: number, count: number): Promise<IRolloverData[]> => {
+    const rollovers: IRolloverData[] = []
+    if (!this.contractsSource) return rollovers
+    const iBZxContract = await this.contractsSource.getiBZxContract()
+
+    if (!iBZxContract) return rollovers
+   
+    const activeLoans = await this.getBzxLoans(start, count, true)
+    activeLoans.forEach(async (loan) => {
+      if (loan.loanData.interestDepositRemaining.eq(0)) {
+        const rolloverEstimate = await iBZxContract.rollover.callAsync(loan.loanId, '0x')
+        const rebateAsset = this.contractsSource!.getAssetFromAddress(rolloverEstimate[0])
+        const gasRebate = rolloverEstimate[1]
+        const rollover = { ...loan, rebateAsset, gasRebate }
+        rollovers.push(rollover)
+      }
+    })
+    return rollovers
   }
 
   public getBurnHistory = async (asset: Asset): Promise<BurnEvent[]> => {
@@ -1107,6 +1136,8 @@ export class ExplorerProvider {
   private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
     if (task.request instanceof LiquidationRequest) {
       await this.processLiquidationRequestTask(task, skipGas)
+    } else if (task.request instanceof RolloverRequest) {
+      await this.processRolloverRequestTask(task, skipGas)
     }
 
     return false
@@ -1114,7 +1145,6 @@ export class ExplorerProvider {
 
   private processLiquidationRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
-      debugger
       this.eventEmitter.emit(ExplorerProviderEvents.AskToOpenProgressDlg, task.request.loanId)
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error('No provider available!')
@@ -1147,9 +1177,43 @@ export class ExplorerProvider {
     }
   }
 
+  private processRolloverRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(ExplorerProviderEvents.AskToOpenProgressDlg, task.request.loanId)
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error('No provider available!')
+      }
+
+      const account =
+        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      if (!account) {
+        throw new Error('Unable to get wallet address!')
+      }
+
+      // Initializing loan
+      const taskRequest: RolloverRequest = task.request as RolloverRequest
+
+      const { RolloverProcessor } = await import('./processors/RolloverProcessor')
+      const processor = new RolloverProcessor()
+      await processor.run(task, account, skipGas)
+
+      task.processingEnd(true, false, null)
+    } catch (e) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
+        // tslint:disable-next-line:no-console
+        console.log(e)
+      }
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(ExplorerProviderEvents.AskToCloseProgressDlg, task)
+    }
+  }
+
   public waitForTransactionMined = async (
     txHash: string,
-    request?: LiquidationRequest
+    request?: LiquidationRequest | RolloverRequest
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
       try {
@@ -1167,7 +1231,7 @@ export class ExplorerProvider {
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LiquidationRequest | undefined,
+    request: LiquidationRequest | RolloverRequest | undefined,
     resolve: (value: any) => void,
     reject: (value: any) => void
   ) => {
@@ -1176,11 +1240,16 @@ export class ExplorerProvider {
       if (receipt && request && request instanceof LiquidationRequest) {
         resolve(receipt)
 
-        const randomNumber = Math.floor(Math.random() * 100000) + 1
-
         this.eventEmitter.emit(
           ExplorerProviderEvents.LiquidationTransactionMined,
           new LiquidationTransactionMinedEvent(request.loanToken, txHash)
+        )
+      } else if (receipt && request && request instanceof RolloverRequest) {
+        resolve(receipt)
+
+        this.eventEmitter.emit(
+          ExplorerProviderEvents.RolloverTransactionMined,
+          new RolloverTransactionMinedEvent(txHash)
         )
       } else {
         window.setTimeout(() => {
