@@ -18,14 +18,15 @@ import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
 import { CollapsibleContainer } from './CollapsibleContainer'
-import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
-import { TradeExpectedResult } from './TradeExpectedResult'
-import { Preloader } from './Preloader'
 import { InputAmount } from './InputAmount'
+import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
+import { Preloader } from './Preloader'
+import { TradeExpectedResult } from './TradeExpectedResult'
 
-import '../styles/components/trade-form.scss'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
+import '../styles/components/trade-form.scss'
 import { InputReceive } from './InputReceive'
+import { ChiSwitch } from './ChiSwitch'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -444,7 +445,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
           </div>
-
+          <ChiSwitch />
           <div className="trade-form__actions-container">
             <button
               title={
@@ -561,7 +562,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         : loanCloseData[1].div(10 ** 18).times(loanAssetPrecision)
     }
 
-    ;(await this._isMounted) &&
+    this._isMounted &&
       this.setState({
         ...this.state,
         returnedAsset: asset,
@@ -571,7 +572,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   public onCollateralChange = async (asset: Asset) => {
-    ;(await this._isMounted) && this.setState({ ...this.state, depositToken: asset })
+    this._isMounted && this.setState({ ...this.state, depositToken: asset })
 
     await this.onInsertMaxValue(1)
 
@@ -593,7 +594,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       return
     }
     let usdPrice = this.state.tradeAmountValue
-    if (usdPrice != null) {
+    if (usdPrice !== new BigNumber(0)) {
       usdPrice = usdPrice.multipliedBy(rateUSD)
     }
 
@@ -707,7 +708,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       collateral,
       interestRate
     } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest)
-    if (this.props.tradeType === TradeType.BUY) await this.setState({ ...this.state, interestRate })
+    if (this.props.tradeType === TradeType.BUY) this.setState({ ...this.state, interestRate })
 
     return {
       inputAmountText: limitedAmount.inputAmountText,
@@ -812,11 +813,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   private formatPrecision(output: number): string {
-    let n = Math.log(output) / Math.LN10
+    const n = Math.log(output) / Math.LN10
     let x = 3 - n
     if (x < 0) x = 0
     if (x > 5) x = 5
-    let result = new Number(output.toFixed(x)).toString()
+    const result = Number(output.toFixed(x)).toString()
     return result
   }
 }
