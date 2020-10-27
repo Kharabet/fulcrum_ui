@@ -1,2 +1,30 @@
 .chi-switch {
+  margin-top: -10px;
+  margin-bottom: 15px;
+  .cb-container {
+    color: #a2abb8;
+    font-weight: 600;
+    font-size: 12px;
+    .cb-label {
+      padding-left: 28px;
+    }
+    .cb-checkmark {
+      width: 20px;
+      height: 20px;
+      top: -3px;
+      left: 20px;
+    }
+    input[type='checkbox']:checked + .cb-checkmark,
+    .cb-checkmark {
+      background-color: #394049;
+      &:after {
+        background-color: #00c0ab;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: none;
+        top: 5px;
+      }
+    }
+  }
 }
