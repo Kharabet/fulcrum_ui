@@ -153,10 +153,10 @@ export class InnerOwnTokenGridRow extends Component<
           resultTx: false
         })
         this.props.changeLoadingTransaction(
-          this.state.isLoadingTransaction,
-          this.state.request,
           false,
-          this.state.resultTx
+          undefined,
+          false,
+          false
         )
       }, 5000)
       return
@@ -166,7 +166,7 @@ export class InnerOwnTokenGridRow extends Component<
       this.state.isLoadingTransaction,
       this.state.request,
       true,
-      this.state.resultTx
+      true
     )
   }
 
