@@ -76,6 +76,7 @@ interface ITradePageState {
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   private _isMounted: boolean = false
+  private apiUrl = 'https://api.bzx.network/v1'
   constructor(props: any) {
     super(props)
     if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
@@ -572,7 +573,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted
     } as IOwnTokenGridRowProps
   }
-  
+
   public getOwnRowsDataAll = async (state: ITradePageState) => {
     const ownRowsDataAll: IOwnTokenGridRowProps[] = []
     this._isMounted && this.setState({ ...this.state, openedPositionsLoaded: false })
@@ -698,6 +699,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public getTokenRowsData = async (state: ITradePageState) => {
     const tokenRowsData: ITradeTokenGridRowProps[] = []
 
+    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`)
+    const yieldAPYJson = await yieldAPYRequest.json()
+    const yieldApr =
+      yieldAPYJson.success && yieldAPYJson.data[state.selectedMarket.baseToken.toLowerCase()]
+        ? new BigNumber(yieldAPYJson.data[state.selectedMarket.baseToken.toLowerCase()])
+        : new BigNumber(0)
+
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
       quoteToken: state.selectedMarket.quoteToken,
@@ -708,6 +716,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
+      yieldApr,
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
         state.selectedMarket.baseToken,
         state.selectedMarket.quoteToken
@@ -723,6 +732,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
+      yieldApr,
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
         state.selectedMarket.quoteToken,
         state.selectedMarket.baseToken

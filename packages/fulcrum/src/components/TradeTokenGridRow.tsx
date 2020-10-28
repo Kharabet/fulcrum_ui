@@ -27,6 +27,7 @@ export interface ITradeTokenGridRowProps {
   defaultLeverage: number
   isTxCompleted: boolean
   maintenanceMargin: BigNumber
+  yieldApr: BigNumber
   onTrade: (request: TradeRequest) => void
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
@@ -44,7 +45,6 @@ interface ITradeTokenGridRowState {
   liquidationPrice: BigNumber
 
   interestRate: BigNumber
-  yieldApr: BigNumber
   isLoading: boolean
   isLoadingTransaction: boolean
   request: TradeRequest | undefined
@@ -61,7 +61,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       baseTokenPrice: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       interestRate: new BigNumber(0),
-      yieldApr: new BigNumber(0),
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
@@ -120,19 +119,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.props.positionType === PositionType.LONG ? this.props.quoteToken : this.props.baseToken
     )
 
-    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`)
-    const yieldAPYJson = await yieldAPYRequest.json()
-    const yieldApr =
-      yieldAPYJson.success && yieldAPYJson.data[this.props.baseToken.toLowerCase()]
-        ? new BigNumber(yieldAPYJson.data[this.props.baseToken.toLowerCase()])
-        : new BigNumber(0)
-
     this._isMounted &&
       this.setState({
         ...this.state,
         baseTokenPrice,
         interestRate,
-        yieldApr,
         liquidationPrice,
         isLoading: false
       })
@@ -320,15 +311,15 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             )}
           </div>
           <div
-            title={this.state.yieldApr.gt(0) ? `${this.state.yieldApr.toFixed(18)}%` : ``}
+            title={this.props.yieldApr.gt(0) ? `${this.props.yieldApr.toFixed(18)}%` : ``}
             className="trade-token-grid-row__col-profit">
             {this.props.isMobileMedia && (
               <span className="trade-token-grid-row__title">Est. Yield, vBZRX</span>
             )}
 
-            {this.state.yieldApr.gt(0) && !this.state.isLoading ? (
+            {this.props.yieldApr.gt(0) && !this.state.isLoading ? (
               <React.Fragment>
-                {this.state.yieldApr.toFixed(0)}
+                {this.props.yieldApr.toFixed(0)}
                 <span className="fw-sign">%</span>
                 <span
                   title={this.state.interestRate.toFixed(18)}
