@@ -82,7 +82,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private _isMounted: boolean
-  private apiUrl = 'https://api.bzx.network/v1'
 
   private async derivedUpdate() {
     const collateralToPrincipalRate =

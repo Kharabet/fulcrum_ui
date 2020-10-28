@@ -1658,10 +1658,9 @@ export class FulcrumProvider {
         )
 
         const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-        const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI)
         //@ts-ignore
         result =
-          isGasTokenEnabled && ChiTokenBalance.gt(0)
+          isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
             ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
                 request.loanId,
                 account,
