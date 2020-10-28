@@ -178,8 +178,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       prevState.isTxCompleted !== this.state.isTxCompleted ||
       prevProps.isMobileMedia !== this.props.isMobileMedia
     ) {
-      await this.getTokenRowsData(this.state)
-      await this.getOwnRowsData(this.state)
+      if (this.state.showMyTokensOnly === true) {
+        await this.getOwnRowsDataAll(this.state)
+      } else {
+        await this.getTokenRowsData(this.state)
+        await this.getOwnRowsData(this.state)
+      }
     }
     if (
       prevState.showMyTokensOnly !== this.state.showMyTokensOnly &&
@@ -371,7 +375,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
 
     if (request) {
-      if (this.state.showMyTokensOnly) await this.onTabSelect(request.asset, request.quoteToken)
+      // if (this.state.showMyTokensOnly) await this.onTabSelect(request.asset, request.quoteToken)
       ;(await this._isMounted) &&
         this.setState({
           ...this.state,
@@ -420,7 +424,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       })
   }
 
-  
   private getOwnRowDataProps = async (
     loan: IBorrowedFundsState,
     collateralToPrincipalRate?: BigNumber
@@ -599,6 +602,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ...this.state,
         openedPositionsLoaded: true,
         ownRowsDataAll,
+        openedPositionsCount: loans?.length || 0,
         loans
       })
   }
