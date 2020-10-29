@@ -476,11 +476,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionValue = collateralAssetAmount
           value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
           collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
-          // .minus(loanAssetAmount)
 
-          const deposited = collateralAssetAmount
-            .times(currentCollateralToPrincipalRate)
-            .minus(loanAssetAmount)
           openPrice = loan.loanData.startRate
             .div(10 ** 18)
             .times(loanAssetPrecision)
@@ -508,10 +504,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
             tradeRequest
           )
+          const depositAmount = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
+          const withdrawAmount = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
           profit = estimatedCollateralReceived[1]
             .div(10 ** collateralAssetDecimals)
             .times(currentCollateralToPrincipalRate)
-            .minus(deposited)
+            .minus(depositAmount).plus(withdrawAmount)
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.loanAsset)) {
@@ -539,9 +537,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           const shortsDiff = collateralAssetAmount
             .times(currentCollateralToPrincipalRate)
             .minus(loanAssetAmount)
-          const deposited = collateralAssetAmount.minus(
-            loanAssetAmount.div(currentCollateralToPrincipalRate)
-          )
+            
           positionValue = collateralAssetAmount
             .times(currentCollateralToPrincipalRate)
             .minus(shortsDiff)
@@ -575,9 +571,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
             tradeRequest
           )
+          const depositAmount = loan.loanData.depositValue.div(10 ** loanAssetDecimals).div(currentCollateralToPrincipalRate)
+          const withdrawAmount = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals).div(currentCollateralToPrincipalRate)
+
           profit = estimatedCollateralReceived[1]
             .div(10 ** collateralAssetDecimals)
-            .minus(deposited)
+            .minus(depositAmount).plus(withdrawAmount)
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
