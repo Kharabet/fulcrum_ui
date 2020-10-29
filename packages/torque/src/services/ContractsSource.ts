@@ -485,6 +485,12 @@ export class ContractsSource {
           case Asset.LEND:
             address = '0x80fb784b7ed66730e8b1dbd9820afd29931aab03'
             break
+          case Asset.UNI:
+            address = ''
+            break
+          case Asset.AAVE:
+            address = ''
+            break
         }
         break
       case 4:
