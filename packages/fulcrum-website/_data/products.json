@@ -52,5 +52,17 @@
     "visibilityApr": false,
     "visibilityEarn": false,
     "visibilityChart": false
+  },
+  {
+    "name": "uni",
+    "visibilityApr": false,
+    "visibilityEarn": false,
+    "visibilityChart": false
+  },
+  {
+    "name": "aave",
+    "visibilityApr": false,
+    "visibilityEarn": false,
+    "visibilityChart": false
   }
 ]
