@@ -15,13 +15,16 @@ import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import '../styles/components/trade-form.scss'
+
+import { ChiSwitch } from './ChiSwitch'
 import { CollapsibleContainer } from './CollapsibleContainer'
 import { InputAmount } from './InputAmount'
 import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import { TradeExpectedResult } from './TradeExpectedResult'
+
+import '../styles/components/trade-form.scss'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -435,7 +438,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
           </div>
-
+          <ChiSwitch />
           <div className="trade-form__actions-container">
             <button
               title={
@@ -563,9 +566,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   public onCollateralChange = async (asset: Asset) => {
-    this._isMounted && this.setState({ ...this.state, depositToken: asset }, () => {
-      this.onInsertMaxValue(1)
-    })
+    this._isMounted &&
+      this.setState({ ...this.state, depositToken: asset }, () => {
+        this.onInsertMaxValue(1)
+      })
   }
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
@@ -695,7 +699,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       collateral,
       interestRate
     } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest)
-    if (this.props.tradeType === TradeType.BUY) await this.setState({ ...this.state, interestRate })
+    if (this.props.tradeType === TradeType.BUY) this.setState({ ...this.state, interestRate })
 
     return {
       inputAmountText: limitedAmount.inputAmountText,
