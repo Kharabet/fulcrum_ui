@@ -1,24 +1,26 @@
 import { Asset } from './Asset'
 import { AssetDetails } from './AssetDetails'
 
+import { ReactComponent as AAVE } from '../assets/images/token-aave.svg'
 import { ReactComponent as BAT } from '../assets/images/token-bat.svg'
 import { ReactComponent as WBTC } from '../assets/images/token-btc.svg'
+import { ReactComponent as BZRX } from '../assets/images/token-bzrx.svg'
+import { ReactComponent as CHI } from '../assets/images/token-chi.svg'
 import { ReactComponent as DAI } from '../assets/images/token-dai.svg'
 import { ReactComponent as ETH } from '../assets/images/token-eth.svg'
 import { ReactComponent as KNC } from '../assets/images/token-knc.svg'
+import { ReactComponent as LEND } from '../assets/images/token-lend.svg'
 import { ReactComponent as LINK } from '../assets/images/token-link.svg'
 import { ReactComponent as MKR } from '../assets/images/token-mkr.svg'
 import { ReactComponent as REP } from '../assets/images/token-rep.svg'
 import { ReactComponent as SAI } from '../assets/images/token-sai.svg'
 import { ReactComponent as SUSD } from '../assets/images/token-susd.svg'
-import { ReactComponent as USDT } from '../assets/images/token-usdt.svg'
+import { ReactComponent as UNI } from '../assets/images/token-uni.svg'
 import { ReactComponent as USDC } from '../assets/images/token-usdc.svg'
-import { ReactComponent as ZRX } from '../assets/images/token-zrx.svg'
+import { ReactComponent as USDT } from '../assets/images/token-usdt.svg'
 import { ReactComponent as WETH } from '../assets/images/token-weth.svg'
-import { ReactComponent as CHI } from '../assets/images/token-chi.svg'
-import { ReactComponent as BZRX } from '../assets/images/token-bzrx.svg'
 import { ReactComponent as YFI } from '../assets/images/token-yfi.svg'
-import { ReactComponent as LEND } from '../assets/images/token-lend.svg'
+import { ReactComponent as ZRX } from '../assets/images/token-zrx.svg'
 
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
@@ -308,6 +310,34 @@ export class AssetsDictionary {
         'LEND',
         'LEND',
         LEND,
+        18,
+        new Map<number, string | null>([
+          [1, '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03'],
+          [3, ''],
+          [42, '']
+        ])
+      )
+    ],
+    [
+      Asset.UNI,
+      new AssetDetails(
+        'UNI',
+        'UNI',
+        UNI,
+        18,
+        new Map<number, string | null>([
+          [1, '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03'],
+          [3, ''],
+          [42, '']
+        ])
+      )
+    ],
+    [
+      Asset.AAVE,
+      new AssetDetails(
+        'AAVE',
+        'AAVE',
+        AAVE,
         18,
         new Map<number, string | null>([
           [1, '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03'],
