@@ -522,7 +522,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       
       profit = estimatedReceivedLoanToken
         .minus(depositAmountLoanToken)
-        .plus(withdrawAmountLoanToken)
 
     } else {
       collateral = collateralAssetAmount
@@ -575,7 +574,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       profit = estimatedCollateralReceived[1]
         .div(10 ** collateralAssetDecimals)
         .minus(depositAmount)
-        .plus(withdrawAmount)
     }
 
     return {
