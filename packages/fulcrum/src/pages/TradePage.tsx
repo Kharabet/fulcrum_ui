@@ -513,11 +513,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       )
       const depositAmount = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
       const withdrawAmount = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
-      profit = estimatedCollateralReceived[1]
-        .div(10 ** collateralAssetDecimals)
-        .times(currentCollateralToPrincipalRate)
-        .minus(depositAmount)
-        .plus(withdrawAmount)
+      profit =
+        depositAmount.gt(0) && withdrawAmount.gt(0)
+          ? estimatedCollateralReceived[1]
+              .div(10 ** collateralAssetDecimals)
+              .times(currentCollateralToPrincipalRate)
+              .minus(depositAmount)
+              .plus(withdrawAmount)
+          : estimatedCollateralReceived[1]
+              .div(10 ** collateralAssetDecimals)
+              .times(currentCollateralToPrincipalRate)
+              .minus(deposited)
     } else {
       collateral = collateralAssetAmount
 
@@ -566,10 +572,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .div(10 ** loanAssetDecimals)
         .div(currentCollateralToPrincipalRate)
 
-      profit = estimatedCollateralReceived[1]
-        .div(10 ** collateralAssetDecimals)
-        .minus(depositAmount)
-        .plus(withdrawAmount)
+      profit =
+        depositAmount.gt(0) && withdrawAmount.gt(0)
+          ? estimatedCollateralReceived[1]
+              .div(10 ** collateralAssetDecimals)
+              .minus(depositAmount)
+              .plus(withdrawAmount)
+          : estimatedCollateralReceived[1].div(10 ** collateralAssetDecimals).minus(deposited)
     }
 
     return {
