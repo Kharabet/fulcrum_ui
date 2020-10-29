@@ -1,31 +1,31 @@
+import { BigNumber } from '@0x/utils'
 import React, { PureComponent } from 'react'
 import Modal from 'react-modal'
-import { BigNumber } from '@0x/utils'
 
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
-import { TradeTokenGrid } from '../components/TradeTokenGrid'
-import { TVChartContainer } from '../components/TVChartContainer'
-import { TokenGridTabs } from '../components/TokenGridTabs'
-import { ITradeTokenGridRowProps } from '../components/TradeTokenGridRow'
-import { IOwnTokenGridRowProps } from '../components/OwnTokenGridRow'
 import { IHistoryTokenGridRowProps } from '../components/HistoryTokenGridRow'
+import { IOwnTokenGridRowProps } from '../components/OwnTokenGridRow'
+import { TokenGridTabs } from '../components/TokenGridTabs'
+import { TradeTokenGrid } from '../components/TradeTokenGrid'
+import { ITradeTokenGridRowProps } from '../components/TradeTokenGridRow'
+import { TVChartContainer } from '../components/TVChartContainer'
 
 import { Asset } from '../domain/Asset'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
+import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
+import { LiquidationEvent } from '../domain/events/LiquidationEvent'
+import { TradeEvent } from '../domain/events/TradeEvent'
+import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
+import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
+import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
-import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { IHistoryEvents } from '../domain/IHistoryEvents'
-import { TradeEvent } from '../domain/events/TradeEvent'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
-import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
-import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
-import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
 
 import '../styles/pages/_trade-page.scss'
 
@@ -89,8 +89,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.WBTC,
         Asset.LINK,
         Asset.MKR,
-        //Asset.LEND,
-        Asset.KNC
+        // Asset.LEND,
+        Asset.KNC,
+        Asset.UNI,
+        Asset.AAVE
       ]
       this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT]
     }

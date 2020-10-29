@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
 import { BigNumber } from '@0x/utils'
+import React, { Component } from 'react'
 import { Asset } from '../domain/Asset'
-import { StatsTokenGridHeader } from './StatsTokenGridHeader'
 import { ReserveDetails } from '../domain/ReserveDetails'
-import { IStatsTokenGridRowProps, StatsTokenGridRow } from './StatsTokenGridRow'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { FulcrumProvider } from '../services/FulcrumProvider'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import { FulcrumProvider } from '../services/FulcrumProvider'
+import { StatsTokenGridHeader } from './StatsTokenGridHeader'
+import { IStatsTokenGridRowProps, StatsTokenGridRow } from './StatsTokenGridRow'
 
 import { PreloaderChart } from '../components/PreloaderChart'
 
@@ -37,7 +37,9 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
           Asset.BZRX,
           Asset.MKR,
           Asset.LEND,
-          Asset.KNC
+          Asset.KNC,
+          Asset.UNI,
+          Asset.AAVE
         ]
       : [Asset.fWETH, Asset.USDC, Asset.WBTC]
 
@@ -59,7 +61,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
   public async derivedUpdate() {
     const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(StatsTokenGrid.assets)
-    //console.log(reserveDetails);
+    // console.log(reserveDetails);
     const rowData = await StatsTokenGrid.getRowsData(reserveDetails, this.state.yieldAPYJson)
     let totalsRow: IStatsTokenGridRowProps | null = null
     if (rowData.length > 0) {
@@ -101,7 +103,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     )
     const yieldAPYRequest = await fetch(`${StatsTokenGrid.apiUrl}/yield-farimng-apy`)
     const yieldAPYJson = await yieldAPYRequest.json()
-    await this.setState({ ...this.state, yieldAPYJson })
+    this.setState({ ...this.state, yieldAPYJson })
     await this.derivedUpdate()
   }
 
@@ -122,10 +124,10 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
       )
     }
 
-    let tokenRows = this.state.tokenRowsData.map((e) => (
+    const tokenRows = this.state.tokenRowsData.map((e) => (
       <StatsTokenGridRow key={e.reserveDetails.asset!} {...e} />
     ))
-    let totalsRow = (
+    const totalsRow = (
       <StatsTokenGridRow
         key={this.state.totalsRow.reserveDetails.asset!}
         {...this.state.totalsRow}
@@ -154,9 +156,9 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
       const yieldApr =
         e.asset &&
         yieldAPYJson &&
-        yieldAPYJson!['success'] &&
-        yieldAPYJson!['data'][e.asset.toLowerCase()]
-          ? new BigNumber(yieldAPYJson!['data'][e.asset.toLowerCase()])
+        yieldAPYJson.success &&
+        yieldAPYJson.data[e.asset.toLowerCase()]
+          ? new BigNumber(yieldAPYJson.data[e.asset.toLowerCase()])
           : new BigNumber(0)
 
       rowsData.push({

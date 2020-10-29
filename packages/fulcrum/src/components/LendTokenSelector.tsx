@@ -31,7 +31,9 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
         Asset.BZRX,
         Asset.MKR,
         Asset.LEND,
-        Asset.KNC
+        Asset.KNC,
+        Asset.UNI,
+        Asset.AAVE
       ]
     }
   }
