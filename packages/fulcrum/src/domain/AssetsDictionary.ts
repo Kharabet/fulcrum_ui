@@ -56,7 +56,6 @@ import rep_ts from '../assets/images/ic___token_selector___rep.svg'
 import sai_ts from '../assets/images/ic___token_selector___sai.svg'
 import susd_ts from '../assets/images/ic___token_selector___susd.svg'
 import usdc_ts from '../assets/images/ic___token_selector___usdc.svg'
-import usdt_ts from '../assets/images/ic___token_selector___usdt.svg'
 import btc_ts from '../assets/images/ic___token_selector___wbtc.svg'
 import yfi_ts from '../assets/images/ic___token_selector___yfi.svg'
 import zrx_ts from '../assets/images/ic___token_selector___zrx.svg'
@@ -162,7 +161,7 @@ export class AssetsDictionary {
         usdt_logo,
         USDTLogo,
         usdt_bg,
-        usdt_ts,
+        '',
         '#8777B1',
         '#FFFFFF',
         '#FFFFFF',
