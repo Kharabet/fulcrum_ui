@@ -284,6 +284,17 @@ export class ContractsSource {
             break
         }
         break
+      case Asset.UNI:
+      case Asset.AAVE:
+        switch (this.networkId) {
+          case 1:
+            address = ''
+            break
+          case 42:
+            address = ''
+            break
+        }
+        break
     }
 
     return address
