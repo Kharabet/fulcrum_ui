@@ -326,7 +326,7 @@ export class AssetsDictionary {
         UNI,
         18,
         new Map<number, string | null>([
-          [1, '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03'],
+          [1, ''],
           [3, ''],
           [42, '']
         ])
@@ -340,7 +340,7 @@ export class AssetsDictionary {
         AAVE,
         18,
         new Map<number, string | null>([
-          [1, '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03'],
+          [1, ''],
           [3, ''],
           [42, '']
         ])
