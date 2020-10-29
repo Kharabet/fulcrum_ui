@@ -63,6 +63,7 @@ interface ITradePageState {
   openedPositionsCount: number
   tokenRowsData: ITradeTokenGridRowProps[]
   ownRowsData: IOwnTokenGridRowProps[]
+  ownRowsDataAll: IOwnTokenGridRowProps[]
   historyEvents: IHistoryEvents | undefined
   historyRowsData: IHistoryTokenGridRowProps[]
   tradeRequestId: number
@@ -75,6 +76,7 @@ interface ITradePageState {
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   private _isMounted: boolean = false
+  private apiUrl = 'https://api.bzx.network/v1'
   constructor(props: any) {
     super(props)
     if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
@@ -114,6 +116,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       openedPositionsCount: 0,
       tokenRowsData: [],
       ownRowsData: [],
+      ownRowsDataAll: [],
       historyEvents: undefined,
       historyRowsData: [],
       tradeRequestId: 0,
@@ -157,22 +160,36 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === 'None')) {
       this.props.doNetworkConnect()
     }
-    await this.derivedUpdate()
+
+    await this.getTokenRowsData(this.state)
+    await this.getOwnRowsData(this.state)
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<ITradePageProps>,
     prevState: Readonly<ITradePageState>,
     snapshot?: any
-  ): void {
+  ) {
     if (prevState.selectedMarket !== this.state.selectedMarket) {
-      this.getTokenRowsData(this.state)
+      await this.getTokenRowsData(this.state)
+      await this.getOwnRowsData(this.state)
     }
     if (
       prevState.isTxCompleted !== this.state.isTxCompleted ||
       prevProps.isMobileMedia !== this.props.isMobileMedia
     ) {
-      this.derivedUpdate()
+      if (this.state.showMyTokensOnly === true) {
+        await this.getOwnRowsDataAll(this.state)
+      } else {
+        await this.getTokenRowsData(this.state)
+        await this.getOwnRowsData(this.state)
+      }
+    }
+    if (
+      prevState.showMyTokensOnly !== this.state.showMyTokensOnly &&
+      this.state.showMyTokensOnly === true
+    ) {
+      await this.getOwnRowsDataAll(this.state)
     }
   }
 
@@ -215,7 +232,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           {this.state.showMyTokensOnly ? (
             <ManageTokenGrid
               isMobileMedia={this.props.isMobileMedia}
-              ownRowsData={this.state.ownRowsData}
+              ownRowsData={this.state.ownRowsDataAll}
               historyEvents={this.state.historyEvents}
               historyRowsData={this.state.historyRowsData}
               isShowHistory={this.state.isShowHistory}
@@ -305,11 +322,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   private onProviderAvailable = async () => {
-    await this.derivedUpdate()
+    // await this.derivedUpdate()
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
-    await this.derivedUpdate()
+    !this.state.isShowHistory
+      ? await this.getOwnRowsData(this.state)
+      : await this.getHistoryEvents(this.state)
   }
 
   public onManageCollateralRequested = async (request: ManageCollateralRequest) => {
@@ -356,7 +375,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
 
     if (request) {
-      if (this.state.showMyTokensOnly) await this.onTabSelect(request.asset, request.quoteToken)
+      // if (this.state.showMyTokensOnly) await this.onTabSelect(request.asset, request.quoteToken)
       ;(await this._isMounted) &&
         this.setState({
           ...this.state,
@@ -397,6 +416,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public onShowHistory = async (value: boolean) => {
+    await this.getHistoryEvents(this.state)
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
@@ -404,8 +424,175 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       })
   }
 
-  public getOwnRowsData = async (state: ITradePageState) => {
-    const ownRowsData: IOwnTokenGridRowProps[] = []
+  private getOwnRowDataProps = async (
+    loan: IBorrowedFundsState,
+    collateralToPrincipalRate?: BigNumber
+  ): Promise<IOwnTokenGridRowProps> => {
+    const maintenanceMargin = loan.loanData.maintenanceMargin
+    const currentCollateralToPrincipalRate = collateralToPrincipalRate
+      ? collateralToPrincipalRate
+      : await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset)
+
+    const isLoanTokenOnlyInQuoteTokens =
+      !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
+    const isCollateralTokenNotInQuoteTokens =
+      this.baseTokens.includes(loan.collateralAsset) &&
+      !this.quoteTokens.includes(loan.collateralAsset)
+    const positionType =
+      isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
+        ? PositionType.LONG
+        : PositionType.SHORT
+
+    const baseAsset = positionType === PositionType.LONG ? loan.collateralAsset : loan.loanAsset
+
+    const quoteAsset = positionType === PositionType.LONG ? loan.loanAsset : loan.collateralAsset
+
+    let leverage = new BigNumber(10 ** 38).div(loan.loanData.startMargin.times(10 ** 18))
+    if (positionType === PositionType.LONG) leverage = leverage.plus(1)
+
+    let positionValue = new BigNumber(0)
+    let value = new BigNumber(0)
+    let collateral = new BigNumber(0)
+    let openPrice = new BigNumber(0)
+    let liquidationPrice = new BigNumber(0)
+    let profit = new BigNumber(0)
+
+    const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18
+    const collateralAssetDecimals =
+      AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18
+    const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
+    const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
+    const collateralAssetAmount = loan.loanData.collateral
+      .div(10 ** 18)
+      .times(collateralAssetPrecision)
+    const loanAssetAmount = loan.loanData.principal.div(10 ** 18).times(loanAssetPrecision)
+    //liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
+    //If SHORT -> 10^36 / liquidation_collateralToLoanRate
+    const liquidation_collateralToLoanRate = maintenanceMargin
+      .times(loan.loanData.principal.times(loanAssetPrecision))
+      .div(10 ** 20)
+      .plus(loan.loanData.principal.times(loanAssetPrecision))
+      .div(loan.loanData.collateral.times(collateralAssetPrecision))
+      .times(10 ** 18)
+
+    if (positionType === PositionType.LONG) {
+      positionValue = collateralAssetAmount
+      value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
+      collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
+      // .minus(loanAssetAmount)
+
+      const deposited = collateralAssetAmount
+        .times(currentCollateralToPrincipalRate)
+        .minus(loanAssetAmount)
+      openPrice = loan.loanData.startRate
+        .div(10 ** 18)
+        .times(loanAssetPrecision)
+        .div(collateralAssetPrecision)
+      liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
+
+      const tradeRequest = new TradeRequest(
+        loan.loanId,
+        TradeType.SELL,
+        loan.loanAsset,
+        loan.collateralAsset,
+        Asset.UNKNOWN,
+        positionType,
+        leverage.toNumber(),
+        await FulcrumProvider.Instance.getMaxTradeValue(
+          TradeType.SELL,
+          loan.loanAsset,
+          loan.collateralAsset,
+          Asset.UNKNOWN,
+          positionType,
+          loan
+        ),
+        positionType === PositionType.LONG
+      )
+      const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+        tradeRequest
+      )
+      const depositAmount = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
+      const withdrawAmount = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
+      profit = estimatedCollateralReceived[1]
+        .div(10 ** collateralAssetDecimals)
+        .times(currentCollateralToPrincipalRate)
+        .minus(depositAmount)
+        .plus(withdrawAmount)
+    } else {
+      collateral = collateralAssetAmount
+
+      const shortsDiff = collateralAssetAmount
+        .times(currentCollateralToPrincipalRate)
+        .minus(loanAssetAmount)
+      const deposited = collateralAssetAmount.minus(
+        loanAssetAmount.div(currentCollateralToPrincipalRate)
+      )
+
+      positionValue = collateralAssetAmount
+        .times(currentCollateralToPrincipalRate)
+        .minus(shortsDiff)
+
+      value = positionValue.div(currentCollateralToPrincipalRate)
+      openPrice = new BigNumber(10 ** 36)
+        .div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision))
+        .div(10 ** 18)
+      liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
+
+      const tradeRequest = new TradeRequest(
+        loan.loanId,
+        TradeType.SELL,
+        loan.loanAsset,
+        loan.collateralAsset,
+        Asset.UNKNOWN,
+        positionType,
+        leverage.toNumber(),
+        await FulcrumProvider.Instance.getMaxTradeValue(
+          TradeType.SELL,
+          loan.loanAsset,
+          loan.collateralAsset,
+          Asset.UNKNOWN,
+          positionType,
+          loan
+        ),
+        true
+      )
+      const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+        tradeRequest
+      )
+      const depositAmount = loan.loanData.depositValue
+        .div(10 ** loanAssetDecimals)
+        .div(currentCollateralToPrincipalRate)
+      const withdrawAmount = loan.loanData.withdrawalValue
+        .div(10 ** loanAssetDecimals)
+        .div(currentCollateralToPrincipalRate)
+
+      profit = estimatedCollateralReceived[1]
+        .div(10 ** collateralAssetDecimals)
+        .minus(depositAmount)
+        .plus(withdrawAmount)
+    }
+
+    return {
+      loan: loan,
+      baseToken: baseAsset,
+      quoteToken: quoteAsset,
+      leverage: leverage.toNumber(),
+      positionType,
+      positionValue,
+      value,
+      collateral,
+      openPrice,
+      liquidationPrice,
+      profit,
+      onTrade: this.onTradeRequested,
+      onManageCollateralOpen: this.onManageCollateralRequested,
+      changeLoadingTransaction: this.changeLoadingTransaction,
+      isTxCompleted: this.state.isTxCompleted
+    } as IOwnTokenGridRowProps
+  }
+
+  public getOwnRowsDataAll = async (state: ITradePageState) => {
+    const ownRowsDataAll: IOwnTokenGridRowProps[] = []
     this._isMounted && this.setState({ ...this.state, openedPositionsLoaded: false })
     let loans: IBorrowedFundsState[] | undefined
     if (
@@ -414,218 +601,63 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       FulcrumProvider.Instance.contractsSource.canWrite
     ) {
       loans = await FulcrumProvider.Instance.getUserMarginTradeLoans()
-      const loan = loans.find(
-        (loan) =>
-          this.state.selectedMarket.baseToken === loan.loanAsset &&
-          this.state.selectedMarket.quoteToken === loan.collateralAsset
-      )
 
       for (const loan of loans) {
         if (!loan.loanData) continue
 
-        const maintenanceMargin = loan.loanData!.maintenanceMargin
+        const ownRowDataProps = await this.getOwnRowDataProps(loan)
 
-        const isLoanTokenOnlyInQuoteTokens =
-          !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
-        const isCollateralTokenNotInQuoteTokens =
-          this.baseTokens.includes(loan.collateralAsset) &&
-          !this.quoteTokens.includes(loan.collateralAsset)
-        const positionType =
-          isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
-            ? PositionType.LONG
-            : PositionType.SHORT
-
-        const baseAsset = positionType === PositionType.LONG ? loan.collateralAsset : loan.loanAsset
-
-        const quoteAsset =
-          positionType === PositionType.LONG ? loan.loanAsset : loan.collateralAsset
-
-        let leverage = new BigNumber(10 ** 38).div(loan.loanData.startMargin.times(10 ** 18))
-        if (positionType === PositionType.LONG) leverage = leverage.plus(1)
-
-        const currentCollateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(
-          loan.collateralAsset,
-          loan.loanAsset
-        )
-        let positionValue = new BigNumber(0)
-        let value = new BigNumber(0)
-        let collateral = new BigNumber(0)
-        let openPrice = new BigNumber(0)
-        let liquidationPrice = new BigNumber(0)
-        let profit = new BigNumber(0)
-
-        const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18
-        const collateralAssetDecimals =
-          AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18
-        const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-        const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
-        const collateralAssetAmount = loan.loanData.collateral
-          .div(10 ** 18)
-          .times(collateralAssetPrecision)
-        const loanAssetAmount = loan.loanData.principal.div(10 ** 18).times(loanAssetPrecision)
-        //liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
-        //If SHORT -> 10^36 / liquidation_collateralToLoanRate
-        const liquidation_collateralToLoanRate = maintenanceMargin
-          .times(loan.loanData.principal.times(loanAssetPrecision))
-          .div(10 ** 20)
-          .plus(loan.loanData.principal.times(loanAssetPrecision))
-          .div(loan.loanData.collateral.times(collateralAssetPrecision))
-          .times(10 ** 18)
-
-        if (positionType === PositionType.LONG) {
-          positionValue = collateralAssetAmount
-          value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
-          collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
-
-          openPrice = loan.loanData.startRate
-            .div(10 ** 18)
-            .times(loanAssetPrecision)
-            .div(collateralAssetPrecision)
-          liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
-
-          const tradeRequest = new TradeRequest(
-            loan.loanId,
-            TradeType.SELL,
-            loan.loanAsset,
-            loan.collateralAsset,
-            Asset.UNKNOWN,
-            positionType,
-            leverage.toNumber(),
-            await FulcrumProvider.Instance.getMaxTradeValue(
-              TradeType.SELL,
-              loan.loanAsset,
-              loan.collateralAsset,
-              Asset.UNKNOWN,
-              positionType,
-              loan
-            ),
-            positionType === PositionType.LONG
-          )
-          const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-            tradeRequest
-          )
-          const depositAmount = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
-          const withdrawAmount = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
-          profit = estimatedCollateralReceived[1]
-            .div(10 ** collateralAssetDecimals)
-            .times(currentCollateralToPrincipalRate)
-            .minus(depositAmount).plus(withdrawAmount)
-
-          //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-          if (!this.stablecoins.includes(loan.loanAsset)) {
-            const tradeEvents = await FulcrumProvider.Instance.getTradeHistory()
-            const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!
-              .timeStamp
-            const swapToUsdHistoryRateRequest = await fetch(
-              `https://api.bzx.network/v1/asset-history-price?asset=${loan.loanAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`
-            )
-            const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
-            if (!swapToUsdHistoryRateResponse) continue
-            const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice)
-            openPrice = openPrice.times(loanAssetUSDStartRate)
-            const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(
-              loan.loanAsset
-            )
-            profit = profit.times(collateralToUSDCurrentRate)
-            value = value.times(collateralToUSDCurrentRate)
-            collateral = collateral.times(collateralToUSDCurrentRate)
-            liquidationPrice = liquidationPrice.times(collateralToUSDCurrentRate)
-          }
-        } else {
-          collateral = collateralAssetAmount
-
-          const shortsDiff = collateralAssetAmount
-            .times(currentCollateralToPrincipalRate)
-            .minus(loanAssetAmount)
-            
-          positionValue = collateralAssetAmount
-            .times(currentCollateralToPrincipalRate)
-            .minus(shortsDiff)
-
-          value = positionValue.div(currentCollateralToPrincipalRate)
-          openPrice = new BigNumber(10 ** 36)
-            .div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision))
-            .div(10 ** 18)
-          liquidationPrice = new BigNumber(10 ** 36)
-            .div(liquidation_collateralToLoanRate)
-            .div(10 ** 18)
-
-          const tradeRequest = new TradeRequest(
-            loan.loanId,
-            TradeType.SELL,
-            loan.loanAsset,
-            loan.collateralAsset,
-            Asset.UNKNOWN,
-            positionType,
-            leverage.toNumber(),
-            await FulcrumProvider.Instance.getMaxTradeValue(
-              TradeType.SELL,
-              loan.loanAsset,
-              loan.collateralAsset,
-              Asset.UNKNOWN,
-              positionType,
-              loan
-            ),
-            true
-          )
-          const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-            tradeRequest
-          )
-          const depositAmount = loan.loanData.depositValue.div(10 ** loanAssetDecimals).div(currentCollateralToPrincipalRate)
-          const withdrawAmount = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals).div(currentCollateralToPrincipalRate)
-
-          profit = estimatedCollateralReceived[1]
-            .div(10 ** collateralAssetDecimals)
-            .minus(depositAmount).plus(withdrawAmount)
-
-          //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-          if (!this.stablecoins.includes(loan.collateralAsset)) {
-            const tradeEvents = await FulcrumProvider.Instance.getTradeHistory()
-            if (!tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)) continue
-            const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!
-              .timeStamp
-            const swapToUsdHistoryRateRequest = await fetch(
-              `https://api.bzx.network/v1/asset-history-price?asset=${loan.collateralAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`
-            )
-            const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
-            if (!swapToUsdHistoryRateResponse) continue
-            const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice)
-            openPrice = openPrice.times(loanAssetUSDStartRate)
-            const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(
-              loan.collateralAsset
-            )
-            profit = profit.times(collateralToUSDCurrentRate)
-            value = value.times(collateralToUSDCurrentRate)
-            collateral = collateral.times(collateralToUSDCurrentRate)
-            liquidationPrice = liquidationPrice.times(collateralToUSDCurrentRate)
-          }
-        }
-
-        ownRowsData.push({
-          loan: loan,
-          baseToken: baseAsset,
-          quoteToken: quoteAsset,
-          leverage: leverage.toNumber(),
-          positionType,
-          positionValue,
-          value,
-          collateral,
-          openPrice,
-          liquidationPrice,
-          profit,
-          onTrade: this.onTradeRequested,
-          onManageCollateralOpen: this.onManageCollateralRequested,
-          changeLoadingTransaction: this.changeLoadingTransaction,
-          isTxCompleted: this.state.isTxCompleted
-        })
+        ownRowsDataAll.push(ownRowDataProps)
       }
+    }
+
+    this._isMounted &&
+      this.setState({
+        ...this.state,
+        openedPositionsLoaded: true,
+        ownRowsDataAll,
+        openedPositionsCount: loans?.length || 0,
+        loans
+      })
+  }
+
+  public getOwnRowsData = async (state: ITradePageState) => {
+    const ownRowsData: IOwnTokenGridRowProps[] = []
+    let loans: IBorrowedFundsState[] | undefined
+    if (
+      !FulcrumProvider.Instance.web3Wrapper ||
+      !FulcrumProvider.Instance.contractsSource ||
+      !FulcrumProvider.Instance.contractsSource.canWrite
+    ) {
+      return null
+    }
+
+    const loansByPair = await FulcrumProvider.Instance.getUserMarginTradeLoansByPair(
+      this.state.selectedMarket.baseToken,
+      this.state.selectedMarket.quoteToken
+    )
+
+    loans = loansByPair.loans
+
+    const selectMarketBaseToQuoteTokenRate = await FulcrumProvider.Instance.getSwapRate(
+      this.state.selectedMarket.baseToken,
+      this.state.selectedMarket.quoteToken
+    )
+
+    for (const loan of loans) {
+      if (!loan.loanData) continue
+      const currentCollateralToPrincipalRate =
+        this.state.selectedMarket.baseToken === loan.collateralAsset
+          ? selectMarketBaseToQuoteTokenRate
+          : new BigNumber(1).div(selectMarketBaseToQuoteTokenRate)
+      const ownRowDataProps = await this.getOwnRowDataProps(loan, currentCollateralToPrincipalRate)
+      ownRowsData.push(ownRowDataProps)
     }
 
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        openedPositionsCount: ownRowsData.length,
-        openedPositionsLoaded: true,
+        openedPositionsCount: loansByPair.allUsersLoansCount,
         ownRowsData,
         loans
       })
@@ -685,6 +717,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public getTokenRowsData = async (state: ITradePageState) => {
     const tokenRowsData: ITradeTokenGridRowProps[] = []
 
+    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`)
+    const yieldAPYJson = await yieldAPYRequest.json()
+    const yieldApr =
+      yieldAPYJson.success && yieldAPYJson.data[state.selectedMarket.baseToken.toLowerCase()]
+        ? new BigNumber(yieldAPYJson.data[state.selectedMarket.baseToken.toLowerCase()])
+        : new BigNumber(0)
+
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
       quoteToken: state.selectedMarket.quoteToken,
@@ -695,6 +734,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
+      yieldApr,
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
         state.selectedMarket.baseToken,
         state.selectedMarket.quoteToken
@@ -710,6 +750,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
+      yieldApr,
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
         state.selectedMarket.quoteToken,
         state.selectedMarket.baseToken

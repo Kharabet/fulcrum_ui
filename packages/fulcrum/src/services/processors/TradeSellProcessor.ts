@@ -125,11 +125,10 @@ export class TradeSellProcessor {
       }
     }
 
-    let txHash: string = ''
     try {
       console.log('amountInBaseUnits ' + amountInBaseUnits)
       // Closing trade
-      txHash =
+      const txHash =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
           ? await iBZxContract.closeWithSwapWithGasToken.sendTransactionAsync(
               taskRequest.loanId!,
@@ -164,7 +163,7 @@ export class TradeSellProcessor {
     }
 
     task.processingStepNext()
-    const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request)
+    const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(task.txHash!, task.request)
     if (!txReceipt.status) {
       throw new Error('Reverted by EVM')
     }
