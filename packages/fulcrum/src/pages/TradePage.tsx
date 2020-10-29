@@ -506,20 +506,24 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionType,
           loan
         ),
-        positionType === PositionType.LONG
+        false //return in loan token
       )
       const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
         tradeRequest
       )
-      const depositAmount = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
-      const withdrawAmount = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
-      profit =
-        estimatedCollateralReceived[1]
-              .div(10 ** collateralAssetDecimals)
-              .times(currentCollateralToPrincipalRate)
-              .minus(depositAmount)
-              .plus(withdrawAmount)
-          
+      const estimatedReceivedLoanToken = estimatedCollateralReceived[1]
+        .div(10 ** loanAssetDecimals)
+
+      const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
+      const withdrawAmountLoanToken = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
+      const depositAmountCollateralToken = depositAmountLoanToken.div(
+        loan.loanData.startRate.div(10 ** loanAssetDecimals)
+      )
+      
+      profit = estimatedReceivedLoanToken
+        .minus(depositAmountLoanToken)
+        .plus(withdrawAmountLoanToken)
+
     } else {
       collateral = collateralAssetAmount
 
@@ -556,7 +560,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionType,
           loan
         ),
-        true
+        true //return in collateral token
       )
       const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
         tradeRequest
@@ -567,11 +571,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const withdrawAmount = loan.loanData.withdrawalValue
         .div(10 ** loanAssetDecimals)
         .div(currentCollateralToPrincipalRate)
-
-      profit =estimatedCollateralReceived[1]
-              .div(10 ** collateralAssetDecimals)
-              .minus(depositAmount)
-              .plus(withdrawAmount)
+       
+      profit = estimatedCollateralReceived[1]
+        .div(10 ** collateralAssetDecimals)
+        .minus(depositAmount)
+        .plus(withdrawAmount)
     }
 
     return {
