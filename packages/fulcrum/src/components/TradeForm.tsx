@@ -7,7 +7,7 @@ import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { ReactComponent as QuestionIcon } from '../assets/images/ic__question_mark.svg'
 import { Asset } from '../domain/Asset'
 import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary, AssetsDictionaryMobile } from '../domain/AssetsDictionary'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'
@@ -93,10 +93,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context)
-    let assetDetails = AssetsDictionary.assets.get(props.baseToken)
-    if (this.props.isMobileMedia) {
-      assetDetails = AssetsDictionaryMobile.assets.get(this.props.baseToken)
-    }
+    const assetDetails = AssetsDictionary.assets.get(props.baseToken)   
     const maxTradeValue = new BigNumber(0)
     const liquidationPrice = new BigNumber(0)
     const exposureValue = new BigNumber(0)
@@ -163,10 +160,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   private async derivedUpdate() {
-    let assetDetails = AssetsDictionary.assets.get(this.props.baseToken)
-    if (this.props.isMobileMedia) {
-      assetDetails = AssetsDictionaryMobile.assets.get(this.props.baseToken)
-    }
+    const assetDetails = AssetsDictionary.assets.get(this.props.baseToken)
     const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken)
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(
       this.props.tradeType,
