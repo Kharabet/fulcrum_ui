@@ -490,39 +490,39 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .div(collateralAssetPrecision)
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
-      const tradeRequest = new TradeRequest(
-        loan.loanId,
-        TradeType.SELL,
-        loan.loanAsset,
-        loan.collateralAsset,
-        Asset.UNKNOWN,
-        positionType,
-        leverage.toNumber(),
-        await FulcrumProvider.Instance.getMaxTradeValue(
-          TradeType.SELL,
-          loan.loanAsset,
-          loan.collateralAsset,
-          Asset.UNKNOWN,
-          positionType,
-          loan
-        ),
-        false //return in loan token
-      )
-      const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-        tradeRequest
-      )
-      const estimatedReceivedLoanToken = estimatedCollateralReceived[1]
-        .div(10 ** loanAssetDecimals)
+      profit = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue)
+      // const tradeRequest = new TradeRequest(
+      //   loan.loanId,
+      //   TradeType.SELL,
+      //   loan.loanAsset,
+      //   loan.collateralAsset,
+      //   Asset.UNKNOWN,
+      //   positionType,
+      //   leverage.toNumber(),
+      //   await FulcrumProvider.Instance.getMaxTradeValue(
+      //     TradeType.SELL,
+      //     loan.loanAsset,
+      //     loan.collateralAsset,
+      //     Asset.UNKNOWN,
+      //     positionType,
+      //     loan
+      //   ),
+      //   false //return in loan token
+      // )
+      // const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+      //   tradeRequest
+      // )
+      // const estimatedReceivedLoanToken = estimatedCollateralReceived[1]
+      //   .div(10 ** loanAssetDecimals)
 
-      const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
-      const withdrawAmountLoanToken = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
-      const depositAmountCollateralToken = depositAmountLoanToken.div(
-        loan.loanData.startRate.div(10 ** loanAssetDecimals)
-      )
-      
-      profit = estimatedReceivedLoanToken
-        .minus(depositAmountLoanToken)
+      // const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
+      // const withdrawAmountLoanToken = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
+      // const depositAmountCollateralToken = depositAmountLoanToken.div(
+      //   loan.loanData.startRate.div(10 ** loanAssetDecimals)
+      // )
 
+      // profit = estimatedReceivedLoanToken
+      //   .minus(depositAmountLoanToken)
     } else {
       collateral = collateralAssetAmount
 
@@ -542,38 +542,40 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision))
         .div(10 ** 18)
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
+      profit = openPrice
+        .minus(new BigNumber(1).div(currentCollateralToPrincipalRate))
+        .times(positionValue)
+      // const tradeRequest = new TradeRequest(
+      //   loan.loanId,
+      //   TradeType.SELL,
+      //   loan.loanAsset,
+      //   loan.collateralAsset,
+      //   Asset.UNKNOWN,
+      //   positionType,
+      //   leverage.toNumber(),
+      //   await FulcrumProvider.Instance.getMaxTradeValue(
+      //     TradeType.SELL,
+      //     loan.loanAsset,
+      //     loan.collateralAsset,
+      //     Asset.UNKNOWN,
+      //     positionType,
+      //     loan
+      //   ),
+      //   true //return in collateral token
+      // )
+      // const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+      //   tradeRequest
+      // )
+      // const depositAmount = loan.loanData.depositValue
+      //   .div(10 ** loanAssetDecimals)
+      //   .div(currentCollateralToPrincipalRate)
+      // const withdrawAmount = loan.loanData.withdrawalValue
+      //   .div(10 ** loanAssetDecimals)
+      //   .div(currentCollateralToPrincipalRate)
 
-      const tradeRequest = new TradeRequest(
-        loan.loanId,
-        TradeType.SELL,
-        loan.loanAsset,
-        loan.collateralAsset,
-        Asset.UNKNOWN,
-        positionType,
-        leverage.toNumber(),
-        await FulcrumProvider.Instance.getMaxTradeValue(
-          TradeType.SELL,
-          loan.loanAsset,
-          loan.collateralAsset,
-          Asset.UNKNOWN,
-          positionType,
-          loan
-        ),
-        true //return in collateral token
-      )
-      const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-        tradeRequest
-      )
-      const depositAmount = loan.loanData.depositValue
-        .div(10 ** loanAssetDecimals)
-        .div(currentCollateralToPrincipalRate)
-      const withdrawAmount = loan.loanData.withdrawalValue
-        .div(10 ** loanAssetDecimals)
-        .div(currentCollateralToPrincipalRate)
-       
-      profit = estimatedCollateralReceived[1]
-        .div(10 ** collateralAssetDecimals)
-        .minus(depositAmount)
+      // profit = estimatedCollateralReceived[1]
+      //   .div(10 ** collateralAssetDecimals)
+      //   .minus(depositAmount)
     }
 
     return {
