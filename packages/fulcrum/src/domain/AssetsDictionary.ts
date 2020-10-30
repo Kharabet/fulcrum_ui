@@ -551,28 +551,6 @@ export class AssetsDictionary {
         ])
       )
     ],
-    [
-      Asset.AAVE,
-      new AssetDetails(
-        'AAVE',
-        'AAVE',
-        'iAAVE',
-        'https://fulcrum.trade/images/iAAVE.svg',
-        18,
-        aave_logo,
-        AAVELogo,
-        '',
-        '',
-        '',
-        '#FFFFFF',
-        '#FFFFFF',
-        new Map<number, string | null>([
-          [1, ''],
-          [3, ''],
-          [42, '']
-        ])
-      )
-    ],
      [
       Asset.UNI,
       new AssetDetails(

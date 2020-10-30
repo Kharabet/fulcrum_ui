@@ -100,8 +100,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
   }
 
   public async componentDidMount() {
-    console.log(await TasksQueue.Instance.getTasksList())
-    const task = await TasksQueue.Instance.getTasksList().find(
+    const task = TasksQueue.Instance.getTasksList().find(
       (t) =>
         t.request instanceof BorrowRequest &&
         t.request.borrowAsset === this.props.asset &&
@@ -137,53 +136,51 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
   public render() {
     let asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails
     return (
-      this.state.interestRate.gt(0) && (
-        <div className="asset-selector-item">
-          {this.state.isLoadingTransaction && this.state.request && (
-            <TxProcessingLoader
-              quantityDots={3}
-              sizeDots={'small'}
-              isOverlay={true}
-              taskId={this.state.request.id}
-            />
-          )}
-          <div className="asset-selector-item-content" onClick={this.onClick}>
-            <div className="asset-selector-body">
-              <div className="asset-selector-row">
-                <div className="asset-selector__apr">Est. Yield, vBZRX</div>
-                <div
-                  title={this.props.yieldApr.toFixed(18)}
-                  className="asset-selector__interest-rate">
-                  <span className="asset-selector__interest-rate-value">
-                    {this.props.yieldApr.toFixed(0)}
-                  </span>
-                  %
-                </div>
-              </div>
-              <div className="asset-selector-row">
-                <div className="asset-selector__apr grey">APR</div>&nbsp;
-                <div className="asset-selector__fixed">
-                  {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}
-                  <span>%</span>
-                </div>
-              </div>
-              <div className="asset-selector-row">
-                <div className="asset-selector__fixed">FIXED</div>
+      <div className="asset-selector-item">
+        {this.state.isLoadingTransaction && this.state.request && (
+          <TxProcessingLoader
+            quantityDots={3}
+            sizeDots={'small'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
+        )}
+        <div className="asset-selector-item-content" onClick={this.onClick}>
+          <div className="asset-selector-body">
+            <div className="asset-selector-row">
+              <div className="asset-selector__apr">Est. Yield, vBZRX</div>
+              <div
+                title={this.props.yieldApr.toFixed(18)}
+                className="asset-selector__interest-rate">
+                <span className="asset-selector__interest-rate-value">
+                  {this.props.yieldApr.toFixed(0)}
+                </span>
+                %
               </div>
             </div>
-            <div className="asset-selector-footer">
-              <div className="asset-selector__title">{this.props.asset}</div>
-              <div className="asset-selector__icon">{asset.reactLogoSvg.render()}</div>
-              <div className="asset-selector__arrow">
-                <ArrowRight />
+            <div className="asset-selector-row">
+              <div className="asset-selector__apr grey">APR</div>&nbsp;
+              <div className="asset-selector__fixed">
+                {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}
+                <span>%</span>
               </div>
+            </div>
+            <div className="asset-selector-row">
+              <div className="asset-selector__fixed">FIXED</div>
             </div>
           </div>
-          <div
-            className="asset-selector-item-bg"
-            style={{ backgroundColor: asset.bgBorrowItem }}></div>
+          <div className="asset-selector-footer">
+            <div className="asset-selector__title">{this.props.asset}</div>
+            <div className="asset-selector__icon">{asset.reactLogoSvg.render()}</div>
+            <div className="asset-selector__arrow">
+              <ArrowRight />
+            </div>
+          </div>
         </div>
-      )
+        <div
+          className="asset-selector-item-bg"
+          style={{ backgroundColor: asset.bgBorrowItem }}></div>
+      </div>
     )
   }
 
