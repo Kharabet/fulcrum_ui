@@ -236,7 +236,7 @@ export class ContractsSource {
         address = '0x76de3d406fee6c3316558406b17ff785c978e98c'
         break
       case 42:
-        address = '0x2F27c07D888751109753533BF299ea5813A6479D'
+        address = '0x59A2b856d8F6B29f2f3095fFc2FDb4AC9297749A'
         break
     }
 
