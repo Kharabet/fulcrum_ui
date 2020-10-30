@@ -190,10 +190,10 @@ export class ContractsSource {
           case '0xdd974d5c2e2928dea5f71b9825b8b646686bd200':
             asset = Asset.KNC
             break
-            case '':
+          case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
               asset = Asset.AAVE
               break
-            case '':
+          case '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984':
               asset = Asset.UNI
               break
           case '0x0000000000004946c0e9f43f4dee607b0ef1fa1c':
@@ -305,10 +305,10 @@ export class ContractsSource {
             address = '0x80fb784b7ed66730e8b1dbd9820afd29931aab03'
             break
           case Asset.UNI:
-            address = ''
+            address = '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'
             break
           case Asset.AAVE:
-            address = ''
+            address = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
             break
         }
         break

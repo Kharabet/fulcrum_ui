@@ -536,7 +536,7 @@ export class AssetsDictionary {
         '#FFFFFF',
         '#2EBAC6',
         new Map<number, string | null>([
-          [1, ''],
+          [1, '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'],
           [3, ''],
           [42, '']
         ])
@@ -559,7 +559,7 @@ export class AssetsDictionary {
         '#FFFFFF',
         '#FFE1EF',
         new Map<number, string | null>([
-          [1, ''],
+          [1, '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'],
           [3, ''],
           [42, '']
         ])
