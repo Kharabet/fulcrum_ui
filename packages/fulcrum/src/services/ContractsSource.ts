@@ -440,7 +440,7 @@ export class ContractsSource {
           case '0xdd974d5c2e2928dea5f71b9825b8b646686bd200':
             asset = Asset.KNC
             break
-          case '0x0cae8d91E0b1b7Bd00D906E990C3625b2c220db1':
+          case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
             asset = Asset.AAVE
             break
           case '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984':
