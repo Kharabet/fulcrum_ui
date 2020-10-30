@@ -93,7 +93,7 @@ export const iTokenList = [
     '0x0a625fcec657053fe2d9fffdeb1dbb4e412cf8a8',
     '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
     'Fulcrum UNI iToken',
-    'UNI',
+    'iUNI',
     '1'
   ]
   ,
@@ -102,7 +102,7 @@ export const iTokenList = [
     '0x0cae8d91e0b1b7bd00d906e990c3625b2c220db1',
     '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
     'Fulcrum AAVE iToken',
-    'AAVE',
+    'iAAVE',
     '1'
   ]
 ]
