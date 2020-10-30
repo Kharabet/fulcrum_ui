@@ -1,25 +1,24 @@
-import React, { Component } from 'react'
-import { Header } from '../layout/Header'
-import { LiquidationEvent } from '../domain/LiquidationEvent'
 import { BigNumber } from '@0x/utils'
-import { ITxRowProps } from '../components/TxRow'
-import configProviders from '../config/providers.json'
-import { TxGrid } from '../components/TxGrid'
-import { LoanGrid } from '../components/LoanGrid'
-import { Asset } from '../domain/Asset'
+import React, { Component } from 'react'
 import { Bar } from 'react-chartjs-2'
+import { LoanGrid } from '../components/LoanGrid'
 import { Search } from '../components/Search'
+import { TxGrid } from '../components/TxGrid'
+import { ITxRowProps } from '../components/TxRow'
 import { UnhealthyChart } from '../components/UnhealthyChart'
+import { Asset } from '../domain/Asset'
+import { LiquidationEvent } from '../domain/LiquidationEvent'
+import { Header } from '../layout/Header'
 
-import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
+import { ExplorerProvider } from '../services/ExplorerProvider'
 
 import { NavService } from '../services/NavService'
 
 import { Loader } from '../components/Loader'
-import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { ILoanRowProps } from '../components/LoanRow'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { IActiveLoanData } from '../domain/IActiveLoanData'
 
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void
@@ -33,14 +32,14 @@ interface ILiquidationsPageState {
   unhealthyLoans: ILoanRowProps[]
   unhealthyLoansUsd: BigNumber
   healthyLoansUsd: BigNumber
-  barChartDatasets: { label: Asset; backgroundColor: string; data: { x: string; y: number }[] }[]
+  barChartDatasets: Array<{ label: Asset; backgroundColor: string; data: Array<{ x: string; y: number }> }>
   isDataLoading: boolean
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
   private _isMounted: boolean
 
   private readonly stablecoins: Asset[] = [Asset.DAI, Asset.USDC, Asset.USDT]
-  private readonly assetsShown: { token: Asset; color: string }[]
+  private readonly assetsShown: Array<{ token: Asset; color: string }>
 
   constructor(props: any) {
     super(props)
@@ -67,7 +66,9 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         { token: Asset.BZRX, color: '#0056D7' },
         { token: Asset.MKR, color: '#028858' },
         { token: Asset.LEND, color: '#00EFEF' },
-        { token: Asset.KNC, color: '#3BD8A7' }
+        { token: Asset.KNC, color: '#3BD8A7' },
+        { token: Asset.UNI, color: '#FFE1EF' },
+        { token: Asset.AAVE, color: '#2EBAC6' }
       ]
     }
 

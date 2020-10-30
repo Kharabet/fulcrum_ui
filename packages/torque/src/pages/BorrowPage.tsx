@@ -3,10 +3,10 @@ import { RouteComponentProps } from 'react-router'
 import { AssetSelector } from '../components/AssetSelector'
 import { BorrowDlg } from '../components/BorrowDlg'
 import { Asset } from '../domain/Asset'
+import { ProviderType } from '../domain/ProviderType'
 import { Footer } from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
 import { TorqueProvider } from '../services/TorqueProvider'
-import { ProviderType } from '../domain/ProviderType'
 
 export interface IBorrowPageRouteParams {}
 

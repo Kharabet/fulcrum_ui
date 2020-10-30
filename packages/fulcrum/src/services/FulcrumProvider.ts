@@ -100,12 +100,35 @@ export class FulcrumProvider {
   public isLoading: boolean = false
   public unsupportedNetwork: boolean = false
 
+  public readonly lendAssetsShown: Asset[]
+
   constructor() {
     // init
     this.eventEmitter = new EventEmitter()
     this.eventEmitter.setMaxListeners(1000)
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued)
 
+    if (networkName === 'kovan') {
+      this.lendAssetsShown = [Asset.fWETH, Asset.USDC, Asset.WBTC]
+    } else if (networkName === 'ropsten') {
+      this.lendAssetsShown = [Asset.ETH, Asset.DAI]
+    } else {
+      this.lendAssetsShown = [
+        Asset.ETH,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
+        Asset.KNC,
+        Asset.UNI,
+        Asset.AAVE
+      ]
+    }
     // singleton
     if (!FulcrumProvider.Instance) {
       FulcrumProvider.Instance = this
@@ -569,7 +592,7 @@ export class FulcrumProvider {
             let usdSupply = new BigNumber(0)
             let usdTotalLocked = new BigNumber(0)
 
-            if (asset == Asset.ETHv1) {
+            if (asset === Asset.ETHv1) {
               vaultBalance = await this.getAssetTokenBalanceOfUser(
                 Asset.WETH,
                 '0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633'
