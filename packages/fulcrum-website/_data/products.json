@@ -55,14 +55,14 @@
   },
   {
     "name": "uni",
-    "visibilityApr": false,
-    "visibilityEarn": false,
+    "visibilityApr": true,
+    "visibilityEarn": true,
     "visibilityChart": false
   },
   {
     "name": "aave",
-    "visibilityApr": false,
-    "visibilityEarn": false,
+    "visibilityApr": true,
+    "visibilityEarn": true,
     "visibilityChart": false
   }
 ]
