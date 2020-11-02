@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./scripts/startServer",
-    "dev": "SET NODE_ENV=development & node ./scripts/startServer",
+    "dev": "NODE_ENV=development node ./scripts/startServer",
     "lint": "eslint scripts server --quiet",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
