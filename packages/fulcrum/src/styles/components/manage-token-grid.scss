@@ -32,18 +32,12 @@
       @media screen and (min-width: $breakpoint-mobile-min) {
         padding: 20px;
       }
-      & path {
-        fill: #8992a4;
-      }
+      
       &.active {
         position: relative;
-        &,
-        & span {
-          color: var(--primary-text);
-        }
-        & path {
-          fill: var(--primary-text);
-        }
+        color: var(--primary-text);
+        
+       
         &:after {
           content: '';
           height: 8px;

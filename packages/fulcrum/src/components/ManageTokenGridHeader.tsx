@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { ReactComponent as WalletSvg } from '../assets/images/wallet-icon.svg'
 
 export interface IManageTokenGridHeaderProps {
   isShowHistory: boolean
@@ -44,8 +43,7 @@ export class ManageTokenGridHeader extends Component<
           onClick={this.onShowOpenPositions}>
           <div className="manage-tab">
             <div className={`trade-token-grid-tab-item__col-token-image`}>
-              {<WalletSvg />}
-              <span>Manage</span>
+              <span>Open Positions</span>
               <span className="opened-positions-count">{this.props.openedPositionsCount}</span>
             </div>
           </div>{' '}

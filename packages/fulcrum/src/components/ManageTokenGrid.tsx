@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { Asset } from '../domain/Asset'
-import { OwnTokenGrid } from './OwnTokenGrid'
+import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { HistoryTokenGrid } from './HistoryTokenGrid'
 import { IHistoryTokenGridRowProps } from './HistoryTokenGridRow'
+import { OwnTokenGrid } from './OwnTokenGrid'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
 
 export interface IManageTokenGridProps {
