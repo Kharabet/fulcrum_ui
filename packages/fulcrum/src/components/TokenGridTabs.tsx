@@ -4,7 +4,6 @@ import { TokenGridTab } from '../domain/TokenGridTab'
 import { IMarketPair } from '../pages/TradePage'
 import '../styles/components/token-grid-tabs.scss'
 import { DropdownSelect, IDropDownSelectOption, IDropdownSelectProps } from './DropdownSelect'
-import { ManageTokenGridHeader } from './ManageTokenGridHeader'
 import { OpenPositionsButton } from './OpenPositionsButton'
 
 export interface ITokenGridTabsProps {
@@ -65,7 +64,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   //   await this.props.onMarketSelect(asset);
   // };
 
-  private async onDropdownSelect(baseTokenString: string, quoteTokenString: string) {    
+  private async onDropdownSelect(baseTokenString: string, quoteTokenString: string) {
     this.props.onTokenGridTabChange(TokenGridTab.Chart)
     const baseToken = baseTokenString as Asset
     const quoteToken = quoteTokenString as Asset
@@ -73,22 +72,13 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   }
 
   public render() {
-    // var selectedAsset = AssetsDictionary.assets.get(this.props.selectedTabAsset);
-    // var displayName = !!selectedAsset ? selectedAsset.displayName : "manage";
-
     return (
       <div className={`trade-token-grid-tab`}>
         <div className="trade-token-grid-tab__container">
-          <div className="trade-token-grid-tab__selector">
-            <DropdownSelect {...this.getDropdownProps()} />
-          </div>
           <div className="trade-token-grid-tab__items">
-            {/* <ManageTokenGridHeader
-              {...this.props}
-              isShowMyTokensOnly={this.state.isShowMyTokensOnly}
-              isShowHistory={this.state.isShowHistory}
-              updateStateisShowHistory={this.updateStateisShowHistory}
-            /> */}
+            <div className="trade-token-grid-tab__selector">
+              <DropdownSelect {...this.getDropdownProps()} />
+            </div>
             <div
               className={`tab ${
                 this.props.activeTokenGridTab === TokenGridTab.Chart ? `active` : ``
@@ -148,11 +138,6 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
           })
       )
     })
-
-    // dropDownSelectOptions.push({
-    //   value: "manage",
-    //   displayName: "Manage"
-    // });
 
     const activeDropDownOption = dropDownSelectOptions.find(
       (option) =>

@@ -30,11 +30,11 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps> {
 
     if (!this.props.ownRowsData.length) {
       return (
-        <div className="history-token-grid__placeholder">
+        <div className="manage-token-grid__placeholder">
           <div>
             <Placeholder />
             <p>No open positions</p>
-            <a href="/trade" className="history-token-grid__link-button">
+            <a href="/trade" className="manage-token-grid__link-button">
               Start Trading
             </a>
           </div>

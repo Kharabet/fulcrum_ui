@@ -32,9 +32,6 @@ import { TradeType } from '../domain/TradeType'
 
 import '../styles/pages/_trade-page.scss'
 
-const ManageTokenGrid = React.lazy(() =>
-  import('../components/ManageTokenGrid').then((module) => ({ default: module.ManageTokenGrid }))
-)
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
 
@@ -213,51 +210,53 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             />
           </div>
 
-          {this.state.activeTokenGridTab === TokenGridTab.Chart && (
-            <TradeTokenGrid
-              isMobileMedia={this.props.isMobileMedia}
-              tokenRowsData={this.state.tokenRowsData.filter(
-                (e) =>
-                  e.baseToken === this.state.selectedMarket.baseToken &&
-                  e.quoteToken === this.state.selectedMarket.quoteToken
-              )}
-              innerOwnRowsData={this.state.innerOwnRowsData.filter(
-                (e) =>
-                  (this.checkWethOrFwethToken(e.baseToken) ===
-                    this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) ||
-                    e.baseToken === this.state.selectedMarket.baseToken) &&
-                  (this.checkWethOrFwethToken(e.quoteToken) ===
-                    this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) ||
-                    e.quoteToken === this.state.selectedMarket.quoteToken)
-              )}
-              changeLoadingTransaction={this.changeLoadingTransaction}
-              request={this.state.request}
-              isLoadingTransaction={this.state.isLoadingTransaction}
-              resultTx={this.state.resultTx}
-              isTxCompleted={this.state.isTxCompleted}
-              changeGridPositionType={this.changeGridPositionType}
-              activePositionType={this.state.activePositionType}
-            />
-          )}
+          <div className="manage-token-grid">
+            {this.state.activeTokenGridTab === TokenGridTab.Chart && (
+              <TradeTokenGrid
+                isMobileMedia={this.props.isMobileMedia}
+                tokenRowsData={this.state.tokenRowsData.filter(
+                  (e) =>
+                    e.baseToken === this.state.selectedMarket.baseToken &&
+                    e.quoteToken === this.state.selectedMarket.quoteToken
+                )}
+                innerOwnRowsData={this.state.innerOwnRowsData.filter(
+                  (e) =>
+                    (this.checkWethOrFwethToken(e.baseToken) ===
+                      this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) ||
+                      e.baseToken === this.state.selectedMarket.baseToken) &&
+                    (this.checkWethOrFwethToken(e.quoteToken) ===
+                      this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) ||
+                      e.quoteToken === this.state.selectedMarket.quoteToken)
+                )}
+                changeLoadingTransaction={this.changeLoadingTransaction}
+                request={this.state.request}
+                isLoadingTransaction={this.state.isLoadingTransaction}
+                resultTx={this.state.resultTx}
+                isTxCompleted={this.state.isTxCompleted}
+                changeGridPositionType={this.changeGridPositionType}
+                activePositionType={this.state.activePositionType}
+              />
+            )}
 
-          {this.state.activeTokenGridTab === TokenGridTab.Open && (
-            <OwnTokenGrid
-              ownRowsData={this.state.ownRowsData}
-              isMobileMedia={this.props.isMobileMedia}
-            />
-          )}
+            {this.state.activeTokenGridTab === TokenGridTab.Open && (
+              <OwnTokenGrid
+                ownRowsData={this.state.ownRowsData}
+                isMobileMedia={this.props.isMobileMedia}
+              />
+            )}
 
-          {this.state.activeTokenGridTab === TokenGridTab.History && (
-            <HistoryTokenGrid
-              historyEvents={this.state.historyEvents}
-              historyRowsData={this.state.historyRowsData}
-              isMobileMedia={this.props.isMobileMedia}
-              stablecoins={this.stablecoins}
-              baseTokens={this.baseTokens}
-              quoteTokens={this.quoteTokens}
-              updateHistoryRowsData={this.updateHistoryRowsData}
-            />
-          )}
+            {this.state.activeTokenGridTab === TokenGridTab.History && (
+              <HistoryTokenGrid
+                historyEvents={this.state.historyEvents}
+                historyRowsData={this.state.historyRowsData}
+                isMobileMedia={this.props.isMobileMedia}
+                stablecoins={this.stablecoins}
+                baseTokens={this.baseTokens}
+                quoteTokens={this.quoteTokens}
+                updateHistoryRowsData={this.updateHistoryRowsData}
+              />
+            )}
+          </div>
 
           <Modal
             isOpen={this.state.isTradeModalOpen}
