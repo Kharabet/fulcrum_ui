@@ -36,8 +36,7 @@ export const ManageTokenGrid = (props: IManageTokenGridProps) => {
       ) : (
         <OwnTokenGrid
           ownRowsData={props.ownRowsData}
-          isMobileMedia={props.isMobileMedia}
-          openedPositionsLoaded={props.openedPositionsLoaded}
+          isMobileMedia={props.isMobileMedia}         
         />
       )}
     </div>

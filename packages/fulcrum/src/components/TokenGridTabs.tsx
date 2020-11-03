@@ -12,14 +12,10 @@ export interface ITokenGridTabsProps {
   isMobile: boolean
   baseTokens: Asset[]
   quoteTokens: Asset[]
-  isShowMyTokensOnly: boolean
-  isShowHistory: boolean
   activeTokenGridTab: TokenGridTab
   openedPositionsCount: number
 
   onMarketSelect: (baseToken: Asset, quoteToken: Asset) => void
-  onShowMyTokensOnlyChange: (value: boolean) => void
-  onShowHistory: (value: boolean) => void
   onTokenGridTabChange: (value: TokenGridTab) => void
 }
 
@@ -32,11 +28,9 @@ interface ITokenGridTabsState {
 export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabsState> {
   constructor(props: ITokenGridTabsProps, context?: any) {
     super(props, context)
-    this.state = {
-      isShowMyTokensOnly: props.isShowMyTokensOnly,
-      isShowHistory: props.isShowHistory
-      // isPro: false
-    }
+    // this.state = {
+    // isPro: false
+    // }
     // this.onSwitchPro = this.onSwitchPro.bind(this);
   }
 
@@ -71,14 +65,10 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   //   await this.props.onMarketSelect(asset);
   // };
 
-  private async onDropdownSelect(baseTokenString: string, quoteTokenString: string) {
-    
+  private async onDropdownSelect(baseTokenString: string, quoteTokenString: string) {    
+    this.props.onTokenGridTabChange(TokenGridTab.Chart)
     const baseToken = baseTokenString as Asset
     const quoteToken = quoteTokenString as Asset
-
-    // this.setState({ ...this.state, isShowMyTokensOnly: false })
-    // this.props.onShowMyTokensOnlyChange(false)
-    this.props.onTokenGridTabChange(TokenGridTab.Chart)
     this.props.onMarketSelect(baseToken, quoteToken)
   }
 
@@ -100,15 +90,19 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               updateStateisShowHistory={this.updateStateisShowHistory}
             /> */}
             <div
-              className={`tab ${this.props.activeTokenGridTab === TokenGridTab.Chart ? `active` : ``}`}
+              className={`tab ${
+                this.props.activeTokenGridTab === TokenGridTab.Chart ? `active` : ``
+              }`}
               onClick={this.showChart}>
               {TokenGridTab.Chart}
-            </div>            
-            <OpenPositionsButton {...this.props}/> 
+            </div>
+            <OpenPositionsButton {...this.props} />
             <div
-              className={`tab ${this.props.activeTokenGridTab === TokenGridTab.History ? `active` : ``}`}
+              className={`tab ${
+                this.props.activeTokenGridTab === TokenGridTab.History ? `active` : ``
+              }`}
               onClick={this.showTradeHistory}>
-                {TokenGridTab.History}
+              {TokenGridTab.History}
             </div>
           </div>
 
@@ -131,25 +125,16 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     )
   }
 
-  public showMyTokensOnlyChange = async () => {
-    this.props.onShowMyTokensOnlyChange(true)
-    this.setState({ ...this.state, isShowMyTokensOnly: true })
-  }
-
   public showChart = async () => {
-    await this.onDropdownSelect(this.props.selectedMarket.baseToken,this.props.selectedMarket.quoteToken)  
+    await this.onDropdownSelect(
+      this.props.selectedMarket.baseToken,
+      this.props.selectedMarket.quoteToken
+    )
   }
 
-  public showTradeHistory = async () => {
-    
+  public showTradeHistory = () => {
     this.props.onTokenGridTabChange(TokenGridTab.History)
   }
-
-  // public updateStateisShowHistory = async (updatedState: boolean) => {
-  //   await this.showMyTokensOnlyChange()
-  //   this.props.onShowHistory(updatedState)
-  //   this.setState({ isShowHistory: updatedState })
-  // }
 
   private getDropdownProps(): IDropdownSelectProps {
     const dropDownSelectOptions: IDropDownSelectOption[] = []

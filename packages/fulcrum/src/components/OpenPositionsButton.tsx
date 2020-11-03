@@ -8,7 +8,7 @@ export interface IOpenPositionsButtonProps {
 }
 
 export const OpenPositionsButton = (props: IOpenPositionsButtonProps) => {
-  const showOpenPositions = async () => {
+  const showOpenPositions = () => {
     props.onTokenGridTabChange(TokenGridTab.Open)
   }
   return (

@@ -1,43 +1,23 @@
 import React, { Component } from 'react'
-import { OwnTokenGridRow, IOwnTokenGridRowProps } from './OwnTokenGridRow'
-import { OwnTokenGridHeader } from './OwnTokenGridHeader'
 import { PreloaderChart } from '../components/PreloaderChart'
+import { OwnTokenGridHeader } from './OwnTokenGridHeader'
+import { IOwnTokenGridRowProps, OwnTokenGridRow } from './OwnTokenGridRow'
 
 import { ReactComponent as Placeholder } from '../assets/images/history_placeholder.svg'
 import '../styles/components/own-token-grid.scss'
 
 export interface IOwnTokenGridProps {
   isMobileMedia: boolean
-  ownRowsData: IOwnTokenGridRowProps[]
-  openedPositionsLoaded: boolean
+  ownRowsData: IOwnTokenGridRowProps[] | undefined
 }
 
-interface IOwnTokenGridState {
-  ownRowsData: IOwnTokenGridRowProps[]
-  isShowHistory: boolean
-}
-
-export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridState> {
+export class OwnTokenGrid extends Component<IOwnTokenGridProps> {
   constructor(props: IOwnTokenGridProps) {
-    super(props)
-    this.state = {
-      ownRowsData: [],
-      isShowHistory: false
-    }
-  }
-  private _isMounted: boolean = false
-
-  public componentWillUnmount(): void {
-    this._isMounted = false
-  }
-
-  public async componentDidMount() {
-    this._isMounted = true
+    super(props)   
   }
 
   public render() {
-    if (!this.props.ownRowsData.length) {
-      if (!this.props.openedPositionsLoaded)
+    if (this.props.ownRowsData===undefined) {
         return (
           <PreloaderChart
             quantityDots={4}
@@ -46,6 +26,9 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
             isOverlay={false}
           />
         )
+    }
+
+    if (!this.props.ownRowsData.length) {
       return (
         <div className="history-token-grid__placeholder">
           <div>
