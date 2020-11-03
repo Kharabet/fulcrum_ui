@@ -98,12 +98,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   public render() {
-    if (this.state.isLoading)
+    if (this.state.isLoading) {
       return (
         <PreloaderChart quantityDots={4} sizeDots={'middle'} title={'Loading'} isOverlay={false} />
       )
+    }
 
-    if (!this.state.historyRowsData.length)
+    if (!this.state.historyRowsData.length) {
       return (
         <div className="history-token-grid__placeholder">
           <div>
@@ -112,9 +113,11 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             <a href="/trade" className="history-token-grid__link-button">
               Start Trading
             </a>
+            
           </div>
         </div>
       )
+    }
 
     const startIndex = this.quantityVisibleRow * this.state.numberPagination
     const endIndex = this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow

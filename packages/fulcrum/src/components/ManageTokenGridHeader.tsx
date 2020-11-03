@@ -46,7 +46,7 @@ export class ManageTokenGridHeader extends Component<
               <span>Open Positions</span>
               <span className="opened-positions-count">{this.props.openedPositionsCount}</span>
             </div>
-          </div>{' '}
+          </div>
         </div>
         <div
           className={`tab ${this.props.isShowHistory ? `active` : ``}`}

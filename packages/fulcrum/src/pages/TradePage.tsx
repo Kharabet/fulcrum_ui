@@ -1,31 +1,34 @@
+import { BigNumber } from '@0x/utils'
 import React, { PureComponent } from 'react'
 import Modal from 'react-modal'
-import { BigNumber } from '@0x/utils'
 
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
-import { TradeTokenGrid } from '../components/TradeTokenGrid'
-import { TVChartContainer } from '../components/TVChartContainer'
-import { TokenGridTabs } from '../components/TokenGridTabs'
-import { ITradeTokenGridRowProps } from '../components/TradeTokenGridRow'
-import { IOwnTokenGridRowProps } from '../components/OwnTokenGridRow'
+import { HistoryTokenGrid } from '../components/HistoryTokenGrid'
 import { IHistoryTokenGridRowProps } from '../components/HistoryTokenGridRow'
+import { OwnTokenGrid } from '../components/OwnTokenGrid'
+import { IOwnTokenGridRowProps } from '../components/OwnTokenGridRow'
+import { TokenGridTabs } from '../components/TokenGridTabs'
+import { TradeTokenGrid } from '../components/TradeTokenGrid'
+import { ITradeTokenGridRowProps } from '../components/TradeTokenGridRow'
+import { TVChartContainer } from '../components/TVChartContainer'
 
 import { Asset } from '../domain/Asset'
-import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
-import { PositionType } from '../domain/PositionType'
-import { TradeRequest } from '../domain/TradeRequest'
-import { TradeType } from '../domain/TradeType'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
+import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
+import { LiquidationEvent } from '../domain/events/LiquidationEvent'
+import { TradeEvent } from '../domain/events/TradeEvent'
+import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { IHistoryEvents } from '../domain/IHistoryEvents'
-import { TradeEvent } from '../domain/events/TradeEvent'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
-import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
-import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
-import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { PositionType } from '../domain/PositionType'
+import { TokenGridTab } from '../domain/TokenGridTab'
+import { TradeRequest } from '../domain/TradeRequest'
+import { TradeType } from '../domain/TradeType'
 
 import '../styles/pages/_trade-page.scss'
 
@@ -52,6 +55,7 @@ interface ITradePageState {
   showMyTokensOnly: boolean
   isTradeModalOpen: boolean
   isShowHistory: boolean
+  activeTokenGridTab: TokenGridTab
   tradeType: TradeType
   tradePositionType: PositionType
   tradeLeverage: number
@@ -91,7 +95,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.WBTC,
         Asset.LINK,
         Asset.MKR,
-        //Asset.LEND,
+        // Asset.LEND,
         Asset.KNC
       ]
       this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT]
@@ -107,6 +111,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       showMyTokensOnly: false,
       isShowHistory: false,
       isTradeModalOpen: false,
+      activeTokenGridTab: TokenGridTab.Chart,
       tradeType: TradeType.BUY,
       // defaultquoteToken: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
       tradePositionType: PositionType.SHORT,
@@ -213,63 +218,70 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             baseTokens={this.baseTokens}
             quoteTokens={this.quoteTokens}
             selectedMarket={this.state.selectedMarket}
+            activeTokenGridTab={this.state.activeTokenGridTab}
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
             onShowHistory={this.onShowHistory}
             onMarketSelect={this.onTabSelect}
+            onTokenGridTabChange={this.onTokenGridTabChange}
             isMobile={this.props.isMobileMedia}
             isShowMyTokensOnly={this.state.showMyTokensOnly}
             isShowHistory={this.state.isShowHistory}
             openedPositionsCount={this.state.openedPositionsCount}
           />
 
-          <div className={`chart-wrapper${this.state.showMyTokensOnly ? ' hidden' : ''}`}>
+          <div
+            className={`chart-wrapper${
+              this.state.activeTokenGridTab !== TokenGridTab.Chart ? ' hidden' : ''
+            }`}>
             <TVChartContainer
               symbol={`${tvBaseToken}_${tvQuoteToken}`}
               preset={this.props.isMobileMedia ? 'mobile' : undefined}
             />
           </div>
 
-          {this.state.showMyTokensOnly ? (
-            <ManageTokenGrid
+          {this.state.activeTokenGridTab === TokenGridTab.Open ? (
+            <OwnTokenGrid
+              ownRowsData={this.state.ownRowsData}
               isMobileMedia={this.props.isMobileMedia}
-              ownRowsData={this.state.ownRowsDataAll}
+              openedPositionsLoaded={this.state.openedPositionsLoaded}
+            />
+          ) : this.state.activeTokenGridTab === TokenGridTab.History ? (
+            <HistoryTokenGrid
               historyEvents={this.state.historyEvents}
               historyRowsData={this.state.historyRowsData}
-              isShowHistory={this.state.isShowHistory}
+              isMobileMedia={this.props.isMobileMedia}
               stablecoins={this.stablecoins}
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
-              openedPositionsLoaded={this.state.openedPositionsLoaded}
               updateHistoryRowsData={this.updateHistoryRowsData}
             />
           ) : (
-            <React.Fragment>
-              <TradeTokenGrid
-                isMobileMedia={this.props.isMobileMedia}
-                tokenRowsData={this.state.tokenRowsData.filter(
-                  (e) =>
-                    e.baseToken === this.state.selectedMarket.baseToken &&
-                    e.quoteToken === this.state.selectedMarket.quoteToken
-                )}
-                ownRowsData={this.state.ownRowsData.filter(
-                  (e) =>
-                    (this.checkWethOrFwethToken(e.baseToken) ===
-                      this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) ||
-                      e.baseToken === this.state.selectedMarket.baseToken) &&
-                    (this.checkWethOrFwethToken(e.quoteToken) ===
-                      this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) ||
-                      e.quoteToken === this.state.selectedMarket.quoteToken)
-                )}
-                changeLoadingTransaction={this.changeLoadingTransaction}
-                request={this.state.request}
-                isLoadingTransaction={this.state.isLoadingTransaction}
-                resultTx={this.state.resultTx}
-                isTxCompleted={this.state.isTxCompleted}
-                changeGridPositionType={this.changeGridPositionType}
-                activePositionType={this.state.activePositionType}
-              />
-            </React.Fragment>
+            <TradeTokenGrid
+              isMobileMedia={this.props.isMobileMedia}
+              tokenRowsData={this.state.tokenRowsData.filter(
+                (e) =>
+                  e.baseToken === this.state.selectedMarket.baseToken &&
+                  e.quoteToken === this.state.selectedMarket.quoteToken
+              )}
+              ownRowsData={this.state.ownRowsData.filter(
+                (e) =>
+                  (this.checkWethOrFwethToken(e.baseToken) ===
+                    this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) ||
+                    e.baseToken === this.state.selectedMarket.baseToken) &&
+                  (this.checkWethOrFwethToken(e.quoteToken) ===
+                    this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) ||
+                    e.quoteToken === this.state.selectedMarket.quoteToken)
+              )}
+              changeLoadingTransaction={this.changeLoadingTransaction}
+              request={this.state.request}
+              isLoadingTransaction={this.state.isLoadingTransaction}
+              resultTx={this.state.resultTx}
+              isTxCompleted={this.state.isTxCompleted}
+              changeGridPositionType={this.changeGridPositionType}
+              activePositionType={this.state.activePositionType}
+            />
           )}
+
           <Modal
             isOpen={this.state.isTradeModalOpen}
             onRequestClose={this.onTradeRequestClose}
@@ -423,6 +435,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         isShowHistory: value
       })
   }
+  public onTokenGridTabChange = async (activeTokenGridTab: TokenGridTab) => {
+    this.setState({ ...this.state, activeTokenGridTab })
+  }
 
   private getOwnRowDataProps = async (
     loan: IBorrowedFundsState,
@@ -511,18 +526,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
         tradeRequest
       )
-      const estimatedReceivedLoanToken = estimatedCollateralReceived[1]
-        .div(10 ** loanAssetDecimals)
+      const estimatedReceivedLoanToken = estimatedCollateralReceived[1].div(10 ** loanAssetDecimals)
 
       const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
       const withdrawAmountLoanToken = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
       const depositAmountCollateralToken = depositAmountLoanToken.div(
         loan.loanData.startRate.div(10 ** loanAssetDecimals)
       )
-      
-      profit = estimatedReceivedLoanToken
-        .minus(depositAmountLoanToken)
 
+      profit = estimatedReceivedLoanToken.minus(depositAmountLoanToken)
     } else {
       collateral = collateralAssetAmount
 
@@ -570,7 +582,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const withdrawAmount = loan.loanData.withdrawalValue
         .div(10 ** loanAssetDecimals)
         .div(currentCollateralToPrincipalRate)
-       
+
       profit = estimatedCollateralReceived[1]
         .div(10 ** collateralAssetDecimals)
         .minus(depositAmount)
