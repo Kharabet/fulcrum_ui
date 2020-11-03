@@ -325,7 +325,7 @@ export class LendTokenSelectorItem extends Component<
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-full"
           onClick={this.onLendClick}
-          disabled={this.props.asset === Asset.SAI}>
+          disabled={this.props.asset === Asset.SAI || this.props.asset === Asset.LEND}>
           Lend
         </button>
       </div>
@@ -334,7 +334,7 @@ export class LendTokenSelectorItem extends Component<
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-half"
           onClick={this.onLendClick}
-          disabled={this.props.asset === Asset.SAI}>
+          disabled={this.props.asset === Asset.SAI || this.props.asset === Asset.LEND}>
           Lend
         </button>
         <button

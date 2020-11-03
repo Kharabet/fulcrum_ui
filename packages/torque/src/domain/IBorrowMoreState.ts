@@ -30,7 +30,5 @@ export interface IBorrowMoreState {
     loanEndTimestamp: BigNumber
     maxLiquidatable: BigNumber
     maxSeizable: BigNumber
-    depositValue: BigNumber
-    withdrawalValue: BigNumber
   }
 }

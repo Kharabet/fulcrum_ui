@@ -19,5 +19,7 @@ export enum Asset {
   CHI = 'CHI',
   BZRX = 'BZRX',
   YFI = 'YFI',
+  UNI = 'UNI',
+  AAVE = 'AAVE',
   UNKNOWN = 'UNKNOWN'
 }

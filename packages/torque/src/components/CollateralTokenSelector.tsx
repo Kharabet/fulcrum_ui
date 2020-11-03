@@ -41,8 +41,10 @@ export class CollateralTokenSelector extends Component<
         Asset.YFI,
         Asset.BZRX,
         Asset.MKR,
-        //Asset.LEND,
-        Asset.KNC
+        // Asset.LEND,
+        Asset.KNC,
+        Asset.UNI,
+        Asset.AAVE
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assets = [Asset.fWETH, Asset.USDC, Asset.WBTC]
@@ -64,8 +66,8 @@ export class CollateralTokenSelector extends Component<
       ) as HTMLElement
       if (collateralTokenSelector) {
         const boundingClient = collateralTokenSelector.getBoundingClientRect()
-        collateralTokenSelector!.style.top = -1 * boundingClient!.top + 'px'
-        collateralTokenSelector!.style.left = -1 * boundingClient!.left + 'px'
+        collateralTokenSelector.style.top = -1 * boundingClient.top + 'px'
+        collateralTokenSelector.style.left = -1 * boundingClient.left + 'px'
       }
       this.props.updateStateActiveToggle(this.state.isOpen)
     }
@@ -77,8 +79,8 @@ export class CollateralTokenSelector extends Component<
         (e) =>
           !(
             (e === this.state.borrowAsset)
-            //|| (e === Asset.SAI && this.props.borrowAsset === Asset.DAI)
-            //|| (e === Asset.DAI && this.props.borrowAsset === Asset.SAI)
+            // || (e === Asset.SAI && this.props.borrowAsset === Asset.DAI)
+            // || (e === Asset.DAI && this.props.borrowAsset === Asset.SAI)
           )
       )
       .map((e) => (
@@ -93,7 +95,7 @@ export class CollateralTokenSelector extends Component<
       <React.Fragment>
         {this.state.isOpen ? (
           <React.Fragment>
-            <div className="collateral-token-selector__wrapper" onClick={this.onClose}></div>
+            <div className="collateral-token-selector__wrapper" onClick={this.onClose}/>
 
             <div className="collateral-token-selector__container">
               <div className="collateral-token-selector__items">

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import { BigNumber } from '@0x/utils'
+import React, { useEffect, useState } from 'react'
+import { Loader } from '../components/Loader'
 import { Asset } from '../domain/Asset'
+import { TorqueProvider } from '../services/TorqueProvider'
 import { AssetSelectorItem } from './AssetSelectorItem'
 import { BorrowDlg } from './BorrowDlg'
-import { BigNumber } from '@0x/utils'
-import { TorqueProvider } from '../services/TorqueProvider'
-import { Loader } from '../components/Loader'
 
 export interface IAssetSelectorProps {
   isLoadingTransaction: boolean
@@ -37,10 +37,12 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
       Asset.WBTC,
       Asset.LINK,
       Asset.YFI,
-      //Asset.BZRX,
+      // Asset.BZRX,
       Asset.MKR,
       Asset.LEND,
-      Asset.KNC
+      Asset.KNC,
+      Asset.UNI,
+      Asset.AAVE
     ]
   } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
     assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
@@ -59,8 +61,9 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
     return <AssetSelectorItem key={asset} yieldApr={yieldApr} asset={asset} {...props} />
   })
 
-  if (!yieldAPYJson || TorqueProvider.Instance.isLoading)
+  if (!yieldAPYJson || TorqueProvider.Instance.isLoading) {
     return <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+  }
 
   return <div className="asset-selector">{assetSelectorItems}</div>
 }
