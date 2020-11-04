@@ -28,7 +28,8 @@ export interface IOwnTokenGridRowProps {
   collateral: BigNumber
   openPrice: BigNumber
   liquidationPrice: BigNumber
-  profit: BigNumber
+  profitCollateralToken: BigNumber
+  profitLoanToken: BigNumber
   isTxCompleted: boolean
   onTrade: (request: TradeRequest) => void
   onManageCollateralOpen: (request: ManageCollateralRequest) => void
@@ -298,15 +299,15 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           )}
         </div>
         <div
-          title={this.props.profit.toFixed(18)}
-          className="own-token-grid-row__col-profit opacityIn">
+          title={this.props.profitCollateralToken.toFixed(18)}
+          className="own-token-grid-row__col-profitCollateralToken opacityIn">
           <span className="own-token-grid-row__body-header">Profit</span>
           {!this.state.isLoading ? (
-            this.props.profit ? (
+            this.props.profitCollateralToken ? (
               <React.Fragment>
                 <span>
                   <span className="sign-currency">$</span>
-                  {this.props.profit.toFixed(2)}
+                  {this.props.profitCollateralToken.toFixed(2)}
                 </span>
               </React.Fragment>
             ) : (

@@ -457,7 +457,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     let collateral = new BigNumber(0)
     let openPrice = new BigNumber(0)
     let liquidationPrice = new BigNumber(0)
-    let profit = new BigNumber(0)
+    let profitCollateralToken = new BigNumber(0)
+    let profitLoanToken = new BigNumber(0)
 
     const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18
     const collateralAssetDecimals =
@@ -508,23 +509,27 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionType,
           loan
         ),
-        false //return in loan token
+        true //return in loan token
       )
       const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
         tradeRequest
       )
-      const estimatedReceivedLoanToken = estimatedCollateralReceived[1]
-        .div(10 ** loanAssetDecimals)
-
-      const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
-      const withdrawAmountLoanToken = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
-      const depositAmountCollateralToken = depositAmountLoanToken.div(
-        loan.loanData.startRate.div(10 ** loanAssetDecimals)
+      const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
+        10 ** collateralAssetDecimals
       )
-      
-      profit = estimatedReceivedLoanToken
-        .minus(depositAmountLoanToken)
+      const estimatedReceivedLoanToken = estimatedCollateralReceived[1]
+        .div(10 ** collateralAssetDecimals)
+        .times(currentCollateralToPrincipalRate)
 
+      const depositAmountCollateralToken = loan.loanData.depositValue
+        .div(10 ** loanAssetDecimals)
+        .div(loan.loanData.startRate.div(10 ** loanAssetDecimals))
+      const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
+
+      profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
+      console.log("profitCollateralToken in collateral token", profitCollateralToken.toFixed())
+      profitLoanToken = estimatedReceivedLoanToken.minus(depositAmountLoanToken)
+      console.log("profitCollateralToken in loan token", profitLoanToken.toFixed())
     } else {
       collateral = collateralAssetAmount
 
@@ -572,10 +577,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const withdrawAmount = loan.loanData.withdrawalValue
         .div(10 ** loanAssetDecimals)
         .div(currentCollateralToPrincipalRate)
-       
-      profit = estimatedCollateralReceived[1]
+
+      profitCollateralToken = estimatedCollateralReceived[1]
         .div(10 ** collateralAssetDecimals)
         .minus(depositAmount)
+        profitLoanToken = profitCollateralToken
+
     }
 
     return {
@@ -589,7 +596,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       collateral,
       openPrice,
       liquidationPrice,
-      profit,
+      profitCollateralToken,
+      profitLoanToken: profitLoanToken,
       onTrade: this.onTradeRequested,
       onManageCollateralOpen: this.onManageCollateralRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
