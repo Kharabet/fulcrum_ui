@@ -101,12 +101,19 @@ export class Web3ConnectionFactory {
 
   public static async getAlchemyProvider(): Promise<AlchemySubprovider> {
     let key
-    if (ethNetwork === 'kovan') {
-      key = configProviders.Alchemy_ApiKey_kovan
+    let url
+    if (process.env.NODE_ENV !== 'development') {
+      if (ethNetwork === 'kovan') {
+        key = configProviders.Alchemy_ApiKey_kovan
+      } else {
+        key = configProviders.Alchemy_ApiKey
+      }
+      url = `https://eth-${ethNetwork}.alchemyapi.io/v2/${key}`
     } else {
-      key = configProviders.Alchemy_ApiKey
+      key = process.env.BZX_DEVELOPMENT_INFURA_KEY // own developer's infura key
+      url = `https://${ethNetwork}.infura.io/v3/${key}`
     }
-    return new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/v2/${key}`, {
+    return new AlchemySubprovider(url, {
       writeProvider: null
     })
   }
