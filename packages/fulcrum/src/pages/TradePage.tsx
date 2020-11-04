@@ -509,17 +509,37 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           positionType,
           loan
         ),
-        true //return in loan token
+        true //false - return in loan token
+      )
+      const tradeRequestLoan = new TradeRequest(
+        loan.loanId,
+        TradeType.SELL,
+        loan.loanAsset,
+        loan.collateralAsset,
+        Asset.UNKNOWN,
+        positionType,
+        leverage.toNumber(),
+        await FulcrumProvider.Instance.getMaxTradeValue(
+          TradeType.SELL,
+          loan.loanAsset,
+          loan.collateralAsset,
+          Asset.UNKNOWN,
+          positionType,
+          loan
+        ),
+        false //false - return in loan token
       )
       const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
         tradeRequest
       )
+      const estimatedLoanReceived =  await FulcrumProvider.Instance.getLoanCloseAmount(
+        tradeRequestLoan
+      )
       const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
         10 ** collateralAssetDecimals
       )
-      const estimatedReceivedLoanToken = estimatedCollateralReceived[1]
-        .div(10 ** collateralAssetDecimals)
-        .times(currentCollateralToPrincipalRate)
+      const estimatedReceivedLoanToken = estimatedLoanReceived[1]
+        .div(10 ** loanAssetDecimals)
 
       const depositAmountCollateralToken = loan.loanData.depositValue
         .div(10 ** loanAssetDecimals)
