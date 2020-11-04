@@ -1541,6 +1541,8 @@ export class iBZxContract extends BaseContract {
         maxLoanTerm: BigNumber
         maxLiquidatable: BigNumber
         maxSeizable: BigNumber
+    depositValue: BigNumber
+    withdrawalValue: BigNumber
       }>
     > {
       const self = (this as any) as iBZxContract
@@ -1578,6 +1580,8 @@ export class iBZxContract extends BaseContract {
           maxLoanTerm: BigNumber
           maxLiquidatable: BigNumber
           maxSeizable: BigNumber
+          depositValue: BigNumber
+          withdrawalValue: BigNumber
         }>
       >(rawCallResult)
       // tslint:enable boolean-naming
@@ -1758,6 +1762,8 @@ export class iBZxContract extends BaseContract {
       maxLoanTerm: BigNumber
       maxLiquidatable: BigNumber
       maxSeizable: BigNumber
+      depositValue: BigNumber
+      withdrawalValue: BigNumber
     }> {
       const self = (this as any) as iBZxContract
       const encodedData = self._strictEncodeArguments('getLoan(bytes32)', [loanId])
@@ -1789,6 +1795,8 @@ export class iBZxContract extends BaseContract {
         maxLoanTerm: BigNumber
         maxLiquidatable: BigNumber
         maxSeizable: BigNumber
+        depositValue: BigNumber
+        withdrawalValue: BigNumber
       }>(rawCallResult)
       // tslint:enable boolean-naming
       return result
@@ -2103,6 +2111,8 @@ export class iBZxContract extends BaseContract {
         maxLoanTerm: BigNumber
         maxLiquidatable: BigNumber
         maxSeizable: BigNumber
+        depositValue: BigNumber
+        withdrawalValue: BigNumber
       }>
     > {
       const self = (this as any) as iBZxContract
@@ -2141,6 +2151,8 @@ export class iBZxContract extends BaseContract {
           maxLoanTerm: BigNumber
           maxLiquidatable: BigNumber
           maxSeizable: BigNumber
+          depositValue: BigNumber
+          withdrawalValue: BigNumber
         }>
       >(rawCallResult)
       // tslint:enable boolean-naming
