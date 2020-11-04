@@ -96,8 +96,8 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        Select market {asset.reactLogoSvg.render()} {props.selectedOption.baseToken}-
-        {props.selectedOption.quoteToken}
+        {asset.reactLogoSvg.render()} 
+        {props.selectedOption.baseToken} - {props.selectedOption.quoteToken}
       </div>
       <ul className="select-options">
         <div className="select-options__search">
@@ -105,7 +105,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
             className="select-options__input"
             placeholder=""
             onChange={(e) => setInput(e.target.value)}
-            maxLength={20}
+            maxLength={10}
             value={inputValue}
           />
           <label className="select-options__value">{inputValue}</label>
