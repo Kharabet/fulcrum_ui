@@ -602,7 +602,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         ownRowsData,
-        openedPositionsCount: loans?.length || 0,
         loans
       })
   }
@@ -639,7 +638,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const ownRowDataProps = await this.getOwnRowDataProps(loan, currentCollateralToPrincipalRate)
       innerOwnRowsData.push(ownRowDataProps)
     }
-
+    
     this._isMounted &&
       this.setState({
         ...this.state,
