@@ -39,8 +39,6 @@ export class TradeBuyProcessor {
       throw new Error('No iToken contract available!')
     }
 
-    let approvePromise: Promise<string> | null = null
-
     let tokenErc20Contract: erc20Contract | null = null
     let assetErc20Address: string | null = ''
     let erc20allowance = new BigNumber(0)
@@ -57,6 +55,7 @@ export class TradeBuyProcessor {
       // no additional inits or checks
       task.processingStepNext()
     } else {
+      //Initializing
       task.processingStart([
         'Initializing',
         'Detecting token allowance',
@@ -79,32 +78,36 @@ export class TradeBuyProcessor {
       if (!tokenErc20Contract) {
         throw new Error('No ERC20 contract available!')
       }
-      task.processingStepNext()
-
       // Detecting token allowance
-      erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address)
       task.processingStepNext()
-    }
 
-    try {
-      //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+      erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address)
 
       // Prompting token allowance
-      if (amountInBaseUnits.gt(erc20allowance)) {
-        approvePromise = FulcrumProvider.Instance.setApproval(
-          tokenContract.address,
-          taskRequest.depositToken,
-          FulcrumProvider.Instance.getLargeApprovalAmount(
+      task.processingStepNext()
+
+      try {
+        //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+
+        // Prompting token allowance
+        if (amountInBaseUnits.gt(erc20allowance)) {
+          const approvePromise = await FulcrumProvider.Instance.setApproval(
+            tokenContract.address,
             taskRequest.depositToken,
-            amountInBaseUnits
+            FulcrumProvider.Instance.getLargeApprovalAmount(
+              taskRequest.depositToken,
+              amountInBaseUnits
+            )
           )
-        )
+        }
+        // Waiting for token allowance
+        task.processingStepNext()
+      } catch (e) {
+        //console.log(e);
       }
-      task.processingStepNext()
-      task.processingStepNext()
-    } catch (e) {
-      //console.log(e);
     }
+    //Submitting loan
+    task.processingStepNext()
 
     let gasAmountBN
 
@@ -142,8 +145,7 @@ export class TradeBuyProcessor {
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
     const ChiTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
     // Waiting for token allowance
-    if (approvePromise || skipGas) {
-      await approvePromise
+    if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit)
     } else {
       const gasAmount =
@@ -224,13 +226,13 @@ export class TradeBuyProcessor {
     } catch (e) {
       throw e
     }
-
+    //Updating the blockchain
     task.processingStepNext()
     const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request)
     if (!txReceipt.status) {
       throw new Error('Reverted by EVM')
     }
-
+    //Transaction completed
     task.processingStepNext()
     await FulcrumProvider.Instance.sleep(FulcrumProvider.Instance.successDisplayTimeout)
   }
