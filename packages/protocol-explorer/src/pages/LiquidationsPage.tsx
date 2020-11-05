@@ -32,7 +32,11 @@ interface ILiquidationsPageState {
   unhealthyLoans: ILoanRowProps[]
   unhealthyLoansUsd: BigNumber
   healthyLoansUsd: BigNumber
-  barChartDatasets: Array<{ label: Asset; backgroundColor: string; data: Array<{ x: string; y: number }> }>
+  barChartDatasets: Array<{
+    label: Asset
+    backgroundColor: string
+    data: Array<{ x: string; y: number }>
+  }>
   isDataLoading: boolean
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
@@ -79,11 +83,11 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       healthyLoansUsd: new BigNumber(0),
       events: [],
       unhealthyLoans: [],
-      barChartDatasets: [] as {
+      barChartDatasets: [] as Array<{
         label: Asset
         backgroundColor: string
-        data: { x: string; y: number }[]
-      }[],
+        data: Array<{ x: string; y: number }>
+      }>,
       isDataLoading: true
     }
 
@@ -98,12 +102,12 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     )
   }
 
-  public getChartData = (events: { event: LiquidationEvent; repayAmountUsd: BigNumber }[]) => {
-    const groupBy = function(
-      xs: { event: LiquidationEvent; repayAmountUsd: BigNumber }[],
+  public getChartData = (events: Array<{ event: LiquidationEvent; repayAmountUsd: BigNumber }>) => {
+    const groupBy = (
+      xs: Array<{ event: LiquidationEvent; repayAmountUsd: BigNumber }>,
       key: any
-    ) {
-      return xs.reduce(function(rv: any, x: any) {
+    ) => {
+      return xs.reduce((rv: any, x: any) => {
         ;(rv[x[key]] = rv[x[key]] || []).push(x)
         return rv
       }, {})
@@ -111,34 +115,34 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const eventsWithDay = events.map(
       (e: { event: LiquidationEvent; repayAmountUsd: BigNumber }) => ({
         ...e,
-        day: parseInt((e.event.timeStamp.getTime() / (1000 * 60 * 60 * 24)).toString())
+        day: parseInt((e.event.timeStamp.getTime() / (1000 * 60 * 60 * 24)).toString(), undefined)
       })
     )
     const eventsWithDayByDay = groupBy(eventsWithDay, 'day')
-    let datasets: {
+    const datasets: Array<{
       label: Asset
       backgroundColor: string
-      data: { x: string; y: number }[]
-    }[] = this.assetsShown.map((e: { token: Asset; color: string }) => ({
+      data: Array<{ x: string; y: number }>
+    }> = this.assetsShown.map((e: { token: Asset; color: string }) => ({
       label: e.token,
-      data: [] as { x: string; y: number }[],
+      data: [] as Array<{ x: string; y: number }>,
       backgroundColor: e.color
     }))
     Object.keys(eventsWithDayByDay).forEach((day: string) => {
-      for (let j = 0; j < this.assetsShown.length; j++) {
-        const token: Asset = this.assetsShown[j].token
+      for (const assetShown of this.assetsShown) {
+        const token: Asset = assetShown.token
         if (!eventsWithDayByDay[day]) continue
-        const eventsWithDayByAsset: {
+        const eventsWithDayByAsset: Array<{
           event: LiquidationEvent
           repayAmountUsd: BigNumber
-        }[] = eventsWithDayByDay[day].filter(
+        }> = eventsWithDayByDay[day].filter(
           (e: { event: LiquidationEvent; repayAmountUsd: BigNumber }) => e.event.loanToken === token
         )
         if (eventsWithDayByAsset.length === 0) {
           datasets
             .find((e) => e.label === token)!
             .data.push({
-              //@ts-ignore
+              // @ts-ignore
               x: new Date(day * 1000 * 60 * 60 * 24).toLocaleDateString('en-US', {
                 day: '2-digit',
                 month: '2-digit',
@@ -157,7 +161,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         datasets
           .find((e) => e.label === token)!
           .data.push({
-            //@ts-ignore
+            // @ts-ignore
             x: new Date(day * 1000 * 60 * 60 * 24).toLocaleDateString('en-US', {
               day: '2-digit',
               month: '2-digit',
@@ -175,14 +179,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   private async derivedUpdate() {
-    ;(await this._isMounted) &&
+    this._isMounted &&
       this.setState({
         ...this.state,
         isDataLoading: true
       })
 
     if (ExplorerProvider.Instance.unsupportedNetwork) {
-      ;(await this._isMounted) &&
+      this._isMounted &&
         this.setState({
           events: [],
           isDataLoading: false
@@ -191,7 +195,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
 
     let volume30d = new BigNumber(0)
-    let liquidationEventsWithUsd: { event: LiquidationEvent; repayAmountUsd: BigNumber }[] = []
+    const liquidationEventsWithUsd: Array<{
+      event: LiquidationEvent
+      repayAmountUsd: BigNumber
+    }> = []
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory()
     const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, true)
     const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, false)
@@ -208,10 +215,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     )
     const transactionsCount30d = liqudiations30d.length
 
-    for (let i = 0; i < this.assetsShown.length; i++) {
-      const tokenLiqudiations30d = liqudiations30d.filter(
-        (e: LiquidationEvent) => e.loanToken === this.assetsShown[i].token
-      )
+    for (const assetShown of this.assetsShown) {
+      const tokenLiqudiations30d = liqudiations30d.filter((e: LiquidationEvent) => {
+        return e.loanToken === assetShown.token
+      })
       for (const e of tokenLiqudiations30d) {
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18
         const collateralAssetDecimals =
@@ -249,20 +256,21 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       onLiquidationUpdated: this.derivedUpdate.bind(this),
       doNetworkConnect: this.props.doNetworkConnect
     }))
-    await this.setState({
-      ...this.state,
-      volume30d,
-      transactionsCount30d,
-      events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
-      unhealthyLoans,
-      isDataLoading: false,
-      unhealthyLoansUsd,
-      healthyLoansUsd
-    })
+    this._isMounted &&
+      this.setState({
+        ...this.state,
+        volume30d,
+        transactionsCount30d,
+        events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
+        unhealthyLoans,
+        isDataLoading: false,
+        unhealthyLoansUsd,
+        healthyLoansUsd
+      })
   }
 
   private numberWithCommas = (x: number | string) => {
-    var parts = x.toString().split('.')
+    const parts = x.toString().split('.')
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     return parts.join('.')
   }
@@ -271,8 +279,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     // this.derivedUpdate()
   }
 
-  private onProviderAvailable = () => {
-    this.derivedUpdate()
+  private onProviderAvailable = async () => {
+    await this.derivedUpdate()
   }
 
   public componentWillUnmount(): void {
@@ -287,7 +295,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     )
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true
 
     this._isMounted &&
@@ -296,10 +304,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         isDataLoading: true
       })
 
-    this.derivedUpdate()
+    await this.derivedUpdate()
   }
 
-  onSearch = (filter: string) => {
+  private onSearch = (filter: string) => {
     if (filter === '') {
       return
     }
@@ -307,9 +315,11 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   public render() {
-    const getData = (canvas: any) => ({
-      datasets: this.state.barChartDatasets
-    })
+    const getData = (_canvas: any) => {
+      return {
+        datasets: this.state.barChartDatasets
+      }
+    }
 
     const canvas = document.createElement('canvas')
     const chartData = getData(canvas)
@@ -360,7 +370,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         mode: 'index',
         custom: this.customTooltips,
         callbacks: {
-          label: function(tooltipItems: any, data: any) {
+          label: (tooltipItems: any, data: any) => {
             const bgColor = data.datasets[tooltipItems.datasetIndex].backgroundColor
             return {
               value: tooltipItems.yLabel,
@@ -422,13 +432,13 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                           {chartData && <Bar data={chartData} options={options} height={100} />}
                         </div>
                         <div id="chartjs-bar-tooltip">
-                          <table></table>
+                          <table />
                         </div>
                       </div>
                       <div className="flex jc-c labels-container">
                         {this.assetsShown.map((e: { token: Asset; color: string }) => (
                           <div key={e.color} className="label-chart">
-                            <span style={{ backgroundColor: e.color }}></span>
+                            <span style={{ backgroundColor: e.color }} />
                             {e.token}
                           </div>
                         ))}
@@ -515,13 +525,15 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     if (tooltip.body) {
       const bodyLines = tooltip.body.map(getBody)
       let innerHtml = `<tbody style="padding: 20px ${paddingX}px;">`
-      bodyLines.forEach(function(body: any) {
-        if (body.value === 0) return
+      bodyLines.forEach((body: any) => {
+        if (body.value === 0) {
+          return
+        }
         innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span><span class="sign sign-currency">$</span>${body.value}</span></td></tr>`
       })
       innerHtml += '</tbody>'
-      const tableRoot = tooltipEl.querySelector('table') as HTMLElement
-      tableRoot.innerHTML = innerHtml
+      const _tableRoot = tooltipEl.querySelector('table') as HTMLElement
+      _tableRoot.innerHTML = innerHtml
     }
 
     const tableRoot = tooltipEl.querySelector('table tbody') as HTMLElement
