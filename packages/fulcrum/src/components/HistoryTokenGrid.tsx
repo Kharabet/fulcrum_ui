@@ -185,10 +185,15 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
       if (positionType === PositionType.LONG) leverage = leverage.plus(1)
 
-      let openPrice =
+      const loanAssetDecimalsFirstEvent = AssetsDictionary.assets.get(tradeEvent.loanToken)!.decimals || 18
+      const collateralAssetDecimalsFirstEvent =
+        AssetsDictionary.assets.get(tradeEvent.collateralToken)!.decimals || 18
+
+
+      const openPrice =
         positionType === PositionType.LONG
-          ? new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
-          : tradeEvent.entryPrice.div(10 ** 18)
+          ? new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** loanAssetDecimalsFirstEvent)
+          : tradeEvent.entryPrice.div(10 ** collateralAssetDecimalsFirstEvent)
 
       const positionEventsGroup = new PositionEventsGroup(
         loanId,
@@ -217,20 +222,15 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const collateralAssetDecimals =
             AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
 
-          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
-
           if (positionType === PositionType.LONG) {
-            positionValue = event.positionSize.div(10 ** 18).times(collateralAssetPrecision)
-            value = event.positionSize.times(collateralAssetPrecision).div(event.entryPrice)
-            tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18)
+            
+            positionValue = event.positionSize.div(10 ** collateralAssetDecimals)
+            tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** loanAssetDecimals)
+            value = positionValue.times(tradePrice)
           } else {
-            positionValue = event.borrowedAmount.div(10 ** 18).times(loanAssetPrecision)
-            value = event.borrowedAmount
-              .div(10 ** 18)
-              .times(loanAssetPrecision)
-              .times(event.entryPrice.div(10 ** 18))
-            tradePrice = event.entryPrice.div(10 ** 18)
+            positionValue = event.borrowedAmount.div(10 ** loanAssetDecimals)
+            tradePrice = event.entryPrice.div(10 ** collateralAssetDecimals)
+            value = positionValue.times(tradePrice)
           }
 
           positionEventsGroup.events.push(
@@ -253,18 +253,16 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
           const collateralAssetDecimals =
             AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
-          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
-
+        
           if (positionType === PositionType.LONG) {
-            positionValue = event.positionCloseSize.times(collateralAssetPrecision).div(10 ** 18)
-            value = event.positionCloseSize.times(collateralAssetPrecision).div(event.exitPrice)
-            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18)
+            positionValue = event.positionCloseSize.div(10 ** collateralAssetDecimals)
+            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** loanAssetDecimals)
+            value = positionValue.times(tradePrice)
             profit = tradePrice.minus(openPrice).times(positionValue)
           } else {
-            positionValue = event.loanCloseAmount.times(loanAssetPrecision).div(10 ** 18)
-            value = event.positionCloseSize.times(loanAssetPrecision).div(10 ** 18)
-            tradePrice = event.exitPrice.div(10 ** 18)
+            positionValue = event.loanCloseAmount.div(10 ** loanAssetDecimals)
+            tradePrice = event.exitPrice.div(10 ** collateralAssetDecimals)
+            value = positionValue.times(tradePrice)
             profit = openPrice.minus(tradePrice).times(positionValue)
           }
 
@@ -338,16 +336,14 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const action = 'Deposited'
           const depositTokenDecimals =
             AssetsDictionary.assets.get(event.depositToken)!.decimals || 18
-          const depositTokenPrecision = new BigNumber(10 ** (18 - depositTokenDecimals))
 
           if (positionType === PositionType.LONG) {
-            positionValue = event.depositAmount.times(depositTokenPrecision).div(10 ** 18)
+            positionValue = event.depositAmount.div(10 ** depositTokenDecimals)
           } else {
             const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
             const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
             positionValue = event.depositAmount
-              .times(depositTokenPrecision)
-              .div(10 ** 18)
+              .div(10 ** depositTokenDecimals)
               .times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken))
           }
           tradePrice = new BigNumber(0)
@@ -371,16 +367,14 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const action = 'Withdrew'
           const withdrawTokenDecimals =
             AssetsDictionary.assets.get(event.withdrawToken)!.decimals || 18
-          const withdrawTokenPrecision = new BigNumber(10 ** (18 - withdrawTokenDecimals))
 
           if (positionType === PositionType.LONG) {
-            positionValue = event.withdrawAmount.times(withdrawTokenPrecision).div(10 ** 18)
+            positionValue = event.withdrawAmount.div(10 ** withdrawTokenDecimals)
           } else {
             const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
             const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
             positionValue = event.withdrawAmount
-              .times(withdrawTokenPrecision)
-              .div(10 ** 18)
+              .div(10 ** withdrawTokenDecimals)
               .times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken))
           }
           tradePrice = new BigNumber(0)
