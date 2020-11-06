@@ -4,7 +4,7 @@ import { erc20Contract } from '../contracts/erc20'
 import { BZRXStakingInterimContract } from '../contracts/BZRXStakingInterim'
 import { BigNumber } from '@0x/utils'
 import { traderCompensationContract } from '../contracts/traderCompensation'
-import { iBZxContract } from '../contracts/iBZxContract'
+import { IBZxContract } from '../contracts/iBZxContract'
 
 import { oracleContract } from '../contracts/oracle'
 
@@ -257,9 +257,9 @@ export class ContractsSource {
     )
   }
 
-  private async getiBZxContractRaw(): Promise<iBZxContract> {
+  private async getiBZxContractRaw(): Promise<IBZxContract> {
     await this.Init()
-    return new iBZxContract(
+    return new IBZxContract(
       ContractsSource.iBZxJson.abi,
       this.getiBZxAddress().toLowerCase(),
       this.provider

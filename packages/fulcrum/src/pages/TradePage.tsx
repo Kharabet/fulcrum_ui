@@ -574,9 +574,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const depositAmount = loan.loanData.depositValue
         .div(10 ** loanAssetDecimals)
         .div(currentCollateralToPrincipalRate)
-      const withdrawAmount = loan.loanData.withdrawalValue
-        .div(10 ** loanAssetDecimals)
-        .div(currentCollateralToPrincipalRate)
+      
 
       profitCollateralToken = estimatedCollateralReceived[1]
         .div(10 ** collateralAssetDecimals)

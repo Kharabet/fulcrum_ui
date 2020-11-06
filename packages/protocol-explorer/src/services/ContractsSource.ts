@@ -4,7 +4,7 @@ import { Asset } from '../domain/Asset'
 
 import { erc20Contract } from '../contracts/erc20'
 import { DAppHelperContract } from '../contracts/DAppHelper'
-import { iBZxContract } from '../contracts/iBZxContract'
+import { IBZxContract } from '../contracts/iBZxContract'
 import { iTokenContract } from '../contracts/iTokenContract'
 import { oracleContract } from '../contracts/oracle'
 
@@ -308,9 +308,9 @@ export class ContractsSource {
       this.provider
     )
   }
-  private async getiBZxContractRaw(): Promise<iBZxContract> {
+  private async getiBZxContractRaw(): Promise<IBZxContract> {
     await this.Init()
-    return new iBZxContract(
+    return new IBZxContract(
       ContractsSource.iBZxJson.abi,
       this.getiBZxAddress().toLowerCase(),
       this.provider

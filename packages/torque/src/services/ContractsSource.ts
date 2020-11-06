@@ -8,7 +8,7 @@ import { CTokenContract } from '../contracts/CToken'
 import { dsProxyJsonContract } from '../contracts/dsProxyJson'
 import { erc20Contract } from '../contracts/erc20'
 import { GetCdpsContract } from '../contracts/getCdps'
-import { iBZxContract } from '../contracts/iBZxContract'
+import { IBZxContract } from '../contracts/iBZxContract'
 import { instaRegistryContract } from '../contracts/instaRegistry'
 import { iTokenContract } from '../contracts/iTokenContract'
 import { makerBridgeContract } from '../contracts/makerBridge'
@@ -108,9 +108,9 @@ export class ContractsSource {
     return address
   }
 
-  private async getiBZxContractRaw(): Promise<iBZxContract> {
+  private async getiBZxContractRaw(): Promise<IBZxContract> {
     await this.Init()
-    return new iBZxContract(this.iBZxJson.abi, this.getiBZxAddress().toLowerCase(), this.provider)
+    return new IBZxContract(this.iBZxJson.abi, this.getiBZxAddress().toLowerCase(), this.provider)
   }
 
   private getOracleAddress(): string {

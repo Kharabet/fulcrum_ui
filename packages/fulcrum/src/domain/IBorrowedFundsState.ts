@@ -31,6 +31,5 @@ export interface IBorrowedFundsState {
     maxLiquidatable: BigNumber
     maxSeizable: BigNumber
     depositValue: BigNumber
-    withdrawalValue: BigNumber
   }
 }

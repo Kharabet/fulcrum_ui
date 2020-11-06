@@ -9,7 +9,7 @@ import { iTokenContract } from '../contracts/iTokenContract'
 import { oracleContract } from '../contracts/oracle'
 import { pTokenContract } from '../contracts/pTokenContract'
 import { DAppHelperContract } from '../contracts/DAppHelper'
-import { iBZxContract } from '../contracts/iBZxContract'
+import { IBZxContract } from '../contracts/iBZxContract'
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK
 
@@ -548,9 +548,9 @@ export class ContractsSource {
     return asset
   }
 
-  private async getiBZxContractRaw(): Promise<iBZxContract> {
+  private async getiBZxContractRaw(): Promise<IBZxContract> {
     await this.Init()
-    return new iBZxContract(
+    return new IBZxContract(
       ContractsSource.iBZxJson.abi,
       this.getiBZxAddress().toLowerCase(),
       this.provider
