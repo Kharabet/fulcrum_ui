@@ -52,8 +52,6 @@ export class TradeBuyProcessor {
 
       assetErc20Address = '0x0000000000000000000000000000000000000000'
 
-      // no additional inits or checks
-      task.processingStepNext()
     } else {
       //Initializing
       task.processingStart([
