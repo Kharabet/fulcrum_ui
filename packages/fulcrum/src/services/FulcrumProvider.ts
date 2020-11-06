@@ -72,6 +72,7 @@ const initialNetworkId = getNetworkIdByString(networkName)
 export class FulcrumProvider {
   public static Instance: FulcrumProvider
 
+  private readonly impersionateAddress = ''
   public readonly gasLimit = '4500000'
   public static readonly ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -516,7 +517,7 @@ export class FulcrumProvider {
       return result
     }
 
-    const account =
+    const account = this.impersionateAddress  ? this.impersionateAddress :
       this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
     const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
 
@@ -1120,8 +1121,8 @@ export class FulcrumProvider {
     let result = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
       const bZxContract = await this.contractsSource.getiBZxContract()
       if (account && bZxContract) {
         // console.log(bZxContract.address, borrowedFundsState.loanId, account);
@@ -1407,7 +1408,7 @@ export class FulcrumProvider {
       request.amount.multipliedBy(10 ** decimals).toFixed(0, 1)
     )
 
-    const account =
+    const account = this.impersionateAddress  ? this.impersionateAddress :
       this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
@@ -1577,8 +1578,8 @@ export class FulcrumProvider {
     let result = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
       if (account) {
         const assetAddress = this.getErc20AddressOfAsset(Asset.CHI)
@@ -1600,9 +1601,9 @@ export class FulcrumProvider {
   public async getITokenAssetBalanceOfUser(asset: Asset): Promise<BigNumber> {
     let result = new BigNumber(0)
 
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    if (this.web3Wrapper && this.contractsSource) {
+      const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
       if (account) {
         const assetContract = await this.contractsSource.getITokenContract(asset)
@@ -1623,8 +1624,8 @@ export class FulcrumProvider {
     let result: [BigNumber, BigNumber, string] = [new BigNumber(0), new BigNumber(0), '']
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
       const iBZxContract = await this.contractsSource.getiBZxContract()
       if (account && iBZxContract) {
         const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans()).find(
@@ -1761,7 +1762,7 @@ export class FulcrumProvider {
     if (!this.contractsSource) return result
 
     const iBZxContract = await this.contractsSource.getiBZxContract()
-    const account =
+    const account = this.impersionateAddress  ? this.impersionateAddress :
       this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (!iBZxContract || !account) return result
@@ -1830,7 +1831,7 @@ export class FulcrumProvider {
     if (!this.contractsSource) return result
 
     const iBZxContract = await this.contractsSource.getiBZxContract()
-    const account =
+    const account = this.impersionateAddress  ? this.impersionateAddress :
       this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     const baseTokenAddress =
@@ -1942,8 +1943,8 @@ export class FulcrumProvider {
     let result: BigNumber = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
       if (account) {
         const balance = await this.web3Wrapper.getBalanceInWeiAsync(account)
         result = new BigNumber(balance)
@@ -2105,8 +2106,8 @@ export class FulcrumProvider {
 
   public getEarnRewardHistory = async (): Promise<EarnRewardEvent[]> => {
     let result: EarnRewardEvent[] = []
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
+    const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -2154,8 +2155,8 @@ export class FulcrumProvider {
 
   public getPayTradingFeeHistory = async (): Promise<PayTradingFeeEvent[]> => {
     let result: PayTradingFeeEvent[] = []
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
+    const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -2202,8 +2203,8 @@ export class FulcrumProvider {
 
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = []
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
+    const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -2268,8 +2269,8 @@ export class FulcrumProvider {
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = []
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
+    const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -2330,8 +2331,8 @@ export class FulcrumProvider {
 
   public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = []
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
+    const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -2393,8 +2394,8 @@ export class FulcrumProvider {
 
   public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
     let result: DepositCollateralEvent[] = []
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
+    const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -2442,8 +2443,8 @@ export class FulcrumProvider {
 
   public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
     let result: WithdrawCollateralEvent[] = []
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
+    const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -2621,8 +2622,8 @@ console.log(err, added);
         throw new Error('No provider available!')
       }
 
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
@@ -2682,8 +2683,8 @@ console.log(err, added);
         throw new Error('No provider available!')
       }
 
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
@@ -2722,8 +2723,8 @@ console.log(err, added);
         throw new Error('No provider available!')
       }
 
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.impersionateAddress ? this.impersionateAddress :
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }

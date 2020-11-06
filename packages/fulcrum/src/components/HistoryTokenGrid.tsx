@@ -112,7 +112,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             <p>No trading history</p>
             <a href="/trade" className="manage-token-grid__link-button">
               Start Trading
-            </a>            
+            </a>
           </div>
         </div>
       )
@@ -152,6 +152,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
   public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
     this.setState({ ...this.state, isLoading: true })
+    const dateWhenPricePrecisionWasChanged = new Date(1603991752000) // approx date of commit where price format was changed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
     const historyRowsData: IHistoryTokenGridRowProps[] = []
     const historyEvents = this.props.historyEvents
     if (!historyEvents) return
@@ -185,15 +186,21 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
       if (positionType === PositionType.LONG) leverage = leverage.plus(1)
 
-      const loanAssetDecimalsFirstEvent = AssetsDictionary.assets.get(tradeEvent.loanToken)!.decimals || 18
+      const loanAssetDecimalsFirstEvent =
+        AssetsDictionary.assets.get(tradeEvent.loanToken)!.decimals || 18
       const collateralAssetDecimalsFirstEvent =
         AssetsDictionary.assets.get(tradeEvent.collateralToken)!.decimals || 18
 
-
       const openPrice =
         positionType === PositionType.LONG
-          ? new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** loanAssetDecimalsFirstEvent)
-          : tradeEvent.entryPrice.div(10 ** collateralAssetDecimalsFirstEvent)
+          ? tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
+            ? new BigNumber(10 ** 36)
+                .div(tradeEvent.entryPrice)
+                .div(10 ** loanAssetDecimalsFirstEvent)
+            : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
+          : tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
+          ? tradeEvent.entryPrice.div(10 ** collateralAssetDecimalsFirstEvent)
+          : tradeEvent.entryPrice.div(10 ** 18)
 
       const positionEventsGroup = new PositionEventsGroup(
         loanId,
@@ -223,13 +230,18 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
 
           if (positionType === PositionType.LONG) {
-            
             positionValue = event.positionSize.div(10 ** collateralAssetDecimals)
-            tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** loanAssetDecimals)
+            tradePrice =
+              event.timeStamp > dateWhenPricePrecisionWasChanged
+                ? new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** loanAssetDecimals)
+                : new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18)
             value = positionValue.times(tradePrice)
           } else {
             positionValue = event.borrowedAmount.div(10 ** loanAssetDecimals)
-            tradePrice = event.entryPrice.div(10 ** collateralAssetDecimals)
+            tradePrice =
+              event.timeStamp > dateWhenPricePrecisionWasChanged
+                ? event.entryPrice.div(10 ** collateralAssetDecimals)
+                : event.entryPrice.div(10 ** 18)
             value = positionValue.times(tradePrice)
           }
 
@@ -253,15 +265,21 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
           const collateralAssetDecimals =
             AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
-        
+
           if (positionType === PositionType.LONG) {
             positionValue = event.positionCloseSize.div(10 ** collateralAssetDecimals)
-            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** loanAssetDecimals)
+            tradePrice =
+              event.timeStamp > dateWhenPricePrecisionWasChanged
+                ? new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** loanAssetDecimals)
+                : new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18)
             value = positionValue.times(tradePrice)
             profit = tradePrice.minus(openPrice).times(positionValue)
           } else {
             positionValue = event.loanCloseAmount.div(10 ** loanAssetDecimals)
-            tradePrice = event.exitPrice.div(10 ** collateralAssetDecimals)
+            tradePrice =
+              event.timeStamp > dateWhenPricePrecisionWasChanged
+                ? event.exitPrice.div(10 ** collateralAssetDecimals)
+                : event.exitPrice.div(10 ** 18)
             value = positionValue.times(tradePrice)
             profit = openPrice.minus(tradePrice).times(positionValue)
           }
