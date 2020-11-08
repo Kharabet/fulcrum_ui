@@ -1,24 +1,24 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import { Bar } from 'react-chartjs-2'
+import ReactModal from 'react-modal'
+import LiquidationForm from '../components/LiquidationForm'
+import { Loader } from '../components/Loader'
 import { LoanGrid } from '../components/LoanGrid'
+import { ILoanRowProps } from '../components/LoanRow'
 import { Search } from '../components/Search'
 import { TxGrid } from '../components/TxGrid'
 import { ITxRowProps } from '../components/TxRow'
 import { UnhealthyChart } from '../components/UnhealthyChart'
 import { Asset } from '../domain/Asset'
-import { LiquidationEvent } from '../domain/LiquidationEvent'
-import { Header } from '../layout/Header'
-
-import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
-import { ExplorerProvider } from '../services/ExplorerProvider'
-
-import { NavService } from '../services/NavService'
-
-import { Loader } from '../components/Loader'
-import { ILoanRowProps } from '../components/LoanRow'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
+import { LiquidationEvent } from '../domain/LiquidationEvent'
+import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { Header } from '../layout/Header'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
+import { ExplorerProvider } from '../services/ExplorerProvider'
+import { NavService } from '../services/NavService'
 
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void
@@ -38,6 +38,8 @@ interface ILiquidationsPageState {
     data: Array<{ x: string; y: number }>
   }>
   isDataLoading: boolean
+  request: LiquidationRequest | null
+  isModalOpen: boolean
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
   private _isMounted: boolean
@@ -88,7 +90,9 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         backgroundColor: string
         data: Array<{ x: string; y: number }>
       }>,
-      isDataLoading: true
+      request: null,
+      isDataLoading: true,
+      isModalOpen: false
     }
 
     this._isMounted = false
@@ -254,6 +258,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       loanToken: e.loanAsset,
       collateralToken: e.collateralAsset,
       onLiquidationUpdated: this.derivedUpdate.bind(this),
+      onLiquidationRequested: this.onLiquidationRequested,
       doNetworkConnect: this.props.doNetworkConnect
     }))
     this._isMounted &&
@@ -297,7 +302,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   public async componentDidMount() {
     this._isMounted = true
-
+    ReactModal.setAppElement('body')
     this._isMounted &&
       this.setState({
         ...this.state,
@@ -501,6 +506,19 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               </div>
             </section>
           )}
+          <ReactModal
+            isOpen={this.state.isModalOpen}
+            onRequestClose={this.onFormDecline}
+            className="modal-content-div"
+            overlayClassName="modal-overlay-div">
+            {this.state.request && (
+              <LiquidationForm
+                request={this.state.request}
+                onSubmit={this.onFormSubmit}
+                onClose={this.onFormDecline}
+              />
+            )}
+          </ReactModal>
         </main>
       </React.Fragment>
     )
@@ -542,5 +560,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     tooltipEl.style.position = 'absolute'
     tooltipEl.style.left = tooltip.caretX - tableRoot.offsetWidth / 2 + 'px'
     tooltipEl.style.top = 0 + 'px'
+  }
+  private onFormSubmit = async (request: LiquidationRequest) => {
+    this.setState({ ...this.state, isModalOpen: false })
+  }
+
+  private onFormDecline = async () => {
+    this.setState({ ...this.state, isModalOpen: false })
+  }
+
+  private onLiquidationRequested = (request: LiquidationRequest) => {
+    this.setState({ ...this.state, request, isModalOpen: true })
   }
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { LoanRow, ILoanRowProps } from './LoanRow'
 import { ReactComponent as ArrowPagination } from '../assets/images/icon_pagination.svg'
+import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { ILoanRowProps, LoanRow } from './LoanRow'
 
 interface ILoanGridProps {
   events: ILoanRowProps[]
