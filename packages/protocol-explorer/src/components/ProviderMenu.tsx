@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react'
 import { BigNumber } from '@0x/utils'
+import { AbstractConnector } from '@web3-react/abstract-connector'
+import { useWeb3React } from '@web3-react/core'
+import React, { useEffect } from 'react'
+import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { Asset } from '../domain/Asset'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { ProviderType } from '../domain/ProviderType'
-import { ProviderMenuListItem } from './ProviderMenuListItem'
-import { useWeb3React } from '@web3-react/core'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
-import { ExplorerProvider } from '../services/ExplorerProvider'
 import { injected } from '../domain/WalletConnectors'
-import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ExplorerProvider } from '../services/ExplorerProvider'
+import { ProviderMenuListItem } from './ProviderMenuListItem'
 import { SwitchButtonInput } from './SwitchButtonInput'
-import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[]
@@ -42,7 +42,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   const { connector, account, activate, deactivate, active, error } = context
 
   // handle logic to recognize the connector currently being activated
-  //@ts-ignore
+  // @ts-ignore
   const [activatingConnector, setActivatingConnector] = React.useState()
   useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
@@ -60,7 +60,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     props.isMobileMedia &&
     ExplorerProvider.Instance.providerType !== ProviderType.MetaMask
   ) {
-    //@ts-ignore
+    // @ts-ignore
     setActivatingConnector(injected)
     activate(injected)
   }
@@ -72,7 +72,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     providerType &&
     providerType !== ExplorerProvider.Instance.providerType
   ) {
-    //@ts-ignore
+    // @ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!)
     activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!)
   }
