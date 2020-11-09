@@ -92,7 +92,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this._input = input
   }
 
-  public async componentWillMount() {
+  private async setDefaultCollaterization(){
     const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
       this.props.borrowAsset,
       this.state.collateralAsset
@@ -106,16 +106,23 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       collateralValue: selectedValue.toFixed()
     })
   }
-  public componentDidUpdate(
+
+  public async componentWillMount() {
+    await this.setDefaultCollaterization()
+  }
+  public async componentDidUpdate(
     prevProps: Readonly<IBorrowFormProps>,
     prevState: Readonly<IBorrowFormState>,
     snapshot?: any
-  ): void {
+  ) {
     if (
       this.state.depositAmount !== prevState.depositAmount ||
       this.state.collateralAsset !== prevState.collateralAsset
     ) {
       this.changeStateLoading()
+    }
+    if (prevState.collateralAsset !== this.state.collateralAsset){
+      await this.setDefaultCollaterization()
     }
   }
 
