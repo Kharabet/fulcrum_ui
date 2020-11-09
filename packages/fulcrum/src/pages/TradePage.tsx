@@ -520,7 +520,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ) {
         profitUSD = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue)
       } else {
-        const depositAmountCollateralToken = loan.loanData.depositValueAsLoanToken.div(
+        const depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
           10 ** collateralAssetDecimals
         )
 
