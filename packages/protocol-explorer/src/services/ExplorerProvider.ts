@@ -1116,7 +1116,6 @@ export class ExplorerProvider {
 
   private processLiquidationRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
-      debugger
       this.eventEmitter.emit(ExplorerProviderEvents.AskToOpenProgressDlg, task.request.loanId)
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error('No provider available!')

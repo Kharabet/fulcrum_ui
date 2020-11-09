@@ -65,9 +65,9 @@ export const LoanRow = (props: ILoanRowProps) => {
     const loanId = props.loanId
     const decimals: number = AssetsDictionary.assets.get(props.loanToken)!.decimals || 18
 
-    const amountInBaseUnits = new BigNumber(
-      props.payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
-    )
+     const amountInBaseUnits = new BigNumber(
+       props.payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
+     )
 
     const rate = props.payOffAmount.dividedBy(props.seizeAmount)
     const request = new LiquidationRequest(
@@ -79,7 +79,7 @@ export const LoanRow = (props: ILoanRowProps) => {
     )
 
     props.onLiquidationRequested(request)
-    // changeLoadingTransaction(true, request)
+     changeLoadingTransaction(true, request)
     // await ExplorerProvider.Instance.onLiquidationConfirmed(request)
   }
 
@@ -88,10 +88,10 @@ export const LoanRow = (props: ILoanRowProps) => {
   }
 
   const changeLoadingTransaction = (
-    isLoadingTransaction: boolean,
+    isLoading: boolean,
     request: LiquidationRequest | undefined
   ) => {
-    setLoadingTransaction(isLoadingTransaction)
+    setLoadingTransaction(isLoading)
     setRequest(request)
   }
 

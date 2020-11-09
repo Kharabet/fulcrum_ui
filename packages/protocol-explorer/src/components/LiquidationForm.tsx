@@ -4,6 +4,7 @@ import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { InputAmount } from './InputAmount'
+import { ExplorerProvider } from '../services/ExplorerProvider'
 
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 export interface ILiquidationFormProps {
@@ -65,10 +66,20 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
     return amount
   }
 
-  function onSubmitClick(event: FormEvent<HTMLFormElement>) {
+  const onSubmitClick = async(event: FormEvent<HTMLFormElement>)=> {
     event.preventDefault()
+    
     setDidSubmit(true)
+    const request = props.request
+
+    const amountInBaseUnits = new BigNumber(
+        payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
+      )
+    request.closeAmount = amountInBaseUnits
+    
+    await ExplorerProvider.Instance.onLiquidationConfirmed(request)
     setDidSubmit(false)
+    props.onClose()
   }
 
   function formatPrecision(output: BigNumber) {
