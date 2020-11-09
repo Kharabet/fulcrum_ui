@@ -1868,6 +1868,11 @@
               "internalType": "uint256",
               "name": "maxSeizable",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "depositValue",
+              "type": "uint256"
             }
           ],
           "internalType": "struct LoanMaintenanceEvents.LoanReturnData[]",
@@ -2144,6 +2149,11 @@
             {
               "internalType": "uint256",
               "name": "maxSeizable",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "depositValue",
               "type": "uint256"
             }
           ],
@@ -2568,6 +2578,11 @@
             {
               "internalType": "uint256",
               "name": "maxSeizable",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "depositValue",
               "type": "uint256"
             }
           ],

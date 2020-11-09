@@ -8,59 +8,67 @@
     margin-bottom: 15px;
   }
   &__items {
+    display: flex;
+    flex-wrap: wrap;
     width: 100%;
-    box-shadow: inset 0px -1.5px 1px -1px var(--indicator-border);
+    // overflow: hidden;
+    justify-content: center;
+    margin-bottom: 20px;
+    .tab {
+      display: flex;
+      align-self: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: 800;
+      color: #8992a4;
+      text-transform: capitalize;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    
+      padding: 10px 20px;
+      &:hover {
+        color: #5b88ff;
+      }
+      @media screen and (min-width: $breakpoint-mobile-min) {
+        padding: 10px 20px;
+      }
+     
+      &.active {
+        position: relative;
+        color: var(--primary-text);
+          border-bottom-color: #276bfb;
+          border-radius: 2px;
+        // &:after {
+        //   content: '';
+        //   height: 8px;
+        //   border-radius: 4px;
+        //   width: 100%;
+        //   position: absolute;
+        //   bottom: -5px;
+        //   background-color: #276bfb;
+        //   z-index: 12;
+        // }
+      }
+    }
   }
   &-item {
-    &--active {
-      position: relative;
-
-      .trade-token-grid-tab-item__col-token-image {
-        span {
-          color: var(--primary-text);
-        }
-      }
-    }
-    &:not(&--active) {
-      &:hover {
-        cursor: pointer;
-
-        .trade-token-grid-tab-item__col-token-image {
-          span {
-            color: #33dfcc;
-            &.opened-positions-count {
-              color: #ffffff;
-            }
-          }
-        }
-      }
-    }
-
     &__col-token-image {
       display: flex;
       justify-content: center;
       align-items: center;
-      svg {
-        height: 28px;
-        width: 28px;
-      }
 
       span {
-        font-size: 16px;
-        font-weight: 600;
-        font-style: normal;
-        line-height: 1.5;
-        color: var(--trade-header-color);
         &.opened-positions-count {
           display: flex;
           align-items: center;
           justify-content: center;
           width: 21px;
           height: 21px;
+          color: #ffffff;
           background-color: #276bfb;
           border-radius: 50%;
           margin-left: 5px;
-          color: #ffffff;
           font-size: 12px;
           font-weight: 900;
           line-height: 21px;
@@ -68,26 +76,24 @@
       }
     }
   }
-  .manage-tab {
-    [data-theme='light'] & svg path {
-      fill: #c8c8c8;
-    }
-  }
+
   @media screen and (min-width: $breakpoint-mobile-min) {
     position: relative;
     &__items {
-      margin-top: -40px;
+      justify-content: left;
+      margin-top: -10px;
+      
     }
     &__container {
       margin-bottom: 10px;
+    }
+    &__selector {
+      margin-right: 12px;
     }
     &:after {
       width: calc(100vw - 17px);
     }
     &-item {
-      &:not(.manage-tab) {
-        width: 110px;
-      }
       &:not(:last-child) {
         margin: 0 5px;
       }
@@ -95,14 +101,6 @@
         svg {
           margin-right: 7px;
         }
-      }
-    }
-
-    .manage-tab {
-      width: 155px;
-      svg {
-        height: 17px;
-        width: 17px;
       }
     }
   }
@@ -118,48 +116,9 @@
       padding: 0 15px;
       text-align: center;
     }
-    // &__items {
-    //   width: 100%;
-    //   order: -1;
-    //   border-bottom: 1px solid var(--border-tab);
-    //   padding: 0 15px;
-    //   background-color: var(--bg-header);
-    // }
-    // &-item {
-    //   display: flex;
-    //   &.trade-token-grid-tab-item {
-    //     &:not(.manage-tab) {
-    //       width: calc(100% / 5);
-    //     }
-    //   }
-    //   &__col-token-image {
-    //     margin-left: auto;
-    //     margin-right: auto;
-    //     span {
-    //       &.opened-positions-count {
-    //         position: absolute;
-    //         top: -10px;
-    //         right: -20px;
-    //         margin-right: 0;
-    //       }
-    //     }
-    //   }
-    // }
-    // &.manage {
-    //   .trade-token-grid-tab__selector {
-    //     display: none;
-    //   }
-    // }
     .manage-tab {
-      //width: auto;
-      // position: absolute;
-      //top: 25px;
-      // right: 87px;
       &:after {
         content: none;
-      }
-      svg {
-        display: none;
       }
     }
   }

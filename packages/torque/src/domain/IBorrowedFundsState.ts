@@ -30,5 +30,7 @@ export interface IBorrowedFundsState {
     maxLoanTerm: BigNumber
     maxLiquidatable: BigNumber
     maxSeizable: BigNumber
+    depositValueAsLoanToken: BigNumber
+    depositValueAsCollateralToken: BigNumber
   }
 }
