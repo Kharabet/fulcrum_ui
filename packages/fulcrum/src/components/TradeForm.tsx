@@ -23,7 +23,7 @@ import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import { TradeExpectedResult } from './TradeExpectedResult'
-
+import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
 import '../styles/components/trade-form.scss'
 
 const isMainnetProd =
@@ -80,6 +80,10 @@ interface ITradeFormState {
   isLoading: boolean
   isExposureLoading: boolean
 
+  slippageRate: BigNumber
+  ethBalance: BigNumber
+  depositTokenBalance: BigNumber
+
   baseTokenPrice: BigNumber
   returnedAsset: Asset
   returnedAmount: BigNumber
@@ -96,7 +100,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context)
-    const assetDetails = AssetsDictionary.assets.get(props.baseToken)   
+    const assetDetails = AssetsDictionary.assets.get(props.baseToken)
     const maxTradeValue = new BigNumber(0)
     const liquidationPrice = new BigNumber(0)
     const exposureValue = new BigNumber(0)
@@ -110,6 +114,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       maxTradeValue: maxTradeValue,
       buttonValue: 0,
       interestRate: new BigNumber(0),
+      slippageRate: new BigNumber(0),
+      ethBalance: new BigNumber(0),
+      depositTokenBalance: new BigNumber(0),
       maybeNeedsApproval: false,
       liquidationPrice: liquidationPrice,
       exposureValue: exposureValue,
@@ -234,6 +241,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       exposureValue = estimatedMargin.exposureValue
       interestRate = estimatedMargin.interestRate
     }
+
+    const ethBalance = await FulcrumProvider.Instance.getEthBalance()
+    const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+      this.state.depositToken
+    )
     this._isMounted &&
       this.setState({
         ...this.state,
@@ -248,7 +260,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         baseTokenPrice,
         exposureValue: exposureValue,
         isExposureLoading: false,
-        isLoading: false
+        isLoading: false,
+        ethBalance,
+        depositTokenBalance
       })
   }
 
@@ -268,7 +282,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   public async componentDidMount() {
     this._isMounted = true
-
+    await this.setSlippageRate(new BigNumber(1))
     await this.derivedUpdate()
     window.history.pushState(
       null,
@@ -284,11 +298,30 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
   }
 
+  private async setSlippageRate(tradeAmount: BigNumber) {
+    const destToken =
+      this.props.positionType === PositionType.LONG ? this.props.baseToken : this.props.quoteToken
+    const srcToken =
+      this.props.positionType === PositionType.LONG ? this.props.quoteToken : this.props.baseToken
+    const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(
+      srcToken,
+      destToken,
+      tradeAmount
+    )
+    this.setState({ ...this.state, slippageRate })
+  }
+
   public componentDidUpdate(
     prevProps: Readonly<ITradeFormProps>,
     prevState: Readonly<ITradeFormState>,
     snapshot?: any
   ): void {
+    if (
+      this.state.depositToken !== prevState.depositToken ||
+      this.state.tradeAmountValue !== prevState.tradeAmountValue
+    ) {
+      this.setSlippageRate(this.state.tradeAmountValue)
+    }
     if (
       this.props.tradeType !== prevProps.tradeType ||
       this.props.baseToken !== prevProps.baseToken ||
@@ -330,17 +363,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? 'trade-form__submit-button--buy'
         : 'trade-form__submit-button--sell'
 
-    // const amountMsg =
-    //   this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
-    //     ? "Insufficient funds for gas"
-    //     : this.state.balance && this.state.balance.eq(0)
-    //       ? "Your wallet is empty"
-    //       : (this.state.tradeAmountValue.gt(0) && this.state.slippageRate.eq(0))
-    //         && (this.state.depositToken === Asset.ETH || !this.state.maybeNeedsApproval)
-    //         ? ``// `Your trade is too small.`
-    //         : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
-    //           ? `Slippage:`
-    //           : "";
+    const amountMsg =
+      this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
+        ? 'Insufficient funds for gas'
+        : this.state.depositTokenBalance && this.state.depositTokenBalance.eq(0)
+        ? 'Your wallet is empty'
+        : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
+        ? `Slippage:`
+        : ''
 
     let submitButtonText = ``
     if (this.props.tradeType === TradeType.BUY) {
@@ -396,17 +426,21 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
 
-            {/*<div className="trade-form__kv-container">
-              {amountMsg.includes("Slippage:") ? (
-                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
+            <div className="trade-form__kv-container">
+              {amountMsg.includes('Slippage:') ? (
+                <div
+                  title={`${this.state.slippageRate.toFixed(18)}%`}
+                  className="trade-form__label slippage">
                   {amountMsg}
                   <span className="trade-form__slippage-amount">
-                    &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
+                    &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}
+                    <SlippageDown />
                   </span>
                 </div>
-              ) : (<div className="trade-form__label">{amountMsg}</div>)}
-
-            </div> */}
+              ) : (
+                <div className="trade-form__label">{amountMsg}</div>
+              )}
+            </div>
 
             <InputAmount
               inputAmountText={this.state.inputAmountText}
