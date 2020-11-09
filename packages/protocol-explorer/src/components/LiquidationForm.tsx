@@ -4,10 +4,10 @@ import { Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
-
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { InputAmount } from './InputAmount'
 
+import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 export interface ILiquidationFormProps {
   request: LiquidationRequest
   onSubmit: (request: LiquidationRequest) => void
@@ -24,7 +24,7 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
   const [liquidationAmountText, setAmountText] = useState('')
   const [liquidationAmount, setAmountValue] = useState(new BigNumber(0))
   const [seizeAmount, setSeizeAmount] = useState(new BigNumber(0))
-  const [didSubmit,setDidSubmit] = useState(false)
+  const [didSubmit, setDidSubmit] = useState(false)
 
   useEffect(() => {
     // subscribe to input value change
@@ -71,12 +71,21 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
 
   return (
     <form className="liquidation-form" onSubmit={onSubmitClick}>
+      <section className="dialog-header">
+        <CloseIcon className="dialog-header__title-close" onClick={props.onClose} />
+        <div className="dialog-header__title">Liquidate</div>
+      </section>
       <section className="dialog-content">
         <InputAmount
           asset={loanToken.logoSvg}
-          inputAmountText={liquidationAmountText}   
-          buttonValue={liquidationAmount}          
+          inputAmountText={liquidationAmountText}
+          buttonValue={liquidationAmount}
           updateButton={(amount) => setAmountValue(amount)}
+          onAmountChange={onAmountChange}
+        />
+        <InputAmount
+          asset={collateralToken.logoSvg}
+          inputAmountText={liquidationAmountText}
           onAmountChange={onAmountChange}
         />
       </section>
@@ -84,7 +93,7 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
         <div className="actions-container">
           <button
             type="submit"
-            className={`btn btn-size--small ${didSubmit ? `btn-disabled` : ``}`}>
+            className={`btn btn-submit action ${didSubmit ? `btn-disabled` : ``}`}>
             {didSubmit ? 'Submitting...' : 'Liquidate'}
           </button>
         </div>

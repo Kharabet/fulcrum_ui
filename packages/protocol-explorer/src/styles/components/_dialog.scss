@@ -1,0 +1,58 @@
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 40px 40px 30px;
+  &__title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #283049;
+  }
+  &__title-close {
+    position: absolute;
+    right: 40px;
+    top: 48px;
+    height: 15px;
+    width: 15px;
+    cursor: pointer;
+    &:hover {
+      path {
+        stroke: #a3b0c2;
+      }
+    }
+  }
+}
+
+.dialog-content {
+  width: 100%;
+  padding: 0 40px;
+}
+
+.dialog-actions {
+  width: 100%;
+  padding: 0 40px 57px;
+}
+
+@media screen and (max-width: $width-max-sm) {
+  .dialog-header {
+    
+  padding: 30px;
+    &__title {
+      font-size: 16px;
+    }
+    &__title-close {
+      position: absolute;
+      right: 30px;
+      top: 38px;
+    }
+  }
+  .dialog-content {
+    width: 100%;
+    padding: 0 30px;
+  }
+
+  .dialog-actions {
+    padding: 0 30px 30px;
+  }
+}
