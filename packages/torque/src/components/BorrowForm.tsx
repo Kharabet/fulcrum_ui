@@ -437,5 +437,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       selectedValue: selectedValue,
       collateralValue: selectedValue.toFixed(2)
     })
+    
+    this._inputTextChange.next(this.state.inputAmountText)
   }
 }
