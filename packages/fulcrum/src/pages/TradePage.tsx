@@ -506,21 +506,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       positionValue = collateralAssetAmount
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
       collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
-      // .minus(loanAssetAmount)
 
-      const deposited = collateralAssetAmount
-        .times(currentCollateralToPrincipalRate)
-        .minus(loanAssetAmount)
       openPrice = loan.loanData.startRate
         .div(10 ** 18)
         .times(loanAssetPrecision)
         .div(collateralAssetPrecision)
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
-      const depositAmountCollateralToken = loan.loanData.depositValue
-        .div(10 ** loanAssetDecimals)
-        .div(loan.loanData.startRate.div(10 ** loanAssetDecimals))
-      const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
+      const depositAmountCollateralToken = loan.loanData.depositValueAsLoanToken
+        .div(10 ** collateralAssetDecimals)
+        
+      const depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(10 ** loanAssetDecimals)
 
       profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
       console.log('profitCollateralToken in collateral token', profitCollateralToken.toFixed())
@@ -547,10 +543,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
 
       const startRate = new BigNumber(10 ** 36).div(loan.loanData.startRate).div(10**collateralAssetDecimals)
-      const depositAmountCollateralToken = loan.loanData.depositValue
-        .div(10 ** loanAssetDecimals)
-        .times(startRate)
-      const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
+      const depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken
+        .div(10 ** collateralAssetDecimals)
+        
+      const depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(10 ** loanAssetDecimals)
 
       profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
       console.log('profitCollateralToken in collateral token', profitCollateralToken.toFixed())

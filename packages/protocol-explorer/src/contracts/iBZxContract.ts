@@ -6,42 +6,43 @@ import { BlockParam, CallData, ContractAbi, DecodedLogArgs, TxData, TxDataPayabl
 import { BigNumber, classUtils } from "@0x/utils";
 // tslint:enable:no-unused-variable
 
-export type IBZxEventArgs =
-    | IBZxBorrowEventArgs
-    | IBZxClaimRewardEventArgs
-    | IBZxCloseWithDepositEventArgs
-    | IBZxCloseWithSwapEventArgs
-    | IBZxDelegatedManagerSetEventArgs
-    | IBZxDepositCollateralEventArgs
-    | IBZxExtendLoanDurationEventArgs
-    | IBZxExternalSwapEventArgs
-    | IBZxLiquidateEventArgs
-    | IBZxLoanParamsDisabledEventArgs
-    | IBZxLoanParamsIdDisabledEventArgs
-    | IBZxLoanParamsIdSetupEventArgs
-    | IBZxLoanParamsSetupEventArgs
-    | IBZxLoanSwapEventArgs
-    | IBZxOwnershipTransferredEventArgs
-    | IBZxReduceLoanDurationEventArgs
-    | IBZxRolloverEventArgs
-    | IBZxSetAffiliateFeePercentEventArgs
-    | IBZxSetBorrowingFeePercentEventArgs
-    | IBZxSetFeesControllerEventArgs
-    | IBZxSetLendingFeePercentEventArgs
-    | IBZxSetLiquidationIncentivePercentEventArgs
-    | IBZxSetLoanPoolEventArgs
-    | IBZxSetMaxSwapSizeEventArgs
-    | IBZxSetPriceFeedContractEventArgs
-    | IBZxSetSupportedTokensEventArgs
-    | IBZxSetSwapsImplContractEventArgs
-    | IBZxSetTradingFeePercentEventArgs
-    | IBZxTradeEventArgs
-    | IBZxWithdrawBorrowingFeesEventArgs
-    | IBZxWithdrawCollateralEventArgs
-    | IBZxWithdrawLendingFeesEventArgs
-    | IBZxWithdrawTradingFeesEventArgs;
+export type iBZxEventArgs =
+    | iBZxBorrowEventArgs
+    | iBZxClaimRewardEventArgs
+    | iBZxCloseWithDepositEventArgs
+    | iBZxCloseWithSwapEventArgs
+    | iBZxDelegatedManagerSetEventArgs
+    | iBZxDepositCollateralEventArgs
+    | iBZxExtendLoanDurationEventArgs
+    | iBZxExternalSwapEventArgs
+    | iBZxLiquidateEventArgs
+    | iBZxLoanInputEventArgs
+    | iBZxLoanParamsDisabledEventArgs
+    | iBZxLoanParamsIdDisabledEventArgs
+    | iBZxLoanParamsIdSetupEventArgs
+    | iBZxLoanParamsSetupEventArgs
+    | iBZxLoanSwapEventArgs
+    | iBZxOwnershipTransferredEventArgs
+    | iBZxReduceLoanDurationEventArgs
+    | iBZxRolloverEventArgs
+    | iBZxSetAffiliateFeePercentEventArgs
+    | iBZxSetBorrowingFeePercentEventArgs
+    | iBZxSetFeesControllerEventArgs
+    | iBZxSetLendingFeePercentEventArgs
+    | iBZxSetLiquidationIncentivePercentEventArgs
+    | iBZxSetLoanPoolEventArgs
+    | iBZxSetMaxSwapSizeEventArgs
+    | iBZxSetPriceFeedContractEventArgs
+    | iBZxSetSupportedTokensEventArgs
+    | iBZxSetSwapsImplContractEventArgs
+    | iBZxSetTradingFeePercentEventArgs
+    | iBZxTradeEventArgs
+    | iBZxWithdrawBorrowingFeesEventArgs
+    | iBZxWithdrawCollateralEventArgs
+    | iBZxWithdrawLendingFeesEventArgs
+    | iBZxWithdrawTradingFeesEventArgs;
 
-export enum IBZxEvents {
+export enum iBZxEvents {
     Borrow = 'Borrow',
     ClaimReward = 'ClaimReward',
     CloseWithDeposit = 'CloseWithDeposit',
@@ -51,6 +52,7 @@ export enum IBZxEvents {
     ExtendLoanDuration = 'ExtendLoanDuration',
     ExternalSwap = 'ExternalSwap',
     Liquidate = 'Liquidate',
+    LoanInput = 'LoanInput',
     LoanParamsDisabled = 'LoanParamsDisabled',
     LoanParamsIdDisabled = 'LoanParamsIdDisabled',
     LoanParamsIdSetup = 'LoanParamsIdSetup',
@@ -78,7 +80,7 @@ export enum IBZxEvents {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxBorrowEventArgs extends DecodedLogArgs {
+export interface iBZxBorrowEventArgs extends DecodedLogArgs {
     user: string;
     lender: string;
     loanId: string;
@@ -93,7 +95,7 @@ export interface IBZxBorrowEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxClaimRewardEventArgs extends DecodedLogArgs {
+export interface iBZxClaimRewardEventArgs extends DecodedLogArgs {
     user: string;
     receiver: string;
     token: string;
@@ -101,7 +103,7 @@ export interface IBZxClaimRewardEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxCloseWithDepositEventArgs extends DecodedLogArgs {
+export interface iBZxCloseWithDepositEventArgs extends DecodedLogArgs {
     user: string;
     lender: string;
     loanId: string;
@@ -115,7 +117,7 @@ export interface IBZxCloseWithDepositEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxCloseWithSwapEventArgs extends DecodedLogArgs {
+export interface iBZxCloseWithSwapEventArgs extends DecodedLogArgs {
     user: string;
     lender: string;
     loanId: string;
@@ -129,7 +131,7 @@ export interface IBZxCloseWithSwapEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxDelegatedManagerSetEventArgs extends DecodedLogArgs {
+export interface iBZxDelegatedManagerSetEventArgs extends DecodedLogArgs {
     loanId: string;
     delegator: string;
     delegated: string;
@@ -137,7 +139,7 @@ export interface IBZxDelegatedManagerSetEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxDepositCollateralEventArgs extends DecodedLogArgs {
+export interface iBZxDepositCollateralEventArgs extends DecodedLogArgs {
     user: string;
     depositToken: string;
     loanId: string;
@@ -145,7 +147,7 @@ export interface IBZxDepositCollateralEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxExtendLoanDurationEventArgs extends DecodedLogArgs {
+export interface iBZxExtendLoanDurationEventArgs extends DecodedLogArgs {
     user: string;
     depositToken: string;
     loanId: string;
@@ -155,7 +157,7 @@ export interface IBZxExtendLoanDurationEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxExternalSwapEventArgs extends DecodedLogArgs {
+export interface iBZxExternalSwapEventArgs extends DecodedLogArgs {
     user: string;
     sourceToken: string;
     destToken: string;
@@ -164,7 +166,7 @@ export interface IBZxExternalSwapEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxLiquidateEventArgs extends DecodedLogArgs {
+export interface iBZxLiquidateEventArgs extends DecodedLogArgs {
     user: string;
     liquidator: string;
     loanId: string;
@@ -178,7 +180,13 @@ export interface IBZxLiquidateEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxLoanParamsDisabledEventArgs extends DecodedLogArgs {
+export interface iBZxLoanInputEventArgs extends DecodedLogArgs {
+    loanId: string;
+    amount: BigNumber;
+}
+
+// tslint:disable-next-line:interface-name
+export interface iBZxLoanParamsDisabledEventArgs extends DecodedLogArgs {
     id: string;
     owner: string;
     loanToken: string;
@@ -189,19 +197,19 @@ export interface IBZxLoanParamsDisabledEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxLoanParamsIdDisabledEventArgs extends DecodedLogArgs {
+export interface iBZxLoanParamsIdDisabledEventArgs extends DecodedLogArgs {
     id: string;
     owner: string;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxLoanParamsIdSetupEventArgs extends DecodedLogArgs {
+export interface iBZxLoanParamsIdSetupEventArgs extends DecodedLogArgs {
     id: string;
     owner: string;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxLoanParamsSetupEventArgs extends DecodedLogArgs {
+export interface iBZxLoanParamsSetupEventArgs extends DecodedLogArgs {
     id: string;
     owner: string;
     loanToken: string;
@@ -212,7 +220,7 @@ export interface IBZxLoanParamsSetupEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxLoanSwapEventArgs extends DecodedLogArgs {
+export interface iBZxLoanSwapEventArgs extends DecodedLogArgs {
     loanId: string;
     sourceToken: string;
     destToken: string;
@@ -222,13 +230,13 @@ export interface IBZxLoanSwapEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxOwnershipTransferredEventArgs extends DecodedLogArgs {
+export interface iBZxOwnershipTransferredEventArgs extends DecodedLogArgs {
     previousOwner: string;
     newOwner: string;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxReduceLoanDurationEventArgs extends DecodedLogArgs {
+export interface iBZxReduceLoanDurationEventArgs extends DecodedLogArgs {
     user: string;
     withdrawToken: string;
     loanId: string;
@@ -237,7 +245,7 @@ export interface IBZxReduceLoanDurationEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxRolloverEventArgs extends DecodedLogArgs {
+export interface iBZxRolloverEventArgs extends DecodedLogArgs {
     user: string;
     caller: string;
     loanId: string;
@@ -251,35 +259,35 @@ export interface IBZxRolloverEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetAffiliateFeePercentEventArgs extends DecodedLogArgs {
+export interface iBZxSetAffiliateFeePercentEventArgs extends DecodedLogArgs {
     sender: string;
     oldValue: BigNumber;
     newValue: BigNumber;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetBorrowingFeePercentEventArgs extends DecodedLogArgs {
+export interface iBZxSetBorrowingFeePercentEventArgs extends DecodedLogArgs {
     sender: string;
     oldValue: BigNumber;
     newValue: BigNumber;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetFeesControllerEventArgs extends DecodedLogArgs {
+export interface iBZxSetFeesControllerEventArgs extends DecodedLogArgs {
     sender: string;
     oldController: string;
     newController: string;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetLendingFeePercentEventArgs extends DecodedLogArgs {
+export interface iBZxSetLendingFeePercentEventArgs extends DecodedLogArgs {
     sender: string;
     oldValue: BigNumber;
     newValue: BigNumber;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetLiquidationIncentivePercentEventArgs extends DecodedLogArgs {
+export interface iBZxSetLiquidationIncentivePercentEventArgs extends DecodedLogArgs {
     sender: string;
     loanToken: string;
     collateralToken: string;
@@ -288,49 +296,49 @@ export interface IBZxSetLiquidationIncentivePercentEventArgs extends DecodedLogA
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetLoanPoolEventArgs extends DecodedLogArgs {
+export interface iBZxSetLoanPoolEventArgs extends DecodedLogArgs {
     sender: string;
     loanPool: string;
     underlying: string;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetMaxSwapSizeEventArgs extends DecodedLogArgs {
+export interface iBZxSetMaxSwapSizeEventArgs extends DecodedLogArgs {
     sender: string;
     oldValue: BigNumber;
     newValue: BigNumber;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetPriceFeedContractEventArgs extends DecodedLogArgs {
+export interface iBZxSetPriceFeedContractEventArgs extends DecodedLogArgs {
     sender: string;
     oldValue: string;
     newValue: string;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetSupportedTokensEventArgs extends DecodedLogArgs {
+export interface iBZxSetSupportedTokensEventArgs extends DecodedLogArgs {
     sender: string;
     token: string;
     isActive: boolean;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetSwapsImplContractEventArgs extends DecodedLogArgs {
+export interface iBZxSetSwapsImplContractEventArgs extends DecodedLogArgs {
     sender: string;
     oldValue: string;
     newValue: string;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxSetTradingFeePercentEventArgs extends DecodedLogArgs {
+export interface iBZxSetTradingFeePercentEventArgs extends DecodedLogArgs {
     sender: string;
     oldValue: BigNumber;
     newValue: BigNumber;
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxTradeEventArgs extends DecodedLogArgs {
+export interface iBZxTradeEventArgs extends DecodedLogArgs {
     user: string;
     lender: string;
     loanId: string;
@@ -346,7 +354,7 @@ export interface IBZxTradeEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxWithdrawBorrowingFeesEventArgs extends DecodedLogArgs {
+export interface iBZxWithdrawBorrowingFeesEventArgs extends DecodedLogArgs {
     sender: string;
     token: string;
     receiver: string;
@@ -354,7 +362,7 @@ export interface IBZxWithdrawBorrowingFeesEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxWithdrawCollateralEventArgs extends DecodedLogArgs {
+export interface iBZxWithdrawCollateralEventArgs extends DecodedLogArgs {
     user: string;
     withdrawToken: string;
     loanId: string;
@@ -362,7 +370,7 @@ export interface IBZxWithdrawCollateralEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxWithdrawLendingFeesEventArgs extends DecodedLogArgs {
+export interface iBZxWithdrawLendingFeesEventArgs extends DecodedLogArgs {
     sender: string;
     token: string;
     receiver: string;
@@ -370,7 +378,7 @@ export interface IBZxWithdrawLendingFeesEventArgs extends DecodedLogArgs {
 }
 
 // tslint:disable-next-line:interface-name
-export interface IBZxWithdrawTradingFeesEventArgs extends DecodedLogArgs {
+export interface iBZxWithdrawTradingFeesEventArgs extends DecodedLogArgs {
     sender: string;
     token: string;
     receiver: string;
@@ -381,14 +389,14 @@ export interface IBZxWithdrawTradingFeesEventArgs extends DecodedLogArgs {
 /* istanbul ignore next */
 // tslint:disable:no-parameter-reassignment
 // tslint:disable-next-line:class-name
-export class IBZxContract extends BaseContract {
+export class iBZxContract extends BaseContract {
     public affiliateFeePercent = {
         async callAsync(
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('affiliateFeePercent()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -419,7 +427,7 @@ export class IBZxContract extends BaseContract {
             loanDataBytes: string,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowOrTradeFromPool(bytes32,bytes32,bool,uint256,address[4],uint256[5],bytes)', [loanParamsId,
     loanId,
     isTorqueLoan,
@@ -459,7 +467,7 @@ export class IBZxContract extends BaseContract {
             loanDataBytes: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowOrTradeFromPool(bytes32,bytes32,bool,uint256,address[4],uint256[5],bytes)', [loanParamsId,
     loanId,
     isTorqueLoan,
@@ -488,7 +496,7 @@ export class IBZxContract extends BaseContract {
             sentValues: BigNumber[],
             loanDataBytes: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('borrowOrTradeFromPool(bytes32,bytes32,bool,uint256,address[4],uint256[5],bytes)', [loanParamsId,
     loanId,
     isTorqueLoan,
@@ -509,9 +517,9 @@ export class IBZxContract extends BaseContract {
             loanDataBytes: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<BigNumber
+        ): Promise<{loanId: string;principal: BigNumber;collateral: BigNumber}
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowOrTradeFromPool(bytes32,bytes32,bool,uint256,address[4],uint256[5],bytes)', [loanParamsId,
         loanId,
         isTorqueLoan,
@@ -532,7 +540,7 @@ export class IBZxContract extends BaseContract {
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('borrowOrTradeFromPool(bytes32,bytes32,bool,uint256,address[4],uint256[5],bytes)');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+            const result = abiEncoder.strictDecodeReturnValue<{loanId: string;principal: BigNumber;collateral: BigNumber}
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
@@ -546,7 +554,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowerOrders(address,bytes32)', [index_0,
         index_1
         ]);
@@ -574,7 +582,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowingFeePercent()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -601,7 +609,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowingFeeTokensHeld(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -629,7 +637,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowingFeeTokensPaid(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -656,7 +664,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('bzrxTokenAddress()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -681,7 +689,7 @@ export class IBZxContract extends BaseContract {
             receiver: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('claimRewards(address)', [receiver
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -703,7 +711,7 @@ export class IBZxContract extends BaseContract {
             receiver: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('claimRewards(address)', [receiver
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -720,7 +728,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             receiver: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('claimRewards(address)', [receiver
     ]);
             return abiEncodedTransactionData;
@@ -731,7 +739,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('claimRewards(address)', [receiver
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -759,7 +767,7 @@ export class IBZxContract extends BaseContract {
             depositAmount: BigNumber,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithDeposit(bytes32,address,uint256)', [loanId,
     receiver,
     depositAmount
@@ -787,7 +795,7 @@ export class IBZxContract extends BaseContract {
             depositAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithDeposit(bytes32,address,uint256)', [loanId,
     receiver,
     depositAmount
@@ -808,7 +816,7 @@ export class IBZxContract extends BaseContract {
             receiver: string,
             depositAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('closeWithDeposit(bytes32,address,uint256)', [loanId,
     receiver,
     depositAmount
@@ -823,7 +831,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, string]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithDeposit(bytes32,address,uint256)', [loanId,
         receiver,
         depositAmount
@@ -854,7 +862,7 @@ export class IBZxContract extends BaseContract {
             depositAmount: BigNumber,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithDepositWithGasToken(bytes32,address,address,uint256)', [loanId,
     receiver,
     gasTokenUser,
@@ -885,7 +893,7 @@ export class IBZxContract extends BaseContract {
             depositAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithDepositWithGasToken(bytes32,address,address,uint256)', [loanId,
     receiver,
     gasTokenUser,
@@ -908,7 +916,7 @@ export class IBZxContract extends BaseContract {
             gasTokenUser: string,
             depositAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('closeWithDepositWithGasToken(bytes32,address,address,uint256)', [loanId,
     receiver,
     gasTokenUser,
@@ -925,7 +933,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, string]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithDepositWithGasToken(bytes32,address,address,uint256)', [loanId,
         receiver,
         gasTokenUser,
@@ -958,7 +966,7 @@ export class IBZxContract extends BaseContract {
             loanDataBytes: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithSwap(bytes32,address,uint256,bool,bytes)', [loanId,
     receiver,
     swapAmount,
@@ -992,7 +1000,7 @@ export class IBZxContract extends BaseContract {
             loanDataBytes: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithSwap(bytes32,address,uint256,bool,bytes)', [loanId,
     receiver,
     swapAmount,
@@ -1017,7 +1025,7 @@ export class IBZxContract extends BaseContract {
             returnTokenIsCollateral: boolean,
             loanDataBytes: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('closeWithSwap(bytes32,address,uint256,bool,bytes)', [loanId,
     receiver,
     swapAmount,
@@ -1036,7 +1044,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, string]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithSwap(bytes32,address,uint256,bool,bytes)', [loanId,
         receiver,
         swapAmount,
@@ -1071,7 +1079,7 @@ export class IBZxContract extends BaseContract {
             index_5: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithSwapWithGasToken(bytes32,address,address,uint256,bool,bytes)', [loanId,
     receiver,
     gasTokenUser,
@@ -1108,7 +1116,7 @@ export class IBZxContract extends BaseContract {
             index_5: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithSwapWithGasToken(bytes32,address,address,uint256,bool,bytes)', [loanId,
     receiver,
     gasTokenUser,
@@ -1135,7 +1143,7 @@ export class IBZxContract extends BaseContract {
             returnTokenIsCollateral: boolean,
             index_5: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('closeWithSwapWithGasToken(bytes32,address,address,uint256,bool,bytes)', [loanId,
     receiver,
     gasTokenUser,
@@ -1156,7 +1164,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, string]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('closeWithSwapWithGasToken(bytes32,address,address,uint256,bool,bytes)', [loanId,
         receiver,
         gasTokenUser,
@@ -1190,7 +1198,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<boolean
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('delegatedManagers(bytes32,address)', [index_0,
         index_1
         ]);
@@ -1218,7 +1226,7 @@ export class IBZxContract extends BaseContract {
             depositAmount: BigNumber,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositCollateral(bytes32,uint256)', [loanId,
     depositAmount
     ]);
@@ -1243,7 +1251,7 @@ export class IBZxContract extends BaseContract {
             depositAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositCollateral(bytes32,uint256)', [loanId,
     depositAmount
     ]);
@@ -1262,7 +1270,7 @@ export class IBZxContract extends BaseContract {
             loanId: string,
             depositAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('depositCollateral(bytes32,uint256)', [loanId,
     depositAmount
     ]);
@@ -1275,7 +1283,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositCollateral(bytes32,uint256)', [loanId,
         depositAmount
         ]);
@@ -1302,7 +1310,7 @@ export class IBZxContract extends BaseContract {
             amount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositProtocolToken(uint256)', [amount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1324,7 +1332,7 @@ export class IBZxContract extends BaseContract {
             amount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositProtocolToken(uint256)', [amount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1341,7 +1349,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             amount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('depositProtocolToken(uint256)', [amount
     ]);
             return abiEncodedTransactionData;
@@ -1352,7 +1360,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositProtocolToken(uint256)', [amount
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1378,7 +1386,7 @@ export class IBZxContract extends BaseContract {
             loanParamsIdList: string[],
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('disableLoanParams(bytes32[])', [loanParamsIdList
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1400,7 +1408,7 @@ export class IBZxContract extends BaseContract {
             loanParamsIdList: string[],
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('disableLoanParams(bytes32[])', [loanParamsIdList
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1417,7 +1425,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             loanParamsIdList: string[],
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('disableLoanParams(bytes32[])', [loanParamsIdList
     ]);
             return abiEncodedTransactionData;
@@ -1428,7 +1436,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('disableLoanParams(bytes32[])', [loanParamsIdList
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1457,7 +1465,7 @@ export class IBZxContract extends BaseContract {
             index_3: string,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('extendLoanDuration(bytes32,uint256,bool,bytes)', [loanId,
     depositAmount,
     useCollateral,
@@ -1488,7 +1496,7 @@ export class IBZxContract extends BaseContract {
             index_3: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('extendLoanDuration(bytes32,uint256,bool,bytes)', [loanId,
     depositAmount,
     useCollateral,
@@ -1511,7 +1519,7 @@ export class IBZxContract extends BaseContract {
             useCollateral: boolean,
             index_3: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('extendLoanDuration(bytes32,uint256,bool,bytes)', [loanId,
     depositAmount,
     useCollateral,
@@ -1528,7 +1536,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('extendLoanDuration(bytes32,uint256,bool,bytes)', [loanId,
         depositAmount,
         useCollateral,
@@ -1558,7 +1566,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('feesController()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -1585,9 +1593,9 @@ export class IBZxContract extends BaseContract {
             unsafeOnly: boolean,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValue: BigNumber}>
+        ): Promise<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}>
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getActiveLoans(uint256,uint256,bool)', [start,
         count,
         unsafeOnly
@@ -1604,7 +1612,7 @@ export class IBZxContract extends BaseContract {
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getActiveLoans(uint256,uint256,bool)');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValue: BigNumber}>
+            const result = abiEncoder.strictDecodeReturnValue<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}>
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
@@ -1616,7 +1624,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getActiveLoansCount()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -1647,7 +1655,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getBorrowAmount(address,address,uint256,uint256,bool)', [loanToken,
         collateralToken,
         collateralTokenAmount,
@@ -1680,7 +1688,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getBorrowAmountByParams(bytes32,uint256)', [loanParamsId,
         collateralTokenAmount
         ]);
@@ -1714,7 +1722,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getEstimatedMarginExposure(address,address,uint256,uint256,uint256,uint256)', [loanToken,
         collateralToken,
         loanTokenSent,
@@ -1748,7 +1756,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLenderInterestData(address,address)', [lender,
         loanToken
         ]);
@@ -1775,9 +1783,9 @@ export class IBZxContract extends BaseContract {
             loanId: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValue: BigNumber}
+        ): Promise<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLoan(bytes32)', [loanId
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1792,7 +1800,7 @@ export class IBZxContract extends BaseContract {
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getLoan(bytes32)');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValue: BigNumber}
+            const result = abiEncoder.strictDecodeReturnValue<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
@@ -1805,7 +1813,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[string, BigNumber, BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLoanInterestData(bytes32)', [loanId
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1833,7 +1841,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<Array<{id: string;active: boolean;owner: string;loanToken: string;collateralToken: string;minInitialMargin: BigNumber;maintenanceMargin: BigNumber;maxLoanTerm: BigNumber}>
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLoanParams(bytes32[])', [loanParamsIdList
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1863,7 +1871,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string[]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLoanParamsList(address,uint256,uint256)', [owner,
         start,
         count
@@ -1894,7 +1902,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string[]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLoanPoolsList(uint256,uint256)', [start,
         count
         ]);
@@ -1927,7 +1935,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getRequiredCollateral(address,address,uint256,uint256,bool)', [loanToken,
         collateralToken,
         newPrincipal,
@@ -1960,7 +1968,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getRequiredCollateralByParams(bytes32,uint256)', [loanParamsId,
         newPrincipal
         ]);
@@ -1991,7 +1999,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getSwapExpectedReturn(address,address,uint256)', [sourceToken,
         destToken,
         sourceTokenAmount
@@ -2021,7 +2029,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getTarget(string)', [sig
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2050,7 +2058,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getTotalPrincipal(address,address)', [lender,
         loanToken
         ]);
@@ -2082,9 +2090,9 @@ export class IBZxContract extends BaseContract {
             unsafeOnly: boolean,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValue: BigNumber}>
+        ): Promise<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}>
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getUserLoans(address,uint256,uint256,uint8,bool,bool)', [user,
         start,
         count,
@@ -2104,7 +2112,7 @@ export class IBZxContract extends BaseContract {
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getUserLoans(address,uint256,uint256,uint8,bool,bool)');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValue: BigNumber}>
+            const result = abiEncoder.strictDecodeReturnValue<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}>
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
@@ -2118,7 +2126,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getUserLoansCount(address,bool)', [user,
         isLender
         ]);
@@ -2146,7 +2154,7 @@ export class IBZxContract extends BaseContract {
             amounts: BigNumber[],
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('grantRewards(address[],uint256[])', [users,
     amounts
     ]);
@@ -2171,7 +2179,7 @@ export class IBZxContract extends BaseContract {
             amounts: BigNumber[],
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('grantRewards(address[],uint256[])', [users,
     amounts
     ]);
@@ -2190,7 +2198,7 @@ export class IBZxContract extends BaseContract {
             users: string[],
             amounts: BigNumber[],
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('grantRewards(address[],uint256[])', [users,
     amounts
     ]);
@@ -2203,7 +2211,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('grantRewards(address[],uint256[])', [users,
         amounts
         ]);
@@ -2232,7 +2240,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<boolean
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('isLoanPool(address)', [loanPool
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2259,7 +2267,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<boolean
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('isOwner()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2287,7 +2295,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('lenderInterest(address,address)', [index_0,
         index_1
         ]);
@@ -2317,7 +2325,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('lenderOrders(address,bytes32)', [index_0,
         index_1
         ]);
@@ -2345,7 +2353,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('lendingFeePercent()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2372,7 +2380,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('lendingFeeTokensHeld(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2400,7 +2408,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('lendingFeeTokensPaid(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2428,7 +2436,7 @@ export class IBZxContract extends BaseContract {
             closeAmount: BigNumber,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('liquidate(bytes32,address,uint256)', [loanId,
     receiver,
     closeAmount
@@ -2456,7 +2464,7 @@ export class IBZxContract extends BaseContract {
             closeAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('liquidate(bytes32,address,uint256)', [loanId,
     receiver,
     closeAmount
@@ -2477,7 +2485,7 @@ export class IBZxContract extends BaseContract {
             receiver: string,
             closeAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('liquidate(bytes32,address,uint256)', [loanId,
     receiver,
     closeAmount
@@ -2492,7 +2500,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, string]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('liquidate(bytes32,address,uint256)', [loanId,
         receiver,
         closeAmount
@@ -2523,7 +2531,7 @@ export class IBZxContract extends BaseContract {
             closeAmount: BigNumber,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('liquidateWithGasToken(bytes32,address,address,uint256)', [loanId,
     receiver,
     gasTokenUser,
@@ -2554,7 +2562,7 @@ export class IBZxContract extends BaseContract {
             closeAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('liquidateWithGasToken(bytes32,address,address,uint256)', [loanId,
     receiver,
     gasTokenUser,
@@ -2577,7 +2585,7 @@ export class IBZxContract extends BaseContract {
             gasTokenUser: string,
             closeAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('liquidateWithGasToken(bytes32,address,address,uint256)', [loanId,
     receiver,
     gasTokenUser,
@@ -2594,7 +2602,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, string]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('liquidateWithGasToken(bytes32,address,address,uint256)', [loanId,
         receiver,
         gasTokenUser,
@@ -2626,7 +2634,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('liquidationIncentivePercent(address,address)', [index_0,
         index_1
         ]);
@@ -2655,7 +2663,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('loanInterest(bytes32)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2683,7 +2691,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[string, boolean, string, string, string, BigNumber, BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('loanParams(bytes32)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2711,7 +2719,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('loanPoolToUnderlying(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2739,7 +2747,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[string, string, string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, string, string, boolean]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('loans(bytes32)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2767,7 +2775,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('logicTargets(bytes4)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -2794,7 +2802,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('maxDisagreement()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2820,7 +2828,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('maxSwapSize()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2846,7 +2854,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('owner()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2872,7 +2880,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('priceFeeds()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2898,7 +2906,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('protocolTokenHeld()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2924,7 +2932,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('protocolTokenPaid()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2952,7 +2960,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber[], BigNumber[]]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('queryFees(address[],uint8)', [tokens,
         feeType
         ]);
@@ -2981,7 +2989,7 @@ export class IBZxContract extends BaseContract {
             withdrawAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('reduceLoanDuration(bytes32,address,uint256)', [loanId,
     receiver,
     withdrawAmount
@@ -3009,7 +3017,7 @@ export class IBZxContract extends BaseContract {
             withdrawAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('reduceLoanDuration(bytes32,address,uint256)', [loanId,
     receiver,
     withdrawAmount
@@ -3030,7 +3038,7 @@ export class IBZxContract extends BaseContract {
             receiver: string,
             withdrawAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('reduceLoanDuration(bytes32,address,uint256)', [loanId,
     receiver,
     withdrawAmount
@@ -3045,7 +3053,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('reduceLoanDuration(bytes32,address,uint256)', [loanId,
         receiver,
         withdrawAmount
@@ -3073,7 +3081,7 @@ export class IBZxContract extends BaseContract {
             target: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('replaceContract(address)', [target
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3095,7 +3103,7 @@ export class IBZxContract extends BaseContract {
             target: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('replaceContract(address)', [target
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3112,7 +3120,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             target: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('replaceContract(address)', [target
     ]);
             return abiEncodedTransactionData;
@@ -3123,7 +3131,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('replaceContract(address)', [target
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3151,7 +3159,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('rewardsBalanceOf(address)', [user
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3178,7 +3186,7 @@ export class IBZxContract extends BaseContract {
             loanDataBytes: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('rollover(bytes32,bytes)', [loanId,
     loanDataBytes
     ]);
@@ -3203,7 +3211,7 @@ export class IBZxContract extends BaseContract {
             loanDataBytes: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('rollover(bytes32,bytes)', [loanId,
     loanDataBytes
     ]);
@@ -3222,7 +3230,7 @@ export class IBZxContract extends BaseContract {
             loanId: string,
             loanDataBytes: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('rollover(bytes32,bytes)', [loanId,
     loanDataBytes
     ]);
@@ -3235,7 +3243,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[string, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('rollover(bytes32,bytes)', [loanId,
         loanDataBytes
         ]);
@@ -3264,7 +3272,7 @@ export class IBZxContract extends BaseContract {
             index_2: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('rolloverWithGasToken(bytes32,address,bytes)', [loanId,
     gasTokenUser,
     index_2
@@ -3292,7 +3300,7 @@ export class IBZxContract extends BaseContract {
             index_2: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('rolloverWithGasToken(bytes32,address,bytes)', [loanId,
     gasTokenUser,
     index_2
@@ -3313,7 +3321,7 @@ export class IBZxContract extends BaseContract {
             gasTokenUser: string,
             index_2: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('rolloverWithGasToken(bytes32,address,bytes)', [loanId,
     gasTokenUser,
     index_2
@@ -3328,7 +3336,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[string, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('rolloverWithGasToken(bytes32,address,bytes)', [loanId,
         gasTokenUser,
         index_2
@@ -3356,7 +3364,7 @@ export class IBZxContract extends BaseContract {
             newValue: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setAffiliateFeePercent(uint256)', [newValue
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3378,7 +3386,7 @@ export class IBZxContract extends BaseContract {
             newValue: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setAffiliateFeePercent(uint256)', [newValue
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3395,7 +3403,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newValue: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setAffiliateFeePercent(uint256)', [newValue
     ]);
             return abiEncodedTransactionData;
@@ -3406,7 +3414,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setAffiliateFeePercent(uint256)', [newValue
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3432,7 +3440,7 @@ export class IBZxContract extends BaseContract {
             newValue: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setBorrowingFeePercent(uint256)', [newValue
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3454,7 +3462,7 @@ export class IBZxContract extends BaseContract {
             newValue: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setBorrowingFeePercent(uint256)', [newValue
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3471,7 +3479,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newValue: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setBorrowingFeePercent(uint256)', [newValue
     ]);
             return abiEncodedTransactionData;
@@ -3482,7 +3490,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setBorrowingFeePercent(uint256)', [newValue
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3510,7 +3518,7 @@ export class IBZxContract extends BaseContract {
             toggle: boolean,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setDelegatedManager(bytes32,address,bool)', [loanId,
     delegated,
     toggle
@@ -3538,7 +3546,7 @@ export class IBZxContract extends BaseContract {
             toggle: boolean,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setDelegatedManager(bytes32,address,bool)', [loanId,
     delegated,
     toggle
@@ -3559,7 +3567,7 @@ export class IBZxContract extends BaseContract {
             delegated: string,
             toggle: boolean,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setDelegatedManager(bytes32,address,bool)', [loanId,
     delegated,
     toggle
@@ -3574,7 +3582,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setDelegatedManager(bytes32,address,bool)', [loanId,
         delegated,
         toggle
@@ -3602,7 +3610,7 @@ export class IBZxContract extends BaseContract {
             newController: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setFeesController(address)', [newController
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3624,7 +3632,7 @@ export class IBZxContract extends BaseContract {
             newController: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setFeesController(address)', [newController
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3641,7 +3649,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newController: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setFeesController(address)', [newController
     ]);
             return abiEncodedTransactionData;
@@ -3652,7 +3660,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setFeesController(address)', [newController
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3678,7 +3686,7 @@ export class IBZxContract extends BaseContract {
             newValue: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLendingFeePercent(uint256)', [newValue
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3700,7 +3708,7 @@ export class IBZxContract extends BaseContract {
             newValue: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLendingFeePercent(uint256)', [newValue
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3717,7 +3725,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newValue: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setLendingFeePercent(uint256)', [newValue
     ]);
             return abiEncodedTransactionData;
@@ -3728,7 +3736,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLendingFeePercent(uint256)', [newValue
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3756,7 +3764,7 @@ export class IBZxContract extends BaseContract {
             amounts: BigNumber[],
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLiquidationIncentivePercent(address[],address[],uint256[])', [loanTokens,
     collateralTokens,
     amounts
@@ -3784,7 +3792,7 @@ export class IBZxContract extends BaseContract {
             amounts: BigNumber[],
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLiquidationIncentivePercent(address[],address[],uint256[])', [loanTokens,
     collateralTokens,
     amounts
@@ -3805,7 +3813,7 @@ export class IBZxContract extends BaseContract {
             collateralTokens: string[],
             amounts: BigNumber[],
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setLiquidationIncentivePercent(address[],address[],uint256[])', [loanTokens,
     collateralTokens,
     amounts
@@ -3820,7 +3828,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLiquidationIncentivePercent(address[],address[],uint256[])', [loanTokens,
         collateralTokens,
         amounts
@@ -3849,7 +3857,7 @@ export class IBZxContract extends BaseContract {
             assets: string[],
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLoanPool(address[],address[])', [pools,
     assets
     ]);
@@ -3874,7 +3882,7 @@ export class IBZxContract extends BaseContract {
             assets: string[],
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLoanPool(address[],address[])', [pools,
     assets
     ]);
@@ -3893,7 +3901,7 @@ export class IBZxContract extends BaseContract {
             pools: string[],
             assets: string[],
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setLoanPool(address[],address[])', [pools,
     assets
     ]);
@@ -3906,7 +3914,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLoanPool(address[],address[])', [pools,
         assets
         ]);
@@ -3933,7 +3941,7 @@ export class IBZxContract extends BaseContract {
             newAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxDisagreement(uint256)', [newAmount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3955,7 +3963,7 @@ export class IBZxContract extends BaseContract {
             newAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxDisagreement(uint256)', [newAmount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -3972,7 +3980,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setMaxDisagreement(uint256)', [newAmount
     ]);
             return abiEncodedTransactionData;
@@ -3983,7 +3991,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxDisagreement(uint256)', [newAmount
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4009,7 +4017,7 @@ export class IBZxContract extends BaseContract {
             newAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxSwapSize(uint256)', [newAmount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4031,7 +4039,7 @@ export class IBZxContract extends BaseContract {
             newAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxSwapSize(uint256)', [newAmount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4048,7 +4056,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setMaxSwapSize(uint256)', [newAmount
     ]);
             return abiEncodedTransactionData;
@@ -4059,7 +4067,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxSwapSize(uint256)', [newAmount
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4085,7 +4093,7 @@ export class IBZxContract extends BaseContract {
             newContract: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setPriceFeedContract(address)', [newContract
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4107,7 +4115,7 @@ export class IBZxContract extends BaseContract {
             newContract: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setPriceFeedContract(address)', [newContract
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4124,7 +4132,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newContract: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setPriceFeedContract(address)', [newContract
     ]);
             return abiEncodedTransactionData;
@@ -4135,7 +4143,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setPriceFeedContract(address)', [newContract
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4161,7 +4169,7 @@ export class IBZxContract extends BaseContract {
             newAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSourceBufferPercent(uint256)', [newAmount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4183,7 +4191,7 @@ export class IBZxContract extends BaseContract {
             newAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSourceBufferPercent(uint256)', [newAmount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4200,7 +4208,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setSourceBufferPercent(uint256)', [newAmount
     ]);
             return abiEncodedTransactionData;
@@ -4211,7 +4219,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSourceBufferPercent(uint256)', [newAmount
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4238,7 +4246,7 @@ export class IBZxContract extends BaseContract {
             toggles: boolean[],
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSupportedTokens(address[],bool[])', [addrs,
     toggles
     ]);
@@ -4263,7 +4271,7 @@ export class IBZxContract extends BaseContract {
             toggles: boolean[],
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSupportedTokens(address[],bool[])', [addrs,
     toggles
     ]);
@@ -4282,7 +4290,7 @@ export class IBZxContract extends BaseContract {
             addrs: string[],
             toggles: boolean[],
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setSupportedTokens(address[],bool[])', [addrs,
     toggles
     ]);
@@ -4295,7 +4303,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSupportedTokens(address[],bool[])', [addrs,
         toggles
         ]);
@@ -4322,7 +4330,7 @@ export class IBZxContract extends BaseContract {
             newContract: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSwapsImplContract(address)', [newContract
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4344,7 +4352,7 @@ export class IBZxContract extends BaseContract {
             newContract: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSwapsImplContract(address)', [newContract
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4361,7 +4369,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newContract: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setSwapsImplContract(address)', [newContract
     ]);
             return abiEncodedTransactionData;
@@ -4372,7 +4380,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSwapsImplContract(address)', [newContract
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4399,7 +4407,7 @@ export class IBZxContract extends BaseContract {
             targetsArr: string[],
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTargets(string[],address[])', [sigsArr,
     targetsArr
     ]);
@@ -4424,7 +4432,7 @@ export class IBZxContract extends BaseContract {
             targetsArr: string[],
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTargets(string[],address[])', [sigsArr,
     targetsArr
     ]);
@@ -4443,7 +4451,7 @@ export class IBZxContract extends BaseContract {
             sigsArr: string[],
             targetsArr: string[],
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setTargets(string[],address[])', [sigsArr,
     targetsArr
     ]);
@@ -4456,7 +4464,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTargets(string[],address[])', [sigsArr,
         targetsArr
         ]);
@@ -4483,7 +4491,7 @@ export class IBZxContract extends BaseContract {
             newValue: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTradingFeePercent(uint256)', [newValue
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4505,7 +4513,7 @@ export class IBZxContract extends BaseContract {
             newValue: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTradingFeePercent(uint256)', [newValue
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4522,7 +4530,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newValue: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setTradingFeePercent(uint256)', [newValue
     ]);
             return abiEncodedTransactionData;
@@ -4533,7 +4541,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTradingFeePercent(uint256)', [newValue
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4559,7 +4567,7 @@ export class IBZxContract extends BaseContract {
             loanParamsList: Array<{id: string;active: boolean;owner: string;loanToken: string;collateralToken: string;minInitialMargin: BigNumber;maintenanceMargin: BigNumber;maxLoanTerm: BigNumber}>,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setupLoanParams((bytes32,bool,address,address,address,uint256,uint256,uint256)[])', [loanParamsList
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4581,7 +4589,7 @@ export class IBZxContract extends BaseContract {
             loanParamsList: Array<{id: string;active: boolean;owner: string;loanToken: string;collateralToken: string;minInitialMargin: BigNumber;maintenanceMargin: BigNumber;maxLoanTerm: BigNumber}>,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setupLoanParams((bytes32,bool,address,address,address,uint256,uint256,uint256)[])', [loanParamsList
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4598,7 +4606,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             loanParamsList: Array<{id: string;active: boolean;owner: string;loanToken: string;collateralToken: string;minInitialMargin: BigNumber;maintenanceMargin: BigNumber;maxLoanTerm: BigNumber}>,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('setupLoanParams((bytes32,bool,address,address,address,uint256,uint256,uint256)[])', [loanParamsList
     ]);
             return abiEncodedTransactionData;
@@ -4609,7 +4617,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string[]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setupLoanParams((bytes32,bool,address,address,address,uint256,uint256,uint256)[])', [loanParamsList
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4636,7 +4644,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('sourceBufferPercent()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -4663,7 +4671,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<boolean
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('supportedTokens(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -4695,7 +4703,7 @@ export class IBZxContract extends BaseContract {
             swapData: string,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('swapExternal(address,address,address,address,uint256,uint256,bytes)', [sourceToken,
     destToken,
     receiver,
@@ -4735,7 +4743,7 @@ export class IBZxContract extends BaseContract {
             swapData: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('swapExternal(address,address,address,address,uint256,uint256,bytes)', [sourceToken,
     destToken,
     receiver,
@@ -4764,7 +4772,7 @@ export class IBZxContract extends BaseContract {
             requiredDestTokenAmount: BigNumber,
             swapData: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('swapExternal(address,address,address,address,uint256,uint256,bytes)', [sourceToken,
     destToken,
     receiver,
@@ -4787,7 +4795,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('swapExternal(address,address,address,address,uint256,uint256,bytes)', [sourceToken,
         destToken,
         receiver,
@@ -4826,7 +4834,7 @@ export class IBZxContract extends BaseContract {
             swapData: string,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('swapExternalWithGasToken(address,address,address,address,address,uint256,uint256,bytes)', [sourceToken,
     destToken,
     receiver,
@@ -4869,7 +4877,7 @@ export class IBZxContract extends BaseContract {
             swapData: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('swapExternalWithGasToken(address,address,address,address,address,uint256,uint256,bytes)', [sourceToken,
     destToken,
     receiver,
@@ -4900,7 +4908,7 @@ export class IBZxContract extends BaseContract {
             requiredDestTokenAmount: BigNumber,
             swapData: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('swapExternalWithGasToken(address,address,address,address,address,uint256,uint256,bytes)', [sourceToken,
     destToken,
     receiver,
@@ -4925,7 +4933,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('swapExternalWithGasToken(address,address,address,address,address,uint256,uint256,bytes)', [sourceToken,
         destToken,
         receiver,
@@ -4959,7 +4967,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('swapsImpl()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -4985,7 +4993,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('tradingFeePercent()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -5012,7 +5020,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('tradingFeeTokensHeld(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5040,7 +5048,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('tradingFeeTokensPaid(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5066,7 +5074,7 @@ export class IBZxContract extends BaseContract {
             newOwner: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5088,7 +5096,7 @@ export class IBZxContract extends BaseContract {
             newOwner: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5105,7 +5113,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             newOwner: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
     ]);
             return abiEncodedTransactionData;
@@ -5116,7 +5124,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5144,7 +5152,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('underlyingToLoanPool(address)', [index_0
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5171,7 +5179,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('vbzrxTokenAddress()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -5197,7 +5205,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<string
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('wethToken()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -5222,7 +5230,7 @@ export class IBZxContract extends BaseContract {
             loanToken: string,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawAccruedInterest(address)', [loanToken
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5244,7 +5252,7 @@ export class IBZxContract extends BaseContract {
             loanToken: string,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawAccruedInterest(address)', [loanToken
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5261,7 +5269,7 @@ export class IBZxContract extends BaseContract {
         getABIEncodedTransactionData(
             loanToken: string,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('withdrawAccruedInterest(address)', [loanToken
     ]);
             return abiEncodedTransactionData;
@@ -5272,7 +5280,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawAccruedInterest(address)', [loanToken
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -5300,7 +5308,7 @@ export class IBZxContract extends BaseContract {
             withdrawAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawCollateral(bytes32,address,uint256)', [loanId,
     receiver,
     withdrawAmount
@@ -5328,7 +5336,7 @@ export class IBZxContract extends BaseContract {
             withdrawAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawCollateral(bytes32,address,uint256)', [loanId,
     receiver,
     withdrawAmount
@@ -5349,7 +5357,7 @@ export class IBZxContract extends BaseContract {
             receiver: string,
             withdrawAmount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('withdrawCollateral(bytes32,address,uint256)', [loanId,
     receiver,
     withdrawAmount
@@ -5364,7 +5372,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawCollateral(bytes32,address,uint256)', [loanId,
         receiver,
         withdrawAmount
@@ -5394,7 +5402,7 @@ export class IBZxContract extends BaseContract {
             feeType: number|BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawFees(address[],address,uint8)', [tokens,
     receiver,
     feeType
@@ -5422,7 +5430,7 @@ export class IBZxContract extends BaseContract {
             feeType: number|BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawFees(address[],address,uint8)', [tokens,
     receiver,
     feeType
@@ -5443,7 +5451,7 @@ export class IBZxContract extends BaseContract {
             receiver: string,
             feeType: number|BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('withdrawFees(address[],address,uint8)', [tokens,
     receiver,
     feeType
@@ -5458,7 +5466,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber[]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawFees(address[],address,uint8)', [tokens,
         receiver,
         feeType
@@ -5487,7 +5495,7 @@ export class IBZxContract extends BaseContract {
             amount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawProtocolToken(address,uint256)', [receiver,
     amount
     ]);
@@ -5512,7 +5520,7 @@ export class IBZxContract extends BaseContract {
             amount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawProtocolToken(address,uint256)', [receiver,
     amount
     ]);
@@ -5531,7 +5539,7 @@ export class IBZxContract extends BaseContract {
             receiver: string,
             amount: BigNumber,
         ): string {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const abiEncodedTransactionData = self._strictEncodeArguments('withdrawProtocolToken(address,uint256)', [receiver,
     amount
     ]);
@@ -5544,7 +5552,7 @@ export class IBZxContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[string, BigNumber]
         > {
-            const self = this as any as IBZxContract;
+            const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawProtocolToken(address,uint256)', [receiver,
         amount
         ]);
@@ -5567,7 +5575,7 @@ export class IBZxContract extends BaseContract {
         },
     };
     constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
-        super('IBZx', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
+        super('iBZx', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
         classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);
     }
 } // tslint:disable:max-file-line-count

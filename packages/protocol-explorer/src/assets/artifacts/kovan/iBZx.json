@@ -454,6 +454,25 @@
         {
           "indexed": true,
           "internalType": "bytes32",
+          "name": "loanId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "LoanInput",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
           "name": "id",
           "type": "bytes32"
         },
@@ -1297,9 +1316,26 @@
       "name": "borrowOrTradeFromPool",
       "outputs": [
         {
-          "internalType": "uint256",
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "loanId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "principal",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "collateral",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct LoanOpeningsEvents.LoanOpenData",
           "name": "",
-          "type": "uint256"
+          "type": "tuple"
         }
       ],
       "payable": true,
@@ -1871,7 +1907,12 @@
             },
             {
               "internalType": "uint256",
-              "name": "depositValue",
+              "name": "depositValueAsLoanToken",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "depositValueAsCollateralToken",
               "type": "uint256"
             }
           ],
@@ -2153,7 +2194,12 @@
             },
             {
               "internalType": "uint256",
-              "name": "depositValue",
+              "name": "depositValueAsLoanToken",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "depositValueAsCollateralToken",
               "type": "uint256"
             }
           ],
@@ -2582,7 +2628,12 @@
             },
             {
               "internalType": "uint256",
-              "name": "depositValue",
+              "name": "depositValueAsLoanToken",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "depositValueAsCollateralToken",
               "type": "uint256"
             }
           ],
@@ -3254,7 +3305,7 @@
           "type": "address[]"
         },
         {
-          "internalType": "enum ProtocolSettingsEvents.FeeType",
+          "internalType": "enum ProtocolSettingsEvents.FeeClaimType",
           "name": "feeType",
           "type": "uint8"
         }
@@ -4084,7 +4135,7 @@
           "type": "address"
         },
         {
-          "internalType": "enum ProtocolSettingsEvents.FeeType",
+          "internalType": "enum ProtocolSettingsEvents.FeeClaimType",
           "name": "feeType",
           "type": "uint8"
         }
