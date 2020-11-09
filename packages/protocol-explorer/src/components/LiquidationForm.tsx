@@ -1,7 +1,5 @@
 import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { Observable, Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
@@ -15,58 +13,73 @@ export interface ILiquidationFormProps {
 }
 
 export default function LiquidationForm(props: ILiquidationFormProps) {
-  const _inputTextChange = new Subject<string>()
+  const inputPrecision = 6
   const loanToken = AssetsDictionary.assets.get(props.request.loanToken) as AssetDetails
   const collateralToken = AssetsDictionary.assets.get(props.request.collateralToken) as AssetDetails
   const decimals: number = loanToken.decimals || 18
-  const maxAmount: BigNumber = props.request.closeAmount.dividedBy(10 ** decimals)
+  const maxPayOffAmount: BigNumber = props.request.closeAmount.dividedBy(10 ** decimals)
+  const maxSeizeAmount: BigNumber = maxPayOffAmount.dividedBy(props.request.rate)
 
-  const [liquidationAmountText, setAmountText] = useState('')
-  const [liquidationAmount, setAmountValue] = useState(new BigNumber(0))
-  const [seizeAmount, setSeizeAmount] = useState(new BigNumber(0))
+  const [payOffAmount, setPayOffAmount] = useState(maxPayOffAmount)
+  const [seizeAmount, setSeizeAmount] = useState(maxSeizeAmount)
+  const [buttonValue, setButtonValue] = useState(new BigNumber(1))
   const [didSubmit, setDidSubmit] = useState(false)
 
-  useEffect(() => {
-    // subscribe to input value change
-    const subscription = _inputTextChange
-      .pipe(
-        distinctUntilChanged(),
-        debounceTime(100),
-        switchMap((value) => rxFromInputAmount(value))
-      )
-      .subscribe((value: string) => {
-        setAmountText(value)
-      })
-    // return unsubscribe method to execute when component unmounts
-    return subscription.unsubscribe()
-  }, [])
+  function onPayOffAmountChange(event: ChangeEvent<HTMLInputElement>) {
+    let amount = new BigNumber(event.target.value ? event.target.value : 0)
+    amount = checkAmount(amount, maxPayOffAmount)
+    payOffAmountChange(amount)
+  }
+
+  function onSeizeAmountChange(event: ChangeEvent<HTMLInputElement>) {
+    let amount = new BigNumber(event.target.value ? event.target.value : 0)
+    amount = checkAmount(amount, maxSeizeAmount)
+    seizeAmountChange(amount)
+  }
+
+  function payOffAmountChange(amount: BigNumber) {
+    setPayOffAmount(amount)
+    setSeizeAmount(amount.dividedBy(props.request.rate))
+    setButtonValue(new BigNumber(0))
+  }
+
+  function seizeAmountChange(amount: BigNumber) {
+    setSeizeAmount(amount)
+    setPayOffAmount(amount.multipliedBy(props.request.rate))
+    setButtonValue(new BigNumber(0))
+  }
+
+  function onButtonChange(value: BigNumber) {
+    const amount = maxPayOffAmount.multipliedBy(value)
+    setButtonValue(value)
+    payOffAmountChange(amount)
+  }
+
+  function checkAmount(amount: BigNumber, maxAmount: BigNumber) {
+    if (amount.lt(0)) {
+      return new BigNumber(0)
+    }
+    if (amount.gt(maxPayOffAmount)) {
+      return maxPayOffAmount
+    }
+    return amount
+  }
 
   function onSubmitClick(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setDidSubmit(true)
+    setDidSubmit(false)
   }
 
-  const onAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    let amountText = event.target.value ? event.target.value : ''
-    const amount = new BigNumber(amountText)
-
-    if (amount.lt(0)) {
-      amountText = '0'
-    } else if (amount.gt(maxAmount)) {
-      amountText = maxAmount.toString()
-    }
-
-    setAmountText(amountText)
-    // setAmountValue(amount)
-    _inputTextChange.next(amountText)
-  }
-
-  const rxFromInputAmount = (value: string): Observable<string> => {
-    return new Observable<string>((observer) => {
-      const amount = new BigNumber(value)
-      setSeizeAmount(amount.dividedBy(props.request.rate))
-      setAmountValue(amount)
-      observer.next(value)
-    })
+  function formatPrecision(output: BigNumber) {
+    const outputNumber = Number(output)
+    const n = Math.log(Math.abs(outputNumber)) / Math.LN10
+    let x = 4 - n
+    if (x < 6) x = 4
+    if (x < -1) x = 0
+    if (x > inputPrecision) x = inputPrecision
+    const m = Math.pow(10, x)
+    return (Math.floor(outputNumber * m) / m).toString()
   }
 
   return (
@@ -78,15 +91,15 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
       <section className="dialog-content">
         <InputAmount
           asset={loanToken.logoSvg}
-          inputAmountText={liquidationAmountText}
-          buttonValue={liquidationAmount}
-          updateButton={(amount) => setAmountValue(amount)}
-          onAmountChange={onAmountChange}
+          inputAmountText={formatPrecision(payOffAmount)}
+          buttonValue={buttonValue}
+          updateButton={onButtonChange}
+          onAmountChange={onPayOffAmountChange}
         />
         <InputAmount
           asset={collateralToken.logoSvg}
-          inputAmountText={liquidationAmountText}
-          onAmountChange={onAmountChange}
+          inputAmountText={formatPrecision(seizeAmount)}
+          onAmountChange={onSeizeAmountChange}
         />
       </section>
       <section className="dialog-actions">

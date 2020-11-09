@@ -2,6 +2,7 @@ import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, useRef } from 'react'
 
 interface IInputAmountProps {
+  children?: string
   asset: any
   inputAmountText: string
   buttonValue?: BigNumber
@@ -29,7 +30,7 @@ export function InputAmount(props: IInputAmountProps) {
             className="input-amount"
             type="number"
             step="any"
-            placeholder={`Enter amount`}
+            placeholder={props.children||'Enter amount'}
             value={props.inputAmountText}
             onChange={props.onAmountChange}
           />
