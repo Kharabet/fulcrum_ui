@@ -2,7 +2,6 @@ import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import { Asset } from '../domain/Asset'
 import { ExplorerProvider } from '../services/ExplorerProvider'
-import '../styles/components/chi-switch.scss'
 import { CheckBox } from './CheckBox'
 
 export const ChiSwitch = () => {
@@ -32,7 +31,7 @@ export const ChiSwitch = () => {
   return (
     <div className="chi-switch">
       <CheckBox checked={isGasTokenEnabled} onChange={onChange}>
-        Use CHI token
+        Use gas token
       </CheckBox>
     </div>
   )

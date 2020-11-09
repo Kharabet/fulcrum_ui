@@ -3,8 +3,9 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
-import { InputAmount } from './InputAmount'
 import { ExplorerProvider } from '../services/ExplorerProvider'
+import { ChiSwitch } from './ChiSwitch'
+import { InputAmount } from './InputAmount'
 
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 export interface ILiquidationFormProps {
@@ -113,6 +114,7 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
           onAmountChange={onSeizeAmountChange}
         />
       </section>
+      <ChiSwitch />
       <section className="dialog-actions">
         <div className="actions-container">
           <button
