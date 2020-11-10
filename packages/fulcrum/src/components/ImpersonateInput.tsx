@@ -4,12 +4,12 @@ import Web3Utils from 'web3-utils'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 
-export function ImepsonateInput() {
+function ImpersonateInput() {
   const onSubmit = () => {
       const input = document.getElementById("impersonate-address") as HTMLInputElement
       const inputValue = input.value || ''
       if (inputValue === '' || (inputValue && Web3Utils.isAddress(inputValue))){
-        FulcrumProvider.Instance.impersionateAddress = inputValue
+        FulcrumProvider.Instance.impersonateAddress = inputValue
         FulcrumProvider.Instance.eventEmitter.emit(
             FulcrumProviderEvents.ProviderChanged,
             new ProviderChangedEvent(
@@ -27,4 +27,4 @@ export function ImepsonateInput() {
   )
 }
 
-export default React.memo(ImepsonateInput)
+export default React.memo(ImpersonateInput)

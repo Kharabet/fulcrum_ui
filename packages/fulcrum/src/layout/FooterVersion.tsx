@@ -1,5 +1,5 @@
 import React from 'react'
-import ImepsonateInput from '../components/ImpersonateImput'
+import ImpersonateInput from '../components/ImpersonateInput'
 import packageJson from '../../package.json'
 
 function FooterVersion() {
@@ -14,8 +14,8 @@ function FooterVersion() {
         Powered by <a href="//bzx.network">bZx</a>
       </div>
       <div className="footer-menu__item">
-        <button onClick={onImpersonateShowClick}>🕵️</button>
-        {isImpersonateShown && <ImepsonateInput />}
+        <button className="impersonate-button" onClick={onImpersonateShowClick}>🕵️</button>
+        {isImpersonateShown && <ImpersonateInput />}
       </div>
     </div>
   )

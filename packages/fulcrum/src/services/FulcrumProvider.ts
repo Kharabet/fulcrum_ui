@@ -71,7 +71,7 @@ const initialNetworkId = getNetworkIdByString(networkName)
 
 export class FulcrumProvider {
   public static Instance: FulcrumProvider
-  public impersionateAddress = ''
+  public impersonateAddress = ''
   public readonly gasLimit = '4500000'
   public static readonly ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -163,8 +163,8 @@ export class FulcrumProvider {
   }
 
   private getCurrentAccount(): string | undefined {
-    return this.impersionateAddress
-      ? this.impersionateAddress
+    return this.impersonateAddress
+      ? this.impersonateAddress
       : this.accounts.length > 0 && this.accounts[0]
       ? this.accounts[0].toLowerCase()
       : undefined

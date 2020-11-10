@@ -42,13 +42,14 @@
     &:not(:first-child) {
       margin-left: 20px;
     }
-
+    .impersonate-button {
+      opacity: 0.2;
+    }
     .impersonate-container {
       display: inline-block;
       margin-left: 20px;
       button {
         margin-left: 10px;
-        opacity: 0.2;
       }
       input {
         background-color: #8b97a9;
