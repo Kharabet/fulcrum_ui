@@ -212,51 +212,51 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             />
           </div>
 
-            {this.state.activeTokenGridTab === TokenGridTab.Chart && (
-              <TradeTokenGrid
-                isMobileMedia={this.props.isMobileMedia}
-                tokenRowsData={this.state.tokenRowsData.filter(
-                  (e) =>
-                    e.baseToken === this.state.selectedMarket.baseToken &&
-                    e.quoteToken === this.state.selectedMarket.quoteToken
-                )}
-                innerOwnRowsData={this.state.innerOwnRowsData.filter(
-                  (e) =>
-                    (this.checkWethOrFwethToken(e.baseToken) ===
-                      this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) ||
-                      e.baseToken === this.state.selectedMarket.baseToken) &&
-                    (this.checkWethOrFwethToken(e.quoteToken) ===
-                      this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) ||
-                      e.quoteToken === this.state.selectedMarket.quoteToken)
-                )}
-                changeLoadingTransaction={this.changeLoadingTransaction}
-                request={this.state.request}
-                isLoadingTransaction={this.state.isLoadingTransaction}
-                resultTx={this.state.resultTx}
-                isTxCompleted={this.state.isTxCompleted}
-                changeGridPositionType={this.changeGridPositionType}
-                activePositionType={this.state.activePositionType}
-              />
-            )}
+          {this.state.activeTokenGridTab === TokenGridTab.Chart && (
+            <TradeTokenGrid
+              isMobileMedia={this.props.isMobileMedia}
+              tokenRowsData={this.state.tokenRowsData.filter(
+                (e) =>
+                  e.baseToken === this.state.selectedMarket.baseToken &&
+                  e.quoteToken === this.state.selectedMarket.quoteToken
+              )}
+              innerOwnRowsData={this.state.innerOwnRowsData.filter(
+                (e) =>
+                  (this.checkWethOrFwethToken(e.baseToken) ===
+                    this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) ||
+                    e.baseToken === this.state.selectedMarket.baseToken) &&
+                  (this.checkWethOrFwethToken(e.quoteToken) ===
+                    this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) ||
+                    e.quoteToken === this.state.selectedMarket.quoteToken)
+              )}
+              changeLoadingTransaction={this.changeLoadingTransaction}
+              request={this.state.request}
+              isLoadingTransaction={this.state.isLoadingTransaction}
+              resultTx={this.state.resultTx}
+              isTxCompleted={this.state.isTxCompleted}
+              changeGridPositionType={this.changeGridPositionType}
+              activePositionType={this.state.activePositionType}
+            />
+          )}
 
-            {this.state.activeTokenGridTab === TokenGridTab.Open && (
-              <OwnTokenGrid
-                ownRowsData={this.state.ownRowsData}
-                isMobileMedia={this.props.isMobileMedia}
-              />
-            )}
+          {this.state.activeTokenGridTab === TokenGridTab.Open && (
+            <OwnTokenGrid
+              ownRowsData={this.state.ownRowsData}
+              isMobileMedia={this.props.isMobileMedia}
+            />
+          )}
 
-            {this.state.activeTokenGridTab === TokenGridTab.History && (
-              <HistoryTokenGrid
-                historyEvents={this.state.historyEvents}
-                historyRowsData={this.state.historyRowsData}
-                isMobileMedia={this.props.isMobileMedia}
-                stablecoins={this.stablecoins}
-                baseTokens={this.baseTokens}
-                quoteTokens={this.quoteTokens}
-                updateHistoryRowsData={this.updateHistoryRowsData}
-              />
-            )}
+          {this.state.activeTokenGridTab === TokenGridTab.History && (
+            <HistoryTokenGrid
+              historyEvents={this.state.historyEvents}
+              historyRowsData={this.state.historyRowsData}
+              isMobileMedia={this.props.isMobileMedia}
+              stablecoins={this.stablecoins}
+              baseTokens={this.baseTokens}
+              quoteTokens={this.quoteTokens}
+              updateHistoryRowsData={this.updateHistoryRowsData}
+            />
+          )}
 
           <Modal
             isOpen={this.state.isTradeModalOpen}
@@ -439,7 +439,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     let collateral = new BigNumber(0)
     let openPrice = new BigNumber(0)
     let liquidationPrice = new BigNumber(0)
-    let profit = new BigNumber(0)
+    let profitCollateralToken = new BigNumber(0)
+    let profitLoanToken = new BigNumber(0)
+    let profitUSD = new BigNumber(0)
 
     const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18
     const collateralAssetDecimals =
@@ -459,54 +461,76 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       .div(loan.loanData.collateral.times(collateralAssetPrecision))
       .times(10 ** 18)
 
+    const maxTradeAmount = await FulcrumProvider.Instance.getMaxTradeValue(
+      TradeType.SELL,
+      loan.loanAsset,
+      loan.collateralAsset,
+      Asset.UNKNOWN,
+      positionType,
+      loan
+    )
+    const tradeRequestCollateral = new TradeRequest(
+      loan.loanId,
+      TradeType.SELL,
+      loan.loanAsset,
+      loan.collateralAsset,
+      Asset.UNKNOWN,
+      positionType,
+      leverage.toNumber(),
+      maxTradeAmount,
+      true //false - return in loan token
+    )
+    const tradeRequestLoan = new TradeRequest(
+      loan.loanId,
+      TradeType.SELL,
+      loan.loanAsset,
+      loan.collateralAsset,
+      Asset.UNKNOWN,
+      positionType,
+      leverage.toNumber(),
+      maxTradeAmount,
+      false //false - return in loan token
+    )
+    const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+      tradeRequestCollateral
+    )
+    const estimatedLoanReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+      tradeRequestLoan
+    )
+
+    const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
+      10 ** collateralAssetDecimals
+    )
+    const estimatedReceivedLoanToken = estimatedLoanReceived[1].div(10 ** loanAssetDecimals)
+
     if (positionType === PositionType.LONG) {
       positionValue = collateralAssetAmount
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
       collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
-      // .minus(loanAssetAmount)
 
-      const deposited = collateralAssetAmount
-        .times(currentCollateralToPrincipalRate)
-        .minus(loanAssetAmount)
       openPrice = loan.loanData.startRate
         .div(10 ** 18)
         .times(loanAssetPrecision)
         .div(collateralAssetPrecision)
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
-      const tradeRequest = new TradeRequest(
-        loan.loanId,
-        TradeType.SELL,
-        loan.loanAsset,
-        loan.collateralAsset,
-        Asset.UNKNOWN,
-        positionType,
-        leverage.toNumber(),
-        await FulcrumProvider.Instance.getMaxTradeValue(
-          TradeType.SELL,
-          loan.loanAsset,
-          loan.collateralAsset,
-          Asset.UNKNOWN,
-          positionType,
-          loan
-        ),
-        false //return in loan token
-      )
-      const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-        tradeRequest
-      )
-      const estimatedReceivedLoanToken = estimatedCollateralReceived[1]
-        .div(10 ** loanAssetDecimals)
+      if (
+        loan.loanData.depositValueAsCollateralToken.eq(0) ||
+        loan.loanData.depositValueAsLoanToken.eq(0)
+      ) {
+        profitUSD = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue)
+      } else {
+        const depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
+          10 ** collateralAssetDecimals
+        )
 
-      const depositAmountLoanToken = loan.loanData.depositValue.div(10 ** loanAssetDecimals)
-      const withdrawAmountLoanToken = loan.loanData.withdrawalValue.div(10 ** loanAssetDecimals)
-      const depositAmountCollateralToken = depositAmountLoanToken.div(
-        loan.loanData.startRate.div(10 ** loanAssetDecimals)
-      )
-      
-      profit = estimatedReceivedLoanToken
-        .minus(depositAmountLoanToken)
+        const depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(
+          10 ** loanAssetDecimals
+        )
 
+        profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
+        profitLoanToken = estimatedReceivedLoanToken.minus(depositAmountLoanToken)
+      }
     } else {
       collateral = collateralAssetAmount
 
@@ -527,37 +551,25 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .div(10 ** 18)
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
 
-      const tradeRequest = new TradeRequest(
-        loan.loanId,
-        TradeType.SELL,
-        loan.loanAsset,
-        loan.collateralAsset,
-        Asset.UNKNOWN,
-        positionType,
-        leverage.toNumber(),
-        await FulcrumProvider.Instance.getMaxTradeValue(
-          TradeType.SELL,
-          loan.loanAsset,
-          loan.collateralAsset,
-          Asset.UNKNOWN,
-          positionType,
-          loan
-        ),
-        true //return in collateral token
-      )
-      const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-        tradeRequest
-      )
-      const depositAmount = loan.loanData.depositValue
-        .div(10 ** loanAssetDecimals)
-        .div(currentCollateralToPrincipalRate)
-      const withdrawAmount = loan.loanData.withdrawalValue
-        .div(10 ** loanAssetDecimals)
-        .div(currentCollateralToPrincipalRate)
-       
-      profit = estimatedCollateralReceived[1]
-        .div(10 ** collateralAssetDecimals)
-        .minus(depositAmount)
+      if (
+        loan.loanData.depositValueAsCollateralToken.eq(0) ||
+        loan.loanData.depositValueAsLoanToken.eq(0)
+      ) {
+        profitUSD = openPrice
+          .minus(new BigNumber(1).div(currentCollateralToPrincipalRate))
+          .times(positionValue)
+      } else {
+        const depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
+          10 ** collateralAssetDecimals
+        )
+
+        const depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(
+          10 ** loanAssetDecimals
+        )
+
+        profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
+        profitLoanToken = estimatedReceivedLoanToken.minus(depositAmountLoanToken)
+      }
     }
 
     return {
@@ -571,7 +583,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       collateral,
       openPrice,
       liquidationPrice,
-      profit,
+      profitCollateralToken,
+      profitLoanToken,
+      profitUSD,
       onTrade: this.onTradeRequested,
       onManageCollateralOpen: this.onManageCollateralRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
@@ -638,7 +652,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const ownRowDataProps = await this.getOwnRowDataProps(loan, currentCollateralToPrincipalRate)
       innerOwnRowsData.push(ownRowDataProps)
     }
-    
+
     this._isMounted &&
       this.setState({
         ...this.state,

@@ -28,7 +28,9 @@ export interface IOwnTokenGridRowProps {
   collateral: BigNumber
   openPrice: BigNumber
   liquidationPrice: BigNumber
-  profit: BigNumber
+  profitCollateralToken: BigNumber
+  profitLoanToken: BigNumber
+  profitUSD: BigNumber
   isTxCompleted: boolean
   onTrade: (request: TradeRequest) => void
   onManageCollateralOpen: (request: ManageCollateralRequest) => void
@@ -194,6 +196,25 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   }
 
   public render() {
+    let profitTitle = ''
+    let profitValue;
+    if (this.props.profitUSD.eq(0)) {
+      profitTitle =
+        this.props.positionType === PositionType.LONG
+          ? `${this.props.profitCollateralToken.toFixed()}/${this.props.profitLoanToken.toFixed()}`
+          : `${this.props.profitLoanToken.toFixed()}/${this.props.profitCollateralToken.toFixed()}`
+      profitValue =
+        this.props.positionType === PositionType.LONG
+          ? `${this.props.profitCollateralToken.toFixed(2)}/${this.props.profitLoanToken.toFixed(
+              2
+            )}`
+          : `${this.props.profitLoanToken.toFixed(2)}/${this.props.profitCollateralToken.toFixed(
+              2
+            )}`
+    } else {
+      profitTitle = `$${this.props.profitUSD.toFixed()}`
+      profitValue = <React.Fragment><span className="sign-currency">$</span>{this.props.profitUSD.toFixed(2)}</React.Fragment>
+    }
     return this.state.isLoadingTransaction && this.state.request ? (
       <React.Fragment>
         <div className="token-selector-item__image">
@@ -298,23 +319,10 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           )}
         </div>
         <div
-          title={this.props.profit.toFixed(18)}
+          title={profitTitle}
           className="own-token-grid-row__col-profit opacityIn">
           <span className="own-token-grid-row__body-header">Profit</span>
-          {!this.state.isLoading ? (
-            this.props.profit ? (
-              <React.Fragment>
-                <span>
-                  <span className="sign-currency">$</span>
-                  {this.props.profit.toFixed(2)}
-                </span>
-              </React.Fragment>
-            ) : (
-              '$0.00'
-            )
-          ) : (
-            <Preloader width="74px" />
-          )}
+          {!this.state.isLoading ? profitValue : <Preloader width="74px" />}
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button
