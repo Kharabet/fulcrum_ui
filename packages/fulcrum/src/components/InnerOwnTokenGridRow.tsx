@@ -1,22 +1,21 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
+import { ReactComponent as OpenManageCollateral } from '../assets/images/openManageCollateral.svg'
 import { Asset } from '../domain/Asset'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { PositionType } from '../domain/PositionType'
+import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { TasksQueue } from '../services/TasksQueue'
-import { Preloader } from './Preloader'
-import { ReactComponent as OpenManageCollateral } from '../assets/images/openManageCollateral.svg'
-import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { RequestTask } from '../domain/RequestTask'
 import { CircleLoader } from './CircleLoader'
+import { Preloader } from './Preloader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
-import { RequestStatus } from '../domain/RequestStatus'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
 
 export interface IInnerOwnTokenGridRowProps {
   loan: IBorrowedFundsState
@@ -96,8 +95,8 @@ export class InnerOwnTokenGridRow extends Component<
     if (this.props.positionType === PositionType.LONG) {
       const collateralAssetDecimals =
         AssetsDictionary.assets.get(this.props.loan.collateralAsset)!.decimals || 18
-      openValue = this.props.loan
-        .loanData!.collateral.times(10 ** (18 - collateralAssetDecimals))
+      openValue = this.props.loan.loanData.collateral
+        .times(10 ** (18 - collateralAssetDecimals))
         .div(10 ** 18)
         .times(this.props.openPrice)
       valueChange = this.props.value
@@ -107,8 +106,8 @@ export class InnerOwnTokenGridRow extends Component<
     } else {
       const loanAssetDecimals =
         AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
-      openValue = this.props.loan
-        .loanData!.principal.times(10 ** (18 - loanAssetDecimals))
+      openValue = this.props.loan.loanData.principal
+        .times(10 ** (18 - loanAssetDecimals))
         .div(10 ** 18)
         .times(this.props.openPrice)
       valueChange = this.props.value
@@ -146,8 +145,8 @@ export class InnerOwnTokenGridRow extends Component<
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.loanId !== this.state.request.loanId) return
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(() => {
-        FulcrumProvider.Instance.onTaskCancel(task)
+      window.setTimeout(async () => {
+        await FulcrumProvider.Instance.onTaskCancel(task)
         this.setState({
           ...this.state,
           isLoadingTransaction: false,
@@ -195,13 +194,13 @@ export class InnerOwnTokenGridRow extends Component<
     // FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<IInnerOwnTokenGridRowProps>,
     prevState: Readonly<IInnerOwnTokenGridRowState>,
     snapshot?: any
-  ): void {
+  ) {
     if (this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted) {
-      this.derivedUpdate()
+      await this.derivedUpdate()
       if (this.state.isLoadingTransaction) {
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
         this.props.changeLoadingTransaction(
@@ -217,7 +216,7 @@ export class InnerOwnTokenGridRow extends Component<
   public async componentDidMount() {
     this._isMounted = true
 
-    const task = await TasksQueue.Instance.getTasksList().find(
+    const task = TasksQueue.Instance.getTasksList().find(
       (t) => t.request.loanId === this.props.loan.loanId
     )
     const isLoadingTransaction = task && !task.error ? true : false
@@ -228,14 +227,14 @@ export class InnerOwnTokenGridRow extends Component<
       request
     })
 
-    this.derivedUpdate()
+    await this.derivedUpdate()
   }
 
   public render() {
-    const collateralizedPercent = this.props.loan!.collateralizedPercent.multipliedBy(100).plus(100)
-    
+    const collateralizedPercent = this.props.loan.collateralizedPercent.multipliedBy(100).plus(100)
+
     let profitTitle = ''
-    let profitValue;
+    let profitValue
     if (this.props.profitUSD.eq(0)) {
       profitTitle =
         this.props.positionType === PositionType.LONG
@@ -251,14 +250,19 @@ export class InnerOwnTokenGridRow extends Component<
             )}`
     } else {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
-      profitValue = <React.Fragment><span className="sign-currency">$</span>{this.props.profitUSD.toFixed(2)}</React.Fragment>
+      profitValue = (
+        <React.Fragment>
+          <span className="sign-currency">$</span>
+          {this.props.profitUSD.toFixed(2)}
+        </React.Fragment>
+      )
     }
     return (
       <React.Fragment>
         {this.state.isLoadingTransaction && this.state.request ? (
           <React.Fragment>
             <div className="token-selector-item__image">
-              <CircleLoader></CircleLoader>
+              <CircleLoader />
               <TradeTxLoaderStep taskId={this.state.request.id} />
             </div>
           </React.Fragment>
@@ -273,7 +277,7 @@ export class InnerOwnTokenGridRow extends Component<
               {this.props.positionValue.toFixed(4)}
             </div>
             <div
-              title={this.props.loan!.loanId}
+              title={this.props.loan.loanId}
               className="inner-own-token-grid-row__col-asset-type">
               <span className="position-type-marker">
                 {`${this.props.leverage}x`}&nbsp; {this.props.positionType}
@@ -364,9 +368,7 @@ export class InnerOwnTokenGridRow extends Component<
                 <Preloader width="74px" />
               )}
             </div>
-            <div
-              title={profitTitle}
-              className="inner-own-token-grid-row__col-profit opacityIn">
+            <div title={profitTitle} className="inner-own-token-grid-row__col-profit opacityIn">
               <span className="inner-own-token-grid-row__body-header">Profit</span>
               {!this.state.isLoading ? profitValue : <Preloader width="74px" />}
             </div>
@@ -388,7 +390,7 @@ export class InnerOwnTokenGridRow extends Component<
     event.stopPropagation()
   }
 
-  public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
+  public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation()
 
     const request = new ManageCollateralRequest(
@@ -399,7 +401,7 @@ export class InnerOwnTokenGridRow extends Component<
       false
     )
 
-    await this.setState({ ...this.state, request: request })
+    this.setState({ ...this.state, request: request })
 
     this.props.onManageCollateralOpen(request)
     this.props.changeLoadingTransaction(
@@ -410,7 +412,7 @@ export class InnerOwnTokenGridRow extends Component<
     )
   }
 
-  public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
+  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation()
 
     const request = new TradeRequest(
@@ -423,7 +425,7 @@ export class InnerOwnTokenGridRow extends Component<
       this.props.leverage,
       new BigNumber(0)
     )
-    await this.setState({ ...this.state, request: request })
+    this.setState({ ...this.state, request: request })
     this.props.changeLoadingTransaction(
       this.state.isLoadingTransaction,
       request,
