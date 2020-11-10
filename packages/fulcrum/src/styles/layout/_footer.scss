@@ -43,6 +43,23 @@
       margin-left: 20px;
     }
 
+    .impersonate-container {
+      display: inline-block;
+      margin-left: 20px;
+      button {
+        margin-left: 10px;
+        opacity: 0.2;
+      }
+      input {
+        background-color: #8b97a9;
+        color: transparent;
+        caret-color: #fff;
+        color: #a9b5c7;
+        border: none;
+        outline: none;
+      }
+    }
+
     a,
     button {
       font-size: 12px;
