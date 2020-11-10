@@ -204,12 +204,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? this.props.loan.loanData.maintenanceMargin
         : this.props.positionType === PositionType.LONG
         ? await FulcrumProvider.Instance.getMaintenanceMargin(
-            this.props.quoteToken,
-            this.props.baseToken
+          this.props.baseToken,
+          this.props.quoteToken
           )
         : await FulcrumProvider.Instance.getMaintenanceMargin(
-            this.props.baseToken,
-            this.props.quoteToken
+          this.props.quoteToken,
+          this.props.baseToken
           )
     // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     // if it's a SHORT then -> 10^36 / above
