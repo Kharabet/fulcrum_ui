@@ -100,7 +100,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.props.baseToken === Asset.WETH || this.props.baseToken === Asset.fWETH
         ? Asset.ETH
         : this.props.baseToken
-    const kyberTokenPrice = new BigNumber((await oracleTokensPricesRequest.json()).data[token.toLowerCase()])
+    const kyberTokenPrice = new BigNumber(
+      (await oracleTokensPricesRequest.json()).data[token.toLowerCase()]
+    )
     const initialMargin =
       this.props.positionType === PositionType.LONG
         ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -199,7 +201,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   public async componentDidMount() {
     this._isMounted = true
 
-    const task = await TasksQueue.Instance.getTasksList().find(
+    const task = TasksQueue.Instance.getTasksList().find(
       (t) =>
         t.request.loanId === '0x0000000000000000000000000000000000000000000000000000000000000000' &&
         t.request.asset === this.props.baseToken &&
@@ -210,7 +212,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const request = task ? (task.request as TradeRequest) : undefined
 
     this.setState({ ...this.state, resultTx: true, isLoadingTransaction, request })
-    this.derivedUpdate()
+    await this.derivedUpdate()
   }
 
   public async componentDidUpdate(
@@ -299,10 +301,12 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
                 <div title={`$${this.state.chainlinkTokenPrice.toFixed(18)}`}>
                   <span className="fw-sign">$</span>
                   {this.state.chainlinkTokenPrice.toFixed(2)}
+                  <label className="fw-market kyber">Kyber</label>
                 </div>
                 <div title={`$${this.state.kyberTokenPrice.toFixed(18)}`}>
                   <span className="fw-sign">$</span>
                   {this.state.kyberTokenPrice.toFixed(2)}
+                  <label className="fw-market chainlink">Chainlink</label>
                 </div>
               </React.Fragment>
             ) : (
@@ -359,14 +363,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.positionType === this.state.request.positionType &&
         this.state.request.tradeType === TradeType.BUY ? (
           <div className={`token-selector-item__image open-tab-tx`}>
-            <CircleLoader></CircleLoader>
+            <CircleLoader />
             <TradeTxLoaderStep taskId={this.state.request.id} />
           </div>
         ) : (
           !this.state.resultTx &&
           this.state.request &&
           this.props.positionType === this.state.request.positionType &&
-          this.state.request.tradeType === TradeType.BUY && <div className="close-tab-tx"></div>
+          this.state.request.tradeType === TradeType.BUY && <div className="close-tab-tx" />
         )}
       </React.Fragment>
     )
@@ -388,7 +392,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.state.leverage,
       new BigNumber(0)
     )
-    await this.setState({ ...this.state, request: request })
+    this.setState({ ...this.state, request: request })
     this.props.onTrade(request)
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
   }
