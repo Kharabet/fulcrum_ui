@@ -83,6 +83,7 @@ interface ITradeFormState {
   slippageRate: BigNumber
   ethBalance: BigNumber
   depositTokenBalance: BigNumber
+  collateralToPrincipalRate: BigNumber
 
   baseTokenPrice: BigNumber
   returnedAsset: Asset
@@ -116,6 +117,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       interestRate: new BigNumber(0),
       slippageRate: new BigNumber(0),
       ethBalance: new BigNumber(0),
+      collateralToPrincipalRate: new BigNumber(0),
       depositTokenBalance: new BigNumber(0),
       maybeNeedsApproval: false,
       liquidationPrice: liquidationPrice,
@@ -262,7 +264,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         isExposureLoading: false,
         isLoading: false,
         ethBalance,
-        depositTokenBalance
+        depositTokenBalance,
+        collateralToPrincipalRate
       })
   }
 
@@ -303,10 +306,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.positionType === PositionType.LONG ? this.props.baseToken : this.props.quoteToken
     const srcToken =
       this.props.positionType === PositionType.LONG ? this.props.quoteToken : this.props.baseToken
-    const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(
+    const tradeAmountInLoanToken = this.state.depositToken === srcToken ? tradeAmount.times(this.props.leverage)
+    : tradeAmount.times(this.state.collateralToPrincipalRate).times(this.props.leverage)
+      const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(
       srcToken,
       destToken,
-      tradeAmount
+      tradeAmountInLoanToken
     )
     this.setState({ ...this.state, slippageRate })
   }
