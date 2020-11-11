@@ -52,9 +52,9 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
   &__col-position-value {
     text-align: right;
   }
-  &__col-profit {
-    text-align: right;
-  }
+  // &__col-profit {
+  //   text-align: right;
+  // }
   &__col-actions {
     text-align: right;
   }
@@ -174,8 +174,37 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     }
   }
   &__col-profit {
-    display: flex;
-    justify-content: flex-end;
+    //display: flex;
+    //justify-content: flex-end;
+
+    margin-top: -6px;
+    margin-bottom: -6px;
+    .value {
+      color: #49bc98;
+      &:before {
+        position: relative;
+        content: '+';
+        color: #a2abb8;
+      }
+      &.danger {
+        color: #ff4f4f;
+        &:before {
+          content: '-';
+        }
+      }
+     
+        &.double {
+          font-size: 16px;
+        }
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+      vertical-align: -4px;
+      margin-right: 8px;
+      display: inline-block;
+    }
   }
   &__col-action {
     display: flex;

@@ -52,7 +52,7 @@ export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderP
           className={`inner-own-token-grid-header__col-profit ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
           }`}>
-          <span className="inner-own-token-grid-header__text">{`Profit (${this.props.asset}/${this.props.quoteToken})`}</span>
+          <span className="inner-own-token-grid-header__text">{`Profit`}</span>
         </div>
       </div>
     )

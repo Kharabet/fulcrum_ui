@@ -2,6 +2,7 @@ import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import { ReactComponent as OpenManageCollateral } from '../assets/images/openManageCollateral.svg'
 import { Asset } from '../domain/Asset'
+import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
@@ -59,6 +60,18 @@ export class InnerOwnTokenGridRow extends Component<
 
     this._isMounted = false
 
+    if (this.props.positionType === PositionType.LONG) {
+      this._firstTokenSvg = AssetsDictionary.assets.get(
+        this.props.loan.collateralAsset
+      )!.reactLogoSvg
+      this._secondTokenSvg = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.reactLogoSvg
+    } else {
+      this._firstTokenSvg = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.reactLogoSvg
+      this._secondTokenSvg = AssetsDictionary.assets.get(
+        this.props.loan.collateralAsset
+      )!.reactLogoSvg
+    }
+
     this.state = {
       isLoading: true,
       isLoadingTransaction: false,
@@ -87,6 +100,8 @@ export class InnerOwnTokenGridRow extends Component<
   }
 
   private _isMounted: boolean
+  private _firstTokenSvg: any
+  private _secondTokenSvg: any
 
   private async derivedUpdate() {
     let openValue = new BigNumber(0)
@@ -221,6 +236,7 @@ export class InnerOwnTokenGridRow extends Component<
     )
     const isLoadingTransaction = task && !task.error ? true : false
     const request = task ? (task.request as TradeRequest | ManageCollateralRequest) : undefined
+
     this.setState({
       ...this.state,
       isLoadingTransaction,
@@ -235,25 +251,44 @@ export class InnerOwnTokenGridRow extends Component<
 
     let profitTitle = ''
     let profitValue
+
     if (this.props.profitUSD.eq(0)) {
-      profitTitle =
+      const firstProfit =
         this.props.positionType === PositionType.LONG
-          ? `${this.props.profitCollateralToken.toFixed()}/${this.props.profitLoanToken.toFixed()}`
-          : `${this.props.profitLoanToken.toFixed()}/${this.props.profitCollateralToken.toFixed()}`
-      profitValue =
+          ? this.props.profitCollateralToken
+          : this.props.profitLoanToken
+      const secondProfit =
         this.props.positionType === PositionType.LONG
-          ? `${this.props.profitCollateralToken.toFixed(2)}/${this.props.profitLoanToken.toFixed(
-              2
-            )}`
-          : `${this.props.profitLoanToken.toFixed(2)}/${this.props.profitCollateralToken.toFixed(
-              2
-            )}`
+          ? this.props.profitLoanToken
+          : this.props.profitCollateralToken
+
+      profitTitle = `${firstProfit.toFixed()}
+          /${secondProfit.toFixed()}`
+
+      profitValue = (
+        <React.Fragment>
+          <div title={`${firstProfit.toFixed(18)}`}>
+            {this._firstTokenSvg && this._firstTokenSvg.render()}
+            <span className={`value double ${firstProfit.lt(0) ? `danger` : ``}`}>
+              {firstProfit.abs().toFixed(2)}
+            </span>
+          </div>
+          <div title={`$${secondProfit.toFixed(18)}`}>
+            {this._secondTokenSvg && this._secondTokenSvg.render()}
+            <span className={`value double ${secondProfit.lt(0) ? `danger` : ``}`}>
+              {secondProfit.abs().toFixed(2)}
+            </span>
+          </div>
+        </React.Fragment>
+      )
     } else {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
       profitValue = (
         <React.Fragment>
           <span className="sign-currency">$</span>
-          {this.props.profitUSD.toFixed(2)}
+          <span className={`value ${this.props.profitUSD.lt(0) ? `danger` : ``}`}>
+            {this.props.profitUSD.abs().toFixed(2)}
+          </span>
         </React.Fragment>
       )
     }
