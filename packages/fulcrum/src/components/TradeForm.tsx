@@ -285,7 +285,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   public async componentDidMount() {
     this._isMounted = true
-    await this.setSlippageRate(new BigNumber(1))
+    await this.setSlippageRate(new BigNumber(0))
     await this.derivedUpdate()
     window.history.pushState(
       null,
@@ -306,9 +306,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.positionType === PositionType.LONG ? this.props.baseToken : this.props.quoteToken
     const srcToken =
       this.props.positionType === PositionType.LONG ? this.props.quoteToken : this.props.baseToken
-    const tradeAmountInLoanToken = this.state.depositToken === srcToken ? tradeAmount.times(this.props.leverage)
-    : tradeAmount.times(this.state.collateralToPrincipalRate).times(this.props.leverage)
-      const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(
+    const tradeAmountInLoanToken =
+      this.state.depositToken === srcToken
+        ? tradeAmount.times(this.props.leverage)
+        : tradeAmount.times(this.state.collateralToPrincipalRate).times(this.props.leverage)
+    const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(
       srcToken,
       destToken,
       tradeAmountInLoanToken

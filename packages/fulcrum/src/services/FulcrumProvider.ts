@@ -1238,23 +1238,37 @@ export class FulcrumProvider {
     return maybeNeedsApproval
   }
 
-  
-  public getTradeSlippageRate = async (srcToken: Asset, destToken: Asset, tradedAmountEstimate: BigNumber): Promise<BigNumber> => {
-
+  public getTradeSlippageRate = async (
+    srcToken: Asset,
+    destToken: Asset,
+    tradedAmountEstimate: BigNumber
+  ): Promise<BigNumber> => {
     if (tradedAmountEstimate.eq(0) || srcToken === destToken) {
-      return new BigNumber(0);
+      return new BigNumber(0)
     }
-    
-      const srcDecimals = AssetsDictionary.assets.get(srcToken)?.decimals || 18;
-      const amount = tradedAmountEstimate.times(10 ** srcDecimals)
-      const srcAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(srcToken);
-      const destAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(destToken);
-      const slippageJsonOneToken = await fetch(`https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${10 ** srcDecimals}`).then(resp => resp.json())
-      const slippageJsonMaxValue = await fetch(`https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${amount}`).then(resp => resp.json())
 
-    const slippage = new BigNumber(slippageJsonOneToken.expectedRate).minus(slippageJsonMaxValue.expectedRate).abs().div(slippageJsonMaxValue.expectedRate).times(100)
+    const srcDecimals = AssetsDictionary.assets.get(srcToken)?.decimals || 18
+    const amount = tradedAmountEstimate.times(10 ** srcDecimals)
+    const srcAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(srcToken)
+    const destAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(destToken)
+    const slippageJsonOneTokenWorth = await fetch(
+      `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${10 **
+        srcDecimals}`
+    ).then((resp) => resp.json())
+    const slippageJsonTradeAmount = await fetch(
+      `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${amount}`
+    ).then((resp) => resp.json())
 
-    return slippage;
+    if (!slippageJsonOneTokenWorth.expectedRate || !slippageJsonTradeAmount.expectedRate) {
+      return new BigNumber(0)
+    }
+    const slippage = new BigNumber(slippageJsonOneTokenWorth.expectedRate)
+      .minus(slippageJsonTradeAmount.expectedRate)
+      .abs()
+      .div(slippageJsonTradeAmount.expectedRate)
+      .times(100)
+
+    return slippage
   }
 
   // public getTradeSlippageRate = async (request: TradeRequest, tradedAmountEstimate: BigNumber): Promise<BigNumber | null> => {
