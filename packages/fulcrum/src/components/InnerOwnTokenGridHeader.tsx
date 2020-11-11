@@ -24,12 +24,7 @@ export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderP
           }`}>
           <span className="inner-own-token-grid-header__text">Type</span>
         </div>
-        <div
-          className={`inner-own-token-grid-header__col-asset-price ${
-            this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
-          }`}>
-          <span className="inner-own-token-grid-header__text">Value</span>
-        </div>
+      
         <div
           className={`inner-own-token-grid-header__col-asset-collateral ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`

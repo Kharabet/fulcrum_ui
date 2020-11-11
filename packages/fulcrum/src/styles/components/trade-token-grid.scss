@@ -14,7 +14,7 @@
     @media screen and (min-width: $breakpoint-mobile-min) {
       display: grid;
       column-gap: 35px;
-      grid-template-columns: 10% 8% 22% 11% 11% 9% 9%;
+      grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
     }
     @media screen and (max-width: $breakpoint-mobile-max) {
       display: flex;
@@ -37,22 +37,22 @@
         width: calc(100% / 3);
       }
     }
-    &__col-liquidation {
-      @media screen and (min-width: $breakpoint-mobile-min) {
-        justify-content: flex-end;
-      }
-    }
-    &__col-profit {
-      display: flex;
-      flex-wrap: wrap;
+    // &__col-liquidation {
+    //   @media screen and (min-width: $breakpoint-mobile-min) {
+    //     justify-content: flex-end;
+    //   }
+    // }
+    // &__col-profit {
+    //   display: flex;
+    //   flex-wrap: wrap;
 
-      @media screen and (min-width: $breakpoint-mobile-min) {
-        justify-content: flex-end;
-      }
-      @media screen and (max-width: $breakpoint-mobile-max) {
-        width: calc(100% / 3);
-      }
-    }
+    //   @media screen and (min-width: $breakpoint-mobile-min) {
+    //     justify-content: flex-end;
+    //   }
+    //   @media screen and (max-width: $breakpoint-mobile-max) {
+    //     width: calc(100% / 3);
+    //   }
+    // }
   }
   .trade-token-grid-header {
     font-size: 12px;
