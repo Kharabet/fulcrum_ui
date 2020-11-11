@@ -41,8 +41,7 @@ export interface ITradeTokenGridRowProps {
 interface ITradeTokenGridRowState {
   leverage: number
 
-  chainlinkTokenPrice: BigNumber
-  kyberTokenPrice: BigNumber
+   baseTokenPrice: BigNumber
   liquidationPrice: BigNumber
 
   interestRate: BigNumber
@@ -59,8 +58,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this._isMounted = false
     this.state = {
       leverage: this.props.defaultLeverage,
-      chainlinkTokenPrice: new BigNumber(0),
-      kyberTokenPrice: new BigNumber(0),
+      baseTokenPrice: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       interestRate: new BigNumber(0),
       isLoading: true,
@@ -91,18 +89,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
         : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken)
 
-    const chainlinkTokenPrice =
+    const baseTokenPrice =
       this.props.positionType === PositionType.LONG
         ? collateralToPrincipalRate
         : new BigNumber(1).div(collateralToPrincipalRate)
-    const oracleTokensPricesRequest = await fetch('https://api.bzx.network/v1/oracle-rates-usd')
-    const token =
-      this.props.baseToken === Asset.WETH || this.props.baseToken === Asset.fWETH
-        ? Asset.ETH
-        : this.props.baseToken
-    const kyberTokenPrice = new BigNumber(
-      (await oracleTokensPricesRequest.json()).data[token.toLowerCase()]
-    )
+  
     const initialMargin =
       this.props.positionType === PositionType.LONG
         ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -131,8 +122,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this._isMounted &&
       this.setState({
         ...this.state,
-        chainlinkTokenPrice,
-        kyberTokenPrice,
+        baseTokenPrice,
         interestRate,
         liquidationPrice,
         isLoading: false
@@ -156,8 +146,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(() => {
-        FulcrumProvider.Instance.onTaskCancel(task)
+      window.setTimeout(async() => {
+        await FulcrumProvider.Instance.onTaskCancel(task)
         this.setState({
           ...this.state,
           isLoadingTransaction: false,
@@ -294,20 +284,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             {this.props.isMobileMedia && (
               <span className="trade-token-grid-row__title">Mid Market Price</span>
             )}
-            {this.state.chainlinkTokenPrice.gt(0) &&
-            this.state.chainlinkTokenPrice.toFixed() !== 'Infinity' &&
+            {this.state.baseTokenPrice.gt(0) &&
+            this.state.baseTokenPrice.toFixed() !== 'Infinity' &&
             !this.state.isLoading ? (
               <React.Fragment>
-                <div title={`$${this.state.chainlinkTokenPrice.toFixed(18)}`}>
+                <div title={`$${this.state.baseTokenPrice.toFixed(18)}`}>
                   <span className="fw-sign">$</span>
-                  {this.state.chainlinkTokenPrice.toFixed(2)}
-                  <label className="fw-market kyber">Kyber</label>
-                </div>
-                <div title={`$${this.state.kyberTokenPrice.toFixed(18)}`}>
-                  <span className="fw-sign">$</span>
-                  {this.state.kyberTokenPrice.toFixed(2)}
-                  <label className="fw-market chainlink">Chainlink</label>
-                </div>
+                  {this.state.baseTokenPrice.toFixed(2)}
+                </div>                
               </React.Fragment>
             ) : (
               <Preloader width="74px" />

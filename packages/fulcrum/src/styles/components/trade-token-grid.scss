@@ -119,12 +119,7 @@
       }
     }
    
-    @media screen and(min-width: $breakpoint-mobile-min) {
-      &__col-price {
-        font-size: 17px;
-        line-height: 20px;
-      }
-    }
+
     &__buy-button {
       border: 0;
       display: flex;
