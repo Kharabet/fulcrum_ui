@@ -30,7 +30,10 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       providerTypeDetails: null
     }
 
-    // FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    FulcrumProvider.Instance.eventEmitter.on(
+      FulcrumProviderEvents.ProviderIsChanging,
+      this.onProviderIsChanging
+    )
     FulcrumProvider.Instance.eventEmitter.on(
       FulcrumProviderEvents.ProviderChanged,
       this.onProviderChanged
@@ -45,11 +48,11 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate()
     this.setState({
       ...this.state,
-      isLoading: true
+      isLoading: false
     })
-    await this.derivedUpdate()
   }
 
   public async componentDidMount() {
@@ -80,7 +83,6 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       )
     }
 
-    const isLoading = FulcrumProvider.Instance.isLoading
     const isSupportedNetwork = !FulcrumProvider.Instance.unsupportedNetwork
     const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings
       ? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
@@ -88,7 +90,6 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
 
     this.setState({
       ...this.state,
-      isLoading,
       isSupportedNetwork,
       etherscanURL,
       accountText,
@@ -97,6 +98,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   public render() {
+    console.log(7)
     const {
       isLoading,
       isSupportedNetwork,

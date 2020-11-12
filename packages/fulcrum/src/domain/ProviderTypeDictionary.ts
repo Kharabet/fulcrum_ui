@@ -91,8 +91,9 @@ export class ProviderTypeDictionary {
 
   public static async getProviderTypeByConnector(value: AbstractConnector): Promise<ProviderType> {
     const provider = await value.getProvider()
-    if (value === injected)
+    if (value === injected) {
       return provider.isMetaMask ? ProviderType.MetaMask : ProviderType.TrustWallet
+    }
     return Object.keys(connectorsByName).find(
       (key) => connectorsByName[key] === value
     ) as ProviderType

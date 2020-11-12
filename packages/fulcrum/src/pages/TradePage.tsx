@@ -38,7 +38,6 @@ const ManageCollateralForm = React.lazy(() => import('../components/ManageCollat
 export interface ITradePageProps {
   doNetworkConnect: () => void
   isRiskDisclosureModalOpen: () => void
-  isLoading: boolean
   isMobileMedia: boolean
 }
 
