@@ -19,6 +19,10 @@ import { Preloader } from './Preloader'
 import { CircleLoader } from './CircleLoader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 
+import ReactTooltip from 'react-tooltip'
+import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
+import '../styles/components/tooltip.scss'
+
 export interface ITradeTokenGridRowProps {
   isMobileMedia: boolean
   baseToken: Asset
@@ -41,7 +45,7 @@ export interface ITradeTokenGridRowProps {
 interface ITradeTokenGridRowState {
   leverage: number
 
-   baseTokenPrice: BigNumber
+  baseTokenPrice: BigNumber
   liquidationPrice: BigNumber
 
   interestRate: BigNumber
@@ -93,7 +97,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.props.positionType === PositionType.LONG
         ? collateralToPrincipalRate
         : new BigNumber(1).div(collateralToPrincipalRate)
-  
+
     const initialMargin =
       this.props.positionType === PositionType.LONG
         ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -146,7 +150,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(async() => {
+      window.setTimeout(async () => {
         await FulcrumProvider.Instance.onTaskCancel(task)
         this.setState({
           ...this.state,
@@ -282,7 +286,18 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           </div>
           <div className="trade-token-grid-row__col-price">
             {this.props.isMobileMedia && (
-              <span className="trade-token-grid-row__title">Mid Market Price</span>
+              <React.Fragment>
+                <span className="trade-token-grid-row__title">
+                  Mid Market Price
+                  <IconInfo
+                    className="tooltip__icon"
+                    data-tip={
+                      'Price feeds are provided securely via Chainlink, trades are executed via Kyber. This can result in minor price variations when opening and closing positions.'
+                    }
+                  />
+                  <ReactTooltip className="tooltip__info" place="top" effect="solid" />
+                </span>
+              </React.Fragment>
             )}
             {this.state.baseTokenPrice.gt(0) &&
             this.state.baseTokenPrice.toFixed() !== 'Infinity' &&
@@ -291,7 +306,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
                 <div title={`$${this.state.baseTokenPrice.toFixed(18)}`}>
                   <span className="fw-sign">$</span>
                   {this.state.baseTokenPrice.toFixed(2)}
-                </div>                
+                </div>
               </React.Fragment>
             ) : (
               <Preloader width="74px" />
