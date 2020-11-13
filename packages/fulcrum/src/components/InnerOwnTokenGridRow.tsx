@@ -243,13 +243,13 @@ export class InnerOwnTokenGridRow extends Component<
         this.props.positionType === PositionType.LONG ? (
           <React.Fragment>
             {this.props.profitCollateralToken.toFixed(2)}{' '}
-            <span className="inner-own-token-grid-row__line"/>{' '}
+            <span className="inner-own-token-grid-row__line" />{' '}
             {this.props.profitLoanToken.toFixed(2)}
           </React.Fragment>
         ) : (
           <React.Fragment>
             {this.props.profitLoanToken.toFixed(2)}{' '}
-            <span className="inner-own-token-grid-row__line"/>{' '}
+            <span className="inner-own-token-grid-row__line" />{' '}
             {this.props.profitCollateralToken.toFixed(2)}
           </React.Fragment>
         )
@@ -286,7 +286,9 @@ export class InnerOwnTokenGridRow extends Component<
             <div
               title={`$${this.props.value.toFixed(18)}`}
               className="inner-own-token-grid-row__col-asset-price">
-              <span className="inner-own-token-grid-row__body-header">Value <label className="text-asset">{this.props.quoteToken}</label></span>
+              <span className="inner-own-token-grid-row__body-header">
+                Value <label className="text-asset">{this.props.quoteToken}</label>
+              </span>
               {!this.state.isLoading ? (
                 <React.Fragment>
                   <span className="value-currency">
@@ -303,7 +305,9 @@ export class InnerOwnTokenGridRow extends Component<
               )}
             </div>
             <div className="inner-own-token-grid-row__col-asset-collateral">
-              <span className="inner-own-token-grid-row__body-header">Collateral <label className="text-asset">{this.props.baseToken}</label></span>
+              <span className="inner-own-token-grid-row__body-header">
+                Collateral <label className="text-asset">{this.props.baseToken}</label>
+              </span>
 
               {!this.state.isLoading ? (
                 <React.Fragment>
@@ -312,7 +316,9 @@ export class InnerOwnTokenGridRow extends Component<
                       {this.props.collateral.toFixed(2)}
                       <div
                         className={`inner-own-token-grid-row__open-manage-collateral ${
-                          this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin) ? 'danger' : ''
+                          this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)
+                            ? 'danger'
+                            : ''
                         }`}
                         onClick={this.onManageClick}>
                         <OpenManageCollateral />
@@ -321,7 +327,11 @@ export class InnerOwnTokenGridRow extends Component<
 
                     <span
                       className={`inner-own-token-grid-row__col-asset-collateral-small ${
-                        this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin.plus(0.1)) ? 'danger' : ''
+                        this.props.loan.collateralizedPercent.lte(
+                          this.props.maintenanceMargin.plus(0.1)
+                        )
+                          ? 'danger'
+                          : ''
                       }`}
                       title={collateralizedPercent.toFixed(18)}>
                       {collateralizedPercent.toFixed(2)}%
@@ -335,7 +345,9 @@ export class InnerOwnTokenGridRow extends Component<
             <div
               title={this.props.openPrice.toFixed(18)}
               className="inner-own-token-grid-row__col-position-value opacityIn">
-              <span className="inner-own-token-grid-row__body-header">Open Price <label className="text-asset">{this.props.quoteToken}</label></span>
+              <span className="inner-own-token-grid-row__body-header">
+                Open Price <label className="text-asset">{this.props.quoteToken}</label>
+              </span>
 
               {!this.state.isLoading ? (
                 this.props.openPrice ? (
@@ -350,7 +362,9 @@ export class InnerOwnTokenGridRow extends Component<
             <div
               title={`$${this.props.liquidationPrice.toFixed(18)}`}
               className="inner-own-token-grid-row__col-liquidation-price opacityIn">
-              <span className="inner-own-token-grid-row__body-header">Liquidation Price <label className="text-asset">{this.props.quoteToken}</label></span>
+              <span className="inner-own-token-grid-row__body-header">
+                Liquidation Price <label className="text-asset">{this.props.quoteToken}</label>
+              </span>
 
               {!this.state.isLoading ? (
                 <React.Fragment>{this.props.liquidationPrice.toFixed(2)}</React.Fragment>
@@ -359,7 +373,12 @@ export class InnerOwnTokenGridRow extends Component<
               )}
             </div>
             <div title={profitTitle} className="inner-own-token-grid-row__col-profit opacityIn">
-              <span className="inner-own-token-grid-row__body-header">Profit <label className="text-asset">{this.props.baseToken}/{this.props.quoteToken}</label></span>
+              <span className="inner-own-token-grid-row__body-header">
+                Profit{' '}
+                <label className="text-asset">
+                  {this.props.baseToken}/{this.props.quoteToken}
+                </label>
+              </span>
               {!this.state.isLoading ? profitValue : <Preloader width="74px" />}
             </div>
             <div className="inner-own-token-grid-row__col-action opacityIn rightIn">
@@ -393,13 +412,13 @@ export class InnerOwnTokenGridRow extends Component<
 
     this.setState({ ...this.state, request: request })
 
-    this.props.onManageCollateralOpen(request)
     this.props.changeLoadingTransaction(
       this.state.isLoadingTransaction,
       request,
       false,
       this.state.resultTx
     )
+    this.props.onManageCollateralOpen(request)
   }
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -415,7 +434,6 @@ export class InnerOwnTokenGridRow extends Component<
       this.props.leverage,
       new BigNumber(0)
     )
-    this.setState({ ...this.state, request: request })
     this.props.changeLoadingTransaction(
       this.state.isLoadingTransaction,
       request,
@@ -423,5 +441,6 @@ export class InnerOwnTokenGridRow extends Component<
       this.state.resultTx
     )
     this.props.onTrade(request)
+    this.setState({ ...this.state, request: request })
   }
 }

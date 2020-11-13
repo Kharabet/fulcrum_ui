@@ -387,8 +387,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.state.leverage,
       new BigNumber(0)
     )
-    this.setState({ ...this.state, request: request })
-    this.props.onTrade(request)
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
+    this.props.onTrade(request)
+    this.setState({ ...this.state, request: request })
   }
 }

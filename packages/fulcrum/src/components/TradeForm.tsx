@@ -433,22 +433,23 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
 
-            <div className="trade-form__kv-container">
-              {amountMsg.includes('Slippage:') ? (
-                <div
-                  title={`${this.state.slippageRate.toFixed(18)}%`}
-                  className="trade-form__label slippage">
-                  {amountMsg}
-                  <span className="trade-form__slippage-amount">
-                    &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}
-                    <SlippageDown />
-                  </span>
-                </div>
-              ) : (
-                <div className="trade-form__label">{amountMsg}</div>
-              )}
-            </div>
-
+            {!this.state.isLoading && (
+              <div className="trade-form__kv-container">
+                {amountMsg.includes('Slippage:') ? (
+                  <div
+                    title={`${this.state.slippageRate.toFixed(18)}%`}
+                    className="trade-form__label slippage">
+                    {amountMsg}
+                    <span className="trade-form__slippage-amount">
+                      &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}
+                      <SlippageDown />
+                    </span>
+                  </div>
+                ) : (
+                  <div className="trade-form__label">{amountMsg}</div>
+                )}
+              </div>
+            )}
             <InputAmount
               inputAmountText={this.state.inputAmountText}
               selectorAssets={[this.props.baseToken, this.props.quoteToken]}

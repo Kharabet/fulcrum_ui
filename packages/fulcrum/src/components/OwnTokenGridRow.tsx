@@ -360,8 +360,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.leverage,
       new BigNumber(0)
     )
-    this.setState({ ...this.state, request: request })
-    this.props.onTrade(request)
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
+    this.props.onTrade(request)
+    this.setState({ ...this.state, request: request })
   }
 }
