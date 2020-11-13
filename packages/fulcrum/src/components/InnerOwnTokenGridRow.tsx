@@ -31,6 +31,7 @@ export interface IInnerOwnTokenGridRowProps {
   profitCollateralToken: BigNumber
   profitLoanToken: BigNumber
   profitUSD: BigNumber
+  maintenanceMargin: BigNumber
   isTxCompleted: boolean
   onTrade: (request: TradeRequest) => void
   onManageCollateralOpen: (request: ManageCollateralRequest) => void
@@ -96,8 +97,7 @@ export class InnerOwnTokenGridRow extends Component<
       const collateralAssetDecimals =
         AssetsDictionary.assets.get(this.props.loan.collateralAsset)!.decimals || 18
       openValue = this.props.loan.loanData.collateral
-        .times(10 ** (18 - collateralAssetDecimals))
-        .div(10 ** 18)
+        .div(10 ** collateralAssetDecimals)
         .times(this.props.openPrice)
       valueChange = this.props.value
         .minus(openValue)
@@ -107,8 +107,7 @@ export class InnerOwnTokenGridRow extends Component<
       const loanAssetDecimals =
         AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
       openValue = this.props.loan.loanData.principal
-        .times(10 ** (18 - loanAssetDecimals))
-        .div(10 ** 18)
+        .div(10 ** loanAssetDecimals)
         .times(this.props.openPrice)
       valueChange = this.props.value
         .minus(openValue)
@@ -231,7 +230,7 @@ export class InnerOwnTokenGridRow extends Component<
   }
 
   public render() {
-    const collateralizedPercent = this.props.loan.collateralizedPercent.multipliedBy(100).plus(100)
+    const collateralizedPercent = this.props.loan.collateralizedPercent.multipliedBy(100)
 
     let profitTitle = ''
     let profitValue
@@ -313,7 +312,7 @@ export class InnerOwnTokenGridRow extends Component<
                       {this.props.collateral.toFixed(2)}
                       <div
                         className={`inner-own-token-grid-row__open-manage-collateral ${
-                          this.props.loan.collateralizedPercent.lte(0.15) ? 'danger' : ''
+                          this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin) ? 'danger' : ''
                         }`}
                         onClick={this.onManageClick}>
                         <OpenManageCollateral />
@@ -322,7 +321,7 @@ export class InnerOwnTokenGridRow extends Component<
 
                     <span
                       className={`inner-own-token-grid-row__col-asset-collateral-small ${
-                        this.props.loan.collateralizedPercent.lte(0.25) ? 'danger' : ''
+                        this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin.plus(0.1)) ? 'danger' : ''
                       }`}
                       title={collateralizedPercent.toFixed(18)}>
                       {collateralizedPercent.toFixed(2)}%

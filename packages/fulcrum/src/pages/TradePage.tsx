@@ -442,6 +442,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     let profitCollateralToken = new BigNumber(0)
     let profitLoanToken = new BigNumber(0)
     let profitUSD = new BigNumber(0)
+    let depositAmountCollateralToken = new BigNumber(0)
+    let depositAmountLoanToken = new BigNumber(0)
 
     const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18
     const collateralAssetDecimals =
@@ -520,13 +522,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ) {
         profitUSD = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue)
       } else {
-        const depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
+        depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
           10 ** collateralAssetDecimals
         )
 
-        const depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(
-          10 ** loanAssetDecimals
-        )
+        depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(10 ** loanAssetDecimals)
 
         profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
         profitLoanToken = estimatedReceivedLoanToken.minus(depositAmountLoanToken)
@@ -537,9 +537,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const shortsDiff = collateralAssetAmount
         .times(currentCollateralToPrincipalRate)
         .minus(loanAssetAmount)
-      const deposited = collateralAssetAmount.minus(
-        loanAssetAmount.div(currentCollateralToPrincipalRate)
-      )
 
       positionValue = collateralAssetAmount
         .times(currentCollateralToPrincipalRate)
@@ -559,13 +556,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           .minus(new BigNumber(1).div(currentCollateralToPrincipalRate))
           .times(positionValue)
       } else {
-        const depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
+        depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
           10 ** collateralAssetDecimals
         )
 
-        const depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(
-          10 ** loanAssetDecimals
-        )
+        depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(10 ** loanAssetDecimals)
 
         profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
         profitLoanToken = estimatedReceivedLoanToken.minus(depositAmountLoanToken)
@@ -580,12 +575,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       positionType,
       positionValue,
       value,
-      collateral,
+      collateral:
+        positionType === PositionType.LONG
+          ? depositAmountCollateralToken.gt(0)
+            ? depositAmountCollateralToken
+            : collateral
+          : depositAmountLoanToken.gt(0)
+          ? depositAmountLoanToken
+          : collateral,
       openPrice,
       liquidationPrice,
       profitCollateralToken,
       profitLoanToken,
       profitUSD,
+      maintenanceMargin: maintenanceMargin.div(10 ** 20),
       onTrade: this.onTradeRequested,
       onManageCollateralOpen: this.onManageCollateralRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,

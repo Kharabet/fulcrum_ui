@@ -31,6 +31,7 @@ export interface IOwnTokenGridRowProps {
   profitCollateralToken: BigNumber
   profitLoanToken: BigNumber
   profitUSD: BigNumber
+  maintenanceMargin: BigNumber
   isTxCompleted: boolean
   onTrade: (request: TradeRequest) => void
   onManageCollateralOpen: (request: ManageCollateralRequest) => void
@@ -280,11 +281,10 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
                 </span>
                 <span
                   className={`own-token-grid-row__col-asset-collateral-small ${
-                    this.props.loan.collateralizedPercent.lte(0.25) ? 'danger' : ''
+                    this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin.plus(0.1)) ? 'danger' : ''
                   }`}>
                   {this.props.loan.collateralizedPercent
                     .multipliedBy(100)
-                    .plus(100)
                     .toFixed(2)}
                   %
                 </span>
@@ -295,7 +295,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           </div>
           <div
             className={`own-token-grid-row__open-manage-collateral ${
-              this.props.loan.collateralizedPercent.lte(0.15) ? 'danger' : ''
+              this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin) ? 'danger' : ''
             }`}
             onClick={this.onManageClick}>
             <OpenManageCollateral />
