@@ -13,7 +13,6 @@ import { InfoBlock } from '../components/InfoBlock'
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void
   isRiskDisclosureModalOpen: () => void
-  isLoading: boolean
   isMobileMedia: boolean
   headerClass: string
   //isV1ITokenInWallet: boolean;

@@ -38,9 +38,7 @@ export class Web3ConnectionFactory {
 
     const alchemyProvider = await this.getAlchemyProvider()
     providerEngine.addProvider(alchemyProvider)
-
     const provider = await connector.getProvider()
-
     try {
       providerEngine.addProvider(new SignerSubprovider(provider))
       await providerEngine.start()
@@ -70,6 +68,7 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.currentWeb3Engine = providerEngine
     Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper
     Web3ConnectionFactory.canWrite = canWrite
+
   }
 
   public static async setReadonlyProvider() {
