@@ -97,9 +97,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT]
     }
     this.stablecoins = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.SUSD]
-
+    const activePair = window.localStorage.getItem('activePair') || undefined
+    const localStoragePair: {baseToken: Asset, quoteToken: Asset} | undefined = activePair && JSON.parse(activePair) || undefined
     this.state = {
-      selectedMarket: {
+      selectedMarket: localStoragePair || {
         baseToken: this.baseTokens[0],
         quoteToken: this.quoteTokens[0]
       },
@@ -306,6 +307,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       quoteToken
     }
     await this.onTokenGridTabChange(TokenGridTab.Chart)
+    window.localStorage.setItem('activePair', JSON.stringify(marketPair))
     this._isMounted && this.setState({ ...this.state, selectedMarket: marketPair })
   }
 
@@ -326,6 +328,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     if (event.providerType === ProviderType.None) {
       this.clearData()
+      return
     }
     await this.getInnerOwnRowsData(this.state)
     await this.getOwnRowsData(this.state)
