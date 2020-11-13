@@ -7,7 +7,7 @@ $font-size-button: 16px;
 $width-button: 95px;
 $height-button: 44px;
 $padding: 22px 30px 35px 30px;
-$grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
+$grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
 
 .inner-own-token-grid-header {
   display: grid;
@@ -31,33 +31,33 @@ $grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
     opacity: 0;
   }
 
-  // &__col-asset-price {
-  //   text-align: right;
-  //   @media screen and (min-width: $breakpoint-desktop-min) {
-  //     padding-right: 20px;
-  //   }
-  // }
-  // &__col-asset-collateral {
-  //   text-align: right;
-  //   @media screen and (min-width: $breakpoint-desktop-min) {
-  //     padding-right: 56px;
-  //   }
-  //   @media screen and (max-width: $breakpoint-desktop-max) {
-  //     padding-right: 36px;
-  //   }
-  // }
-  // &__col-liquidation-price {
-  //   text-align: right;
-  // }
-  // &__col-position-value {
-  //   text-align: right;
-  // }
-  // // &__col-profit {
-  // //   text-align: right;
-  // // }
-  // &__col-actions {
-  //   text-align: right;
-  // }
+  &__col-asset-price {
+    text-align: right;
+    @media screen and (min-width: $breakpoint-desktop-min) {
+      padding-right: 20px;
+    }
+  }
+  &__col-asset-collateral {
+    text-align: right;
+    @media screen and (min-width: $breakpoint-desktop-min) {
+      padding-right: 56px;
+    }
+    @media screen and (max-width: $breakpoint-desktop-max) {
+      padding-right: 36px;
+    }
+  }
+  &__col-liquidation-price {
+    text-align: right;
+  }
+  &__col-position-value {
+    text-align: right;
+  }
+  &__col-profit {
+    text-align: right;
+  }
+  &__col-actions {
+    text-align: right;
+  }
 }
 
 .inner-own-token-grid-row {
@@ -110,28 +110,28 @@ $grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
     font-size: 12px;
     font-weight: 600;
     text-indent: 13px;
-    left: 0;
+    right: 0;
     top: 100%;
   }
 
-  // &__col-asset-type {
-  //   display: flex;
-  // }
-  // &__col-liquidation-price {
-  //   display: flex;
-  //   justify-content: flex-end;
-  // }
-  // &__col-position-value {
-  //   display: flex;
-  //   justify-content: flex-end;
-  // }
+  &__col-asset-type {
+    display: flex;
+  }
+  &__col-liquidation-price {
+    display: flex;
+    justify-content: flex-end;
+  }
+  &__col-position-value {
+    display: flex;
+    justify-content: flex-end;
+  }
   &__col-asset-collateral {
     align-items: center;
     position: relative;
     display: flex;
-    // .value-currency {
-    //   min-width: 90px;
-    // }
+    .value-currency {
+      min-width: 90px;
+    }
   }
   &__col-asset-collateral-small {
     position: absolute;
@@ -139,7 +139,7 @@ $grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
     font-weight: 600;
     text-indent: 13px;
     top: 100%;
-    left: -13px;
+    right: 0;
     &.danger {
       color: #ff4f4f;
     }
@@ -174,37 +174,8 @@ $grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
     }
   }
   &__col-profit {
-    //display: flex;
-    //justify-content: flex-end;
-
-    margin-top: -16px;
-    margin-bottom: -16px;
-    .value {
-      color: #49bc98;
-      &:before {
-        position: relative;
-        content: '+';
-        color: #a2abb8;
-      }
-      &.danger {
-        color: #ff4f4f;
-        &:before {
-          content: '-';
-        }
-      }
-     
-        &.double {
-          font-size: 16px;
-        }
-    }
-
-    svg {
-      width: 20px;
-      height: 20px;
-      vertical-align: -4px;
-      margin-right: 8px;
-      display: inline-block;
-    }
+    display: flex;
+    justify-content: flex-end;
   }
   &__col-action {
     display: flex;
@@ -279,16 +250,16 @@ $grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
       }
       &__col-asset-price {
         order: 1;
-        display: block;        
+        display: block;
       }
       &__col-asset-price-small {
         text-indent: 10px;
         left: 0;
       }
-      // &__col-position-value {
-      //   order: 2;
-      //   display: block;
-      // }
+      &__col-position-value {
+        order: 2;
+        display: block;
+      }
       &__col-asset-type {
         order: 3;
         .position-type-marker {
@@ -302,11 +273,15 @@ $grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
       &__col-asset-collateral {
         flex-wrap: wrap;
         margin-bottom: 21px;
-         order: 2;
+        order: 4;
+        grid-column-start: 2;
+        grid-column-end: 4;
+        grid-row-start: 2;
+        grid-row-end: 3;
       }
 
       &__col-liquidation-price {
-        order: 4;
+        order: 5;
         display: block;
       }
 
@@ -314,21 +289,13 @@ $grid-template-columns: 10% 8% 16% 12% 12% 12% 10%;
         display: flex;
         justify-content: flex-end;
         padding-top: 12px;
-        order: 7;
-        grid-column-start: 3;
-        grid-column-end: 4;
-        grid-row-start: 1;
-        grid-row-end: 3;        
+        order: 6;
       }
 
       &__col-profit {
-        order: 6;
+        order: 7;
         display: block;
         text-align: right;
-        grid-column-start: 3;
-        grid-column-end: 4;
-        grid-row-start: 2;
-        grid-row-end: 3;
       }
 
       &__col-asset-collateral-small {
