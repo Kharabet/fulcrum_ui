@@ -65,7 +65,7 @@
     font-size: 12px;
     font-weight: 600;
     color: var(--trade-header-color);
-    strong{
+    &__text-asset{
       color:var(--primary-text);
     }
     @media screen and (min-width: $breakpoint-desktop-min) {
@@ -86,7 +86,7 @@
   .trade-token-grid-row {
     position: relative;
     background-color: var(--primary-row);
-    z-index: 3;
+    z-index: 2;
     font-weight: 800;
     color: var(--primary-text);
     margin-bottom: 1px;

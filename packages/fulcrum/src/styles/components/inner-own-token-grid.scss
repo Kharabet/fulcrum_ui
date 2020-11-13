@@ -30,15 +30,17 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
   .opacity {
     opacity: 0;
   }
-
+  &__text-asset{
+    color:var(--primary-text);
+  }
   &__col-asset-price {
-    text-align: right;
+    //text-align: right;
     @media screen and (min-width: $breakpoint-desktop-min) {
       padding-right: 20px;
     }
   }
   &__col-asset-collateral {
-    text-align: right;
+   // text-align: right;
     @media screen and (min-width: $breakpoint-desktop-min) {
       padding-right: 56px;
     }
@@ -46,18 +48,19 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
       padding-right: 36px;
     }
   }
-  &__col-liquidation-price {
-    text-align: right;
-  }
-  &__col-position-value {
-    text-align: right;
-  }
-  &__col-profit {
-    text-align: right;
-  }
-  &__col-actions {
-    text-align: right;
-  }
+  // &__col-liquidation-price {
+  //   text-align: right;
+  // }
+  // &__col-position-value {
+  //   text-align: right;
+  // }
+   &__col-profit {
+    grid-column-start: 7;
+    grid-column-end: 9;
+   }
+  // &__col-actions {
+  //   text-align: right;
+  // }
 }
 
 .inner-own-token-grid-row {
@@ -86,7 +89,7 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
   }
   .value-currency {
     position: relative;
-    text-align: right;
+    text-align: left;
   }
 
   &__body-header {
@@ -103,34 +106,39 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     display: flex;
     .value-currency {
       min-width: 85px;
+      
     }
   }
   &__col-asset-price-small {
     position: absolute;
     font-size: 12px;
     font-weight: 600;
-    text-indent: 13px;
-    right: 0;
+    
+    color: #a2abb8;
+    left: 0;
     top: 100%;
   }
 
   &__col-asset-type {
     display: flex;
   }
-  &__col-liquidation-price {
-    display: flex;
-    justify-content: flex-end;
-  }
-  &__col-position-value {
-    display: flex;
-    justify-content: flex-end;
-  }
+  // &__col-liquidation-price {
+  //   display: flex;
+  //   justify-content: flex-end;
+  // }
+  // &__col-position-value {
+  //   display: flex;
+  //   justify-content: flex-end;
+  // }
   &__col-asset-collateral {
-    align-items: center;
-    position: relative;
+   // align-items: center;
+   // position: relative;
     display: flex;
-    .value-currency {
+    .value-currency {     
       min-width: 90px;
+      >:first-child{
+        position: relative;
+      }
     }
   }
   &__col-asset-collateral-small {
@@ -139,7 +147,8 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     font-weight: 600;
     text-indent: 13px;
     top: 100%;
-    right: 0;
+    left: -13px;
+    color: #a2abb8;
     &.danger {
       color: #ff4f4f;
     }
@@ -152,10 +161,9 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    margin-left: 10px;
     position: absolute;
-    right: -34px;
-    top: 2px;
+    right: -35px;
+    top: -1px;
     cursor: pointer;
 
     .icon-collateral-fill {
@@ -173,10 +181,10 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
       }
     }
   }
-  &__col-profit {
-    display: flex;
-    justify-content: flex-end;
-  }
+  // &__col-profit {
+  //   display: flex;
+  //   justify-content: flex-end;
+  // }
   &__col-action {
     display: flex;
     justify-content: flex-end;

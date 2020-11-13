@@ -250,12 +250,7 @@ export class InnerOwnTokenGridRow extends Component<
             )}`
     } else {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
-      profitValue = (
-        <React.Fragment>
-          <span className="sign-currency">$</span>
-          {this.props.profitUSD.toFixed(2)}
-        </React.Fragment>
-      )
+      profitValue = <React.Fragment>{this.props.profitUSD.toFixed(2)}</React.Fragment>
     }
     return (
       <React.Fragment>
@@ -290,8 +285,6 @@ export class InnerOwnTokenGridRow extends Component<
               {!this.state.isLoading ? (
                 <React.Fragment>
                   <span className="value-currency">
-                    <span className="sign-currency">$</span>
-
                     {this.props.value.toFixed(2)}
                     <span
                       title={this.state.valueChange.toFixed(18)}
@@ -311,9 +304,14 @@ export class InnerOwnTokenGridRow extends Component<
                 <React.Fragment>
                   <span className="value-currency">
                     <span title={this.props.collateral.toFixed(18)}>
-                      <span className="sign-currency">$</span>
-
                       {this.props.collateral.toFixed(2)}
+                      <div
+                        className={`inner-own-token-grid-row__open-manage-collateral ${
+                          this.props.loan.collateralizedPercent.lte(0.15) ? 'danger' : ''
+                        }`}
+                        onClick={this.onManageClick}>
+                        <OpenManageCollateral />
+                      </div>
                     </span>
 
                     <span
@@ -323,13 +321,6 @@ export class InnerOwnTokenGridRow extends Component<
                       title={collateralizedPercent.toFixed(18)}>
                       {collateralizedPercent.toFixed(2)}%
                     </span>
-                    <div
-                      className={`inner-own-token-grid-row__open-manage-collateral ${
-                        this.props.loan.collateralizedPercent.lte(0.15) ? 'danger' : ''
-                      }`}
-                      onClick={this.onManageClick}>
-                      <OpenManageCollateral />
-                    </div>
                   </span>
                 </React.Fragment>
               ) : (
@@ -343,10 +334,7 @@ export class InnerOwnTokenGridRow extends Component<
 
               {!this.state.isLoading ? (
                 this.props.openPrice ? (
-                  <React.Fragment>
-                    <span className="sign-currency">$</span>
-                    {this.props.openPrice.toFixed(2)}
-                  </React.Fragment>
+                  <React.Fragment>{this.props.openPrice.toFixed(2)}</React.Fragment>
                 ) : (
                   '$0.00'
                 )
@@ -360,10 +348,7 @@ export class InnerOwnTokenGridRow extends Component<
               <span className="inner-own-token-grid-row__body-header">Liquidation Price</span>
 
               {!this.state.isLoading ? (
-                <React.Fragment>
-                  <span className="sign-currency">$</span>
-                  {this.props.liquidationPrice.toFixed(2)}
-                </React.Fragment>
+                <React.Fragment>{this.props.liquidationPrice.toFixed(2)}</React.Fragment>
               ) : (
                 <Preloader width="74px" />
               )}

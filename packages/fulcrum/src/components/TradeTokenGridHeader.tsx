@@ -25,13 +25,13 @@ export const TradeTokenGridHeader = (props:ITradeTokenGridHeaderProps) => {
       </div>
       <div className="trade-token-grid-header__col-price">
         <span className="trade-token-grid-header__text">
-          Mid Market Price <strong>{props.quoteToken}</strong>
+          Mid Market Price <label className="trade-token-grid-header__text-asset">{props.quoteToken}</label>
           <IconInfo className="tooltip__icon" data-tip={info} />
           <ReactTooltip className="tooltip__info" place="top" effect="solid" />
         </span>
       </div>
       <div className="trade-token-grid-header__col-liquidation">
-        <span className="trade-token-grid-header__text">Liquidation Price <strong>{props.quoteToken}</strong></span>
+        <span className="trade-token-grid-header__text">Liquidation Price <label className="trade-token-grid-header__text-asset">{props.quoteToken}</label></span>
       </div>
       <div className="trade-token-grid-header__col-profit">
         <span className="trade-token-grid-header__text">Est. Yield, vBZRX</span>

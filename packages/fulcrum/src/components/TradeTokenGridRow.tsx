@@ -304,7 +304,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             !this.state.isLoading ? (
               <React.Fragment>
                 <div title={`$${this.state.baseTokenPrice.toFixed(18)}`}>
-                  <span className="fw-sign">$</span>
                   {this.state.baseTokenPrice.toFixed(2)}
                 </div>
               </React.Fragment>
@@ -319,10 +318,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <span className="trade-token-grid-row__title">Liquidation Price</span>
             )}
             {this.state.liquidationPrice.gt(0) && !this.state.isLoading ? (
-              <React.Fragment>
-                <span className="fw-sign">$</span>
-                {this.state.liquidationPrice.toFixed(2)}
-              </React.Fragment>
+              <React.Fragment>{this.state.liquidationPrice.toFixed(2)}</React.Fragment>
             ) : (
               <Preloader width="74px" />
             )}
