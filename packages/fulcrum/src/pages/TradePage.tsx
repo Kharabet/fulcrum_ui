@@ -31,6 +31,7 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 
 import '../styles/pages/_trade-page.scss'
+import { ProviderType } from '../domain/ProviderType'
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
@@ -312,7 +313,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // await this.derivedUpdate()
   }
 
+  private clearData = () => {
+    this.setState({
+      ownRowsData: [],
+      innerOwnRowsData: [],
+      loans: [],
+      openedPositionsCount: 0,
+      historyEvents: undefined
+    })
+  }
+
   private onProviderChanged = async (event: ProviderChangedEvent) => {
+    if (event.providerType === ProviderType.None) {
+      this.clearData()
+    }
     await this.getInnerOwnRowsData(this.state)
     await this.getOwnRowsData(this.state)
     await this.getHistoryEvents(this.state)
@@ -596,22 +610,24 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public getOwnRowsData = async (state: ITradePageState) => {
+    if (
+      !FulcrumProvider.Instance.web3Wrapper ||
+      !FulcrumProvider.Instance.contractsSource ||
+      !FulcrumProvider.Instance.contractsSource.canWrite
+    ) {
+      this.setState({ ownRowsData: [], loans: [], openedPositionsCount: 0 })
+      return null
+    }
     const ownRowsData: IOwnTokenGridRowProps[] = []
     let loans: IBorrowedFundsState[] | undefined
-    if (
-      FulcrumProvider.Instance.web3Wrapper &&
-      FulcrumProvider.Instance.contractsSource &&
-      FulcrumProvider.Instance.contractsSource.canWrite
-    ) {
-      loans = await FulcrumProvider.Instance.getUserMarginTradeLoans()
+    loans = await FulcrumProvider.Instance.getUserMarginTradeLoans()
 
-      for (const loan of loans) {
-        if (!loan.loanData) continue
+    for (const loan of loans) {
+      if (!loan.loanData) continue
 
-        const ownRowDataProps = await this.getOwnRowDataProps(loan)
+      const ownRowDataProps = await this.getOwnRowDataProps(loan)
 
-        ownRowsData.push(ownRowDataProps)
-      }
+      ownRowsData.push(ownRowDataProps)
     }
 
     this._isMounted &&
@@ -623,15 +639,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public getInnerOwnRowsData = async (state: ITradePageState) => {
-    const innerOwnRowsData: IOwnTokenGridRowProps[] = []
-    let loans: IBorrowedFundsState[] | undefined
     if (
       !FulcrumProvider.Instance.web3Wrapper ||
       !FulcrumProvider.Instance.contractsSource ||
       !FulcrumProvider.Instance.contractsSource.canWrite
     ) {
+      this.setState({ innerOwnRowsData: [], loans: [], openedPositionsCount: 0 })
       return null
     }
+    const innerOwnRowsData: IOwnTokenGridRowProps[] = []
+    let loans: IBorrowedFundsState[] | undefined
 
     const loansByPair = await FulcrumProvider.Instance.getUserMarginTradeLoansByPair(
       this.state.selectedMarket.baseToken,
@@ -665,6 +682,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public getHistoryEvents = async (state: ITradePageState) => {
+    
+    if (
+      !FulcrumProvider.Instance.web3Wrapper ||
+      !FulcrumProvider.Instance.contractsSource ||
+      !FulcrumProvider.Instance.contractsSource.canWrite
+    ) {
+      this.setState({ historyEvents: undefined })
+      return null
+    }
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory()
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory()
     const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory()
