@@ -1095,10 +1095,10 @@ export class FulcrumProvider {
             ? new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1))
             : new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
         )
-        result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18).plus(100)
+        result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18)
       } catch (e) {
         // console.log(e);
-        result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100)
+        result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100)
       }
     }
 
