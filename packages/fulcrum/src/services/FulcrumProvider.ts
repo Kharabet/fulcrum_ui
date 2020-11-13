@@ -72,6 +72,7 @@ const initialNetworkId = getNetworkIdByString(networkName)
 export class FulcrumProvider {
   public static Instance: FulcrumProvider
   public impersonateAddress = ''
+  private readonly impersionateAddress = ''
   public readonly gasLimit = '4500000'
   public static readonly ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
