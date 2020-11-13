@@ -7,7 +7,7 @@ $font-size-button: 16px;
 $width-button: 95px;
 $height-button: 44px;
 $padding: 22px 30px 35px 30px;
-$grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
+$grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
 
 .inner-own-token-grid-header {
   display: grid;
@@ -30,17 +30,11 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
   .opacity {
     opacity: 0;
   }
-  &__text-asset{
-    color:var(--primary-text);
-  }
-  &__col-asset-price {
-    //text-align: right;
-    @media screen and (min-width: $breakpoint-desktop-min) {
-      padding-right: 20px;
-    }
+  &__text-asset {
+    color: var(--primary-text);
   }
   &__col-asset-collateral {
-   // text-align: right;
+    // text-align: right;
     @media screen and (min-width: $breakpoint-desktop-min) {
       padding-right: 56px;
     }
@@ -48,16 +42,22 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
       padding-right: 36px;
     }
   }
-  // &__col-liquidation-price {
-  //   text-align: right;
-  // }
-  // &__col-position-value {
-  //   text-align: right;
-  // }
-   &__col-profit {
+  @media screen and (min-width: $breakpoint-laptop-min) {
+    &__col-liquidation-price,
+    &__col-asset-price,
+    &__col-position-value,
+    &__col-asset-collateral {
+      position: relative;
+      > span {
+        position: absolute;
+        width: max-content;
+      }
+    }
+  }
+  &__col-profit {
     grid-column-start: 7;
     grid-column-end: 9;
-   }
+  }
   // &__col-actions {
   //   text-align: right;
   // }
@@ -91,7 +91,14 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     position: relative;
     text-align: left;
   }
-
+  &__line {
+    display: inline-block;
+    height: 26px;
+    width: 1px;
+    vertical-align: -4px;
+    margin: 0 4px;
+    background-color: #586473;
+  }
   &__body-header {
     display: none;
     margin-bottom: 3px;
@@ -106,14 +113,13 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     display: flex;
     .value-currency {
       min-width: 85px;
-      
     }
   }
   &__col-asset-price-small {
     position: absolute;
     font-size: 12px;
     font-weight: 600;
-    
+
     color: #a2abb8;
     left: 0;
     top: 100%;
@@ -131,12 +137,12 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
   //   justify-content: flex-end;
   // }
   &__col-asset-collateral {
-   // align-items: center;
-   // position: relative;
+    // align-items: center;
+    // position: relative;
     display: flex;
-    .value-currency {     
+    .value-currency {
       min-width: 90px;
-      >:first-child{
+      > :first-child {
         position: relative;
       }
     }

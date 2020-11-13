@@ -241,13 +241,19 @@ export class InnerOwnTokenGridRow extends Component<
           ? `${this.props.profitCollateralToken.toFixed()}/${this.props.profitLoanToken.toFixed()}`
           : `${this.props.profitLoanToken.toFixed()}/${this.props.profitCollateralToken.toFixed()}`
       profitValue =
-        this.props.positionType === PositionType.LONG
-          ? `${this.props.profitCollateralToken.toFixed(2)}/${this.props.profitLoanToken.toFixed(
-              2
-            )}`
-          : `${this.props.profitLoanToken.toFixed(2)}/${this.props.profitCollateralToken.toFixed(
-              2
-            )}`
+        this.props.positionType === PositionType.LONG ? (
+          <React.Fragment>
+            {this.props.profitCollateralToken.toFixed(2)}{' '}
+            <span className="inner-own-token-grid-row__line"/>{' '}
+            {this.props.profitLoanToken.toFixed(2)}
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            {this.props.profitLoanToken.toFixed(2)}{' '}
+            <span className="inner-own-token-grid-row__line"/>{' '}
+            {this.props.profitCollateralToken.toFixed(2)}
+          </React.Fragment>
+        )
     } else {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
       profitValue = <React.Fragment>{this.props.profitUSD.toFixed(2)}</React.Fragment>
