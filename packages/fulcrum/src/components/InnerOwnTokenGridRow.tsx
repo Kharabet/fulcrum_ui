@@ -273,7 +273,7 @@ export class InnerOwnTokenGridRow extends Component<
               title={this.props.positionValue.toFixed(18)}
               className="inner-own-token-grid-row__col-token-name-full opacityIn">
               <span className="inner-own-token-grid-row__body-header">
-                Position({this.props.baseToken}/{this.props.quoteToken})
+                Position <label className="text-asset">{this.props.baseToken}</label>
               </span>
               {this.props.positionValue.toFixed(4)}
             </div>
@@ -287,7 +287,7 @@ export class InnerOwnTokenGridRow extends Component<
             <div
               title={`$${this.props.value.toFixed(18)}`}
               className="inner-own-token-grid-row__col-asset-price">
-              <span className="inner-own-token-grid-row__body-header">Value</span>
+              <span className="inner-own-token-grid-row__body-header">Value <label className="text-asset">{this.props.quoteToken}</label></span>
               {!this.state.isLoading ? (
                 <React.Fragment>
                   <span className="value-currency">
@@ -304,7 +304,7 @@ export class InnerOwnTokenGridRow extends Component<
               )}
             </div>
             <div className="inner-own-token-grid-row__col-asset-collateral">
-              <span className="inner-own-token-grid-row__body-header">Collateral</span>
+              <span className="inner-own-token-grid-row__body-header">Collateral <label className="text-asset">{this.props.baseToken}</label></span>
 
               {!this.state.isLoading ? (
                 <React.Fragment>
@@ -336,7 +336,7 @@ export class InnerOwnTokenGridRow extends Component<
             <div
               title={this.props.openPrice.toFixed(18)}
               className="inner-own-token-grid-row__col-position-value opacityIn">
-              <span className="inner-own-token-grid-row__body-header">Open Price</span>
+              <span className="inner-own-token-grid-row__body-header">Open Price <label className="text-asset">{this.props.quoteToken}</label></span>
 
               {!this.state.isLoading ? (
                 this.props.openPrice ? (
@@ -351,7 +351,7 @@ export class InnerOwnTokenGridRow extends Component<
             <div
               title={`$${this.props.liquidationPrice.toFixed(18)}`}
               className="inner-own-token-grid-row__col-liquidation-price opacityIn">
-              <span className="inner-own-token-grid-row__body-header">Liquidation Price</span>
+              <span className="inner-own-token-grid-row__body-header">Liquidation Price <label className="text-asset">{this.props.quoteToken}</label></span>
 
               {!this.state.isLoading ? (
                 <React.Fragment>{this.props.liquidationPrice.toFixed(2)}</React.Fragment>
@@ -360,7 +360,7 @@ export class InnerOwnTokenGridRow extends Component<
               )}
             </div>
             <div title={profitTitle} className="inner-own-token-grid-row__col-profit opacityIn">
-              <span className="inner-own-token-grid-row__body-header">Profit</span>
+              <span className="inner-own-token-grid-row__body-header">Profit <label className="text-asset">{this.props.baseToken}/{this.props.quoteToken}</label></span>
               {!this.state.isLoading ? profitValue : <Preloader width="74px" />}
             </div>
             <div className="inner-own-token-grid-row__col-action opacityIn rightIn">

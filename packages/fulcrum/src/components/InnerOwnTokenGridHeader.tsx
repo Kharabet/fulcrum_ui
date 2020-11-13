@@ -19,7 +19,7 @@ export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderP
           className={`inner-own-token-grid-header__col-token-image ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
           }`}>
-          <span className="inner-own-token-grid-header__text">Position <label className="inner-own-token-grid-header__text-asset">{this.props.asset}/{this.props.quoteToken}</label></span>
+          <span className="inner-own-token-grid-header__text">Position <label className="text-asset">{this.props.asset}/{this.props.quoteToken}</label></span>
         </div>
         <div
           className={`inner-own-token-grid-header__col-asset-type ${
@@ -31,31 +31,31 @@ export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderP
           className={`inner-own-token-grid-header__col-asset-price ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
           }`}>
-          <span className="inner-own-token-grid-header__text">Value <label className="inner-own-token-grid-header__text-asset">{this.props.quoteToken}</label></span>
+          <span className="inner-own-token-grid-header__text">Value <label className="text-asset">{this.props.quoteToken}</label></span>
         </div>
         <div
           className={`inner-own-token-grid-header__col-asset-collateral ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
           }`}>
-          <span className="inner-own-token-grid-header__text">Collateral <label className="inner-own-token-grid-header__text-asset">{this.props.quoteToken}</label></span>
+          <span className="inner-own-token-grid-header__text">Collateral <label className="text-asset">{this.props.asset}</label></span>
         </div>
         <div
           className={`inner-own-token-grid-header__col-position-value ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
           }`}>
-          <span className="inner-own-token-grid-header__text">Open Price <label className="inner-own-token-grid-header__text-asset">{this.props.quoteToken}</label></span>
+          <span className="inner-own-token-grid-header__text">Open Price <label className="text-asset">{this.props.quoteToken}</label></span>
         </div>
         <div
           className={`inner-own-token-grid-header__col-liquidation-price ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
           }`}>
-          <span className="inner-own-token-grid-header__text">Liquidation Price <label className="inner-own-token-grid-header__text-asset">{this.props.quoteToken}</label></span>
+          <span className="inner-own-token-grid-header__text">Liquidation Price <label className="text-asset">{this.props.quoteToken}</label></span>
         </div>
         <div
           className={`inner-own-token-grid-header__col-profit ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
           }`}>
-          <span className="inner-own-token-grid-header__text">Profit <label className="inner-own-token-grid-header__text-asset">{this.props.asset}/{this.props.quoteToken}</label>
+          <span className="inner-own-token-grid-header__text">Profit <label className="text-asset">{this.props.asset}/{this.props.quoteToken}</label>
           <IconInfo className="tooltip__icon" data-tip={`Hello world`} />
           <ReactTooltip className="tooltip__info" place="top" effect="solid" /></span>
         </div>
