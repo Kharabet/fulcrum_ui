@@ -327,7 +327,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             title={this.props.yieldApr.gt(0) ? `${this.props.yieldApr.toFixed(18)}%` : ``}
             className="trade-token-grid-row__col-profit">
             {this.props.isMobileMedia && (
-              <span className="trade-token-grid-row__title">Est. Yield, vBZRX</span>
+              <div className="trade-token-grid-row__title">Est. Yield, vBZRX</div>
             )}
 
             {this.props.yieldApr.gt(0) && !this.state.isLoading ? (

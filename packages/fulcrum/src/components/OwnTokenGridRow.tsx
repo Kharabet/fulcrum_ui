@@ -214,7 +214,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             )}`
     } else {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
-      profitValue = <React.Fragment><span className="sign-currency">$</span>{this.props.profitUSD.toFixed(2)}</React.Fragment>
+      profitValue = <React.Fragment>{this.props.profitUSD.toFixed(2)}</React.Fragment>
     }
     return this.state.isLoadingTransaction && this.state.request ? (
       <React.Fragment>
@@ -248,7 +248,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <span className="own-token-grid-row__body-header">Mid Market Price</span>
           {!this.state.isLoading ? (
             <React.Fragment>
-              <span className="sign-currency">$</span>
+              
               {this.props.openPrice.toFixed(2)}
             </React.Fragment>
           ) : (
@@ -261,7 +261,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <span className="own-token-grid-row__body-header">Liq. Price</span>
           {!this.state.isLoading ? (
             <React.Fragment>
-              <span className="sign-currency">$</span>
+              
               {this.props.liquidationPrice.toFixed(2)}
             </React.Fragment>
           ) : (
@@ -276,7 +276,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             {!this.state.isLoading ? (
               <React.Fragment>
                 <span>
-                  <span className="sign-currency">$</span>
+                  
                   {this.props.collateral.toFixed(2)}
                 </span>
                 <span
@@ -308,7 +308,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           {!this.state.isLoading ? (
             this.props.value ? (
               <React.Fragment>
-                <span className="sign-currency">$</span>
+                
                 {this.props.value.toFixed(2)}
               </React.Fragment>
             ) : (
