@@ -780,34 +780,8 @@ export class FulcrumProvider {
         }
       }
     }
-    //  await new Promise(r => setTimeout(r, 10000))
     return result
   }
-
-  // public getLendProfits = async (assets: Asset[]): Promise<[BigNumber, BigNumber]> => {
-  //   // should return null if no data (not traded asset), new BigNumber(0) if no profit
-  //   let result: [BigNumber, BigNumber] = [new BigNumber(0), new BigNumber(0)]
-  //   let account: string | null = null
-
-  //   if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-  //     account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
-  //   }
-
-  //   if (account && this.contractsSource && this.contractsSource.canWrite) {
-  //     const assetContract = this.contractsSource.getITokenContract(asset)
-  //     if (assetContract) {
-  //       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
-  //       const balance = (await assetContract.assetBalanceOf.callAsync(account)).div(10 ** precision)
-  //       result = [new BigNumber(0), balance]
-
-  //       if (balance.gt(0)) {
-  //         const profit = (await assetContract.profitOf.callAsync(account)).div(10 ** precision)
-  //         result = [profit, balance]
-  //       }
-  //     }
-  //   }
-  //   return result
-  // }
 
   public getBaseAsset = (key: TradeTokenKey): Asset => {
     if (key.positionType === PositionType.SHORT) {

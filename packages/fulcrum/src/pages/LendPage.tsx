@@ -17,17 +17,16 @@ export interface ILendPageProps {
 }
 
 function LendPage(props: ILendPageProps) {
-  const [isLendModalOpen, setIsLendModalOpen] = useState(false)
-  const [lendType, setLendType] = useState(LendType.LEND)
-  const [lendAsset, setLendAsset] = useState(Asset.UNKNOWN)
-  const [lendRequestId, setLendRequestId] = useState(0)
-
-  let isMounted = true
+  const [isLendModalOpen, setIsLendModalOpen] = useState<boolean>(false)
+  const [lendType, setLendType] = useState<LendType>(LendType.LEND)
+  const [lendAsset, setLendAsset] = useState<Asset>(Asset.UNKNOWN)
+  const [lendRequestId, setLendRequestId] = useState<number>(0)
+  
+  let isMounted: boolean = false
+  
   useEffect(() => {
-    // const provider = FulcrumProvider.getLocalstorageItem('providerType')
-    // if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === 'None')) {
-    //   props.doNetworkConnect()
-    // }
+    isMounted = true
+
     return () => {
       isMounted = false
     }
