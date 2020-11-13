@@ -19,13 +19,13 @@ import { LendTxLoaderStep } from './LendTxLoaderStep'
 
 export interface ILendTokenSelectorItemProps {
   asset: Asset
-  interestRate?: BigNumber
+  profit: BigNumber
+  balanceOfUser: BigNumber
+  interestRate: BigNumber
   onLend: (request: LendRequest) => void
 }
 
 function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
-  const [profit, setProfit] = React.useState<BigNumber>(new BigNumber(0))
-  const [balanceOfUser, setBalanceOfUser] = React.useState<BigNumber>(new BigNumber(0))
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [isLoadingTransaction, setIsLoadingTransaction] = React.useState<boolean>(false)
   const [request, setRequest] = React.useState<LendRequest | undefined>(undefined)
@@ -33,40 +33,19 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
   const assetDetails = AssetsDictionary.assets.get(props.asset)
 
   const tickerSecondDiff =
-    (balanceOfUser &&
+    (props.balanceOfUser &&
       props.interestRate &&
-      balanceOfUser.times(props.interestRate).dividedBy(100 * 365 * 24 * 60 * 60)) ||
+      props.balanceOfUser.times(props.interestRate).dividedBy(100 * 365 * 24 * 60 * 60)) ||
     new BigNumber(0)
   const iTokenAddress =
     (FulcrumProvider.Instance.contractsSource &&
       FulcrumProvider.Instance.contractsSource.getITokenErc20Address(props.asset)) ||
     ''
-  let _refreshInterval: any
-  const _refreshProfitTimerMillisec: number = 1000 * 60 * 10
+
   let _isMounted: any
 
   React.useEffect(() => {
     _isMounted = true
-    // FulcrumProvider.Instance.eventEmitter.on(
-    //   FulcrumProviderEvents.ProviderAvailable,
-    //   onProviderAvailable
-    // )
-    FulcrumProvider.Instance.eventEmitter.on(
-      FulcrumProviderEvents.ProviderChanged,
-      onProviderChanged
-    )
-    FulcrumProvider.Instance.eventEmitter.on(
-      FulcrumProviderEvents.AskToOpenProgressDlg,
-      onAskToOpenProgressDlg
-    )
-    FulcrumProvider.Instance.eventEmitter.on(
-      FulcrumProviderEvents.AskToCloseProgressDlg,
-      onAskToCloseProgressDlg
-    )
-    FulcrumProvider.Instance.eventEmitter.on(
-      FulcrumProviderEvents.LendTransactionMined,
-      onLendTransactionMined
-    )
 
     const task = TasksQueue.Instance.getTasksList().find(
       (t) => t.request instanceof LendRequest && t.request.asset === props.asset
@@ -74,20 +53,10 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
 
     setIsLoadingTransaction(task && !task.error ? true : false)
     setRequest(task ? (task.request as LendRequest) : undefined)
-    derivedUpdate()
-    _refreshInterval = window.setInterval(derivedUpdate, _refreshProfitTimerMillisec)
+
 
     return () => {
       _isMounted = false
-      window.clearInterval(_refreshInterval)
-      FulcrumProvider.Instance.eventEmitter.off(
-        FulcrumProviderEvents.ProviderAvailable,
-        onProviderAvailable
-      )
-      FulcrumProvider.Instance.eventEmitter.off(
-        FulcrumProviderEvents.ProviderChanged,
-        onProviderChanged
-      )
       FulcrumProvider.Instance.eventEmitter.off(
         FulcrumProviderEvents.AskToOpenProgressDlg,
         onAskToOpenProgressDlg
@@ -96,48 +65,34 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
         FulcrumProviderEvents.AskToCloseProgressDlg,
         onAskToCloseProgressDlg
       )
-      FulcrumProvider.Instance.eventEmitter.off(
-        FulcrumProviderEvents.LendTransactionMined,
-        onLendTransactionMined
-      )
     }
   }, [])
 
-  const derivedUpdate = () => {
-    _isMounted && setIsLoading(true)
-    console.log('derivedUpdate')
-
-    // setTimeout(()=>{
-    // console.log('setTimeout')
-
-    //   setBalanceOfUser(new BigNumber(10))
-    //   setProfit(new BigNumber(10))
-    //   setIsLoading(false)
-    // }, 10000)
-    FulcrumProvider.Instance.getLendProfit(props.asset).then(([profit, balance]) => {
-    console.log('getLendProfit')
-      
-      if (_isMounted) {
-        setBalanceOfUser(balance)
-        setProfit(profit && profit.lt(0) ? new BigNumber(0) : profit)
-      }
-      setIsLoading(false)
-    }).catch((e) => {
-      
-      setIsLoading(false)
-      console.log(e)
-    })
-  }
-
-  const onProviderAvailable =  () => {
-    derivedUpdate()
-  }
-
-  const onProviderChanged =  (event: ProviderChangedEvent) => {
-    console.log("onProviderChanged")
-    derivedUpdate()
-  }
-
+  React.useEffect(() => {
+    if (request){
+      FulcrumProvider.Instance.eventEmitter.on(
+        FulcrumProviderEvents.AskToOpenProgressDlg,
+        onAskToOpenProgressDlg
+      )
+      FulcrumProvider.Instance.eventEmitter.on(
+        FulcrumProviderEvents.AskToCloseProgressDlg,
+        onAskToCloseProgressDlg
+      )
+     
+    }
+    else{
+      FulcrumProvider.Instance.eventEmitter.off(
+        FulcrumProviderEvents.AskToOpenProgressDlg,
+        onAskToOpenProgressDlg
+      )
+      FulcrumProvider.Instance.eventEmitter.off(
+        FulcrumProviderEvents.AskToCloseProgressDlg,
+        onAskToCloseProgressDlg
+      )
+     
+    }
+  },[request])
+  
   const onAskToOpenProgressDlg = (taskId: number) => {
     if (!request || taskId !== request.id) return
     setIsLoadingTransaction(true)
@@ -154,12 +109,6 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
     }
     setIsLoadingTransaction(false)
     setRequest(undefined)
-  }
-
-  const onLendTransactionMined =  (event: LendTransactionMinedEvent) => {
-    if (event.asset === props.asset) {
-      derivedUpdate()
-    }
   }
 
   const renderActions = (isLendOnly: boolean) => {
@@ -189,13 +138,13 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
     )
   }
 
-  const onLendClick =  () => {
+  const onLendClick = () => {
     const lendRequest = new LendRequest(LendType.LEND, props.asset, new BigNumber(0))
     setRequest(lendRequest)
     props.onLend(lendRequest)
   }
 
-  const onUnLendClick =  () => {
+  const onUnLendClick = () => {
     const unLendRequest = new LendRequest(LendType.UNLEND, props.asset, new BigNumber(0))
     setRequest(unLendRequest)
     props.onLend(unLendRequest)
@@ -206,9 +155,9 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
   }
   return (
     <div
-      className={`token-selector-item ${balanceOfUser.eq(0) ? '' : 'token-selector-item_active'} ${
-        isLoadingTransaction ? 'loading-transaction' : ''
-      }`}>
+      className={`token-selector-item ${
+        props.balanceOfUser.eq(0) ? '' : 'token-selector-item_active'
+      } ${isLoadingTransaction ? 'loading-transaction' : ''}`}>
       <div className="token-selector-item__image">
         {isLoadingTransaction ? (
           <CircleLoader>{assetDetails.reactLogoSvg.render()}</CircleLoader>
@@ -223,7 +172,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
         <React.Fragment>
           <div
             className="token-selector-item__descriptions"
-            style={{ marginTop: profit === null ? `1.5rem` : undefined }}>
+            style={{ marginTop: props.profit === null ? `1.5rem` : undefined }}>
             <div className="token-selector-item__description">
               {iTokenAddress &&
               FulcrumProvider.Instance.web3ProviderSettings &&
@@ -260,18 +209,18 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
                   )}
                 </div>
               </div>
-              {balanceOfUser.gt(0) ? (
+              {props.balanceOfUser.gt(0) ? (
                 <React.Fragment>
-                  {profit !== null ? (
+                  {props.profit !== null ? (
                     <div className="token-selector-item__profit-container token-selector-item__balance-container">
                       <div className="token-selector-item__profit-title token-selector-item__profit-balance">
                         Balance:
                       </div>
                       {!isLoading ? (
                         <div
-                          title={`${balanceOfUser.toFixed(18)} ${props.asset}`}
+                          title={`${props.balanceOfUser.toFixed(18)} ${props.asset}`}
                           className="token-selector-item__profit-value token-selector-item__balance-value">
-                          {balanceOfUser.toFixed(2)}
+                          {props.balanceOfUser.toFixed(2)}
                         </div>
                       ) : (
                         <div className="token-selector-item__interest-rate-value">
@@ -285,7 +234,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
                     <ProfitTicker
                       asset={props.asset}
                       secondDiff={tickerSecondDiff}
-                      profit={profit}
+                      profit={props.profit}
                     />
                   </div>
                 </React.Fragment>
@@ -299,7 +248,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
               )}
             </div>
           </div>
-          {renderActions(balanceOfUser.eq(0))}
+          {renderActions(props.balanceOfUser.eq(0))}
         </React.Fragment>
       )}
     </div>

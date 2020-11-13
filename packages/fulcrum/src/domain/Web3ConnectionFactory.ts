@@ -41,7 +41,7 @@ export class Web3ConnectionFactory {
     const provider = await connector.getProvider()
     try {
       providerEngine.addProvider(new SignerSubprovider(provider))
-      providerEngine.start()
+      await providerEngine.start()
       web3Wrapper = new Web3Wrapper(providerEngine)
       canWrite = true
       const account = await connector.getAccount()

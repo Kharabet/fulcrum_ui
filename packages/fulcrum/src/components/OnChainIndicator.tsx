@@ -98,7 +98,6 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   public render() {
-    console.log(7)
     const {
       isLoading,
       isSupportedNetwork,

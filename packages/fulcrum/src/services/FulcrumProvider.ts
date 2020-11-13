@@ -196,6 +196,8 @@ export class FulcrumProvider {
 
   public async setWeb3ProviderFinalize(providerType: ProviderType) {
     // : Promise<boolean> {
+      
+    this.unsupportedNetwork = false
     this.web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
     this.providerEngine = Web3ConnectionFactory.currentWeb3Engine
     let canWrite = Web3ConnectionFactory.canWrite
@@ -232,10 +234,9 @@ export class FulcrumProvider {
       this.contractsSource = null
     }
 
-    this.providerType = canWrite ? providerType : ProviderType.None
+    this.providerType = canWrite || (!canWrite && this.unsupportedNetwork) ? providerType : ProviderType.None
 
     FulcrumProvider.setLocalstorageItem('providerType', this.providerType)
-    console.log(6)
 
     this.eventEmitter.emit(
       FulcrumProviderEvents.ProviderChanged,
@@ -759,7 +760,7 @@ export class FulcrumProvider {
 
   public getLendProfit = async (asset: Asset): Promise<[BigNumber, BigNumber]> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
-    let result: [BigNumber, BigNumber] = [new BigNumber(10), new BigNumber(10)]
+    let result: [BigNumber, BigNumber] = [new BigNumber(0), new BigNumber(0)]
     let account: string | null = null
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
@@ -783,30 +784,30 @@ export class FulcrumProvider {
     return result
   }
 
-  public getLendProfits = async (asset: Asset): Promise<[BigNumber, BigNumber]> => {
-    // should return null if no data (not traded asset), new BigNumber(0) if no profit
-    let result: [BigNumber, BigNumber] = [new BigNumber(0), new BigNumber(0)]
-    let account: string | null = null
+  // public getLendProfits = async (assets: Asset[]): Promise<[BigNumber, BigNumber]> => {
+  //   // should return null if no data (not traded asset), new BigNumber(0) if no profit
+  //   let result: [BigNumber, BigNumber] = [new BigNumber(0), new BigNumber(0)]
+  //   let account: string | null = null
 
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
-    }
+  //   if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+  //     account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+  //   }
 
-    if (account && this.contractsSource && this.contractsSource.canWrite) {
-      const assetContract = this.contractsSource.getITokenContract(asset)
-      if (assetContract) {
-        const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
-        const balance = (await assetContract.assetBalanceOf.callAsync(account)).div(10 ** precision)
-        result = [new BigNumber(0), balance]
+  //   if (account && this.contractsSource && this.contractsSource.canWrite) {
+  //     const assetContract = this.contractsSource.getITokenContract(asset)
+  //     if (assetContract) {
+  //       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
+  //       const balance = (await assetContract.assetBalanceOf.callAsync(account)).div(10 ** precision)
+  //       result = [new BigNumber(0), balance]
 
-        if (balance.gt(0)) {
-          const profit = (await assetContract.profitOf.callAsync(account)).div(10 ** precision)
-          result = [profit, balance]
-        }
-      }
-    }
-    return result
-  }
+  //       if (balance.gt(0)) {
+  //         const profit = (await assetContract.profitOf.callAsync(account)).div(10 ** precision)
+  //         result = [profit, balance]
+  //       }
+  //     }
+  //   }
+  //   return result
+  // }
 
   public getBaseAsset = (key: TradeTokenKey): Asset => {
     if (key.positionType === PositionType.SHORT) {
@@ -2984,7 +2985,7 @@ console.log(err, added);
 
         const randomNumber = Math.floor(Math.random() * 100000) + 1
 
-        if (isMainnetProd && request) {
+        if (request) {
           if (request instanceof LendRequest) {
             const tagManagerArgs = {
               dataLayer: {
@@ -2998,7 +2999,7 @@ console.log(err, added);
                 ]
               }
             }
-            TagManager.dataLayer(tagManagerArgs)
+            isMainnetProd && TagManager.dataLayer(tagManagerArgs)
             this.eventEmitter.emit(
               FulcrumProviderEvents.LendTransactionMined,
               new LendTransactionMinedEvent(request.asset, txHash)
@@ -3016,7 +3017,7 @@ console.log(err, added);
                 ]
               }
             }
-            TagManager.dataLayer(tagManagerArgs)
+            isMainnetProd && TagManager.dataLayer(tagManagerArgs)
           } else {
             const tagManagerArgs = {
               dataLayer: {
@@ -3030,7 +3031,7 @@ console.log(err, added);
                 ]
               }
             }
-            TagManager.dataLayer(tagManagerArgs)
+            isMainnetProd && TagManager.dataLayer(tagManagerArgs)
           }
         }
       } else {
