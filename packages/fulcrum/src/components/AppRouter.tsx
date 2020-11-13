@@ -4,7 +4,7 @@ import React, { Component, Suspense } from 'react'
 import TagManager from 'react-gtm-module'
 import Modal from 'react-modal'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
-import { Footer } from '../layout/Footer'
+import Footer from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
 
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'

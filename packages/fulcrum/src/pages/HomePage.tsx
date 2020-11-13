@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { OpsSelector } from '../components/OpsSelector'
-import { Footer } from '../layout/Footer'
+import Footer from '../layout/Footer'
 import { HeaderHome } from '../layout/HeaderHome'
 
 export interface IHomePageProps {
