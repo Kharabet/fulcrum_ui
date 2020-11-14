@@ -87,7 +87,7 @@ export class LiquidationProcessor {
 
     const sendAmountForValue = isETHLoanToken ? taskRequest.closeAmount : new BigNumber(0)
 
-    let gasAmountBN = new BigNumber(0)
+    let gasAmountBN = new BigNumber(ExplorerProvider.Instance.gasLimit)
     let txHash: string = ''
 
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
@@ -136,7 +136,7 @@ export class LiquidationProcessor {
               {
                 from: account,
                 value: sendAmountForValue,
-                gas: ExplorerProvider.Instance.gasLimit,
+                gas: gasAmountBN.toString(),
                 gasPrice: await ExplorerProvider.Instance.gasPrice()
               }
             )
@@ -147,7 +147,7 @@ export class LiquidationProcessor {
               {
                 from: account,
                 value: sendAmountForValue,
-                gas: ExplorerProvider.Instance.gasLimit,
+                gas: gasAmountBN.toString(),
                 gasPrice: await ExplorerProvider.Instance.gasPrice()
               }
             )
