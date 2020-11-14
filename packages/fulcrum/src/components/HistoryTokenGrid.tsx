@@ -196,7 +196,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           ? tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
             ? new BigNumber(10 ** 36)
                 .div(tradeEvent.entryPrice)
-                .div(10 ** loanAssetDecimalsFirstEvent)
+                .div(10 ** 18)
+                .times(10 ** (collateralAssetDecimalsFirstEvent - loanAssetDecimalsFirstEvent))
             : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
           : tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
           ? tradeEvent.entryPrice.div(10 ** collateralAssetDecimalsFirstEvent)
@@ -233,14 +234,19 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionSize.div(10 ** collateralAssetDecimals)
             tradePrice =
               event.timeStamp > dateWhenPricePrecisionWasChanged
-                ? new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** loanAssetDecimals)
+                ? new BigNumber(10 ** 36)
+                    .div(event.entryPrice)
+                    .div(10 ** 18)
+                    .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
                 : new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18)
             value = positionValue.times(tradePrice)
           } else {
             positionValue = event.borrowedAmount.div(10 ** loanAssetDecimals)
             tradePrice =
               event.timeStamp > dateWhenPricePrecisionWasChanged
-                ? event.entryPrice.div(10 ** collateralAssetDecimals)
+                ? event.entryPrice
+                    .div(10 ** 18)
+                    .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
                 : event.entryPrice.div(10 ** 18)
             value = positionValue.times(tradePrice)
           }
@@ -270,7 +276,10 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionCloseSize.div(10 ** collateralAssetDecimals)
             tradePrice =
               event.timeStamp > dateWhenPricePrecisionWasChanged
-                ? new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** loanAssetDecimals)
+                ? new BigNumber(10 ** 36)
+                    .div(event.exitPrice)
+                    .div(10 ** 18)
+                    .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
                 : new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18)
             value = positionValue.times(tradePrice)
             profit = tradePrice.minus(openPrice).times(positionValue)
@@ -278,7 +287,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.loanCloseAmount.div(10 ** loanAssetDecimals)
             tradePrice =
               event.timeStamp > dateWhenPricePrecisionWasChanged
-                ? event.exitPrice.div(10 ** collateralAssetDecimals)
+                ? event.exitPrice
+                    .div(10 ** 18)
+                    .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
                 : event.exitPrice.div(10 ** 18)
             value = positionValue.times(tradePrice)
             profit = openPrice.minus(tradePrice).times(positionValue)
@@ -306,31 +317,22 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
           const collateralAssetDecimals =
             AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
-          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
 
           if (positionType === PositionType.LONG) {
-            positionValue = event.repayAmount.div(10 ** loanAssetDecimals).div(
-              event.collateralToLoanRate
-                .div(10 ** 18)
-                .times(loanAssetPrecision)
-                .div(collateralAssetPrecision)
-            )
             tradePrice = event.collateralToLoanRate
-              .div(10 ** 18)
-              .times(loanAssetPrecision)
-              .div(collateralAssetPrecision)
+            .div(10 ** 18)
+            .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+            positionValue = event.repayAmount.div(10 ** loanAssetDecimals).div(tradePrice)
             value = positionValue.times(tradePrice)
             profit = value.minus(
               event.collateralWithdrawAmount.div(10 ** collateralAssetDecimals).times(tradePrice)
             )
           } else {
-            positionValue = event.repayAmount.times(loanAssetPrecision).div(10 ** 18)
+            positionValue = event.repayAmount.div(10 ** loanAssetDecimals)
             tradePrice = new BigNumber(10 ** 36)
               .div(event.collateralToLoanRate)
               .div(10 ** 18)
-              .div(loanAssetPrecision)
-              .times(collateralAssetPrecision)
+              .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
             value = positionValue.times(tradePrice)
             profit = value.minus(event.collateralWithdrawAmount.div(10 ** collateralAssetDecimals))
           }
