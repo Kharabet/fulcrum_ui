@@ -42,6 +42,7 @@ import { TradeEvent } from '../domain/events/TradeEvent'
 import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
 import { LiquidationEvent } from '../domain/events/LiquidationEvent'
 import { EarnRewardEvent } from '../domain/events/EarnRewardEvent'
+import { EarnRewardEventNew, FeeType } from '../domain/events/EarnRewardEventNew'
 import { PayTradingFeeEvent } from '../domain/events/PayTradingFeeEvent'
 import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
@@ -2093,8 +2094,8 @@ export class FulcrumProvider {
     return result
   }
 
-  public getEarnRewardHistory = async (): Promise<EarnRewardEvent[]> => {
-    let result: EarnRewardEvent[] = []
+  public getEarnRewardHistory = async (): Promise<Array<(EarnRewardEvent|EarnRewardEventNew)>> => {
+    let result: Array<(EarnRewardEvent|EarnRewardEventNew)> = []
     const account = this.getCurrentAccount()
 
     if (!this.contractsSource) return result
@@ -2138,6 +2139,45 @@ export class FulcrumProvider {
         )
       })
       .filter((e: any) => e)
+
+    etherscanApiUrl =
+      networkName === 'kovan'
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
+            EarnRewardEventNew.topic0
+          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
+            EarnRewardEventNew.topic0
+          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+    const earnRewardEventNewResponse = await fetch(etherscanApiUrl)
+    const earnRewardEventNewResponseJson = await earnRewardEventNewResponse.json()
+    if (earnRewardEventNewResponseJson.status !== '1') return result
+    const eventsNew = earnRewardEventNewResponseJson.result
+    eventsNew.forEach((event: any) => {
+      const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const loandId = event.topics[2]
+      const feeType = parseInt(event.topics[3], 16)
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return null
+      const tokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
+      const token = this.contractsSource!.getAssetFromAddress(tokenAddress)
+      if (token === Asset.UNKNOWN) return null
+
+      const amount = new BigNumber(parseInt(dataSegments[1], 16))
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
+      const txHash = event.transactionHash
+      result.push(
+        new EarnRewardEventNew(
+          userAddress,
+          loandId,
+          feeType,
+          token,
+          amount.div(10 ** 18),
+          timeStamp,
+          txHash
+        )
+      )
+    })
     return result
   }
 

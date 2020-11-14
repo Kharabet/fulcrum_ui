@@ -449,6 +449,9 @@ export class ContractsSource {
           case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
             asset = Asset.CHI
             break
+          case '0xb72b31907c1c95f3650b64b2469e08edacee5e8f':
+            asset = Asset.vBZRX
+            break
         }
         break
       case 3:
