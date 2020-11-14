@@ -103,7 +103,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
 
   const renderActions = (isLendOnly: boolean) => {
     return isLendOnly ? (
-      <div className="token-selector-item__actions" style={{ marginTop: `-1.5rem` }}>
+      <div className="token-selector-item__actions">
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-full"
           onClick={onLendClick}

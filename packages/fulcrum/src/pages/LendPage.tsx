@@ -21,16 +21,6 @@ function LendPage(props: ILendPageProps) {
   const [lendType, setLendType] = useState<LendType>(LendType.LEND)
   const [lendAsset, setLendAsset] = useState<Asset>(Asset.UNKNOWN)
   const [lendRequestId, setLendRequestId] = useState<number>(0)
-  
-  let isMounted: boolean = false
-  
-  useEffect(() => {
-    isMounted = true
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
 
   const onLendRequested = (request: LendRequest) => {
     if (
@@ -41,7 +31,7 @@ function LendPage(props: ILendPageProps) {
       return
     }
 
-    if (request && isMounted) {
+    if (request) {
       setIsLendModalOpen(true)
       setLendType(request.lendType)
       setLendAsset(request.asset)
@@ -50,13 +40,13 @@ function LendPage(props: ILendPageProps) {
   }
 
   const onLendConfirmed = (request: LendRequest) => {
-    isMounted && setIsLendModalOpen(false)
+    setIsLendModalOpen(false)
     request.id = lendRequestId
     FulcrumProvider.Instance.onLendConfirmed(request)
   }
 
   const onRequestClose = () => {
-    isMounted && setIsLendModalOpen(false)
+    setIsLendModalOpen(false)
   }
   return (
     <div className="lend-page">
