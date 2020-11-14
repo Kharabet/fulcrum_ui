@@ -55,7 +55,7 @@ export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderP
           className={`inner-own-token-grid-header__col-profit ${
             this.props.isLoadingTransaction && this.props.loader ? `opacity` : `opacityIn`
           }`}>
-          <span className="inner-own-token-grid-header__text">Profit <label className="text-asset">{this.props.asset}/{this.props.quoteToken}</label>
+          <span className="inner-own-token-grid-header__text">Profit <label className="text-asset">{this.props.asset} | {this.props.quoteToken}</label>
           <IconInfo className="tooltip__icon" data-tip={`Hello world`} />
           <ReactTooltip className="tooltip__info" place="top" effect="solid" /></span>
         </div>
