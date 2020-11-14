@@ -255,7 +255,12 @@ export class InnerOwnTokenGridRow extends Component<
         )
     } else {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
-      profitValue = <React.Fragment>{this.props.profitUSD.toFixed(2)}</React.Fragment>
+      profitValue = (
+        <React.Fragment>
+          <span className="sign-currency">$</span>
+          {this.props.profitUSD.toFixed(2)}
+        </React.Fragment>
+      )
     }
     return (
       <React.Fragment>

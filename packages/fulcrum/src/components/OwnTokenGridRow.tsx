@@ -213,7 +213,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             )}`
     } else {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
-      profitValue = <React.Fragment>{this.props.profitUSD.toFixed(2)}</React.Fragment>
+      profitValue = (
+        <React.Fragment>
+          <span className="sign-currency">$</span>
+          {this.props.profitUSD.toFixed(2)}
+        </React.Fragment>
+      )
     }
     return this.state.isLoadingTransaction && this.state.request ? (
       <React.Fragment>
@@ -271,12 +276,13 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
                 <span>{this.props.collateral.toFixed(2)}</span>
                 <span
                   className={`own-token-grid-row__col-asset-collateral-small ${
-                    this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin.plus(0.1)) ? 'danger' : ''
+                    this.props.loan.collateralizedPercent.lte(
+                      this.props.maintenanceMargin.plus(0.1)
+                    )
+                      ? 'danger'
+                      : ''
                   }`}>
-                  {this.props.loan.collateralizedPercent
-                    .multipliedBy(100)
-                    .toFixed(2)}
-                  %
+                  {this.props.loan.collateralizedPercent.multipliedBy(100).toFixed(2)}%
                 </span>
               </React.Fragment>
             ) : (
@@ -285,7 +291,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           </div>
           <div
             className={`own-token-grid-row__open-manage-collateral ${
-              this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin) ? 'danger' : ''
+              this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)
+                ? 'danger'
+                : ''
             }`}
             onClick={this.onManageClick}>
             <OpenManageCollateral />
