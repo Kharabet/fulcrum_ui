@@ -7,7 +7,6 @@ import '../styles/pages/_stats-page.scss'
 export interface IStatsPageProps {
   doNetworkConnect: () => void
   isRiskDisclosureModalOpen: () => void
-  isLoading: boolean
   isMobileMedia: boolean
 }
 

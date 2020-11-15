@@ -535,8 +535,7 @@ export class StakingProvider {
 
   public canOptin = async (): Promise<boolean> => {
     let result: boolean = false
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const traderCompensationContract = await this.contractsSource.getTraderCompensationContract()
@@ -554,8 +553,7 @@ export class StakingProvider {
 
   public isClaimable = async (): Promise<BigNumber> => {
     let result: BigNumber = new BigNumber(0)
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const traderCompensationContract = await this.contractsSource.getTraderCompensationContract()
@@ -574,8 +572,7 @@ export class StakingProvider {
   public doOptin = async () => {
     let receipt = null
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return receipt
 
     const traderCompensationContract = await this.contractsSource.getTraderCompensationContract()
@@ -682,8 +679,7 @@ export class StakingProvider {
   > => {
     let result: { wallet: string; BZRX: BigNumber; vBZRX: BigNumber; LPToken: BigNumber }[] = []
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
@@ -704,8 +700,7 @@ export class StakingProvider {
   public checkIsRep = async (): Promise<boolean> => {
     let result = false
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
@@ -721,8 +716,7 @@ export class StakingProvider {
   public stakeableByAsset = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const bZxContract = await this.contractsSource.getBZRXStakingInterimContract()
@@ -741,8 +735,7 @@ export class StakingProvider {
   public balanceOfByAsset = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
@@ -765,8 +758,7 @@ export class StakingProvider {
   public balanceOfByAssetWalletAware = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
@@ -789,8 +781,7 @@ export class StakingProvider {
   public getUserEarnings = async (): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
@@ -806,8 +797,7 @@ export class StakingProvider {
   public getDelegateAddress = async (): Promise<string> => {
     let result = ''
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
@@ -823,8 +813,7 @@ export class StakingProvider {
   public getRebateRewards = async (): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = "0x077b89835d729283bDCcE39840dF5B063bC1159f"
     if (!this.contractsSource) return result
 
     const bZxContract = await this.contractsSource.getiBZxContract()

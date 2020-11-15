@@ -19,6 +19,10 @@ import { Preloader } from './Preloader'
 import { CircleLoader } from './CircleLoader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 
+import ReactTooltip from 'react-tooltip'
+import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
+import '../styles/components/tooltip.scss'
+
 export interface ITradeTokenGridRowProps {
   isMobileMedia: boolean
   baseToken: Asset
@@ -93,6 +97,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.props.positionType === PositionType.LONG
         ? collateralToPrincipalRate
         : new BigNumber(1).div(collateralToPrincipalRate)
+
     const initialMargin =
       this.props.positionType === PositionType.LONG
         ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -145,8 +150,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(() => {
-        FulcrumProvider.Instance.onTaskCancel(task)
+      window.setTimeout(async () => {
+        await FulcrumProvider.Instance.onTaskCancel(task)
         this.setState({
           ...this.state,
           isLoadingTransaction: false,
@@ -190,7 +195,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   public async componentDidMount() {
     this._isMounted = true
 
-    const task = await TasksQueue.Instance.getTasksList().find(
+    const task = TasksQueue.Instance.getTasksList().find(
       (t) =>
         t.request.loanId === '0x0000000000000000000000000000000000000000000000000000000000000000' &&
         t.request.asset === this.props.baseToken &&
@@ -201,7 +206,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const request = task ? (task.request as TradeRequest) : undefined
 
     this.setState({ ...this.state, resultTx: true, isLoadingTransaction, request })
-    this.derivedUpdate()
+    await this.derivedUpdate()
   }
 
   public async componentDidUpdate(
@@ -279,16 +284,28 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               />
             </div>
           </div>
-          <div
-            title={`$${this.state.baseTokenPrice.toFixed(18)}`}
-            className="trade-token-grid-row__col-price">
+          <div className="trade-token-grid-row__col-price">
             {this.props.isMobileMedia && (
-              <span className="trade-token-grid-row__title">Mid Market Price</span>
-            )}
-            {this.state.baseTokenPrice.gt(0) && this.state.baseTokenPrice.toFixed() !== "Infinity" && !this.state.isLoading ? (
               <React.Fragment>
-                <span className="fw-sign">$</span>
-                {this.state.baseTokenPrice.toFixed(2)}
+                <span className="trade-token-grid-row__title">
+                  Mid Market Price
+                  <IconInfo
+                    className="tooltip__icon"
+                    data-tip={
+                      'Price feeds are provided securely via Chainlink, trades are executed via Kyber. This can result in minor price variations when opening and closing positions.'
+                    }
+                  />
+                  <ReactTooltip className="tooltip__info" place="top" effect="solid" />
+                </span>
+              </React.Fragment>
+            )}
+            {this.state.baseTokenPrice.gt(0) &&
+            this.state.baseTokenPrice.toFixed() !== 'Infinity' &&
+            !this.state.isLoading ? (
+              <React.Fragment>
+                <div title={`$${this.state.baseTokenPrice.toFixed(18)}`}>
+                  {this.state.baseTokenPrice.toFixed(2)}
+                </div>
               </React.Fragment>
             ) : (
               <Preloader width="74px" />
@@ -301,10 +318,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <span className="trade-token-grid-row__title">Liquidation Price</span>
             )}
             {this.state.liquidationPrice.gt(0) && !this.state.isLoading ? (
-              <React.Fragment>
-                <span className="fw-sign">$</span>
-                {this.state.liquidationPrice.toFixed(2)}
-              </React.Fragment>
+              <React.Fragment>{this.state.liquidationPrice.toFixed(2)}</React.Fragment>
             ) : (
               <Preloader width="74px" />
             )}
@@ -313,7 +327,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             title={this.props.yieldApr.gt(0) ? `${this.props.yieldApr.toFixed(18)}%` : ``}
             className="trade-token-grid-row__col-profit">
             {this.props.isMobileMedia && (
-              <span className="trade-token-grid-row__title">Est. Yield, vBZRX</span>
+              <div className="trade-token-grid-row__title">Est. Yield, vBZRX</div>
             )}
 
             {this.props.yieldApr.gt(0) && !this.state.isLoading ? (
@@ -344,14 +358,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.positionType === this.state.request.positionType &&
         this.state.request.tradeType === TradeType.BUY ? (
           <div className={`token-selector-item__image open-tab-tx`}>
-            <CircleLoader></CircleLoader>
+            <CircleLoader />
             <TradeTxLoaderStep taskId={this.state.request.id} />
           </div>
         ) : (
           !this.state.resultTx &&
           this.state.request &&
           this.props.positionType === this.state.request.positionType &&
-          this.state.request.tradeType === TradeType.BUY && <div className="close-tab-tx"></div>
+          this.state.request.tradeType === TradeType.BUY && <div className="close-tab-tx" />
         )}
       </React.Fragment>
     )
@@ -373,8 +387,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.state.leverage,
       new BigNumber(0)
     )
-    await this.setState({ ...this.state, request: request })
-    this.props.onTrade(request)
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
+    this.props.onTrade(request)
+    this.setState({ ...this.state, request: request })
   }
 }
