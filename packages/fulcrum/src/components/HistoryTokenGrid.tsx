@@ -200,7 +200,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
                 .times(10 ** (collateralAssetDecimalsFirstEvent - loanAssetDecimalsFirstEvent))
             : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
           : tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
-          ? tradeEvent.entryPrice.div(10 ** collateralAssetDecimalsFirstEvent)
+          ? tradeEvent.entryPrice
+              .div(10 ** 18)
+              .times(10 ** (loanAssetDecimalsFirstEvent - collateralAssetDecimalsFirstEvent))
           : tradeEvent.entryPrice.div(10 ** 18)
 
       const positionEventsGroup = new PositionEventsGroup(
@@ -320,8 +322,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           if (positionType === PositionType.LONG) {
             tradePrice = event.collateralToLoanRate
-            .div(10 ** 18)
-            .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+              .div(10 ** 18)
+              .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
             positionValue = event.repayAmount.div(10 ** loanAssetDecimals).div(tradePrice)
             value = positionValue.times(tradePrice)
             profit = value.minus(
