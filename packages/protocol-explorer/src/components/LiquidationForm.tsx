@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useState } from 'react'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'

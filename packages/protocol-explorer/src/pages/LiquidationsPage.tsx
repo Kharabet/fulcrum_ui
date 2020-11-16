@@ -119,7 +119,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const eventsWithDay = events.map(
       (e: { event: LiquidationEvent; repayAmountUsd: BigNumber }) => ({
         ...e,
-        day: parseInt((e.event.timeStamp.getTime() / (1000 * 60 * 60 * 24)).toString(), undefined)
+        day: Math.floor(e.event.timeStamp.getTime() / (1000 * 60 * 60 * 24))
       })
     )
     const eventsWithDayByDay = groupBy(eventsWithDay, 'day')

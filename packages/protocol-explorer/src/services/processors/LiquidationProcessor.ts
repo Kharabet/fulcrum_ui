@@ -73,7 +73,7 @@ export class LiquidationProcessor {
         const approveHash = await ExplorerProvider.Instance.setApproval(
           iBZxContract.address,
           taskRequest.loanToken,
-          taskRequest.closeAmount
+          ExplorerProvider.Instance.getLargeApprovalAmount(taskRequest.loanToken, taskRequest.closeAmount)
         )
         await ExplorerProvider.Instance.waitForTransactionMined(approveHash, taskRequest)
       }      
