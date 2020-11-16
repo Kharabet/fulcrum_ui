@@ -152,7 +152,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
   public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
     this.setState({ ...this.state, isLoading: true })
-    const dateWhenPricePrecisionWasChanged = new Date(1603991752000) // approx date of commit where price format was changed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
+    const dateWhenPricePrecisionWasChanged = new Date(1605557075000) // approx date when price feed precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
     const historyRowsData: IHistoryTokenGridRowProps[] = []
     const historyEvents = this.props.historyEvents
     if (!historyEvents) return
