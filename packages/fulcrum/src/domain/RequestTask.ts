@@ -14,6 +14,7 @@ export class RequestTask {
   public stepCurrent: number
   public txHash: string | null
   public error: Error | null
+  static FAILED: RequestStatus
 
   constructor(request: LendRequest | TradeRequest | ManageCollateralRequest) {
     this.request = request

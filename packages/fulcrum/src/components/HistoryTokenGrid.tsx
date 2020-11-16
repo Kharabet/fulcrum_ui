@@ -19,6 +19,12 @@ import { ReactComponent as Placeholder } from '../assets/images/history_placehol
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
+import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
+import { TradeRequest } from '../domain/TradeRequest'
+import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
+import { FulcrumProvider } from '../services/FulcrumProvider'
 import '../styles/components/history-token-grid.scss'
 
 export interface IHistoryTokenGridProps {
@@ -29,6 +35,12 @@ export interface IHistoryTokenGridProps {
   baseTokens: Asset[]
   quoteTokens: Asset[]
   updateHistoryRowsData: (data: IHistoryTokenGridRowProps[]) => void
+  changeLoadingTransaction: (
+    isLoadingTransaction: boolean,
+    request: TradeRequest | ManageCollateralRequest | undefined,
+    isTxCompleted: boolean,
+    resultTx: boolean
+  ) => void
 }
 
 interface IHistoryTokenGridState {
@@ -50,6 +62,18 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       isLastRow: false,
       isLoading: true
     }
+
+    FulcrumProvider.Instance.eventEmitter.on(
+      FulcrumProviderEvents.AskToCloseProgressDlg,
+      this.onAskToCloseProgressDlg
+    )
+  }
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.off(
+      FulcrumProviderEvents.AskToCloseProgressDlg,
+      this.onAskToCloseProgressDlg
+    )
   }
 
   public async componentDidMount() {
@@ -79,7 +103,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     prevProps: IHistoryTokenGridProps,
     prevState: IHistoryTokenGridState
   ) {
+    
     if (prevProps.historyEvents !== this.props.historyEvents) {
+      debugger
       await this.getHistoryRowsData(this.state)
     }
     if (prevState.numberPagination !== this.state.numberPagination) {
@@ -95,6 +121,17 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         isLastRow
       })
     }
+  }
+
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(async () => {
+        await FulcrumProvider.Instance.onTaskCancel(task)
+        this.props.changeLoadingTransaction(false, undefined, false, false)
+      }, 5000)
+      return
+    }
+    this.props.changeLoadingTransaction(false, undefined, true, true)
   }
 
   public render() {
@@ -320,8 +357,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           if (positionType === PositionType.LONG) {
             tradePrice = event.collateralToLoanRate
-            .div(10 ** 18)
-            .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+              .div(10 ** 18)
+              .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
             positionValue = event.repayAmount.div(10 ** loanAssetDecimals).div(tradePrice)
             value = positionValue.times(tradePrice)
             profit = value.minus(
@@ -415,7 +452,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             )
           )
         } else {
-          //do nothing
+          // do nothing
         }
       }
       historyRowsData.push({
@@ -429,7 +466,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     const isLastRow =
       quantityEvents <= (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1)
 
-     this.setState({
+    this.setState({
       ...this.setState,
       historyRowsData,
       quantityGrids,

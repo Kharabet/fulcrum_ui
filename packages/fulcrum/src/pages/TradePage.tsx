@@ -258,6 +258,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
               updateHistoryRowsData={this.updateHistoryRowsData}
+              changeLoadingTransaction={this.changeLoadingTransaction}
             />
           )}
 
@@ -656,8 +657,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       !FulcrumProvider.Instance.contractsSource ||
       !FulcrumProvider.Instance.contractsSource.canWrite
     ) {
-      ;(await this._isMounted) &&
-        this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
+      ;(await this._isMounted) && this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
       return null
     }
     const innerOwnRowsData: IOwnTokenGridRowProps[] = []
@@ -806,13 +806,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     isTxCompleted: boolean,
     resultTx: boolean
   ) => {
+    if (isTxCompleted && resultTx) {
+      await this.getHistoryEvents(this.state)
+    }
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isLoadingTransaction: isLoadingTransaction,
-        request: request,
-        isTxCompleted: isTxCompleted,
-        resultTx: resultTx
+        isLoadingTransaction,
+        request,
+        isTxCompleted,
+        resultTx
       })
   }
 
