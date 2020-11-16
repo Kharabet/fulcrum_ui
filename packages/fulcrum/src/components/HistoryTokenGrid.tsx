@@ -2,24 +2,24 @@ import React, { Component } from 'react'
 
 import { BigNumber } from '@0x/utils'
 import { Asset } from '../domain/Asset'
-import { PositionType } from '../domain/PositionType'
-import { IHistoryEvents } from '../domain/IHistoryEvents'
-import { TradeEvent } from '../domain/events/TradeEvent'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
 import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
+import { LiquidationEvent } from '../domain/events/LiquidationEvent'
+import { TradeEvent } from '../domain/events/TradeEvent'
+import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { PositionEventsGroup } from '../domain/PositionEventsGroup'
 import { PositionHistoryData } from '../domain/PositionHistoryData'
+import { PositionType } from '../domain/PositionType'
 
-import { HistoryTokenGridHeader } from './HistoryTokenGridHeader'
-import { IHistoryTokenGridRowProps, HistoryTokenGridRow } from './HistoryTokenGridRow'
 import { ReactComponent as ArrowPagination } from '../assets/images/icon_pagination.svg'
 import { PreloaderChart } from '../components/PreloaderChart'
+import { HistoryTokenGridHeader } from './HistoryTokenGridHeader'
+import { HistoryTokenGridRow, IHistoryTokenGridRowProps } from './HistoryTokenGridRow'
 
-import '../styles/components/history-token-grid.scss'
-import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
-import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { ReactComponent as Placeholder } from '../assets/images/history_placeholder.svg'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
+import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
+import '../styles/components/history-token-grid.scss'
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean
@@ -52,9 +52,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     }
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     if (!this.props.historyRowsData.length) {
-      this.getHistoryRowsData(this.state)
+      await this.getHistoryRowsData(this.state)
     } else {
       this.setState({ ...this.state, isLoading: true })
       const historyEvents = this.props.historyEvents
@@ -75,12 +75,12 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     }
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: IHistoryTokenGridProps,
     prevState: IHistoryTokenGridState
-  ): void {
+  ) {
     if (prevProps.historyEvents !== this.props.historyEvents) {
-      this.getHistoryRowsData(this.state)
+      await this.getHistoryRowsData(this.state)
     }
     if (prevState.numberPagination !== this.state.numberPagination) {
       const historyEvents = this.props.historyEvents
@@ -158,7 +158,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     if (!historyEvents) return
     const loanIds = Object.keys(historyEvents.groupedEvents)
     for (const loanId of loanIds) {
-      //@ts-ignore
+      // @ts-ignore
       const events = historyEvents.groupedEvents[loanId].sort(
         (a: any, b: any) => a.timeStamp.getTime() - b.timeStamp.getTime()
       )
@@ -311,8 +311,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             )
           )
         } else if (event instanceof LiquidationEvent) {
-          //loanToken in LiquidationEvent is a quoteAsset in TradeEvent
-          //collateralToken in LiquidationEvent is a baseAsset in TradeEvent
+          // loanToken in LiquidationEvent is a quoteAsset in TradeEvent
+          // collateralToken in LiquidationEvent is a baseAsset in TradeEvent
           const action = 'Liquidated'
           const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
           const collateralAssetDecimals =
@@ -429,7 +429,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     const isLastRow =
       quantityEvents <= (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1)
 
-    await this.setState({
+     this.setState({
       ...this.setState,
       historyRowsData,
       quantityGrids,
@@ -437,7 +437,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       isLoading: false
     })
 
-    await this.props.updateHistoryRowsData(historyRowsData)
+    this.props.updateHistoryRowsData(historyRowsData)
   }
 
   public getAssetUSDRate = async (asset: Asset, date: Date) => {
