@@ -47,7 +47,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
           <div className="table-header table-header-loan">
             <div className="table-header-loan__id">Loan ID</div>
             <div className="table-header-loan__amount">Amount to Pay Off</div>
-            <div className="table-header-loan__collateral">Collateral to Recive</div>
+            <div className="table-header-loan__collateral">Collateral to Receive</div>
             <div className="table-header-loan__action">Action</div>
           </div>
           {assetItems}
