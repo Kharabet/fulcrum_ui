@@ -131,7 +131,7 @@ export class LiquidationProcessor {
               {
                 from: account,
                 value: sendAmountForValue,
-                gas: ExplorerProvider.Instance.gasLimit,
+                gas: gasAmountBN.toString(),
                 gasPrice: await ExplorerProvider.Instance.gasPrice()
               }
             )
@@ -142,7 +142,7 @@ export class LiquidationProcessor {
               {
                 from: account,
                 value: sendAmountForValue,
-                gas: ExplorerProvider.Instance.gasLimit,
+                gas: gasAmountBN.toString(),
                 gasPrice: await ExplorerProvider.Instance.gasPrice()
               }
             )

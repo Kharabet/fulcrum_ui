@@ -47,12 +47,13 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
           .map((e) => <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />)
       : this.props.tokenRowsData.map((e) => (
           <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />
-        ))
+        ))   
 
+    const quoteToken = this.props.tokenRowsData.length?this.props.tokenRowsData[0].quoteToken : null
     return (
       <div className="trade-token-grid__wrapper">
         <div className="trade-token-grid">
-          {!this.props.isMobileMedia && <TradeTokenGridHeader />}
+          {!this.props.isMobileMedia && <TradeTokenGridHeader quoteToken={quoteToken} />}
           {tokenRows &&
             tokenRows.map((row) => {
               return (

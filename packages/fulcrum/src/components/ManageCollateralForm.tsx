@@ -117,7 +117,7 @@ export default class ManageCollateralForm extends Component<
           ...this.state,
           collateralAmount: next!.collateralAmount,
           collateralizedPercent: next!.collateralizedPercent,
-          collateralTooLow: next!.collateralizedPercent.lt(125),
+          collateralTooLow: next!.collateralizedPercent.lt(this.props.loan!.loanData!.maintenanceMargin.div(10**18).plus(10) || 25),
           inputAmountText: this.formatPrecision(next!.collateralAmount.toString())
         })
 
@@ -150,7 +150,6 @@ export default class ManageCollateralForm extends Component<
               ).then((assetBalance) => {
                 const collateralizedPercent = this.props
                   .loan!.collateralizedPercent.multipliedBy(100)
-                  .plus(100)
 
                 let minCollateral
                 let maxCollateral
