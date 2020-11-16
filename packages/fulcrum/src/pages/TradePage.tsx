@@ -261,24 +261,26 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             />
           )}
 
-          <Modal
-            isOpen={this.state.isTradeModalOpen}
-            onRequestClose={this.onTradeRequestClose}
-            className="modal-content-div modal-content-div-form"
-            overlayClassName="modal-overlay-div">
-            <TradeForm
-              stablecoins={this.quoteTokens}
-              loan={loan}
-              isMobileMedia={this.props.isMobileMedia}
-              tradeType={this.state.tradeType}
-              baseToken={this.state.selectedMarket.baseToken}
-              positionType={this.state.tradePositionType}
-              leverage={this.state.tradeLeverage}
-              quoteToken={this.state.selectedMarket.quoteToken}
-              onSubmit={this.onTradeConfirmed}
-              onCancel={this.onTradeRequestClose}
-            />
-          </Modal>
+          {this.state.request && this.state.request instanceof TradeRequest && (
+            <Modal
+              isOpen={this.state.isTradeModalOpen}
+              onRequestClose={this.onTradeRequestClose}
+              className="modal-content-div modal-content-div-form"
+              overlayClassName="modal-overlay-div">
+              <TradeForm
+                stablecoins={this.quoteTokens}
+                loan={loan}
+                isMobileMedia={this.props.isMobileMedia}
+                tradeType={this.state.tradeType}
+                baseToken={this.state.request.asset}
+                positionType={this.state.tradePositionType}
+                leverage={this.state.tradeLeverage}
+                quoteToken={this.state.request.quoteToken}
+                onSubmit={this.onTradeConfirmed}
+                onCancel={this.onTradeRequestClose}
+              />
+            </Modal>
+          )}
           {this.state.request !== undefined && loan !== undefined && (
             <Modal
               isOpen={this.state.isManageCollateralModalOpen}
@@ -656,8 +658,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       !FulcrumProvider.Instance.contractsSource ||
       !FulcrumProvider.Instance.contractsSource.canWrite
     ) {
-      ;(await this._isMounted) &&
-        this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
+      ;(await this._isMounted) && this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
       return null
     }
     const innerOwnRowsData: IOwnTokenGridRowProps[] = []
