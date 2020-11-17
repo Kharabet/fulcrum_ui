@@ -32,7 +32,11 @@ interface ILiquidationsPageState {
   unhealthyLoans: ILoanRowProps[]
   unhealthyLoansUsd: BigNumber
   healthyLoansUsd: BigNumber
-  barChartDatasets: Array<{ label: Asset; backgroundColor: string; data: Array<{ x: string; y: number }> }>
+  barChartDatasets: Array<{
+    label: Asset
+    backgroundColor: string
+    data: Array<{ x: string; y: number }>
+  }>
   isDataLoading: boolean
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
@@ -191,6 +195,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
 
     let volume30d = new BigNumber(0)
+    const dateWhenPricePrecisionWasChanged = new Date(
+      process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1605458163000 : 1603991752000
+    ) // approx date when price feed precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
+
     let liquidationEventsWithUsd: { event: LiquidationEvent; repayAmountUsd: BigNumber }[] = []
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory()
     const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, true)
@@ -212,12 +220,17 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       const tokenLiqudiations30d = liqudiations30d.filter(
         (e: LiquidationEvent) => e.loanToken === this.assetsShown[i].token
       )
+
       for (const e of tokenLiqudiations30d) {
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18
         const collateralAssetDecimals =
           AssetsDictionary.assets.get(e.collateralToken)!.decimals || 18
         let swapToUSDPrice = this.stablecoins.includes(e.loanToken)
           ? new BigNumber(1)
+          : e.timeStamp > dateWhenPricePrecisionWasChanged
+          ? new BigNumber(10 ** 18)
+              .div(e.collateralToLoanRate)
+              .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
           : new BigNumber(10 ** 36).div(e.collateralToLoanRate).div(10 ** collateralAssetDecimals)
 
         if (
