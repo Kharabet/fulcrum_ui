@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - feat/cors-proxy
+      - cors-proxy-production
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
