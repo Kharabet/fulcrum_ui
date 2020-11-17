@@ -2,15 +2,15 @@ import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
 import { Asset } from '../domain/Asset'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { CircleLoader } from './CircleLoader'
+import { LendRequest } from '../domain/LendRequest'
+import { LendType } from '../domain/LendType'
+import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import { LendRequest } from '../domain/LendRequest'
-import { LendTxLoaderStep } from './LendTxLoaderStep'
-import { LendType } from '../domain/LendType'
 import { TasksQueue } from '../services/TasksQueue'
-import { RequestTask } from '../domain/RequestTask'
-import { RequestStatus } from '../domain/RequestStatus'
+import { CircleLoader } from './CircleLoader'
+import { LendTxLoaderStep } from './LendTxLoaderStep'
 import { ProfitTicker } from './ProfitTicker'
 
 export interface ILendTokenSelectorItemProps {
@@ -163,7 +163,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
         <React.Fragment>
           <div
             className="token-selector-item__descriptions"
-            style={{ marginTop: props.profit.eq(0) ? `1.5rem` : undefined }}>
+            style={{ marginTop: props.balanceOfUser.eq(0) ? undefined : `8px` }}>
             <div className="token-selector-item__description">
               {iTokenAddress &&
               FulcrumProvider.Instance.web3ProviderSettings &&

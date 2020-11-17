@@ -318,6 +318,13 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this.setState({ ...this.state, slippageRate })
   }
 
+  private async setDepositTokenBalance(depositToken: Asset) {
+    const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+      depositToken
+    )
+    this.setState({ ...this.state, depositTokenBalance })
+  }
+
   public componentDidUpdate(
     prevProps: Readonly<ITradeFormProps>,
     prevState: Readonly<ITradeFormState>,
@@ -328,6 +335,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       this.setSlippageRate(this.state.tradeAmountValue)
+    }
+    if (this.state.depositToken !== prevState.depositToken) {
+      this.setDepositTokenBalance(this.state.depositToken)
     }
     if (
       this.props.tradeType !== prevProps.tradeType ||
@@ -370,23 +380,31 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? 'trade-form__submit-button--buy'
         : 'trade-form__submit-button--sell'
 
-    const amountMsg =
-      this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
-        ? 'Insufficient funds for gas'
-        : this.state.depositTokenBalance && this.state.depositTokenBalance.eq(0)
-        ? 'Your wallet is empty'
-        : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
-        ? `Slippage:`
-        : ''
-
+    let amountMsg = ``
     let submitButtonText = ``
     if (this.props.tradeType === TradeType.BUY) {
+      amountMsg =
+        this.state.ethBalance &&
+        this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
+          ? 'Insufficient funds for gas'
+          : this.state.depositTokenBalance && this.state.depositTokenBalance.eq(0)
+          ? 'Your wallet is empty'
+          : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
+          ? `Slippage:`
+          : ''
       if (this.props.positionType === PositionType.SHORT) {
         submitButtonText = `SHORT`
       } else {
         submitButtonText = `LEVERAGE`
       }
     } else {
+      amountMsg =
+        this.state.ethBalance &&
+        this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
+          ? 'Insufficient funds for gas'
+          : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
+          ? `Slippage:`
+          : ''
       submitButtonText = `CLOSE`
     }
     if (this.state.exposureValue.gt(0)) {

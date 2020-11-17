@@ -223,13 +223,17 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       const tokenLiqudiations30d = liqudiations30d.filter((e: LiquidationEvent) => {
         return e.loanToken === assetShown.token
       })
+
       for (const e of tokenLiqudiations30d) {
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18
         const collateralAssetDecimals =
           AssetsDictionary.assets.get(e.collateralToken)!.decimals || 18
+         
         let swapToUSDPrice = this.stablecoins.includes(e.loanToken)
           ? new BigNumber(1)
-          : new BigNumber(10 ** 36).div(e.collateralToLoanRate).div(10 ** collateralAssetDecimals)
+          : new BigNumber(10 ** 18)
+              .div(e.collateralToLoanRate)
+              .div(10 ** (collateralAssetDecimals - loanAssetDecimals))
 
         if (
           !this.stablecoins.includes(e.loanToken) &&

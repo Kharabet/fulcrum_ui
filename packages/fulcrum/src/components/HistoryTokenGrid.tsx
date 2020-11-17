@@ -152,7 +152,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
   public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
     this.setState({ ...this.state, isLoading: true })
-    const dateWhenPricePrecisionWasChanged = new Date(1603991752000) // approx date of commit where price format was changed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
+    const dateWhenPricePrecisionWasChanged = new Date(process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1605557075000 : 1603991752000) // approx date when price feed precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
     const historyRowsData: IHistoryTokenGridRowProps[] = []
     const historyEvents = this.props.historyEvents
     if (!historyEvents) return
@@ -200,7 +200,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
                 .times(10 ** (collateralAssetDecimalsFirstEvent - loanAssetDecimalsFirstEvent))
             : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
           : tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
-          ? tradeEvent.entryPrice.div(10 ** collateralAssetDecimalsFirstEvent)
+          ? tradeEvent.entryPrice
+              .div(10 ** 18)
+              .times(10 ** (loanAssetDecimalsFirstEvent - collateralAssetDecimalsFirstEvent))
           : tradeEvent.entryPrice.div(10 ** 18)
 
       const positionEventsGroup = new PositionEventsGroup(
@@ -320,8 +322,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           if (positionType === PositionType.LONG) {
             tradePrice = event.collateralToLoanRate
-            .div(10 ** 18)
-            .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+              .div(10 ** 18)
+              .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
             positionValue = event.repayAmount.div(10 ** loanAssetDecimals).div(tradePrice)
             value = positionValue.times(tradePrice)
             profit = value.minus(
