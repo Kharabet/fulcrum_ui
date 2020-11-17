@@ -23,16 +23,13 @@
     top: 50%;
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
-    &.modal-content-div-form {
-      // @media screen and (max-width: $mobile-version-max-width) {
-      //     top: 40px;
-      //     transform: translateX(-50%) translateY(0);
-      // }
-    }
-
+    border-radius: 16px;
+    box-shadow: 0 16px 80px 0 rgba(59, 54, 75, 0.2);
+    background-color: #ffffff;
     &:focus {
       outline: none;
     }
+
   }
   .modal-content-div-top {
     display: inline-block;

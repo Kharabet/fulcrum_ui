@@ -64,7 +64,7 @@ export const TxRow = (props: ITxRowProps) => {
           <span className="table-row-tx__from-address">{getShortHash(props.account, 12)}</span>
         </a>
         <div className="table-row-tx__quantity">
-          {props.quantity.toFixed(18)}&nbsp;{props.asset}
+          {props.quantity.toFixed()}&nbsp;{props.asset}
         </div>
         <div className="table-row-tx__action">{props.action}</div>
       </div>
