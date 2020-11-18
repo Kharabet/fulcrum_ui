@@ -177,9 +177,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       (this.state.isTxCompleted && prevState.isTxCompleted !== this.state.isTxCompleted) ||
       prevProps.isMobileMedia !== this.props.isMobileMedia
     ) {
+      this.setState({
+        ...this.state,
+        historyEvents: undefined
+      })
+      await this.getTokenRowsData(this.state)
       await this.getInnerOwnRowsData(this.state)
       await this.getOwnRowsData(this.state)
-      await this.getHistoryEvents(this.state)
     }
   }
 
@@ -325,7 +329,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private clearData = async () => {
     ;(await this._isMounted) &&
       this.setState({
-        ownRowsData: [],
+        ownRowsData: undefined,
         innerOwnRowsData: [],
         loans: [],
         openedPositionsCount: 0,
@@ -648,8 +652,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        ownRowsData,
-        loans
+        ownRowsData: ownRowsData,
+        loans: loans
       })
   }
 
@@ -690,7 +694,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         openedPositionsCount: loansByPair.allUsersLoansCount,
-        innerOwnRowsData
+        innerOwnRowsData: innerOwnRowsData
       })
   }
 
@@ -750,7 +754,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       'loanId'
     )
     const historyEvents = { groupedEvents, earnRewardEvents, payTradingFeeEvents }
-    ;(await this._isMounted) && this.setState({ ...this.state, historyRowsData: [], historyEvents })
+    ;(await this._isMounted) &&
+      this.setState({ ...this.state, historyRowsData: [], historyEvents: historyEvents })
   }
 
   public getTokenRowsData = async (state: ITradePageState) => {
@@ -795,11 +800,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         state.selectedMarket.baseToken
       )
     })
-    ;(await this._isMounted) && this.setState({ ...this.state, tokenRowsData })
+    ;(await this._isMounted) && this.setState({ ...this.state, tokenRowsData: tokenRowsData })
   }
 
   public updateHistoryRowsData = async (historyRowsData: IHistoryTokenGridRowProps[]) => {
-    ;(await this._isMounted) && this.setState({ ...this.state, historyRowsData })
+    ;(await this._isMounted) && this.setState({ ...this.state, historyRowsData: historyRowsData })
   }
 
   public changeLoadingTransaction = async (
