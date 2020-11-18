@@ -583,6 +583,15 @@ export default class Fulcrum {
           totalAssetBorrow = totalAssetBorrow.times(precision)
           marketLiquidity = marketLiquidity.times(precision)
           vaultBalance = vaultBalance.times(precision)
+
+          if (token.name === 'bzrx') {
+            const vbzrxLockedAmount = await this.getErc20BalanceOfUser(
+              '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F',
+              '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'
+            )
+            vaultBalance = vaultBalance.plus(vbzrxLockedAmount.times(precision))
+          }
+
           if (swapRates[i]) {
             usdSupply = totalAssetSupply.times(swapRates[i]).dividedBy(10 ** 18)
             usdSupplyAll = usdSupplyAll.plus(usdSupply)
