@@ -3,17 +3,38 @@ button {
   cursor: pointer;
   border: none;
   outline: none;
+
+  border-radius: 40px;
   &.action {
-    width: 100px;
-    height: 32px;
+   width: 100px;
+   height: 32px;
     background-color: $primary-color;
-    border-radius: 22px;
+    border-radius: 50px;
     color: #ffffff;
     font-size: 14px;
     font-weight: 700;
     &:hover {
       background-color: $primary-color-hover;
     }
+  }
+  &.btn-submit {
+    width: 270px;
+    height: 64px;
+  }
+}
+
+
+
+.btn-disabled {
+  opacity: 0.4;
+  background-color: $primary-color !important;
+
+  &:hover {
+    background-color: $primary-color !important;
+  }
+
+  &:active {
+    background-color: $primary-color !important;
   }
 }
 .group-button {

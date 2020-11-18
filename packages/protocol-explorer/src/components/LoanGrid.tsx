@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { LoanRow, ILoanRowProps } from './LoanRow'
 import { ReactComponent as ArrowPagination } from '../assets/images/icon_pagination.svg'
+import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { ILoanRowProps, LoanRow } from './LoanRow'
 
 interface ILoanGridProps {
   events: ILoanRowProps[]
@@ -46,7 +47,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
           <div className="table-header table-header-loan">
             <div className="table-header-loan__id">Loan ID</div>
             <div className="table-header-loan__amount">Amount to Pay Off</div>
-            <div className="table-header-loan__collateral">Collateral to Recive</div>
+            <div className="table-header-loan__collateral">Collateral to Receive</div>
             <div className="table-header-loan__action">Action</div>
           </div>
           {assetItems}

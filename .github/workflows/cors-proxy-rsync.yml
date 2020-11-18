@@ -1,0 +1,35 @@
+on:
+  push:
+    branches:
+      - cors-proxy-production
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install
+      uses: actions/setup-node@v1
+      with:
+          node-version: '12.x'
+    - name: Build
+      run: |
+        cd $GITHUB_WORKSPACE/packages/cors-proxy && npm install
+    - name: Deploy
+      uses: AEnterprise/rsync-deploy@v1.0
+      env:
+        DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        ARGS: "-e -c -r --delete --include 'node_modules' --exclude '.env'"
+        SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        FOLDER: "./packages/cors-proxy/"
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+        USERNAME: ${{ secrets.USERNAME }}
+        SERVER_DESTINATION: ${{ secrets.CORS_SERVER_DESTINATION }}
+    - name: Restart
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: bash ${{ secrets.CORS_SERVER_DESTINATION }}/scripts/cors-proxy-start.sh

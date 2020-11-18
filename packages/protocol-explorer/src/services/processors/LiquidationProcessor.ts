@@ -1,10 +1,9 @@
 import { BigNumber } from '@0x/utils'
-import { RequestTask } from '../../domain/RequestTask'
-import { LiquidationRequest } from '../../domain/LiquidationRequest'
-
-import { ExplorerProvider } from '../ExplorerProvider'
 import { erc20Contract } from '../../contracts/erc20'
 import { Asset } from '../../domain/Asset'
+import { LiquidationRequest } from '../../domain/LiquidationRequest'
+import { RequestTask } from '../../domain/RequestTask'
+import { ExplorerProvider } from '../ExplorerProvider'
 
 export class LiquidationProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -18,16 +17,23 @@ export class LiquidationProcessor {
     }
 
     // Initializing loan
-    const taskRequest: LiquidationRequest = task.request as LiquidationRequest
-    const isETHLoanToken = ExplorerProvider.Instance.isETHAsset(taskRequest.loanToken)
+    const iBZxContract = await ExplorerProvider.Instance.contractsSource.getiBZxContract()
+    
+    if (!iBZxContract) {
+      throw new Error('No bzxContract contract available!')
+    }
+    const taskRequest: LiquidationRequest = task.request
+    let sendAmountForValue = new BigNumber(0)
 
-    if (isETHLoanToken) {
+    if (taskRequest.loanToken === Asset.WETH || taskRequest.loanToken === Asset.ETH) {
       task.processingStart([
         'Initializing',
         'Submitting collateral',
         'Updating the blockchain',
         'Transaction completed'
       ])
+      sendAmountForValue = taskRequest.closeAmount
+
     } else {
       task.processingStart([
         'Initializing',
@@ -38,16 +44,7 @@ export class LiquidationProcessor {
         'Updating the blockchain',
         'Transaction completed'
       ])
-    }
 
-    // Initializing loan
-    let iBZxContract = await ExplorerProvider.Instance.contractsSource.getiBZxContract()
-
-    if (!iBZxContract) {
-      throw new Error('No bzxContract contract available!')
-    }
-
-    if (!isETHLoanToken) {
       let tokenErc20Contract: erc20Contract | null = null
       let assetErc20Address: string | null = ''
       let erc20allowance = new BigNumber(0)
@@ -76,18 +73,16 @@ export class LiquidationProcessor {
         const approveHash = await ExplorerProvider.Instance.setApproval(
           iBZxContract.address,
           taskRequest.loanToken,
-          taskRequest.closeAmount
+          ExplorerProvider.Instance.getLargeApprovalAmount(taskRequest.loanToken, taskRequest.closeAmount)
         )
         await ExplorerProvider.Instance.waitForTransactionMined(approveHash, taskRequest)
-      }
+      }      
     }
 
-    //Submitting loan
+    // Submitting loan
     task.processingStepNext()
-
-    const sendAmountForValue = isETHLoanToken ? taskRequest.closeAmount : new BigNumber(0)
-
-    let gasAmountBN = new BigNumber(ExplorerProvider.Instance.gasLimit)
+    
+    let gasAmountBN = new BigNumber(0)
     let txHash: string = ''
 
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'

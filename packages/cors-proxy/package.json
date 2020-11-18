@@ -1,0 +1,27 @@
+{
+  "name": "cv-cors-proxy",
+  "version": "1.0.0",
+  "description": "CORS anywhere for Cryptovista",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./scripts/startServer",
+    "dev": "NODE_ENV=development node ./scripts/startServer",
+    "lint": "eslint scripts server --quiet",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kevin Purnelle <kevin.purnelle@gmail.com> (http://kevinpurnelle.com/)",
+  "license": "MIT",
+  "dependencies": {
+    "cors-anywhere": "0.4.3",
+    "dotenv": "8.2.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "10.1.0",
+    "eslint": "7.11.0",
+    "eslint-config-standard": "14.1.1",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1"
+  }
+}

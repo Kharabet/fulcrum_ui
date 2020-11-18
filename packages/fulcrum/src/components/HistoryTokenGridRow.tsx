@@ -380,9 +380,7 @@ export class HistoryTokenGridRow extends Component<
             title={
               latestEvent.payTradingFeeEvent &&
               latestEvent.earnRewardEvent &&
-              `${latestEvent.payTradingFeeEvent.amount.toFixed(
-                18
-              )} / ${latestEvent.earnRewardEvent.amount.toFixed(18)}`
+              `${latestEvent.payTradingFeeEvent.amount.toFixed()} / ${latestEvent.earnRewardEvent.amount.toFixed()}`
             }
             className="history-token-grid-row__col history-token-grid-row__col-fee-reward">
             <span className="label">

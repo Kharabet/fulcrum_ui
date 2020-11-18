@@ -57,7 +57,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       selectedProviderType: StakingProvider.Instance.providerType,
       web3: StakingProvider.Instance.web3Wrapper,
-      isMobileMedia: false
+      isMobileMedia: window.innerWidth <= 767
     }
     StakingProvider.Instance.eventEmitter.on(
       StakingProviderEvents.ProviderChanged,
@@ -158,15 +158,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public componentDidMount(): void {
     this._isMounted = true
     window.addEventListener('resize', this.didResize.bind(this))
-    this.didResize()
     //errors.setLogLevel("error")
     this.doNetworkConnect()
   }
-  private didResize = async () => {
+  private didResize = () => {
     const isMobileMedia = window.innerWidth <= 767
-    if (isMobileMedia !== this.state.isMobileMedia) {
-      ;(await this._isMounted) && this.setState({ isMobileMedia })
-    }
+    this.setState({ isMobileMedia })
+    
   }
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {

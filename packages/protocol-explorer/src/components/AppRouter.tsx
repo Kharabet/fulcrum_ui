@@ -1,29 +1,29 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import React, { Component } from 'react'
-import { MainPage } from '../pages/MainPage'
-import { Header } from '../layout/Header'
-import { Footer } from '../layout/Footer'
-import { Router, Switch, Route } from 'react-router-dom'
+import { Route, Router, Switch } from 'react-router-dom'
 import configProviders from '../config/providers.json'
 import { ProviderType } from '../domain/ProviderType'
-import { StatsPage } from '../pages/StatsPage'
+import { Footer } from '../layout/Footer'
+import { Header } from '../layout/Header'
 import { LiquidationsPage } from '../pages/LiquidationsPage'
+import { MainPage } from '../pages/MainPage'
 import { SearchResultPage } from '../pages/SearchResultPage'
+import { StatsPage } from '../pages/StatsPage'
 import { NavService } from '../services/NavService'
 
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
-import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
-import { ExplorerProvider } from '../services/ExplorerProvider'
 import Modal from 'react-modal'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
+import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import { ExplorerProvider } from '../services/ExplorerProvider'
 
-import { ProviderMenu } from './ProviderMenu'
-import { Web3ReactProvider } from '@web3-react/core'
 import { Web3ProviderEngine } from '@0x/subproviders'
-import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
-import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import { AbstractConnector } from '@web3-react/abstract-connector'
-import { errors } from 'ethers'
+import { Web3ReactProvider } from '@web3-react/core'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
+import { errors } from 'ethers'
+import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
+import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
+import { ProviderMenu } from './ProviderMenu'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -48,7 +48,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       selectedProviderType: ExplorerProvider.Instance.providerType,
       web3: ExplorerProvider.Instance.web3Wrapper,
-      isMobileMedia: false
+      isMobileMedia: window.innerWidth <= 991
     }
 
     ExplorerProvider.Instance.eventEmitter.on(
@@ -66,20 +66,21 @@ export class AppRouter extends Component<any, IAppRouterState> {
     window.removeEventListener('resize', this.didResize.bind(this))
   }
 
-  public componentDidMount(): void {
+  public componentDidMount() {
     this._isMounted = true
+    Modal.setAppElement('body')
     window.addEventListener('resize', this.didResize.bind(this))
-    this.didResize()
     errors.setLogLevel('error')
     this.doNetworkConnect()
   }
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
-    console.log(provider)
-    //handle connectors events (i.e. network changed)
+    // console.log(provider)
+    // handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)
-    if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated))
+    if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated)) {
       connector.on(ConnectorEvent.Update, this.onConnectorUpdated)
+    }
     return Web3ConnectionFactory.currentWeb3Engine
   }
 
@@ -145,25 +146,26 @@ export class AppRouter extends Component<any, IAppRouterState> {
     )
   }
 
-  private didResize = async () => {
+  private didResize = () => {
     const isMobileMedia = window.innerWidth <= 991
     if (isMobileMedia !== this.state.isMobileMedia) {
-      ;(await this._isMounted) && this.setState({ isMobileMedia })
+      this._isMounted && this.setState({ isMobileMedia })
     }
   }
 
-  public doNetworkConnect = async () => {
-    ;(await this._isMounted) &&
+  public doNetworkConnect = () => {
+    this._isMounted &&
       !this.state.isProviderMenuModalOpen &&
       this.setState({ ...this.state, isProviderMenuModalOpen: true })
   }
+
   public async onConnectorUpdated(update: ConnectorUpdate) {
-    console.log('onConnectorUpdated')
-    await ExplorerProvider.Instance.eventEmitter.emit(ExplorerProviderEvents.ProviderIsChanging)
+    // console.log('onConnectorUpdated')
+    ExplorerProvider.Instance.eventEmitter.emit(ExplorerProviderEvents.ProviderIsChanging)
 
     await Web3ConnectionFactory.updateConnector(update)
     await ExplorerProvider.Instance.setWeb3ProviderFinalize(ExplorerProvider.Instance.providerType)
-    await ExplorerProvider.Instance.eventEmitter.emit(
+    ExplorerProvider.Instance.eventEmitter.emit(
       ExplorerProviderEvents.ProviderChanged,
       new ProviderChangedEvent(
         ExplorerProvider.Instance.providerType,
@@ -175,8 +177,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public onDeactivate = async () => {
     ExplorerProvider.Instance.isLoading = true
 
-    await ExplorerProvider.Instance.eventEmitter.emit(ExplorerProviderEvents.ProviderIsChanging)
-    ;(await this._isMounted) &&
+    ExplorerProvider.Instance.eventEmitter.emit(ExplorerProviderEvents.ProviderIsChanging)
+    this._isMounted &&
       this.setState({
         ...this.state,
         isProviderMenuModalOpen: false
@@ -184,7 +186,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await ExplorerProvider.Instance.setReadonlyWeb3Provider()
 
     ExplorerProvider.Instance.isLoading = false
-    await ExplorerProvider.Instance.eventEmitter.emit(
+    ExplorerProvider.Instance.eventEmitter.emit(
       ExplorerProviderEvents.ProviderChanged,
       new ProviderChangedEvent(
         ExplorerProvider.Instance.providerType,
@@ -197,8 +199,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
     if (!this.state.isLoading) {
       ExplorerProvider.Instance.isLoading = true
 
-      await ExplorerProvider.Instance.eventEmitter.emit(ExplorerProviderEvents.ProviderIsChanging)
-      ;(await this._isMounted) &&
+      ExplorerProvider.Instance.eventEmitter.emit(ExplorerProviderEvents.ProviderIsChanging)
+      this._isMounted &&
         this.setState(
           {
             ...this.state,
@@ -210,7 +212,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
             ExplorerProvider.Instance.isLoading = false
 
-            await ExplorerProvider.Instance.eventEmitter.emit(
+            ExplorerProvider.Instance.eventEmitter.emit(
               ExplorerProviderEvents.ProviderChanged,
               new ProviderChangedEvent(
                 ExplorerProvider.Instance.providerType,
@@ -220,7 +222,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
           }
         )
     } else {
-      ;(await this._isMounted) &&
+      this._isMounted &&
         this.setState({
           ...this.state,
           isProviderMenuModalOpen: false
@@ -229,12 +231,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public onRequestClose = async () => {
-    ;(await this._isMounted) && this.setState({ ...this.state, isProviderMenuModalOpen: false })
+    this._isMounted && this.setState({ ...this.state, isProviderMenuModalOpen: false })
   }
 
   public onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.checkGasTokenAllowance()
-    ;(await this._isMounted) &&
+    this._isMounted &&
       this.setState({
         ...this.state,
         selectedProviderType: event.providerType,
