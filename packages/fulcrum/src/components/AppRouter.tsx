@@ -71,7 +71,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       currentPage: '',
       web3: FulcrumProvider.Instance.web3Wrapper,
-      isMobileMedia: false
+      isMobileMedia: window.innerWidth <= 991
       //isV1ITokenInWallet: false
     }
 
@@ -84,7 +84,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public componentDidMount(): void {
     this._isMounted = true
     window.addEventListener('resize', this.didResize.bind(this))
-    this.didResize()
     errors.setLogLevel('error')
     this.doNetworkConnect()
   }
@@ -316,11 +315,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
       </Web3ReactProvider>
     )
   }
-  private didResize = async () => {
+  private didResize = () => {
     const isMobileMedia = window.innerWidth <= 959
-    if (isMobileMedia !== this.state.isMobileMedia) {
-      ;(await this._isMounted) && this.setState({ isMobileMedia })
-    }
+    this.setState({ isMobileMedia })
   }
 
   public doNetworkConnect = async () => {

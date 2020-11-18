@@ -48,7 +48,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       selectedProviderType: ExplorerProvider.Instance.providerType,
       web3: ExplorerProvider.Instance.web3Wrapper,
-      isMobileMedia: false
+      isMobileMedia: window.innerWidth <= 991
     }
 
     ExplorerProvider.Instance.eventEmitter.on(
@@ -70,7 +70,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this._isMounted = true
     Modal.setAppElement('body')
     window.addEventListener('resize', this.didResize.bind(this))
-    this.didResize()
     errors.setLogLevel('error')
     this.doNetworkConnect()
   }
