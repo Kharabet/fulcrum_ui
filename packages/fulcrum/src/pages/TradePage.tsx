@@ -29,9 +29,9 @@ import { PositionType } from '../domain/PositionType'
 import { TokenGridTab } from '../domain/TokenGridTab'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
+import { ProviderType } from '../domain/ProviderType'
 
 import '../styles/pages/_trade-page.scss'
-import { ProviderType } from '../domain/ProviderType'
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
@@ -174,12 +174,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       await this.getInnerOwnRowsData(this.state)
     }
     if (
-      prevState.isTxCompleted !== this.state.isTxCompleted ||
+      (this.state.isTxCompleted && prevState.isTxCompleted !== this.state.isTxCompleted) ||
       prevProps.isMobileMedia !== this.props.isMobileMedia
     ) {
-      await this.getTokenRowsData(this.state)
       await this.getInnerOwnRowsData(this.state)
       await this.getOwnRowsData(this.state)
+      await this.getHistoryEvents(this.state)
     }
   }
 
@@ -748,7 +748,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       'loanId'
     )
     const historyEvents = { groupedEvents, earnRewardEvents, payTradingFeeEvents }
-    ;(await this._isMounted) && this.setState({ ...this.state, historyEvents })
+    ;(await this._isMounted) && this.setState({ ...this.state, historyRowsData: [], historyEvents })
   }
 
   public getTokenRowsData = async (state: ITradePageState) => {
@@ -806,9 +806,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     isTxCompleted: boolean,
     resultTx: boolean
   ) => {
-    if (isTxCompleted && resultTx) {
-      await this.getHistoryEvents(this.state)
-    }
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,

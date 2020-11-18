@@ -77,7 +77,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   public async componentDidMount() {
-    if (!this.props.historyRowsData.length) {
+    if (!this.props.historyRowsData.length) {  
       await this.getHistoryRowsData(this.state)
     } else {
       this.setState({ ...this.state, isLoading: true })
@@ -105,7 +105,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   ) {
     
     if (prevProps.historyEvents !== this.props.historyEvents) {
-      debugger
       await this.getHistoryRowsData(this.state)
     }
     if (prevState.numberPagination !== this.state.numberPagination) {
