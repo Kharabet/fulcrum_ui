@@ -102,7 +102,7 @@ export class ContractsSource {
     let address: string = ''
     switch (this.networkId) {
       case 1:
-        address = '0xaaA601aE20077F9fae80494DDC36BB39C952c2d0'
+        address = '0x9b40EC9636C68FE752A628A9e7dF620FafAe9A83'
         break
       case 3:
         address = '0x4330762418df3555ddd1d732200b317c9239b941'
@@ -111,7 +111,7 @@ export class ContractsSource {
         address = '0x76de3d406fee6c3316558406b17ff785c978e98c'
         break
       case 42:
-        address = '0x2F27c07D888751109753533BF299ea5813A6479D'
+        address = '0x59A2b856d8F6B29f2f3095fFc2FDb4AC9297749A'
         break
     }
 
@@ -225,6 +225,12 @@ export class ContractsSource {
             break
           case '0xdd974d5c2e2928dea5f71b9825b8b646686bd200':
             asset = Asset.KNC
+            break
+          case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
+            asset = Asset.AAVE
+            break
+          case '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984':
+            asset = Asset.UNI
             break
           case '0x0000000000004946c0e9f43f4dee607b0ef1fa1c':
             asset = Asset.CHI

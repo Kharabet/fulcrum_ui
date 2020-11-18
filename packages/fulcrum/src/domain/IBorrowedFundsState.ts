@@ -14,7 +14,7 @@ export interface IBorrowedFundsState {
   collateralizedPercent: BigNumber
   hasManagementContract: boolean
   isInProgress: boolean
-  loanData?: {
+  loanData: {
     loanId: string
     endTimestamp: BigNumber
     loanToken: string
@@ -30,5 +30,7 @@ export interface IBorrowedFundsState {
     maxLoanTerm: BigNumber
     maxLiquidatable: BigNumber
     maxSeizable: BigNumber
+    depositValueAsLoanToken: BigNumber
+    depositValueAsCollateralToken: BigNumber
   }
 }

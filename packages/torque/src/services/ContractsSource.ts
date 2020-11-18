@@ -1,3 +1,4 @@
+import { BigNumber } from '@0x/utils'
 import * as _ from 'lodash'
 
 import { cdpManagerContract } from '../contracts/cdpManager'
@@ -22,11 +23,23 @@ import { Asset } from '../domain/Asset'
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK
 
+interface ITokenContractInfo {
+  token: string
+  asset: string
+  name: string
+  symbol: string
+  index: BigNumber
+  version?: number
+}
 export class ContractsSource {
   private readonly provider: any
 
   private static isInit = false
 
+  private static iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<
+    string,
+    ITokenContractInfo
+  >()
   private erc20Json: any
   private cdpsJson: any
   private compoundComptrollerJson: any
@@ -100,200 +113,11 @@ export class ContractsSource {
     return new iBZxContract(this.iBZxJson.abi, this.getiBZxAddress().toLowerCase(), this.provider)
   }
 
-  private getiTokenAddress(asset: Asset): string {
-    let address: string = ''
-    switch (asset) {
-      case Asset.BZRX:
-        switch (this.networkId) {
-          case 1:
-            address = '0x18240bd9c07fa6156ce3f3f61921cc82b2619157'
-            break
-        }
-        break
-      case Asset.YFI:
-        switch (this.networkId) {
-          case 1:
-            address = '0x7f3fe9d492a9a60aebb06d82cba23c6f32cad10b'
-            break
-        }
-        break
-      case Asset.LEND:
-        switch (this.networkId) {
-          case 1:
-            address = '0xab45bf58c6482b87da85d6688c4d9640e093be98'
-            break
-        }
-        break
-      case Asset.ETH:
-      case Asset.WETH:
-        switch (this.networkId) {
-          case 1:
-            address = '0xb983e01458529665007ff7e0cddecdb74b967eb6'
-            break
-          case 3:
-            address = '0x0c9b7891e0374ce96e8063891a2356a0fe23ee33'
-            break
-          case 4:
-            address = '0x1885a748d7393f5d23db8df01ea3a33f4d85eac5'
-            break
-          case 42:
-            address = '0x0afbfce9db35ffd1dfdf144a788fa196fd08efe9'
-            break
-        }
-        break
-      case Asset.fWETH:
-        switch (this.networkId) {
-          case 42:
-            address = '0x021c5923398168311ff320902bf8c8c725b4f288'
-            break
-        }
-        break
-      case Asset.USDT:
-        switch (this.networkId) {
-          case 1:
-            address = '0x7e9997a38a439b2be7ed9c9c4628391d3e055d48'
-            break
-          case 42:
-            address = '0x6b9f03e05423cc8d00617497890c0872ff33d4e8'
-            break
-        }
-        break
-      case Asset.SAI:
-        switch (this.networkId) {
-          case 1:
-            address = '0x14094949152eddbfcd073717200da82fed8dc960'
-            break
-          case 42:
-            address = ''
-            break
-        }
-        break
-      case Asset.DAI:
-        switch (this.networkId) {
-          case 1:
-            address = '0x6b093998d36f2c7f0cc359441fbb24cc629d5ff0'
-            break
-          case 3:
-            address = '0x8cca3a42105de7765c58f547e85ac98f57b25d5c'
-            break
-          case 4:
-            address = '0xb530f422ff1520cbb76a8300e39bd4f55bc03bbc'
-            break
-          case 42:
-            address = '0x73d0b4834ba4ada053d8282c02305ecdac2304f0'
-            break
-        }
-        break
-      case Asset.USDC:
-        switch (this.networkId) {
-          case 1:
-            address = '0x32e4c68b3a4a813b710595aeba7f6b7604ab9c15'
-            break
-          case 42:
-            address = '0x021C5923398168311Ff320902BF8c8C725B4F288'
-            break
-        }
-        break
-      case Asset.SUSD:
-        switch (this.networkId) {
-          case 1:
-            address = '0x49f4592e641820e928f9919ef4abd92a719b4b49'
-            break
-          case 42:
-            address = '0x1cac31ecc90912eea18ccadfab15fd9c0e77cbab'
-            break
-        }
-        break
-      case Asset.BAT:
-        switch (this.networkId) {
-          case 1:
-            address = '0xa8b65249de7f85494bc1fe75f525f568aa7dfa39'
-            break
-          case 42:
-            address = '0xb59659564012fa337bb8b9e626b7964b5349f047'
-            break
-        }
-        break
-      case Asset.KNC:
-        switch (this.networkId) {
-          case 1:
-            address = '0x687642347a9282be8fd809d8309910a3f984ac5a'
-            break
-          case 42:
-            address = '0xde7a60c3581f0d8c8723a71c28579131984a410c'
-            break
-        }
-        break
-      case Asset.LINK:
-        switch (this.networkId) {
-          case 1:
-            address = '0x463538705e7d22aa7f03ebf8ab09b067e1001b54'
-            break
-          case 42:
-            address = '0x76754c763a23e9202cc721584fbaf6012ecd8fba'
-            break
-        }
-        break
-      case Asset.MKR:
-        switch (this.networkId) {
-          case 1:
-            address = '0x9189c499727f88f8ecc7dc4eea22c828e6aac015'
-            break
-          case 42:
-            address = '0x3e72500122c3afd64afe0306d7fbc7b8bd82b7d2'
-            break
-        }
-        break
-      case Asset.REP:
-        switch (this.networkId) {
-          case 1:
-            address = '0xbd56e9477fc6997609cf45f84795efbdac642ff1'
-            break
-          case 42:
-            address = '0x8638b468bf02bdb8fc8c5b33dca8c2d16c3fd67b'
-            break
-        }
-        break
-      case Asset.WBTC:
-        switch (this.networkId) {
-          case 1:
-            address = '0x2ffa85f655752fb2acb210287c60b9ef335f5b6e'
-            break
-          case 42:
-            address = '0xF6a0690f22da5464924A28a8198E8ecA69ffc47e'
-            break
-        }
-        break
-      case Asset.ZRX:
-        switch (this.networkId) {
-          case 1:
-            address = '0xa7eb2bc82df18013ecc2a6c533fc29446442edee'
-            break
-          case 42:
-            address = '0xbac711d9963f0db23613f3c338a7a1af151c0696'
-            break
-        }
-        break
-      case Asset.USDT:
-        switch (this.networkId) {
-          case 1:
-            address = '0x7e9997a38a439b2be7ed9c9c4628391d3e055d48'
-            break
-          case 42:
-            address = ''
-            break
-        }
-        break
-    }
-
-    return address
-  }
-
   private getOracleAddress(): string {
     let address: string = ''
     switch (this.networkId) {
       case 1:
-        address = '0xaaA601aE20077F9fae80494DDC36BB39C952c2d0'
+        address = '0x9b40EC9636C68FE752A628A9e7dF620FafAe9A83'
         break
       case 3:
         address = '0x115338e77339d64b3d58181aa9c0518df9d18022'
@@ -302,7 +126,7 @@ export class ContractsSource {
         address = '0x76de3d406fee6c3316558406b17ff785c978e98c'
         break
       case 42:
-        address = '0x2F27c07D888751109753533BF299ea5813A6479D'
+        address = '0x59A2b856d8F6B29f2f3095fFc2FDb4AC9297749A'
         break
     }
 
@@ -366,6 +190,12 @@ export class ContractsSource {
           case '0xdd974d5c2e2928dea5f71b9825b8b646686bd200':
             asset = Asset.KNC
             break
+          case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
+              asset = Asset.AAVE
+              break
+          case '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984':
+              asset = Asset.UNI
+              break
           case '0x0000000000004946c0e9f43f4dee607b0ef1fa1c':
             asset = Asset.CHI
             break
@@ -474,6 +304,12 @@ export class ContractsSource {
           case Asset.LEND:
             address = '0x80fb784b7ed66730e8b1dbd9820afd29931aab03'
             break
+          case Asset.UNI:
+            address = '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'
+            break
+          case Asset.AAVE:
+            address = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
+            break
         }
         break
       case 4:
@@ -529,14 +365,23 @@ export class ContractsSource {
     return Asset[symbol]
   }
 
-  private async getiTokenContractRaw(asset: Asset): Promise<iTokenContract> {
+  
+  private async getiTokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     await this.Init()
-    return new iTokenContract(
-      this.iTokenJson.abi,
-      this.getiTokenAddress(asset).toLowerCase(),
-      this.provider
-    )
+    let symbol
+    if (asset === Asset.WETH) {
+      symbol = `iETH`
+    } else if (asset === Asset.CHAI) {
+      symbol = `iDAI`
+    } else {
+      symbol = `i${asset}`
+    }
+    const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null
+    return tokenContractInfo
+      ? new iTokenContract(this.iTokenJson.abi, tokenContractInfo.token, this.provider)
+      : null
   }
+
 
   private async getOracleContractRaw(): Promise<oracleContract> {
     await this.Init()
@@ -677,6 +522,24 @@ export class ContractsSource {
     this.dsProxyIsAllowJson = await import(`./../assets/artifacts/${network}/dsProxyIsAllow.json`)
     this.saiToDAIBridgeJson = await import(`./../assets/artifacts/${network}/saiToDAIBridge.json`)
     this.instaRegistryJson = await import(`./../assets/artifacts/${network}/instaRegistry.json`)
+    const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList
+
+    iTokenList.forEach((val: any, index: any) => {
+      // tslint:disable:no-console
+      // console.log(val);
+      const t = {
+        token: val[1],
+        asset: val[2],
+        name: val[3],
+        symbol: val[4],
+        index: new BigNumber(index),
+        version: parseInt(val[5], 10)
+      }
+      // tslint:disable:no-console
+      // console.log(t);
+
+      ContractsSource.iTokensContractInfos.set(val[4], t)
+    })
     ContractsSource.isInit = true
   }
 

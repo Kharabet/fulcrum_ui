@@ -15,8 +15,10 @@
     z-index: 2;
     background-color: var(--primary-bg);
   }
+
+
   @media only screen and (min-width: $breakpoint-laptop-min) and (max-height: 820px) {
-    margin-top: -30px;
+    //margin-top: -30px;
     margin-bottom: -10px;
     max-height: 280px;
   }
@@ -25,6 +27,9 @@
   }
 }
 .chart-wrapper {
+  @media only screen and (min-width: $breakpoint-mobile-min) {
+    border-top: 1px solid var(--select-border);
+  }
   &.hidden {
     display: none;
   }

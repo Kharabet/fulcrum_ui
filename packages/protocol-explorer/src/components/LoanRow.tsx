@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react'
 import { BigNumber } from '@0x/utils'
+import React, { useEffect, useState } from 'react'
 import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { AssetDetails } from '../domain/AssetDetails'
-import { ExplorerProvider } from '../services/ExplorerProvider'
-import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
-import { RequestTask } from '../domain/RequestTask'
-import { RequestStatus } from '../domain/RequestStatus'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
+import { ExplorerProvider } from '../services/ExplorerProvider'
+import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
 import { TxLoaderStep } from './TxLoaderStep'
-import { TasksQueue } from '../services/TasksQueue'
 
 export interface ILoanRowProps {
   loanId: string
@@ -19,6 +19,7 @@ export interface ILoanRowProps {
   loanToken: Asset
   collateralToken: Asset
   onLiquidationUpdated: () => void
+  onLiquidationRequested: (request: LiquidationRequest) => void
   doNetworkConnect: () => void
 }
 
@@ -34,14 +35,9 @@ export const LoanRow = (props: ILoanRowProps) => {
   const [liquidationRequest, setRequest] = useState<LiquidationRequest>()
 
   useEffect(() => {
-    async function loadData() {
-      const task = TasksQueue.Instance.getTasksList().find(
-        (t: RequestTask) => t.request instanceof LiquidationRequest && t.request.loanId === props.loanId
-      )
+    const task = TasksQueue.Instance.getTasksList().find((t) => t.request.loanId === props.loanId)
       setLoadingTransaction(task && !task.error ? true : false)
       setRequest(task && task.request instanceof LiquidationRequest ? task.request : undefined)
-    }
-    loadData()
 
     ExplorerProvider.Instance.eventEmitter.on(
       ExplorerProviderEvents.AskToOpenProgressDlg,
@@ -65,34 +61,26 @@ export const LoanRow = (props: ILoanRowProps) => {
   })
 
   const onLiquidateClick = async () => {
-    const provider = ExplorerProvider.getLocalstorageItem('providerType')
-
-    if (
-      !provider ||
-      provider === 'None' ||
-      !ExplorerProvider.Instance.contractsSource ||
-      !ExplorerProvider.Instance.contractsSource.canWrite
-    ) {
-      props.doNetworkConnect()
-      return
-    }
-
-    setLoadingTransaction(true)
+    // setLoadingTransaction(true)
     const loanId = props.loanId
     const decimals: number = AssetsDictionary.assets.get(props.loanToken)!.decimals || 18
 
     const amountInBaseUnits = new BigNumber(
       props.payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
     )
+
+    const rate = props.payOffAmount.dividedBy(props.seizeAmount)
     const request = new LiquidationRequest(
       loanId || '0x0000000000000000000000000000000000000000000000000000000000000000',
       props.loanToken,
-      amountInBaseUnits
+      props.collateralToken,
+      amountInBaseUnits,
+      rate
     )
 
-    console.log(request)
+    props.onLiquidationRequested(request)
     changeLoadingTransaction(true, request)
-    await ExplorerProvider.Instance.onLiquidationConfirmed(request)
+    // await ExplorerProvider.Instance.onLiquidationConfirmed(request)
   }
 
   const getShortHash = (hash: string, count: number) => {
@@ -100,10 +88,10 @@ export const LoanRow = (props: ILoanRowProps) => {
   }
 
   const changeLoadingTransaction = (
-    isLoadingTransaction: boolean,
+    isLoading: boolean,
     request: LiquidationRequest | undefined
   ) => {
-    setLoadingTransaction(isLoadingTransaction)
+    setLoadingTransaction(isLoading)
     setRequest(request)
   }
 
@@ -116,8 +104,8 @@ export const LoanRow = (props: ILoanRowProps) => {
     if (!liquidationRequest || task.request.loanId !== liquidationRequest.loanId) return
 
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(() => {
-        ExplorerProvider.Instance.onTaskCancel(task)
+      window.setTimeout(async () => {
+        await ExplorerProvider.Instance.onTaskCancel(task)
         changeLoadingTransaction(false, undefined)
       }, 5000)
       return
@@ -132,7 +120,7 @@ export const LoanRow = (props: ILoanRowProps) => {
       {isLoadingTransaction ? (
         <div className="table-row__image">
           <TxLoaderStep taskId={props.loanId} />
-          <CircleLoader></CircleLoader>
+          <CircleLoader />
         </div>
       ) : (
         <div className="table-row table-row-loan">

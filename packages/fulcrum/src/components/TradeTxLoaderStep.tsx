@@ -153,8 +153,9 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
     const taskList = TasksQueue.Instance.getTasksList()
     const task = taskList.find((t) => t.request.id === this.props.taskId)
     let title = this.getTitle(task)
-    if (!title && this.state.requestTask?.status == 'Done')
+    if (!title && this.state.requestTask?.status == 'Done') {
       title = { message: 'Updating data', isWarning: false }
+    }
 
     this._isMounted &&
       this.setState({

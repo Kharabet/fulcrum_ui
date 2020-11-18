@@ -5,6 +5,7 @@ import { LiquidationEvent } from '../domain/events/LiquidationEvent'
 import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
 import { DepositCollateralEvent } from './events/DepositCollateralEvent'
 import { WithdrawCollateralEvent } from './events/WithdrawCollateralEvent'
+import { EarnRewardEventNew } from './events/EarnRewardEventNew'
 
 export interface IHistoryEvents {
   groupedEvents: (
@@ -14,6 +15,6 @@ export interface IHistoryEvents {
     | WithdrawCollateralEvent
     | DepositCollateralEvent
   )[]
-  earnRewardEvents: EarnRewardEvent[]
+  earnRewardEvents: Array<(EarnRewardEvent|EarnRewardEventNew)>
   payTradingFeeEvents: PayTradingFeeEvent[]
 }

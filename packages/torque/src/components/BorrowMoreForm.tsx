@@ -1,19 +1,14 @@
 import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
-import { Observable, Subject } from 'rxjs'
-import { debounceTime, switchMap } from 'rxjs/operators'
-import { ActionType } from '../domain/ActionType'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { IBorrowMoreState } from '../domain/IBorrowMoreState'
-import { IBorrowMoreEstimate } from '../domain/IBorrowMoreEstimate'
-import { BorrowRequest } from '../domain/BorrowRequest'
-import { TorqueProvider } from '../services/TorqueProvider'
-import { Rail } from './Rail'
-import { Loader } from './Loader'
-import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import TagManager from 'react-gtm-module'
+import { Subject } from 'rxjs'
+import { debounceTime } from 'rxjs/operators'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { BorrowRequest } from '../domain/BorrowRequest'
+import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
+import { TorqueProvider } from '../services/TorqueProvider'
+import { ChiSwitch } from './ChiSwitch'
+import { Rail } from './Rail'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -61,8 +56,11 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   }
 
   public async componentDidMount() {
-    const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(this.props.loanOrderState.loanAsset, this.props.loanOrderState.collateralAsset)
-    this.setState({borrowMoreColalterizationMin: minInitialMargin.plus(30)})
+    const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
+      this.props.loanOrderState.loanAsset,
+      this.props.loanOrderState.collateralAsset
+    )
+    this.setState({ borrowMoreColalterizationMin: minInitialMargin.plus(30) })
   }
 
   public render() {
@@ -89,9 +87,9 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
         ? 'Danger'
         : 'Liquidation Pending'
 
-    //115%
+    // 115%
     const sliderMin = loan.loanData!.maintenanceMargin.div(10 ** 18).toNumber()
-    //300%
+    // 300%
     const sliderMax = sliderMin + 185
 
     let sliderValue = loan.collateralizedPercent.multipliedBy(100).toNumber()
@@ -151,12 +149,14 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             </div>
           </div>
         </section>
+        <ChiSwitch />
         <section className="dialog-actions">
           <div className="borrow-more-loan-form__actions-container">
             {loan.collateralizedPercent
               .times(100)
               .plus(100)
-              .lte(this.state.borrowMoreColalterizationMin) || !Number(this.state.inputAmountText) ? (
+              .lte(this.state.borrowMoreColalterizationMin) ||
+            !Number(this.state.inputAmountText) ? (
               <button type="button" className="btn btn-size--small" onClick={this.props.onDecline}>
                 Close
               </button>
@@ -187,9 +187,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
         this.props.loanOrderState.loanAsset
       )
       let usdPrice = this.state.borrowAmount
-      if (usdPrice !== null) {
-        usdPrice = usdPrice.multipliedBy(usdAmount)
-      }
+      usdPrice = usdPrice.multipliedBy(usdAmount)
 
       if (isMainnetProd) {
         const tagManagerArgs = {
@@ -212,7 +210,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             ]
           }
         }
-        //console.log("tagManagerArgs = ", tagManagerArgs)
+        // console.log("tagManagerArgs = ", tagManagerArgs)
         TagManager.dataLayer(tagManagerArgs)
       }
 
@@ -230,7 +228,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
-    let amountText = event.target.value ? event.target.value : ''
+    const amountText = event.target.value ? event.target.value : ''
     if (parseFloat(amountText) < 0) return
     this.setState(
       {
@@ -247,9 +245,9 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
   private getCollateralPercent = async (inputAmountText: string) => {
     const borrowMoreLoanOrderState = { ...this.props.loanOrderState }
-    borrowMoreLoanOrderState.loanData = { ...this.props.loanOrderState.loanData! } //deep copy
+    borrowMoreLoanOrderState.loanData = { ...this.props.loanOrderState.loanData! } // deep copy
     const decimals = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals
-    borrowMoreLoanOrderState.loanData.principal = borrowMoreLoanOrderState.loanData!.principal.plus(
+    borrowMoreLoanOrderState.loanData.principal = borrowMoreLoanOrderState.loanData.principal.plus(
       new BigNumber(inputAmountText).times(10 ** decimals)
     )
     const collateralChangeEstimate = await TorqueProvider.Instance.getLoanCollateralChangeEstimate(

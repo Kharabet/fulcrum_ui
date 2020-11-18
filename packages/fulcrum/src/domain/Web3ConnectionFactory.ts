@@ -38,9 +38,7 @@ export class Web3ConnectionFactory {
 
     const alchemyProvider = await this.getAlchemyProvider()
     providerEngine.addProvider(alchemyProvider)
-
     const provider = await connector.getProvider()
-
     try {
       providerEngine.addProvider(new SignerSubprovider(provider))
       await providerEngine.start()
@@ -70,6 +68,7 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.currentWeb3Engine = providerEngine
     Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper
     Web3ConnectionFactory.canWrite = canWrite
+
   }
 
   public static async setReadonlyProvider() {
@@ -98,14 +97,22 @@ export class Web3ConnectionFactory {
     if (account) Web3ConnectionFactory.userAccount = account
   }
 
+ 
   public static async getAlchemyProvider(): Promise<AlchemySubprovider> {
     let key
-    if (ethNetwork === 'kovan') {
-      key = configProviders.Alchemy_ApiKey_kovan
+    let url
+    if (process.env.NODE_ENV !== 'development') {
+      if (ethNetwork === 'kovan') {
+        key = configProviders.Alchemy_ApiKey_kovan
+      } else {
+        key = configProviders.Alchemy_ApiKey
+      }
+      url = `https://eth-${ethNetwork}.alchemyapi.io/v2/${key}`
     } else {
-      key = configProviders.Alchemy_ApiKey
+      key = process.env.REACT_APP_INFURA_KEY // own developer's infura key
+      url = `https://${ethNetwork}.infura.io/v3/${key}`
     }
-    return new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/v2/${key}`, {
+    return new AlchemySubprovider(url, {
       writeProvider: null
     })
   }

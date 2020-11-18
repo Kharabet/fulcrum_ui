@@ -6,7 +6,7 @@ import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { Asset } from '../domain/Asset'
 import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary, AssetsDictionaryMobile } from '../domain/AssetsDictionary'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
@@ -77,10 +77,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
   constructor(props: ILendFormProps, context?: any) {
     super(props, context)
 
-    let assetDetails = AssetsDictionary.assets.get(this.props.asset)
-    if (this.props.isMobileMedia) {
-      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset)
-    }
+    const assetDetails = AssetsDictionary.assets.get(this.props.asset)
 
     this._isMounted = false
 
@@ -154,10 +151,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
         isLoading: true
       })
 
-    let assetDetails = AssetsDictionary.assets.get(this.props.asset)
-    if (this.props.isMobileMedia) {
-      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset)
-    }
+    const assetDetails = AssetsDictionary.assets.get(this.props.asset)
 
     let assetOrWrapped: Asset
     if (this.props.asset === Asset.ETH) {

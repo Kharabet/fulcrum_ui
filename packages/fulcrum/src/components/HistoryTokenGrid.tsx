@@ -98,23 +98,25 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   public render() {
-    if (this.state.isLoading)
+    if (this.state.isLoading) {
       return (
         <PreloaderChart quantityDots={4} sizeDots={'middle'} title={'Loading'} isOverlay={false} />
       )
+    }
 
-    if (!this.state.historyRowsData.length)
+    if (!this.state.historyRowsData.length) {
       return (
-        <div className="history-token-grid__placeholder">
+        <div className="manage-token-grid__placeholder">
           <div>
             <Placeholder />
             <p>No trading history</p>
-            <a href="/trade" className="history-token-grid__link-button">
+            <a href="/trade" className="manage-token-grid__link-button">
               Start Trading
             </a>
           </div>
         </div>
       )
+    }
 
     const startIndex = this.quantityVisibleRow * this.state.numberPagination
     const endIndex = this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow
@@ -150,6 +152,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
   public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
     this.setState({ ...this.state, isLoading: true })
+    const dateWhenPricePrecisionWasChanged = new Date(process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1605557075000 : 1603991752000) // approx date when price feed precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
     const historyRowsData: IHistoryTokenGridRowProps[] = []
     const historyEvents = this.props.historyEvents
     if (!historyEvents) return
@@ -183,9 +186,23 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
       if (positionType === PositionType.LONG) leverage = leverage.plus(1)
 
-      let openPrice =
+      const loanAssetDecimalsFirstEvent =
+        AssetsDictionary.assets.get(tradeEvent.loanToken)!.decimals || 18
+      const collateralAssetDecimalsFirstEvent =
+        AssetsDictionary.assets.get(tradeEvent.collateralToken)!.decimals || 18
+
+      const openPrice =
         positionType === PositionType.LONG
-          ? new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
+          ? tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
+            ? new BigNumber(10 ** 36)
+                .div(tradeEvent.entryPrice)
+                .div(10 ** 18)
+                .times(10 ** (collateralAssetDecimalsFirstEvent - loanAssetDecimalsFirstEvent))
+            : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
+          : tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
+          ? tradeEvent.entryPrice
+              .div(10 ** 18)
+              .times(10 ** (loanAssetDecimalsFirstEvent - collateralAssetDecimalsFirstEvent))
           : tradeEvent.entryPrice.div(10 ** 18)
 
       const positionEventsGroup = new PositionEventsGroup(
@@ -215,20 +232,25 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const collateralAssetDecimals =
             AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
 
-          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
-
           if (positionType === PositionType.LONG) {
-            positionValue = event.positionSize.div(10 ** 18).times(collateralAssetPrecision)
-            value = event.positionSize.times(collateralAssetPrecision).div(event.entryPrice)
-            tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18)
+            positionValue = event.positionSize.div(10 ** collateralAssetDecimals)
+            tradePrice =
+              event.timeStamp > dateWhenPricePrecisionWasChanged
+                ? new BigNumber(10 ** 36)
+                    .div(event.entryPrice)
+                    .div(10 ** 18)
+                    .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+                : new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18)
+            value = positionValue.times(tradePrice)
           } else {
-            positionValue = event.borrowedAmount.div(10 ** 18).times(loanAssetPrecision)
-            value = event.borrowedAmount
-              .div(10 ** 18)
-              .times(loanAssetPrecision)
-              .times(event.entryPrice.div(10 ** 18))
-            tradePrice = event.entryPrice.div(10 ** 18)
+            positionValue = event.borrowedAmount.div(10 ** loanAssetDecimals)
+            tradePrice =
+              event.timeStamp > dateWhenPricePrecisionWasChanged
+                ? event.entryPrice
+                    .div(10 ** 18)
+                    .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
+                : event.entryPrice.div(10 ** 18)
+            value = positionValue.times(tradePrice)
           }
 
           positionEventsGroup.events.push(
@@ -251,18 +273,27 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
           const collateralAssetDecimals =
             AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
-          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
 
           if (positionType === PositionType.LONG) {
-            positionValue = event.positionCloseSize.times(collateralAssetPrecision).div(10 ** 18)
-            value = event.positionCloseSize.times(collateralAssetPrecision).div(event.exitPrice)
-            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18)
+            positionValue = event.positionCloseSize.div(10 ** collateralAssetDecimals)
+            tradePrice =
+              event.timeStamp > dateWhenPricePrecisionWasChanged
+                ? new BigNumber(10 ** 36)
+                    .div(event.exitPrice)
+                    .div(10 ** 18)
+                    .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+                : new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18)
+            value = positionValue.times(tradePrice)
             profit = tradePrice.minus(openPrice).times(positionValue)
           } else {
-            positionValue = event.loanCloseAmount.times(loanAssetPrecision).div(10 ** 18)
-            value = event.positionCloseSize.times(loanAssetPrecision).div(10 ** 18)
-            tradePrice = event.exitPrice.div(10 ** 18)
+            positionValue = event.loanCloseAmount.div(10 ** loanAssetDecimals)
+            tradePrice =
+              event.timeStamp > dateWhenPricePrecisionWasChanged
+                ? event.exitPrice
+                    .div(10 ** 18)
+                    .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
+                : event.exitPrice.div(10 ** 18)
+            value = positionValue.times(tradePrice)
             profit = openPrice.minus(tradePrice).times(positionValue)
           }
 
@@ -288,31 +319,22 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
           const collateralAssetDecimals =
             AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
-          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
 
           if (positionType === PositionType.LONG) {
-            positionValue = event.repayAmount.div(10 ** loanAssetDecimals).div(
-              event.collateralToLoanRate
-                .div(10 ** 18)
-                .times(loanAssetPrecision)
-                .div(collateralAssetPrecision)
-            )
             tradePrice = event.collateralToLoanRate
               .div(10 ** 18)
-              .times(loanAssetPrecision)
-              .div(collateralAssetPrecision)
+              .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+            positionValue = event.repayAmount.div(10 ** loanAssetDecimals).div(tradePrice)
             value = positionValue.times(tradePrice)
             profit = value.minus(
               event.collateralWithdrawAmount.div(10 ** collateralAssetDecimals).times(tradePrice)
             )
           } else {
-            positionValue = event.repayAmount.times(loanAssetPrecision).div(10 ** 18)
+            positionValue = event.repayAmount.div(10 ** loanAssetDecimals)
             tradePrice = new BigNumber(10 ** 36)
               .div(event.collateralToLoanRate)
               .div(10 ** 18)
-              .div(loanAssetPrecision)
-              .times(collateralAssetPrecision)
+              .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
             value = positionValue.times(tradePrice)
             profit = value.minus(event.collateralWithdrawAmount.div(10 ** collateralAssetDecimals))
           }
@@ -336,16 +358,14 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const action = 'Deposited'
           const depositTokenDecimals =
             AssetsDictionary.assets.get(event.depositToken)!.decimals || 18
-          const depositTokenPrecision = new BigNumber(10 ** (18 - depositTokenDecimals))
 
           if (positionType === PositionType.LONG) {
-            positionValue = event.depositAmount.times(depositTokenPrecision).div(10 ** 18)
+            positionValue = event.depositAmount.div(10 ** depositTokenDecimals)
           } else {
             const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
             const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
             positionValue = event.depositAmount
-              .times(depositTokenPrecision)
-              .div(10 ** 18)
+              .div(10 ** depositTokenDecimals)
               .times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken))
           }
           tradePrice = new BigNumber(0)
@@ -369,16 +389,14 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const action = 'Withdrew'
           const withdrawTokenDecimals =
             AssetsDictionary.assets.get(event.withdrawToken)!.decimals || 18
-          const withdrawTokenPrecision = new BigNumber(10 ** (18 - withdrawTokenDecimals))
 
           if (positionType === PositionType.LONG) {
-            positionValue = event.withdrawAmount.times(withdrawTokenPrecision).div(10 ** 18)
+            positionValue = event.withdrawAmount.div(10 ** withdrawTokenDecimals)
           } else {
             const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
             const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
             positionValue = event.withdrawAmount
-              .times(withdrawTokenPrecision)
-              .div(10 ** 18)
+              .div(10 ** withdrawTokenDecimals)
               .times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken))
           }
           tradePrice = new BigNumber(0)

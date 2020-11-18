@@ -129,6 +129,10 @@
       text-align: center;
       display: flex;
       justify-content: center;
+      align-items: center;
+      width: 82px;
+      height: 82px;
+      align-self: center;
       img,
       svg {
         display: inline-block;
@@ -145,7 +149,7 @@
       flex-direction: column;
       justify-content: space-between;
 
-      margin-bottom: 1.5rem;
+      margin-bottom: 24px;
       .token-selector-item__description {
         flex-direction: row;
         display: flex;

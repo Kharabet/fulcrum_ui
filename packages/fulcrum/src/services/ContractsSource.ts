@@ -72,10 +72,10 @@ export class ContractsSource {
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`)
 
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList
-    const pTokenList = (await import(`../assets/artifacts/${ethNetwork}/pTokenList.js`)).pTokenList
-    const pTokenListBurnOnly = (
-      await import(`../assets/artifacts/${ethNetwork}/pTokenListBurnOnly.js`)
-    ).pTokenListBurnOnly
+    // const pTokenList = (await import(`../assets/artifacts/${ethNetwork}/pTokenList.js`)).pTokenList
+    // const pTokenListBurnOnly = (
+    //   await import(`../assets/artifacts/${ethNetwork}/pTokenListBurnOnly.js`)
+    // ).pTokenListBurnOnly
 
     iTokenList.forEach((val: any, index: any) => {
       // tslint:disable:no-console
@@ -96,69 +96,69 @@ export class ContractsSource {
 
     // tslint:disable:no-console
     // console.log(`--- start of token list ---`);
-    pTokenList.forEach((val: any, index: any) => {
-      // tslint:disable:no-console
-      // console.log(val);
+    // pTokenList.forEach((val: any, index: any) => {
+    //   // tslint:disable:no-console
+    //   // console.log(val);
 
-      const version = parseInt(val.version, 10)
+    //   const version = parseInt(val.version, 10)
 
-      let baseAsset
-      if (val.direction === 'SHORT') {
-        baseAsset = version === 2 ? val.unit : val.asset
-      } else {
-        baseAsset = version === 2 ? val.asset : val.unit
-      }
+    //   let baseAsset
+    //   if (val.direction === 'SHORT') {
+    //     baseAsset = version === 2 ? val.unit : val.asset
+    //   } else {
+    //     baseAsset = version === 2 ? val.asset : val.unit
+    //   }
 
-      const t = {
-        token: val.address,
-        asset: AssetsDictionary.assets.get(baseAsset)!.addressErc20.get(this.networkId)!,
-        name: val.symbol,
-        symbol: val.symbol,
-        index: new BigNumber(index),
-        version: version
-      }
-      // tslint:disable:no-console
-      // console.log(t);
+    //   const t = {
+    //     token: val.address,
+    //     asset: AssetsDictionary.assets.get(baseAsset)!.addressErc20.get(this.networkId)!,
+    //     name: val.symbol,
+    //     symbol: val.symbol,
+    //     index: new BigNumber(index),
+    //     version: version
+    //   }
+    //   // tslint:disable:no-console
+    //   // console.log(t);
 
-      ContractsSource.pTokensContractInfos.set(val.symbol, t)
-    })
-    // console.log(ContractsSource.pTokensContractInfos);
+    //   ContractsSource.pTokensContractInfos.set(val.symbol, t)
+    // })
+    // // console.log(ContractsSource.pTokensContractInfos);
 
-    // tslint:disable:no-console
-    // console.log(`--- start of token list ---`);
-    pTokenListBurnOnly.forEach((val: any, index: any) => {
-      // tslint:disable:no-console
-      // console.log(val);
+    // // tslint:disable:no-console
+    // // console.log(`--- start of token list ---`);
+    // pTokenListBurnOnly.forEach((val: any, index: any) => {
+    //   // tslint:disable:no-console
+    //   // console.log(val);
 
-      const version = parseInt(val.version, 10)
+    //   const version = parseInt(val.version, 10)
 
-      let baseAsset
-      if (val.direction === 'SHORT') {
-        baseAsset = version === 2 ? val.unit : val.asset
-      } else {
-        baseAsset = version === 2 ? val.asset : val.unit
-      }
+    //   let baseAsset
+    //   if (val.direction === 'SHORT') {
+    //     baseAsset = version === 2 ? val.unit : val.asset
+    //   } else {
+    //     baseAsset = version === 2 ? val.asset : val.unit
+    //   }
 
-      const t = {
-        token: val.address,
-        asset: AssetsDictionary.assets.get(baseAsset)!.addressErc20.get(this.networkId)!,
-        name: val.symbol,
-        symbol: val.symbol,
-        index: new BigNumber(index),
-        version: version
-      }
-      // tslint:disable:no-console
-      // console.log(t);
+    //   const t = {
+    //     token: val.address,
+    //     asset: AssetsDictionary.assets.get(baseAsset)!.addressErc20.get(this.networkId)!,
+    //     name: val.symbol,
+    //     symbol: val.symbol,
+    //     index: new BigNumber(index),
+    //     version: version
+    //   }
+    //   // tslint:disable:no-console
+    //   // console.log(t);
 
-      ContractsSource.pTokensContractInfosBurnOnly.set(val.symbol, t)
-    })
-    // console.log(ContractsSource.pTokensContractInfosBurnOnly);
+    //   ContractsSource.pTokensContractInfosBurnOnly.set(val.symbol, t)
+    // })
+    // // console.log(ContractsSource.pTokensContractInfosBurnOnly);
 
-    // tslint:disable:no-console
-    console.log(`Loaded ${iTokenList.length} Fulcrum iTokens.`)
+    // // tslint:disable:no-console
+    // console.log(`Loaded ${iTokenList.length} Fulcrum iTokens.`)
 
-    // tslint:disable:no-console
-    console.log(`Loaded ${pTokenList.length + pTokenListBurnOnly.length} Fulcrum pTokens.`)
+    // // tslint:disable:no-console
+    // console.log(`Loaded ${pTokenList.length + pTokenListBurnOnly.length} Fulcrum pTokens.`)
 
     ContractsSource.isInit = true
   }
@@ -227,7 +227,7 @@ export class ContractsSource {
     let address: string = ''
     switch (this.networkId) {
       case 1:
-        address = '0xaaA601aE20077F9fae80494DDC36BB39C952c2d0'
+        address = '0x9b40EC9636C68FE752A628A9e7dF620FafAe9A83'
         break
       case 3:
         address = '0x4330762418df3555ddd1d732200b317c9239b941'
@@ -236,7 +236,7 @@ export class ContractsSource {
         address = '0x76de3d406fee6c3316558406b17ff785c978e98c'
         break
       case 42:
-        address = '0x2F27c07D888751109753533BF299ea5813A6479D'
+        address = '0x59A2b856d8F6B29f2f3095fFc2FDb4AC9297749A'
         break
     }
 
@@ -272,8 +272,7 @@ export class ContractsSource {
     )
   }
 
-  private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
-    await this.Init()
+  private getITokenContractRaw(asset: Asset): iTokenContract | null {
     let symbol
     if (asset === Asset.WETH) {
       symbol = `iETH`
@@ -440,8 +439,17 @@ export class ContractsSource {
           case '0xdd974d5c2e2928dea5f71b9825b8b646686bd200':
             asset = Asset.KNC
             break
-          case '0x0000000000004946c0e9f43f4dee607b0ef1fa1c':
+          case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
+            asset = Asset.AAVE
+            break
+          case '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984':
+            asset = Asset.UNI
+            break
+          case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
             asset = Asset.CHI
+            break
+          case '0xb72b31907c1c95f3650b64b2469e08edacee5e8f':
+            asset = Asset.vBZRX
             break
         }
         break
@@ -525,6 +533,12 @@ export class ContractsSource {
             break
           case '0x02357164ba33f299f7654cbb29da29db38ae1f44':
             asset = Asset.KNC
+            break
+          case '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984':
+            asset = Asset.UNI
+            break
+          case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
+            asset = Asset.AAVE
             break
           case '0x0000000000004946c0e9f43f4dee607b0ef1fa1c':
             asset = Asset.CHI

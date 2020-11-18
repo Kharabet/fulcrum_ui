@@ -66,7 +66,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper,
-      isMobileMedia: false,
+      isMobileMedia: window.innerWidth <= 959,
       isChiEnabled: TorqueProvider.getLocalstorageItem('isChiEnabled') === 'true'
     }
 
@@ -88,7 +88,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public componentDidMount(): void {
     this._isMounted = true
     window.addEventListener('resize', this.didResize.bind(this))
-    this.didResize()
     errors.setLogLevel('error')
     this.doNetworkConnect()
   }
@@ -199,10 +198,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   private didResize = async () => {
     const isMobileMedia = window.innerWidth <= 959
-    if (isMobileMedia !== this.state.isMobileMedia) {
-      ;(await this._isMounted) && this.setState({ isMobileMedia })
-    }
+    this.setState({ isMobileMedia })
   }
+
   public doNetworkConnect = async () => {
     ;(await this._isMounted) &&
       !this.state.isProviderMenuModalOpen &&

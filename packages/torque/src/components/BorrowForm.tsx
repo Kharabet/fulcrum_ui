@@ -1,4 +1,5 @@
 import { BigNumber } from '@0x/utils'
+import Slider from 'rc-slider'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { Observable, Subject } from 'rxjs'
@@ -8,10 +9,11 @@ import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { IBorrowEstimate } from '../domain/IBorrowEstimate'
 import { TorqueProvider } from '../services/TorqueProvider'
+import { ChiSwitch } from './ChiSwitch'
 import { CollateralTokenSelectorToggle } from './CollateralTokenSelectorToggle'
 import { Loader } from './Loader'
+
 import { ReactComponent as Edit } from '../assets/images/edit.svg'
-import Slider from 'rc-slider'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -76,8 +78,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         switchMap((value) => this.rxGetEstimate(value))
       )
       .subscribe(async () => {
-        let balanceTooLow = await this.checkBalanceTooLow(this.state.collateralAsset)
-        let borrowEstimate = await this.getBorrowEstimate(this.state.collateralAsset)
+        const balanceTooLow = await this.checkBalanceTooLow(this.state.collateralAsset)
+        const borrowEstimate = await this.getBorrowEstimate(this.state.collateralAsset)
         this.setState({
           ...this.state,
           depositAmount: borrowEstimate.depositAmount,
@@ -90,7 +92,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this._input = input
   }
 
-  public async componentWillMount() {
+  private async setDefaultCollaterization(){
     const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
       this.props.borrowAsset,
       this.state.collateralAsset
@@ -104,16 +106,23 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       collateralValue: selectedValue.toFixed()
     })
   }
-  public componentDidUpdate(
+
+  public async componentWillMount() {
+    await this.setDefaultCollaterization()
+  }
+  public async componentDidUpdate(
     prevProps: Readonly<IBorrowFormProps>,
     prevState: Readonly<IBorrowFormState>,
     snapshot?: any
-  ): void {
+  ) {
     if (
       this.state.depositAmount !== prevState.depositAmount ||
       this.state.collateralAsset !== prevState.collateralAsset
     ) {
       this.changeStateLoading()
+    }
+    if (prevState.collateralAsset !== this.state.collateralAsset){
+      await this.setDefaultCollaterization()
     }
   }
 
@@ -208,11 +217,14 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <div className="rail"></div>
+                <div className="rail" />
               </React.Fragment>
             )}
           </div>
         </section>
+
+        <ChiSwitch />
+
         <section className="dialog-actions">
           <div className="borrow-form__actions-container">
             <div className="borrow-form__action-change">
@@ -265,7 +277,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
     if (this.props.onSubmit && !this.state.didSubmit && this.state.depositAmount.gt(0)) {
       this.setState({ ...this.state, didSubmit: true })
-      let balanceTooLow = await this.checkBalanceTooLow(this.state.collateralAsset)
+      const balanceTooLow = await this.checkBalanceTooLow(this.state.collateralAsset)
       if (balanceTooLow) {
         this.setState({ ...this.state, balanceTooLow: true, didSubmit: false })
         return
@@ -275,9 +287,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       const randomNumber = Math.floor(Math.random() * 100000) + 1
       const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset)
       let usdPrice = this.state.borrowAmount
-      if (usdPrice !== null) {
-        usdPrice = usdPrice.multipliedBy(usdAmount)
-      }
+      usdPrice = usdPrice.multipliedBy(usdAmount)
 
       if (isMainnetProd) {
         const tagManagerArgs = {
@@ -296,7 +306,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             ]
           }
         }
-        //console.log("tagManagerArgs = ", tagManagerArgs)
+        // console.log("tagManagerArgs = ", tagManagerArgs)
         TagManager.dataLayer(tagManagerArgs)
       }
 
@@ -313,7 +323,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   private onCollateralChange = async (asset: Asset) => {
-    let balanceTooLow = await this.checkBalanceTooLow(asset)
+    const balanceTooLow = await this.checkBalanceTooLow(asset)
     const borrowEstimate = await this.getBorrowEstimate(asset)
     this.setState({
       ...this.state,
@@ -326,10 +336,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
-    let inputAmountText = event.target.value ? event.target.value : ''
+    const inputAmountText = event.target.value ? event.target.value : ''
     if (inputAmountText === '' || parseFloat(inputAmountText) < 0) return
     // setting inputAmountText to update display at the same time
-    await this.setState({
+    this.setState({
       ...this.state,
       inputAmountText: inputAmountText,
       borrowAmount: new BigNumber(inputAmountText),
@@ -364,7 +374,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       this.props.borrowAsset,
       collateralAsset
     )
-    console.log(this.state.selectedValue)
+    // console.log(this.state.selectedValue)
     borrowEstimate.depositAmount = borrowEstimate.depositAmount
       .times(this.state.selectedValue)
       .div(minInitialMargin)
@@ -377,26 +387,26 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     }
   }
 
-  public onCollateralAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    let inputCollateralText = event.target.value ? event.target.value : ''
-    let inputCollateralValue = Number(inputCollateralText)
+  public onCollateralAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputCollateralText = event.target.value ? event.target.value : ''
+    const inputCollateralValue = Number(inputCollateralText)
 
     if (parseFloat(inputCollateralText) < 0) return
 
     if (this.state.minValue > inputCollateralValue) {
-      await this.setState({
+      this.setState({
         ...this.state,
         collateralValue: inputCollateralText,
         selectedValue: this.state.minValue
       })
     } else if (inputCollateralValue > this.state.maxValue) {
-      await this.setState({
+      this.setState({
         ...this.state,
         collateralValue: inputCollateralText,
         selectedValue: this.state.maxValue
       })
     } else {
-      await this.setState({
+      this.setState({
         ...this.state,
         collateralValue: inputCollateralText,
         selectedValue: inputCollateralValue
@@ -409,23 +419,25 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this.setState({ ...this.state, isEdit: true })
   }
 
-  public onClickForm = async (event: FormEvent<HTMLFormElement>) => {
+  public onClickForm = (event: FormEvent<HTMLFormElement>) => {
     if (this.state.isEdit && (event.target as Element).className !== 'input-collateral') {
       this.setState({ ...this.state, isEdit: false })
       if (this.state.minValue > Number(this.state.collateralValue)) {
-        await this.setState({ ...this.state, collateralValue: this.state.minValue.toFixed() })
+        this.setState({ ...this.state, collateralValue: this.state.minValue.toFixed() })
       } else if (Number(this.state.collateralValue) > this.state.maxValue) {
-        await this.setState({ ...this.state, collateralValue: this.state.maxValue.toFixed() })
+        this.setState({ ...this.state, collateralValue: this.state.maxValue.toFixed() })
       }
     }
   }
 
   private onChange = async (value: number) => {
-    let selectedValue = Number(value.toFixed(2))
+    const selectedValue = Number(value.toFixed(2))
     this.setState({
       ...this.state,
       selectedValue: selectedValue,
       collateralValue: selectedValue.toFixed(2)
     })
+    
+    this._inputTextChange.next(this.state.inputAmountText)
   }
 }

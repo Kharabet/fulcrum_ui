@@ -4,7 +4,7 @@ import React, { Component, Suspense } from 'react'
 import TagManager from 'react-gtm-module'
 import Modal from 'react-modal'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
-import { Footer } from '../layout/Footer'
+import Footer from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
 
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
@@ -71,7 +71,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       currentPage: '',
       web3: FulcrumProvider.Instance.web3Wrapper,
-      isMobileMedia: false
+      isMobileMedia: window.innerWidth <= 991
       //isV1ITokenInWallet: false
     }
 
@@ -84,7 +84,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public componentDidMount(): void {
     this._isMounted = true
     window.addEventListener('resize', this.didResize.bind(this))
-    this.didResize()
     errors.setLogLevel('error')
     this.doNetworkConnect()
   }
@@ -101,9 +100,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
     console.log(provider)
     //handle connectors events (i.e. network changed)
-    await this.onProviderTypeSelect(connector)
-    if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated))
+    // await this.onProviderTypeSelect(connector)
+    if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated)) {
       connector.on(ConnectorEvent.Update, this.onConnectorUpdated)
+    }
 
     return Web3ConnectionFactory.currentWeb3Engine
   }
@@ -192,7 +192,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                           <HeaderOps
                             headerClass="lend"
                             isMobileMedia={this.state.isMobileMedia}
-                            isLoading={this.state.isLoading}
                             doNetworkConnect={this.doNetworkConnect}
                             isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
                           />
@@ -207,7 +206,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                             }>
                             <LendPage
                               isMobileMedia={this.state.isMobileMedia}
-                              isLoading={this.state.isLoading}
                               doNetworkConnect={this.doNetworkConnect}
                               isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
                             />
@@ -224,7 +222,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                           <HeaderOps
                             headerClass="trade"
                             isMobileMedia={this.state.isMobileMedia}
-                            isLoading={this.state.isLoading}
                             doNetworkConnect={this.doNetworkConnect}
                             isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
                           />
@@ -239,7 +236,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                             }>
                             <TradePage
                               isMobileMedia={this.state.isMobileMedia}
-                              isLoading={this.state.isLoading}
                               doNetworkConnect={this.doNetworkConnect}
                               isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
                             />
@@ -256,7 +252,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                           <HeaderOps
                             headerClass="stats"
                             isMobileMedia={this.state.isMobileMedia}
-                            isLoading={this.state.isLoading}
                             doNetworkConnect={this.doNetworkConnect}
                             isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
                           />
@@ -271,7 +266,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                             }>
                             <StatsPage
                               isMobileMedia={this.state.isMobileMedia}
-                              isLoading={this.state.isLoading}
                               doNetworkConnect={this.doNetworkConnect}
                               isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
                             />
@@ -321,11 +315,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
       </Web3ReactProvider>
     )
   }
-  private didResize = async () => {
+  private didResize = () => {
     const isMobileMedia = window.innerWidth <= 959
-    if (isMobileMedia !== this.state.isMobileMedia) {
-      ;(await this._isMounted) && this.setState({ isMobileMedia })
-    }
+    this.setState({ isMobileMedia })
   }
 
   public doNetworkConnect = async () => {
@@ -336,22 +328,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public async onConnectorUpdated(update: ConnectorUpdate) {
     console.log('onConnectorUpdated')
-    await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
+    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
 
     await Web3ConnectionFactory.updateConnector(update)
     await FulcrumProvider.Instance.setWeb3ProviderFinalize(FulcrumProvider.Instance.providerType)
-    await FulcrumProvider.Instance.eventEmitter.emit(
-      FulcrumProviderEvents.ProviderChanged,
-      new ProviderChangedEvent(
-        FulcrumProvider.Instance.providerType,
-        FulcrumProvider.Instance.web3Wrapper
-      )
-    )
   }
 
   public onDeactivate = async () => {
-    FulcrumProvider.Instance.isLoading = true
-
     await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
     ;(await this._isMounted) &&
       this.setState({
@@ -359,70 +342,31 @@ export class AppRouter extends Component<any, IAppRouterState> {
         isProviderMenuModalOpen: false
       })
     await FulcrumProvider.Instance.setReadonlyWeb3Provider()
-
-    FulcrumProvider.Instance.isLoading = false
-    await FulcrumProvider.Instance.eventEmitter.emit(
-      FulcrumProviderEvents.ProviderChanged,
-      new ProviderChangedEvent(
-        FulcrumProvider.Instance.providerType,
-        FulcrumProvider.Instance.web3Wrapper
-      )
-    )
   }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
-    if (!this.state.isLoading) {
-      FulcrumProvider.Instance.isLoading = true
+      this.setState({
+        ...this.state,
+        isLoading: true,
+        isProviderMenuModalOpen: false
+      })
 
-      await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
-      ;(await this._isMounted) &&
-        this.setState(
-          {
-            ...this.state,
-            isLoading: true,
-            isProviderMenuModalOpen: false
-          },
-          async () => {
-            await FulcrumProvider.Instance.setWeb3Provider(connector, account)
-
-            FulcrumProvider.Instance.isLoading = false
-
-            await FulcrumProvider.Instance.eventEmitter.emit(
-              FulcrumProviderEvents.ProviderChanged,
-              new ProviderChangedEvent(
-                FulcrumProvider.Instance.providerType,
-                FulcrumProvider.Instance.web3Wrapper
-              )
-            )
-            ;(await this._isMounted) &&
-              this.setState({
-                ...this.state,
-                isLoading: false
-              })
-          }
-        )
-    } else {
-      ;(await this._isMounted) &&
-        this.setState({
-          ...this.state,
-          isProviderMenuModalOpen: false
-        })
-    }
+      FulcrumProvider.Instance.setWeb3Provider(connector, account)
   }
 
   public onRequestClose = async () => {
     ;(await this._isMounted) && this.setState({ ...this.state, isProviderMenuModalOpen: false })
   }
 
-  public onProviderChanged = async (event: ProviderChangedEvent) => {
+  public onProviderChanged = (event: ProviderChangedEvent) => {
     //await this.checkITokenV1Balances();
-    await this.checkGasTokenAllowance()
-    ;(await this._isMounted) &&
-      this.setState({
-        ...this.state,
-        isLoading: false,
-        web3: event.web3
-      })
+    this.checkGasTokenAllowance()
+    // ;(await this._isMounted) &&
+    //   this.setState({
+    //     ...this.state,
+    //     isLoading: false,
+    //     web3: event.web3
+    //   })
   }
   public onRiskDisclosureRequestClose = async () => {
     ;(await this._isMounted) && this.setState({ ...this.state, isRiskDisclosureModalOpen: false })

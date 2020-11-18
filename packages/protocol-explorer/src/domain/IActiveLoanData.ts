@@ -24,5 +24,7 @@ export interface IActiveLoanData {
     maxLoanTerm: BigNumber
     maxLiquidatable: BigNumber
     maxSeizable: BigNumber
+    depositValueAsLoanToken: BigNumber
+    depositValueAsCollateralToken: BigNumber
   }
 }

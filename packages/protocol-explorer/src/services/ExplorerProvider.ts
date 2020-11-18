@@ -9,28 +9,28 @@ import Web3 from 'web3'
 import constantAddress from '../config/constant.json'
 
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
-import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { ProviderType } from '../domain/ProviderType'
-import { ExplorerProviderEvents } from './events/ExplorerProviderEvents'
+import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { ContractsSource } from './ContractsSource'
+import { ExplorerProviderEvents } from './events/ExplorerProviderEvents'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
-import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
-import { LiquidationEvent } from '../domain/LiquidationEvent'
-import { TradeEvent } from '../domain/TradeEvent'
-import { CloseWithSwapEvent } from '../domain/CloseWithSwapEvent'
-import { CloseWithDepositEvent } from '../domain/CloseWithDepositEvent'
 import { BorrowEvent } from '../domain/BorrowEvent'
 import { BurnEvent } from '../domain/BurnEvent'
+import { CloseWithDepositEvent } from '../domain/CloseWithDepositEvent'
+import { CloseWithSwapEvent } from '../domain/CloseWithSwapEvent'
+import { LiquidationEvent } from '../domain/LiquidationEvent'
 import { MintEvent } from '../domain/MintEvent'
+import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
+import { TradeEvent } from '../domain/TradeEvent'
 
+import { ITxRowProps } from '../components/TxRow'
 import configProviders from '../config/providers.json'
 import { Asset } from '../domain/Asset'
-import { ITxRowProps } from '../components/TxRow'
-import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { RequestTask } from '../domain/RequestTask'
+import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { RequestTask } from '../domain/RequestTask'
 import { TasksQueue } from '../services/TasksQueue'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
 import { RequestStatus } from '../domain/RequestStatus'
@@ -107,7 +107,9 @@ export class ExplorerProvider {
         Asset.BZRX,
         Asset.MKR,
         Asset.LEND,
-        Asset.KNC
+        Asset.KNC,
+        Asset.UNI,
+        Asset.AAVE
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
@@ -330,7 +332,7 @@ export class ExplorerProvider {
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
+    const etherscanApiUrl =
       networkName === 'kovan'
         ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
         : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
