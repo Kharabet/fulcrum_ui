@@ -179,7 +179,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     ) {
       this.setState({
         ...this.state,
-        historyEvents: undefined
+        historyEvents: undefined,        
       })
       await this.getTokenRowsData(this.state)
       await this.getInnerOwnRowsData(this.state)
