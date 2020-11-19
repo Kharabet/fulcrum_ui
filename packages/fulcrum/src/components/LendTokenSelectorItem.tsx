@@ -210,6 +210,8 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
                       asset={props.asset}
                       secondDiff={tickerSecondDiff}
                       profit={props.profit}
+                      initialBalance={props.balanceOfUser}
+                      interestRate={props.interestRate}
                     />
                   </div>
                 </React.Fragment>
