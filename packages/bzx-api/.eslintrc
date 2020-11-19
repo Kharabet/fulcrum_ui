@@ -1,0 +1,27 @@
+{
+  "env": {
+    "browser": false,
+    "jest": true,
+    "node": true,
+    "es6": true
+  },
+
+  "parser": "babel-eslint",
+
+  "plugins": [
+    "standard"
+  ],
+
+  "extends": [
+    "eslint-config-standard",
+    "prettier"
+  ],
+
+  "rules": {
+    "brace-style": [
+      2,
+      "stroustrup"
+    ],
+    "comma-dangle": 0
+  }
+}
