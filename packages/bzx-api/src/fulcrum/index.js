@@ -28,24 +28,22 @@ export default class Fulcrum {
   }
 
   async updateCache(key, value) {
-    const reserve_data = await this.updateReservedData()
+    await this.updateReservedData()
     // await this.storage.setItem("reserve_data", reserve_data);
     this.logger.info('reserve_data updated')
 
-    const itoken = await this.updateITokensPrices()
+    await this.updateITokensPrices()
     // await this.storage.setItem("itoken-prices", itoken);
     this.logger.info('itoken-prices updated')
 
-    const ptoken = await this.updatePTokensPrices()
+    await this.updatePTokensPrices()
     // await this.storage.setItem("ptoken-prices", ptoken);
     this.logger.info('ptoken-prices updated')
-
-    return
   }
 
   async getTotalAssetSupply() {
     const reserveData = await this.getReserveData()
-    let totalAssetSupply = {}
+    const totalAssetSupply = {}
     reserveData.forEach((item) => (totalAssetSupply[item.token] = item.totalSupply))
 
     return totalAssetSupply
@@ -53,7 +51,7 @@ export default class Fulcrum {
 
   async getTotalAssetBorrow() {
     const reserveData = await this.getReserveData()
-    let totalAssetBorrow = {}
+    const totalAssetBorrow = {}
     reserveData.forEach((item) => (totalAssetBorrow[item.token] = item.totalBorrow))
 
     return totalAssetBorrow
@@ -61,7 +59,7 @@ export default class Fulcrum {
 
   async getSupplyRateAPR() {
     const reserveData = await this.getReserveData()
-    let apr = {}
+    const apr = {}
     reserveData.forEach((item) => (apr[item.token] = item.supplyInterestRate))
 
     return apr
@@ -69,7 +67,7 @@ export default class Fulcrum {
 
   async getBorrowRateAPR() {
     const reserveData = await this.getReserveData()
-    let apr = {}
+    const apr = {}
     reserveData.forEach((item) => (apr[item.token] = item.borrowInterestRate))
 
     return apr
@@ -77,7 +75,7 @@ export default class Fulcrum {
 
   async getYieldFarmingAPY() {
     const reserveData = await this.getReserveData()
-    let apy = {}
+    const apy = {}
     reserveData.forEach((item) => (apy[item.token] = item.yieldFarmingAPR))
 
     return apy
@@ -85,8 +83,8 @@ export default class Fulcrum {
 
   async getFulcrumLendRates() {
     const reserveData = await this.getReserveData()
-    let lendRates = []
-    let borrowRates = []
+    const lendRates = []
+    const borrowRates = []
     reserveData
       .filter((item) => item.token !== 'all' && item.token !== 'ethv1')
       .forEach((item) => {
@@ -100,13 +98,13 @@ export default class Fulcrum {
         })
       })
 
-    return { lendRates, borrowRates: [] }
+    return { lendRates, borrowRates }
   }
 
   async getTorqueBorrowRates() {
     const reserveData = await this.getReserveData()
 
-    let borrowRates = []
+    const borrowRates = []
     reserveData
       .filter((item) => item.token !== 'all' && item.token !== 'ethv1')
       .forEach((item) => {
@@ -125,11 +123,10 @@ export default class Fulcrum {
 
   async getFulcrumLendAndTorqueBorrowAndYieldRates() {
     const reserveData = await this.getReserveData()
-    let rates = {}
+    const rates = {}
     reserveData
       .filter((item) => item.token !== 'all' && item.token !== 'ethv1')
       .forEach((item) => {
-        const tokenSymbol = item.token.toUpperCase()
         const yieldFarmingAPR = item.yieldFarmingAPR / 100
         const lendApr = item.supplyInterestRate / 100
         const lendApy = this.convertAPRtoAPY(lendApr)
@@ -154,34 +151,35 @@ export default class Fulcrum {
 
   async getTorqueBorrowRateAPR() {
     const reserveData = await this.getReserveData()
-    let torqueBorrowRates = {}
+    const torqueBorrowRates = {}
     reserveData.forEach((item) => (torqueBorrowRates[item.token] = item.torqueBorrowInterestRate))
     return torqueBorrowRates
   }
 
   async getVaultBalance() {
     const reserveData = await this.getReserveData()
-    let vaultBalance = {}
+    const vaultBalance = {}
     reserveData.forEach((item) => (vaultBalance[item.token] = item.vaultBalance))
     return vaultBalance
   }
 
   async getFreeLiquidity() {
     const reserveData = await this.getReserveData()
-    let freeLiquidity = {}
+    const freeLiquidity = {}
     reserveData.forEach((item) => (freeLiquidity[item.token] = item.liquidity))
     return freeLiquidity
   }
 
   async getTVL() {
     const reserveData = await this.getReserveData()
-    let tvl = {}
+    const tvl = {}
     reserveData.forEach((item) => (tvl[item.token] = item.usdTotalLocked))
     return tvl
   }
+
   async getUsdRates() {
     const reserveData = await this.getReserveData()
-    let usdRates = {}
+    const usdRates = {}
     reserveData.forEach((item) => (usdRates[item.token] = item.swapToUSDPrice))
     return usdRates
   }
@@ -204,7 +202,7 @@ export default class Fulcrum {
       // console.dir(`itoken-prices:`);
       // console.dir(result);
     }
-    let result = {}
+    const result = {}
     lastITokenPrices.iTokenPrices.forEach((iTokenPrice) => {
       result[iTokenPrice.token] = {
         symbol: iTokenPrice.symbol,
@@ -218,7 +216,7 @@ export default class Fulcrum {
 
   async updateITokensPrices() {
     const usdRates = await this.getUsdRates()
-    let iTokenPrices = new iTokenPricesModel()
+    const iTokenPrices = new iTokenPricesModel()
     iTokenPrices.iTokenPrices = []
     for (const token in iTokens) {
       const iToken = iTokens[token]
@@ -226,7 +224,7 @@ export default class Fulcrum {
       this.logger.info('call iTokenContract')
       const tokenPrice = await iTokenContract.methods.tokenPrice().call()
 
-      //price is in loanAsset of iToken contract
+      // price is in loanAsset of iToken contract
       const priceUsd = new BigNumber(tokenPrice)
         .multipliedBy(usdRates[iToken.name === 'ethv1' ? 'eth' : iToken.name])
         .dividedBy(10 ** 18)
@@ -259,7 +257,7 @@ export default class Fulcrum {
       // console.dir(`ptoken-prices:`);
       // console.dir(result);
     }
-    let result = {}
+    const result = {}
     lastPTokenPrices.pTokenPrices.forEach((pTokenPrice) => {
       result[pTokenPrice.token] = {
         symbol: pTokenPrice.symbol,
@@ -271,9 +269,9 @@ export default class Fulcrum {
   }
 
   async updatePTokensPrices() {
-    let result = {}
+    const result = {}
     const usdRates = await this.getUsdRates()
-    let pTokenPrices = new pTokenPricesModel()
+    const pTokenPrices = new pTokenPricesModel()
     pTokenPrices.pTokenPrices = []
     try {
       for (const token in pTokens) {
@@ -284,9 +282,9 @@ export default class Fulcrum {
         const tokenPrice = await pTokenContract.methods
           .tokenPrice()
           .call({ from: '0x4abB24590606f5bf4645185e20C4E7B97596cA3B' })
-        //price is in loanAsset of iToken contract
+        // price is in loanAsset of iToken contract
         const baseAsset = this.getBaseAsset(pToken)
-        //const swapPrice = await this.getSwapToUsdRate(baseAsset);
+        // const swapPrice = await this.getSwapToUsdRate(baseAsset);
         const price = new BigNumber(tokenPrice)
           .multipliedBy(usdRates[baseAsset.toLowerCase()])
           .dividedBy(10 ** 18)
@@ -320,14 +318,14 @@ export default class Fulcrum {
       return new BigNumber(1)
     }
 
-    /*const swapRates = await this.getSwapToUsdRateBatch(
+    /* const swapRates = await this.getSwapToUsdRateBatch(
           [asset],
           process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
             Asset.DAI :
             Asset.SAI
         );
     
-        return swapRates[0];*/
+        return swapRates[0]; */
     return this.getSwapRate(asset, 'DAI')
   }
 
@@ -421,7 +419,7 @@ export default class Fulcrum {
         ? estimatedPointsNumber - 1
         : dbStatsDocuments.length
 
-    //pick every n-th element to get normal scale of data
+    // pick every n-th element to get normal scale of data
     const timeBetweenTwoArrayElements =
       (new Date(dbStatsDocuments[0].date).getTime() -
         new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) /
@@ -433,7 +431,7 @@ export default class Fulcrum {
     const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements)
     const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0)
 
-    let result = []
+    const result = []
     reducedArray.forEach((document, index, documents) => {
       let diffWithPrevPrecents = 0
       if (index > 0)
@@ -472,7 +470,7 @@ export default class Fulcrum {
         ? estimatedPointsNumber - 1
         : dbStatsDocuments.length
 
-    //pick every n-th element to get normal scale of data
+    // pick every n-th element to get normal scale of data
     const timeBetweenTwoArrayElements =
       (new Date(dbStatsDocuments[0].date).getTime() -
         new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) /
@@ -484,7 +482,7 @@ export default class Fulcrum {
     const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements)
     const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0)
 
-    let result = []
+    const result = []
     reducedArray.forEach((document, index, documents) => {
       const assetStats = document.tokensStats[0]
       let tvlChange24h = 0
@@ -540,15 +538,15 @@ export default class Fulcrum {
   }
 
   async updateReservedData() {
-    var result = []
-    var tokenAddresses = iTokens.map((x) => x.address)
-    var swapRates = (await this.getSwapToUsdRateBatch(iTokens.find((x) => x.name === 'dai')))[0]
+    const result = []
+    const tokenAddresses = iTokens.map((x) => x.address)
+    const swapRates = (await this.getSwapToUsdRateBatch(iTokens.find((x) => x.name === 'dai')))[0]
     const reserveData = await this.DappHeperContract.methods
       .reserveDetails(tokenAddresses)
       .call({ from: '0x4abB24590606f5bf4645185e20C4E7B97596cA3B' })
     let usdTotalLockedAll = new BigNumber(0)
     let usdSupplyAll = new BigNumber(0)
-    let stats = new statsModel()
+    const stats = new statsModel()
     stats.tokensStats = []
     const bzrxUsdPrice = new BigNumber(
       swapRates[iTokens.map((x) => x.name).indexOf('bzrx')]
@@ -560,9 +558,9 @@ export default class Fulcrum {
         iTokens.map(async (token, i) => {
           let totalAssetSupply = new BigNumber(reserveData.totalAssetSupply[i])
           let totalAssetBorrow = new BigNumber(reserveData.totalAssetBorrow[i])
-          let supplyInterestRate = new BigNumber(reserveData.supplyInterestRate[i])
-          let borrowInterestRate = new BigNumber(reserveData[4][i])
-          let torqueBorrowInterestRate = new BigNumber(reserveData.torqueBorrowInterestRate[i])
+          const supplyInterestRate = new BigNumber(reserveData.supplyInterestRate[i])
+          const borrowInterestRate = new BigNumber(reserveData[4][i])
+          const torqueBorrowInterestRate = new BigNumber(reserveData.torqueBorrowInterestRate[i])
           let vaultBalance = new BigNumber(reserveData.vaultBalance[i])
 
           let marketLiquidity = totalAssetSupply.minus(totalAssetBorrow)
@@ -634,7 +632,7 @@ export default class Fulcrum {
 
       let totalBorrowAmountAllAssetsUsd = new BigNumber(0)
 
-      //collecting total asset borrow and interest fees for all assets
+      // collecting total asset borrow and interest fees for all assets
       stats.tokensStats.forEach((tokenStat) => {
         const totalAssetBorrowUSD = new BigNumber(tokenStat.totalBorrow).times(
           new BigNumber(tokenStat.swapToUSDPrice)
