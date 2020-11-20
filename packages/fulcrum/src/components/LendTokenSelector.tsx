@@ -19,9 +19,9 @@ export interface ILendTokenSelectorState {
 
 function LendTokenSelector(props: ILendTokenSelectorProps) {
   let _refreshInterval: any
-  const _refreshProfitTimerMillisec: number = 1000 * 60 * 10
+  const _refreshProfitTimerMillisec: number = 1000 * 60 * 5
   const assets = FulcrumProvider.Instance.lendAssetsShown
-  const [lendTokenItemProps, setInterestRates] = useState(
+  const [lendTokenItemProps, setLendTokenItemProps] = useState(
     new Map<Asset, ILendTokenSelectorItemProps>()
   )
   const [isLoading, setIsLoading] = useState(false)
@@ -84,7 +84,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
         isLoading: false
       } as ILendTokenSelectorItemProps)
     }
-    setInterestRates(newLendTokenItemProps)
+    setLendTokenItemProps(newLendTokenItemProps)
     setIsLoading(false)
   }
 
@@ -108,7 +108,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
         ...currentLendTokenItemProps,
         isLoading: true
       } as ILendTokenSelectorItemProps)
-      setInterestRates(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps)) // create a copy of object so re-render will happen
+      setLendTokenItemProps(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps)) // create a copy of object so re-render will happen
 
       const [profit, balance] = await FulcrumProvider.Instance.getLendProfit(asset)
       if (
@@ -119,7 +119,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
           ...currentLendTokenItemProps,
           isLoading: false
         } as ILendTokenSelectorItemProps)
-        setInterestRates(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps))
+        setLendTokenItemProps(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps))
         continue
       }
 
@@ -131,7 +131,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
         interestRate: new BigNumber(currentLendTokenItemProps.interestRate || 0),
         isLoading: false
       } as ILendTokenSelectorItemProps)
-      setInterestRates(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps))
+      setLendTokenItemProps(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps))
     }
   }
 
