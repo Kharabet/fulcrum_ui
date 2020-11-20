@@ -26,10 +26,10 @@ import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { PositionType } from '../domain/PositionType'
+import { ProviderType } from '../domain/ProviderType'
 import { TokenGridTab } from '../domain/TokenGridTab'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
-import { ProviderType } from '../domain/ProviderType'
 
 import '../styles/pages/_trade-page.scss'
 
@@ -67,7 +67,6 @@ interface ITradePageState {
   tradeRequestId: number
   isLoadingTransaction: boolean
   request: TradeRequest | ManageCollateralRequest | undefined
-  resultTx: boolean
   isTxCompleted: boolean
   activePositionType: PositionType
 }
@@ -121,7 +120,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       historyRowsData: [],
       tradeRequestId: 0,
       isLoadingTransaction: false,
-      resultTx: true,
       isTxCompleted: false,
       request: undefined,
       activePositionType: PositionType.LONG
@@ -174,16 +172,18 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       await this.getInnerOwnRowsData(this.state)
     }
     if (
-      (this.state.isTxCompleted && prevState.isTxCompleted !== this.state.isTxCompleted) ||
+      (prevState.isTxCompleted !== this.state.isTxCompleted) ||
       prevProps.isMobileMedia !== this.props.isMobileMedia
-    ) {
-      this.setState({
-        ...this.state,
-        historyEvents: undefined,        
-      })
+    ) {      
       await this.getTokenRowsData(this.state)
       await this.getInnerOwnRowsData(this.state)
-      await this.getOwnRowsData(this.state)
+      await this.getOwnRowsData(this.state).then(() => {
+        this.setState({
+          ...this.state,
+          historyEvents: undefined,
+          historyRowsData:[]
+        })
+      })
     }
   }
 
@@ -237,9 +237,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                     e.quoteToken === this.state.selectedMarket.quoteToken)
               )}
               changeLoadingTransaction={this.changeLoadingTransaction}
+              onTransactionsCompleted={this.onTransactionsCompleted}
               request={this.state.request}
               isLoadingTransaction={this.state.isLoadingTransaction}
-              resultTx={this.state.resultTx}
               isTxCompleted={this.state.isTxCompleted}
               changeGridPositionType={this.changeGridPositionType}
               activePositionType={this.state.activePositionType}
@@ -623,6 +623,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       onTrade: this.onTradeRequested,
       onManageCollateralOpen: this.onManageCollateralRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
+      onTransactionsCompleted: this.onTransactionsCompleted,
       isTxCompleted: this.state.isTxCompleted
     } as IOwnTokenGridRowProps
   }
@@ -634,7 +635,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       !FulcrumProvider.Instance.contractsSource.canWrite
     ) {
       ;(await this._isMounted) &&
-        this.setState({ ownRowsData: [], loans: [], openedPositionsCount: 0 })
+        this.setState({ ownRowsData: undefined, loans: undefined, openedPositionsCount: 0 })
       return null
     }
     const ownRowsData: IOwnTokenGridRowProps[] = []
@@ -649,10 +650,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ownRowsData.push(ownRowDataProps)
     }
 
+    if (ownRowsData === this.state.ownRowsData) {
+      debugger
+    }
+    if (ownRowsData == this.state.ownRowsData) {
+      debugger
+    }
+
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        ownRowsData: ownRowsData,
+        ownRowsData: [...ownRowsData],
         loans: loans
       })
   }
@@ -680,7 +688,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.state.selectedMarket.baseToken,
       this.state.selectedMarket.quoteToken
     )
-
     for (const loan of loans) {
       if (!loan.loanData) continue
       const currentCollateralToPrincipalRate =
@@ -775,6 +782,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       defaultLeverage: this.defaultLeverageLong,
       onTrade: this.onTradeRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
+      onTransactionsCompleted: this.onTransactionsCompleted,
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
@@ -791,6 +799,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       defaultLeverage: this.defaultLeverageShort,
       onTrade: this.onTradeRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
+      onTransactionsCompleted: this.onTransactionsCompleted,
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
@@ -809,17 +818,21 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public changeLoadingTransaction = async (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined,
-    isTxCompleted: boolean,
-    resultTx: boolean
+    request: TradeRequest | ManageCollateralRequest | undefined
   ) => {
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
         isLoadingTransaction,
-        request,
-        isTxCompleted,
-        resultTx
+        request
+      })
+  }
+
+  private onTransactionsCompleted = async () => {
+    ;(await this._isMounted) &&
+      this.setState({
+        ...this.state,
+        isTxCompleted: !this.state.isTxCompleted
       })
   }
 
