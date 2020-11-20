@@ -84,7 +84,9 @@ $secondary-dark-color: rgba(#333c46, 0.4);
       background-color: $secondary-dark-color;
     }
   }
-
+  > div {
+    line-height: 17px;
+  }
   .sign-currency {
     color: #a2abb8;
     font-weight: 400;
@@ -100,12 +102,11 @@ $secondary-dark-color: rgba(#333c46, 0.4);
   }
 
   &__asset {
-    display: block;
     font-size: 12px;
     color: #8992a4;
     font-weight: 600;
-    line-height: 14px;
   }
+
   &__line {
     display: inline-block;
     height: 18px;
@@ -115,7 +116,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
     background-color: #8992a4;
   }
 
-  &__body-header {
+  .body-header {
     display: none;
     align-items: center;
     flex-wrap: wrap;
@@ -126,7 +127,6 @@ $secondary-dark-color: rgba(#333c46, 0.4);
     font-size: 10px;
     line-height: 1.5;
     color: #a2abb8;
-    width: 100%;
   }
 
   &__col-position-type {
@@ -140,7 +140,8 @@ $secondary-dark-color: rgba(#333c46, 0.4);
     font-weight: 600;
     // text-indent: 13px;
     color: #a2abb8;
-    bottom: -19px;
+    bottom: -20px;
+    left: 0;
     &.danger {
       color: #ff4f4f;
     }
@@ -156,7 +157,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
     border-radius: 50%;
     margin-left: 10px;
     position: absolute;
-    top: 3px;
+    top: -2px;
     right: -27px;
     cursor: pointer;
     .icon-collateral-fill {
@@ -228,32 +229,56 @@ $secondary-dark-color: rgba(#333c46, 0.4);
 
 @media (max-width: $breakpoint-mobile-max) {
   .own-token-grid {
+    margin-top: -36px;
     padding: 0 15px;
     &-row {
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       grid-auto-flow: column;
       align-items: baseline;
-      padding: 18px 15px 24px;
+      padding: 12px 15px 25px;
       row-gap: 20px;
 
-      &__body-header {
-        display: flex;
+      .body-header {
+        display: inline-block;
+      }
+      &__asset {
+        display: inline-block;
+        font-size: 10px;
+        color: #fff;
       }
       &__col-token-name {
+        align-self: flex-start;
+        display: block;
         order: 0;
+        grid-column-start: 1;
+        grid-column-end: 3;
+        .body-header {
+          display: block;
+        }
       }
       &__col-position {
         order: 1;
+        grid-column-start: 1;
+        grid-column-end: 4;
       }
       &__col-collateral {
-        flex-wrap: wrap;
-        margin-bottom: 16px;
-        order: 2;
+        order: 5;
+        grid-column-start: 4;
+        grid-column-end: 7;
       }
       &__col-position-type {
         flex-wrap: wrap;
         order: 3;
+        align-self: flex-start;
+        justify-content: center;
+
+        padding-top: 11px;
+        grid-column-start: 3;
+        grid-column-end: 5;
+        .body-header {
+          visibility: hidden;
+        }
         .position-type-marker {
           font-size: 10px;
           width: 71px;
@@ -263,46 +288,52 @@ $secondary-dark-color: rgba(#333c46, 0.4);
       }
       &__col-asset-price {
         order: 4;
+        grid-column-start: 1;
+        grid-column-end: 4;
       }
 
       &__col-position-value {
         order: 5;
+        grid-column-start: 1;
+        grid-column-end: 4;
       }
       &__col-action {
-        display: flex;
-        justify-content: flex-start;
         order: 6;
+
+        align-self: baseline;
+        grid-column-start: 5;
+        grid-column-end: 7;
+        align-self: flex-start;
+        padding-top: 11px;
       }
 
       &__col-liquidation-price {
         order: 7;
+        grid-column-start: 4;
+        grid-column-end: 7;
       }
 
       &__col-profit {
         order: 8;
-      }
-      &__col-action {
-        align-self: flex-start;
-        padding-top: 15px;
+        grid-column-start: 4;
+        grid-column-end: 7;
       }
       &__open-manage-collateral {
-        top: 17px;
+        width: 16px;
+        height: 16px;
+        padding: 4px;
+        top: 0;
+        right: -30px;
       }
       &__col-asset-collateral-small {
-        text-indent: 12px;
+        text-indent: 10px;
+        font-size: 10px;
+        bottom: 7px;
+        left: auto;
+        right: -75px;
       }
       &_button {
         font-size: 14px;
-      }
-    }
-  }
-}
-
-@media (max-width: 400px) {
-  .own-token-grid {
-    &-row {
-      &__open-manage-collateral {
-        left: 55px;
       }
     }
   }
