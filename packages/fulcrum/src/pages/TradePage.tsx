@@ -186,7 +186,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public render() {
     const tvBaseToken = this.checkWethOrFwethToken(this.state.selectedMarket.baseToken)
     const tvQuoteToken = this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken)
-    const loan = this.state.loans?.find((e) => e.loanId === this.state.loanId)
+    const loan =
+      this.state.request && this.state.loans?.find((e) => e.loanId === this.state.request!.loanId)
     return (
       <div className="trade-page">
         <main>
@@ -261,26 +262,29 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             />
           )}
 
-          {this.state.request && this.state.request instanceof TradeRequest && (
-            <Modal
-              isOpen={this.state.isTradeModalOpen}
-              onRequestClose={this.onTradeRequestClose}
-              className="modal-content-div modal-content-div-form"
-              overlayClassName="modal-overlay-div">
-              <TradeForm
-                stablecoins={this.quoteTokens}
-                loan={loan}
-                isMobileMedia={this.props.isMobileMedia}
-                tradeType={this.state.tradeType}
-                baseToken={this.state.request.asset}
-                positionType={this.state.tradePositionType}
-                leverage={this.state.tradeLeverage}
-                quoteToken={this.state.request.quoteToken}
-                onSubmit={this.onTradeConfirmed}
-                onCancel={this.onTradeRequestClose}
-              />
-            </Modal>
-          )}
+          {this.state.request &&
+            this.state.request instanceof TradeRequest &&
+            (this.state.tradeType === TradeType.BUY ||
+              (this.state.tradeType === TradeType.SELL && loan && loan.loanData)) && (
+              <Modal
+                isOpen={this.state.isTradeModalOpen}
+                onRequestClose={this.onTradeRequestClose}
+                className="modal-content-div modal-content-div-form"
+                overlayClassName="modal-overlay-div">
+                <TradeForm
+                  stablecoins={this.quoteTokens}
+                  loan={loan}
+                  isMobileMedia={this.props.isMobileMedia}
+                  tradeType={this.state.tradeType}
+                  baseToken={this.state.request.asset}
+                  positionType={this.state.tradePositionType}
+                  leverage={this.state.tradeLeverage}
+                  quoteToken={this.state.request.quoteToken}
+                  onSubmit={this.onTradeConfirmed}
+                  onCancel={this.onTradeRequestClose}
+                />
+              </Modal>
+            )}
           {this.state.request !== undefined && loan !== undefined && (
             <Modal
               isOpen={this.state.isManageCollateralModalOpen}
@@ -465,8 +469,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     let collateral = new BigNumber(0)
     let openPrice = new BigNumber(0)
     let liquidationPrice = new BigNumber(0)
-    let profitCollateralToken = new BigNumber(0)
-    let profitLoanToken = new BigNumber(0)
+    let profitCollateralToken: BigNumber | undefined = new BigNumber(0)
+    let profitLoanToken: BigNumber | undefined = new BigNumber(0)
     let profitUSD = new BigNumber(0)
     let depositAmountCollateralToken = new BigNumber(0)
     let depositAmountLoanToken = new BigNumber(0)
@@ -554,8 +558,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
         depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(10 ** loanAssetDecimals)
 
-        profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
-        profitLoanToken = estimatedReceivedLoanToken.minus(depositAmountLoanToken)
+        profitCollateralToken = estimatedReceivedCollateralToken.gt(0)
+          ? estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
+          : undefined
+        profitLoanToken = estimatedReceivedLoanToken.gt(0)
+          ? estimatedReceivedLoanToken.minus(depositAmountLoanToken)
+          : undefined
       }
     } else {
       collateral = collateralAssetAmount
@@ -588,10 +596,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
         depositAmountLoanToken = loan.loanData.depositValueAsLoanToken.div(10 ** loanAssetDecimals)
 
-        profitCollateralToken = estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
-        profitLoanToken = estimatedReceivedLoanToken.minus(depositAmountLoanToken)
+        profitCollateralToken = estimatedReceivedCollateralToken.gt(0)
+          ? estimatedReceivedCollateralToken.minus(depositAmountCollateralToken)
+          : undefined
+        profitLoanToken = estimatedReceivedLoanToken.gt(0)
+          ? estimatedReceivedLoanToken.minus(depositAmountLoanToken)
+          : undefined
       }
     }
+
+    console.log(estimatedReceivedLoanToken.toFixed())
 
     return {
       loan: loan,
@@ -689,7 +703,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         openedPositionsCount: loansByPair.allUsersLoansCount,
-        innerOwnRowsData
+        innerOwnRowsData,
+        loans: !this.state.loans ? loans : this.state.loans
       })
   }
 
