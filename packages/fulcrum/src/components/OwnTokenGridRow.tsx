@@ -27,8 +27,8 @@ export interface IOwnTokenGridRowProps {
   collateral: BigNumber
   openPrice: BigNumber
   liquidationPrice: BigNumber
-  profitCollateralToken: BigNumber
-  profitLoanToken: BigNumber
+  profitCollateralToken?: BigNumber
+  profitLoanToken?: BigNumber
   profitUSD: BigNumber
   maintenanceMargin: BigNumber
   isTxCompleted: boolean
@@ -182,7 +182,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   public render() {
     let profitTitle = ''
     let profitValue
-    if (this.props.profitUSD.eq(0)) {
+    if (
+      this.props.profitUSD.eq(0) &&
+      this.props.profitCollateralToken &&
+      this.props.profitLoanToken
+    ) {
       profitTitle =
         this.props.positionType === PositionType.LONG
           ? `${this.props.profitCollateralToken.toFixed()} | ${this.props.profitLoanToken.toFixed()}`
@@ -203,7 +207,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             {this.props.profitCollateralToken.toFixed(2)}
           </React.Fragment>
         )
-    } else {
+    }
+    if (!this.props.profitUSD.eq(0)) {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
       profitValue = (
         <React.Fragment>
@@ -212,6 +217,17 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         </React.Fragment>
       )
     }
+    if (!this.props.profitCollateralToken || !this.props.profitLoanToken) {
+      profitTitle = ''
+      profitValue = (
+        <React.Fragment>
+          – &nbsp;
+          <span className="inner-own-token-grid-row__line" />
+          &nbsp; –
+        </React.Fragment>
+      )
+    }
+
     return this.state.isLoadingTransaction && this.state.request ? (
       <React.Fragment>
         <div className="token-selector-item__image">

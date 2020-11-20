@@ -14,6 +14,7 @@ import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
+import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
 import { Preloader } from './Preloader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 
@@ -51,10 +52,10 @@ interface IInnerOwnTokenGridRowState {
 }
 
 export class InnerOwnTokenGridRow extends Component<
-  IInnerOwnTokenGridRowProps,
+  IOwnTokenGridRowProps,
   IInnerOwnTokenGridRowState
 > {
-  constructor(props: IInnerOwnTokenGridRowProps, context?: any) {
+  constructor(props: IOwnTokenGridRowProps, context?: any) {
     super(props, context)
 
     this._isMounted = false
@@ -187,7 +188,7 @@ export class InnerOwnTokenGridRow extends Component<
   }
 
   public async componentDidUpdate(
-    prevProps: Readonly<IInnerOwnTokenGridRowProps>,
+    prevProps: Readonly<IOwnTokenGridRowProps>,
     prevState: Readonly<IInnerOwnTokenGridRowState>,
     snapshot?: any
   ) {
@@ -222,7 +223,11 @@ export class InnerOwnTokenGridRow extends Component<
 
     let profitTitle = ''
     let profitValue
-    if (this.props.profitUSD.eq(0)) {
+    if (
+      this.props.profitUSD.eq(0) &&
+      this.props.profitCollateralToken &&
+      this.props.profitLoanToken
+    ) {
       profitTitle =
         this.props.positionType === PositionType.LONG
           ? `${this.props.profitCollateralToken.toFixed()} | ${this.props.profitLoanToken.toFixed()}`
@@ -243,7 +248,8 @@ export class InnerOwnTokenGridRow extends Component<
             {this.props.profitCollateralToken.toFixed(2)}
           </React.Fragment>
         )
-    } else {
+    }
+    if (!this.props.profitUSD.eq(0)) {
       profitTitle = `$${this.props.profitUSD.toFixed()}`
       profitValue = (
         <React.Fragment>
@@ -252,6 +258,17 @@ export class InnerOwnTokenGridRow extends Component<
         </React.Fragment>
       )
     }
+    if (!this.props.profitCollateralToken || !this.props.profitLoanToken) {
+      profitTitle = ''
+      profitValue = (
+        <React.Fragment>
+          – &nbsp;
+          <span className="inner-own-token-grid-row__line" />
+          &nbsp; –
+        </React.Fragment>
+      )
+    }
+
     return (
       <React.Fragment>
         {this.state.isLoadingTransaction && this.state.request ? (

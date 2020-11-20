@@ -11,7 +11,6 @@ import { FulcrumProvider } from '../services/FulcrumProvider'
 import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
 import { LendTxLoaderStep } from './LendTxLoaderStep'
-import { ProfitTicker } from './ProfitTicker'
 
 export interface ILendTokenSelectorItemProps {
   asset: Asset
@@ -26,11 +25,12 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
   const [isLoadingTransaction, setIsLoadingTransaction] = useState<boolean>(false)
   const [request, setRequest] = useState<LendRequest | undefined>(undefined)
 
+  const [balanceWithProfit, setBalanceWithProfit] = useState<BigNumber>(props.balanceOfUser)
+  const [profit, setProfit] = useState<BigNumber>(props.profit)
+  let profitUpdateInterval: number | undefined
+  const timerMillisec: number = 1000
   const assetDetails = AssetsDictionary.assets.get(props.asset)
 
-  const tickerSecondDiff = props.balanceOfUser
-    .times(props.interestRate)
-    .dividedBy(100 * 365 * 24 * 60 * 60)
   const iTokenAddress =
     (FulcrumProvider.Instance.contractsSource &&
       FulcrumProvider.Instance.contractsSource.getITokenErc20Address(props.asset)) ||
@@ -40,16 +40,17 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
 
   useEffect(() => {
     _isMounted = true
-
+    
     const task = TasksQueue.Instance.getTasksList().find(
       (t) => t.request instanceof LendRequest && t.request.asset === props.asset
     )
 
     setIsLoadingTransaction(task && !task.error ? true : false)
     setRequest(task ? (task.request as LendRequest) : undefined)
-
+    profitUpdateInterval = window.setInterval(updateProfit, timerMillisec)
     return () => {
       _isMounted = false
+      window.clearInterval(profitUpdateInterval)
       FulcrumProvider.Instance.eventEmitter.off(
         FulcrumProviderEvents.AskToOpenProgressDlg,
         onAskToOpenProgressDlg
@@ -82,6 +83,14 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
       )
     }
   }, [request])
+
+  useEffect(() => {
+    setProfit(props.profit)
+  }, [props.profit])
+
+  useEffect(() => {
+    setBalanceWithProfit(props.balanceOfUser)
+  }, [props.balanceOfUser])
 
   const onAskToOpenProgressDlg = (taskId: number) => {
     if (!request || taskId !== request.id) return
@@ -140,14 +149,27 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
     props.onLend(unLendRequest)
   }
 
+  const assetDecimals: number = AssetsDictionary.assets.get(props.asset)!.decimals || 18
+
+  const updateProfit = () => {
+    setBalanceWithProfit((prevBalanceWithProfit) => {
+      const inerestPerSec: BigNumber = props.interestRate.div(100 * 365 * 24 * 60 * 60)
+      const diff = prevBalanceWithProfit.times(inerestPerSec)
+      setProfit((prevProfit) => {
+        return prevProfit.plus(diff).dp(18, BigNumber.ROUND_HALF_DOWN)
+      })
+
+      return prevBalanceWithProfit.plus(diff).dp(18, BigNumber.ROUND_HALF_DOWN)
+    })
+  }
+
   if (!assetDetails) {
     return null
   }
-
   return (
     <div
       className={`token-selector-item ${
-        props.balanceOfUser.eq(0) ? '' : 'token-selector-item_active'
+        balanceWithProfit.eq(0) ? '' : 'token-selector-item_active'
       } ${isLoadingTransaction ? 'loading-transaction' : ''}`}>
       <div className="token-selector-item__image">
         {props.isLoading || isLoadingTransaction ? (
@@ -163,7 +185,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
         <React.Fragment>
           <div
             className="token-selector-item__descriptions"
-            style={{ marginTop: props.balanceOfUser.eq(0) ? undefined : `8px` }}>
+            style={{ marginTop: balanceWithProfit.eq(0) ? undefined : `8px` }}>
             <div className="token-selector-item__description">
               {iTokenAddress &&
               FulcrumProvider.Instance.web3ProviderSettings &&
@@ -186,31 +208,31 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
               <div className="token-selector-item__interest-rate-container">
                 <div className="token-selector-item__interest-rate-title">Interest APR:</div>
                 <div
-                  title={`${props.interestRate && props.interestRate.toFixed(18)}%`}
+                  title={`${props.interestRate &&
+                    props.interestRate.toFixed(assetDetails.decimals)}%`}
                   className="token-selector-item__interest-rate-value">
                   {props.interestRate.toFixed(4)}
                   <span className="sign-currency">%</span>
                 </div>
               </div>
-              {props.balanceOfUser.gt(0) ? (
+              {balanceWithProfit.gt(0) ? (
                 <React.Fragment>
                   <div className="token-selector-item__profit-container token-selector-item__balance-container">
                     <div className="token-selector-item__profit-title token-selector-item__profit-balance">
                       Balance:
                     </div>
                     <div
-                      title={`${props.balanceOfUser.toFixed(18)} ${props.asset}`}
+                      title={`${balanceWithProfit.toFixed(assetDetails.decimals)} ${props.asset}`}
                       className="token-selector-item__profit-value token-selector-item__balance-value">
-                      {props.balanceOfUser.toFixed(2)}
+                      {balanceWithProfit.toFixed(2)}
                     </div>
                   </div>
                   <div className="token-selector-item__profit-container">
                     <div className="token-selector-item__profit-title">Profit:</div>
-                    <ProfitTicker
-                      asset={props.asset}
-                      secondDiff={tickerSecondDiff}
-                      profit={props.profit}
-                    />
+
+                    <div title={profit.toFixed()} className="token-selector-item__profit-value">
+                      {assetDecimals <= 8 ? profit.toFixed(assetDecimals) : profit.toFixed(8)}
+                    </div>
                   </div>
                 </React.Fragment>
               ) : (
@@ -223,7 +245,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
               )}
             </div>
           </div>
-          {renderActions(props.balanceOfUser.eq(0))}
+          {renderActions(balanceWithProfit.eq(0))}
         </React.Fragment>
       )}
     </div>
