@@ -624,6 +624,15 @@ export class FulcrumProvider {
             marketLiquidity = marketLiquidity.times(precision)
             //liquidityReserved = liquidityReserved.times(precision);
             vaultBalance = vaultBalance.times(precision)
+
+            if (asset === Asset.BZRX) {
+              const vbzrxLockedAmount = await this.getErc20BalanceOfUser(
+                '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F',
+                '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'
+              )
+              vaultBalance = vaultBalance.plus(vbzrxLockedAmount.times(precision))
+            }
+
             if (swapRates && swapRates[i]) {
               usdSupply = totalAssetSupply!.times(swapRates[i]).dividedBy(10 ** 18)
               usdSupplyAll = usdSupplyAll.plus(usdSupply)
@@ -2134,9 +2143,7 @@ export class FulcrumProvider {
     const earnRewardEventResponse = await fetch(etherscanApiUrl)
     const earnRewardEventResponseJson = await earnRewardEventResponse.json()
     const result = earnRewardEventResponseJson.result
-    return result instanceof Array && result.length > 0
-      ? result
-      : undefined
+    return result instanceof Array && result.length > 0 ? result : undefined
   }
 
   private getNewRewradEvents = async (
@@ -2155,9 +2162,7 @@ export class FulcrumProvider {
     const earnRewardEventNewResponse = await fetch(etherscanApiUrl)
     const earnRewardEventNewResponseJson = await earnRewardEventNewResponse.json()
     const result = earnRewardEventNewResponseJson.result
-    return result instanceof Array && result.length > 0
-      ? result
-      : undefined
+    return result instanceof Array && result.length > 0 ? result : undefined
   }
 
   public getEarnRewardHistory = async (): Promise<Array<EarnRewardEvent | EarnRewardEventNew>> => {
@@ -2171,32 +2176,23 @@ export class FulcrumProvider {
     const events = await this.getOldRewradEvents(bzxContractAddress, account, etherscanApiKey)
 
     events &&
-      events
-        .reverse()
-        .forEach((event: any) => {
-          const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-          const tokenAddress = event.topics[2].replace('0x000000000000000000000000', '0x')
-          const token = this.contractsSource!.getAssetFromAddress(tokenAddress)
-          if (token === Asset.UNKNOWN) return null
-          const loandId = event.topics[3]
-          const data = event.data.replace('0x', '')
-          const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-          if (!dataSegments) return null
+      events.reverse().forEach((event: any) => {
+        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+        const tokenAddress = event.topics[2].replace('0x000000000000000000000000', '0x')
+        const token = this.contractsSource!.getAssetFromAddress(tokenAddress)
+        if (token === Asset.UNKNOWN) return null
+        const loandId = event.topics[3]
+        const data = event.data.replace('0x', '')
+        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+        if (!dataSegments) return null
 
-          const amount = new BigNumber(parseInt(dataSegments[0], 16))
-          const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-          const txHash = event.transactionHash
-          result.push(
-            new EarnRewardEvent(
-              userAddress,
-              token,
-              loandId,
-              amount.div(10 ** 18),
-              timeStamp,
-              txHash
-            )
-          )
-        })
+        const amount = new BigNumber(parseInt(dataSegments[0], 16))
+        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
+        const txHash = event.transactionHash
+        result.push(
+          new EarnRewardEvent(userAddress, token, loandId, amount.div(10 ** 18), timeStamp, txHash)
+        )
+      })
 
     const eventsNew = await this.getNewRewradEvents(bzxContractAddress, account, etherscanApiKey)
     eventsNew &&
