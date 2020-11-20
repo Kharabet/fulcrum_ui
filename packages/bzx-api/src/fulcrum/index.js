@@ -551,7 +551,7 @@ export default class Fulcrum {
     const bzrxUsdPrice = new BigNumber(
       swapRates[iTokens.map((x) => x.name).indexOf('bzrx')]
     ).dividedBy(10 ** 18)
-    const monthlyReward = new BigNumber(10300000).times(bzrxUsdPrice)
+    const monthlyReward = new BigNumber(10300000).times(bzrxUsdPrice).div(2)
 
     if (reserveData && reserveData.totalAssetSupply.length > 0) {
       await Promise.all(
