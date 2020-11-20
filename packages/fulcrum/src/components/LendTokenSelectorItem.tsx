@@ -154,12 +154,12 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
   const updateProfit = () => {
     setBalanceWithProfit((prevBalanceWithProfit) => {
       const inerestPerSec: BigNumber = props.interestRate.div(100 * 365 * 24 * 60 * 60)
-      const diff = prevBalanceWithProfit.times(inerestPerSec).dp(assetDecimals, BigNumber.ROUND_UP)
+      const diff = prevBalanceWithProfit.times(inerestPerSec)
       setProfit((prevProfit) => {
-        return prevProfit.plus(diff).dp(assetDecimals, BigNumber.ROUND_HALF_DOWN)
+        return prevProfit.plus(diff).dp(18, BigNumber.ROUND_HALF_DOWN)
       })
 
-      return prevBalanceWithProfit.plus(diff).dp(assetDecimals, BigNumber.ROUND_HALF_DOWN)
+      return prevBalanceWithProfit.plus(diff).dp(18, BigNumber.ROUND_HALF_DOWN)
     })
   }
 
