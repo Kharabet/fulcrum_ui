@@ -164,7 +164,7 @@ export class FulcrumProvider {
     return FulcrumProvider.Instance
   }
 
-  private getCurrentAccount(): string | undefined {
+  public getCurrentAccount(): string | undefined {
     return this.impersonateAddress
       ? this.impersonateAddress
       : this.accounts.length > 0 && this.accounts[0]
