@@ -551,7 +551,7 @@ export default class Fulcrum {
     const bzrxUsdPrice = new BigNumber(
       swapRates[iTokens.map((x) => x.name).indexOf('bzrx')]
     ).dividedBy(10 ** 18)
-    const monthlyReward = new BigNumber(10300000).times(bzrxUsdPrice).div(2)
+    const monthlyReward = new BigNumber(10300000).times(bzrxUsdPrice)
 
     if (reserveData && reserveData.totalAssetSupply.length > 0) {
       await Promise.all(
@@ -653,7 +653,7 @@ export default class Fulcrum {
 
         const reward = rebate.plus(monthlyRewardPerToken)
         const yieldMonthlyRate = reward.div(totalBorrowUSD)
-        const yieldYearlyPercents = yieldMonthlyRate.times(12).times(100)
+        const yieldYearlyPercents = yieldMonthlyRate.times(12).times(100).div(2)
 
         tokenStat.yieldFarmingAPR =
           isNaN(yieldYearlyPercents.toFixed()) || yieldYearlyPercents.toFixed() === 'Infinity'
