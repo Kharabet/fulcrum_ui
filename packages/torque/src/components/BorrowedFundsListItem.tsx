@@ -1,5 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
+import ReactTooltip from 'react-tooltip'
+import { ReactComponent as IconInfo } from '../assets/images/ic_info.svg'
 import { Asset } from '../domain/Asset'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
@@ -75,9 +77,7 @@ export class BorrowedFundsListItem extends Component<
       (t) => t.request.loanId === this.state.borrowedFundsItem.loanId
     )
     const isLoadingTransaction = task && !task.error ? true : false
-    const request = task
-      ? (task.request)
-      : undefined
+    const request = task ? task.request : undefined
     this.setState({
       ...this.state,
       isLoadingTransaction,
@@ -106,7 +106,7 @@ export class BorrowedFundsListItem extends Component<
   private onAskToCloseProgressDlg = async (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(async() => {
+      window.setTimeout(async () => {
         await TorqueProvider.Instance.onTaskCancel(task)
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
@@ -116,9 +116,7 @@ export class BorrowedFundsListItem extends Component<
     this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
   }
 
-  public async componentDidUpdate(
-    prevProps: Readonly<IBorrowedFundsListItemProps>
-  ) {
+  public async componentDidUpdate(prevProps: Readonly<IBorrowedFundsListItemProps>) {
     if (this.props.item.loanAsset !== prevProps.item.loanAsset) {
       await this.derivedUpdate()
     }
@@ -308,7 +306,12 @@ export class BorrowedFundsListItem extends Component<
                 className={`remaining ${
                   isRollover ? `danger` : remainingDays.lt(5) ? `warning` : ``
                 }`}>
-                {isRollover ? `Warning`:`${remainingDays.toFixed()} days` } 
+                {isRollover ? `Warning` : `${remainingDays.toFixed()} days`}
+                <IconInfo
+                  className="tooltip__icon"
+                  data-tip="Price feeds are provided securely via Chainlink, trades are executed via Kyber. This can result in minor price variations when opening and closing positions."
+                />
+                <ReactTooltip className="tooltip__info" place="top" effect="solid" />
               </div>
               {isRollover ? (
                 <button className="rollover" onClick={this.onRollover}>
@@ -389,8 +392,8 @@ export class BorrowedFundsListItem extends Component<
   }
 
   private onRollover = () => {
-    return    
-  } 
+    return
+  }
 
   private onBorrowMore = async () => {
     if (!this.props.borrowMoreDlgRef.current) return
@@ -399,7 +402,7 @@ export class BorrowedFundsListItem extends Component<
       const borroweMoreRequest = await this.props.borrowMoreDlgRef.current.getValue({
         ...this.props.item
       })
-       this.setState({ ...this.state, request: borroweMoreRequest })
+      this.setState({ ...this.state, request: borroweMoreRequest })
       await TorqueProvider.Instance.onDoBorrow(borroweMoreRequest)
     } catch (error) {
       // tslint:disable-next-line: no-console
