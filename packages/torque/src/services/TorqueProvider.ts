@@ -73,7 +73,7 @@ const isMainnetProd =
   process.env.NODE_ENV &&
   process.env.NODE_ENV !== 'development' &&
   process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-  
+
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
   configAddress = constantAddress.mainnet
@@ -1639,9 +1639,7 @@ export class TorqueProvider {
     result = loansData
       .filter(
         (e) =>
-          (!e.principal.eq(zero) &&
-            !e.currentMargin.eq(zero) &&
-            !e.interestDepositRemaining.eq(zero)) ||
+          (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
           account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
       )
       .map((e) => {
