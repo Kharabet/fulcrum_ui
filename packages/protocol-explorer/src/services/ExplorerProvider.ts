@@ -74,6 +74,9 @@ export class ExplorerProvider {
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
   // 5000ms
   public readonly successDisplayTimeout = 5000
+
+  public readonly gasBufferForTrade = new BigNumber(5 * 10 ** 16) // 0.05 ETH
+
   public readonly eventEmitter: EventEmitter
   public providerType: ProviderType = ProviderType.None
   public providerEngine: Web3ProviderEngine | null = null
@@ -1263,14 +1266,14 @@ export class ExplorerProvider {
       result = new BigNumber(0)
     } else if (asset === Asset.ETH) {
       // get eth (wallet) balance
-      result = await this.getEthBalance()
+      result = (await this.getEthBalance()).div(10 ** 18)
     } else {
       // get erc20 token balance
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
+      const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
       const assetErc20Address = this.getErc20AddressOfAsset(asset)
       if (assetErc20Address) {
         result = await this.getErc20BalanceOfUser(assetErc20Address, account)
-        result = result.multipliedBy(10 ** (18 - precision))
+        result = result.div(10 ** decimals)
       }
     }
 
@@ -1280,7 +1283,7 @@ export class ExplorerProvider {
     return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
   }
   public wethToEth = (asset: Asset): Asset => {
-    return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH ? Asset.ETH : asset
+    return asset === Asset.ETH || asset === Asset.WETH ? Asset.ETH : asset
   }
 }
 
