@@ -11,6 +11,9 @@ import { RolloverRequest } from '../domain/RolloverRequest'
 import { CircleLoader } from './CircleLoader'
 import { TxLoaderStep } from './TxLoaderStep'
 import { TasksQueue } from '../services/TasksQueue'
+import { ReactComponent as IconCopy } from '../assets/images/ic__copy.svg'
+
+import ReactTooltip from 'react-tooltip'
 
 export interface IRolloverRowProps {
   loanId: string
@@ -25,15 +28,16 @@ export interface IRolloverRow {
 }
 
 export const RolloverRow = (props: IRolloverRowProps) => {
-    const rebateToken = AssetsDictionary.assets.get(props.rebateAsset) as AssetDetails
+  const rebateToken = AssetsDictionary.assets.get(props.rebateAsset) as AssetDetails
 
   const [isLoadingTransaction, setLoadingTransaction] = useState(false)
   const [rolloverRequest, setRequest] = useState<RolloverRequest>()
 
   useEffect(() => {
     async function loadData() {
-      const task =TasksQueue.Instance.getTasksList().find(
-        (t: RequestTask) => t.request instanceof RolloverRequest && t.request.loanId === props.loanId
+      const task = TasksQueue.Instance.getTasksList().find(
+        (t: RequestTask) =>
+          t.request instanceof RolloverRequest && t.request.loanId === props.loanId
       )
       setLoadingTransaction(task && !task.error ? true : false)
       setRequest(task && task.request instanceof RolloverRequest ? task.request : undefined)
@@ -101,6 +105,23 @@ export const RolloverRow = (props: IRolloverRowProps) => {
     changeLoadingTransaction(true, rolloverRequest)
   }
 
+  const onCopyClick = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const loanId = e.currentTarget.dataset.id
+    if (!loanId) {
+      return
+    }
+
+    const tempInput = document.createElement('input')
+    tempInput.style.position = 'absolute'
+    tempInput.style.left = '-1000px'
+    tempInput.style.top = '-1000px'
+    tempInput.value = loanId
+    document.body.appendChild(tempInput)
+    tempInput.select()
+    document.execCommand('copy')
+    document.body.removeChild(tempInput)
+  }
+
   const onAskToCloseProgressDlg = async (task: RequestTask) => {
     if (!rolloverRequest || task.request.loanId !== rolloverRequest.loanId) return
 
@@ -121,18 +142,32 @@ export const RolloverRow = (props: IRolloverRowProps) => {
       {isLoadingTransaction ? (
         <div className="table-row__image">
           <TxLoaderStep taskId={props.loanId} />
-          <CircleLoader></CircleLoader>
+          <CircleLoader />
         </div>
       ) : (
         <div className="table-row table-row-loan">
           <div title={props.loanId} className="table-row-loan__id">
-            {getShortHash(props.loanId, 45)}
+            {getShortHash(props.loanId, 45)}&nbsp;
+            <span
+              className="table-row-loan__id-copy"
+              data-id={props.loanId}
+              data-for={props.loanId}
+              data-tip="Copied!">
+              <IconCopy />
+            </span>
+            <ReactTooltip
+              className="tooltip__info"
+              id={props.loanId}
+              event="click focus"
+              eventOff="click"
+              effect="solid"
+              delayHide={1000}
+              afterShow={onCopyClick}
+            />
           </div>
-          <div className="table-row-loan__amount">
-            {rebateToken.logoSvg.render()}
-          </div>
+          <div className="table-row-loan__amount" />
           <div title={props.gasRebate.toFixed()} className="table-row-loan__collateral">
-            {props.gasRebate.toFixed(2)}
+            {rebateToken.logoSvg.render()}&nbsp;{props.gasRebate.toFixed(2)}
           </div>
           <div className="table-row-loan__action">
             <button className="action" onClick={onRolloverClick}>

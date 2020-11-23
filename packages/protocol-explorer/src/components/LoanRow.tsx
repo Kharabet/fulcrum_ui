@@ -11,6 +11,9 @@ import { ExplorerProvider } from '../services/ExplorerProvider'
 import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
 import { TxLoaderStep } from './TxLoaderStep'
+import { ReactComponent as IconCopy } from '../assets/images/ic__copy.svg'
+
+import ReactTooltip from 'react-tooltip'
 
 export interface ILoanRowProps {
   loanId: string
@@ -36,8 +39,8 @@ export const LoanRow = (props: ILoanRowProps) => {
 
   useEffect(() => {
     const task = TasksQueue.Instance.getTasksList().find((t) => t.request.loanId === props.loanId)
-      setLoadingTransaction(task && !task.error ? true : false)
-      setRequest(task && task.request instanceof LiquidationRequest ? task.request : undefined)
+    setLoadingTransaction(task && !task.error ? true : false)
+    setRequest(task && task.request instanceof LiquidationRequest ? task.request : undefined)
 
     ExplorerProvider.Instance.eventEmitter.on(
       ExplorerProviderEvents.AskToOpenProgressDlg,
@@ -115,6 +118,23 @@ export const LoanRow = (props: ILoanRowProps) => {
     changeLoadingTransaction(false, undefined)
   }
 
+  const onCopyClick = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const loanId = e.currentTarget.dataset.id
+    if (!loanId) {
+      return
+    }
+
+    const tempInput = document.createElement('input')
+    tempInput.style.position = 'absolute'
+    tempInput.style.left = '-1000px'
+    tempInput.style.top = '-1000px'
+    tempInput.value = loanId
+    document.body.appendChild(tempInput)
+    tempInput.select()
+    document.execCommand('copy')
+    document.body.removeChild(tempInput)
+  }
+
   return (
     <React.Fragment>
       {isLoadingTransaction ? (
@@ -125,7 +145,23 @@ export const LoanRow = (props: ILoanRowProps) => {
       ) : (
         <div className="table-row table-row-loan">
           <div title={props.loanId} className="table-row-loan__id">
-            {getShortHash(props.loanId, 45)}
+            {getShortHash(props.loanId, 45)}&nbsp;
+            <span
+              className="table-row-loan__id-copy"
+              data-id={props.loanId}
+              data-for={props.loanId}
+              data-tip="Copied!">
+              <IconCopy />
+            </span>
+            <ReactTooltip
+              className="tooltip__info"
+              id={props.loanId}
+              event="click focus"
+              eventOff="click"
+              effect="solid"
+              delayHide={1000}
+              afterShow={onCopyClick}
+            />
           </div>
           <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">
             {loanToken.logoSvg.render()} {props.payOffAmount.toFixed(3)}

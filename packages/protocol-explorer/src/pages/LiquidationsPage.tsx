@@ -235,7 +235,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18
         const collateralAssetDecimals =
           AssetsDictionary.assets.get(e.collateralToken)!.decimals || 18
-         
+
         let swapToUSDPrice = this.stablecoins.includes(e.loanToken)
           ? new BigNumber(1)
           : new BigNumber(10 ** 18)
@@ -272,11 +272,11 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       onLiquidationRequested: this.onLiquidationRequested,
       doNetworkConnect: this.props.doNetworkConnect
     }))
-    
+
     const rollovers = rolloversData.map((e: IRolloverData) => ({
       loanId: e.loanData.loanId,
-      rebateAsset: e.rebateAsset, 
-      gasRebate: e.gasRebate, 
+      rebateAsset: e.rebateAsset,
+      gasRebate: e.gasRebate,
       onRolloverUpdated: this.derivedUpdate.bind(this),
       doNetworkConnect: this.props.doNetworkConnect
     }))
@@ -342,7 +342,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   public render() {
     const getData = (_canvas: any) => {
       return {
-      datasets: this.state.barChartDatasets
+        datasets: this.state.barChartDatasets
       }
     }
 
@@ -517,13 +517,12 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                     </div>
                   </section>
                   <section className="pt-75">
-                  <div className="container">
+                    <div className="container">
                       <h2 className="h1">Rollovers</h2>
-                      <div className="pt-75">
+                      <div className="pt-45">
                         <RolloversGrid events={this.state.rollovers} />
                       </div>
                     </div>
-
                   </section>
                 </React.Fragment>
               )}

@@ -46,8 +46,8 @@ export class RolloversGrid extends Component<IRolloversGridProps, IRolloversGrid
         <div className="table table-loan">
           <div className="table-header table-header-loan">
             <div className="table-header-loan__id">Loan ID</div>
-            {/* <div className="table-header-loan__amount">Amount to Pay Off</div>
-            <div className="table-header-loan__collateral">Collateral to Recive</div> */}
+            <div className="table-header-loan__amount" />
+            <div className="table-header-loan__collateral">Rollover Rebate to Recive</div> 
             <div className="table-header-loan__action">Action</div>
           </div>
           {assetItems}

@@ -659,16 +659,27 @@ export class ExplorerProvider {
 
     if (!iBZxContract) return rollovers
    
-    const activeLoans = await this.getBzxLoans(start, count, true)
+    const activeLoans = await this.getBzxLoans(start, count, false)
     activeLoans.forEach(async (loan) => {
       if (loan.loanData.interestDepositRemaining.eq(0)) {
-        const rolloverEstimate = await iBZxContract.rollover.callAsync(loan.loanId, '0x')
+        try {
+        const rolloverEstimate = await iBZxContract.rollover.callAsync(loan.loanId, '0x' /*, {from: "0xaf9E002A4e71f886E1082c40322181f022d338d8", gas: this.gasLimit, gasPrice: await this.gasPrice()}*/)
         const rebateAsset = this.contractsSource!.getAssetFromAddress(rolloverEstimate[0])
-        const gasRebate = rolloverEstimate[1]
+        const decimals = AssetsDictionary.assets.get(rebateAsset)?.decimals || 18
+        if (rebateAsset === Asset.UNKNOWN) {
+          return
+        }
+        const gasRebate = rolloverEstimate[1].div(10 ** decimals)
         const rollover = { ...loan, rebateAsset, gasRebate }
         rollovers.push(rollover)
+        }
+        catch (e){
+          console.log(e)
+          console.log(loan)
+        }
       }
     })
+    console.log(rollovers)
     return rollovers
   }
 

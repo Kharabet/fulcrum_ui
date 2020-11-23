@@ -36,7 +36,7 @@ export class RolloverProcessor {
     task.processingStepNext()
 
     let gasAmountBN = new BigNumber(0)
-    const txHash: string = ''
+    let txHash: string = ''
 
     const loanData = '0x'
     try {
@@ -57,12 +57,12 @@ export class RolloverProcessor {
     }
 
     try {
-      const txHash = await iBZxContract.rollover.sendTransactionAsync(
+      txHash = await iBZxContract.rollover.sendTransactionAsync(
         taskRequest.loanId,
         loanData,
         {
           from: account,
-          gas: ExplorerProvider.Instance.gasLimit,
+          gas: gasAmountBN.toString(),
           gasPrice: await ExplorerProvider.Instance.gasPrice()
         }
       )
