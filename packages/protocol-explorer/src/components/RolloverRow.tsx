@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react'
 import { BigNumber } from '@0x/utils'
+import React, { useEffect, useState } from 'react'
+import { ReactComponent as IconCopy } from '../assets/images/ic__copy.svg'
 import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { AssetDetails } from '../domain/AssetDetails'
-import { ExplorerProvider } from '../services/ExplorerProvider'
-import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
-import { RequestTask } from '../domain/RequestTask'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
 import { RolloverRequest } from '../domain/RolloverRequest'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
+import { ExplorerProvider } from '../services/ExplorerProvider'
+import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
 import { TxLoaderStep } from './TxLoaderStep'
-import { TasksQueue } from '../services/TasksQueue'
-import { ReactComponent as IconCopy } from '../assets/images/ic__copy.svg'
 
+import Clipboard from 'clipboard'
 import ReactTooltip from 'react-tooltip'
 
 export interface IRolloverRowProps {
@@ -33,6 +34,8 @@ export const RolloverRow = (props: IRolloverRowProps) => {
   const [isLoadingTransaction, setLoadingTransaction] = useState(false)
   const [rolloverRequest, setRequest] = useState<RolloverRequest>()
 
+  const copyEl = React.useRef<HTMLSpanElement | null>(null)
+  let clipboard: Clipboard | undefined
   useEffect(() => {
     async function loadData() {
       const task = TasksQueue.Instance.getTasksList().find(
@@ -62,6 +65,9 @@ export const RolloverRow = (props: IRolloverRowProps) => {
         ExplorerProviderEvents.AskToCloseProgressDlg,
         onAskToCloseProgressDlg
       )
+      if (clipboard) {
+        clipboard.destroy()
+      }
     }
   })
 
@@ -137,6 +143,27 @@ export const RolloverRow = (props: IRolloverRowProps) => {
     changeLoadingTransaction(false, undefined)
   }
 
+  if (copyEl.current !== null && !clipboard) {
+    clipboard = new Clipboard(copyEl.current)
+    clipboard.on('success', (e) => {
+      if (!copyEl.current) {
+        return
+      }
+      copyEl.current.dataset.tip = 'Copied!'
+      ReactTooltip.show(copyEl.current)
+      window.setTimeout(() => ReactTooltip.hide(copyEl.current), 1000)
+      e.clearSelection()
+    })
+    clipboard.on('error', (e) => {
+      if (!copyEl.current) {
+        return
+      }
+      copyEl.current.dataset.tip = 'Copy failed!'
+      ReactTooltip.show(copyEl.current)
+      window.setTimeout(() => ReactTooltip.hide(copyEl.current), 1000)
+    })
+  }
+
   return (
     <React.Fragment>
       {isLoadingTransaction ? (
@@ -150,20 +177,12 @@ export const RolloverRow = (props: IRolloverRowProps) => {
             {getShortHash(props.loanId, 45)}&nbsp;
             <span
               className="table-row-loan__id-copy"
-              data-id={props.loanId}
-              data-for={props.loanId}
-              data-tip="Copied!">
+              ref={copyEl}
+              data-clipboard-text={props.loanId}
+              data-for={props.loanId}>
               <IconCopy />
             </span>
-            <ReactTooltip
-              className="tooltip__info"
-              id={props.loanId}
-              event="click focus"
-              eventOff="click"
-              effect="solid"
-              delayHide={1000}
-              afterShow={onCopyClick}
-            />
+            <ReactTooltip className="tooltip__info" id={props.loanId} event="fakeEvent" />
           </div>
           <div className="table-row-loan__amount" />
           <div title={props.gasRebate.toFixed()} className="table-row-loan__collateral">

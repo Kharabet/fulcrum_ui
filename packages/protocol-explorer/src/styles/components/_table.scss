@@ -142,12 +142,17 @@
       width: 45%;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
-      
-    &-copy:hover{
-      opacity: 0.7;
-      cursor: pointer;
-    }
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      &-copy {
+        display: flex;
+        align-items: center;
+        &:hover {
+          opacity: 0.7;
+          cursor: pointer;
+        }
+      }
     }
     &__amount,
     &__collateral {
