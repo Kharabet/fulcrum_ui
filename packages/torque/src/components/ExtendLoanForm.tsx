@@ -331,8 +331,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     let x = 4 - n
     if (x < 0) x = 0
     if (x > this._inputDecimals) x = this._inputDecimals + 1
-    const m = Math.pow(10, x)
 
-    return new BigNumber(Math.floor(output * m) / m).toString()
+    return Number(output.toFixed(x)).toString()
   }
 }
