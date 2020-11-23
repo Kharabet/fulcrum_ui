@@ -679,7 +679,6 @@ export class ExplorerProvider {
         }
       }
     })
-    console.log(rollovers)
     return rollovers
   }
 
