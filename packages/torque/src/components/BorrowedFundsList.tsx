@@ -1,13 +1,14 @@
 import React, { Component, RefObject } from 'react'
 import { BorrowRequestAwaiting } from '../domain/BorrowRequestAwaiting'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
+import { RolloverRequest } from '../domain/RolloverRequest'
+import { TorqueProvider } from '../services/TorqueProvider'
 import { BorrowedFundsAwaitingListItem } from './BorrowedFundsAwaitingListItem'
 import { BorrowedFundsListItem } from './BorrowedFundsListItem'
+import { BorrowMoreDlg } from './BorrowMoreDlg'
+import { ExtendLoanDlg } from './ExtendLoanDlg'
 import { ManageCollateralDlg } from './ManageCollateralDlg'
 import { RepayLoanDlg } from './RepayLoanDlg'
-import { ExtendLoanDlg } from './ExtendLoanDlg'
-import { BorrowMoreDlg } from './BorrowMoreDlg'
-import { TorqueProvider } from '../services/TorqueProvider'
 
 export interface IBorrowedFundsListProps {
   items: IBorrowedFundsState[]
@@ -25,8 +26,6 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
   constructor(props: IBorrowedFundsListProps) {
     super(props)
   }
-
-  public componentDidMount(): void {}
 
   public render() {
     const itemsAwaiting = this.props.itemsAwaiting.map((e, index) => {

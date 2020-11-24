@@ -12,6 +12,7 @@ import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TasksQueue } from '../services/TasksQueue'
 import { TorqueProvider } from '../services/TorqueProvider'
@@ -43,8 +44,14 @@ interface IBorrowedFundsListItemState {
     | RepayLoanRequest
     | ExtendLoanRequest
     | BorrowRequest
+    | RolloverRequest
     | undefined
 }
+
+const isMainnetProd =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export class BorrowedFundsListItem extends Component<
   IBorrowedFundsListItemProps,
@@ -391,8 +398,10 @@ export class BorrowedFundsListItem extends Component<
     // this.props.onExtendLoan({ ...this.props.item });
   }
 
-  private onRollover = () => {
-    return
+  private onRollover = async () => {
+    const rolloverRequest = new RolloverRequest(this.props.item.loanData!.loanId)
+    this.setState({ ...this.state, request: rolloverRequest, isLoadingTransaction: true })
+    await TorqueProvider.Instance.onDoRollover(rolloverRequest)
   }
 
   private onBorrowMore = async () => {
