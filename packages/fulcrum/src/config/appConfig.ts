@@ -1,6 +1,6 @@
 
 const appNetwork = process.env.REACT_APP_ETH_NETWORK
-const releaseCommit = process.env.REACT_APP_GIT_SHA
+const releaseVersion = '2.0.0' // process.env.RELEASE_VERSION in the future
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== 'development' && appNetwork === 'mainnet'
@@ -11,5 +11,5 @@ export default {
   appNetwork,
   isKovan,
   isMainnetProd,
-  releaseCommit
+  releaseVersion
 }
