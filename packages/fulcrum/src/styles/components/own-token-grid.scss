@@ -107,7 +107,7 @@ $primary-dark-color: rgba(#444e5a, 0.4);
     position: absolute;
     font-size: 12px;
     font-weight: 600;
-   // text-indent: 13px;
+    // text-indent: 13px;
     color: #a2abb8;
     bottom: -16px;
     &.danger {
@@ -149,6 +149,7 @@ $primary-dark-color: rgba(#444e5a, 0.4);
   &__col-action {
     display: flex;
     justify-content: flex-end;
+    position: relative;
   }
   &_button {
     width: 82px;

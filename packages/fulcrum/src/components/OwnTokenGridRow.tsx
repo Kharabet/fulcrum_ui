@@ -15,6 +15,7 @@ import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
 import { Preloader } from './Preloader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
+import { NotificationRollover } from './NotificationRollover'
 
 export interface IOwnTokenGridRowProps {
   loan: IBorrowedFundsState
@@ -349,6 +350,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             disabled={this.props.loan.collateralizedPercent.lte(0.15)}>
             {TradeType.SELL}
           </button>
+          <NotificationRollover countOfDaysToRollover={1} />
         </div>
       </div>
     )
