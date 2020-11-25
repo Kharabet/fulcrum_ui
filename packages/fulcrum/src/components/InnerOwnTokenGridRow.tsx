@@ -422,23 +422,10 @@ export class InnerOwnTokenGridRow extends Component<
       false
     )
 
-<<<<<<< HEAD
-    this.props.onManageCollateralOpen(request)
-    this.props.changeLoadingTransaction(
-      this.state.isLoadingTransaction,
-      request,
-      false,
-      this.state.resultTx
-    )
-
-    this.setState({ ...this.state, request: request })
-   
-=======
     this._isMounted && this.setState({ ...this.state, request: request })
 
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request)
     this.props.onManageCollateralOpen(request)
->>>>>>> upstream/development
   }
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
