@@ -199,8 +199,10 @@ export class BorrowedFundsListItem extends Component<
       .times(100)
       .plus(100)
       .lt(startMargin)
-    const interestDepositRemaining = this.state.borrowedFundsItem.loanData!.interestDepositRemaining
-    const remainingDays = interestDepositRemaining.dividedToIntegerBy(24 * 60)
+    const loanData = this.state.borrowedFundsItem.loanData
+    const remainingDays = loanData
+      ? loanData.interestDepositRemaining.dividedToIntegerBy(loanData.interestOwedPerDay)
+      : new BigNumber(0)
     const isRollover = remainingDays.eq(0)
     let sliderValue = borrowedFundsItem.collateralizedPercent.multipliedBy(100).toNumber()
     if (sliderValue > sliderMax) {
