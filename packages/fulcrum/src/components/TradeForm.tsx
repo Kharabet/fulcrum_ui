@@ -5,6 +5,8 @@ import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { ReactComponent as QuestionIcon } from '../assets/images/ic__question_mark.svg'
+import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
+import { ReactComponent as OpenManageCollateral } from '../assets/images/openManageCollateral.svg'
 import { Asset } from '../domain/Asset'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
@@ -15,7 +17,7 @@ import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-
+import '../styles/components/trade-form.scss'
 import { ChiSwitch } from './ChiSwitch'
 import { CollapsibleContainer } from './CollapsibleContainer'
 import { InputAmount } from './InputAmount'
@@ -23,8 +25,6 @@ import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import { TradeExpectedResult } from './TradeExpectedResult'
-import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
-import '../styles/components/trade-form.scss'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -89,6 +89,12 @@ interface ITradeFormState {
   returnedAsset: Asset
   returnedAmount: BigNumber
   returnTokenIsCollateral: boolean
+
+  isEdit: boolean
+  minValue: number
+  maxValue: number
+  selectedValue: number
+  collateralValue: string
 }
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -96,7 +102,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   private readonly _inputChange: Subject<string>
   private readonly _inputSetMax: Subject<BigNumber>
-
   private _isMounted: boolean
 
   constructor(props: ITradeFormProps, context?: any) {
@@ -127,7 +132,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       baseTokenPrice: new BigNumber(0),
       returnedAsset: props.baseToken,
       returnedAmount: new BigNumber(0),
-      returnTokenIsCollateral: props.positionType === PositionType.LONG ? true : false
+      returnTokenIsCollateral: props.positionType === PositionType.LONG ? true : false,
+      isEdit: false,
+      minValue: 30,
+      maxValue: 200,
+      selectedValue: 0,
+      collateralValue: ''
     }
 
     this._inputChange = new Subject()
@@ -213,12 +223,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? this.props.loan.loanData.maintenanceMargin
         : this.props.positionType === PositionType.LONG
         ? await FulcrumProvider.Instance.getMaintenanceMargin(
-          this.props.baseToken,
-          this.props.quoteToken
+            this.props.baseToken,
+            this.props.quoteToken
           )
         : await FulcrumProvider.Instance.getMaintenanceMargin(
-          this.props.quoteToken,
-          this.props.baseToken
+            this.props.quoteToken,
+            this.props.baseToken
           )
     // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     // if it's a SHORT then -> 10^36 / above
@@ -295,10 +305,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       }x-${this.props.positionType.toLocaleLowerCase()}-${this.props.baseToken}/`
     )
     if (this.props.tradeType === TradeType.BUY) {
-      this.onInsertMaxValue(1)
+      await this.onInsertMaxValue(1)
     } else {
       this.rxFromCurrentAmount('0')
     }
+    await this.setDefaultCollaterization()
   }
 
   private async setSlippageRate(tradeAmount: BigNumber) {
@@ -325,19 +336,19 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this.setState({ ...this.state, depositTokenBalance })
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<ITradeFormProps>,
     prevState: Readonly<ITradeFormState>,
     snapshot?: any
-  ): void {
+  ) {
     if (
       this.state.depositToken !== prevState.depositToken ||
       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
-      this.setSlippageRate(this.state.tradeAmountValue)
+      await this.setSlippageRate(this.state.tradeAmountValue)
     }
     if (this.state.depositToken !== prevState.depositToken) {
-      this.setDepositTokenBalance(this.state.depositToken)
+      await this.setDepositTokenBalance(this.state.depositToken)
     }
     if (
       this.props.tradeType !== prevProps.tradeType ||
@@ -349,22 +360,19 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     ) {
       if (this.state.depositToken !== prevState.depositToken) {
         this._isMounted &&
-          this.setState(
-            {
-              ...this.state,
-              inputAmountText: '',
-              inputAmountValue: new BigNumber(0),
-              tradeAmountValue: new BigNumber(0)
-            },
-            () => {
-              this.derivedUpdate()
-            }
-          )
+          this.setState({
+            ...this.state,
+            inputAmountText: '',
+            inputAmountValue: new BigNumber(0),
+            tradeAmountValue: new BigNumber(0)
+          })
+        await this.derivedUpdate()
+        await this.setDefaultCollaterization()
       } else {
         // this.derivedUpdate();
         if (this.props.tradeType === TradeType.SELL) {
           // TODO: need to handle this with a feedback to the user?
-          this.getLoanCloseAmount(this.state.returnedAsset)
+          await this.getLoanCloseAmount(this.state.returnedAsset)
         }
       }
     }
@@ -418,7 +426,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const canSubmit = this.state.inputAmountValue.gt(0)
 
     return (
-      <form className="trade-form" onSubmit={this.onSubmitClick}>
+      <form className="trade-form" onSubmit={this.onSubmitClick} onClick={this.onClickForm}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
         <div className="trade-form__left_block">
           <div className="trade-form__info_block">
@@ -498,7 +506,44 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
           </div>
-          <ChiSwitch />
+          <div className="trade-form__edit-collateral-by-container">
+            <div className="edit-input-wrapper">
+              <span className="lh mb-15">Collateralized</span>
+              <div className="edit-input-container">
+                {this.state.isEdit ? (
+                  <React.Fragment>
+                    <div className="edit-input-collateral">
+                      <input
+                        type="number"
+                        step="any"
+                        placeholder={`Enter`}
+                        value={this.state.collateralValue}
+                        className="input-collateral"
+                        onChange={this.onCollateralAmountChange}
+                      />
+                    </div>
+                  </React.Fragment>
+                ) : this.state.collateralValue === '' ? (
+                  <div className="loader-container">
+                    <Preloader width="75px" />
+                  </div>
+                ) : (
+                  <React.Fragment>
+                    <span>
+                      {this.state.collateralValue}
+                      <span className="sign">%</span>
+                    </span>
+                    <div className="edit-icon-collateral" onClick={this.editInput}>
+                      <OpenManageCollateral />
+                    </div>
+                  </React.Fragment>
+                )}
+              </div>
+              {this.state.isEdit && <span className="lh">Safe</span>}
+            </div>
+              <ChiSwitch />
+          </div>        
+        
           <div className="trade-form__actions-container">
             <button
               title={
@@ -626,10 +671,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   public onCollateralChange = async (asset: Asset) => {
-    this._isMounted &&
-      this.setState({ ...this.state, depositToken: asset }, () => {
-        this.onInsertMaxValue(1)
-      })
+    this._isMounted && this.setState({ ...this.state, depositToken: asset })
+    await this.onInsertMaxValue(1)
   }
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
@@ -771,6 +814,22 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
   }
 
+  private async setDefaultCollaterization() {
+    const minMaintenanceMargin = await FulcrumProvider.Instance.getMaintenanceMargin(
+      this.props.baseToken,
+      this.state.depositToken
+    )
+
+    const selectedValue: BigNumber = minMaintenanceMargin.plus(30)
+
+    this.setState({
+      ...this.state,
+      minValue: selectedValue.toNumber(),
+      selectedValue: selectedValue.toNumber(),
+      collateralValue: selectedValue.toFixed()
+    })
+  }
+
   private getInputAmountLimitedFromText = async (
     textValue: string,
     maxTradeValue: BigNumber
@@ -825,10 +884,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
       const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
       const collateralAssetAmount = this.props
-        .loan!.loanData!.collateral.div(10 ** 18)
+        .loan!.loanData.collateral.div(10 ** 18)
         .times(collateralAssetPrecision)
       const loanAssetAmount = this.props
-        .loan!.loanData!.principal.div(10 ** 18)
+        .loan!.loanData.principal.div(10 ** 18)
         .times(loanAssetPrecision)
 
       const positionAmount =
@@ -870,5 +929,48 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     if (x > 5) x = 5
     const result = Number(output.toFixed(x)).toString()
     return result
+  }
+
+  public onCollateralAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputCollateralText = event.target.value ? event.target.value : ''
+    const inputCollateralValue = Number(inputCollateralText)
+
+    if (parseFloat(inputCollateralText) < 0) return
+
+    if (this.state.minValue > inputCollateralValue) {
+      this.setState({
+        ...this.state,
+        collateralValue: inputCollateralText,
+        selectedValue: this.state.minValue
+      })
+    } else if (inputCollateralValue > this.state.maxValue) {
+      this.setState({
+        ...this.state,
+        collateralValue: inputCollateralText,
+        selectedValue: this.state.maxValue
+      })
+    } else {
+      this.setState({
+        ...this.state,
+        collateralValue: inputCollateralText,
+        selectedValue: inputCollateralValue
+      })
+    }
+    this._inputChange.next(this.state.inputAmountText)
+  }
+
+  public editInput = () => {
+    this.setState({ ...this.state, isEdit: true })
+  }
+  
+  public onClickForm = (event: FormEvent<HTMLFormElement>) => {
+    if (this.state.isEdit && (event.target as Element).className !== 'input-collateral') {
+      this.setState({ ...this.state, isEdit: false })
+      if (this.state.minValue > Number(this.state.collateralValue)) {
+        this.setState({ ...this.state, collateralValue: this.state.minValue.toFixed() })
+      } else if (Number(this.state.collateralValue) > this.state.maxValue) {
+        this.setState({ ...this.state, collateralValue: this.state.maxValue.toFixed() })
+      }
+    }
   }
 }
