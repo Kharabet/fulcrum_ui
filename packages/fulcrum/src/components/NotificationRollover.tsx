@@ -23,7 +23,7 @@ export class NotificationRollover extends Component<INotificationRolloverProps> 
               <div
                 className={`rollover-tooltip  ${classNameNotificationRollover}`}
                 data-tip="Rollover tooltips"></div>
-              <ReactTooltip className="rollover-tooltip" place="top" effect="solid" />
+              <ReactTooltip className="tooltip__info" place="top" effect="solid" />
             </React.Fragment>
           ) : (
             <React.Fragment>Warning</React.Fragment>
