@@ -1710,6 +1710,8 @@ export class FulcrumProvider {
         )
 
         const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
+        
+        try {
         //@ts-ignore
         result =
           isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
@@ -1736,6 +1738,10 @@ export class FulcrumProvider {
                   gas: FulcrumProvider.Instance.gasLimit
                 }
               )
+        }
+        catch (e){
+          console.log(e)
+        }
         console.log(result)
       }
     }
