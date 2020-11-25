@@ -2461,6 +2461,43 @@ export class FulcrumProvider {
     return result
   }
 
+  public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
+    const result: number = 0
+    const account = this.getCurrentAccount()
+    const blocksPerDay = 10000 // 7-8k per day with a buffer
+    if (!account || !this.contractsSource || !this.web3Wrapper) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api
+    const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
+    const etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${blockNumber -
+      (days * blocksPerDay)}&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      LiquidationEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+
+    const liquidationEventResponse = await fetch(etherscanApiUrl)
+    const liquidationEventResponseJson = await liquidationEventResponse.json()
+    if (liquidationEventResponseJson.status !== '1') return result
+    const events = liquidationEventResponseJson.result
+    const liquidationEvents = events
+      .filter((event: any) => {
+        const data = event.data.replace('0x', '')
+        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+        if (!dataSegments) return false
+
+        const baseTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+        const quoteTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+        const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress)
+        const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress)
+        if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return false
+        return true
+      })
+    return liquidationEvents && liquidationEvents.length || result
+  }
+
+
   public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
     let result: DepositCollateralEvent[] = []
     const account = this.getCurrentAccount()

@@ -32,6 +32,7 @@ import { TradeType } from '../domain/TradeType'
 
 import '../styles/pages/_trade-page.scss'
 import { ProviderType } from '../domain/ProviderType'
+import { InfoBlock } from '../components/InfoBlock'
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
@@ -70,11 +71,14 @@ interface ITradePageState {
   resultTx: boolean
   isTxCompleted: boolean
   activePositionType: PositionType
+
+  recentLiquidationsNumber: number
 }
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   private _isMounted: boolean = false
   private apiUrl = 'https://api.bzx.network/v1'
+  private readonly daysNumberForLoanActionNotification = 2
   constructor(props: any) {
     super(props)
     if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
@@ -120,6 +124,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       historyEvents: undefined,
       historyRowsData: [],
       tradeRequestId: 0,
+      recentLiquidationsNumber: 0,
       isLoadingTransaction: false,
       resultTx: true,
       isTxCompleted: false,
@@ -162,6 +167,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
     await this.getTokenRowsData(this.state)
     await this.getInnerOwnRowsData(this.state)
+    await this.setRecentLiquidationsNumber()
+  }
+
+  private async setRecentLiquidationsNumber() {
+    const liquidationsNumber = await FulcrumProvider.Instance.getLiquidationsInPastNDays(
+      this.daysNumberForLoanActionNotification
+    )
+    this.setState({ ...this.state, recentLiquidationsNumber: liquidationsNumber })
   }
 
   public async componentDidUpdate(
@@ -191,10 +204,27 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     return (
       <div className="trade-page">
         <main>
-          {/* <InfoBlock localstorageItemProp="trade-page-info">
-            Currently only our lending, unlending, and closing of position functions are enabled. <br />
-              Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
-          </InfoBlock> */}
+          {this.state.recentLiquidationsNumber > 0 && (
+            <InfoBlock localstorageItemProp="past-liquidations-info">
+              {this.state.recentLiquidationsNumber === 1
+                ? 'One'
+                : this.state.recentLiquidationsNumber}
+              of your loans
+              {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated during
+              the past {this.daysNumberForLoanActionNotification} days. For more information visit
+              your&nbsp;
+              <a
+                href="#"
+                className="regular-link"
+                onClick={(e) => {
+                  e.preventDefault()
+                  this.onTokenGridTabChange(TokenGridTab.History)
+                }}>
+                Trade History
+              </a>
+              .
+            </InfoBlock>
+          )}
           <TokenGridTabs
             baseTokens={this.baseTokens}
             quoteTokens={this.quoteTokens}
@@ -332,6 +362,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         innerOwnRowsData: [],
         loans: [],
         openedPositionsCount: 0,
+        recentLiquidationsNumber: 0,
         historyEvents: undefined
       })
   }
@@ -341,6 +372,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       await this.clearData()
       return
     }
+    await this.setRecentLiquidationsNumber()
+
     await this.getInnerOwnRowsData(this.state)
     await this.getOwnRowsData(this.state)
     await this.getHistoryEvents(this.state)
