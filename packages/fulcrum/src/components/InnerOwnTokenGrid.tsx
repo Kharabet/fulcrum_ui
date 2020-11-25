@@ -13,10 +13,9 @@ export interface IInnerOwnTokenGridProps {
   request: TradeRequest | ManageCollateralRequest | undefined
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined,
-    isTxCompleted: boolean,
-    resultTx: boolean
-  ) => void
+    request: TradeRequest | ManageCollateralRequest | undefined
+  ) => void  
+  onTransactionsCompleted: () => void
   isLoadingTransaction: boolean
 }
 
