@@ -150,7 +150,8 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
         <div className="actions-container">
           <button
             type="submit"
-            className={`btn btn-submit action ${didSubmit || amountMsg ? `btn-disabled` : ``}`}>
+            disabled={didSubmit || !!amountMsg}
+            className={`btn btn-submit action`}>
             {didSubmit ? 'Submitting...' : 'Liquidate'}
           </button>
         </div>
