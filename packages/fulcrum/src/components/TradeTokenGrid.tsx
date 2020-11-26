@@ -18,12 +18,10 @@ export interface ITradeTokenGridProps {
   isLoadingTransaction: boolean
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined,
-    isTxCompleted: boolean,
-    resultTx: boolean
+    request: TradeRequest | ManageCollateralRequest | undefined
   ) => void
+  onTransactionsCompleted: () => void
   isTxCompleted: boolean
-  resultTx: boolean
   changeGridPositionType: (activePositionType: PositionType) => void
   activePositionType: PositionType
 }
@@ -47,9 +45,11 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
           .map((e) => <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />)
       : this.props.tokenRowsData.map((e) => (
           <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />
-        ))   
+        ))
 
-    const quoteToken = this.props.tokenRowsData.length?this.props.tokenRowsData[0].quoteToken : null
+    const quoteToken = this.props.tokenRowsData.length
+      ? this.props.tokenRowsData[0].quoteToken
+      : null
     return (
       <div className="trade-token-grid__wrapper">
         <div className="trade-token-grid">
@@ -75,6 +75,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                     request={this.props.request}
                     isLoadingTransaction={this.props.isLoadingTransaction}
                     changeLoadingTransaction={this.props.changeLoadingTransaction}
+                    onTransactionsCompleted={this.props.onTransactionsCompleted}
                   />
                 </div>
               )
