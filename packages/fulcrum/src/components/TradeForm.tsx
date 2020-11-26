@@ -183,6 +183,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.baseToken)
+
     const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken)
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(
       this.props.tradeType,
@@ -516,7 +517,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                       <input
                         type="number"
                         step="any"
-                        placeholder={`Enter`}
+                        placeholder={`Enter`}                        
                         value={this.state.collateralValue}
                         className="input-collateral"
                         onChange={this.onCollateralAmountChange}
@@ -539,7 +540,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                   </React.Fragment>
                 )}
               </div>
-              {this.state.isEdit && <span className="lh">Safe</span>}
             </div>
               <ChiSwitch />
           </div>        
@@ -826,7 +826,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       ...this.state,
       minValue: selectedValue.toNumber(),
       selectedValue: selectedValue.toNumber(),
-      collateralValue: selectedValue.toFixed()
+      collateralValue: selectedValue.toFixed(2)
     })
   }
 
@@ -967,10 +967,13 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     if (this.state.isEdit && (event.target as Element).className !== 'input-collateral') {
       this.setState({ ...this.state, isEdit: false })
       if (this.state.minValue > Number(this.state.collateralValue)) {
-        this.setState({ ...this.state, collateralValue: this.state.minValue.toFixed() })
+        this.setState({ ...this.state, collateralValue: this.state.minValue.toFixed(2), isEdit: false  })
       } else if (Number(this.state.collateralValue) > this.state.maxValue) {
-        this.setState({ ...this.state, collateralValue: this.state.maxValue.toFixed() })
+        this.setState({ ...this.state, collateralValue: this.state.maxValue.toFixed(2), isEdit: false  })
+      }else{
+        this.setState({ ...this.state, collateralValue:  this.state.selectedValue.toFixed(2), isEdit: false })
       }
+
     }
   }
 }

@@ -104,8 +104,6 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
-    padding: 0.22rem 0;
     &.jc-fe {
       justify-content: flex-end;
     }
@@ -119,10 +117,9 @@
   &__label {
     font-weight: 600;
     font-size: 12px;
-    line-height: 150%;
+    line-height: 26px;
     color: #fe7272;
-    margin-bottom: 10px;
-
+   
     &.slippage {
       font-size: 14px;
       display: flex;
@@ -181,44 +178,38 @@
   }
 
   &__edit-collateral-by-container {
-     
-   display: flex;
-    
-    .edit-input-wrapper {    
+    display: flex;
+    align-items: flex-end;
+    margin-top: -5px;
+    margin-bottom: 20px;
+    .edit-input-wrapper {
       width: 50%;
       > span {
         font-size: 12px;
         line-height: 18px;
         &:first-child {
           font-weight: 600;
-          color: #758295;
-        }
-        &:last-child {
-          font-weight: 800;
-          color: #00c0ab;
+          color: #a2abb8;
         }
       }
     }
     .edit-input-container {
-      text-align: center;
+      text-align: left;
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
+      margin-top: 4px;
       > span {
         font-size: 20px;
-        font-weight: 800;
-        line-height: 1.5;
-        color: #00c0ab;
-        padding: 4px 10px 4px 25px;
+        font-weight: 600;
+        line-height: 34px;
+        color: #fff;
       }
       .sign {
-        font-weight: 400;
+        margin-left: 5px;
+        color: #939fac;
       }
-      svg {
-        margin-right: 5px;
-      }
+
       .loader-container {
-        padding: 20px;
+        padding:4px 0;
       }
     }
     .collateral-slider {
@@ -239,28 +230,40 @@
         content: '%';
         position: absolute;
         font-size: 20px;
-        color: #758295;
+        color: #758295;        
+        font-weight: 600;
         right: 15px;
       }
     }
     input {
-      background-color: #f5f7f9;
-      border: 2px solid #e7ebf0;
+      background-color: #394049;
+      border: 2px solid #394049;
       border-radius: 4px;
-      color: #283049;
-      width: 164px;
-      text-align: center;
+      color: #fff;
+      width: 120px;
+      text-align: left;
       font-size: 20px;
       line-height: 1.5;
-      font-weight: 800;
-      padding: 2px 0;
+      font-weight: 600;
+      padding: 0 30px 0 15px;
+      &:focus{
+      outline: none;
+      }
     }
     .edit-icon-collateral {
+      text-align: center;
+      margin-left: 10px;
+      background-color: #586473;
+      width: 20px;
+      height: 20px;
+      margin-top: 3px;
+      border-radius: 20px;
       cursor: pointer;
+      svg {
+        padding: 1px;
+      }
     }
-    .lh {
-      line-height: 2.375 !important;
-    }
+   
     .mb-15 {
       margin-bottom: 15px;
     }
