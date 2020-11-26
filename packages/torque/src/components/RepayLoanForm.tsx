@@ -1,12 +1,11 @@
 import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
-import { Observable, Subject } from 'rxjs'
+import { Subject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { Asset } from '../domain/Asset'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { IRepayEstimate } from '../domain/IRepayEstimate'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { ChiSwitch } from './ChiSwitch'
@@ -28,6 +27,8 @@ interface IRepayLoanFormState {
   balanceTooLow: boolean
   didSubmit: boolean
   interestAmount: number
+  assetBalance: BigNumber
+  ethBalance: BigNumber
 }
 
 export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanFormState> {
@@ -38,13 +39,15 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
     this.state = {
       assetDetails: null,
-      repayAmountText: props.loanOrderState.amountOwed.toString(),
-      repayAmount: props.loanOrderState.amountOwed,
+      repayAmountText: '',
+      repayAmount: new BigNumber(0),
       repayManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
       balanceTooLow: false,
       didSubmit: false,
-      interestAmount: 0
+      interestAmount: 0,
+      assetBalance: new BigNumber(0),
+      ethBalance: new BigNumber(0)
     }
 
     this._inputTextChange = new Subject<string>()
@@ -79,6 +82,30 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         )
       }
     )
+    TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset).then(
+      (balance) => {
+        const precision = this.state.assetDetails!.decimals || 18
+        const amountOwed = this.props.loanOrderState.amountOwed.multipliedBy(10 ** precision)
+        const isBalanceTooLow = amountOwed.gt(balance) ? true : false
+        const repayAmount = amountOwed.gt(balance)
+          ? balance.div(10 ** precision)
+          : this.props.loanOrderState.amountOwed
+        const repayAmountText = repayAmount.toString()
+        this.setState({
+          ...this.state,
+          assetBalance: balance,
+          repayAmount: repayAmount,
+          repayAmountText: repayAmountText,
+          balanceTooLow: isBalanceTooLow
+        })
+      }
+    )
+    TorqueProvider.Instance.getEthBalance().then((ethBalance) => {
+      this.setState({
+        ...this.state,
+        ethBalance: ethBalance
+      })
+    })
   }
 
   public componentDidUpdate(
@@ -112,48 +139,45 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   }
 
   public render() {
-    if (this.state.assetDetails === null) {
-      return null
-    }
+    if (this.state.assetDetails === null) return null
+
+    const balanceNumber = this.state.assetBalance.toNumber()
+    const amountOwedNumber = this.props.loanOrderState.amountOwed
+      .multipliedBy(10 ** this.state.assetDetails.decimals)
+      .toNumber()
+    const ratio = balanceNumber / amountOwedNumber
 
     return (
       <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
+          {this.state.ethBalance &&
+            this.state.ethBalance.lte(TorqueProvider.Instance.gasBufferForTxn) && (
+              <span className="error insufficient-gas">Insufficient funds for gas</span>
+            )}
           <InputAmount
             asset={this.state.assetDetails.reactLogoSvg}
             inputAmountText={this.state.repayAmountText}
             updateInterestAmount={this.updateInterestAmount}
             onTradeAmountChange={this.onTradeAmountChange}
             interestAmount={this.state.interestAmount}
+            ratio={ratio}
           />
-          {this.state.balanceTooLow ? (
-            <div className="repay-loan-form__insufficient-balance">
+          {this.state.balanceTooLow && (
+            <div className="error insufficient-balance">
               Insufficient {this.state.assetDetails.displayName} balance in your wallet!
             </div>
-          ) : null}
+          )}
         </section>
         <ChiSwitch />
         <section className="dialog-actions">
           <div className="repay-loan-form__actions-container">
-            <button
-              type="submit"
-              className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+            <button type="submit" className={`btn btn-size--small`} disabled={this.state.didSubmit}>
               {this.state.didSubmit ? 'Submitting...' : 'Repay'}
             </button>
           </div>
         </section>
       </form>
     )
-  }
-
-  private rxGetEstimate = (selectedValue: number): Observable<IRepayEstimate> => {
-    return new Observable<IRepayEstimate>((observer) => {
-      TorqueProvider.Instance.getLoanRepayEstimate(this.props.loanOrderState, selectedValue).then(
-        (value) => {
-          observer.next(value)
-        }
-      )
-    })
   }
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
@@ -167,32 +191,23 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     if (!this.state.didSubmit) {
       this.setState({ ...this.state, didSubmit: true })
 
-      let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(
-        this.props.loanOrderState.loanAsset
-      )
       if (this.props.loanOrderState.loanAsset === Asset.ETH) {
-        assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
-          ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
+        const assetBalance = this.state.assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
+          ? this.state.assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
           : new BigNumber(0)
+        this.setState({ ...this.state, assetBalance: assetBalance })
       }
-      const precision =
-        AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18
+
+      const precision = this.state.assetDetails!.decimals || 18
       const amountInBaseUnits = new BigNumber(
         repayAmount.multipliedBy(10 ** precision).toFixed(0, 1)
       )
-      if (assetBalance.lt(amountInBaseUnits)) {
+      if (this.state.assetBalance.lt(amountInBaseUnits)) {
         this.setState({
           ...this.state,
-          balanceTooLow: true,
           didSubmit: false
         })
-
         return
-      } else {
-        this.setState({
-          ...this.state,
-          balanceTooLow: false
-        })
       }
 
       const percentData = await TorqueProvider.Instance.getLoanRepayPercent(
@@ -216,13 +231,20 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     let repayAmountText = event.target.value ? event.target.value : ''
-
     let repayAmount = new BigNumber(repayAmountText)
+
+    const precision = this.state.assetDetails!.decimals || 18
+    const amountOwed = this.props.loanOrderState.amountOwed
+    const balance = this.state.assetBalance.div(10 ** precision)
+    const maxRepayAmount = this.state.balanceTooLow ? balance : amountOwed
+
     if (repayAmount.lt(0)) {
       repayAmount = new BigNumber(0)
-      repayAmountText = '0'
-    } else if (repayAmount.gt(this.props.loanOrderState.amountOwed)) {
-      repayAmount = this.props.loanOrderState.amountOwed
+      repayAmountText = repayAmount.toString()
+    }
+
+    if (repayAmount.gt(balance) || repayAmount.gt(amountOwed)) {
+      repayAmount = maxRepayAmount
       repayAmountText = repayAmount.toString()
     }
 
@@ -241,23 +263,17 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   }
 
   public updateRepayAmount = (value: number) => {
-    if (value !== 0) {
-      const repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(
-        this.state.interestAmount
-      )
+    if (value === 0) return
+    const repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(this.state.interestAmount)
+    const repayAmountText = repayAmount.toString()
 
-      this.setState(
-        {
-          ...this.state,
-          repayAmount: repayAmount,
-          repayAmountText: repayAmount.toString()
-        },
-        () => {
-          // emitting next event for processing with rx.js
-          this._inputTextChange.next(this.state.repayAmountText)
-        }
-      )
-    }
+    this.setState(
+      { ...this.state, repayAmount: repayAmount, repayAmountText: repayAmountText },
+      () => {
+        // emitting next event for processing with rx.js
+        this._inputTextChange.next(this.state.repayAmountText)
+      }
+    )
   }
 
   public updateInterestAmount = (interest: number) => {

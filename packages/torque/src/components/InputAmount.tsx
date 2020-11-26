@@ -4,6 +4,7 @@ interface IInputAmountProps {
   inputAmountText: string
   asset: any
   interestAmount: number
+  ratio: number
   updateInterestAmount: (state: number) => void
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
@@ -56,30 +57,34 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
           </div>
 
           <div className="interest-group-button">
-            <div
+            <button
               className={`interest-button${this.props.interestAmount === 0.25 ? ' active' : ''}`}
               data-interest="0.25"
-              onClick={this.getInterestAmount}>
+              onClick={this.getInterestAmount}
+              disabled={this.props.ratio < 0.25}>
               25%
-            </div>
-            <div
+            </button>
+            <button
               className={`interest-button${this.props.interestAmount === 0.5 ? ' active' : ''}`}
               data-interest="0.5"
-              onClick={this.getInterestAmount}>
+              onClick={this.getInterestAmount}
+              disabled={this.props.ratio < 0.5}>
               50%
-            </div>
-            <div
+            </button>
+            <button
               className={`interest-button${this.props.interestAmount === 0.75 ? ' active' : ''}`}
               data-interest="0.75"
-              onClick={this.getInterestAmount}>
+              onClick={this.getInterestAmount}
+              disabled={this.props.ratio < 0.75}>
               75%
-            </div>
-            <div
+            </button>
+            <button
               className={`interest-button${this.props.interestAmount === 1 ? ' active' : ''}`}
               data-interest="1"
-              onClick={this.getInterestAmount}>
+              onClick={this.getInterestAmount}
+              disabled={this.props.ratio < 1}>
               100%
-            </div>
+            </button>
           </div>
         </div>
       </React.Fragment>

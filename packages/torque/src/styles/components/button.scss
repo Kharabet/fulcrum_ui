@@ -27,6 +27,18 @@
       background-color: rgba(203, 226, 255, 0.8);
     }
   }
+  &[disabled] {
+    opacity: 0.4;
+    background-color: $color-blue !important;
+    cursor: not-allowed;
+    &:hover {
+      background-color: $color-blue !important;
+    }
+
+    &:active {
+      background-color: $color-blue !important;
+    }
+  }
 }
 
 .btn-size--small {
