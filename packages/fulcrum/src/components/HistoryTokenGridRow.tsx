@@ -315,7 +315,7 @@ export class HistoryTokenGridRow extends Component<
             title={this.props.eventsGroup.loanId}
             className="history-token-grid-row__col history-token-grid-row__col-token-asset">
             <span className="label">Pair</span>
-            {this.props.eventsGroup.baseToken}-{this.props.eventsGroup.quoteToken}
+            {this.props.eventsGroup.baseToken}/{this.props.eventsGroup.quoteToken}
           </div>
           <div className="history-token-grid-row__col history-token-grid-row__col-type">
             <span className="label">Type</span>
