@@ -40,7 +40,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
 
   useEffect(() => {
     _isMounted = true
-    
+
     const task = TasksQueue.Instance.getTasksList().find(
       (t) => t.request instanceof LendRequest && t.request.asset === props.asset
     )
@@ -211,7 +211,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
                   title={`${props.interestRate &&
                     props.interestRate.toFixed(assetDetails.decimals)}%`}
                   className="token-selector-item__interest-rate-value">
-                  {props.interestRate.toFixed(4)}
+                  {props.interestRate.toFixed(2)}
                   <span className="sign-currency">%</span>
                 </div>
               </div>
