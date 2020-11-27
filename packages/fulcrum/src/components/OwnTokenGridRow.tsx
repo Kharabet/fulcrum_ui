@@ -197,6 +197,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   }
 
   public render() {
+    const remainingDays = this.props.loan.loanData.interestDepositRemaining.div(
+      this.props.loan.loanData.interestOwedPerDay
+    )
+    const isRollover = remainingDays.eq(0)
+
     let profitTitle = ''
     let profitValue
     if (
@@ -234,7 +239,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         </React.Fragment>
       )
     }
-    if (!this.props.profitCollateralToken || !this.props.profitLoanToken) {
+    if (!this.props.profitCollateralToken || !this.props.profitLoanToken || isRollover) {
       profitTitle = ''
       profitValue = (
         <React.Fragment>
@@ -346,11 +351,13 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button
             className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half"
-            onClick={this.onSellClick}
+            onClick={isRollover ? this.onSellClick : this.onRolloverClick}
             disabled={this.props.loan.collateralizedPercent.lte(0.15)}>
-            {TradeType.SELL}
+            {isRollover ? 'ROLLOVER' : TradeType.SELL}
           </button>
-          <NotificationRollover countOfDaysToRollover={1} />
+          {remainingDays.lte(6) && (
+            <NotificationRollover isRollover={isRollover} countOfDaysToRollover={remainingDays} />
+          )}
         </div>
       </div>
     )
@@ -397,5 +404,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
     this.props.onTrade(request)
     this.setState({ ...this.state, request: request })
+  }
+
+  public onRolloverClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation()
+    console.log('rollover')
+    return
   }
 }

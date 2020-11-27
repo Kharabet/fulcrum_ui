@@ -523,18 +523,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maxTradeAmount,
       false //false - return in loan token
     )
-    const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-      tradeRequestCollateral
-    )
-    const estimatedLoanReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-      tradeRequestLoan
-    )
-
-    const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
-      10 ** collateralAssetDecimals
-    )
-    const estimatedReceivedLoanToken = estimatedLoanReceived[1].div(10 ** loanAssetDecimals)
-
+      const isRolloverPending = loan.loanData.interestDepositRemaining.eq(0)
     if (positionType === PositionType.LONG) {
       positionValue = collateralAssetAmount
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
@@ -546,12 +535,24 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .div(collateralAssetPrecision)
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
-      if (
+      if (isRolloverPending ||
         loan.loanData.depositValueAsCollateralToken.eq(0) ||
         loan.loanData.depositValueAsLoanToken.eq(0)
       ) {
         profitUSD = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue)
       } else {
+        const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+          tradeRequestCollateral
+        )
+        const estimatedLoanReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+          tradeRequestLoan
+        )
+
+        const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
+          10 ** collateralAssetDecimals
+        )
+        const estimatedReceivedLoanToken = estimatedLoanReceived[1].div(10 ** loanAssetDecimals)
+
         depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
           10 ** collateralAssetDecimals
         )
@@ -582,7 +583,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .div(10 ** 18)
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
 
-      if (
+      if (isRolloverPending ||
         loan.loanData.depositValueAsCollateralToken.eq(0) ||
         loan.loanData.depositValueAsLoanToken.eq(0)
       ) {
@@ -590,6 +591,18 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           .minus(new BigNumber(1).div(currentCollateralToPrincipalRate))
           .times(positionValue)
       } else {
+        const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+          tradeRequestCollateral
+        )
+        const estimatedLoanReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+          tradeRequestLoan
+        )
+
+        const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
+          10 ** collateralAssetDecimals
+        )
+        const estimatedReceivedLoanToken = estimatedLoanReceived[1].div(10 ** loanAssetDecimals)
+
         depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
           10 ** collateralAssetDecimals
         )
@@ -604,8 +617,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           : undefined
       }
     }
-
-    console.log(estimatedReceivedLoanToken.toFixed())
 
     return {
       loan: loan,

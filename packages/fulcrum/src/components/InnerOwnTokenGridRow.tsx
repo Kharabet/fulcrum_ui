@@ -206,6 +206,11 @@ export class InnerOwnTokenGridRow extends Component<
   }
 
   public render() {
+    const remainingDays = this.props.loan.loanData.interestDepositRemaining.div(
+      this.props.loan.loanData.interestOwedPerDay
+    )
+    const isRollover = remainingDays.eq(0)
+
     const collateralizedPercent = this.props.loan.collateralizedPercent.multipliedBy(100)
 
     let profitTitle = ''
@@ -245,7 +250,7 @@ export class InnerOwnTokenGridRow extends Component<
         </React.Fragment>
       )
     }
-    if (!this.props.profitCollateralToken || !this.props.profitLoanToken) {
+    if (!this.props.profitCollateralToken || !this.props.profitLoanToken || isRollover) {
       profitTitle = ''
       profitValue = (
         <React.Fragment>
@@ -383,11 +388,16 @@ export class InnerOwnTokenGridRow extends Component<
             <div className="inner-own-token-grid-row__col-action opacityIn rightIn">
               <button
                 className="inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half"
-                onClick={this.onSellClick}
-                disabled={this.props.loan.collateralizedPercent.lte(0.15)}>
-                {TradeType.SELL}
+                onClick={isRollover ? this.onSellClick : this.onRolloverClick}
+                disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
+                {isRollover ? 'ROLLOVER' : TradeType.SELL}
               </button>
-              <NotificationRollover countOfDaysToRollover={6} />
+              {remainingDays.lte(6) && (
+                <NotificationRollover
+                  isRollover={isRollover}
+                  countOfDaysToRollover={remainingDays}
+                />
+              )}
             </div>
           </div>
         )}
@@ -442,5 +452,11 @@ export class InnerOwnTokenGridRow extends Component<
     )
     this.props.onTrade(request)
     this.setState({ ...this.state, request: request })
+  }
+
+  public onRolloverClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation()
+    console.log('rollover')
+    return
   }
 }
