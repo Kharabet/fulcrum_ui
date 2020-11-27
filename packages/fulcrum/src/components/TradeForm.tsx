@@ -101,6 +101,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private readonly _inputPrecision = 6
 
   private readonly _inputChange: Subject<string>
+  private readonly _collateralChange: Subject<string>
   private readonly _inputSetMax: Subject<BigNumber>
   private _isMounted: boolean
 
@@ -141,13 +142,17 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
 
     this._inputChange = new Subject()
+    this._collateralChange = new Subject()
     this._inputSetMax = new Subject()
 
     merge(
       this._inputChange.pipe(
         distinctUntilChanged(),
         debounceTime(500),
-        switchMap((value) => this.rxFromCurrentAmount(value))
+        switchMap(() => this.rxFromCurrentAmount(this.state.inputAmountText))
+      ),
+      this._collateralChange.pipe(
+        switchMap(() => this.rxFromCurrentAmount(this.state.inputAmountText))
       ),
       this._inputSetMax.pipe(switchMap((value) => this.rxFromMaxAmountWithMultiplier(value)))
     )
@@ -307,10 +312,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     )
     if (this.props.tradeType === TradeType.BUY) {
       await this.onInsertMaxValue(1)
+      await this.setDefaultCollaterization()
     } else {
       this.rxFromCurrentAmount('0')
     }
-    await this.setDefaultCollaterization()
   }
 
   private async setSlippageRate(tradeAmount: BigNumber) {
@@ -508,42 +513,44 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             ) : null}
           </div>
           <div className="trade-form__edit-collateral-by-container">
-            <div className="edit-input-wrapper">
-              <span className="lh mb-15">Collateralized</span>
-              <div className="edit-input-container">
-                {this.state.isEdit ? (
-                  <React.Fragment>
-                    <div className="edit-input-collateral">
-                      <input
-                        type="number"
-                        step="any"
-                        placeholder={`Enter`}                        
-                        value={this.state.collateralValue}
-                        className="input-collateral"
-                        onChange={this.onCollateralAmountChange}
-                      />
+            {this.props.tradeType === TradeType.BUY && (
+              <div className="edit-input-wrapper">
+                <span className="lh mb-15">Collateralized</span>
+                <div className="edit-input-container">
+                  {this.state.isEdit ? (
+                    <React.Fragment>
+                      <div className="edit-input-collateral">
+                        <input
+                          type="number"
+                          step="any"
+                          placeholder={`Enter`}
+                          value={this.state.collateralValue}
+                          className="input-collateral"
+                          onChange={this.onCollateralAmountChange}
+                        />
+                      </div>
+                    </React.Fragment>
+                  ) : this.state.collateralValue === '' ? (
+                    <div className="loader-container">
+                      <Preloader width="75px" />
                     </div>
-                  </React.Fragment>
-                ) : this.state.collateralValue === '' ? (
-                  <div className="loader-container">
-                    <Preloader width="75px" />
-                  </div>
-                ) : (
-                  <React.Fragment>
-                    <span>
-                      {this.state.collateralValue}
-                      <span className="sign">%</span>
-                    </span>
-                    <div className="edit-icon-collateral" onClick={this.editInput}>
-                      <OpenManageCollateral />
-                    </div>
-                  </React.Fragment>
-                )}
+                  ) : (
+                    <React.Fragment>
+                      <span>
+                        {this.state.collateralValue}
+                        <span className="sign">%</span>
+                      </span>
+                      <div className="edit-icon-collateral" onClick={this.editInput}>
+                        <OpenManageCollateral />
+                      </div>
+                    </React.Fragment>
+                  )}
+                </div>
               </div>
-            </div>
-              <ChiSwitch />
-          </div>        
-        
+            )}
+            <ChiSwitch />
+          </div>
+
           <div className="trade-form__actions-container">
             <button
               title={
@@ -802,29 +809,40 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       collateral,
       interestRate
     } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest)
-    if (this.props.tradeType === TradeType.BUY) this.setState({ ...this.state, interestRate })
+    let expectedValue = limitedAmount.inputAmountValue
+    if (this.props.tradeType === TradeType.BUY) {
+      this.setState({ ...this.state, interestRate })
+
+      const maintenanceMargin = await FulcrumProvider.Instance.getMaintenanceMargin(
+        this.props.baseToken,
+        this.state.depositToken
+      )
+      const defaultCollaterization = maintenanceMargin.div(10 ** 18).plus(185)
+
+      expectedValue = exposureValue.times(this.state.selectedValue + 100).div(defaultCollaterization)
+    }
 
     return {
       inputAmountText: limitedAmount.inputAmountText,
       inputAmountValue: limitedAmount.inputAmountValue,
       tradeAmountValue: limitedAmount.tradeAmountValue,
       maxTradeValue: maxTradeValue,
-      exposureValue:
-        this.props.tradeType === TradeType.BUY ? exposureValue : limitedAmount.inputAmountValue
+      exposureValue: expectedValue
     }
   }
 
   private async setDefaultCollaterization() {
-    const minMaintenanceMargin = await FulcrumProvider.Instance.getMaintenanceMargin(
+    const maintenanceMargin = await FulcrumProvider.Instance.getMaintenanceMargin(
       this.props.baseToken,
       this.state.depositToken
     )
 
-    const selectedValue: BigNumber = minMaintenanceMargin.plus(30)
+    const minValue: BigNumber = maintenanceMargin.div(10 ** 18)
+    const selectedValue: BigNumber = minValue.plus(85)
 
     this.setState({
       ...this.state,
-      minValue: selectedValue.toNumber(),
+      minValue: minValue.toNumber(),
       selectedValue: selectedValue.toNumber(),
       collateralValue: selectedValue.toFixed(2)
     })
@@ -956,24 +974,29 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         selectedValue: inputCollateralValue
       })
     }
-    this._inputChange.next(this.state.inputAmountText)
   }
 
   public editInput = () => {
     this.setState({ ...this.state, isEdit: true })
   }
-  
+
   public onClickForm = (event: FormEvent<HTMLFormElement>) => {
     if (this.state.isEdit && (event.target as Element).className !== 'input-collateral') {
       this.setState({ ...this.state, isEdit: false })
-      if (this.state.minValue > Number(this.state.collateralValue)) {
-        this.setState({ ...this.state, collateralValue: this.state.minValue.toFixed(2), isEdit: false  })
-      } else if (Number(this.state.collateralValue) > this.state.maxValue) {
-        this.setState({ ...this.state, collateralValue: this.state.maxValue.toFixed(2), isEdit: false  })
-      }else{
-        this.setState({ ...this.state, collateralValue:  this.state.selectedValue.toFixed(2), isEdit: false })
-      }
 
+      const collateralValue =
+        this.state.minValue > Number(this.state.collateralValue)
+          ? this.state.minValue.toFixed(2)
+          : Number(this.state.collateralValue) > this.state.maxValue
+          ? this.state.maxValue.toFixed(2)
+          : this.state.selectedValue.toFixed(2)
+
+      this._collateralChange.next(collateralValue)
+      this.setState({
+        ...this.state,
+        collateralValue,
+        isEdit: false
+      })
     }
   }
 }

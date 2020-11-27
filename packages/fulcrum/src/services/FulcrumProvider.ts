@@ -1753,7 +1753,7 @@ export class FulcrumProvider {
     collateralAsset: Asset
   ): Promise<BigNumber> => {
     const loanParam = await this.getLoanParams(asset, collateralAsset)
-    if (!loanParam) {
+    if (!loanParam || loanParam.maintenanceMargin.eq(0)) {
       return new BigNumber(15).times(10 ** 18) // fallback value
     }
     return loanParam.maintenanceMargin
