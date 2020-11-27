@@ -141,11 +141,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   public render() {
     if (this.state.assetDetails === null) return null
 
-    const balanceNumber = this.state.assetBalance.toNumber()
-    const amountOwedNumber = this.props.loanOrderState.amountOwed
-      .multipliedBy(10 ** this.state.assetDetails.decimals)
-      .toNumber()
-    const ratio = balanceNumber / amountOwedNumber
+    const ratio = this.state.assetBalance.div(this.props.loanOrderState.amountOwed
+      .times(10 ** this.state.assetDetails.decimals))
 
     return (
       <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
@@ -160,11 +157,12 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
             updateInterestAmount={this.updateInterestAmount}
             onTradeAmountChange={this.onTradeAmountChange}
             interestAmount={this.state.interestAmount}
+            onMaxClick={this.onMaxClick}
             ratio={ratio}
           />
           {this.state.balanceTooLow && (
             <div className="error insufficient-balance">
-              Insufficient {this.state.assetDetails.displayName} balance in your wallet!
+              Insufficient {this.state.assetDetails.displayName} wallet balance to repay 100%!
             </div>
           )}
         </section>
@@ -266,6 +264,19 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     if (value === 0) return
     const repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(this.state.interestAmount)
     const repayAmountText = repayAmount.toString()
+
+    this.setState(
+      { ...this.state, repayAmount: repayAmount, repayAmountText: repayAmountText },
+      () => {
+        // emitting next event for processing with rx.js
+        this._inputTextChange.next(this.state.repayAmountText)
+      }
+    )
+  }
+
+  public onMaxClick = () => {
+    const repayAmount = this.state.assetBalance.div(10 ** this.state.assetDetails!.decimals)
+    const repayAmountText = repayAmount.dp(4, BigNumber.ROUND_HALF_DOWN).toFixed()
 
     this.setState(
       { ...this.state, repayAmount: repayAmount, repayAmountText: repayAmountText },
