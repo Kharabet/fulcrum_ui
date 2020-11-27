@@ -445,6 +445,12 @@ export class ContractsSource {
           case '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984':
             asset = Asset.UNI
             break
+          case '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd':
+            asset = Asset.LRC
+            break
+          case '0xc00e94cb662c3520282e6f5717214004a7f26888':
+            asset = Asset.COMP
+            break
           case '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9':
             asset = Asset.CHI
             break

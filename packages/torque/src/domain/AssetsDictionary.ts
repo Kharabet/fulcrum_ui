@@ -7,11 +7,13 @@ import btc_logo, { ReactComponent as BTCLogo } from '../assets/images/ic_token_b
 import bzrx_logo, { ReactComponent as BZRXLogo } from '../assets/images/ic_token_bzrx.svg'
 import chai_logo, { ReactComponent as CHAILogo } from '../assets/images/ic_token_chai.svg'
 import chi_logo, { ReactComponent as CHILogo } from '../assets/images/ic_token_chi.svg'
+import comp_logo, { ReactComponent as COMPLogo } from '../assets/images/ic_token_comp.svg'
 import dai_logo, { ReactComponent as DAILogo } from '../assets/images/ic_token_dai.svg'
 import eth_logo, { ReactComponent as ETHLogo } from '../assets/images/ic_token_eth.svg'
 import knc_logo, { ReactComponent as KNCLogo } from '../assets/images/ic_token_knc.svg'
 import lend_logo, { ReactComponent as LENDLogo } from '../assets/images/ic_token_lend.svg'
 import link_logo, { ReactComponent as LINKLogo } from '../assets/images/ic_token_link.svg'
+import lrc_logo, { ReactComponent as LRCLogo } from '../assets/images/ic_token_lrc.svg'
 import mkr_logo, { ReactComponent as MKRLogo } from '../assets/images/ic_token_mkr.svg'
 import rep_logo, { ReactComponent as REPLogo } from '../assets/images/ic_token_rep.svg'
 import sai_logo, { ReactComponent as SAILogo } from '../assets/images/ic_token_sai.svg'
@@ -560,6 +562,52 @@ export class AssetsDictionary {
         '#FFE1EF',
         new Map<number, string | null>([
           [1, '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'],
+          [3, ''],
+          [42, '']
+        ])
+      )
+    ],
+    [
+      Asset.LRC,
+      new AssetDetails(
+        'LRC',
+        'LRC',
+        'iLRC',
+        'https://fulcrum.trade/images/iLRC.svg',
+        18,
+        lrc_logo,
+        LRCLogo,
+        '',
+        '',
+        '#DCE7FF',
+        '#FFFFFF',
+        '#FFFFFF',
+        '#DCE7FF',
+        new Map<number, string | null>([
+          [1, '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd'],
+          [3, ''],
+          [42, '']
+        ])
+      )
+    ],
+    [
+      Asset.COMP,
+      new AssetDetails(
+        'COMP',
+        'COMP',
+        'iCOMP',
+        'https://fulcrum.trade/images/iCOMP.svg',
+        18,
+        comp_logo,
+        COMPLogo,
+        '',
+        '',
+        '#9DFBDF',
+        '#FFFFFF',
+        '#FFFFFF',
+        '#9DFBDF',
+        new Map<number, string | null>([
+          [1, '0xc00e94cb662c3520282e6f5717214004a7f26888'],
           [3, ''],
           [42, '']
         ])

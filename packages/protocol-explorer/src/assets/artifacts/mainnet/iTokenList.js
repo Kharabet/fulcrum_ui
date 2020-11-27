@@ -87,7 +87,6 @@ export const iTokenList = [
     'iUSDT',
     '1'
   ],
-  ,
   [
     '1',
     '0x0a625fcec657053fe2d9fffdeb1dbb4e412cf8a8',
@@ -95,8 +94,7 @@ export const iTokenList = [
     'Fulcrum UNI iToken',
     'iUNI',
     '1'
-  ]
-  ,
+  ],
   [
     '1',
     '0x0cae8d91e0b1b7bd00d906e990c3625b2c220db1',
@@ -104,5 +102,7 @@ export const iTokenList = [
     'Fulcrum AAVE iToken',
     'iAAVE',
     '1'
-  ]
+  ],
+  ['1', '0x3da0e01472dee3746b4d324a65d7edfaeca9aa4f', '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd', 'Fulcrum LRC iToken', 'iLRC', '1'],
+  ['1', '0x6d29903bc2c4318b59b35d97ab98ab9ec08ed70d', '0xc00e94cb662c3520282e6f5717214004a7f26888', 'Fulcrum COMP iToken', 'iCOMP', '1']
 ]
