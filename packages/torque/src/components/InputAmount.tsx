@@ -1,11 +1,14 @@
+import { BigNumber } from '@0x/utils'
 import React, { Component, ChangeEvent } from 'react'
 
 interface IInputAmountProps {
   inputAmountText: string
   asset: any
   interestAmount: number
+  ratio: BigNumber
   updateInterestAmount: (state: number) => void
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void
+  onMaxClick?: () => void
 }
 
 interface IInputAmountState {
@@ -56,30 +59,41 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
           </div>
 
           <div className="interest-group-button">
-            <div
+            <button
+              type="button"
               className={`interest-button${this.props.interestAmount === 0.25 ? ' active' : ''}`}
               data-interest="0.25"
-              onClick={this.getInterestAmount}>
+              onClick={this.getInterestAmount}
+              disabled={this.props.ratio.lt(0.25)}>
               25%
-            </div>
-            <div
+            </button>
+            <button
+              type="button"
               className={`interest-button${this.props.interestAmount === 0.5 ? ' active' : ''}`}
               data-interest="0.5"
-              onClick={this.getInterestAmount}>
+              onClick={this.getInterestAmount}
+              disabled={this.props.ratio.lt(0.5)}>
               50%
-            </div>
-            <div
+            </button>
+            <button
+              type="button"
               className={`interest-button${this.props.interestAmount === 0.75 ? ' active' : ''}`}
               data-interest="0.75"
-              onClick={this.getInterestAmount}>
+              onClick={this.getInterestAmount}
+              disabled={this.props.ratio.lt(0.75)}>
               75%
-            </div>
-            <div
+            </button>
+            <button
+              type="button"
               className={`interest-button${this.props.interestAmount === 1 ? ' active' : ''}`}
               data-interest="1"
-              onClick={this.getInterestAmount}>
-              100%
-            </div>
+              onClick={
+                this.props.ratio.lt(1) && this.props.onMaxClick !== undefined
+                  ? this.props.onMaxClick
+                  : this.getInterestAmount
+              }>
+              {this.props.ratio.lt(1) ? 'MAX' : '100%'}
+            </button>
           </div>
         </div>
       </React.Fragment>
@@ -88,9 +102,8 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
 
   public getInterestAmount = (event: any) => {
     event.preventDefault()
-    let target = event.currentTarget as HTMLButtonElement
-    let interestString = target.dataset.interest as string
-    let interestNumber = +interestString
+    const target = event.currentTarget as HTMLButtonElement
+    const interestNumber = parseFloat(target.dataset.interest!)
     this.setState({ ...this.state, interestAmount: interestNumber })
   }
 }

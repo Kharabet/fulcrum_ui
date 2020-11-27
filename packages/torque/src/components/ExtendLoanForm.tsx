@@ -169,6 +169,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             updateInterestAmount={this.updateInterestAmount}
             onTradeAmountChange={this.onTradeAmountChange}
             interestAmount={this.state.interestAmount}
+            ratio={new BigNumber(1)}
           />
           {this.state.balanceTooLow ? (
             <React.Fragment>
