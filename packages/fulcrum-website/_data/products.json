@@ -52,5 +52,29 @@
     "visibilityApr": false,
     "visibilityEarn": false,
     "visibilityChart": false
+  },
+  {
+    "name": "uni",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": false
+  },
+  {
+    "name": "aave",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": false
+  },
+  {
+    "name": "comp",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": false
+  },
+  {
+    "name": "lrc",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": false
   }
 ]

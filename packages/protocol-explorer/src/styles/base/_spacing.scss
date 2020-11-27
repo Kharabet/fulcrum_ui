@@ -1,44 +1,44 @@
 .py-90 {
-    padding-top: 90px;
-    padding-bottom: 90px;
+  padding-top: 90px;
+  padding-bottom: 90px;
 }
 .pt-45 {
-    padding-top: 45px;
+  padding-top: 45px;
 }
 .pt-75 {
-    padding-top: 75px;
+  padding-top: 75px;
 }
 .pt-90 {
-    padding-top: 90px;
+  padding-top: 90px;
 }
 .pb-45 {
-    padding-bottom: 45px;
+  padding-bottom: 45px;
 }
 .mb-15 {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 .mb-30 {
-    margin-bottom: 30px;
+  margin-bottom: 30px;
 }
-.mb-45{
-    margin-bottom: 45px;
+.mb-45 {
+  margin-bottom: 45px;
 }
 .mb-60 {
-    margin-bottom: 60px;
+  margin-bottom: 60px;
 }
 .mr-15 {
-    margin-right: 15px;
+  margin-right: 15px;
 }
-.mt-5{
-    margin-top: 5px;
+.mt-5 {
+  margin-top: 5px;
 }
-@media screen and (max-width: $width-max-md){
-    .mt-md-30{
-        margin-top: 30px;
-    }
+@media screen and (max-width: $width-max-md) {
+  .mt-md-30 {
+    margin-top: 30px;
+  }
 }
-@media screen and(max-width: $width-max-sm){
-    .pt-sm-30{
-        padding-top: 30px;
-    }
+@media screen and(max-width: $width-max-sm) {
+  .pt-sm-30 {
+    padding-top: 30px;
+  }
 }

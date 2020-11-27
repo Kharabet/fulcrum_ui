@@ -8,14 +8,14 @@
   width: 100%;
   z-index: 100002;
   background-color: rgba(0, 0, 0, 0.8);
-  &.overflow-auto{
+  &.overflow-auto {
     overflow: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
     &::-webkit-scrollbar {
       display: none;
       scrollbar-width: none;
-  }
+    }
   }
   .modal-content-div {
     display: inline-block;
@@ -23,7 +23,7 @@
     top: 50%;
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
-    &.modal-content-div-form{
+    &.modal-content-div-form {
       @media screen and (max-width: $mobile-version-max-width) {
         top: 40px;
         transform: translateX(-50%) translateY(0);

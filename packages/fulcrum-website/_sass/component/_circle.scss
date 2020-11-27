@@ -5,20 +5,20 @@
   span {
     position: absolute;
     border-radius: 50%;
-    @media(min-width: 580px){
+    @media (min-width: 580px) {
       width: 22px;
       height: 22px;
     }
-    @media(max-width: 579px){
+    @media (max-width: 579px) {
       width: 14px;
       height: 14px;
     }
     &.big {
-      @media(min-width: 580px){
+      @media (min-width: 580px) {
         width: 30px;
         height: 30px;
       }
-      @media(max-width: 579px){
+      @media (max-width: 579px) {
         width: 20px;
         height: 20px;
       }
@@ -38,13 +38,13 @@
   }
   .left-35 {
     left: 35px;
-    @media(max-width: 991px){
+    @media (max-width: 991px) {
       left: 5px;
     }
   }
   .left-165 {
     left: 165px;
-    @media(max-width: 579px){
+    @media (max-width: 579px) {
       left: 105px;
     }
   }
@@ -61,13 +61,13 @@
   }
   .top-r-10 {
     top: -10px;
-    @media(max-width: 579px){
+    @media (max-width: 579px) {
       top: 0;
     }
   }
   .top-r-60 {
     top: -60px;
-    @media(max-width: 579px){
+    @media (max-width: 579px) {
       top: -40px;
     }
   }

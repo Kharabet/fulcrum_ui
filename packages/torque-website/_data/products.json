@@ -1,4 +1,4 @@
-[ 
+[
   {
     "name": "dai"
   },
@@ -25,5 +25,20 @@
   },
   {
     "name": "lend"
+  },
+  {
+    "name": "yfi"
+  },
+  {
+    "name": "uni"
+  },
+  {
+    "name": "aave"
+  },
+  {
+    "name": "comp"
+  },
+  {
+    "name": "lrc"
   }
 ]

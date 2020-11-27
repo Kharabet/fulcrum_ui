@@ -38,6 +38,11 @@ header {
       }
     }
   }
+  .icon-external {
+    position: absolute;
+    top: -6px;
+    left: -16px;
+  }
 }
 .header-right {
   z-index: 2;
@@ -56,7 +61,7 @@ header {
   @media screen and(min-width: $width-min-md) {
     position: absolute;
     left: 0;
-    right: 0;
+    right: 60px;
   }
   @media screen and(max-width: $width-max-md) {
     display: flex;
@@ -65,6 +70,7 @@ header {
   }
 
   .item-menu {
+    position: relative;
     text-decoration: none;
     font-weight: 600;
     font-size: 18px;
@@ -72,11 +78,12 @@ header {
     &:hover {
       color: $green-label;
     }
+
     &:not(:last-child) {
-      @media screen and(min-width: $width-min-md) {
+      @media screen and(min-width: $width-min-lg) {
         margin-right: 60px;
       }
-      @media screen and(max-width: $width-max-md) and (min-width: $width-min-sm) {
+      @media screen and(max-width: $width-max-lg) and (min-width: $width-min-md) {
         margin-right: 30px;
       }
     }
@@ -86,10 +93,16 @@ header {
       font-size: 26px;
       margin-top: 30px;
     }
+    &.c-blue {
+      color: $primary-color;
+      &:hover {
+        color: $primary-color-hover;
+      }
+    }
     &.active {
       position: relative;
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         left: 0;
         background-color: $primary-color;

@@ -1,16 +1,16 @@
-import React, { Component } from "react";
+import React, { Component } from 'react'
 
 interface ICircleLoaderProps {
   // quantityDots: number,
   // sizeDots: string,
   // title: string,
-  // isOverlay: boolean,  
+  // isOverlay: boolean,
   // isWarningTitle?: boolean
 }
 
 export class CircleLoader extends Component<ICircleLoaderProps> {
   public constructor(props: ICircleLoaderProps, context?: any) {
-    super(props, context);
+    super(props, context)
   }
   // public renderDots = () => {
   //   const animationDuration = 0.35 * this.props.quantityDots;
@@ -22,7 +22,7 @@ export class CircleLoader extends Component<ICircleLoaderProps> {
   // }
 
   public componentDidMount(): void {
-    const loaderWrapper = document.querySelector(".loader-wrapper") as HTMLElement;
+    const loaderWrapper = document.querySelector('.loader-wrapper') as HTMLElement
     // if (loaderWrapper) {
     //   const boundingClient = loaderWrapper.getBoundingClientRect();
     //   loaderWrapper!.style.top = -1 * boundingClient!.top + "px";
@@ -33,14 +33,10 @@ export class CircleLoader extends Component<ICircleLoaderProps> {
   public render() {
     return (
       <div className="circle-loader">
-        <div className="circle-main">
-
-        </div>
-        <div className="circle-background">
-
-        </div>
+        <div className="circle-main"></div>
+        <div className="circle-background"></div>
         {this.props.children}
       </div>
-    );
+    )
   }
 }

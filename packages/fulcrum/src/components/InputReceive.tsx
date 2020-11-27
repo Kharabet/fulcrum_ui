@@ -1,24 +1,21 @@
-import React, { Component } from "react";
-import { Asset } from "../domain/Asset";
-import { AssetDropdown } from "./AssetDropdown";
-import { BigNumber } from "@0x/utils";
+import { BigNumber } from '@0x/utils'
+import React, { Component } from 'react'
+import { Asset } from '../domain/Asset'
+import { AssetDropdown } from './AssetDropdown'
 
 interface IInputReceiveProps {
-  receiveAmout: BigNumber;
-  returnedAsset: Asset;
-  assetDropdown: Asset[];
-  getLoanCloseAmount: (asset: Asset) => void;
+  receiveAmout: BigNumber
+  returnedAsset: Asset
+  assetDropdown: Asset[]
+  getLoanCloseAmount: (asset: Asset) => void
 }
 
-interface IInputReceiveState {
-}
+interface IInputReceiveState {}
 
-export class InputReceive extends Component<IInputReceiveProps, IInputReceiveState> {
-
+export default class InputReceive extends Component<IInputReceiveProps, IInputReceiveState> {
   constructor(props: IInputReceiveProps) {
-    super(props);
+    super(props)
   }
-
 
   public render() {
     return (
@@ -31,9 +28,10 @@ export class InputReceive extends Component<IInputReceiveProps, IInputReceiveSta
           <AssetDropdown
             selectedAsset={this.props.returnedAsset}
             onAssetChange={this.props.getLoanCloseAmount}
-            assets={this.props.assetDropdown} />
+            assets={this.props.assetDropdown}
+          />
         </div>
       </React.Fragment>
-    );
+    )
   }
 }

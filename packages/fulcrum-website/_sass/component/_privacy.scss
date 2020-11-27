@@ -79,7 +79,7 @@
         }
       }
       > li:before {
-        content: counters(list, ".");
+        content: counters(list, '.');
         position: absolute;
         font-size: 14px;
         font-weight: 800;
@@ -101,7 +101,7 @@
         counter-increment: listStyle;
         padding-left: 30px;
         &:before {
-          content: counter(listStyle, lower-alpha) ".";
+          content: counter(listStyle, lower-alpha) '.';
           position: absolute;
           font-size: 14px;
           font-weight: 800;

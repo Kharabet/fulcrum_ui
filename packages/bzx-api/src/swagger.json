@@ -33,15 +33,11 @@
       "description": "Data for building charts, history metrics etc."
     }
   ],
-  "schemes": [
-    "https"
-  ],
+  "schemes": ["https"],
   "paths": {
     "/supply-rate-apr": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Get supply interest rates (APR)",
         "responses": {
           "200": {
@@ -52,17 +48,11 @@
     },
     "/total-asset-supply": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Get Total Supply (USD)",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -72,17 +62,11 @@
     },
     "/total-asset-borrow": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Get Total Borrow Assets",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -92,17 +76,11 @@
     },
     "/borrow-rate-apr": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Get Fulcrum Borrow Interest Rates (APR)",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -112,17 +90,11 @@
     },
     "/torque-borrow-rate-apr": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Get Torque Borrow Interest Rates (APR)",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -132,17 +104,11 @@
     },
     "/vault-balance": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Get bZx Vault Balance",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -152,17 +118,11 @@
     },
     "/liquidity": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Get bZx Free Liquidity",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -172,17 +132,11 @@
     },
     "/vault-balance-usd": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Get bZx TVL in USD",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -192,17 +146,11 @@
     },
     "/oracle-rates-usd": {
       "get": {
-        "tags": [
-          "Stats"
-        ],
+        "tags": ["Stats"],
         "summary": "Oracle Assets Prices in USD",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -212,9 +160,7 @@
     },
     "/borrow-deposit-estimate": {
       "get": {
-        "tags": [
-          "Torque"
-        ],
+        "tags": ["Torque"],
         "summary": "Collateral Estimate",
         "description": "Estimates how much of collateral you have to deposit to borrow AMOUNT of asset",
         "parameters": [
@@ -240,12 +186,8 @@
             "description": "Loan amount"
           }
         ],
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -255,17 +197,11 @@
     },
     "/itoken-prices": {
       "get": {
-        "tags": [
-          "iTokens Prices"
-        ],
+        "tags": ["iTokens Prices"],
         "summary": "Get iToken prices",
         "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -275,9 +211,7 @@
     },
     "/tvl-history": {
       "get": {
-        "tags": [
-          "History Data"
-        ],
+        "tags": ["History Data"],
         "summary": "Get tvl history data",
         "description": "",
         "parameters": [
@@ -303,12 +237,8 @@
             "description": "number of desired datapoints output"
           }
         ],
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -318,9 +248,7 @@
     },
     "/asset-stats-history": {
       "get": {
-        "tags": [
-          "History Data"
-        ],
+        "tags": ["History Data"],
         "summary": "Get history data for the asset (tvl, apr, utilization)",
         "description": "",
         "parameters": [
@@ -353,12 +281,8 @@
             "description": "number of desired datapoints output"
           }
         ],
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -368,9 +292,7 @@
     },
     "/asset-history-price": {
       "get": {
-        "tags": [
-          "History Data"
-        ],
+        "tags": ["History Data"],
         "summary": "Get asset's swap to USD price at some timestamp",
         "description": "",
         "parameters": [
@@ -389,12 +311,8 @@
             "description": "Date (timestamp)"
           }
         ],
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Success"
@@ -404,9 +322,7 @@
     },
     "/interest-rates-fulcrum": {
       "get": {
-        "tags": [
-          "External Integration"
-        ],
+        "tags": ["External Integration"],
         "summary": "Get Fulcrum interest rates (APR and APY), specifically designed for loanscan",
         "responses": {
           "200": {
@@ -417,9 +333,7 @@
     },
     "/interest-rates-torque": {
       "get": {
-        "tags": [
-          "External Integration"
-        ],
+        "tags": ["External Integration"],
         "summary": "Get Torque interest rates (APR and APY), specifically designed for loanscan",
         "responses": {
           "200": {
@@ -430,9 +344,7 @@
     },
     "/interest-rates": {
       "get": {
-        "tags": [
-          "External Integration"
-        ],
+        "tags": ["External Integration"],
         "summary": "Get Fulcrum and Torque interest rates (APR and APY) and Yield",
         "responses": {
           "200": {

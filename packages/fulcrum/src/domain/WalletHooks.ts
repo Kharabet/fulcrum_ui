@@ -15,7 +15,6 @@ export function useEagerConnect() {
           setTried(true)
         })
       } else {
-
         setTried(true)
       }
     })

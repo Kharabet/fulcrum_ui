@@ -4,7 +4,7 @@
 .fw-w {
   flex-wrap: wrap;
 }
-.fg-1{
+.fg-1 {
   flex-grow: 1;
 }
 .jc-sb {
@@ -31,7 +31,7 @@
 .ai-fe {
   align-items: flex-end;
 }
-.as-b{
+.as-b {
   align-self: baseline;
 }
 .as-c {
@@ -47,23 +47,23 @@
   flex-direction: row;
 }
 
-.f-1{
+.f-1 {
   flex: 1;
 }
-.f-2{
+.f-2 {
   flex: 2;
 }
-.f-3{
+.f-3 {
   flex: 3;
 }
 @media screen and (max-width: $breakpoint-lg-down) {
-  .fw-lg-w{
+  .fw-lg-w {
     flex-wrap: wrap;
   }
-  .jc-lg-fe{
+  .jc-lg-fe {
     justify-content: flex-end;
   }
-  .jc-lg-fs{
+  .jc-lg-fs {
     justify-content: flex-start;
   }
 }
@@ -75,13 +75,13 @@
   .fw-md-w {
     flex-wrap: wrap;
   }
-  .jc-md-c{
-      justify-content: center;
+  .jc-md-c {
+    justify-content: center;
   }
-  .order-md-1{
+  .order-md-1 {
     order: 1;
   }
-  .fg-lg-initial{
+  .fg-lg-initial {
     flex-grow: initial;
   }
 }
@@ -101,10 +101,10 @@
   .jc-sm-fs {
     justify-content: flex-start;
   }
-  .as-sm-a{
+  .as-sm-a {
     align-self: auto;
   }
-  .ai-sm-ih{
+  .ai-sm-ih {
     align-items: inherit;
   }
 }
@@ -115,10 +115,10 @@
   .fd-xs-c {
     flex-direction: column;
   }
-  .jc-xs-c{
+  .jc-xs-c {
     justify-content: ceil($number: 0);
-  } 
-  .al-xs-c{
+  }
+  .al-xs-c {
     align-items: center;
   }
 }

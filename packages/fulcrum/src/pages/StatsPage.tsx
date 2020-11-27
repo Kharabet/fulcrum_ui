@@ -1,31 +1,29 @@
-import React, { Component } from "react";
-import { StatsTokenGrid } from "../components/StatsTokenGrid";
-import { InfoBlock } from "../components/InfoBlock";
+import React, { Component } from 'react'
+import { StatsTokenGrid } from '../components/StatsTokenGrid'
+import { InfoBlock } from '../components/InfoBlock'
 
-import "../styles/pages/_stats-page.scss"
+import '../styles/pages/_stats-page.scss'
 
 export interface IStatsPageProps {
-  doNetworkConnect: () => void;
-  isRiskDisclosureModalOpen: () => void;
-  isLoading: boolean;
-  isMobileMedia: boolean;
+  doNetworkConnect: () => void
+  isRiskDisclosureModalOpen: () => void
+  isMobileMedia: boolean
 }
 
-interface IStatsPageState {
-}
+interface IStatsPageState {}
 
 export default class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   constructor(props: any) {
-    super(props);
+    super(props)
   }
-  private _isMounted: boolean = false;
+  private _isMounted: boolean = false
 
   public componentWillUnmount(): void {
-    this._isMounted = false;
+    this._isMounted = false
   }
 
   public async componentDidMount() {
-    this._isMounted = true;
+    this._isMounted = true
   }
 
   public render() {
@@ -35,6 +33,6 @@ export default class StatsPage extends Component<IStatsPageProps, IStatsPageStat
           <StatsTokenGrid isMobileMedia={this.props.isMobileMedia} />
         </main>
       </div>
-    );
+    )
   }
 }

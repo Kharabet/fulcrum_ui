@@ -27,8 +27,8 @@ header {
       z-index: 2;
     }
   }
-  .footer-social{
-    .logo{
+  .footer-social {
+    .logo {
       justify-content: center;
     }
   }
@@ -80,7 +80,7 @@ header {
     &.active {
       position: relative;
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         left: 0;
         background-color: $primary-color;

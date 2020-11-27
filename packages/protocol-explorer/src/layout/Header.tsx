@@ -1,37 +1,39 @@
-import React, { Component } from "react";
-import { ReactComponent as LogoExplorer } from "../assets/images/logo-explorer.svg"
-import { ReactComponent as LogoSign } from "../assets/images/logo-sign.svg"
-import { HeaderMenu } from "./HeaderMenu";
-import { Link } from "react-router-dom";
-import { OnChainIndicator } from "../components/OnChainIndicator";
-import { FooterSocial } from "../layout/FooterSocial";
-import { ReactComponent as MenuIconClose } from "../assets/images/menu-close.svg";
-import { ReactComponent as MenuIconOpen } from "../assets/images/menu-open.svg";
+import React, { Component } from 'react'
+import { ReactComponent as LogoExplorer } from '../assets/images/logo-explorer.svg'
+import { ReactComponent as LogoSign } from '../assets/images/logo-sign.svg'
+import { HeaderMenu } from './HeaderMenu'
+import { Link } from 'react-router-dom'
+import { OnChainIndicator } from '../components/OnChainIndicator'
+import { FooterSocial } from '../layout/FooterSocial'
+import { ReactComponent as MenuIconClose } from '../assets/images/menu-close.svg'
+import { ReactComponent as MenuIconOpen } from '../assets/images/menu-open.svg'
 
 interface IHeaderProps {
-  doNetworkConnect: () => void;
-  isMobileMedia: boolean;
+  doNetworkConnect: () => void
+  isMobileMedia: boolean
 }
 interface IHeaderState {
-  isMenuOpen: boolean;
+  isMenuOpen: boolean
 }
 
 export class Header extends Component<IHeaderProps, IHeaderState> {
   constructor(props: IHeaderProps) {
-    super(props);
+    super(props)
     this.state = {
       isMenuOpen: false
-    };
+    }
   }
 
   componentDidUpdate(prevProps: IHeaderProps, prevState: IHeaderState): void {
     if (this.state.isMenuOpen !== prevState.isMenuOpen) {
-      this.state.isMenuOpen ? document.body.classList.add("overflow") : document.body.classList.remove("overflow");
+      this.state.isMenuOpen
+        ? document.body.classList.add('overflow')
+        : document.body.classList.remove('overflow')
     }
   }
 
   public render() {
-    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
+    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile()
   }
 
   private renderDesktop = () => {
@@ -47,15 +49,19 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
             </Link>
             <HeaderMenu />
             <div className="flex ai-c header-right">
-              <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://help.bzx.network/en/"
+                className={`item-menu`}
+                target="_blank"
+                rel="noopener noreferrer">
                 Help Center
-                </a>
+              </a>
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
             </div>
           </div>
         </div>
       </header>
-    );
+    )
   }
 
   private renderMobile = () => {
@@ -70,20 +76,22 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
               <LogoExplorer />
             </Link>
             <div className="header_icon" onClick={this.onMenuToggle}>
-              {!this.state.isMenuOpen ? <MenuIconOpen className="header__menu" /> : <MenuIconClose className="header__menu" />}
+              {!this.state.isMenuOpen ? (
+                <MenuIconOpen className="header__menu" />
+              ) : (
+                <MenuIconClose className="header__menu" />
+              )}
             </div>
           </div>
           <div className={`mobile-menu ${this.state.isMenuOpen ? `shown` : `hidden`}`}>
             <div className="w-100">
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              <HeaderMenu />
               <div className="header-menu">
-                <Link to="/" className={`item-menu ${window.location.pathname === "/" ? `active` : ``}`} onClick={this.removeOverflow}>
-                  Stats
-                </Link>
-                <Link to="/liquidations" className={`item-menu ${window.location.pathname === "/liquidations" ? `active` : ``}`} onClick={this.removeOverflow}>
-                  Liquidations
-                </Link>
-                <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
+                <a
+                  href="https://help.bzx.network/en/"
+                  className={`item-menu c-blue`}
+                  target="_blank">
                   Help Center
                 </a>
               </div>
@@ -93,14 +101,14 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
           </div>
         </div>
       </header>
-    );
+    )
   }
 
   private onMenuToggle = () => {
-    this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
-  };
+    this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen })
+  }
 
   public removeOverflow = () => {
-    document.body.classList.remove("overflow");
+    document.body.classList.remove('overflow')
   }
 }

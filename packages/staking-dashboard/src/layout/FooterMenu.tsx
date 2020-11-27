@@ -1,11 +1,11 @@
-import React, { MouseEvent } from "react";
+import React, { MouseEvent } from 'react'
 export const FooterMenu = () => {
   const contactClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
+    e.preventDefault()
     //@ts-ignore
     if (window.Intercom) {
       //@ts-ignore
-      window.Intercom("show")
+      window.Intercom('show')
     }
   }
   return (
@@ -27,8 +27,8 @@ export const FooterMenu = () => {
           <a href="https://fulcrum.trade/">Fulcrum</a>
           <a href="https://torque.loans">Torque</a>
           <a href="https://staking.bzx.network/">Staking Dashboard</a>
+          <a href="https://explorer.bzx.network">Protocol Explorer</a>
           <a href="https://bzx.network/itokens">iTokens</a>
-          <a href="https://bzx.network/ptokens">pTokens</a>
           <a href="https://bzx.network/bzrx-token">BZRX Token</a>
         </div>
       </div>
@@ -40,9 +40,11 @@ export const FooterMenu = () => {
           <a href="https://angel.co/company/bzx-1/jobs">Careers</a>
           <a href="https://bzx.network/press">Press</a>
           <a href="https://bzx.network/media-assets">Media assets</a>
-          <a href="#" className="contact-us-button" onClick={contactClick}>Contact us</a>
+          <a href="#" className="contact-us-button" onClick={contactClick}>
+            Contact us
+          </a>
         </div>
       </div>
     </div>
-  );
+  )
 }

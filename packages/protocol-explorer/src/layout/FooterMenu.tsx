@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 export const FooterMenu = () => {
   return (
     <div className="footer-menu">
@@ -19,8 +19,8 @@ export const FooterMenu = () => {
           <a href="https://fulcrum.trade/">Fulcrum</a>
           <a href="https://torque.loans">Torque</a>
           <a href="https://staking.bzx.network/">Staking Dashboard</a>
+          <a href="https://explorer.bzx.network">Protocol Explorer</a>
           <a href="https://bzx.network/itokens">iTokens</a>
-          <a href="https://bzx.network/ptokens">pTokens</a>
           <a href="https://bzx.network/bzrx-token">BZRX Token</a>
         </div>
       </div>
@@ -32,9 +32,11 @@ export const FooterMenu = () => {
           <a href="https://angel.co/company/bzx-1/jobs">Careers</a>
           <a href="https://bzx.network/press">Press</a>
           <a href="https://bzx.network/media-assets">Media assets</a>
-          <a href="#" className="contact-us-button">Contact us</a>
+          <a href="#" className="contact-us-button">
+            Contact us
+          </a>
         </div>
       </div>
     </div>
-  );
+  )
 }

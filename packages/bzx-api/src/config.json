@@ -1,7 +1,7 @@
 {
-	"port": 8080,
-	"bodyLimit": "1000kb",
-	"corsHeaders": ["Link"],
-	"cache_ttl_sec": 900,
-	"web3_provider_url": "https://mainnet.infura.io/v3/090248ae4e924e70a074376505dcee8c"
+  "port": 8080,
+  "bodyLimit": "1000kb",
+  "corsHeaders": ["Link"],
+  "cache_ttl_sec": 900,
+  "web3_provider_url": "https://mainnet.infura.io/v3/090248ae4e924e70a074376505dcee8c"
 }

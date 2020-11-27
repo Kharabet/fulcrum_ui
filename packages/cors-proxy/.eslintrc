@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": false,
+    "jest": true,
+    "node": true,
+    "es6": true
+  },
+
+  "parser": "babel-eslint",
+
+  "plugins": [
+    "standard"
+  ],
+
+  "extends": [
+    "eslint-config-standard"
+  ],
+
+  "rules": {
+    "object-curly-spacing": [
+      2,
+      "never"
+    ],
+    "brace-style": [
+      2,
+      "stroustrup"
+    ],
+    "comma-dangle": 0
+  }
+}

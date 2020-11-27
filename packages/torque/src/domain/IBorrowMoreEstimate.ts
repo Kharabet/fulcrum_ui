@@ -1,6 +1,6 @@
-import { BigNumber } from "@0x/utils";
+import { BigNumber } from '@0x/utils'
 
 export interface IBorrowMoreEstimate {
-  depositAmount: BigNumber;
+  depositAmount: BigNumber
   balanceTooLow: boolean
 }

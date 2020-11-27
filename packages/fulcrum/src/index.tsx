@@ -1,10 +1,13 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import Modal from "react-modal";
-import { AppRouter } from "./components/AppRouter";
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Modal from 'react-modal'
+import { AppRouter } from './components/AppRouter'
+import services from './services'
 
-import "./styles/index.scss";
+import './styles/index.scss'
 
-Modal.setAppElement("#root");
+services.start()
 
-ReactDOM.render(<AppRouter />, document.getElementById("root"));
+Modal.setAppElement('#root')
+
+ReactDOM.render(<AppRouter />, document.getElementById('root'))

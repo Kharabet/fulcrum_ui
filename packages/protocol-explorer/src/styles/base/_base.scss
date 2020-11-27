@@ -1,106 +1,112 @@
-*{
-    box-sizing: border-box;
+* {
+  box-sizing: border-box;
 }
 
 body {
-    font-family: "Muli", sans-serif;
-    margin: 0;
-    color: #283049;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  font-family: 'Muli', sans-serif;
+  margin: 0;
+  color: #283049;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 body,
 #root {
-    height: 100%;
+  height: 100%;
 }
 p {
-    margin: 0;
+  margin: 0;
 }
 a {
-    text-decoration: none;
-    color: $primary-color;
-    &:hover {
-        color: $primary-color-hover;
-    }
+  text-decoration: none;
+  color: $primary-color;
+  &:hover {
+    color: $primary-color-hover;
+  }
 }
 .container {
-    padding: 0 15px;
-    margin: auto;
-    box-sizing: border-box;
-    @media screen and (min-width: $width-min-lg){
-        width: 1140px;
-    }
-    @media screen and (max-width: $width-max-lg){
-        width: 100%;
-    }
+  padding: 0 15px;
+  margin: auto;
+  box-sizing: border-box;
+  @media screen and (min-width: $width-min-lg) {
+    width: 1140px;
+  }
+  @media screen and (max-width: $width-max-lg) {
+    width: 100%;
+  }
 }
 
 .labels-container {
-    margin-top: 35px;
-    .label-chart {
-        display: flex;
-        align-items: center;
-        @media screen and (min-width: $width-min-sm){
-            &:not(:last-child) {
-                margin-right: 35px;
-            }
-        }
-        @media screen and (max-width: $width-max-sm){
-            font-size: 10px;
-            &:not(:last-child) {
-                margin-right: 20px;
-            }   
-        }
-        span {
-            width: 12px;
-            height: 12px;
-            margin-right: 15px;
-            border-radius: 50%;
-            display: inline-block;
-        }
+  margin-top: 35px;
+  flex-wrap: wrap;
+  @media screen and (max-width: $width-max-sm) {
+    overflow: auto;
+    flex-wrap: nowrap;
+  }
+  .label-chart {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    @media screen and (min-width: $width-min-sm) {
+      &:not(:last-child) {
+        margin-right: 35px;
+      }
     }
+    @media screen and (max-width: $width-max-sm) {
+      font-size: 10px;
+      &:not(:last-child) {
+        margin-right: 20px;
+      }
+    }
+    span {
+      width: 12px;
+      height: 12px;
+      margin-right: 15px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  }
 }
 
 .bg-primary {
-    background-color: $primary-color;
+  background-color: $primary-color;
 }
 .bg-secondary {
-    background-color: $secondary-color;
+  background-color: $secondary-color;
 }
 .bg-green {
-    background-color: $green-label;
+  background-color: $green-label;
 }
 .bg-gradient {
-    background: linear-gradient(360deg, #edf5ff 0%, #ffffff 100%);
+  background: linear-gradient(360deg, #edf5ff 0%, #ffffff 100%);
 }
 .w-100 {
-    width: 100%;
+  width: 100%;
 }
-@media screen and (max-width: $width-max-md){
-    .w-md-100{
-        width: 100%;
-    }
+@media screen and (max-width: $width-max-md) {
+  .w-md-100 {
+    width: 100%;
+  }
 }
 
 .pages-container {
-    min-height: 100vh;
-    overflow-x: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .relative {
-    position: relative;
+  position: relative;
 }
 
 main {
-    margin: auto;
-    width: 100%;
+  margin: auto;
+  width: 100%;
 }
-.h-100{
-    height: 100%;
+.h-100 {
+  height: 100%;
 }
 .wrapper-logo-sign {
-    background: linear-gradient(314.37deg, #003cda 19.25%, #33dfcc 86.5%);
-    display: flex;
-    margin-right: 15px;
-    border-radius: 8px;
+  background: linear-gradient(314.37deg, #003cda 19.25%, #33dfcc 86.5%);
+  display: flex;
+  margin-right: 15px;
+  border-radius: 8px;
 }

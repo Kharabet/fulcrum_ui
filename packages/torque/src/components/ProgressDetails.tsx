@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import { RequestTask } from "../domain/RequestTask";
-import { TasksList } from "./TasksList";
+import React, { Component } from 'react'
+import { RequestTask } from '../domain/RequestTask'
+import { TasksList } from './TasksList'
 
 export interface IProgressDetailsProps {
-  tasks: RequestTask[];
-  onRequestClose: () => void;
+  tasks: RequestTask[]
+  onRequestClose: () => void
 }
 
 export class ProgressDetails extends Component<IProgressDetailsProps> {
@@ -13,6 +13,6 @@ export class ProgressDetails extends Component<IProgressDetailsProps> {
       <div className="progress-details">
         <TasksList tasks={this.props.tasks} />
       </div>
-    );
+    )
   }
 }

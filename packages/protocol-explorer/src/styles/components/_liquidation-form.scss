@@ -1,0 +1,25 @@
+.liquidation-form {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  width: 535px;
+  @media screen and (max-width: $width-max-sm) {
+    width: 100%;
+  }
+  &__title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #283049;
+  }
+  .actions-container {
+    display: flex;
+    justify-content: center;
+  }
+  .amount-warning {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 150%;
+    color: #fe7272;
+    margin-bottom: 10px;
+  }
+}

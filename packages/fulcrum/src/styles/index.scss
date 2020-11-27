@@ -1,34 +1,35 @@
-@import "~react-tippy/dist/tippy.css";
+@import '~react-tippy/dist/tippy.css';
 
-@import "abstracts/functions";
-@import "abstracts/mixins";
-@import "abstracts/variables";
+@import 'abstracts/functions';
+@import 'abstracts/mixins';
+@import 'abstracts/variables';
 
-@import "themes/theme";
+@import 'themes/theme';
 
-@import "base/animations";
-@import "base/base";
-@import "base/typography";
+@import 'base/animations';
+@import 'base/base';
+@import 'base/typography';
 
-@import "components/check-box";
-@import "components/asset-dropdown";
+@import 'components/check-box';
+@import 'components/asset-dropdown';
 
-@import "components/preloader";
+@import 'components/preloader';
 
-@import "components/provider-menu";
+@import 'components/provider-menu';
 
-@import "components/on-chain-indicator";
-@import "components/switch-button";
-@import "components/switch-pro";
-@import "components/risk-disclosure";
-@import "components/circle-loader";
-@import "components/trade-tx-animation";
+@import 'components/on-chain-indicator';
+@import 'components/switch-button';
+@import 'components/switch-pro';
+@import 'components/risk-disclosure';
+@import 'components/circle-loader';
+@import 'components/trade-tx-animation';
+@import 'components/manage-token-grid.scss';
 
-@import "layout/footer";
-@import "layout/header";
-@import "layout/header.mobile";
-@import "layout/header-logo";
-@import "layout/header-menu";
-@import "layout/header-menu.mobile";
+@import 'layout/footer';
+@import 'layout/header';
+@import 'layout/header.mobile';
+@import 'layout/header-logo';
+@import 'layout/header-menu';
+@import 'layout/header-menu.mobile';
 
-@import "base/modal";
+@import 'base/modal';

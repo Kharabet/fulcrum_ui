@@ -86,9 +86,21 @@ var Datafeeds = (function (exports) {
         }
         HistoryProvider.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate) {
             var _this = this;
+            var kyberResolution = "";
+            switch (resolution) {
+                case '1D':
+                    kyberResolution = 'D';
+                    break;
+                case '1W':
+                    kyberResolution = 'W';
+                    break;
+                case '1M':
+                    kyberResolution = 'M';
+                    break;
+            }
             var requestParams = {
                 symbol: symbolInfo.ticker || '',
-                resolution: resolution,
+                resolution: kyberResolution || resolution,
                 from: rangeStartDate,
                 to: rangeEndDate,
             };
@@ -726,7 +738,7 @@ var Datafeeds = (function (exports) {
             if (configurationData.supports_group_request || !configurationData.supports_search) {
                 this._symbolsStorage = new SymbolsStorage(this._datafeedURL, configurationData.supported_resolutions || [], this._requester);
             }
-            //set default supported_resolutions
+            //set custom supported_resolutions
             configurationData.supported_resolutions = defaultConfiguration().supported_resolutions;
             logMessage("UdfCompatibleDatafeed: Initialized with " + JSON.stringify(configurationData));
         };
@@ -736,7 +748,7 @@ var Datafeeds = (function (exports) {
         return {
             supports_search: false,
             supports_group_request: true,
-            supported_resolutions: ['15', '30', '60', '120', '240', '360', '720'],
+            supported_resolutions: ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
             supports_marks: false,
             supports_timescale_marks: false,
         };

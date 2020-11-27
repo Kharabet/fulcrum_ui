@@ -1,4 +1,4 @@
-@import "../abstracts/variables.scss";
+@import '../abstracts/variables.scss';
 
 .styled-select {
   background-color: var(--select-bg);
@@ -6,13 +6,13 @@
   border-radius: 26px;
   color: var(--primary-text);
   font-weight: 600;
-  padding: 8px 45px 8px 25px;
+  padding: 8px 83px 8px 10px;
   display: flex;
   align-items: center;
   svg {
     width: 30px;
     height: 30px;
-    margin: 0 10px 0 30px;
+    margin-right: 10px;
     .eth-svg {
       fill: #c8c8c8;
     }
@@ -28,7 +28,7 @@
     }
   }
   &:after {
-    content: "";
+    content: '';
     width: 0;
     height: 0;
     border: 5px solid transparent;
@@ -128,7 +128,7 @@
     font-size: 14px;
   }
 
-  [class*="icon"] {
+  [class*='icon'] {
     position: absolute;
     top: 9px;
     height: 28px;
@@ -183,7 +183,7 @@
     &:only-child {
       border-radius: 4px;
     }
-    &[rel="hide"] {
+    &[rel='hide'] {
       display: none;
     }
   }

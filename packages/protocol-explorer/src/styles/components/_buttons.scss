@@ -1,13 +1,15 @@
 button {
-  font-family: "Muli", sans-serif;
+  font-family: 'Muli', sans-serif;
   cursor: pointer;
   border: none;
   outline: none;
+
+  border-radius: 40px;
   &.action {
     width: 100px;
     height: 32px;
     background-color: $primary-color;
-    border-radius: 22px;
+    border-radius: 50px;
     color: #ffffff;
     font-size: 14px;
     font-weight: 700;
@@ -15,10 +17,27 @@ button {
       background-color: $primary-color-hover;
     }
   }
+  &.btn-submit {
+    width: 270px;
+    height: 64px;
+    &:disabled {
+      opacity: 0.4;
+      background-color: $primary-color !important;
+
+      &:hover {
+        background-color: $primary-color !important;
+      }
+
+      &:active {
+        background-color: $primary-color !important;
+      }
+    }
+  }
 }
+
 .group-button {
   display: flex;
-  @media screen and (max-width: $width-max-sm){
+  @media screen and (max-width: $width-max-sm) {
     margin-top: 30px;
   }
   button {

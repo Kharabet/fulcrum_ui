@@ -1,5 +1,5 @@
 body {
-  font-family: "Muli", sans-serif;
+  font-family: 'Muli', sans-serif;
   font-size: 14px;
   font-weight: 400;
   p {
@@ -17,12 +17,18 @@ body {
 .lend-gradient {
   background: linear-gradient(90deg, #10adc8 0%, #1c91cb 100%);
   border-radius: 50%;
-  display: flex;
 }
 .bzrx-gradient {
   background: linear-gradient(315deg, #003cda 19.25%, #33dfcc 86.5%);
   border-radius: 50%;
-  display: flex;
+}
+.aave-gradient {
+  background: linear-gradient(229.92deg, #B6509E 15.42%, #2EBAC6 84.43%);
+  border-radius: 50%;
+}
+.uni-gradient {
+  background: linear-gradient(130.6deg, #FFFFFF 15.49%, #FFE1EF 90.22%);
+  border-radius: 50%;
 }
 .li-options {
   .lend-gradient,

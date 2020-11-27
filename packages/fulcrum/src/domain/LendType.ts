@@ -1,4 +1,4 @@
 export enum LendType {
-  LEND = "LEND",
-  UNLEND = "UNLEND"
+  LEND = 'LEND',
+  UNLEND = 'UNLEND'
 }

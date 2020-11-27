@@ -1,5 +1,5 @@
-@import "../abstracts/mixins";
-@import "../abstracts/variables";
+@import '../abstracts/mixins';
+@import '../abstracts/variables';
 
 .trade-form {
   @include clearfix();
@@ -90,7 +90,7 @@
   }
 
   &__form-values-container {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
   &__actions-container {
@@ -112,7 +112,7 @@
   }
 
   &__kv-container--w_dots {
-    background-image: url("../../assets/images/dotted_line.png");
+    background-image: url('../../assets/images/dotted_line.png');
     background-repeat: repeat-x;
     background-position-y: 1.25rem;
   }
@@ -283,6 +283,18 @@
       }
     }
   }
+  .trade-form__submit-button--buy:disabled,
+  .trade-form__submit-button--sell:disabled {
+    background-color: #a9b5c7;
+
+    .container-loader {
+      background-color: #eee;
+
+      .item-loader {
+        background-color: #fff;
+      }
+    }
+  }
   .input-receive {
     &__title {
       font-weight: 600;
@@ -377,7 +389,7 @@
       align-items: flex-start;
       position: relative;
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         border: 16px solid transparent;
         border-top: 16px solid #ffffff;
@@ -501,7 +513,7 @@
     }
 
     &__kv-container--w_dots {
-      background-image: url("../../assets/images/dotted_line.png");
+      background-image: url('../../assets/images/dotted_line.png');
       background-repeat: repeat-x;
       background-position-y: 1.25rem;
     }

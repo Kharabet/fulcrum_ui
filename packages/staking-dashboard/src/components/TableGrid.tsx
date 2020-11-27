@@ -1,13 +1,13 @@
-import React, { Component } from "react";
-import { TableRow } from "./TableRow";
+import React, { Component } from 'react'
+import { TableRow } from './TableRow'
 
 interface ITableGridProps {
-  isMobileMedia: boolean;
+  isMobileMedia: boolean
 }
 
 export class TableGrid extends Component<ITableGridProps> {
   constructor(props: any) {
-    super(props);
+    super(props)
   }
 
   public render() {
@@ -28,6 +28,6 @@ export class TableGrid extends Component<ITableGridProps> {
           </div>
         </div>
       </React.Fragment>
-    );
+    )
   }
 }

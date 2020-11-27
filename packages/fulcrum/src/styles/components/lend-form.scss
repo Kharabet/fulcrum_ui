@@ -1,5 +1,5 @@
-@import "../abstracts/mixins";
-@import "../abstracts/variables";
+@import '../abstracts/mixins';
+@import '../abstracts/variables';
 
 .lend-form {
   @include clearfix();
@@ -177,7 +177,7 @@
     box-sizing: border-box;
 
     &:before {
-      content: "";
+      content: '';
       position: absolute;
       border: 16px solid transparent;
       border-left: 16px solid #ffffff;
@@ -273,6 +273,6 @@ hr {
   }
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield; /* Firefox */
 }

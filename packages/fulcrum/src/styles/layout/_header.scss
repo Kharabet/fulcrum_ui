@@ -1,10 +1,6 @@
 .header {
   padding-top: 50px;
   margin-bottom: 60px;
-
-  display: flex;
-  flex-direction: column;
-  box-sizing: content-box;
   .header__row {
     display: flex;
     flex-direction: row;
@@ -41,9 +37,9 @@
     border-top: solid 1px #393f49;
     border-bottom: solid 1px #393f49;
   }
-  svg{
-    .primary{
-      fill: var(--primary-text)
+  svg {
+    .primary {
+      fill: var(--primary-text);
     }
   }
 }

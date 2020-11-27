@@ -1,11 +1,11 @@
-import React, { PureComponent } from "react";
-import { OpsSelector } from "../components/OpsSelector";
-import { Footer } from "../layout/Footer";
-import { HeaderHome } from "../layout/HeaderHome";
+import React, { PureComponent } from 'react'
+import { OpsSelector } from '../components/OpsSelector'
+import Footer from '../layout/Footer'
+import { HeaderHome } from '../layout/HeaderHome'
 
 export interface IHomePageProps {
-  isMobileMedia: boolean;
-  isRiskDisclosureModalOpen: () => void;
+  isMobileMedia: boolean
+  isRiskDisclosureModalOpen: () => void
 }
 export class HomePage extends PureComponent<IHomePageProps> {
   public render() {
@@ -17,6 +17,6 @@ export class HomePage extends PureComponent<IHomePageProps> {
         </main>
         <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
-    );
+    )
   }
 }

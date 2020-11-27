@@ -1,11 +1,11 @@
-import React, { Component } from "react";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { RequestStatus } from "../domain/RequestStatus";
-import { RequestTask } from "../domain/RequestTask";
-import { TasksListItemDetails } from "./TasksListItemDetails";
+import React, { Component } from 'react'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
+import { TasksListItemDetails } from './TasksListItemDetails'
 
 export interface ITasksListItemProps {
-  task: RequestTask;
+  task: RequestTask
 }
 
 export class TasksListItem extends Component<ITasksListItemProps> {
@@ -33,8 +33,10 @@ export class TasksListItem extends Component<ITasksListItemProps> {
             </div>
           </div>
         </div>
-        {this.props.task.status === RequestStatus.AWAITING ? null : <TasksListItemDetails task={this.props.task} />}
+        {this.props.task.status === RequestStatus.AWAITING ? null : (
+          <TasksListItemDetails task={this.props.task} />
+        )}
       </React.Fragment>
-    );
+    )
   }
 }

@@ -1,2 +1,1 @@
-export const pTokenListBurnOnly = [
-];
+export const pTokenListBurnOnly = []

@@ -1,18 +1,18 @@
-import React, { Component } from "react";
-import { FooterMenu } from "./FooterMenu";
-import { FooterVersion } from "./FooterVersion";
+import React from 'react'
+import { FooterMenu } from './FooterMenu'
+import  FooterVersion  from './FooterVersion'
 
 interface IFooterProps {
-  isRiskDisclosureModalOpen: () => void;
+  isRiskDisclosureModalOpen: () => void
 }
 
-export class Footer extends Component<IFooterProps> {
-  public render() {
-    return (
-      <footer className="footer">
-        <FooterVersion />
-        <FooterMenu {...this.props}/>
-      </footer>
-    );
-  }
+function Footer(props: IFooterProps) {
+  return (
+    <footer className="footer">
+      <FooterVersion />
+      <FooterMenu {...props} />
+    </footer>
+  )
 }
+
+export default React.memo(Footer)

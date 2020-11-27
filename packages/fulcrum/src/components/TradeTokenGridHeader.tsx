@@ -1,6 +1,17 @@
-import React from "react";
+import React from 'react'
+import ReactTooltip from 'react-tooltip'
+import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
+import { Asset } from '../domain/Asset'
+import '../styles/components/tooltip.scss'
 
-export const TradeTokenGridHeader = () => {
+export interface ITradeTokenGridHeaderProps{
+  quoteToken: Asset|null
+}
+ 
+export const TradeTokenGridHeader = (props:ITradeTokenGridHeaderProps) => {
+  const info =
+    'Price feeds are provided securely via Chainlink, trades are executed via Kyber. This can result in minor price variations when opening and closing positions.'
+
   return (
     <div className="trade-token-grid-header">
       <div className="trade-token-grid-header__col-token-name">
@@ -13,14 +24,18 @@ export const TradeTokenGridHeader = () => {
         <span className="trade-token-grid-header__text">Leverage</span>
       </div>
       <div className="trade-token-grid-header__col-price">
-        <span className="trade-token-grid-header__text">Mid Market Price</span>
+        <span className="trade-token-grid-header__text">
+          Mid Market Price <label className="trade-token-grid-header__text-asset">{props.quoteToken}</label>
+          <IconInfo className="tooltip__icon" data-tip={info} />
+          <ReactTooltip className="tooltip__info" place="top" effect="solid" />
+        </span>
       </div>
       <div className="trade-token-grid-header__col-liquidation">
-        <span className="trade-token-grid-header__text">Liquidation Price</span>
+        <span className="trade-token-grid-header__text">Liquidation Price <label className="trade-token-grid-header__text-asset">{props.quoteToken}</label></span>
       </div>
       <div className="trade-token-grid-header__col-profit">
         <span className="trade-token-grid-header__text">Est. Yield, vBZRX</span>
       </div>
     </div>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-@import "../abstracts/variables";
-@import "./collateral-slider.scss";
+@import '../abstracts/variables';
+@import './collateral-slider.scss';
 
 .manage-collateral-form {
   width: 520px;
@@ -17,7 +17,7 @@
     width: 16px;
     cursor: pointer;
   }
-  
+
   &__form-container {
     padding: 0;
   }
@@ -57,8 +57,8 @@
       font-weight: 800;
       color: #ffffff;
       margin-right: 1px;
-      &.text-danger{
-        color:#FF4F4F;
+      &.text-danger {
+        color: #ff4f4f;
       }
     }
   }
@@ -207,7 +207,7 @@
   }
 
   &__kv-container--w_dots {
-    background-image: url("../../assets/images/dotted_line.png");
+    background-image: url('../../assets/images/dotted_line.png');
     background-repeat: repeat-x;
     background-position-y: 1.25rem;
   }
@@ -236,7 +236,6 @@
       margin-left: 2px;
     }
   }
- 
 
   @media screen and (max-width: $mobile-version-max-width) {
     width: 310px;
@@ -256,7 +255,7 @@
 
     &__collaterized {
       font-size: 26px;
-      line-height: 39px;     
+      line-height: 39px;
     }
     &__tips {
       margin-bottom: 22px;

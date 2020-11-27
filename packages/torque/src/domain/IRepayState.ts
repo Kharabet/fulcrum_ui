@@ -1,5 +1,5 @@
 export interface IRepayState {
-  minValue: number;
-  maxValue: number;
-  currentValue: number;
+  minValue: number
+  maxValue: number
+  currentValue: number
 }

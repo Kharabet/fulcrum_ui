@@ -1,5 +1,5 @@
 export interface ICollateralManagementParams {
-  minValue: number;
-  maxValue: number;
-  currentValue: number;
+  minValue: number
+  maxValue: number
+  currentValue: number
 }

@@ -1,4 +1,4 @@
-@import "../abstracts/variables";
+@import '../abstracts/variables';
 
 .TVChartContainer,
 .TVChartContainer > iframe,
@@ -15,11 +15,24 @@
     z-index: 2;
     background-color: var(--primary-bg);
   }
-  @media only screen and (min-width: $mobile-version-max-width) {
+
+
+  @media only screen and (min-width: $breakpoint-laptop-min) and (max-height: 820px) {
+    //margin-top: -30px;
+    margin-bottom: -10px;
+    max-height: 280px;
+  }
+  @media only screen and (min-width: $breakpoint-desktop-min) {
     min-height: 400px;
   }
 }
 .chart-wrapper {
+  @media only screen and (min-width: $breakpoint-mobile-min) {
+    border-top: 1px solid var(--select-border);
+  }
+  &.hidden {
+    display: none;
+  }
   @media (max-width: $breakpoint-mobile-max) {
     padding-left: 15px;
     padding-right: 15px;

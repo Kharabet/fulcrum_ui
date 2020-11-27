@@ -101,9 +101,21 @@ export class HistoryProvider {
 	}
 
 	public getBars(symbolInfo: LibrarySymbolInfo, resolution: string, rangeStartDate: number, rangeEndDate: number): Promise<GetBarsResult> {
+		let kyberResolution = "";
+		switch (resolution){
+			case '1D':
+			kyberResolution='D'
+			break
+			case '1W':
+			kyberResolution='W'
+			break
+			case '1M':
+			kyberResolution='M'
+			break
+		}
 		const requestParams: RequestParams = {
 			symbol: symbolInfo.ticker || '',
-			resolution: resolution,
+			resolution: kyberResolution || resolution,
 			from: rangeStartDate,
 			to: rangeEndDate,
 		};

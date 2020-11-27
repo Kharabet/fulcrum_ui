@@ -11,5 +11,4 @@ secrets.js
 .vscode
 .next
 .idea
-package-lock.json
 persist-storage
