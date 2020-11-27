@@ -128,7 +128,9 @@ export class FulcrumProvider {
         Asset.LEND,
         Asset.KNC,
         Asset.UNI,
-        Asset.AAVE
+        Asset.AAVE,
+        Asset.LRC,
+        Asset.COMP
       ]
     }
     // singleton

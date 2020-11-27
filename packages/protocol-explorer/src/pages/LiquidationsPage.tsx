@@ -74,7 +74,9 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         { token: Asset.LEND, color: '#00EFEF' },
         { token: Asset.KNC, color: '#3BD8A7' },
         { token: Asset.UNI, color: '#FFE1EF' },
-        { token: Asset.AAVE, color: '#2EBAC6' }
+        { token: Asset.AAVE, color: '#2EBAC6' },
+        { token: Asset.LRC, color: '#1E61FF' },
+        { token: Asset.COMP, color: '#00F9B0' }
       ]
     }
 
