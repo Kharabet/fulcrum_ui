@@ -179,6 +179,10 @@ $primary-dark-color: rgba(#444e5a, 0.4);
   }
   &__sell-button {
     background-color: #ff4f4f;
+    &.rollover-warning {
+      color: #fcff7a;
+      text-transform: capitalize;
+    }
     &:hover {
       background-color: #fe7272;
     }

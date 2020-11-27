@@ -388,10 +388,11 @@ export class InnerOwnTokenGridRow extends Component<
             </div>
             <div className="inner-own-token-grid-row__col-action opacityIn rightIn">
               <button
-                className="inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half"
+                className={`inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half  ${isRollover &&
+                  'rollover-warning'}`}
                 onClick={isRollover ? this.onRolloverClick : this.onSellClick}
                 disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
-                {isRollover ? 'ROLLOVER' : TradeType.SELL}
+                {isRollover ? 'Rollover' : TradeType.SELL}
               </button>
               {remainingDays.lte(6) && (
                 <NotificationRollover

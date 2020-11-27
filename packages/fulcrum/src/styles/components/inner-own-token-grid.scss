@@ -230,6 +230,10 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
   }
   &__sell-button {
     background-color: #ff4f4f;
+    &.rollover-warning {
+      color: #fcff7a;
+      text-transform: capitalize;
+    }
     &:hover {
       background-color: #fe7272;
     }
