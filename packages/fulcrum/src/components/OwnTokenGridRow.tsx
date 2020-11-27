@@ -16,6 +16,7 @@ import { CircleLoader } from './CircleLoader'
 import { Preloader } from './Preloader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 import { NotificationRollover } from './NotificationRollover'
+import { RolloverRequest } from '../domain/RolloverRequest'
 
 export interface IOwnTokenGridRowProps {
   loan: IBorrowedFundsState
@@ -35,9 +36,10 @@ export interface IOwnTokenGridRowProps {
   isTxCompleted: boolean
   onTrade: (request: TradeRequest) => void
   onManageCollateralOpen: (request: ManageCollateralRequest) => void
+  onRolloverConfirmed: (request: RolloverRequest) => void
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined,
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
     isTxCompleted: boolean,
     resultTx: boolean
   ) => void
@@ -46,7 +48,7 @@ export interface IOwnTokenGridRowProps {
 interface IOwnTokenGridRowState {
   isLoading: boolean
   isLoadingTransaction: boolean
-  request: TradeRequest | ManageCollateralRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   resultTx: boolean
 }
 
@@ -351,8 +353,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button
             className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half"
-            onClick={isRollover ? this.onSellClick : this.onRolloverClick}
-            disabled={this.props.loan.collateralizedPercent.lte(0.15)}>
+            onClick={isRollover ? this.onRolloverClick : this.onSellClick}
+            disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
             {isRollover ? 'ROLLOVER' : TradeType.SELL}
           </button>
           {remainingDays.lte(6) && (
@@ -408,7 +410,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
   public onRolloverClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation()
-    console.log('rollover')
-    return
+    const rolloverRequest = new RolloverRequest(this.props.loan.loanId)
+    this.props.onRolloverConfirmed(rolloverRequest)
+    this.setState({ ...this.state, request: rolloverRequest, isLoadingTransaction: true })
   }
 }

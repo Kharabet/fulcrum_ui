@@ -4,18 +4,19 @@ import { LendRequest } from './LendRequest'
 import { RequestStatus } from './RequestStatus'
 import { TradeRequest } from './TradeRequest'
 import { ManageCollateralRequest } from './ManageCollateralRequest'
+import { RolloverRequest } from './RolloverRequest'
 
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null
 
-  public readonly request: LendRequest | TradeRequest | ManageCollateralRequest
+  public readonly request: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest
   public status: RequestStatus
   public steps: string[]
   public stepCurrent: number
   public txHash: string | null
   public error: Error | null
 
-  constructor(request: LendRequest | TradeRequest | ManageCollateralRequest) {
+  constructor(request: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest) {
     this.request = request
     this.status = RequestStatus.AWAITING
     this.steps = ['Preparing processing...']

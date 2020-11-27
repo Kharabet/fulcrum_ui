@@ -197,10 +197,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
     const task = TasksQueue.Instance.getTasksList().find(
       (t) =>
+        t.request instanceof TradeRequest &&
         t.request.loanId === '0x0000000000000000000000000000000000000000000000000000000000000000' &&
         t.request.asset === this.props.baseToken &&
-        (t.request as TradeRequest).quoteToken === this.props.quoteToken &&
-        (t.request as TradeRequest).positionType === this.props.positionType
+        t.request.quoteToken === this.props.quoteToken &&
+        t.request.positionType === this.props.positionType
     )
     const isLoadingTransaction = task && !task.error ? true : false
     const request = task ? (task.request as TradeRequest) : undefined

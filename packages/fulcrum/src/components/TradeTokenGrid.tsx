@@ -9,16 +9,17 @@ import { TradeTokenGridHeader } from './TradeTokenGridHeader'
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from './TradeTokenGridRow'
 
 import '../styles/components/trade-token-grid.scss'
+import { RolloverRequest } from '../domain/RolloverRequest'
 
 export interface ITradeTokenGridProps {
   isMobileMedia: boolean
   tokenRowsData: ITradeTokenGridRowProps[]
   innerOwnRowsData: IOwnTokenGridRowProps[]
-  request: TradeRequest | ManageCollateralRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   isLoadingTransaction: boolean
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined,
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
     isTxCompleted: boolean,
     resultTx: boolean
   ) => void
@@ -47,9 +48,11 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
           .map((e) => <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />)
       : this.props.tokenRowsData.map((e) => (
           <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />
-        ))   
+        ))
 
-    const quoteToken = this.props.tokenRowsData.length?this.props.tokenRowsData[0].quoteToken : null
+    const quoteToken = this.props.tokenRowsData.length
+      ? this.props.tokenRowsData[0].quoteToken
+      : null
     return (
       <div className="trade-token-grid__wrapper">
         <div className="trade-token-grid">

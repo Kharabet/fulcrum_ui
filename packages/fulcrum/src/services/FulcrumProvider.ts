@@ -47,6 +47,7 @@ import { PayTradingFeeEvent } from '../domain/events/PayTradingFeeEvent'
 import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
 import { ILoanParams } from '../domain/ILoanParams'
+import { RolloverRequest } from '../domain/RolloverRequest'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -319,6 +320,12 @@ export class FulcrumProvider {
   }
 
   public onTradeConfirmed = async (request: TradeRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
+  public onRolloverConfirmed = async (request: RolloverRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
@@ -1808,9 +1815,7 @@ export class FulcrumProvider {
     result = loansData
       .filter(
         (e: any) =>
-          (!e.principal.eq(zero) &&
-            !e.currentMargin.eq(zero) 
-            ) ||
+          (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
           account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
       )
       .map((e: any) => {
@@ -1882,8 +1887,7 @@ export class FulcrumProvider {
     const zero = new BigNumber(0)
     const healthyUserLoans = loansData.filter(
       (e: any) =>
-        (!e.principal.eq(zero) &&
-          !e.currentMargin.eq(zero)) ||
+        (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
         account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
     )
     const loansByPair: IBorrowedFundsState[] = []
@@ -2638,6 +2642,10 @@ export class FulcrumProvider {
       await this.processManageCollateralRequestTask(task, skipGas)
     }
 
+    if (task.request instanceof RolloverRequest) {
+      await this.processRolloverRequestTask(task, skipGas)
+    }
+
     return false
   }
 
@@ -3003,9 +3011,41 @@ console.log(err, added);
     }
   }
 
+  private processRolloverRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.loanId)
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error('No provider available!')
+      }
+
+      const account = this.getCurrentAccount()
+      if (!account) {
+        throw new Error('Unable to get wallet address!')
+      }
+
+      const taskRequest: RolloverRequest = task.request as RolloverRequest
+
+      const { RolloverProcessor } = await import('./processors/RolloverProcessor')
+      const processor = new RolloverProcessor()
+      await processor.run(task, account, skipGas)
+
+      task.processingEnd(true, false, null)
+    } catch (e) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
+        // tslint:disable-next-line:no-console
+        console.log(e)
+      }
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task)
+    }
+  }
+
   public waitForTransactionMined = async (
     txHash: string,
-    request?: LendRequest | TradeRequest | ManageCollateralRequest
+    request?: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
       try {
@@ -3023,7 +3063,7 @@ console.log(err, added);
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest | ManageCollateralRequest | undefined,
+    request: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
     resolve: (value: any) => void,
     reject: (value: any) => void
   ) => {
@@ -3067,7 +3107,7 @@ console.log(err, added);
               }
             }
             isMainnetProd && TagManager.dataLayer(tagManagerArgs)
-          } else {
+          } else if (request instanceof TradeRequest) {
             const tagManagerArgs = {
               dataLayer: {
                 transactionId: randomNumber,

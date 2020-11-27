@@ -32,6 +32,7 @@ import { TradeType } from '../domain/TradeType'
 
 import '../styles/pages/_trade-page.scss'
 import { ProviderType } from '../domain/ProviderType'
+import { RolloverRequest } from '../domain/RolloverRequest'
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
@@ -66,7 +67,7 @@ interface ITradePageState {
   historyRowsData: IHistoryTokenGridRowProps[]
   tradeRequestId: number
   isLoadingTransaction: boolean
-  request: TradeRequest | ManageCollateralRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   resultTx: boolean
   isTxCompleted: boolean
   activePositionType: PositionType
@@ -418,6 +419,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       })
   }
 
+  public onRolloverConfirmed = async (request: RolloverRequest) => {
+    FulcrumProvider.Instance.onRolloverConfirmed(request)
+    this.setState({
+      ...this.state,
+      request
+    })
+  }
+
   public onTradeRequestClose = async () => {
     ;(await this._isMounted) &&
       this.setState({
@@ -523,7 +532,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maxTradeAmount,
       false //false - return in loan token
     )
-      const isRolloverPending = loan.loanData.interestDepositRemaining.eq(0)
+    const isRolloverPending = loan.loanData.interestDepositRemaining.eq(0)
     if (positionType === PositionType.LONG) {
       positionValue = collateralAssetAmount
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
@@ -535,7 +544,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .div(collateralAssetPrecision)
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
-      if (isRolloverPending ||
+      if (
+        isRolloverPending ||
         loan.loanData.depositValueAsCollateralToken.eq(0) ||
         loan.loanData.depositValueAsLoanToken.eq(0)
       ) {
@@ -583,7 +593,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .div(10 ** 18)
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
 
-      if (isRolloverPending ||
+      if (
+        isRolloverPending ||
         loan.loanData.depositValueAsCollateralToken.eq(0) ||
         loan.loanData.depositValueAsLoanToken.eq(0)
       ) {
@@ -642,6 +653,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maintenanceMargin: maintenanceMargin.div(10 ** 20),
       onTrade: this.onTradeRequested,
       onManageCollateralOpen: this.onManageCollateralRequested,
+      onRolloverConfirmed: this.onRolloverConfirmed,
       changeLoadingTransaction: this.changeLoadingTransaction,
       isTxCompleted: this.state.isTxCompleted
     } as IOwnTokenGridRowProps
@@ -829,7 +841,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public changeLoadingTransaction = async (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined,
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
     isTxCompleted: boolean,
     resultTx: boolean
   ) => {

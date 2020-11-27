@@ -32,7 +32,6 @@ const MaintenancePage = React.lazy(() => import('../pages/MaintenancePage'))
 
 const StatsPage = React.lazy(() => import('../pages/StatsPage'))
 const TradePage = React.lazy(() => import('../pages/TradePage'))
-const ProgressFragment = React.lazy(() => import('./ProgressFragment'))
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -146,9 +145,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
           overlayClassName="modal-overlay-div overflow-auto">
           <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
         </Modal>
-        {/*<Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
-          <ProgressFragment />
-        </Suspense>*/}
         <div className="pages-container">
           <div className="pages-wrap">
             {siteConfig.MaintenanceMode ? (
@@ -345,13 +341,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
-      this.setState({
-        ...this.state,
-        isLoading: true,
-        isProviderMenuModalOpen: false
-      })
+    this.setState({
+      ...this.state,
+      isLoading: true,
+      isProviderMenuModalOpen: false
+    })
 
-      FulcrumProvider.Instance.setWeb3Provider(connector, account)
+    FulcrumProvider.Instance.setWeb3Provider(connector, account)
   }
 
   public onRequestClose = async () => {
