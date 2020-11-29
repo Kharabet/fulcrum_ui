@@ -95,6 +95,7 @@ interface ITradeFormState {
   maxValue: number
   selectedValue: number
   collateralValue: string
+  defaultCollateral: number
 }
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -138,6 +139,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       minValue: 30,
       maxValue: 200,
       selectedValue: 0,
+      defaultCollateral: 0,
       collateralValue: ''
     }
 
@@ -727,6 +729,13 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       TagManager.dataLayer(tagManagerArgs)
     }
 
+    const collaterizationProportion =  this.state.selectedValue / this.state.defaultCollateral
+    const leverage =
+      this.props.tradeType === TradeType.SELL &&
+      this.state.selectedValue === this.state.defaultCollateral
+        ? this.props.leverage
+        : this.props.leverage * collaterizationProportion
+
     this.props.onSubmit(
       new TradeRequest(
         this.props.loan?.loanId ||
@@ -736,7 +745,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.props.quoteToken,
         this.state.depositToken,
         this.props.positionType,
-        this.props.leverage,
+        leverage,
         this.state.tradeAmountValue,
         this.state.returnTokenIsCollateral
       )
@@ -813,13 +822,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     if (this.props.tradeType === TradeType.BUY) {
       this.setState({ ...this.state, interestRate })
 
-      const maintenanceMargin = await FulcrumProvider.Instance.getMaintenanceMargin(
-        this.props.baseToken,
-        this.state.depositToken
-      )
-      const defaultCollaterization = maintenanceMargin.div(10 ** 18).plus(185)
-
-      expectedValue = exposureValue.times(this.state.selectedValue + 100).div(defaultCollaterization)
+      expectedValue = exposureValue
+        .times(this.state.selectedValue)
+        .div(this.state.defaultCollateral)
     }
 
     return {
@@ -838,13 +843,16 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     )
 
     const minValue: BigNumber = maintenanceMargin.div(10 ** 18)
-    const selectedValue: BigNumber = minValue.plus(85)
+    const defaultCollateral: BigNumber = new BigNumber(100).div(
+      this.props.leverage - (this.props.positionType === PositionType.LONG ? 1 : 0)
+    )
 
     this.setState({
       ...this.state,
       minValue: minValue.toNumber(),
-      selectedValue: selectedValue.toNumber(),
-      collateralValue: selectedValue.toFixed(2)
+      selectedValue: defaultCollateral.toNumber(),
+      collateralValue: defaultCollateral.toFixed(2),
+      defaultCollateral: defaultCollateral.toNumber()
     })
   }
 
