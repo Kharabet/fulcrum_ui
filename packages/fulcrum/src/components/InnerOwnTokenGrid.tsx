@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { InnerOwnTokenGridHeader } from './InnerOwnTokenGridHeader'
+import InnerOwnTokenGridHeader from './InnerOwnTokenGridHeader'
 import { InnerOwnTokenGridRow } from './InnerOwnTokenGridRow'
 import { TradeRequest } from '../domain/TradeRequest'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'

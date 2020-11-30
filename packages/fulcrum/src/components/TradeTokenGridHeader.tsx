@@ -8,7 +8,7 @@ export interface ITradeTokenGridHeaderProps {
   quoteToken: Asset | null
 }
 
-export const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
+const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
   const midMarketTooltip =
     'Price feeds are provided securely via Chainlink, trades are executed via Kyber. This can result in minor price variations when opening and closing positions.'
   const liqPriceTooltip =
@@ -64,3 +64,5 @@ export const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
     </div>
   )
 }
+
+export default React.memo(TradeTokenGridHeader)

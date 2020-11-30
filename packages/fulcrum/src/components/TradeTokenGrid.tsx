@@ -5,7 +5,7 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 import { InnerOwnTokenGrid } from './InnerOwnTokenGrid'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
-import { TradeTokenGridHeader } from './TradeTokenGridHeader'
+import TradeTokenGridHeader from './TradeTokenGridHeader'
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from './TradeTokenGridRow'
 
 import '../styles/components/trade-token-grid.scss'
