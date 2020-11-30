@@ -22,13 +22,14 @@ export class NotificationRollover extends Component<INotificationRolloverProps> 
           {this.props.countOfDaysToRollover.gte(1) && this.props.countOfDaysToRollover.lte(6) && (
             <React.Fragment>
               {this.props.countOfDaysToRollover.toFixed(0, 1)}&nbsp;days
-              <div
-                className={`rollover-tooltip  ${classNameNotificationRollover}`}
-                data-tip="Rollover tooltips"
-              />
-              <ReactTooltip className="tooltip__info" place="top" effect="solid" />
             </React.Fragment>
           )}
+          &nbsp;
+          <div
+            className={`rollover-tooltip  ${classNameNotificationRollover}`}
+            data-tip="Your position is required to front more interest payments, this will come from your collateral."
+          />
+          <ReactTooltip className="tooltip__info" place="top" effect="solid" />
         </div>
       </React.Fragment>
     )
