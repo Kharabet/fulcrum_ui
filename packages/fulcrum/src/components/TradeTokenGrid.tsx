@@ -5,7 +5,7 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 import { InnerOwnTokenGrid } from './InnerOwnTokenGrid'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
-import { TradeTokenGridHeader } from './TradeTokenGridHeader'
+import TradeTokenGridHeader from './TradeTokenGridHeader'
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from './TradeTokenGridRow'
 
 import '../styles/components/trade-token-grid.scss'
@@ -19,12 +19,10 @@ export interface ITradeTokenGridProps {
   isLoadingTransaction: boolean
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
-    isTxCompleted: boolean,
-    resultTx: boolean
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   ) => void
+  onTransactionsCompleted: () => void
   isTxCompleted: boolean
-  resultTx: boolean
   changeGridPositionType: (activePositionType: PositionType) => void
   activePositionType: PositionType
 }
@@ -78,6 +76,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                     request={this.props.request}
                     isLoadingTransaction={this.props.isLoadingTransaction}
                     changeLoadingTransaction={this.props.changeLoadingTransaction}
+                    onTransactionsCompleted={this.props.onTransactionsCompleted}
                   />
                 </div>
               )

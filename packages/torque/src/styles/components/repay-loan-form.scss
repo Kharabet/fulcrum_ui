@@ -11,9 +11,22 @@
     display: flex;
     justify-content: flex-end;
   }
-  &__insufficient-balance {
-    color: #de4a4a;
-    padding: 10px 0;
-    text-align: center;
+  .dialog-content {
+    position: relative;
+
+    .error {
+      position: absolute;
+      color: #de4a4a;
+      font-size: 12px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      &.insufficient-gas {
+        top: -25px;
+      }
+      &.insufficient-balance {
+        bottom: -20px;
+      }
+    }
   }
 }

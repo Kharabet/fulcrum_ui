@@ -89,6 +89,10 @@
 }
 .asset-selector-icon {
   display: flex;
+  svg {
+    width: 40px;
+    height: 40px;
+  }
   @media screen and(min-width: $width-min-xs) {
     padding-left: 24px;
   }

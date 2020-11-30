@@ -20,6 +20,31 @@ import { NotificationRollover } from './NotificationRollover'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 import { RolloverRequest } from '../domain/RolloverRequest'
 
+export interface IInnerOwnTokenGridRowProps {
+  loan: IBorrowedFundsState
+  baseToken: Asset
+  quoteToken: Asset
+  leverage: number
+  positionType: PositionType
+  positionValue: BigNumber
+  value: BigNumber
+  collateral: BigNumber
+  openPrice: BigNumber
+  liquidationPrice: BigNumber
+  profitCollateralToken: BigNumber
+  profitLoanToken: BigNumber
+  profitUSD: BigNumber
+  maintenanceMargin: BigNumber
+  isTxCompleted: boolean
+  onTrade: (request: TradeRequest) => void
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void
+  changeLoadingTransaction: (
+    isLoadingTransaction: boolean,
+    request: TradeRequest | ManageCollateralRequest | undefined
+  ) => void
+  onTransactionsCompleted: () => void
+}
+
 interface IInnerOwnTokenGridRowState {
   isLoading: boolean
   isLoadingTransaction: boolean
@@ -111,35 +136,29 @@ export class InnerOwnTokenGridRow extends Component<
   private onAskToOpenProgressDlg = (taskId: string) => {
     if (!this.state.request || taskId !== this.state.request.loanId) return
     this.setState({ ...this.state, isLoadingTransaction: true, resultTx: true })
-    this.props.changeLoadingTransaction(
-      this.state.isLoadingTransaction,
-      this.state.request,
-      false,
-      this.state.resultTx
-    )
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.loanId !== this.state.request.loanId) return
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(async () => {
         await FulcrumProvider.Instance.onTaskCancel(task)
-        this.setState({
+        this._isMounted && this.setState({
           ...this.state,
           isLoadingTransaction: false,
           request: undefined,
           resultTx: false
         })
-        this.props.changeLoadingTransaction(false, undefined, false, false)
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }, 5000)
       return
     }
-    this.setState({ ...this.state, resultTx: true })
-    this.props.changeLoadingTransaction(
-      this.state.isLoadingTransaction,
-      this.state.request,
-      true,
-      true
-    )
+    this._isMounted && this.setState({ ...this.state, resultTx: true })
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
+    const activeTasks = TasksQueue.Instance.getTasksList().filter(
+      (item) => item.status !== RequestStatus.FAILED && item.status !== RequestStatus.FAILED_SKIPGAS
+    ).length
+    if (activeTasks < 2) this.props.onTransactionsCompleted()
   }
 
   // private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
@@ -175,16 +194,11 @@ export class InnerOwnTokenGridRow extends Component<
     prevState: Readonly<IInnerOwnTokenGridRowState>,
     snapshot?: any
   ) {
-    if (this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted) {
+    if (prevProps.isTxCompleted !== this.props.isTxCompleted) {
       await this.derivedUpdate()
       if (this.state.isLoadingTransaction) {
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
-        this.props.changeLoadingTransaction(
-          this.state.isLoadingTransaction,
-          this.state.request,
-          false,
-          this.state.resultTx
-        )
+        this._isMounted && this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }
     }
   }
@@ -197,7 +211,7 @@ export class InnerOwnTokenGridRow extends Component<
     )
     const isLoadingTransaction = task && !task.error ? true : false
     const request = task ? (task.request as TradeRequest | ManageCollateralRequest) : undefined
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isLoadingTransaction,
       request
@@ -422,14 +436,9 @@ export class InnerOwnTokenGridRow extends Component<
       false
     )
 
-    this.setState({ ...this.state, request: request })
+    this._isMounted && this.setState({ ...this.state, request: request })
 
-    this.props.changeLoadingTransaction(
-      this.state.isLoadingTransaction,
-      request,
-      false,
-      this.state.resultTx
-    )
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request)
     this.props.onManageCollateralOpen(request)
   }
 
@@ -446,14 +455,9 @@ export class InnerOwnTokenGridRow extends Component<
       this.props.leverage,
       new BigNumber(0)
     )
-    this.props.changeLoadingTransaction(
-      this.state.isLoadingTransaction,
-      request,
-      false,
-      this.state.resultTx
-    )
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request)
     this.props.onTrade(request)
-    this.setState({ ...this.state, request: request })
+    this._isMounted && this.setState({ ...this.state, request: request })
   }
 
   public onRolloverClick = (event: React.MouseEvent<HTMLElement>) => {

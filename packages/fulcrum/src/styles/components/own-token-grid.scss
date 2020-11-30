@@ -3,17 +3,19 @@ $font-size-header: 12px;
 $font-size-row: 18px;
 $width-col-token-image: 26%;
 $width-col-token-name: 14%;
-$width-col-position-type: 10%;
-$width-col-asset-unit: 10%;
-$width-col-position: 10%;
-$width-col-asset-price: 10%;
-$width-col-liquidation-price: 10%;
-$width-col-collateral: 14%;
-$width-col-position-value: 10%;
+$width-col-position-type: 8%;
+$width-col-asset-unit: 11%;
+$width-col-position: 11%;
+$width-col-asset-price: 11%;
+$width-col-liquidation-price: 11%;
+$width-col-collateral: 12%;
+$width-col-position-value: 11%;
 $width-col-profit: 12%;
 $width-col-actions: 10%;
 $primary-color: #e9f4ff;
 $primary-dark-color: rgba(#444e5a, 0.4);
+$secondary-color: rgba(#e9f4ff, 0.4);
+$secondary-dark-color: rgba(#333c46, 0.4);
 
 @mixin own-token-grid-header__col {
   font-family: 'Muli', sans-serif;
@@ -49,7 +51,7 @@ $primary-dark-color: rgba(#444e5a, 0.4);
     $width-col-position-value
     $width-col-profit
     $width-col-actions;
-  padding: 0 40px 22px 40px;
+  padding: 0 16px 22px 16px;
 }
 
 .own-token-grid-row {
@@ -68,21 +70,53 @@ $primary-dark-color: rgba(#444e5a, 0.4);
     $width-col-actions;
 
   margin-bottom: 20px;
-  align-items: center;
   background-color: $primary-color;
-  padding: 20px 40px;
+  padding: 12px 16px;
   margin-bottom: 2px;
+  min-height: 80px;
 
+  &:hover {
+    background-color: $secondary-color;
+  }
   [data-theme='dark'] & {
     background-color: $primary-dark-color;
+    &:hover {
+      background-color: $secondary-dark-color;
   }
-
+  }
+  > div {
+    line-height: 17px;
+  }
   .sign-currency {
     color: #a2abb8;
     font-weight: 400;
   }
 
-  &__body-header {
+  .value-currency {
+    position: relative;
+  }
+
+  &__col-token-name {
+    display: flex;
+    align-self: center;
+  }
+
+  &__asset {
+    font-size: 12px;
+    color: #8992a4;
+    font-weight: 600;
+  }
+
+  &__line {
+    display: inline-block;
+    height: 18px;
+    width: 1px;
+    vertical-align: -3px;
+    margin: 0 2px;
+    background-color: #8992a4;
+  }
+
+  .body-header {
     display: none;
     align-items: center;
     flex-wrap: wrap;
@@ -93,38 +127,38 @@ $primary-dark-color: rgba(#444e5a, 0.4);
     font-size: 10px;
     line-height: 1.5;
     color: #a2abb8;
-    width: 100%;
   }
 
-  &__col-collateral {
-    display: flex;
-    position: relative;
-  }
   &__col-position-type {
     display: flex;
+    align-self: center;
   }
+
   &__col-asset-collateral-small {
     position: absolute;
     font-size: 12px;
     font-weight: 600;
     // text-indent: 13px;
     color: #a2abb8;
-    bottom: -16px;
+    bottom: -20px;
+    left: 0;
     &.danger {
       color: #ff4f4f;
     }
   }
   &__open-manage-collateral {
     background-color: var(--bg-icon-collateral);
-    width: 26px;
-    height: 26px;
+    width: 20px;
+    height: 20px;
+    padding: 4.5px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     margin-left: 10px;
     position: absolute;
-    left: 70px;
+    top: -2px;
+    right: -27px;
     cursor: pointer;
     .icon-collateral-fill {
       fill: var(--icon-collateral);
@@ -143,13 +177,14 @@ $primary-dark-color: rgba(#444e5a, 0.4);
   }
   &__col-collateral-wrapper {
     display: flex;
-    flex-direction: column;
+    position: relative;
   }
 
   &__col-action {
     display: flex;
     justify-content: flex-end;
     position: relative;
+    align-self: center;
   }
   &_button {
     width: 82px;
@@ -159,7 +194,7 @@ $primary-dark-color: rgba(#444e5a, 0.4);
     justify-content: center;
     font-family: 'Muli', sans-serif;
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 34px;
     font-weight: 700;
     letter-spacing: 0.05em;
     border: 0;
@@ -199,32 +234,56 @@ $primary-dark-color: rgba(#444e5a, 0.4);
 
 @media (max-width: $breakpoint-mobile-max) {
   .own-token-grid {
+    margin-top: -36px;
     padding: 0 15px;
     &-row {
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       grid-auto-flow: column;
       align-items: baseline;
-      padding: 18px 15px 24px;
+      padding: 12px 15px 25px;
       row-gap: 20px;
 
-      &__body-header {
-        display: flex;
+      .body-header {
+        display: inline-block;
+      }
+      &__asset {
+        display: inline-block;
+        font-size: 10px;
+        color: #fff;
       }
       &__col-token-name {
+        align-self: flex-start;
+        display: block;
         order: 0;
+        grid-column-start: 1;
+        grid-column-end: 3;
+        .body-header {
+          display: block;
+      }
       }
       &__col-position {
         order: 1;
+        grid-column-start: 1;
+        grid-column-end: 4;
       }
       &__col-collateral {
-        flex-wrap: wrap;
-        margin-bottom: 16px;
-        order: 2;
+        order: 5;
+        grid-column-start: 4;
+        grid-column-end: 7;
       }
       &__col-position-type {
         flex-wrap: wrap;
         order: 3;
+        align-self: flex-start;
+        justify-content: center;
+
+        padding-top: 11px;
+        grid-column-start: 3;
+        grid-column-end: 5;
+        .body-header {
+          visibility: hidden;
+        }
         .position-type-marker {
           font-size: 10px;
           width: 71px;
@@ -234,46 +293,52 @@ $primary-dark-color: rgba(#444e5a, 0.4);
       }
       &__col-asset-price {
         order: 4;
+        grid-column-start: 1;
+        grid-column-end: 4;
       }
 
       &__col-position-value {
         order: 5;
+        grid-column-start: 1;
+        grid-column-end: 4;
       }
       &__col-action {
-        display: flex;
-        justify-content: flex-start;
         order: 6;
+
+        align-self: baseline;
+        grid-column-start: 5;
+        grid-column-end: 7;
+        align-self: flex-start;
+        padding-top: 11px;
       }
 
       &__col-liquidation-price {
         order: 7;
+        grid-column-start: 4;
+        grid-column-end: 7;
       }
 
       &__col-profit {
         order: 8;
-      }
-      &__col-action {
-        align-self: flex-start;
-        padding-top: 15px;
+        grid-column-start: 4;
+        grid-column-end: 7;
       }
       &__open-manage-collateral {
-        top: 17px;
+        width: 16px;
+        height: 16px;
+        padding: 4px;
+        top: 0;
+        right: -30px;
       }
       &__col-asset-collateral-small {
-        text-indent: 12px;
+        text-indent: 10px;
+        font-size: 10px;
+        bottom: 7px;
+        left: auto;
+        right: -75px;
       }
       &_button {
         font-size: 14px;
-      }
-    }
-  }
-}
-
-@media (max-width: 400px) {
-  .own-token-grid {
-    &-row {
-      &__open-manage-collateral {
-        left: 55px;
       }
     }
   }

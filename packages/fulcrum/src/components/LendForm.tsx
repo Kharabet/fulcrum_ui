@@ -336,7 +336,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               <div
                 title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``}
                 className="lend-form__value">
-                {this.state.interestRate ? `${this.state.interestRate.toFixed(4)}%` : `0.0000%`}
+                {this.state.interestRate ? `${this.state.interestRate.toFixed(2)}%` : `0.00%`}
               </div>
             </div>
 

@@ -2,6 +2,10 @@
   position: relative;
   // overflow: hidden;
 }
+.icon-wrapper svg{
+  height: 40px;
+  width: 40px;
+}
 #chartjs,
 .chartjs,
 .chartjs-back {
