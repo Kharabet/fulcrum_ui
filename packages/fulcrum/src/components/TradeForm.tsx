@@ -16,6 +16,8 @@ import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
+import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
+import '../styles/components/trade-form.scss'
 import { ChiSwitch } from './ChiSwitch'
 import { CollapsibleContainer } from './CollapsibleContainer'
 import { InputAmount } from './InputAmount'
@@ -23,8 +25,6 @@ import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import { TradeExpectedResult } from './TradeExpectedResult'
-import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
-import '../styles/components/trade-form.scss'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -95,11 +95,12 @@ interface ITradeFormState {
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private readonly _inputPrecision = 6
-
+  private readonly _staleDataDelay = 300000
   private readonly _inputChange: Subject<string>
   private readonly _inputSetMax: Subject<BigNumber>
 
   private _isMounted: boolean
+  private _timer: any
 
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context)
@@ -108,6 +109,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const liquidationPrice = new BigNumber(0)
     const exposureValue = new BigNumber(0)
     this._isMounted = false
+
     this.state = {
       assetDetails: assetDetails || null,
       depositToken: props.baseToken,
@@ -278,7 +280,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   public componentWillUnmount(): void {
     this._isMounted = false
-
+    clearTimeout(this._timer)
     window.history.pushState(null, 'Trade Modal Closed', `/trade`)
     FulcrumProvider.Instance.eventEmitter.removeListener(
       FulcrumProviderEvents.ProviderChanged,
@@ -302,8 +304,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     } else {
       this.rxFromCurrentAmount('0')
     }
-
-    window.setTimeout(() => this.setState({ ...this.state, isExpired: true }), 300000)
+    this._timer = window.setTimeout(() => this.setState({ isExpired: true }), this._staleDataDelay)
   }
 
   private async setSlippageRate(tradeAmount: BigNumber) {
@@ -412,6 +413,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           : ''
       submitButtonText = `CLOSE`
     }
+    if (this.state.isExpired) {
+      amountMsg = 'Price has changed'
+    }
+
     if (this.state.exposureValue.gt(0)) {
       submitButtonText += ` ${this.formatPrecision(this.state.exposureValue.toNumber())} ${
         this.props.baseToken
@@ -507,7 +512,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           <div className="trade-form__actions-container">
             {this.state.isExpired ? (
               <button onClick={this.onUpdateClick} className={`trade-form__submit-button update`}>
-                Update
+                Update Price
               </button>
             ) : (
               <button
@@ -645,17 +650,18 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   public onUpdateClick = async (event: any) => {
     event.preventDefault()
+    clearTimeout(this._timer)
 
-    this._isMounted && this.setState({ ...this.state, isLoading:true, isExpired: false })      
-    await this.setSlippageRate(this.state.tradeAmountValue)  
-    await this.setDepositTokenBalance(this.state.depositToken)    
+    this._isMounted && this.setState({ isLoading: true, isExpired: false })
+    await this.setSlippageRate(this.state.tradeAmountValue)
+    await this.setDepositTokenBalance(this.state.depositToken)
     if (this.props.tradeType === TradeType.SELL) {
       await this.getLoanCloseAmount(this.state.returnedAsset)
     }
     await this.derivedUpdate()
-    window.setTimeout(
-      () => this._isMounted && this.setState({ ...this.state, isExpired: true }),
-      300000
+    this._timer = window.setTimeout(
+      () => this._isMounted && this.setState({ isExpired: true }),
+      this._staleDataDelay
     )
   }
 
