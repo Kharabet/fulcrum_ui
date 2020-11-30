@@ -275,7 +275,13 @@
         background-color: #5b88ff;
       }
     }
-
+    &.update {
+      z-index: 2;
+      background-color: #00c0ab;
+      &:hover {
+        background-color: #33dfcc;
+      }
+    }
     &--sell {
       background-color: #ff5353;
       &:hover {
@@ -330,6 +336,11 @@
       &:focus {
         outline: none;
       }
+    }
+  }
+  .expired {
+    .input-receive__input {
+      color: #495460;
     }
   }
 }

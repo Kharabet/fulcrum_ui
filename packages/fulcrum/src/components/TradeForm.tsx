@@ -89,6 +89,8 @@ interface ITradeFormState {
   returnedAsset: Asset
   returnedAmount: BigNumber
   returnTokenIsCollateral: boolean
+
+  isExpired: boolean
 }
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -127,7 +129,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       baseTokenPrice: new BigNumber(0),
       returnedAsset: props.baseToken,
       returnedAmount: new BigNumber(0),
-      returnTokenIsCollateral: props.positionType === PositionType.LONG ? true : false
+      returnTokenIsCollateral: props.positionType === PositionType.LONG ? true : false,
+      isExpired: false
     }
 
     this._inputChange = new Subject()
@@ -213,12 +216,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? this.props.loan.loanData.maintenanceMargin
         : this.props.positionType === PositionType.LONG
         ? await FulcrumProvider.Instance.getMaintenanceMargin(
-          this.props.baseToken,
-          this.props.quoteToken
+            this.props.baseToken,
+            this.props.quoteToken
           )
         : await FulcrumProvider.Instance.getMaintenanceMargin(
-          this.props.quoteToken,
-          this.props.baseToken
+            this.props.quoteToken,
+            this.props.baseToken
           )
     // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     // if it's a SHORT then -> 10^36 / above
@@ -299,6 +302,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     } else {
       this.rxFromCurrentAmount('0')
     }
+
+    window.setTimeout(() => this.setState({ ...this.state, isExpired: true }), 300000)
   }
 
   private async setSlippageRate(tradeAmount: BigNumber) {
@@ -442,7 +447,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         <div
           className={`trade-form__form-container ${
             this.props.tradeType === TradeType.BUY ? 'buy' : 'sell'
-          }`}>
+          }${this.state.isExpired ? ' expired' : ''}`}>
           <div className="trade-form__form-values-container">
             {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult
@@ -500,21 +505,27 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           </div>
           <ChiSwitch />
           <div className="trade-form__actions-container">
-            <button
-              title={
-                this.state.exposureValue.gt(0)
-                  ? `${this.state.exposureValue.toFixed(18)} ${this.props.baseToken}`
-                  : ``
-              }
-              type="submit"
-              disabled={!canSubmit}
-              className={`trade-form__submit-button ${submitClassName}`}>
-              {this.state.isExposureLoading || this.state.isLoading ? (
-                <Preloader width="75px" />
-              ) : (
-                submitButtonText
-              )}
-            </button>
+            {this.state.isExpired ? (
+              <button onClick={this.onUpdateClick} className={`trade-form__submit-button update`}>
+                Update
+              </button>
+            ) : (
+              <button
+                title={
+                  this.state.exposureValue.gt(0)
+                    ? `${this.state.exposureValue.toFixed(18)} ${this.props.baseToken}`
+                    : ``
+                }
+                type="submit"
+                disabled={!canSubmit}
+                className={`trade-form__submit-button ${submitClassName}`}>
+                {this.state.isExposureLoading || this.state.isLoading ? (
+                  <Preloader width="75px" />
+                ) : (
+                  submitButtonText
+                )}
+              </button>
+            )}
           </div>
           {this.props.tradeType === TradeType.BUY ? (
             <div className="trade-how-it-works-container">
@@ -630,6 +641,22 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.setState({ ...this.state, depositToken: asset }, () => {
         this.onInsertMaxValue(1)
       })
+  }
+
+  public onUpdateClick = async (event: any) => {
+    event.preventDefault()
+
+    this._isMounted && this.setState({ ...this.state, isLoading:true, isExpired: false })      
+    await this.setSlippageRate(this.state.tradeAmountValue)  
+    await this.setDepositTokenBalance(this.state.depositToken)    
+    if (this.props.tradeType === TradeType.SELL) {
+      await this.getLoanCloseAmount(this.state.returnedAsset)
+    }
+    await this.derivedUpdate()
+    window.setTimeout(
+      () => this._isMounted && this.setState({ ...this.state, isExpired: true }),
+      300000
+    )
   }
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
