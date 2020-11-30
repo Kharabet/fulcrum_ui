@@ -173,7 +173,8 @@ export class BorrowedFundsListItem extends Component<
   }
 
   public render() {
-    if (!this.state.assetDetails) {
+    const loanData = this.state.borrowedFundsItem.loanData
+    if (!this.state.assetDetails || !loanData) {
       return null
     }
 
@@ -185,24 +186,22 @@ export class BorrowedFundsListItem extends Component<
 
     // const firstInRowModifier = this.props.firstInTheRow ? "borrowed-funds-list-item--first-in-row" : "";
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
-    const maintenanceMargin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber()
-    const startMargin = borrowedFundsItem.loanData!.startMargin.div(10 ** 18).toNumber()
+    const maintenanceMargin = loanData.maintenanceMargin.div(10 ** 18).toNumber()
+    const startMargin = loanData.startMargin.div(10 ** 18).toNumber()
     // 115%
-    const sliderMin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber()
+    const sliderMin = loanData.maintenanceMargin.div(10 ** 18).toNumber()
     // 300%
     const sliderMax = sliderMin + 185
     const isUnhealthyLoan = this.state.borrowedFundsItem.collateralizedPercent
       .times(100)
       .plus(100)
       .lt(maintenanceMargin)
-    const isBoorowMoreDisabled = this.state.borrowedFundsItem.collateralizedPercent
+    const isBorrowMoreDisabled = this.state.borrowedFundsItem.collateralizedPercent
       .times(100)
       .plus(100)
       .lt(startMargin)
-    const loanData = this.state.borrowedFundsItem.loanData
-    const remainingDays = loanData
-      ? loanData.interestDepositRemaining.dividedToIntegerBy(loanData.interestOwedPerDay)
-      : new BigNumber(0)
+
+    const remainingDays = loanData.interestDepositRemaining.div(loanData.interestOwedPerDay)
     const isRollover = remainingDays.eq(0)
     let sliderValue = borrowedFundsItem.collateralizedPercent.multipliedBy(100).toNumber()
     if (sliderValue > sliderMax) {
@@ -237,7 +236,7 @@ export class BorrowedFundsListItem extends Component<
             </div>
           </div>
           <div className="borrowed-funds-list-item__header-asset">
-            <div className="borrowed-funds-list-item__header-asset-img">
+            <div title={borrowedFundsItem.loanId} className="borrowed-funds-list-item__header-asset-img">
               <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
             </div>
             <div className="borrowed-funds-list-item__header-asset-name">
@@ -311,17 +310,19 @@ export class BorrowedFundsListItem extends Component<
             </button>
 
             <div className="borrowed-funds-list-item__extend">
-              <div
-                className={`remaining ${
-                  isRollover ? `danger` : remainingDays.lt(5) ? `warning` : ``
-                }`}>
-                {isRollover ? `Warning` : `${remainingDays.toFixed()} days`}
-                <IconInfo
-                  className="tooltip__icon"
-                  data-tip="Price feeds are provided securely via Chainlink, trades are executed via Kyber. This can result in minor price variations when opening and closing positions."
-                />
-                <ReactTooltip className="tooltip__info" place="top" effect="solid" />
-              </div>
+              {remainingDays.lte(6) && (
+                <div
+                  className={`remaining ${
+                    isRollover ? `danger` : remainingDays.lte(3) ? `warning` : ``
+                  }`}>
+                  {isRollover ? `Warning` : `${remainingDays.toFixed(0, 1)} days`}
+                  <IconInfo
+                    className="tooltip__icon"
+                    data-tip="Your loan is required to front more interest payments, this will come from your collateral."
+                  />
+                  <ReactTooltip className="tooltip__info" place="top" effect="solid" />
+                </div>
+              )}
               {isRollover ? (
                 <button className="rollover" onClick={this.onRollover}>
                   Rollover
@@ -341,8 +342,8 @@ export class BorrowedFundsListItem extends Component<
               </button>*/}
             <button
               className=""
-              title={isBoorowMoreDisabled ? 'Collateral too low' : ''}
-              disabled={isBoorowMoreDisabled}
+              title={isBorrowMoreDisabled ? 'Collateral too low' : ''}
+              disabled={isBorrowMoreDisabled}
               onClick={this.onBorrowMore}>
               Borrow More
             </button>
