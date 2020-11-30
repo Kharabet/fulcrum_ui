@@ -110,5 +110,21 @@ export const iTokens = [
     displayName: 'AAVE',
     iTokenName: 'iAAVE',
     decimals: 18
+  },
+  {
+    name: 'lrc',
+    address: '0x3da0e01472dee3746b4d324a65d7edfaeca9aa4f',
+    erc20Address: '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd',
+    displayName: 'LRC',
+    iTokenName: 'iLRC',
+    decimals: 18
+  },
+  {
+    name: 'comp',
+    address: '0x6d29903bc2c4318b59b35d97ab98ab9ec08ed70d',
+    erc20Address: '0xc00e94cb662c3520282e6f5717214004a7f26888',
+    displayName: 'COMP',
+    iTokenName: 'iCOMP',
+    decimals: 18
   }
 ]

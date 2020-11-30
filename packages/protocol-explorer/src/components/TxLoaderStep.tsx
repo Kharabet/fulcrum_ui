@@ -107,7 +107,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
           errorMsg.includes(`always failing transaction`)
         ) {
           errorMsg =
-            'The transaction seems like it will fail. Change request parameters and try agian, please.' //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
+            'The transaction seems like it will fail. Change request parameters and try again, please.' //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
         } else if (errorMsg.includes('Reverted by EVM')) {
           errorMsg = 'The transaction failed. Reverted by EVM' //. Etherscan link:";
         } else if (errorMsg.includes('MetaMask Tx Signature: User denied transaction signature.')) {

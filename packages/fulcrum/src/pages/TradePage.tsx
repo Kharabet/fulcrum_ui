@@ -91,7 +91,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         // Asset.LEND,
         Asset.KNC,
         Asset.UNI,
-        Asset.AAVE
+        Asset.AAVE,
+        Asset.LRC,
+        Asset.COMP
       ]
       this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT]
     }

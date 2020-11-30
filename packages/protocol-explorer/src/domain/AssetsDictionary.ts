@@ -3,14 +3,15 @@ import { AssetDetails } from './AssetDetails'
 
 import { ReactComponent as AAVE } from '../assets/images/token-aave.svg'
 import { ReactComponent as BAT } from '../assets/images/token-bat.svg'
-import { ReactComponent as WBTC } from '../assets/images/token-btc.svg'
 import { ReactComponent as BZRX } from '../assets/images/token-bzrx.svg'
+import { ReactComponent as COMP } from '../assets/images/ic_token_comp.svg'
 import { ReactComponent as CHI } from '../assets/images/token-chi.svg'
 import { ReactComponent as DAI } from '../assets/images/token-dai.svg'
 import { ReactComponent as ETH } from '../assets/images/token-eth.svg'
 import { ReactComponent as KNC } from '../assets/images/token-knc.svg'
 import { ReactComponent as LEND } from '../assets/images/token-lend.svg'
 import { ReactComponent as LINK } from '../assets/images/token-link.svg'
+import { ReactComponent as LRC } from '../assets/images/ic_token_lrc.svg'
 import { ReactComponent as MKR } from '../assets/images/token-mkr.svg'
 import { ReactComponent as REP } from '../assets/images/token-rep.svg'
 import { ReactComponent as SAI } from '../assets/images/token-sai.svg'
@@ -18,6 +19,7 @@ import { ReactComponent as SUSD } from '../assets/images/token-susd.svg'
 import { ReactComponent as UNI } from '../assets/images/token-uni.svg'
 import { ReactComponent as USDC } from '../assets/images/token-usdc.svg'
 import { ReactComponent as USDT } from '../assets/images/token-usdt.svg'
+import { ReactComponent as WBTC } from '../assets/images/token-btc.svg'
 import { ReactComponent as WETH } from '../assets/images/token-weth.svg'
 import { ReactComponent as YFI } from '../assets/images/token-yfi.svg'
 import { ReactComponent as ZRX } from '../assets/images/token-zrx.svg'
@@ -356,6 +358,34 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x0000000000004946c0e9f43f4dee607b0ef1fa1c'],
           [42, '0x0000000000004946c0e9f43f4dee607b0ef1fa1c']
+        ])
+      )
+    ],
+    [
+      Asset.LRC,
+      new AssetDetails(
+        'LRC',
+        'LRC',
+        LRC,
+        18,
+        new Map<number, string | null>([
+          [1, '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd'],
+          [3, ''],
+          [42, '']
+        ])
+      )
+    ],
+    [
+      Asset.COMP,
+      new AssetDetails(
+        'COMP',
+        'COMP',
+        COMP,
+        18,
+        new Map<number, string | null>([
+          [1, '0xc00e94cb662c3520282e6f5717214004a7f26888'],
+          [3, ''],
+          [42, '']
         ])
       )
     ]

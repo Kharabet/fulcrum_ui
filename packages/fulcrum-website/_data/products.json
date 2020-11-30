@@ -64,5 +64,17 @@
     "visibilityApr": true,
     "visibilityEarn": true,
     "visibilityChart": false
+  },
+  {
+    "name": "comp",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": false
+  },
+  {
+    "name": "lrc",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": false
   }
 ]

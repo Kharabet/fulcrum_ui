@@ -96,8 +96,8 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        {asset.reactLogoSvg.render()} 
-        {props.selectedOption.baseToken} - {props.selectedOption.quoteToken}
+        {asset.reactLogoSvg.render()}
+        {props.selectedOption.baseToken}/{props.selectedOption.quoteToken}
       </div>
       <ul className="select-options">
         <div className="select-options__search">
@@ -123,7 +123,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
               key={i}
               onClick={onLiClick}>
               {AssetsDictionary.assets.get(option.baseToken)!.reactLogoSvg.render()}
-              {option.baseToken}-{option.quoteToken}
+              {option.baseToken}/{option.quoteToken}
             </li>
           ))}
         </SimpleBar>

@@ -1,4 +1,4 @@
-export const mainnetAddress = '0xaaA601aE20077F9fae80494DDC36BB39C952c2d0'
+export const mainnetAddress = '0x5AbC9e082Bf6e4F930Bbc79742DA3f6259c4aD1d'
 
 export const oracleJson = {
   contractName: 'PriceFeeds',
