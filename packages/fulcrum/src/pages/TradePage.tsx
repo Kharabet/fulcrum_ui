@@ -741,6 +741,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       return null
     }
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory()
+    const rolloverEvents = await FulcrumProvider.Instance.getRolloverHistory()
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory()
     const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory()
     const depositCollateralEvents = await FulcrumProvider.Instance.getDepositCollateralHistory()
@@ -773,6 +774,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // TODO: remove ts-ignore
     // @ts-ignore
     const events = tradeEvents
+      // @ts-ignore
+      .concat(rolloverEvents)
       // @ts-ignore
       .concat(closeWithSwapEvents)
       // @ts-ignore

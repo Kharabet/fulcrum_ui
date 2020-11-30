@@ -48,6 +48,7 @@ import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
 import { ILoanParams } from '../domain/ILoanParams'
 import { RolloverRequest } from '../domain/RolloverRequest'
+import { RolloverEvent } from '../domain/events/RolloverEvent'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -2333,6 +2334,65 @@ export class FulcrumProvider {
           entryPrice,
           entryLeverage,
           currentLeverage,
+          timeStamp,
+          txHash
+        )
+      })
+      .filter((e: any) => e)
+    return result
+  }
+
+  public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
+    let result: RolloverEvent[] = []
+    const account = this.getCurrentAccount()
+
+    if (!this.contractsSource) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api
+    let etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      RolloverEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+
+    const rolloverEventResponse = await fetch(etherscanApiUrl)
+    const rolloverEventResponseJson = await rolloverEventResponse.json()
+    if (rolloverEventResponseJson.status !== '1') return result
+    const events = rolloverEventResponseJson.result
+    result = events
+      .reverse()
+      .map((event: any) => {
+        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+        const caller = event.topics[2].replace('0x000000000000000000000000', '0x')
+        const loandId = event.topics[3]
+        const data = event.data.replace('0x', '')
+        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+        if (!dataSegments) return result
+        const lender = dataSegments[0].replace('000000000000000000000000', '0x')
+        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+        const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
+
+        const collateralAmountUsed = new BigNumber(parseInt(dataSegments[3], 16))
+        const interestAmountAdded = new BigNumber(parseInt(dataSegments[4], 16))
+        const loanEndTimestamp = new Date(parseInt(dataSegments[5], 16) * 1000)
+        const gasRebate = new BigNumber(parseInt(dataSegments[6], 16))
+        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
+        const txHash = event.transactionHash
+        return new RolloverEvent(
+          userAddress,
+          caller,
+          loandId,
+          lender,
+          loanToken,
+          collateralToken,
+          collateralAmountUsed,
+          interestAmountAdded,
+          loanEndTimestamp,
+          gasRebate,
           timeStamp,
           txHash
         )
