@@ -113,7 +113,8 @@ export class ExplorerProvider {
         Asset.UNI,
         Asset.AAVE,
         Asset.LRC,
-        Asset.COMP
+        Asset.COMP,
+        Asset.BNB
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]

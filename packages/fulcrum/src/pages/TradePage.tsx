@@ -93,7 +93,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.UNI,
         Asset.AAVE,
         Asset.LRC,
-        Asset.COMP
+        Asset.COMP,
+        Asset.BNB
       ]
       this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT]
     }
@@ -174,16 +175,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       await this.getInnerOwnRowsData(this.state)
     }
     if (
-      (prevState.isTxCompleted !== this.state.isTxCompleted) ||
+      prevState.isTxCompleted !== this.state.isTxCompleted ||
       prevProps.isMobileMedia !== this.props.isMobileMedia
-    ) {      
+    ) {
       await this.getTokenRowsData(this.state)
       await this.getInnerOwnRowsData(this.state)
       await this.getOwnRowsData(this.state).then(() => {
         this.setState({
           ...this.state,
           historyEvents: undefined,
-          historyRowsData:[]
+          historyRowsData: []
         })
       })
     }
@@ -666,7 +667,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ownRowsData.push(ownRowDataProps)
     }
 
-  
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,

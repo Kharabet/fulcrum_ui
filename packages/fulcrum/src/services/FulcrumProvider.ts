@@ -130,7 +130,8 @@ export class FulcrumProvider {
         Asset.UNI,
         Asset.AAVE,
         Asset.LRC,
-        Asset.COMP
+        Asset.COMP,
+        Asset.BNB
       ]
     }
     // singleton
@@ -1712,36 +1713,35 @@ export class FulcrumProvider {
         )
 
         const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-        
+
         try {
-        //@ts-ignore
-        result =
-          isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
-            ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
-                request.loanId,
-                account,
-                account,
-                amountInBaseUnits,
-                request.returnTokenIsCollateral, // returnTokenIsCollateral
-                request.loanDataBytes,
-                {
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-            : await iBZxContract.closeWithSwap.callAsync(
-                request.loanId,
-                account,
-                amountInBaseUnits,
-                request.returnTokenIsCollateral, // returnTokenIsCollateral
-                request.loanDataBytes,
-                {
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-        }
-        catch (e){
+          //@ts-ignore
+          result =
+            isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
+              ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
+                  request.loanId,
+                  account,
+                  account,
+                  amountInBaseUnits,
+                  request.returnTokenIsCollateral, // returnTokenIsCollateral
+                  request.loanDataBytes,
+                  {
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit
+                  }
+                )
+              : await iBZxContract.closeWithSwap.callAsync(
+                  request.loanId,
+                  account,
+                  amountInBaseUnits,
+                  request.returnTokenIsCollateral, // returnTokenIsCollateral
+                  request.loanDataBytes,
+                  {
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit
+                  }
+                )
+        } catch (e) {
           console.log(e)
         }
         console.log(result)

@@ -76,7 +76,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         { token: Asset.UNI, color: '#FFE1EF' },
         { token: Asset.AAVE, color: '#2EBAC6' },
         { token: Asset.LRC, color: '#1E61FF' },
-        { token: Asset.COMP, color: '#00F9B0' }
+        { token: Asset.COMP, color: '#00F9B0' },
+        { token: Asset.BNB, color: '#FFC944' }
       ]
     }
 
@@ -230,7 +231,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18
         const collateralAssetDecimals =
           AssetsDictionary.assets.get(e.collateralToken)!.decimals || 18
-         
+
         let swapToUSDPrice = this.stablecoins.includes(e.loanToken)
           ? new BigNumber(1)
           : new BigNumber(10 ** 18)

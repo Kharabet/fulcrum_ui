@@ -205,6 +205,9 @@ export class ContractsSource {
           case '0x0000000000004946c0e9f43f4dee607b0ef1fa1c':
             asset = Asset.CHI
             break
+          case '0xB8c77482e45F1F44dE1745F52C74426C631bDD52':
+            asset = Asset.BNB
+            break
         }
         break
       case 3:
@@ -321,6 +324,9 @@ export class ContractsSource {
             break
           case Asset.COMP:
             address = '0xc00e94cb662c3520282e6f5717214004a7f26888'
+            break
+          case Asset.BNB:
+            address = '0xB8c77482e45F1F44dE1745F52C74426C631bDD52'
             break
         }
         break
