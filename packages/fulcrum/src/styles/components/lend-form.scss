@@ -149,11 +149,10 @@
   &--no-color,
   &.lend-estimate {
     color: #a2abb8;
-    span {
-      .expired & {
-        color: #323942;
-      }
+    .expired & {
+        visibility: hidden;
     }
+    
   }
 }
 

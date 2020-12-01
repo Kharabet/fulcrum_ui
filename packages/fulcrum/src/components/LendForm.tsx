@@ -413,7 +413,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                     href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
                     target="_blank"
                     rel="noopener noreferrer">
-                    <span>{lendedAmountEstimateText}</span> {tokenNameDestination}
+                    {lendedAmountEstimateText} {tokenNameDestination}
                   </a>
                 ) : (
                   <React.Fragment>
