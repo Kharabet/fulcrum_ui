@@ -64,7 +64,8 @@ export interface ITradeFormProps {
 interface ITradeFormState {
   assetDetails: AssetDetails | null
   depositToken: Asset
-  interestRate: BigNumber
+  interestRate: BigNumber  
+  leverage: number
 
   inputAmountText: string
   inputAmountValue: BigNumber
@@ -94,8 +95,8 @@ interface ITradeFormState {
   minValue: number
   maxValue: number
   selectedValue: number
-  collateralValue: string
-  defaultCollateral: number
+  collateralizedPercent: string
+  defaultCollateralizedPercent: number
 }
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -117,6 +118,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       assetDetails: assetDetails || null,
       depositToken: props.baseToken,
       inputAmountText: '',
+      leverage: this.props.leverage,
       inputAmountValue: maxTradeValue,
       tradeAmountValue: maxTradeValue,
       maxTradeValue: maxTradeValue,
@@ -137,10 +139,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       returnTokenIsCollateral: props.positionType === PositionType.LONG ? true : false,
       isEdit: false,
       minValue: 30,
-      maxValue: 200,
+      maxValue: 1000,
       selectedValue: 0,
-      defaultCollateral: 0,
-      collateralValue: ''
+      defaultCollateralizedPercent: 0,
+      collateralizedPercent: ''
     }
 
     this._inputChange = new Subject()
@@ -208,7 +210,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.quoteToken,
       this.state.depositToken,
       this.props.positionType,
-      this.props.leverage,
+      this.state.leverage,
       this.state.tradeAmountValue,
       this.state.returnTokenIsCollateral
     )
@@ -327,8 +329,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.positionType === PositionType.LONG ? this.props.quoteToken : this.props.baseToken
     const tradeAmountInLoanToken =
       this.state.depositToken === srcToken
-        ? tradeAmount.times(this.props.leverage)
-        : tradeAmount.times(this.state.collateralToPrincipalRate).times(this.props.leverage)
+        ? tradeAmount.times(this.state.leverage)
+        : tradeAmount.times(this.state.collateralToPrincipalRate).times(this.state.leverage)
     const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(
       srcToken,
       destToken,
@@ -450,7 +452,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 <div className="trade-form__info_block__stats__data">
                   {`${this.state.interestRate.toFixed(1)}%`} APR
                 </div>
-                <div className="trade-form__info_block__stats__data">{`${this.props.leverage.toString()}x`}</div>
+                <div className="trade-form__info_block__stats__data">{`${Number(this.state.leverage.toFixed(2))}x`}</div>
               </div>
             </div>
           </div>
@@ -526,20 +528,20 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                           type="number"
                           step="any"
                           placeholder={`Enter`}
-                          value={this.state.collateralValue}
+                          value={this.state.collateralizedPercent}
                           className="input-collateral"
                           onChange={this.onCollateralAmountChange}
                         />
                       </div>
                     </React.Fragment>
-                  ) : this.state.collateralValue === '' ? (
+                  ) : this.state.collateralizedPercent === '' ? (
                     <div className="loader-container">
                       <Preloader width="75px" />
                     </div>
                   ) : (
                     <React.Fragment>
                       <span>
-                        {this.state.collateralValue}
+                        {this.state.collateralizedPercent}
                         <span className="sign">%</span>
                       </span>
                       <div className="edit-icon-collateral" onClick={this.editInput}>
@@ -581,7 +583,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                     <QuestionIcon />
                   </div>
                   <div className="hiw-content">
-                    You are opening {this.props.leverage}x {this.props.positionType}{' '}
+                    You are opening {this.state.leverage}x {this.props.positionType}{' '}
                     {this.state.assetDetails.displayName} position. This will borrow{' '}
                     {this.props.positionType === PositionType.LONG
                       ? this.props.quoteToken
@@ -651,7 +653,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.quoteToken,
       this.state.depositToken,
       this.props.positionType,
-      this.props.leverage,
+      this.state.leverage,
       this.state.tradeAmountValue,
       returnTokenIsCollateral
     )
@@ -711,14 +713,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           transactionProducts: [
             {
               name:
-                this.props.leverage +
+                this.state.leverage +
                 'x' +
                 this.props.baseToken +
                 '-' +
                 this.props.positionType +
                 '-' +
                 this.props.quoteToken,
-              sku: this.props.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType,
+              sku: this.state.leverage + 'x' + this.props.baseToken + '-' + this.props.positionType,
               category: this.props.positionType,
               price: new BigNumber(usdPrice).toNumber(),
               quantity: 1
@@ -729,12 +731,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       TagManager.dataLayer(tagManagerArgs)
     }
 
-    const collaterizationProportion =  this.state.selectedValue / this.state.defaultCollateral
-    const leverage =
-      this.props.tradeType === TradeType.SELL &&
-      this.state.selectedValue === this.state.defaultCollateral
-        ? this.props.leverage
-        : this.props.leverage * collaterizationProportion
+    // const leverage =
+    //   this.props.tradeType === TradeType.SELL &&
+    //   this.state.selectedValue === this.state.defaultCollateralizedPercent
+    //     ? this.props.leverage
+    //     : 100 / this.state.selectedValue + (this.props.positionType === PositionType.LONG ? 1 : 0)
 
     this.props.onSubmit(
       new TradeRequest(
@@ -745,7 +746,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.props.quoteToken,
         this.state.depositToken,
         this.props.positionType,
-        leverage,
+        this.state.leverage,
         this.state.tradeAmountValue,
         this.state.returnTokenIsCollateral
       )
@@ -800,6 +801,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     limitedAmount: IInputAmountLimited,
     maxTradeValue: BigNumber
   ): Promise<ITradeAmountChangeEvent | null> => {
+
     if (limitedAmount.tradeAmountValue.isNaN()) return null
     const tradeRequest = new TradeRequest(
       this.props.loan?.loanId ||
@@ -809,7 +811,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.quoteToken,
       this.state.depositToken,
       this.props.positionType,
-      this.props.leverage,
+      this.state.leverage,
       limitedAmount.tradeAmountValue,
       this.state.returnTokenIsCollateral
     )
@@ -823,8 +825,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.setState({ ...this.state, interestRate })
 
       expectedValue = exposureValue
-        .times(this.state.selectedValue)
-        .div(this.state.defaultCollateral)
     }
 
     return {
@@ -843,16 +843,16 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     )
 
     const minValue: BigNumber = maintenanceMargin.div(10 ** 18)
-    const defaultCollateral: BigNumber = new BigNumber(100).div(
+    const defaultCollateralizedPercent: BigNumber = new BigNumber(100).div(
       this.props.leverage - (this.props.positionType === PositionType.LONG ? 1 : 0)
     )
 
     this.setState({
       ...this.state,
       minValue: minValue.toNumber(),
-      selectedValue: defaultCollateral.toNumber(),
-      collateralValue: defaultCollateral.toFixed(2),
-      defaultCollateral: defaultCollateral.toNumber()
+      selectedValue: defaultCollateralizedPercent.toNumber(),
+      collateralizedPercent: defaultCollateralizedPercent.toFixed(2),
+      defaultCollateralizedPercent: defaultCollateralizedPercent.toNumber()
     })
   }
 
@@ -959,27 +959,27 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   public onCollateralAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
     const inputCollateralText = event.target.value ? event.target.value : ''
-    const inputCollateralValue = Number(inputCollateralText)
+    const inputcollateralizedPercent = Number(inputCollateralText)
 
     if (parseFloat(inputCollateralText) < 0) return
 
-    if (this.state.minValue > inputCollateralValue) {
+    if (this.state.minValue > inputcollateralizedPercent) {
       this.setState({
         ...this.state,
-        collateralValue: inputCollateralText,
+        collateralizedPercent: inputCollateralText,
         selectedValue: this.state.minValue
       })
-    } else if (inputCollateralValue > this.state.maxValue) {
+    } else if (inputcollateralizedPercent > this.state.maxValue) {
       this.setState({
         ...this.state,
-        collateralValue: inputCollateralText,
+        collateralizedPercent: inputCollateralText,
         selectedValue: this.state.maxValue
       })
     } else {
       this.setState({
         ...this.state,
-        collateralValue: inputCollateralText,
-        selectedValue: inputCollateralValue
+        collateralizedPercent: inputCollateralText,
+        selectedValue: inputcollateralizedPercent
       })
     }
   }
@@ -992,17 +992,22 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     if (this.state.isEdit && (event.target as Element).className !== 'input-collateral') {
       this.setState({ ...this.state, isEdit: false })
 
-      const collateralValue =
-        this.state.minValue > Number(this.state.collateralValue)
+      const collateralizedPercent =
+        this.state.minValue > Number(this.state.collateralizedPercent)
           ? this.state.minValue.toFixed(2)
-          : Number(this.state.collateralValue) > this.state.maxValue
+          : Number(this.state.collateralizedPercent) > this.state.maxValue
           ? this.state.maxValue.toFixed(2)
           : this.state.selectedValue.toFixed(2)
 
-      this._collateralChange.next(collateralValue)
+       const leverage = this.props.tradeType === TradeType.SELL &&
+          this.state.selectedValue === this.state.defaultCollateralizedPercent
+            ? this.props.leverage
+            : 100 / this.state.selectedValue + (this.props.positionType === PositionType.LONG ? 1 : 0)
+      this._collateralChange.next(collateralizedPercent)
       this.setState({
         ...this.state,
-        collateralValue,
+        collateralizedPercent,
+        leverage,
         isEdit: false
       })
     }
