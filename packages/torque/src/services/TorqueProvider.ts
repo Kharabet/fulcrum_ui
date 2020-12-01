@@ -2269,6 +2269,25 @@ export class TorqueProvider {
     return result
   }
 
+  
+  public getAvailableLiquidaity = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0)
+
+    if (this.contractsSource && this.web3Wrapper) {
+      const iTokenContract = await this.contractsSource.getiTokenContract(asset)
+      if (iTokenContract) {
+        const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
+        const totalAssetSupply = await iTokenContract.totalAssetSupply.callAsync()
+        const totalAssetBorrow = await iTokenContract.totalAssetBorrow.callAsync()
+
+        const marketLiquidity = totalAssetSupply.minus(totalAssetBorrow)
+        result = marketLiquidity.div(10 ** decimals);
+      }
+    }
+
+    return result
+  }
+
   public getErc20AddressOfAsset(asset: Asset): string | null {
     let result: string | null = null
 
