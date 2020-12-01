@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { RequestTask } from '../domain/RequestTask'
 import { TasksQueueEvents } from '../services/events/TasksQueueEvents'
-import { TasksQueue } from '../services/TasksQueue'
 import { FulcrumProvider } from '../services/FulcrumProvider'
+import { TasksQueue } from '../services/TasksQueue'
 
 export interface ITitle {
   message: string
@@ -62,8 +62,10 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       prevState.requestTask &&
       this.state.requestTask &&
       this.getTitle(prevState.requestTask) === this.getTitle(this.state.requestTask)
-    )
+    ) {
       return
+    }
+
     div.classList.remove('animation-out')
     div.classList.remove('animation-in')
     div.classList.add('animation-in')
@@ -83,7 +85,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
 
   public getTitle = (requestTask: RequestTask | undefined) => {
     if (requestTask === undefined) return null
-    let title = requestTask.steps.find((s, i) => i + 1 === requestTask!.stepCurrent)
+    let title = requestTask.steps.find((s, i) => i + 1 === requestTask.stepCurrent)
     if (!title) title = requestTask.status
 
     let errorMsg = ''
@@ -102,9 +104,9 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
           errorMsg.includes(`always failing transaction`)
         ) {
           errorMsg =
-            'The transaction seems like it will fail. Change request parameters and try agian, please.' //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
+            'The transaction seems like it will fail. Change request parameters and try again, please.' // The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
         } else if (errorMsg.includes('Reverted by EVM')) {
-          errorMsg = 'The transaction failed. Reverted by EVM' //. Etherscan link:";
+          errorMsg = 'The transaction failed. Reverted by EVM' // Etherscan link:";
         } else if (errorMsg.includes('MetaMask Tx Signature: User denied transaction signature.')) {
           errorMsg = "You didn't confirm in MetaMask. Please try again."
         } else if (errorMsg.includes('User denied account authorization.')) {
@@ -127,8 +129,8 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       <React.Fragment>
         {this.state.requestTask && this.state.requestTask.txHash ? (
           <a
-            href={`${FulcrumProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${
-              this.state.requestTask!.txHash
+            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${
+              this.state.requestTask.txHash
             }`}
             target="_blank"
             rel="noopener noreferrer">
@@ -153,7 +155,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
     const taskList = TasksQueue.Instance.getTasksList()
     const task = taskList.find((t) => t.request.id === this.props.taskId)
     let title = this.getTitle(task)
-    if (!title && this.state.requestTask?.status == 'Done') {
+    if (!title && this.state.requestTask?.status === 'Done') {
       title = { message: 'Updating data', isWarning: false }
     }
 
@@ -164,7 +166,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       })
 
     const div = this.stepDiv.current
-    //if (div && task && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
+    // if (div && task && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
     if (
       div &&
       this.state.requestTask &&

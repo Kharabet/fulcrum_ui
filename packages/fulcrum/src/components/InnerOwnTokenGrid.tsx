@@ -1,22 +1,22 @@
 import React, { Component } from 'react'
-import { InnerOwnTokenGridHeader } from './InnerOwnTokenGridHeader'
+import InnerOwnTokenGridHeader from './InnerOwnTokenGridHeader'
 import { InnerOwnTokenGridRow } from './InnerOwnTokenGridRow'
 import { TradeRequest } from '../domain/TradeRequest'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 
 import '../styles/components/inner-own-token-grid.scss'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
+import { RolloverRequest } from '../domain/RolloverRequest'
 
 export interface IInnerOwnTokenGridProps {
   isMobileMedia: boolean
   ownRowsData: IOwnTokenGridRowProps[]
-  request: TradeRequest | ManageCollateralRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined,
-    isTxCompleted: boolean,
-    resultTx: boolean
-  ) => void
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
+  ) => void  
+  onTransactionsCompleted: () => void
   isLoadingTransaction: boolean
 }
 

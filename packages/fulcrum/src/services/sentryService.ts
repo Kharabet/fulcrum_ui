@@ -25,7 +25,7 @@ function setWalletAddressAsId (address?: string) {
 function init (provider: {getCurrentAccount: () => string | undefined, eventEmitter: EventEmitter}) {
   Sentry.init({
     dsn: 'https://ee577e18ed6645bfaaac30fb29e63460@o479738.ingest.sentry.io/5525206',
-    release: `fulcrum-${appConfig.releaseCommit}`
+    release: `fulcrum-${appConfig.releaseVersion}`
   })
 
   provider.eventEmitter.on('ProviderChanged', () => {

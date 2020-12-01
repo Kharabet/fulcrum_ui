@@ -1,5 +1,6 @@
 import { BigNumber } from '@0x/utils'
-import React, { Component, FormEvent, ChangeEvent } from 'react'
+import Slider from 'rc-slider'
+import React, { ChangeEvent, Component, FormEvent } from 'react'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { Asset } from '../domain/Asset'
@@ -9,7 +10,6 @@ import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { IExtendEstimate } from '../domain/IExtendEstimate'
 import { TorqueProvider } from '../services/TorqueProvider'
-import Slider from 'rc-slider'
 import { InputAmount } from './InputAmount'
 
 export interface IExtendLoanFormProps {
@@ -79,40 +79,40 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       })
   }
 
-  public componentDidMount(): void {
-    TorqueProvider.Instance.getLoanExtendParams(this.props.loanOrderState).then(
-      (collateralState) => {
-        TorqueProvider.Instance.getLoanExtendManagementAddress(this.props.loanOrderState).then(
-          (extendManagementAddress) => {
-            this.setState(
-              {
-                ...this.state,
-                minValue: collateralState.minValue,
-                maxValue: collateralState.maxValue,
-                assetDetails:
-                  AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
-                selectedValue: collateralState.currentValue,
-                extendManagementAddress: extendManagementAddress
-              },
-              () => {
-                this._selectedValueUpdate.next(this.state.selectedValue)
-              }
-            )
-          }
-        )
+  public async componentDidMount() {
+    await TorqueProvider.Instance.getLoanExtendParams(this.props.loanOrderState).then(
+      async (collateralState) => {
+        await TorqueProvider.Instance.getLoanExtendManagementAddress(
+          this.props.loanOrderState
+        ).then((extendManagementAddress) => {
+          this.setState(
+            {
+              ...this.state,
+              minValue: collateralState.minValue,
+              maxValue: collateralState.maxValue,
+              assetDetails:
+                AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
+              selectedValue: collateralState.currentValue,
+              extendManagementAddress: extendManagementAddress
+            },
+            () => {
+              this._selectedValueUpdate.next(this.state.selectedValue)
+            }
+          )
+        })
       }
     )
-    this.getMaxDepositAmount()
+    await this.getMaxDepositAmount()
   }
 
-  public componentDidUpdate(prevProps: Readonly<IExtendLoanFormProps>): void {
+  public async componentDidUpdate(prevProps: Readonly<IExtendLoanFormProps>) {
     if (
       prevProps.loanOrderState.accountAddress !== this.props.loanOrderState.accountAddress ||
       prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId
     ) {
-      TorqueProvider.Instance.getLoanExtendManagementAddress(this.props.loanOrderState).then(
-        (extendManagementAddress) => {
-          TorqueProvider.Instance.getLoanExtendGasAmount().then((gasAmountNeeded) => {
+      await TorqueProvider.Instance.getLoanExtendManagementAddress(this.props.loanOrderState).then(
+        async (extendManagementAddress) => {
+          await TorqueProvider.Instance.getLoanExtendGasAmount().then((gasAmountNeeded) => {
             this.setState(
               {
                 ...this.state,
@@ -169,6 +169,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             updateInterestAmount={this.updateInterestAmount}
             onTradeAmountChange={this.onTradeAmountChange}
             interestAmount={this.state.interestAmount}
+            ratio={new BigNumber(1)}
           />
           {this.state.balanceTooLow ? (
             <React.Fragment>
@@ -289,8 +290,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   }
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    let inputAmountText = event.target.value ? event.target.value : ''
-    if (Number(inputAmountText) == 0) {
+    const inputAmountText = event.target.value ? event.target.value : ''
+    if (Number(inputAmountText) === 0) {
       this.setState({
         ...this.state,
         inputAmountText
@@ -318,7 +319,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   }
 
   private getMaxDepositAmount = async () => {
-    let maxDepositAmount = await TorqueProvider.Instance.getLoanExtendEstimate(
+    const maxDepositAmount = await TorqueProvider.Instance.getLoanExtendEstimate(
       this.props.loanOrderState.interestOwedPerDay,
       this.state.maxValue
     )
@@ -327,12 +328,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
   public formatPrecision(outputText: BigNumber): string {
     const output = Number(outputText)
-    let n = Math.log(Math.abs(output)) / Math.LN10
+    const n = Math.log(Math.abs(output)) / Math.LN10
     let x = 4 - n
     if (x < 0) x = 0
     if (x > this._inputDecimals) x = this._inputDecimals + 1
-    var m = Math.pow(10, x)
 
-    return new BigNumber(Math.floor(output * m) / m).toString()
+    return Number(output.toFixed(x)).toString()
   }
 }

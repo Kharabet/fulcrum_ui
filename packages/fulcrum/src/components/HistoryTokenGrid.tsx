@@ -2,24 +2,31 @@ import React, { Component } from 'react'
 
 import { BigNumber } from '@0x/utils'
 import { Asset } from '../domain/Asset'
-import { PositionType } from '../domain/PositionType'
-import { IHistoryEvents } from '../domain/IHistoryEvents'
-import { TradeEvent } from '../domain/events/TradeEvent'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
 import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
+import { LiquidationEvent } from '../domain/events/LiquidationEvent'
+import { TradeEvent } from '../domain/events/TradeEvent'
+import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { PositionEventsGroup } from '../domain/PositionEventsGroup'
 import { PositionHistoryData } from '../domain/PositionHistoryData'
+import { PositionType } from '../domain/PositionType'
 
-import { HistoryTokenGridHeader } from './HistoryTokenGridHeader'
-import { IHistoryTokenGridRowProps, HistoryTokenGridRow } from './HistoryTokenGridRow'
 import { ReactComponent as ArrowPagination } from '../assets/images/icon_pagination.svg'
 import { PreloaderChart } from '../components/PreloaderChart'
+import { HistoryTokenGridHeader } from './HistoryTokenGridHeader'
+import { HistoryTokenGridRow, IHistoryTokenGridRowProps } from './HistoryTokenGridRow'
 
-import '../styles/components/history-token-grid.scss'
-import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
-import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { ReactComponent as Placeholder } from '../assets/images/history_placeholder.svg'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
+import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
+import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { RequestStatus } from '../domain/RequestStatus'
+import { RequestTask } from '../domain/RequestTask'
+import { TradeRequest } from '../domain/TradeRequest'
+import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
+import { FulcrumProvider } from '../services/FulcrumProvider'
+import '../styles/components/history-token-grid.scss'
+import { RolloverEvent } from '../domain/events/RolloverEvent'
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean
@@ -29,6 +36,12 @@ export interface IHistoryTokenGridProps {
   baseTokens: Asset[]
   quoteTokens: Asset[]
   updateHistoryRowsData: (data: IHistoryTokenGridRowProps[]) => void
+  changeLoadingTransaction: (
+    isLoadingTransaction: boolean,
+    request: TradeRequest | ManageCollateralRequest | undefined,
+    isTxCompleted: boolean,
+    resultTx: boolean
+  ) => void
 }
 
 interface IHistoryTokenGridState {
@@ -50,11 +63,23 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       isLastRow: false,
       isLoading: true
     }
+
+    FulcrumProvider.Instance.eventEmitter.on(
+      FulcrumProviderEvents.AskToCloseProgressDlg,
+      this.onAskToCloseProgressDlg
+    )
   }
 
-  public componentDidMount(): void {
-    if (!this.props.historyRowsData.length) {
-      this.getHistoryRowsData(this.state)
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.off(
+      FulcrumProviderEvents.AskToCloseProgressDlg,
+      this.onAskToCloseProgressDlg
+    )
+  }
+
+  public async componentDidMount() {
+    if (!this.props.historyRowsData.length) {  
+      await this.getHistoryRowsData(this.state)
     } else {
       this.setState({ ...this.state, isLoading: true })
       const historyEvents = this.props.historyEvents
@@ -75,12 +100,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     }
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: IHistoryTokenGridProps,
     prevState: IHistoryTokenGridState
-  ): void {
+  ) {
+    
     if (prevProps.historyEvents !== this.props.historyEvents) {
-      this.getHistoryRowsData(this.state)
+      await this.getHistoryRowsData(this.state)
     }
     if (prevState.numberPagination !== this.state.numberPagination) {
       const historyEvents = this.props.historyEvents
@@ -95,6 +121,17 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         isLastRow
       })
     }
+  }
+
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(async () => {
+        await FulcrumProvider.Instance.onTaskCancel(task)
+        this.props.changeLoadingTransaction(false, undefined, false, false)
+      }, 5000)
+      return
+    }
+    this.props.changeLoadingTransaction(false, undefined, true, true)
   }
 
   public render() {
@@ -152,13 +189,15 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
   public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
     this.setState({ ...this.state, isLoading: true })
-    const dateWhenPricePrecisionWasChanged = new Date(process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1605557075000 : 1603991752000) // approx date when price feed precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
+    const dateWhenPricePrecisionWasChanged = new Date(
+      process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1605557075000 : 1603991752000
+    ) // approx date when price feed precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
     const historyRowsData: IHistoryTokenGridRowProps[] = []
     const historyEvents = this.props.historyEvents
     if (!historyEvents) return
     const loanIds = Object.keys(historyEvents.groupedEvents)
     for (const loanId of loanIds) {
-      //@ts-ignore
+      // @ts-ignore
       const events = historyEvents.groupedEvents[loanId].sort(
         (a: any, b: any) => a.timeStamp.getTime() - b.timeStamp.getTime()
       )
@@ -313,8 +352,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             )
           )
         } else if (event instanceof LiquidationEvent) {
-          //loanToken in LiquidationEvent is a quoteAsset in TradeEvent
-          //collateralToken in LiquidationEvent is a baseAsset in TradeEvent
+          // loanToken in LiquidationEvent is a quoteAsset in TradeEvent
+          // collateralToken in LiquidationEvent is a baseAsset in TradeEvent
           const action = 'Liquidated'
           const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
           const collateralAssetDecimals =
@@ -361,14 +400,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           if (positionType === PositionType.LONG) {
             positionValue = event.depositAmount.div(10 ** depositTokenDecimals)
+            tradePrice = new BigNumber(0)
           } else {
             const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
             const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
-            positionValue = event.depositAmount
-              .div(10 ** depositTokenDecimals)
-              .times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken))
+            tradePrice = new BigNumber(swapRateQuoteToken).div(swapRateBaseToken)
+            positionValue = event.depositAmount.div(10 ** depositTokenDecimals).times(tradePrice)
           }
-          tradePrice = new BigNumber(0)
 
           positionEventsGroup.events.push(
             new PositionHistoryData(
@@ -392,13 +430,35 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           if (positionType === PositionType.LONG) {
             positionValue = event.withdrawAmount.div(10 ** withdrawTokenDecimals)
+            tradePrice = new BigNumber(0)
           } else {
             const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
             const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
-            positionValue = event.withdrawAmount
-              .div(10 ** withdrawTokenDecimals)
-              .times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken))
+            tradePrice = new BigNumber(swapRateQuoteToken).div(swapRateBaseToken)
+            positionValue = event.withdrawAmount.div(10 ** withdrawTokenDecimals).times(tradePrice)
           }
+
+          positionEventsGroup.events.push(
+            new PositionHistoryData(
+              loanId,
+              timeStamp,
+              action,
+              positionValue,
+              tradePrice,
+              value,
+              profit,
+              txHash,
+              quoteAsset,
+              payTradingFeeEvent,
+              earnRewardEvent
+            )
+          )
+        } else if (event instanceof RolloverEvent) {
+          const action = 'Rollovered'
+          const loanTokenDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
+          const collateralTokenDecimals =
+            AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
+
           tradePrice = new BigNumber(0)
 
           positionEventsGroup.events.push(
@@ -417,7 +477,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             )
           )
         } else {
-          //do nothing
+          // do nothing
         }
       }
       historyRowsData.push({
@@ -431,7 +491,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     const isLastRow =
       quantityEvents <= (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1)
 
-    await this.setState({
+    this.setState({
       ...this.setState,
       historyRowsData,
       quantityGrids,
@@ -439,7 +499,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       isLoading: false
     })
 
-    await this.props.updateHistoryRowsData(historyRowsData)
+    this.props.updateHistoryRowsData(historyRowsData)
   }
 
   public getAssetUSDRate = async (asset: Asset, date: Date) => {

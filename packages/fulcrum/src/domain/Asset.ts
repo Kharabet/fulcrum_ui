@@ -34,5 +34,7 @@ export enum Asset {
   YFI = 'YFI',
   UNI = 'UNI',
   AAVE = 'AAVE',
+  LRC = 'LRC',
+  COMP = 'COMP',
   UNKNOWN = 'UNKNOWN'
 }
