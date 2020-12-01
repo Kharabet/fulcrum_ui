@@ -25,6 +25,8 @@ import { Preloader } from './Preloader'
 import { TradeExpectedResult } from './TradeExpectedResult'
 import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
 import '../styles/components/trade-form.scss'
+import ReactTooltip from 'react-tooltip'
+import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -213,12 +215,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? this.props.loan.loanData.maintenanceMargin
         : this.props.positionType === PositionType.LONG
         ? await FulcrumProvider.Instance.getMaintenanceMargin(
-          this.props.baseToken,
-          this.props.quoteToken
+            this.props.baseToken,
+            this.props.quoteToken
           )
         : await FulcrumProvider.Instance.getMaintenanceMargin(
-          this.props.quoteToken,
-          this.props.baseToken
+            this.props.quoteToken,
+            this.props.baseToken
           )
     // liq_price_before_trade = (maintenance_margin * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     // if it's a SHORT then -> 10^36 / above
@@ -498,7 +500,23 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
           </div>
-          <ChiSwitch />
+          <div className="trade-form__row-container">
+            <ChiSwitch />
+            <div className="gas-limits-container">
+              Gas limits are overestimated
+              <IconInfo
+                className="tooltip__icon"
+                data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
+                data-for="gas-limits-tooltip"
+              />
+              <ReactTooltip
+                id="gas-limits-tooltip"
+                className="tooltip__info"
+                place="top"
+                effect="solid"
+              />
+            </div>
+          </div>
           <div className="trade-form__actions-container">
             <button
               title={
