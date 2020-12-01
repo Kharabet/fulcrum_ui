@@ -9,16 +9,17 @@ import TradeTokenGridHeader from './TradeTokenGridHeader'
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from './TradeTokenGridRow'
 
 import '../styles/components/trade-token-grid.scss'
+import { RolloverRequest } from '../domain/RolloverRequest'
 
 export interface ITradeTokenGridProps {
   isMobileMedia: boolean
   tokenRowsData: ITradeTokenGridRowProps[]
   innerOwnRowsData: IOwnTokenGridRowProps[]
-  request: TradeRequest | ManageCollateralRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   isLoadingTransaction: boolean
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   ) => void
   onTransactionsCompleted: () => void
   isTxCompleted: boolean

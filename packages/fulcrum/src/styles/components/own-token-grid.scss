@@ -82,7 +82,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
     background-color: $primary-dark-color;
     &:hover {
       background-color: $secondary-dark-color;
-    }
+  }
   }
   > div {
     line-height: 17px;
@@ -183,6 +183,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
   &__col-action {
     display: flex;
     justify-content: flex-end;
+    position: relative;
     align-self: center;
   }
   &_button {
@@ -213,6 +214,10 @@ $secondary-dark-color: rgba(#333c46, 0.4);
   }
   &__sell-button {
     background-color: #ff4f4f;
+    &.rollover-warning {
+      color: #fcff7a;
+      text-transform: capitalize;
+    }
     &:hover {
       background-color: #fe7272;
     }
@@ -255,7 +260,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
         grid-column-end: 3;
         .body-header {
           display: block;
-        }
+      }
       }
       &__col-position {
         order: 1;

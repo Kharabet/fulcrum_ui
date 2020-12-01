@@ -32,6 +32,7 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 
 import '../styles/pages/_trade-page.scss'
+import { RolloverRequest } from '../domain/RolloverRequest'
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
@@ -66,7 +67,7 @@ interface ITradePageState {
   historyRowsData: IHistoryTokenGridRowProps[]
   tradeRequestId: number
   isLoadingTransaction: boolean
-  request: TradeRequest | ManageCollateralRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   isTxCompleted: boolean
   activePositionType: PositionType
 }
@@ -425,6 +426,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       })
   }
 
+  public onRolloverConfirmed = async (request: RolloverRequest) => {
+    FulcrumProvider.Instance.onRolloverConfirmed(request)
+    this.setState({
+      ...this.state,
+      request
+    })
+  }
+
   public onTradeRequestClose = async () => {
     ;(await this._isMounted) &&
       this.setState({
@@ -530,18 +539,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maxTradeAmount,
       false // false - return in loan token
     )
-    const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-      tradeRequestCollateral
-    )
-    const estimatedLoanReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
-      tradeRequestLoan
-    )
-
-    const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
-      10 ** collateralAssetDecimals
-    )
-    const estimatedReceivedLoanToken = estimatedLoanReceived[1].div(10 ** loanAssetDecimals)
-
+    const isRolloverPending = loan.loanData.interestDepositRemaining.eq(0)
     if (positionType === PositionType.LONG) {
       positionValue = collateralAssetAmount
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
@@ -554,11 +552,24 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
       if (
+        isRolloverPending ||
         loan.loanData.depositValueAsCollateralToken.eq(0) ||
         loan.loanData.depositValueAsLoanToken.eq(0)
       ) {
         profitUSD = currentCollateralToPrincipalRate.minus(openPrice).times(positionValue)
       } else {
+        const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+          tradeRequestCollateral
+        )
+        const estimatedLoanReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+          tradeRequestLoan
+        )
+
+        const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
+          10 ** collateralAssetDecimals
+        )
+        const estimatedReceivedLoanToken = estimatedLoanReceived[1].div(10 ** loanAssetDecimals)
+
         depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
           10 ** collateralAssetDecimals
         )
@@ -590,6 +601,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
 
       if (
+        isRolloverPending ||
         loan.loanData.depositValueAsCollateralToken.eq(0) ||
         loan.loanData.depositValueAsLoanToken.eq(0)
       ) {
@@ -597,6 +609,18 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           .minus(new BigNumber(1).div(currentCollateralToPrincipalRate))
           .times(positionValue)
       } else {
+        const estimatedCollateralReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+          tradeRequestCollateral
+        )
+        const estimatedLoanReceived = await FulcrumProvider.Instance.getLoanCloseAmount(
+          tradeRequestLoan
+        )
+
+        const estimatedReceivedCollateralToken = estimatedCollateralReceived[1].div(
+          10 ** collateralAssetDecimals
+        )
+        const estimatedReceivedLoanToken = estimatedLoanReceived[1].div(10 ** loanAssetDecimals)
+
         depositAmountCollateralToken = loan.loanData.depositValueAsCollateralToken.div(
           10 ** collateralAssetDecimals
         )
@@ -611,8 +635,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           : undefined
       }
     }
-
-    console.log(estimatedReceivedLoanToken.toFixed())
 
     return {
       loan: loan,
@@ -638,6 +660,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maintenanceMargin: maintenanceMargin.div(10 ** 20),
       onTrade: this.onTradeRequested,
       onManageCollateralOpen: this.onManageCollateralRequested,
+      onRolloverConfirmed: this.onRolloverConfirmed,
       changeLoadingTransaction: this.changeLoadingTransaction,
       onTransactionsCompleted: this.onTransactionsCompleted,
       isTxCompleted: this.state.isTxCompleted
@@ -726,6 +749,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       return null
     }
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory()
+    const rolloverEvents = await FulcrumProvider.Instance.getRolloverHistory()
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory()
     const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory()
     const depositCollateralEvents = await FulcrumProvider.Instance.getDepositCollateralHistory()
@@ -758,6 +782,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // TODO: remove ts-ignore
     // @ts-ignore
     const events = tradeEvents
+      // @ts-ignore
+      .concat(rolloverEvents)
       // @ts-ignore
       .concat(closeWithSwapEvents)
       // @ts-ignore
@@ -829,7 +855,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public changeLoadingTransaction = async (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | undefined
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
   ) => {
     ;(await this._isMounted) &&
       this.setState({
