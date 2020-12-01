@@ -39,7 +39,7 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
       Asset.YFI,
       // Asset.BZRX,
       Asset.MKR,
-      Asset.LEND,
+      // Asset.LEND,
       Asset.KNC,
       Asset.UNI,
       Asset.AAVE,
