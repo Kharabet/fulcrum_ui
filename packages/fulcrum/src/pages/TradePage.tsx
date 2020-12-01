@@ -209,7 +209,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               {this.state.recentLiquidationsNumber === 1
                 ? 'One'
                 : this.state.recentLiquidationsNumber}
-              of your loans
+              &nbsp;of your loans&nbsp;
               {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated during
               the past {this.daysNumberForLoanActionNotification} days. For more information visit
               your&nbsp;
