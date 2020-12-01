@@ -300,7 +300,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       }x-${this.props.positionType.toLocaleLowerCase()}-${this.props.baseToken}/`
     )
     if (this.props.tradeType === TradeType.BUY) {
-      this.onInsertMaxValue(1)
+      await this.onInsertMaxValue(1)
     } else {
       this.rxFromCurrentAmount('0')
     }
@@ -321,30 +321,30 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       destToken,
       tradeAmountInLoanToken
     )
-    this.setState({ ...this.state, slippageRate })
+    this.setState({ slippageRate })
   }
 
   private async setDepositTokenBalance(depositToken: Asset) {
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       depositToken
     )
-    this.setState({ ...this.state, depositTokenBalance })
+    this.setState({ depositTokenBalance })
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<ITradeFormProps>,
     prevState: Readonly<ITradeFormState>,
     snapshot?: any
-  ): void {
+  ) {
     if (
       this.state.depositToken !== prevState.depositToken ||
       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
-      this.setSlippageRate(this.state.tradeAmountValue)
+      await this.setSlippageRate(this.state.tradeAmountValue)
+      this.state.depositToken !== prevState.depositToken &&
+        (await this.setDepositTokenBalance(this.state.depositToken))
     }
-    if (this.state.depositToken !== prevState.depositToken) {
-      this.setDepositTokenBalance(this.state.depositToken)
-    }
+
     if (
       this.props.tradeType !== prevProps.tradeType ||
       this.props.baseToken !== prevProps.baseToken ||
@@ -355,22 +355,18 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     ) {
       if (this.state.depositToken !== prevState.depositToken) {
         this._isMounted &&
-          this.setState(
-            {
-              ...this.state,
-              inputAmountText: '',
-              inputAmountValue: new BigNumber(0),
-              tradeAmountValue: new BigNumber(0)
-            },
-            () => {
-              this.derivedUpdate()
-            }
-          )
+          this.setState({
+            ...this.state,
+            inputAmountText: '',
+            inputAmountValue: new BigNumber(0),
+            tradeAmountValue: new BigNumber(0)
+          })
+        await this.derivedUpdate()
       } else {
         // this.derivedUpdate();
         if (this.props.tradeType === TradeType.SELL) {
           // TODO: need to handle this with a feedback to the user?
-          this.getLoanCloseAmount(this.state.returnedAsset)
+          await this.getLoanCloseAmount(this.state.returnedAsset)
         }
       }
     }
@@ -642,10 +638,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   public onCollateralChange = async (asset: Asset) => {
-    this._isMounted &&
-      this.setState({ ...this.state, depositToken: asset }, () => {
-        this.onInsertMaxValue(1)
-      })
+    this._isMounted && this.setState({ depositToken: asset })
+    await this.onInsertMaxValue(1)
   }
 
   public onUpdateClick = async (event: any) => {
@@ -858,10 +852,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
       const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
       const collateralAssetAmount = this.props
-        .loan!.loanData!.collateral.div(10 ** 18)
+        .loan!.loanData.collateral.div(10 ** 18)
         .times(collateralAssetPrecision)
       const loanAssetAmount = this.props
-        .loan!.loanData!.principal.div(10 ** 18)
+        .loan!.loanData.principal.div(10 ** 18)
         .times(loanAssetPrecision)
 
       const positionAmount =

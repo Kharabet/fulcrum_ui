@@ -1,7 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
-import { Tooltip } from 'react-tippy'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { Asset } from '../domain/Asset'
@@ -17,8 +16,8 @@ import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { AssetDropdown } from './AssetDropdown'
 import { Preloader } from './Preloader'
 
-import '../styles/components/lend-form.scss'
 import '../styles/components/input-amount.scss'
+import '../styles/components/lend-form.scss'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -176,8 +175,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest)
     const ethBalance = await FulcrumProvider.Instance.getEthBalance()
     const address = FulcrumProvider.Instance.contractsSource
-      ? (await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset)) ||
-        ''
+      ? FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || ''
       : ''
 
     const maybeNeedsApproval =
@@ -236,18 +234,18 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     }
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<ILendFormProps>,
     prevState: Readonly<ILendFormState>,
     snapshot?: any
-  ): void {
+  ) {
     if (
       this.props.lendType !== prevProps.lendType ||
       this.props.asset !== prevProps.asset ||
       this.state.useWrapped !== prevState.useWrapped ||
       this.state.useWrappedDai !== prevState.useWrappedDai
     ) {
-      this.derivedUpdate()
+      await this.derivedUpdate()
     }
   }
 
@@ -326,13 +324,13 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
           <div className="lend-form__form-values-container">
             <div className="lend-form__kv-container">
               <div className="lend-form__label">Asset</div>
-              <hr></hr>
+              <hr />
 
               <div className="lend-form__value">{tokenNameSource}</div>
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">Interest APR</div>
-              <hr></hr>
+              <hr />
               <div
                 title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``}
                 className="lend-form__value">
@@ -424,7 +422,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                 </div>
               </div>
             ) : (
-              <div style={{ height: '10px' }}></div>
+              <div style={{ height: '10px' }} />
             )}
           </div>
 
@@ -544,10 +542,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       }
     }
 
-    let usdPrice = sendAmount
-    if (usdPrice !== null) {
-      usdPrice = usdPrice.multipliedBy(usdAmount)
-    }
+    const usdPrice = sendAmount.multipliedBy(usdAmount)
 
     if (isMainnetProd && LendType.LEND) {
       const randomNumber = Math.floor(Math.random() * 100000) + 1
@@ -604,13 +599,14 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     const multipliedLendAmount = this.state.maxLendAmount
       ? this.state.maxLendAmount.multipliedBy(multiplier)
       : new BigNumber(0)
-    return new Observable<ILendAmountChangeEvent | null>((observer) => {
-      const lendRequest = new LendRequest(
-        this.props.lendType,
-        assetOrWrapped,
-        multipliedLendAmount || new BigNumber(0)
-      )
 
+    const lendRequest = new LendRequest(
+      this.props.lendType,
+      assetOrWrapped,
+      multipliedLendAmount || new BigNumber(0)
+    )
+
+    return new Observable<ILendAmountChangeEvent | null>((observer) => {
       FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest).then((lendedAmountEstimate) => {
         observer.next({
           isLendAmountTouched: this.state.isLendAmountTouched || false,
@@ -644,7 +640,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
   private rxFromCurrentAmount = (value: string): Observable<ILendAmountChangeEvent | null> => {
     return new Observable<ILendAmountChangeEvent | null>((observer) => {
-      let amountText = value
+      const amountText = value
       const amountTextForConversion =
         amountText === '' ? '0' : amountText[0] === '.' ? `0${amountText}` : amountText
       const maxAmount = this.state.maxLendAmount || new BigNumber(0)
@@ -691,12 +687,12 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
   public formatPrecision(output: BigNumber): string {
     const outputNumber = Number(output)
 
-    let n = Math.log(Math.abs(outputNumber)) / Math.LN10
+    const n = Math.log(Math.abs(outputNumber)) / Math.LN10
     let x = 4 - n
     if (x < 6) x = 4
     if (x < -1) x = 0
     if (x > this._inputPrecision) x = this._inputPrecision
-    var m = Math.pow(10, x)
+    const m = Math.pow(10, x)
     return (Math.floor(outputNumber * m) / m).toString()
   }
 }
