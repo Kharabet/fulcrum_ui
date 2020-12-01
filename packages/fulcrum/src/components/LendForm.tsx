@@ -62,16 +62,17 @@ interface ILendFormState {
 
   isLoading: boolean
   infoMessage: string
+  isExpired: boolean
 }
 
 export default class LendForm extends Component<ILendFormProps, ILendFormState> {
   private readonly _inputPrecision = 6
-  private _input: HTMLInputElement | null = null
-
-  private _isMounted: boolean
-
+  private readonly _staleDataDelay = 300000
   private readonly _inputChange: Subject<string>
   private readonly _inputSetMax: Subject<BigNumber>
+  private _input: HTMLInputElement | null = null
+  private _isMounted: boolean
+  private _timer: any
 
   constructor(props: ILendFormProps, context?: any) {
     super(props, context)
@@ -97,7 +98,8 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       tokenPrice: null,
       chaiPrice: null,
       isLoading: true,
-      infoMessage: ''
+      infoMessage: '',
+      isExpired: false
     }
 
     this._inputChange = new Subject()
@@ -144,9 +146,10 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
   }
 
   private async derivedUpdate() {
+    window.clearTimeout(this._timer)
     this._isMounted &&
       this.setState({
-        ...this.state,
+        isExpired: false,
         isLoading: true
       })
 
@@ -201,6 +204,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
         isLoading: false,
         infoMessage: infoMessage
       })
+    this._timer = window.setTimeout(() => this.setState({ isExpired: true }), this._staleDataDelay)
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
@@ -209,7 +213,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
   public componentWillUnmount(): void {
     this._isMounted = false
-
+    window.clearTimeout(this._timer)
     window.history.pushState(null, 'Lend Modal Closed', `/lend`)
     FulcrumProvider.Instance.eventEmitter.removeListener(
       FulcrumProviderEvents.ProviderChanged,
@@ -277,6 +281,8 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
         ? 'Your wallet is empty'
         : this.state.infoMessage
         ? this.state.infoMessage
+        : this.state.isExpired
+        ? 'Price has changed'
         : ''
 
     const lendedAmountEstimateText =
@@ -293,7 +299,9 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       this.props.asset !== Asset.ETH
 
     return (
-      <form className="lend-form" onSubmit={this.onSubmitClick}>
+      <form
+        className={`lend-form${this.state.isExpired ? ' expired' : ''}`}
+        onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
         <div className={`lend-form__image ${this.props.asset === Asset.ETH ? 'notice' : ''}`}>
           {this.state.iTokenAddress &&
@@ -405,7 +413,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                     href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
                     target="_blank"
                     rel="noopener noreferrer">
-                    &nbsp; {lendedAmountEstimateText} {tokenNameDestination}
+                    <span>{lendedAmountEstimateText}</span> {tokenNameDestination}
                   </a>
                 ) : (
                   <React.Fragment>
@@ -427,9 +435,18 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
           </div>
 
           <div className="lend-form__actions-container">
-            <button type="submit" className={`lend-form__submit-button ${submitClassName}`}>
-              {this.props.lendType}
-            </button>
+            {this.state.isExpired ? (
+              <button
+                type="submit"
+                onClick={this.onUpdateClick}
+                className={`lend-form__submit-button`}>
+                Update Price
+              </button>
+            ) : (
+              <button type="submit" className={`lend-form__submit-button ${submitClassName}`}>
+                {this.props.lendType}
+              </button>
+            )}
           </div>
         </div>
       </form>
@@ -442,7 +459,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     // setting tradeAmountText to update display at the same time
     this._isMounted &&
-      this.setState({ ...this.state, lendAmountText: amountText }, () => {
+      this.setState({ lendAmountText: amountText }, () => {
         // emitting next event for processing with rx.js
         this._inputChange.next(this.state.lendAmountText)
       })
@@ -450,17 +467,17 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
   public onChangeUseWrapped = async (asset: Asset) => {
     if (this.state.useWrapped && asset === Asset.ETH) {
-      this._isMounted && this.setState({ ...this.state, useWrapped: false })
+      this._isMounted && this.setState({ useWrapped: false })
     } else if (!this.state.useWrapped && asset === Asset.WETH) {
-      this._isMounted && this.setState({ ...this.state, useWrapped: true })
+      this._isMounted && this.setState({ useWrapped: true })
     }
   }
 
   public onChangeUseWrappedDai = async (asset: Asset) => {
     if (this.state.useWrappedDai && asset === Asset.DAI) {
-      this._isMounted && this.setState({ ...this.state, useWrappedDai: false })
+      this._isMounted && this.setState({ useWrappedDai: false })
     } else if (!this.state.useWrappedDai && asset === Asset.CHAI) {
-      this._isMounted && this.setState({ ...this.state, useWrappedDai: true })
+      this._isMounted && this.setState({ useWrappedDai: true })
     }
   }
 
@@ -474,7 +491,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     // emitting next event for processing with rx.js
     this._isMounted &&
-      this.setState({ ...this.state, isLoading: true }, () => {
+      this.setState({ isLoading: true }, () => {
         // emitting next event for processing with rx.js
         this._inputSetMax.next(value)
       })
@@ -582,6 +599,11 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     }
 
     this.props.onSubmit(new LendRequest(this.props.lendType, assetOrWrapped, sendAmount))
+  }
+
+  public onUpdateClick = async (event: any) => {
+    event.preventDefault()
+    await this.derivedUpdate()
   }
 
   private rxFromMaxAmountWithMultiplier = (

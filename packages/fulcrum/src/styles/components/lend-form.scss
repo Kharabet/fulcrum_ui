@@ -142,17 +142,18 @@
 }
 
 .lend-form__value {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 12px;
   line-height: 150%;
   color: #ffe352;
-
-  &--no-color {
-    color: #a2abb8;
-  }
+  &--no-color,
   &.lend-estimate {
     color: #a2abb8;
-    font-weight: 600;
+    span {
+      .expired & {
+        color: #323942;
+      }
+    }
   }
 }
 
@@ -205,11 +206,10 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
-  &--lend {
-    background: #00c0ab;
-    &:hover {
-      background-color: #33dfcc;
-    }
+
+  background: #00c0ab;
+  &:hover {
+    background-color: #33dfcc;
   }
 
   &--un-lend {
@@ -272,7 +272,11 @@ hr {
     padding: 10px 25px;
   }
 }
-
+.expired {
+  .input-amount__input {
+    color: #495460;
+  }
+}
 input[type='number'] {
   -moz-appearance: textfield; /* Firefox */
 }
