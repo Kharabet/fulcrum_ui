@@ -13,7 +13,7 @@ import { TorqueProvider } from '../services/TorqueProvider'
 import { Loader } from '../components/Loader'
 import { ProviderType } from '../domain/ProviderType'
 import { BorrowMoreDlg } from '../components/BorrowMoreDlg'
-import { Asset } from '../domain/Asset'
+import { InfoBlock } from '../components/InfoBlock'
 
 export interface IDashboardPageRouteParams {
   walletAddress: string | undefined
@@ -29,6 +29,7 @@ interface IDashboardPageState {
   items: IBorrowedFundsState[]
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>
   isDataLoading: boolean
+  recentLiquidationsNumber: number
 }
 
 export class DashboardPage extends PureComponent<
@@ -39,6 +40,7 @@ export class DashboardPage extends PureComponent<
   private repayLoanDlgRef: RefObject<RepayLoanDlg>
   private extendLoanDlgRef: RefObject<ExtendLoanDlg>
   private borrowMoreDlgRef: RefObject<BorrowMoreDlg>
+  private readonly daysNumberForLoanActionNotification = 2
 
   constructor(props: any) {
     super(props)
@@ -51,7 +53,8 @@ export class DashboardPage extends PureComponent<
     this.state = {
       items: [],
       itemsAwaiting: [],
-      isDataLoading: true
+      isDataLoading: true,
+      recentLiquidationsNumber: 0
     }
 
     this._isMounted = false
@@ -113,8 +116,9 @@ export class DashboardPage extends PureComponent<
       })
   }
 
-  private onProviderChanged = () => {
+  private onProviderChanged = async () => {
     this.derivedUpdate()
+    await this.setRecentLiquidationsNumber()
   }
 
   private onProviderAvailable = () => {
@@ -133,9 +137,17 @@ export class DashboardPage extends PureComponent<
     )
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true
     this.derivedUpdate()
+    await this.setRecentLiquidationsNumber()
+  }
+
+  private async setRecentLiquidationsNumber() {
+    const liquidationsNumber = await TorqueProvider.Instance.getLiquidationsInPastNDays(
+      this.daysNumberForLoanActionNotification
+    )
+    this.setState({ ...this.state, recentLiquidationsNumber: liquidationsNumber })
   }
 
   public render() {
@@ -152,6 +164,25 @@ export class DashboardPage extends PureComponent<
             isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}
           />
           <main>
+            {this.state.recentLiquidationsNumber > 0 && (
+              <InfoBlock localstorageItemProp="past-liquidations-info">
+                {this.state.recentLiquidationsNumber === 1
+                  ? 'One'
+                  : this.state.recentLiquidationsNumber}
+                &nbsp;of your loans&nbsp;
+                {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated during
+                the past {this.daysNumberForLoanActionNotification} days. For more information visit
+                your&nbsp;
+                <a
+                  href="https://explorer.bzx.network/liquidations"
+                  className="regular-link"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  Liquidations
+                </a>
+                .
+              </InfoBlock>
+            )}
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
                 <div className="page-header">
