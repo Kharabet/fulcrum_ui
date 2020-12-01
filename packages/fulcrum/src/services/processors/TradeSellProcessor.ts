@@ -117,7 +117,7 @@ export class TradeSellProcessor {
                 }
               )
         gasAmountBN = new BigNumber(gasAmount)
-          .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
+          .multipliedBy(FulcrumProvider.Instance.gasBufferCoeffForTrade)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
         console.log(e)
