@@ -11,7 +11,6 @@ import { RolloverRequest } from '../domain/RolloverRequest'
 export interface IInnerOwnTokenGridProps {
   isMobileMedia: boolean
   ownRowsData: IOwnTokenGridRowProps[]
-  request: TradeRequest | ManageCollateralRequest | undefined
   request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
