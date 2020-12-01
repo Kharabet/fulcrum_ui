@@ -16,7 +16,9 @@ import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
 import { Preloader } from './Preloader'
+import { NotificationRollover } from './NotificationRollover'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
+import { RolloverRequest } from '../domain/RolloverRequest'
 
 export interface IInnerOwnTokenGridRowProps {
   loan: IBorrowedFundsState
@@ -46,7 +48,7 @@ export interface IInnerOwnTokenGridRowProps {
 interface IInnerOwnTokenGridRowState {
   isLoading: boolean
   isLoadingTransaction: boolean
-  request: TradeRequest | ManageCollateralRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   valueChange: BigNumber
   resultTx: boolean
 }
@@ -219,6 +221,11 @@ export class InnerOwnTokenGridRow extends Component<
   }
 
   public render() {
+    const remainingDays = this.props.loan.loanData.interestDepositRemaining.div(
+      this.props.loan.loanData.interestOwedPerDay
+    )
+    const isRollover = remainingDays.eq(0)
+
     const collateralizedPercent = this.props.loan.collateralizedPercent.multipliedBy(100)
 
     let profitTitle = ''
@@ -258,7 +265,7 @@ export class InnerOwnTokenGridRow extends Component<
         </React.Fragment>
       )
     }
-    if (!this.props.profitCollateralToken || !this.props.profitLoanToken) {
+    if (!this.props.profitCollateralToken || !this.props.profitLoanToken || isRollover) {
       profitTitle = ''
       profitValue = (
         <React.Fragment>
@@ -395,11 +402,18 @@ export class InnerOwnTokenGridRow extends Component<
             </div>
             <div className="inner-own-token-grid-row__col-action opacityIn rightIn">
               <button
-                className="inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half"
-                onClick={this.onSellClick}
-                disabled={this.props.loan.collateralizedPercent.lte(0.15)}>
-                {TradeType.SELL}
+                className={`inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half  ${isRollover &&
+                  'rollover-warning'}`}
+                onClick={isRollover ? this.onRolloverClick : this.onSellClick}
+                disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
+                {isRollover ? 'Rollover' : TradeType.SELL}
               </button>
+              {remainingDays.lte(6) && (
+                <NotificationRollover
+                  isRollover={isRollover}
+                  countOfDaysToRollover={remainingDays}
+                />
+              )}
             </div>
           </div>
         )}
@@ -444,5 +458,12 @@ export class InnerOwnTokenGridRow extends Component<
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request)
     this.props.onTrade(request)
     this._isMounted && this.setState({ ...this.state, request: request })
+  }
+
+  public onRolloverClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation()
+    const rolloverRequest = new RolloverRequest(this.props.loan.loanId)
+    this.props.onRolloverConfirmed(rolloverRequest)
+    this.setState({ ...this.state, request: rolloverRequest, isLoadingTransaction: true })
   }
 }

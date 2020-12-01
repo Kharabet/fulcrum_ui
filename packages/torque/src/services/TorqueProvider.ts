@@ -32,9 +32,9 @@ import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
 import { ICollateralManagementParams } from '../domain/ICollateralManagementParams'
 import { IExtendEstimate } from '../domain/IExtendEstimate'
 import { IExtendState } from '../domain/IExtendState'
+import { ILoanParams } from '../domain/ILoanParams'
 import { IRepayEstimate } from '../domain/IRepayEstimate'
 import { IRepayState } from '../domain/IRepayState'
-import { ILoanParams } from '../domain/ILoanParams'
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { ProviderType } from '../domain/ProviderType'
@@ -45,35 +45,24 @@ import {
   RefinanceData
 } from '../domain/RefinanceData'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { BorrowRequestAwaitingStore } from './BorrowRequestAwaitingStore'
 import { ContractsSource } from './ContractsSource'
-import { ProviderChangedEvent } from './events/ProviderChangedEvent'
 import { TorqueProviderEvents } from './events/TorqueProviderEvents'
-import { NavService } from './NavService'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
-import { RequestTask } from '../domain/RequestTask'
 import { RequestStatus } from '../domain/RequestStatus'
-import { TasksQueue } from './TasksQueue'
+import { RequestTask } from '../domain/RequestTask'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
-import { BorrowProcessor } from './processors/BorrowProcessor'
-import { RepayLoanProcessor } from './processors/RepayLoanProcessor'
-import { ExtendLoanProcessor } from './processors/ExtendLoanProcessor'
-import { ManageCollateralProcessor } from './processors/ManageCollateralProcessor'
-// import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
-// import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
-// import { RefinanceCompoundRequest } from "../domain/RefinanceCompoundRequest";
-// import { RefinanceCompoundProcessor } from "./processors/RefinanceCompoundProcessor";
-// import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
-// import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
+import { TasksQueue } from './TasksQueue'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
   process.env.NODE_ENV !== 'development' &&
   process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-  
+
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
   configAddress = constantAddress.mainnet
@@ -1636,13 +1625,20 @@ export class TorqueProvider {
     )
     // console.log(loansData);
     const zero = new BigNumber(0)
-    result = loansData
-      .filter(
-        (e) =>
-          (!e.principal.eq(zero) &&
-            !e.currentMargin.eq(zero) &&
-            !e.interestDepositRemaining.eq(zero)) ||
-          account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+    const rolloverData = loansData.filter(
+      (e) =>
+        !e.principal.eq(zero) && !e.currentMargin.eq(zero) && e.interestDepositRemaining.eq(zero)
+    )
+
+    result = rolloverData
+      .concat(
+        loansData.filter(
+          (e) =>
+            (!e.principal.eq(zero) &&
+              !e.currentMargin.eq(zero) &&
+              !e.interestDepositRemaining.eq(zero)) ||
+            account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+        )
       )
       .map((e) => {
         let loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
@@ -2350,6 +2346,12 @@ export class TorqueProvider {
     }
   }
 
+  public onDoRollover = async (request: RolloverRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
   // public onMigrateMakerLoan = async (request: RefinanceMakerRequest) => {
   //   if (request) {
   //     TasksQueue.Instance.enqueue(new RequestTask(request));
@@ -2455,37 +2457,33 @@ export class TorqueProvider {
 
       let processor
       if (task.request instanceof BorrowRequest) {
+        const { BorrowProcessor } = await import('./processors/BorrowProcessor')
         processor = new BorrowProcessor()
         await processor.run(task, account, skipGas)
       }
 
       if (task.request instanceof ExtendLoanRequest) {
+        const { ExtendLoanProcessor } = await import('./processors/ExtendLoanProcessor')
         processor = new ExtendLoanProcessor()
         await processor.run(task, account, skipGas)
       }
       if (task.request instanceof ManageCollateralRequest) {
+        const { ManageCollateralProcessor } = await import('./processors/ManageCollateralProcessor')
         processor = new ManageCollateralProcessor()
         await processor.run(task, account, skipGas)
       }
+
       if (task.request instanceof RepayLoanRequest) {
+        const { RepayLoanProcessor } = await import('./processors/RepayLoanProcessor')
         processor = new RepayLoanProcessor()
         await processor.run(task, account, skipGas)
       }
 
-      // if (task.request instanceof RefinanceMakerRequest) {
-      //   processor = new RefinanceMakerProcessor();
-      //   await processor.run(task, skipGas, configAddress, web3);
-      // }
-
-      // if (task.request instanceof RefinanceCompoundRequest) {
-      //   processor = new RefinanceCompoundProcessor();
-      //   await processor.run(task, account, skipGas);
-      // }
-
-      // if (task.request instanceof RefinanceDydxRequest) {
-      //   processor = new RefinanceDydxProcessor();
-      //   await processor.run(task, account, skipGas);
-      // }
+      if (task.request instanceof RolloverRequest) {
+        const { RolloverProcessor } = await import('./processors/RolloverProcessor')
+        processor = new RolloverProcessor()
+        await processor.run(task, account, skipGas)
+      }
 
       task.processingEnd(true, false, null)
     } catch (e) {

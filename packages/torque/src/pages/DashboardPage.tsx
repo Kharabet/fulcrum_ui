@@ -1,19 +1,20 @@
 import React, { PureComponent, RefObject } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { BorrowedFundsList } from '../components/BorrowedFundsList'
+import { BorrowMoreDlg } from '../components/BorrowMoreDlg'
 import { ExtendLoanDlg } from '../components/ExtendLoanDlg'
+import { Loader } from '../components/Loader'
 import { ManageCollateralDlg } from '../components/ManageCollateralDlg'
 import { RepayLoanDlg } from '../components/RepayLoanDlg'
+import { Asset } from '../domain/Asset'
 import { BorrowRequestAwaiting } from '../domain/BorrowRequestAwaiting'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
+import { ProviderType } from '../domain/ProviderType'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { Footer } from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
-import { Loader } from '../components/Loader'
-import { ProviderType } from '../domain/ProviderType'
-import { BorrowMoreDlg } from '../components/BorrowMoreDlg'
-import { Asset } from '../domain/Asset'
 
 export interface IDashboardPageRouteParams {
   walletAddress: string | undefined
@@ -187,6 +188,9 @@ export class DashboardPage extends PureComponent<
         </div>
       </React.Fragment>
     )
+  }
+  private onRollover = async (request: RolloverRequest) => {
+    await TorqueProvider.Instance.onDoRollover(request)
   }
 
   private onBorrowMore = async (item: IBorrowedFundsState) => {
