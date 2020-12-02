@@ -16,7 +16,9 @@ import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
+import ReactTooltip from 'react-tooltip'
 import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
+import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
 import '../styles/components/trade-form.scss'
 import { ChiSwitch } from './ChiSwitch'
 import { CollapsibleContainer } from './CollapsibleContainer'
@@ -504,7 +506,23 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
           </div>
-          <ChiSwitch />
+          <div className="trade-form__row-container">
+            <ChiSwitch />
+            <div className="gas-limits-container">
+              Gas limits are overestimated
+              <IconInfo
+                className="tooltip__icon"
+                data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
+                data-for="gas-limits-tooltip"
+              />
+              <ReactTooltip
+                id="gas-limits-tooltip"
+                className="tooltip__info"
+                place="top"
+                effect="solid"
+              />
+            </div>
+          </div>
           <div className="trade-form__actions-container">
             {this.state.isExpired ? (
               <button onClick={this.onUpdateClick} className={`trade-form__submit-button update`}>

@@ -7,5 +7,6 @@
   "Squarelink_ClientId": "1bd995a2f7730d49f889",
   "Covalent_ApiKey": "ckey_c3bf7f3f22fd465b9afa7650d08",
   "Google_TrackingID": "GTM-NQCQR39",
-  "Infura_ApiKey": "7989ee6b11324cc49f18b8ab7be5a7c4"
+  "Infura_ApiKey": "7989ee6b11324cc49f18b8ab7be5a7c4",
+  "Etherscan_Api": "X85FQ7Y6FEZGSUTMKVGATUK5SKFCE76EYA"
 }

@@ -88,9 +88,22 @@
       padding-top: 55px;
     }
   }
+  &__row-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    .gas-limits-container {
+      font-style: normal;
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 150%;
+      color: #fff;
+    }
+  }
 
   &__form-values-container {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   &__actions-container {

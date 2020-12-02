@@ -57,6 +57,8 @@ import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
 import { TasksQueue } from './TasksQueue'
+import configProviders from '../config/providers.json'
+import { LiquidationEvent } from '../domain/events/LiquidationEvent'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -2267,6 +2269,25 @@ export class TorqueProvider {
     return result
   }
 
+  
+  public getAvailableLiquidaity = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0)
+
+    if (this.contractsSource && this.web3Wrapper) {
+      const iTokenContract = await this.contractsSource.getiTokenContract(asset)
+      if (iTokenContract) {
+        const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
+        const totalAssetSupply = await iTokenContract.totalAssetSupply.callAsync()
+        const totalAssetBorrow = await iTokenContract.totalAssetBorrow.callAsync()
+
+        const marketLiquidity = totalAssetSupply.minus(totalAssetBorrow)
+        result = marketLiquidity.div(10 ** decimals);
+      }
+    }
+
+    return result
+  }
+
   public getErc20AddressOfAsset(asset: Asset): string | null {
     let result: string | null = null
 
@@ -2536,6 +2557,43 @@ export class TorqueProvider {
 
   public sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
+  }
+
+  public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
+    const result: number = 0
+    if (!this.contractsSource) return result
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const blocksPerDay = 10000 // 7-8k per day with a buffer
+    if (!account || !this.contractsSource || !this.web3Wrapper) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api
+    const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
+    const etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${blockNumber -
+      days * blocksPerDay}&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      LiquidationEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+
+    const liquidationEventResponse = await fetch(etherscanApiUrl)
+    const liquidationEventResponseJson = await liquidationEventResponse.json()
+    if (liquidationEventResponseJson.status !== '1') return result
+    const events = liquidationEventResponseJson.result
+    const liquidationEvents = events.filter((event: any) => {
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return false
+
+      const baseTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const quoteTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress)
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress)
+      if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return false
+      return true
+    })
+    return (liquidationEvents && liquidationEvents.length) || result
   }
 }
 
