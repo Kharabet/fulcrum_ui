@@ -161,9 +161,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
                 Close
               </button>
             ) : (
-              <button
-                type="submit"
-                className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+              <button type="submit" className="btn btn-size--small" disabled={this.state.didSubmit}>
                 {this.state.didSubmit ? 'Submitting...' : 'Borrow'}
               </button>
             )}
@@ -175,7 +173,19 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (this.state.borrowAmount.lte(0)) {
+
+    const loan =
+      this.state.inputAmountText === ''
+        ? this.props.loanOrderState
+        : this.state.borrowMoreLoanOrderState
+    if (
+      this.state.borrowAmount.lte(0) ||
+      loan.collateralizedPercent
+        .times(100)
+        .plus(100)
+        .lte(this.state.borrowMoreColalterizationMin) ||
+        !Number(this.state.inputAmountText)
+    ) {
       return
     }
 
