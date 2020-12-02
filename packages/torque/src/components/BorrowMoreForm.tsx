@@ -140,8 +140,8 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
           <Rail sliderValue={sliderValue} sliderMax={sliderMax} />
           {collateralizationTooLow && (
             <div className="borrow-more-loan-form__insufficient-balance borrow-more-loan-form__error">
-              {this.state.borrowMoreColalterizationMin.toFixed(2)}% Collateralization required to
-              Borrow
+              A minimum of {this.state.borrowMoreColalterizationMin.toFixed(2)}% collaterilization
+              is requited to borrow
             </div>
           )}
           <div className="input-container mt-30">
