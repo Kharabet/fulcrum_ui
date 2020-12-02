@@ -99,11 +99,11 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       sliderValue = sliderMin
     }
 
-    const collateralizationTooLow=loan.collateralizedPercent
-    .times(100)
-    .plus(100)
-    .lte(this.state.borrowMoreColalterizationMin)
-    
+    const collateralizationTooLow = loan.collateralizedPercent
+      .times(100)
+      .plus(100)
+      .lte(this.state.borrowMoreColalterizationMin)
+
     return (
       <form className="borrow-more-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
@@ -140,7 +140,8 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
           <Rail sliderValue={sliderValue} sliderMax={sliderMax} />
           {collateralizationTooLow && (
             <div className="borrow-more-loan-form__insufficient-balance borrow-more-loan-form__error">
-              {this.state.borrowMoreColalterizationMin.toFixed(2)}% Collateralization required to Borrow
+              {this.state.borrowMoreColalterizationMin.toFixed(2)}% Collateralization required to
+              Borrow
             </div>
           )}
           <div className="input-container mt-30">
@@ -161,13 +162,15 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
         <ChiSwitch />
         <section className="dialog-actions">
           <div className="borrow-more-loan-form__actions-container">
-            {collateralizationTooLow ||
-            !Number(this.state.inputAmountText) ? (
+            {!Number(this.state.inputAmountText) ? (
               <button type="button" className="btn btn-size--small" onClick={this.props.onDecline}>
                 Close
               </button>
             ) : (
-              <button type="submit" className="btn btn-size--small" disabled={this.state.didSubmit}>
+              <button
+                type="submit"
+                className="btn btn-size--small"
+                disabled={this.state.didSubmit || collateralizationTooLow}>
                 {this.state.didSubmit ? 'Submitting...' : 'Borrow'}
               </button>
             )}
@@ -190,7 +193,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
         .times(100)
         .plus(100)
         .lte(this.state.borrowMoreColalterizationMin) ||
-        !Number(this.state.inputAmountText)
+      !Number(this.state.inputAmountText)
     ) {
       return
     }
