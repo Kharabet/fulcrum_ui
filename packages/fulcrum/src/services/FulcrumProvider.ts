@@ -2023,7 +2023,7 @@ export class FulcrumProvider {
       if (account) {
         // @ts-ignore
         const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
-        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20)
+        const resp = await alchemyProvider.alchemyWeb3.alchemy.getTokenBalances(account, addressesErc20)
         if (resp) {
           // @ts-ignore
           result = resp.tokenBalances

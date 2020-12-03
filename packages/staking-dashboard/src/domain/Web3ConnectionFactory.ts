@@ -1,7 +1,7 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 
 import { SignerSubprovider, Web3ProviderEngine } from '@0x/subproviders'
-// @ts-ignore
+
 import { AlchemySubprovider } from '@alch/alchemy-web3'
 
 import configProviders from '../config/providers.json'

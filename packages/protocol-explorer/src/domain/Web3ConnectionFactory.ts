@@ -1,8 +1,8 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 
 import { SignerSubprovider, Web3ProviderEngine } from '@0x/subproviders'
-// @ts-ignore
-import { AlchemySubprovider } from '@alch/alchemy-web3'
+
+import { AlchemySubprovider  } from '@alch/alchemy-web3'
 
 import configProviders from '../config/providers.json'
 
@@ -113,6 +113,7 @@ export class Web3ConnectionFactory {
       key = process.env.REACT_APP_INFURA_KEY // own developer's infura key
       url = `https://${ethNetwork}.infura.io/v3/${key}`
     }
+    url = `https://eth-${ethNetwork}.alchemyapi.io/v2/${key}`
     return new AlchemySubprovider(url, {
       writeProvider: null
     })
