@@ -16,7 +16,7 @@ import {
   Callback,
   ErrorCallback,
   JSONRPCRequestPayload,
-  RPCSubprovider,
+  Subprovider,
 } from "@0x/subproviders";
 import { makeHttpSender } from "./web3-adapter/alchemySendHttp";
 import { makePayloadSender, PayloadSender } from "./web3-adapter/sendPayload";
@@ -315,7 +315,7 @@ function identity<T>(x: T): T {
   return x;
 }
 
-export class AlchemySubprovider extends RPCSubprovider {
+export class AlchemySubprovider extends Subprovider {
   public readonly alchemyWeb3: AlchemyWeb3;
   public readonly payloadSender: PayloadSender;
 
@@ -323,7 +323,7 @@ export class AlchemySubprovider extends RPCSubprovider {
    * Instantiates a new AlchemySubprovider
    */
   constructor(alchemyUrl: string, config: AlchemyWeb3Config) {
-    super(alchemyUrl);
+    super();
 
     const fullConfig = fillInConfigDefaults(config);
     this.alchemyWeb3 = createAlchemyWeb3(alchemyUrl, config);
