@@ -413,8 +413,8 @@ export class AlchemySubprovider extends RPCSubprovider {
         try {
           const data = await this.payloadSender.sendPayload(alchemyPayload);
           if (data.error) {
-            end(new Error(data.error!.message), data);
-            console.error(data)
+            // @ts-ignore
+            end(data.error, data);
             break;
           }
           end(null, data.result);

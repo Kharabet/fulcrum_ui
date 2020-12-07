@@ -112,7 +112,7 @@ export class Web3ConnectionFactory {
       key = process.env.REACT_APP_INFURA_KEY // own developer's infura key
       url = `https://${ethNetwork}.infura.io/v3/${key}`
     }
-    url = `https://eth-${ethNetwork}.alchemyapi.io/v2/${key}`
+    
     return new AlchemySubprovider(url, {
       writeProvider: null,
     })
