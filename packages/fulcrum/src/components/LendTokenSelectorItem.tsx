@@ -226,8 +226,8 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
               <div className="token-selector-item__liquidity-container">
                 <div className="token-selector-item__liquidity-title">Liquidity:</div>
                 <div
-                  title={`${props.liquidity &&
-                    props.liquidity.toFixed(assetDetails.decimals)}%`}
+                  title={props.liquidity &&
+                    props.liquidity.toFixed(assetDetails.decimals)}
                   className="token-selector-item__liquidity-value">
                   {formatLiquidity(props.liquidity)}
                 </div>
