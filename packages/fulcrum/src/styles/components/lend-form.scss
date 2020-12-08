@@ -9,7 +9,7 @@
   background-color: #444e5a;
   display: flex;
   flex-direction: row;
-  @media screen and (max-width: $breakpoint-mobile-min) {
+  @media screen and (max-width: $mobile-version-width) {
     max-width: 320px;
     width: 320px;
     flex-direction: column;
@@ -40,7 +40,7 @@
       fill: #c8c8c8;
     }
   }
-  @media screen and (max-width: $breakpoint-mobile-min) {
+  @media screen and (max-width: $mobile-version-width) {
     justify-content: center;
   }
 }

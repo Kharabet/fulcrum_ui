@@ -380,7 +380,7 @@
 //   }
 // }
 
-@media screen and (max-width: $breakpoint-mobile-max) {
+@media screen and (max-width: $mobile-version-width) {
   .trade-form {
     @include clearfix();
 
