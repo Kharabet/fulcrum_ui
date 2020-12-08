@@ -8,17 +8,17 @@ import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { PositionType } from '../domain/PositionType'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
+import { NotificationRollover } from './NotificationRollover'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
 import { Preloader } from './Preloader'
-import { NotificationRollover } from './NotificationRollover'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
-import { RolloverRequest } from '../domain/RolloverRequest'
 
 export interface IInnerOwnTokenGridRowProps {
   loan: IBorrowedFundsState
@@ -120,7 +120,7 @@ export class InnerOwnTokenGridRow extends Component<
     this._isMounted &&
       this.setState({
         ...this.state,
-        valueChange,
+        valueChange: valueChange.dp(2, BigNumber.ROUND_HALF_UP),
         isLoading: false
       })
   }
@@ -143,12 +143,13 @@ export class InnerOwnTokenGridRow extends Component<
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(async () => {
         await FulcrumProvider.Instance.onTaskCancel(task)
-        this._isMounted && this.setState({
-          ...this.state,
-          isLoadingTransaction: false,
-          request: undefined,
-          resultTx: false
-        })
+        this._isMounted &&
+          this.setState({
+            ...this.state,
+            isLoadingTransaction: false,
+            request: undefined,
+            resultTx: false
+          })
         this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }, 5000)
       return
@@ -197,7 +198,8 @@ export class InnerOwnTokenGridRow extends Component<
     if (prevProps.isTxCompleted !== this.props.isTxCompleted) {
       await this.derivedUpdate()
       if (this.state.isLoadingTransaction) {
-        this._isMounted && this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+        this._isMounted &&
+          this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
         this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }
     }
@@ -211,11 +213,12 @@ export class InnerOwnTokenGridRow extends Component<
     )
     const isLoadingTransaction = task && !task.error ? true : false
     const request = task ? (task.request as TradeRequest | ManageCollateralRequest) : undefined
-    this._isMounted && this.setState({
-      ...this.state,
-      isLoadingTransaction,
-      request
-    })
+    this._isMounted &&
+      this.setState({
+        ...this.state,
+        isLoadingTransaction,
+        request
+      })
 
     await this.derivedUpdate()
   }
@@ -303,7 +306,7 @@ export class InnerOwnTokenGridRow extends Component<
               </span>
             </div>
             <div
-              title={`$${this.props.value.toFixed(18)}`}
+              title={`${this.props.value.toFixed(18)}`}
               className="inner-own-token-grid-row__col-asset-price">
               <span className="inner-own-token-grid-row__body-header">
                 Value <label className="text-asset">{this.props.quoteToken}</label>
@@ -313,8 +316,15 @@ export class InnerOwnTokenGridRow extends Component<
                   <span className="value-currency">
                     {this.props.value.toFixed(2)}
                     <span
-                      title={this.state.valueChange.toFixed(18)}
-                      className="inner-own-token-grid-row__col-asset-price-small">
+                      title={this.state.valueChange.toFixed()}
+                      className={`inner-own-token-grid-row__col-asset-price-small ${
+                        this.state.valueChange.gt(0)
+                          ? 'positive'
+                          : this.state.valueChange.lt(0)
+                          ? 'negative'
+                          : ''
+                      }`}>
+                      {this.state.valueChange.gt(0) ? '+' : ''}
                       {this.state.valueChange.toFixed(2)}%
                     </span>
                   </span>
