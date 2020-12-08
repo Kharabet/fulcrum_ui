@@ -120,7 +120,7 @@ export class InnerOwnTokenGridRow extends Component<
     this._isMounted &&
       this.setState({
         ...this.state,
-        valueChange,
+        valueChange: valueChange.dp(2, BigNumber.ROUND_HALF_UP),
         isLoading: false
       })
   }
@@ -316,7 +316,7 @@ export class InnerOwnTokenGridRow extends Component<
                   <span className="value-currency">
                     {this.props.value.toFixed(2)}
                     <span
-                      title={this.state.valueChange.toFixed(18)}
+                      title={this.state.valueChange.toFixed()}
                       className={`inner-own-token-grid-row__col-asset-price-small ${
                         this.state.valueChange.gt(0)
                           ? 'positive'
