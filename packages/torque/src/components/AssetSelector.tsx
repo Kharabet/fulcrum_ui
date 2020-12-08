@@ -14,15 +14,12 @@ export interface IAssetSelectorProps {
 
 export const AssetSelector = (props: IAssetSelectorProps) => {
   const apiUrl = 'https://api.bzx.network/v1'
-  const [yieldAPYJson, setYieldAPYJson] = useState()
+  const [yields, setYield] = useState()
+  const [liquidities, setLiquidity] = useState()
 
   useEffect(() => {
-    async function yieldAPYJson() {
-      const yieldAPYRequest = await fetch(`${apiUrl}/yield-farimng-apy`)
-      const yieldAPYJson = await yieldAPYRequest.json()
-      setYieldAPYJson(yieldAPYJson)
-    }
-    yieldAPYJson()
+    getYield()
+    getLiquidity()
   }, [props.isLoadingTransaction])
 
   // true includes ENS support
@@ -53,17 +50,43 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
   } else {
     assetsShown = []
   }
+  
+  async function getYield() {
+    const yieldAPYRequest = await fetch(`${apiUrl}/yield-farimng-apy`)
+    const yieldAPYJson = await yieldAPYRequest.json()
+    let yieldAPYData = []
+    if (yieldAPYJson.success) {
+      yieldAPYData = yieldAPYJson.data
+    }
+    setYield(yieldAPYData)
+  }
+
+  async function getLiquidity() {
+    const liquidityRequest = await fetch(`${apiUrl}/liquidity`)
+    const liquidityJson = await liquidityRequest.json()
+    let liquidityData = []
+    if (liquidityJson.success) {
+      liquidityData = liquidityJson.data
+    }
+    setLiquidity(liquidityData)
+  }
 
   const assetSelectorItems = assetsShown.map((asset) => {
     const yieldApr =
-      yieldAPYJson && yieldAPYJson!['success'] && yieldAPYJson!['data'][asset.toLowerCase()]
-        ? new BigNumber(yieldAPYJson!['data'][asset.toLowerCase()])
+      yields && yields![asset.toLowerCase()]
+        ? new BigNumber(yields![asset.toLowerCase()])
         : new BigNumber(0)
 
-    return <AssetSelectorItem key={asset} yieldApr={yieldApr} asset={asset} {...props} />
+      const liquidity =
+      liquidities && liquidities![asset.toLowerCase()]
+          ? new BigNumber(liquidities![asset.toLowerCase()])
+          : new BigNumber(0)
+  
+
+    return <AssetSelectorItem key={asset} yieldApr={yieldApr} liquidity={liquidity} asset={asset} {...props} />
   })
 
-  if (!yieldAPYJson || TorqueProvider.Instance.isLoading) {
+  if (!yields || !liquidities || TorqueProvider.Instance.isLoading) {
     return <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
   }
 

@@ -16,7 +16,8 @@ export interface ILendTokenSelectorItemProps {
   asset: Asset
   profit: BigNumber
   balanceOfUser: BigNumber
-  interestRate: BigNumber
+  interestRate: BigNumber  
+  liquidity: BigNumber
   onLend: (request: LendRequest) => void
   isLoading?: boolean
 }
@@ -99,8 +100,8 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
   const onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!request || task.request.id !== request.id) return
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(() => {
-        FulcrumProvider.Instance.onTaskCancel(task)
+      window.setTimeout(async() => {
+        await FulcrumProvider.Instance.onTaskCancel(task)
         setIsLoadingTransaction(false)
         setRequest(undefined)
       }, 5000)
@@ -163,6 +164,14 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
     })
   }
 
+  function formatLiquidity(value: BigNumber): string {
+    if (value.lt(1000)) return value.toFixed(2)
+    if (value.lt(10 ** 6)) return `${Number(value.dividedBy(1000).toFixed(2)).toString()}k`
+    if (value.lt(10 ** 9)) return `${Number(value.dividedBy(10 ** 6).toFixed(2)).toString()}m`
+    return `${Number(value.dividedBy(10 ** 9).toFixed(2)).toString()}b`
+  }
+  
+
   if (!assetDetails) {
     return null
   }
@@ -184,8 +193,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
       ) : (
         <React.Fragment>
           <div
-            className="token-selector-item__descriptions"
-            style={{ marginTop: balanceWithProfit.eq(0) ? undefined : `8px` }}>
+            className="token-selector-item__descriptions">          
             <div className="token-selector-item__description">
               {iTokenAddress &&
               FulcrumProvider.Instance.web3ProviderSettings &&
@@ -215,7 +223,16 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
                   <span className="sign-currency">%</span>
                 </div>
               </div>
-              {balanceWithProfit.gt(0) ? (
+              <div className="token-selector-item__liquidity-container">
+                <div className="token-selector-item__liquidity-title">Liquidity:</div>
+                <div
+                  title={props.liquidity &&
+                    props.liquidity.toFixed(assetDetails.decimals)}
+                  className="token-selector-item__liquidity-value">
+                  {formatLiquidity(props.liquidity)}
+                </div>
+              </div>
+              {balanceWithProfit.gt(0) &&
                 <React.Fragment>
                   <div className="token-selector-item__profit-container token-selector-item__balance-container">
                     <div className="token-selector-item__profit-title token-selector-item__profit-balance">
@@ -235,14 +252,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
                     </div>
                   </div>
                 </React.Fragment>
-              ) : (
-                <div className="token-selector-item__description">
-                  <div className="token-selector-item__interest-rate-container">
-                    <div className="token-selector-item__interest-rate-title" />
-                    <div className="token-selector-item__interest-rate-value" />
-                  </div>
-                </div>
-              )}
+              } 
             </div>
           </div>
           {renderActions(balanceWithProfit.eq(0))}
