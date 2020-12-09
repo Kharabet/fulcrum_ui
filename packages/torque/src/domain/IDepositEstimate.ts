@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
 
-export interface IBorrowEstimate {
-  borrowAmount: BigNumber
+export interface IDepositEstimate {
+  depositAmount: BigNumber
   gasEstimate: BigNumber
 }

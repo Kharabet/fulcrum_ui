@@ -14,6 +14,7 @@ import { CollateralTokenSelectorToggle } from './CollateralTokenSelectorToggle'
 import { Loader } from './Loader'
 
 import { ReactComponent as Edit } from '../assets/images/edit.svg'
+import { IDepositEstimate } from '../domain/IDepositEstimate'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -29,8 +30,9 @@ export interface IBorrowFormProps {
 interface IBorrowFormState {
   borrowAmount: BigNumber
   collateralAsset: Asset
-  inputAmountText: string
+  borrowAmountValue: string
   depositAmount: BigNumber
+  depositAmountValue: string
   gasAmountNeeded: BigNumber
   balanceTooLow: boolean
   didSubmit: boolean
@@ -45,7 +47,8 @@ interface IBorrowFormState {
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private _input: HTMLInputElement | null = null
 
-  private readonly _inputTextChange: Subject<string>
+  private readonly _borrowAmountChange: Subject<string>
+  private readonly _depositAmountChange: Subject<string>
 
   public constructor(props: IBorrowFormProps, context?: any) {
     super(props, context)
@@ -57,34 +60,45 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         : isMainnetProd
         ? Asset.ETH
         : Asset.fWETH,
-      inputAmountText: '',
+      borrowAmountValue: '',
       depositAmount: new BigNumber(0),
+      depositAmountValue: '',
       gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false,
       didSubmit: false,
       isLoading: false,
       isEdit: false,
       minValue: 120,
-      maxValue: 300,
+      maxValue: 700,
       selectedValue: 0,
       collateralValue: ''
     }
 
-    this._inputTextChange = new Subject<string>()
-    this._inputTextChange
+    this._borrowAmountChange = new Subject<string>()
+    this._borrowAmountChange
       .pipe(
         debounceTime(100),
         switchMap((value) => this.rxConvertToBigNumber(value)),
-        switchMap((value) => this.rxGetEstimate(value))
+        switchMap((value) => this.rxGetDepositEstimate(value))
       )
       .subscribe(async () => {
+        this.setDepositEstimate(this.state.collateralAsset)
         const balanceTooLow = await this.checkBalanceTooLow(this.state.collateralAsset)
-        const borrowEstimate = await this.getBorrowEstimate(this.state.collateralAsset)
         this.setState({
           ...this.state,
-          depositAmount: borrowEstimate.depositAmount,
           balanceTooLow: balanceTooLow
         })
+      })
+
+    this._depositAmountChange = new Subject<string>()
+    this._depositAmountChange
+      .pipe(
+        debounceTime(100),
+        switchMap((value) => this.rxConvertToBigNumber(value)),
+        switchMap((value) => this.rxGetBorrowEstimate(value))
+      )
+      .subscribe(async () => {
+        this.setBorrowEstimate(this.state.collateralAsset)
       })
   }
 
@@ -92,7 +106,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this._input = input
   }
 
-  private async setDefaultCollaterization(){
+  private async setDefaultCollaterization() {
     const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
       this.props.borrowAsset,
       this.state.collateralAsset
@@ -110,6 +124,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   public async componentWillMount() {
     await this.setDefaultCollaterization()
   }
+
   public async componentDidUpdate(
     prevProps: Readonly<IBorrowFormProps>,
     prevState: Readonly<IBorrowFormState>,
@@ -121,9 +136,12 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     ) {
       this.changeStateLoading()
     }
-    if (prevState.collateralAsset !== this.state.collateralAsset){
+    if (prevState.collateralAsset !== this.state.collateralAsset) {
       await this.setDefaultCollaterization()
+      this.setDepositEstimate(this.state.collateralAsset)
     }
+    if (prevState.selectedValue !== this.state.selectedValue)
+      this.updateBorrowAmount(prevState.selectedValue, this.state.selectedValue)
   }
 
   public render() {
@@ -136,16 +154,14 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               className="borrow-form__input-amount"
               type="number"
               step="any"
-              value={this.state.inputAmountText}
+              value={this.state.borrowAmountValue}
               onChange={this.onTradeAmountChange}
               placeholder={`Enter amount`}
             />
           </div>
-          <div className="borrow-form__info-collateral-by-container">
-            <div className="borrow-form__info-collateral-by-msg">
-              To open the loan, you will deposit
-            </div>
-            <div className="borrow-form__info-collateral-by-amount">
+          <div className="borrow-form__edit-deposit-by-container">
+            <div className="borrow-form__info-collateral-by-msg">To open the loan</div>
+            <div className="borrow-form__edit-deposit-by-input">
               {this.state.isLoading ? (
                 <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
               ) : (
@@ -153,22 +169,31 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                   {this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0) ? (
                     <span className="borrow-form__error">Loan is too large</span>
                   ) : (
-                    <span title={this.state.depositAmount.multipliedBy(1.005).toFixed()}>
-                      {this.state.depositAmount
-                        .multipliedBy(1.005)
-                        .dp(5, BigNumber.ROUND_CEIL)
-                        .toString()}{' '}
-                      {this.state.collateralAsset}
-                    </span>
+                    <React.Fragment>
+                      <span className="borrow-form__title">You will Deposit</span>
+                      <div className="wrapper-input">
+                        <input
+                          type="number"
+                          step="any"
+                          value={this.state.depositAmountValue}
+                          onChange={this.onChangeDeposit}
+                        />
+                        <span className="borrow-form__collateral-asset">
+                          {this.state.collateralAsset}
+                        </span>
+                      </div>
+                    </React.Fragment>
                   )}
                 </React.Fragment>
               )}
-              {this.state.balanceTooLow && (
+            </div>
+            {this.state.balanceTooLow && (
+              <div className="borrow-form__info-collateral-by-amount">
                 <div className="borrow-form__insufficient-balance borrow-form__error">
                   Insufficient {this.state.collateralAsset} balance in your wallet!
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
           <div className="borrow-form__edit-collateral-by-container">
             <div className="edit-input-wrapper">
@@ -197,7 +222,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                       {this.state.collateralValue}
                       <span className="sign">%</span>
                     </span>
-                    <div className="edit-icon-collateral" onClick={this.editInput}>
+                    <div className="edit-icon-collateral" onClick={this.editCollateralInput}>
                       <Edit />
                     </div>
                   </React.Fragment>
@@ -232,7 +257,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 borrowAsset={this.props.borrowAsset}
                 collateralAsset={this.state.collateralAsset}
                 readonly={this.state.didSubmit}
-                onChange={this.onCollateralChange}
+                onChange={this.onChangeCollateralAsset}
               />
             </div>
             <button
@@ -255,12 +280,25 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     })
   }
 
-  private rxGetEstimate = (selectedValue: BigNumber): Observable<IBorrowEstimate> => {
-    return new Observable<IBorrowEstimate>((observer) => {
-      TorqueProvider.Instance.getBorrowDepositEstimate(
+  private rxGetDepositEstimate = (borrowAmount: BigNumber): Observable<IDepositEstimate> => {
+    return new Observable<IDepositEstimate>((observer) => {
+      TorqueProvider.Instance.getDepositAmountEstimate(
         this.props.borrowAsset,
         this.state.collateralAsset,
-        selectedValue,
+        borrowAmount,
+        new BigNumber(this.state.selectedValue)
+      ).then((value) => {
+        observer.next(value)
+      })
+    })
+  }
+
+  private rxGetBorrowEstimate = (depositAmount: BigNumber): Observable<IBorrowEstimate> => {
+    return new Observable<IBorrowEstimate>((observer) => {
+      TorqueProvider.Instance.getBorrowAmountEstimate(
+        this.props.borrowAsset,
+        this.state.collateralAsset,
+        depositAmount,
         new BigNumber(this.state.selectedValue)
       ).then((value) => {
         observer.next(value)
@@ -322,13 +360,12 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     }
   }
 
-  private onCollateralChange = async (asset: Asset) => {
+  private onChangeCollateralAsset = async (asset: Asset) => {
     const balanceTooLow = await this.checkBalanceTooLow(asset)
-    const borrowEstimate = await this.getBorrowEstimate(asset)
+    this.setDepositEstimate(asset)
     this.setState({
       ...this.state,
       collateralAsset: asset,
-      depositAmount: borrowEstimate.depositAmount,
       balanceTooLow: balanceTooLow,
       isLoading: true
     })
@@ -341,15 +378,15 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     // setting inputAmountText to update display at the same time
     this.setState({
       ...this.state,
-      inputAmountText: inputAmountText,
+      borrowAmountValue: inputAmountText,
       borrowAmount: new BigNumber(inputAmountText),
       isLoading: true
     })
-    this._inputTextChange.next(this.state.inputAmountText)
+    this._borrowAmountChange.next(this.state.borrowAmountValue)
   }
 
   private checkBalanceTooLow = async (collateralAsset: Asset) => {
-    const borrowEstimate = await this.getBorrowEstimate(collateralAsset)
+    const borrowEstimate = await this.getDepositEstimateForBorrow(collateralAsset)
     let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(collateralAsset)
     if (collateralAsset === Asset.ETH) {
       assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
@@ -363,8 +400,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     return assetBalance.lt(amountInBaseUnits)
   }
 
-  private getBorrowEstimate = async (collateralAsset: Asset) => {
-    const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(
+  private getDepositEstimateForBorrow = async (collateralAsset: Asset) => {
+    const borrowEstimate = await TorqueProvider.Instance.getDepositAmountEstimate(
       this.props.borrowAsset,
       collateralAsset,
       this.state.borrowAmount,
@@ -381,41 +418,70 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     return borrowEstimate
   }
 
-  public changeStateLoading = () => {
-    if (this.state.depositAmount) {
-      this.setState({ ...this.state, isLoading: false })
-    }
+  private setDepositEstimate = async (collateralAsset: Asset) => {
+    const borrowEstimate = await this.getDepositEstimateForBorrow(collateralAsset)
+    const depositAmount = borrowEstimate.depositAmount
+    const depositAmountValue = depositAmount.dp(5, BigNumber.ROUND_CEIL).toString()
+    this.setState({
+      ...this.state,
+      depositAmount: depositAmount,
+      depositAmountValue: depositAmountValue
+    })
   }
 
-  public onCollateralAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+  private getBorrowEstimateForDeposit = async (collateralAsset: Asset) => {
+    const borrowEstimate = await TorqueProvider.Instance.getBorrowAmountEstimate(
+      this.props.borrowAsset,
+      collateralAsset,
+      this.state.depositAmount,
+      new BigNumber(this.state.selectedValue)
+    )
+    const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
+      this.props.borrowAsset,
+      collateralAsset
+    )
+    borrowEstimate.borrowAmount = borrowEstimate.borrowAmount
+      .times(this.state.selectedValue)
+      .div(minInitialMargin)
+    return borrowEstimate
+  }
+
+  private setBorrowEstimate = async (collateralAsset: Asset) => {
+    const borrowEstimate = await this.getBorrowEstimateForDeposit(collateralAsset)
+    const borrowAmount = borrowEstimate.borrowAmount //.div(1.005).dp(5, BigNumber.ROUND_CEIL)
+    const borrowAmountValue = borrowAmount.dp(5, BigNumber.ROUND_CEIL).toString()
+
+    this.setState({
+      ...this.state,
+      borrowAmount: borrowAmount,
+      borrowAmountValue: borrowAmountValue
+    })
+  }
+
+  public changeStateLoading = () => {
+    if (this.state.depositAmount) this.setState({ ...this.state, isLoading: false })
+  }
+
+  public onCollateralAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const inputCollateralText = event.target.value ? event.target.value : ''
     const inputCollateralValue = Number(inputCollateralText)
 
     if (parseFloat(inputCollateralText) < 0) return
 
-    if (this.state.minValue > inputCollateralValue) {
-      this.setState({
-        ...this.state,
-        collateralValue: inputCollateralText,
-        selectedValue: this.state.minValue
-      })
-    } else if (inputCollateralValue > this.state.maxValue) {
-      this.setState({
-        ...this.state,
-        collateralValue: inputCollateralText,
-        selectedValue: this.state.maxValue
-      })
-    } else {
-      this.setState({
-        ...this.state,
-        collateralValue: inputCollateralText,
-        selectedValue: inputCollateralValue
-      })
-    }
-    this._inputTextChange.next(this.state.inputAmountText)
+    const collateralText = inputCollateralText
+    let collateralValue = inputCollateralValue
+
+    if (inputCollateralValue < this.state.minValue) collateralValue = this.state.minValue
+    if (inputCollateralValue > this.state.maxValue) collateralValue = this.state.maxValue
+
+    this.setState({
+      ...this.state,
+      collateralValue: collateralText,
+      selectedValue: collateralValue
+    })
   }
 
-  public editInput = () => {
+  public editCollateralInput = () => {
     this.setState({ ...this.state, isEdit: true })
   }
 
@@ -437,7 +503,27 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       selectedValue: selectedValue,
       collateralValue: selectedValue.toFixed(2)
     })
-    
-    this._inputTextChange.next(this.state.inputAmountText)
+  }
+
+  public onChangeDeposit = async (event: ChangeEvent<HTMLInputElement>) => {
+    const depositAmountValue = event.target.value ? event.target.value : ''
+
+    this.setState({
+      ...this.state,
+      depositAmount: new BigNumber(depositAmountValue),
+      depositAmountValue: depositAmountValue
+    })
+    this._depositAmountChange.next(this.state.depositAmountValue)
+  }
+
+  public updateBorrowAmount = (previousCollateral: number, currentCollateral: number) => {
+    let borrowAmount = this.state.borrowAmount
+    const updatedBorrowAmount = borrowAmount.times(previousCollateral).div(currentCollateral)
+    const borrowAmountValue = updatedBorrowAmount.dp(5, BigNumber.ROUND_CEIL).toString()
+    this.setState({
+      ...this.state,
+      borrowAmount: updatedBorrowAmount,
+      borrowAmountValue: borrowAmountValue
+    })
   }
 }

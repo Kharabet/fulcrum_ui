@@ -7,7 +7,7 @@
     width: 100%;
   }
   &__input-container {
-    padding: 0 48px 40px 48px;
+    padding: 0 48px 24px 48px;
   }
   &__input-amount {
     font-size: 42px;
@@ -44,6 +44,7 @@
     font-weight: 400;
     width: 100%;
     text-align: center;
+    top: 6px;
   }
 
   &__actions-container {
@@ -51,14 +52,59 @@
     align-items: center;
     justify-content: space-between;
   }
-
-  &__info-collateral-by-container {
-    padding: 25px 0;
-    background-color: $bg-color-gray;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 1.5;
-    text-align: center;
+  &__title {
+    position: absolute;
+    left: 0;
+    font-size: 16px;
+    color: #758295;
+    font-weight: 200;
+  }
+  &__edit-deposit-by-container {
+    padding: 0px 48px 0 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .wrapper-input {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background-color: #f5f7f9;
+      border: 2px solid #e7ebf0;
+      border-radius: 4px;
+      width: 185px;
+    }
+    input {
+      background-color: #f5f7f9;
+      border: none;
+      color: #283049;
+      width: 100%;
+      text-align: center;
+      font-size: 20px;
+      line-height: 1.5;
+      font-weight: 800;
+      padding: 2px 0;
+    }
+  }
+  &__edit-deposit-by-input {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+    span {
+      &:first-child() {
+        position: absolute;
+      }
+    }
+    .loader {
+      height: 38px;
+    }
+  }
+  &__collateral-asset {
+    color: #758295;
+    font-weight: 600;
+    margin-right: 5px;
   }
   &__edit-collateral-by-container {
     .rc-slider-rail {
@@ -67,7 +113,7 @@
     .rc-slider-track {
       background-color: transparent;
     }
-    padding: 40px 48px 0 48px;
+    padding: 30px 48px 0 48px;
     .rail {
       height: 7px;
       background: linear-gradient(90deg, #ff4f4f 0%, #f0e93f 52.16%, #33dfcc 101.16%);
@@ -147,7 +193,7 @@
       border: 2px solid #e7ebf0;
       border-radius: 4px;
       color: #283049;
-      width: 164px;
+      width: 185px;
       text-align: center;
       font-size: 20px;
       line-height: 1.5;
@@ -168,6 +214,7 @@
     font-size: 16px;
     font-weight: 400;
     color: $color-gray-darker;
+    margin-bottom: 20px;
   }
 
   &__info-collateral-by-amount {
@@ -175,6 +222,7 @@
     font-weight: 800;
     color: #283049;
     position: relative;
+    width: 100%;
     .loader,
     .loader-dots {
       height: 30px;
