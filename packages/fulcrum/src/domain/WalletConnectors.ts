@@ -61,7 +61,12 @@ export const walletlink = new WalletLinkConnector({
 export const ledger = new LedgerConnector({
   chainId: networkId,
   url: RPC_URL,
-  pollingInterval: POLLING_INTERVAL
+  pollingInterval: POLLING_INTERVAL,
+  accountFetchingConfigs: {
+    shouldAskForOnDeviceConfirmation: true,
+    numAddressesToReturn: 100,
+    addressSearchLimit: 1000
+  }
 })
 
 export const trezor = new TrezorConnector({
@@ -69,7 +74,15 @@ export const trezor = new TrezorConnector({
   url: RPC_URL,
   pollingInterval: POLLING_INTERVAL,
   manifestEmail: 'hello@bzx.network',
-  manifestAppUrl: window.location.origin
+  manifestAppUrl: window.location.origin,
+  config: {
+    networkId: networkId,
+    accountFetchingConfigs: {
+      shouldAskForOnDeviceConfirmation: true,
+      numAddressesToReturn: 100,
+      addressSearchLimit: 1000
+    }
+  }
 })
 
 // export const frame = new FrameConnector({ supportedChainIds: [1] })

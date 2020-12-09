@@ -1,24 +1,33 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 
-import { SignerSubprovider, Web3ProviderEngine } from '@0x/subproviders'
-// @ts-ignore
-import { AlchemySubprovider } from '@alch/alchemy-web3'
+import {
+  MetamaskSubprovider,
+  RPCSubprovider,
+  SignerSubprovider,
+  Subprovider,
+  Web3ProviderEngine
+} from '@0x/subproviders'
 
 import configProviders from '../config/providers.json'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorUpdate } from '@web3-react/types'
+import { ProviderType } from './ProviderType'
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK
 
 export class Web3ConnectionFactory {
-  public static alchemyProvider: AlchemySubprovider
+  public static rpcSubprovider: RPCSubprovider
   public static networkId: number
   public static canWrite: boolean
   public static userAccount: string | undefined
   public static currentWeb3Engine: Web3ProviderEngine
   public static currentWeb3Wrapper: Web3Wrapper
 
-  public static async setWalletProvider(connector: AbstractConnector, web3ReactAccount?: string) {
+  public static async setWalletProvider(
+    connector: AbstractConnector,
+    providerType: ProviderType,
+    web3ReactAccount?: string
+  ) {
     let canWrite = false
     let networkId: number = 0
     let web3Wrapper: Web3Wrapper
@@ -34,19 +43,42 @@ export class Web3ConnectionFactory {
           blockTrackerProvider?: any;
       }
     */
+
+    const rpcSubprovider = await this.getRPCSubprovider()
+
     let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }) // 1 hour polling
 
-    const alchemyProvider = await this.getAlchemyProvider()
-    providerEngine.addProvider(alchemyProvider)
     const provider = await connector.getProvider()
     try {
-      providerEngine.addProvider(new SignerSubprovider(provider))
-      await providerEngine.start()
-      web3Wrapper = new Web3Wrapper(providerEngine)
-      canWrite = true
+      
       const account = await connector.getAccount()
       const chainId = (await connector.getChainId()).toString()
       networkId = chainId.includes('0x') ? parseInt(chainId, 16) : parseInt(chainId, 10)
+      
+      let walletSubprovider: Subprovider
+      switch (providerType) {
+        case ProviderType.Ledger:
+          // Ledger connector is the Web3ProviderEngine itself
+          providerEngine = provider
+          break
+        case ProviderType.MetaMask:
+          walletSubprovider = new MetamaskSubprovider(provider)
+          providerEngine.addProvider(walletSubprovider)
+          providerEngine.addProvider(rpcSubprovider)
+          break
+        case ProviderType.Trezor:
+          // Trezor connector is the Web3ProviderEngine itself
+          providerEngine = provider
+          break
+        default:
+          walletSubprovider = new SignerSubprovider(provider)
+          providerEngine.addProvider(walletSubprovider)
+          providerEngine.addProvider(rpcSubprovider)
+          break;
+      }
+      await providerEngine.start()
+      
+      canWrite = true
       Web3ConnectionFactory.userAccount = account
         ? account
         : web3ReactAccount
@@ -55,27 +87,25 @@ export class Web3ConnectionFactory {
     } catch (e) {
       console.log(e)
 
-      await providerEngine.stop()
-
       // rebuild providerEngine
       providerEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }) // 1 hour polling
-      providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider)
+      providerEngine.addProvider(rpcSubprovider)
 
-      // @ts-ignore
-      web3Wrapper = new Web3Wrapper(providerEngine)
+      await providerEngine.start()
     }
+    
+    web3Wrapper = new Web3Wrapper(providerEngine)
     Web3ConnectionFactory.networkId = networkId ? networkId : await web3Wrapper.getNetworkIdAsync()
     Web3ConnectionFactory.currentWeb3Engine = providerEngine
     Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper
     Web3ConnectionFactory.canWrite = canWrite
-
   }
 
   public static async setReadonlyProvider() {
     let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }) // 1 hour polling
 
-    const alchemyProvider = await this.getAlchemyProvider()
-    providerEngine.addProvider(alchemyProvider)
+    const rpcSubprovider = await this.getRPCSubprovider()
+    providerEngine.addProvider(rpcSubprovider)
 
     // @ts-ignore
     await providerEngine.start()
@@ -97,8 +127,7 @@ export class Web3ConnectionFactory {
     if (account) Web3ConnectionFactory.userAccount = account
   }
 
- 
-  public static async getAlchemyProvider(): Promise<AlchemySubprovider> {
+  public static async getRPCSubprovider(): Promise<RPCSubprovider> {
     let key
     let url
     if (process.env.NODE_ENV !== 'development') {
@@ -112,8 +141,6 @@ export class Web3ConnectionFactory {
       key = process.env.REACT_APP_INFURA_KEY // own developer's infura key
       url = `https://${ethNetwork}.infura.io/v3/${key}`
     }
-    return new AlchemySubprovider(url, {
-      writeProvider: null
-    })
+    return new RPCSubprovider(url)
   }
 }
