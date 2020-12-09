@@ -45,7 +45,8 @@
   padding: 20px 46px;
 }
 
-.btn-disabled {
+.btn-disabled,
+:disabled {
   opacity: 0.4;
   background-color: $color-blue !important;
 

@@ -129,6 +129,12 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
     color: #a2abb8;
     left: 0;
     top: 100%;
+    &.positive {
+      color: #00c0ab;
+    }
+    &.negative {
+      color: #ff4f4f;
+    }
   }
 
   &__col-asset-type {

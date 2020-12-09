@@ -96,13 +96,14 @@ export class ExtendLoanProcessor {
 
     let gasAmountBN = new BigNumber(0)
     let txHash: string = ''
+    const loanData = '0x'
 
     try {
       const gasAmount = await bZxContract.extendLoanDuration.estimateGasAsync(
         taskRequest.loanId,
         depositAmountInBaseUnits,
         false,
-        '',
+        loanData,
         {
           from: account,
           value: isETHBorrowAsset ? depositAmountInBaseUnits : undefined,
@@ -122,7 +123,7 @@ export class ExtendLoanProcessor {
         taskRequest.loanId, // loanId
         depositAmountInBaseUnits, // depositAmount
         false, // useCollateral
-        '',
+        loanData,
         {
           from: account,
           value: isETHBorrowAsset ? depositAmountInBaseUnits : undefined,

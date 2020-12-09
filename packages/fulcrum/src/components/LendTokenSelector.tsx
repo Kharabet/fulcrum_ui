@@ -18,14 +18,16 @@ export interface ILendTokenSelectorState {
 }
 
 function LendTokenSelector(props: ILendTokenSelectorProps) {
-  let _refreshInterval: any
+  let _refreshInterval: any  
+  const apiUrl = 'https://api.bzx.network/v1'
   const _refreshProfitTimerMillisec: number = 1000 * 60 * 5
   const assets = FulcrumProvider.Instance.lendAssetsShown
   const [lendTokenItemProps, setLendTokenItemProps] = useState(
     new Map<Asset, ILendTokenSelectorItemProps>()
   )
   const [isLoading, setIsLoading] = useState(false)
-  const [retry, setRetry] = useState(false)
+  const [retry, setRetry] = useState(false)  
+
   useEffect(() => {
     _refreshInterval = window.setInterval(derivedUpdate, _refreshProfitTimerMillisec)
 
@@ -55,6 +57,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
       derivedUpdate()
     }
   }, [lendTokenItemProps])
+
   useEffect(() => {
     if (retry && lendTokenItemProps.size > 0) {
       derivedUpdate()
@@ -63,24 +66,29 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
 
   const setReadonlyInterestRates = async () => {
     setIsLoading(true)
-    const resp = await (await fetch('https://api.bzx.network/v1/supply-rate-apr')).json()
-    if (!resp.success) {
+    const aprs = await (await fetch(`${apiUrl}/supply-rate-apr`)).json()
+    const liquidities = await (await fetch(`${apiUrl}/liquidity`)).json()
+
+    if (!aprs.success||!liquidities.success) {
       setIsLoading(false)
       return
     }
+   
     const newLendTokenItemProps = new Map<Asset, ILendTokenSelectorItemProps>()
     for (const i in assets) {
       if (!assets[i]) {
         continue
       }
       const asset = assets[i]
-      const interestRate = resp.data[asset.toLowerCase()]
+      const interestRate = aprs.data[asset.toLowerCase()]
+      const liquidity = liquidities.data[asset.toLowerCase()]
       newLendTokenItemProps.set(asset, {
         profit: new BigNumber(0),
         balanceOfUser: new BigNumber(0),
         asset,
         onLend: props.onLend,
         interestRate: new BigNumber(interestRate || 0),
+        liquidity: new BigNumber(liquidity || 0),
         isLoading: false
       } as ILendTokenSelectorItemProps)
     }
@@ -128,7 +136,8 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
         balanceOfUser: balance,
         asset: asset,
         onLend: props.onLend,
-        interestRate: new BigNumber(currentLendTokenItemProps.interestRate || 0),
+        interestRate: new BigNumber(currentLendTokenItemProps.interestRate || 0),        
+        liquidity: new BigNumber(currentLendTokenItemProps.liquidity || 0),
         isLoading: false
       } as ILendTokenSelectorItemProps)
       setLendTokenItemProps(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps))

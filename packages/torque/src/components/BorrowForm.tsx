@@ -42,6 +42,8 @@ interface IBorrowFormState {
   maxValue: number
   selectedValue: number
   collateralValue: string
+  ethBalance: BigNumber
+  maxAvailableLiquidity: BigNumber
 }
 
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
@@ -63,6 +65,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       borrowAmountValue: '',
       depositAmount: new BigNumber(0),
       depositAmountValue: '',
+      ethBalance: new BigNumber(0),
+      maxAvailableLiquidity: new BigNumber(0),
       gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false,
       didSubmit: false,
@@ -125,6 +129,25 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     await this.setDefaultCollaterization()
   }
 
+  public async componentDidMount() {
+    this.setState({
+      ...this.state,
+      isLoading: true
+    })
+
+    const maxAvailableLiquidity = await TorqueProvider.Instance.getAvailableLiquidaity(
+      this.props.borrowAsset
+    )
+
+    const ethBalance = await TorqueProvider.Instance.getEthBalance()
+    this.setState({
+      ...this.state,
+      isLoading: false,
+      maxAvailableLiquidity,
+      ethBalance
+    })
+  }
+
   public async componentDidUpdate(
     prevProps: Readonly<IBorrowFormProps>,
     prevState: Readonly<IBorrowFormState>,
@@ -145,6 +168,14 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public render() {
+    const amountMsg =
+      this.state.ethBalance && this.state.ethBalance.lte(TorqueProvider.Instance.gasBufferForTxn)
+        ? 'Insufficient funds for gas'
+        : this.state.borrowAmount.gt(this.state.maxAvailableLiquidity)
+        ? 'There is insufficient liquidity available for this loan'
+        : this.state.balanceTooLow
+        ? `Insufficient ${this.state.collateralAsset} balance in your wallet!`
+        : undefined
     return (
       <form className="borrow-form" onSubmit={this.onSubmit} onClick={this.onClickForm}>
         <section className="borrow-form__content">
@@ -187,10 +218,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 </React.Fragment>
               )}
             </div>
-            {this.state.balanceTooLow && (
+            {!this.state.isLoading && amountMsg !== undefined && (
               <div className="borrow-form__info-collateral-by-amount">
                 <div className="borrow-form__insufficient-balance borrow-form__error">
-                  Insufficient {this.state.collateralAsset} balance in your wallet!
+                  {amountMsg}
                 </div>
               </div>
             )}
@@ -261,10 +292,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               />
             </div>
             <button
-              className={`btn btn-size--small ${
-                this.state.didSubmit || this.state.balanceTooLow ? `btn-disabled` : ``
-              }`}
-              disabled={this.state.balanceTooLow}
+              className={`btn btn-size--small`}
+              disabled={this.state.didSubmit || this.state.balanceTooLow || amountMsg !== undefined}
               type="submit">
               {this.state.didSubmit ? 'Submitting...' : 'Borrow'}
             </button>
