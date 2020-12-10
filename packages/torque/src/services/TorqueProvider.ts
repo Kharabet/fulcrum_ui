@@ -195,7 +195,7 @@ export class TorqueProvider {
     try {
       this.isLoading = true
       this.unsupportedNetwork = false
-      await Web3ConnectionFactory.setWalletProvider(connector, account)
+      await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     } catch (e) {
       console.log(e)
       this.isLoading = false

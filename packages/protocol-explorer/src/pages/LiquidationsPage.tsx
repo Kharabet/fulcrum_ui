@@ -602,6 +602,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   private onLiquidationRequested = (request: LiquidationRequest) => {
+    if (
+      !ExplorerProvider.Instance.contractsSource ||
+      !ExplorerProvider.Instance.contractsSource.canWrite ||
+      ExplorerProvider.Instance.unsupportedNetwork
+    ) {
+      this.props.doNetworkConnect()
+      return
+    }
     this.setState({ ...this.state, request, isModalOpen: true })
   }
 }

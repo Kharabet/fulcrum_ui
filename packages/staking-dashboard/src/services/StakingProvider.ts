@@ -120,8 +120,8 @@ export class StakingProvider {
 
   public async setWeb3Provider(connector: AbstractConnector, account?: string) {
     this.unsupportedNetwork = false
-    await Web3ConnectionFactory.setWalletProvider(connector, account)
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector)
+    await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     await this.setWeb3ProviderFinalize(providerType)
   }
 

@@ -198,8 +198,8 @@ export class FulcrumProvider {
     this.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
 
     this.unsupportedNetwork = false
-    await Web3ConnectionFactory.setWalletProvider(connector, account)
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector)
+    await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     await this.setWeb3ProviderFinalize(providerType)
   }
 
@@ -2011,32 +2011,32 @@ export class FulcrumProvider {
     return result
   }
 
-  public async getErc20BalancesOfUser(
-    addressesErc20: string[],
-    account?: string
-  ): Promise<Map<string, BigNumber>> {
-    let result: Map<string, BigNumber> = new Map<string, BigNumber>()
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      if (!account && this.contractsSource.canWrite) {
-        account = this.getCurrentAccount()
-      }
-      if (account) {
-        // @ts-ignore
-        const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
-        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20)
-        if (resp) {
-          // @ts-ignore
-          result = resp.tokenBalances
-            .filter((t) => !t.error && t.tokenBalance !== '0')
-            .reduce(
-              (map, obj) => (map.set(obj.address, new BigNumber(obj.tokenBalance!)), map),
-              new Map<string, BigNumber>()
-            )
-        }
-      }
-    }
-    return result
-  }
+  // public async getErc20BalancesOfUser(
+  //   addressesErc20: string[],
+  //   account?: string
+  // ): Promise<Map<string, BigNumber>> {
+  //   let result: Map<string, BigNumber> = new Map<string, BigNumber>()
+  //   if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+  //     if (!account && this.contractsSource.canWrite) {
+  //       account = this.getCurrentAccount()
+  //     }
+  //     if (account) {
+  //       // @ts-ignore
+  //       const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
+  //       const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20)
+  //       if (resp) {
+  //         // @ts-ignore
+  //         result = resp.tokenBalances
+  //           .filter((t) => !t.error && t.tokenBalance !== '0')
+  //           .reduce(
+  //             (map, obj) => (map.set(obj.address, new BigNumber(obj.tokenBalance!)), map),
+  //             new Map<string, BigNumber>()
+  //           )
+  //       }
+  //     }
+  //   }
+  //   return result
+  // }
 
   public async getSwapToUsdRateBatch(
     assets: Asset[],
