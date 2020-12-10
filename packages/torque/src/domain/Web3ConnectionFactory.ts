@@ -128,8 +128,13 @@ export class Web3ConnectionFactory {
   }
 
   public static async getRPCSubprovider(): Promise<RPCSubprovider> {
-    let key
+    const rpcUrl = Web3ConnectionFactory.getRPCUrl()
+    return new RPCSubprovider(rpcUrl)
+  }
+
+  public static getRPCUrl(): string {
     let url
+    let key
     if (process.env.NODE_ENV !== 'development') {
       if (ethNetwork === 'kovan') {
         key = configProviders.Alchemy_ApiKey_kovan
@@ -141,6 +146,6 @@ export class Web3ConnectionFactory {
       key = process.env.REACT_APP_INFURA_KEY // own developer's infura key
       url = `https://${ethNetwork}.infura.io/v3/${key}`
     }
-    return new RPCSubprovider(url)
+    return url
   }
 }
