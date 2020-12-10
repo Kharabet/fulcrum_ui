@@ -2,18 +2,19 @@ import { EventEmitter } from 'events'
 import { TasksQueueEvents } from '../services/events/TasksQueueEvents'
 import { LiquidationRequest } from './LiquidationRequest'
 import { RequestStatus } from './RequestStatus'
+import { RolloverRequest } from './RolloverRequest'
 
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null
 
-  public readonly request: LiquidationRequest
+  public readonly request: LiquidationRequest | RolloverRequest
   public status: RequestStatus
   public steps: string[]
   public stepCurrent: number
   public txHash: string | null
   public error: Error | null
 
-  constructor(request: LiquidationRequest) {
+  constructor(request: LiquidationRequest | RolloverRequest) {
     this.request = request
     this.status = RequestStatus.AWAITING
     this.steps = ['Preparing processing...']
