@@ -14,11 +14,11 @@ export interface IAssetSelectorProps {
 
 export const AssetSelector = (props: IAssetSelectorProps) => {
   const apiUrl = 'https://api.bzx.network/v1'
-  const [yields, setYield] = useState()
+  const [interestRates, setInterestRates] = useState()
   const [liquidities, setLiquidity] = useState()
 
   useEffect(() => {
-    getYield()
+    getInterestRates()
     getLiquidity()
   }, [props.isLoadingTransaction])
 
@@ -50,18 +50,18 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
   } else {
     assetsShown = []
   }
-  
-  async function getYield() {
-    const yieldAPYRequest = await fetch(`${apiUrl}/yield-farimng-apy`)
-    const yieldAPYJson = await yieldAPYRequest.json()
-    let yieldAPYData = []
-    if (yieldAPYJson.success) {
-      yieldAPYData = yieldAPYJson.data
+
+  const getInterestRates = async () => {
+    const interestRatesRequest = await fetch(`${apiUrl}/interest-rates`)
+    const interestRatesJson = await interestRatesRequest.json()
+    let interestRatesData = []
+    if (interestRatesJson.success) {
+      interestRatesData = interestRatesJson.data
     }
-    setYield(yieldAPYData)
+    setInterestRates(interestRatesData)
   }
 
-  async function getLiquidity() {
+  const getLiquidity = async () => {
     const liquidityRequest = await fetch(`${apiUrl}/liquidity`)
     const liquidityJson = await liquidityRequest.json()
     let liquidityData = []
@@ -71,22 +71,36 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
     setLiquidity(liquidityData)
   }
 
-  const assetSelectorItems = assetsShown.map((asset) => {
-    const yieldApr =
-      yields && yields![asset.toLowerCase()]
-        ? new BigNumber(yields![asset.toLowerCase()])
+  const assetSelectorItems = assetsShown.map((asset) => {   
+    const interestRate =
+    interestRates && interestRates![asset.toLowerCase()]
+        ? new BigNumber(interestRates![asset.toLowerCase()]["borrowApr"]).times(100)
         : new BigNumber(0)
 
-      const liquidity =
-      liquidities && liquidities![asset.toLowerCase()]
-          ? new BigNumber(liquidities![asset.toLowerCase()])
-          : new BigNumber(0)
-  
+        const yieldApr =
+        interestRates && interestRates![asset.toLowerCase()]
+            ? new BigNumber(interestRates![asset.toLowerCase()]["yieldFarmingAPR"]).times(100)
+            : new BigNumber(0)
+    
 
-    return <AssetSelectorItem key={asset} yieldApr={yieldApr} liquidity={liquidity} asset={asset} {...props} />
+    const liquidity =
+      liquidities && liquidities![asset.toLowerCase()]
+        ? new BigNumber(liquidities![asset.toLowerCase()])
+        : new BigNumber(0)
+
+    return (
+      <AssetSelectorItem
+        key={asset}
+        interestRate={interestRate}
+        yieldApr={yieldApr}
+        liquidity={liquidity}
+        asset={asset}
+        {...props}
+      />
+    )
   })
 
-  if (!yields || !liquidities || TorqueProvider.Instance.isLoading) {
+  if (!interestRates || !liquidities || TorqueProvider.Instance.isLoading) {
     return <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
   }
 

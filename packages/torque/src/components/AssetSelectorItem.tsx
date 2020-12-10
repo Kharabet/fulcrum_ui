@@ -18,6 +18,7 @@ import { TxProcessingLoader } from './TxProcessingLoader'
 export interface IAssetSelectorItemProps {
   asset: Asset
   isLoadingTransaction: boolean
+  interestRate: BigNumber
   yieldApr: BigNumber
   liquidity: BigNumber
   borrowDlgRef: React.RefObject<BorrowDlg>
@@ -25,7 +26,6 @@ export interface IAssetSelectorItemProps {
 }
 
 interface IAssetSelectorItemState {
-  interestRate: BigNumber
   isLoadingTransaction: boolean
   request: BorrowRequest | undefined
 }
@@ -35,7 +35,6 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     super(props)
 
     this.state = {
-      interestRate: new BigNumber(0),
       isLoadingTransaction: false,
       request: undefined
     }
@@ -46,16 +45,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     TorqueProvider.Instance.eventEmitter.on(
       TorqueProviderEvents.AskToCloseProgressDlg,
       this.onAskToCloseProgressDlg
-    )
-
-    TorqueProvider.Instance.eventEmitter.on(
-      TorqueProviderEvents.ProviderAvailable,
-      this.onProviderAvailable
-    )
-    TorqueProvider.Instance.eventEmitter.on(
-      TorqueProviderEvents.ProviderChanged,
-      this.derivedUpdate
-    )
+    )   
   }
 
   private onAskToOpenProgressDlg = (taskId: number) => {
@@ -76,9 +66,6 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     NavService.Instance.History.push('/dashboard')
   }
 
-  private onProviderAvailable = async () => {
-    await this.derivedUpdate()
-  }
 
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.off(
@@ -88,16 +75,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     TorqueProvider.Instance.eventEmitter.off(
       TorqueProviderEvents.AskToCloseProgressDlg,
       this.onAskToCloseProgressDlg
-    )
-
-    TorqueProvider.Instance.eventEmitter.removeListener(
-      TorqueProviderEvents.ProviderAvailable,
-      this.onProviderAvailable
-    )
-    TorqueProvider.Instance.eventEmitter.removeListener(
-      TorqueProviderEvents.ProviderChanged,
-      this.derivedUpdate
-    )
+    )   
   }
 
   public async componentDidMount() {
@@ -114,25 +92,8 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       isLoadingTransaction,
       request
     })
-
-    await this.derivedUpdate()
   }
 
-  public async componentDidUpdate(
-    prevProps: Readonly<IAssetSelectorItemProps>,
-    prevState: Readonly<IAssetSelectorItemState>,
-    snapshot?: any
-  ) {
-    if (this.props.asset !== prevProps.asset) {
-      await this.derivedUpdate()
-    }
-  }
-
-  private derivedUpdate = async () => {
-    const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.asset)
-
-    this.setState({ ...this.state, interestRate })
-  }
 
   public render() {
     const asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails
@@ -163,7 +124,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
               <div className="asset-selector__apr">APR</div>
               <div className="asset-selector__fixed">
                 FIXED
-                {this.state.interestRate.gt(0) ? ` ${this.state.interestRate.toFixed(2)}` : ` 0`}
+                {this.props.interestRate.gt(0) ? ` ${this.props.interestRate.toFixed(2)}` : ` 0`}
                 <span>%</span>
               </div>
             </div>
@@ -208,6 +169,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       if (error.message !== 'Form closed') console.error(error)
     }
   }
+  
   private formatLiquidity(value: BigNumber): string {
     if (value.lt(1000)) return value.toFixed(2)
     if (value.lt(10 ** 6)) return `${Number(value.dividedBy(1000).toFixed(2)).toString()}k`

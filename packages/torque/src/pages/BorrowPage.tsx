@@ -33,8 +33,7 @@ export class BorrowPage extends PureComponent<
       isLoadingTransaction: false
     }
   }
-  public componentWillUnmount(): void {}
-
+  
   public render() {
     return (
       <React.Fragment>
@@ -76,7 +75,7 @@ export class BorrowPage extends PureComponent<
       await TorqueProvider.Instance.onDoBorrow(borrowRequest)
       // if (receipt.status === 1) {
       this.setState({ ...this.state, isLoadingTransaction: false })
-      //NavService.Instance.History.push("/dashboard");
+      // NavService.Instance.History.push("/dashboard");
       // }
     } catch (error) {
       if (error.message !== 'Form closed') console.error(error)
