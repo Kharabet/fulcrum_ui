@@ -682,7 +682,7 @@ export class ExplorerProvider {
         const rollover = { ...loan, rebateAsset, gasRebate }
         rollovers.push(rollover)
       } catch (e) {
-        console.log(e)
+        console.error(e)
         console.log(loan)
       }
     }
