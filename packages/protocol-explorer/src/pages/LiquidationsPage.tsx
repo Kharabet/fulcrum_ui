@@ -206,8 +206,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       repayAmountUsd: BigNumber
     }> = []
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory()
-    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, true)
-    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, false)
+    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 5000, true)
+    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 5000, false)
     const unhealthyLoansUsd = unhealthyLoansData.reduce(
       (a, b) => a.plus(b.amountOwedUsd),
       new BigNumber(0)
