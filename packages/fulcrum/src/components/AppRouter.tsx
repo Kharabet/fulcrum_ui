@@ -18,7 +18,6 @@ import { errors } from 'ethers'
 import siteConfig from './../config/SiteConfig.json'
 
 import { Web3ReactProvider } from '@web3-react/core'
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { AbstractConnector } from '@web3-react/abstract-connector'
@@ -96,7 +95,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     window.removeEventListener('resize', this.didResize.bind(this))
   }
 
-  public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
+  public getLibrary = async (provider: any, connector: any): Promise<any> => {
     console.log(provider)
     //handle connectors events (i.e. network changed)
     // await this.onProviderTypeSelect(connector)

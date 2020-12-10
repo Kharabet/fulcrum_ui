@@ -1,4 +1,3 @@
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { EventEmitter } from 'events'
@@ -97,7 +96,7 @@ export class FulcrumProvider {
 
   public readonly eventEmitter: EventEmitter
   public providerType: ProviderType = ProviderType.None
-  public providerEngine: Web3ProviderEngine | null = null
+  public providerEngine: any = null
   public web3Wrapper: Web3Wrapper | null = null
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
@@ -261,7 +260,7 @@ export class FulcrumProvider {
 
   public async setWeb3ProviderMobileFinalize(
     providerType: ProviderType,
-    providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]
+    providerData: [Web3Wrapper | null, any | null, boolean, number, string]
   ) {
     // : Promise<boolean> {
     this.web3Wrapper = providerData[0]

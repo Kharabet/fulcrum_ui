@@ -284,16 +284,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }))
 
     await this.setState({
-      ...this.state,
-      volume30d,
-      transactionsCount30d,
-      events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
-      unhealthyLoans,
-      isDataLoading: false,
-      unhealthyLoansUsd,
+        ...this.state,
+        volume30d,
+        transactionsCount30d,
+        events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
+        unhealthyLoans,
+        isDataLoading: false,
+        unhealthyLoansUsd,
       healthyLoansUsd,
       rollovers
-    })
+      })
   }
 
   private numberWithCommas = (x: number | string) => {
