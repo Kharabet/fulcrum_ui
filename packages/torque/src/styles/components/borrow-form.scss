@@ -53,8 +53,6 @@
     justify-content: space-between;
   }
   &__title {
-    position: absolute;
-    left: 0;
     font-size: 16px;
     color: #758295;
     font-weight: 200;
@@ -72,7 +70,9 @@
       background-color: #f5f7f9;
       border: 2px solid #e7ebf0;
       border-radius: 4px;
-      width: 185px;
+      width: 265px;
+      justify-content: space-between;
+      padding: 0 15px 0 8px;
     }
     input {
       background-color: #f5f7f9;
@@ -91,7 +91,8 @@
     align-items: center;
     position: relative;
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
+    text-align: center;
     span {
       &:first-child() {
         position: absolute;
@@ -104,7 +105,26 @@
   &__collateral-asset {
     color: #758295;
     font-weight: 600;
-    margin-right: 5px;
+  }
+  &__max-deposit {
+    background: #b9c7d6;
+    border-radius: 2px;
+    border: none;
+    color: #ffffff;
+    text-transform: uppercase;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    min-width: 40px;
+    font-size: 12px;
+    justify-content: center;
+    cursor: pointer;
+  }
+  &__label-safe {
+    font-weight: 800;
+    color: #00c0ab;
+    display: block;
+    text-align: right;
   }
   &__edit-collateral-by-container {
     .rc-slider-rail {
@@ -132,18 +152,9 @@
           color: #758295;
           margin-bottom: 15px;
         }
-        &:last-child {
-          font-weight: 800;
-          color: #00c0ab;
-        }
       }
     }
     .edit-input-container {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      margin: auto;
       text-align: center;
       display: flex;
       align-items: center;
@@ -193,7 +204,7 @@
       border: 2px solid #e7ebf0;
       border-radius: 4px;
       color: #283049;
-      width: 185px;
+      width: 265px;
       text-align: center;
       font-size: 20px;
       line-height: 1.5;
@@ -202,12 +213,6 @@
     }
     .edit-icon-collateral {
       cursor: pointer;
-    }
-    .lh {
-      line-height: 2.375 !important;
-    }
-    .mb-15 {
-      margin-bottom: 15px;
     }
   }
   &__info-collateral-by-msg {
@@ -234,6 +239,7 @@
   }
   &__error {
     color: #de4a4a;
+    width: 100%;
   }
 }
 

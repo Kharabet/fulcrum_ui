@@ -165,6 +165,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     }
     if (prevState.selectedValue !== this.state.selectedValue)
       this.updateBorrowAmount(prevState.selectedValue, this.state.selectedValue)
+
+    if (prevState.depositAmount !== this.state.depositAmount) {
+      const isBalanceTooLow = await this.checkBalanceTooLow(this.state.collateralAsset)
+      this.setState({ ...this.state, balanceTooLow: isBalanceTooLow })
+    }
   }
 
   public render() {
@@ -203,6 +208,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                     <React.Fragment>
                       <span className="borrow-form__title">You will Deposit</span>
                       <div className="wrapper-input">
+                        <div className="borrow-form__max-deposit" onClick={this.setMaxDeposit}>
+                          Max
+                        </div>
                         <input
                           type="number"
                           step="any"
@@ -228,7 +236,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           </div>
           <div className="borrow-form__edit-collateral-by-container">
             <div className="edit-input-wrapper">
-              <span className="lh mb-15">Collateralized</span>
+              <span>Collateralized</span>
               <div className="edit-input-container">
                 {this.state.isEdit ? (
                   <React.Fragment>
@@ -259,8 +267,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                   </React.Fragment>
                 )}
               </div>
-              {this.state.isEdit && <span className="lh">Safe</span>}
             </div>
+            <span className="borrow-form__label-safe">Safe</span>
             {this.state.isEdit ? (
               <React.Fragment>
                 <Slider
@@ -415,7 +423,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   private checkBalanceTooLow = async (collateralAsset: Asset) => {
-    const borrowEstimate = await this.getDepositEstimateForBorrow(collateralAsset)
+    const depositEstimate = await this.getDepositEstimateForBorrow(collateralAsset)
     let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(collateralAsset)
     if (collateralAsset === Asset.ETH) {
       assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
@@ -424,9 +432,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     }
     const decimals = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
     const amountInBaseUnits = new BigNumber(
-      borrowEstimate.depositAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
+      depositEstimate.depositAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
     )
-    return assetBalance.lt(amountInBaseUnits)
+
+    const balance = assetBalance.dividedBy(10 ** decimals)
+    return balance.lt(this.state.depositAmount)
   }
 
   private getDepositEstimateForBorrow = async (collateralAsset: Asset) => {
@@ -554,5 +564,27 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       borrowAmount: updatedBorrowAmount,
       borrowAmountValue: borrowAmountValue
     })
+  }
+
+  public setMaxDeposit = async () => {
+    TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset).then(
+      (balance) => {
+        if (this.state.collateralAsset === Asset.ETH) {
+          balance = balance.gt(TorqueProvider.Instance.gasBufferForTxn)
+            ? balance.minus(TorqueProvider.Instance.gasBufferForTxn)
+            : new BigNumber(0)
+        }
+        const decimals = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18
+
+        const depositAmount = balance.dividedBy(10 ** decimals)
+        const depositAmountValue = depositAmount.dp(5, BigNumber.ROUND_CEIL).toString()
+        this.setState({
+          ...this.state,
+          depositAmount: depositAmount,
+          depositAmountValue: depositAmountValue
+        })
+        this._depositAmountChange.next(this.state.depositAmountValue)
+      }
+    )
   }
 }
