@@ -1,4 +1,3 @@
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { EventEmitter } from 'events'
@@ -97,7 +96,7 @@ export class FulcrumProvider {
 
   public readonly eventEmitter: EventEmitter
   public providerType: ProviderType = ProviderType.None
-  public providerEngine: Web3ProviderEngine | null = null
+  public providerEngine: any = null
   public web3Wrapper: Web3Wrapper | null = null
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
@@ -198,8 +197,8 @@ export class FulcrumProvider {
     this.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
 
     this.unsupportedNetwork = false
-    await Web3ConnectionFactory.setWalletProvider(connector, account)
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector)
+    await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     await this.setWeb3ProviderFinalize(providerType)
   }
 
@@ -261,7 +260,7 @@ export class FulcrumProvider {
 
   public async setWeb3ProviderMobileFinalize(
     providerType: ProviderType,
-    providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]
+    providerData: [Web3Wrapper | null, any | null, boolean, number, string]
   ) {
     // : Promise<boolean> {
     this.web3Wrapper = providerData[0]
@@ -2011,32 +2010,32 @@ export class FulcrumProvider {
     return result
   }
 
-  public async getErc20BalancesOfUser(
-    addressesErc20: string[],
-    account?: string
-  ): Promise<Map<string, BigNumber>> {
-    let result: Map<string, BigNumber> = new Map<string, BigNumber>()
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      if (!account && this.contractsSource.canWrite) {
-        account = this.getCurrentAccount()
-      }
-      if (account) {
-        // @ts-ignore
-        const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
-        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20)
-        if (resp) {
-          // @ts-ignore
-          result = resp.tokenBalances
-            .filter((t) => !t.error && t.tokenBalance !== '0')
-            .reduce(
-              (map, obj) => (map.set(obj.address, new BigNumber(obj.tokenBalance!)), map),
-              new Map<string, BigNumber>()
-            )
-        }
-      }
-    }
-    return result
-  }
+  // public async getErc20BalancesOfUser(
+  //   addressesErc20: string[],
+  //   account?: string
+  // ): Promise<Map<string, BigNumber>> {
+  //   let result: Map<string, BigNumber> = new Map<string, BigNumber>()
+  //   if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+  //     if (!account && this.contractsSource.canWrite) {
+  //       account = this.getCurrentAccount()
+  //     }
+  //     if (account) {
+  //       // @ts-ignore
+  //       const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
+  //       const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20)
+  //       if (resp) {
+  //         // @ts-ignore
+  //         result = resp.tokenBalances
+  //           .filter((t) => !t.error && t.tokenBalance !== '0')
+  //           .reduce(
+  //             (map, obj) => (map.set(obj.address, new BigNumber(obj.tokenBalance!)), map),
+  //             new Map<string, BigNumber>()
+  //           )
+  //       }
+  //     }
+  //   }
+  //   return result
+  // }
 
   public async getSwapToUsdRateBatch(
     assets: Asset[],

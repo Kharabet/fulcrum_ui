@@ -22,7 +22,11 @@ export class LiquidationProcessor {
     if (!iBZxContract) {
       throw new Error('No bzxContract contract available!')
     }
-    const taskRequest: LiquidationRequest = task.request
+    const taskRequest = task.request
+    
+    if (!(taskRequest instanceof LiquidationRequest)) {
+      throw new Error('Incorrect request type!')
+    }
     let sendAmountForValue = new BigNumber(0)
 
     if (taskRequest.loanToken === Asset.WETH || taskRequest.loanToken === Asset.ETH) {

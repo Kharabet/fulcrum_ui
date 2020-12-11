@@ -4,9 +4,9 @@ import { ReactComponent as IconCopy } from '../assets/images/ic__copy.svg'
 import { Asset } from '../domain/Asset'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { TasksQueue } from '../services/TasksQueue'
@@ -16,34 +16,36 @@ import { TxLoaderStep } from './TxLoaderStep'
 import Clipboard from 'clipboard'
 import ReactTooltip from 'react-tooltip'
 
-export interface ILoanRowProps {
+export interface IRolloverRowProps {
   loanId: string
-  payOffAmount: BigNumber
-  seizeAmount: BigNumber
-  loanToken: Asset
-  collateralToken: Asset
-  onLiquidationUpdated: () => void
-  onLiquidationRequested: (request: LiquidationRequest) => void
+  rebateAsset: Asset
+  gasRebate: BigNumber
+  onRolloverUpdated: () => void
   doNetworkConnect: () => void
 }
 
-export interface ILoanRow {
+export interface IRolloverRow {
   isLoadingTransaction: boolean
 }
 
-export const LoanRow = (props: ILoanRowProps) => {
-  const loanToken = AssetsDictionary.assets.get(props.loanToken) as AssetDetails
-  const collateralToken = AssetsDictionary.assets.get(props.collateralToken) as AssetDetails
+export const RolloverRow = (props: IRolloverRowProps) => {
+  const rebateToken = AssetsDictionary.assets.get(props.rebateAsset) as AssetDetails
 
   const [isLoadingTransaction, setLoadingTransaction] = useState(false)
-  const [liquidationRequest, setRequest] = useState<LiquidationRequest>()
+  const [rolloverRequest, setRequest] = useState<RolloverRequest>()
 
   const copyEl = React.useRef<HTMLSpanElement | null>(null)
   let clipboard: Clipboard | undefined
   useEffect(() => {
-    const task = TasksQueue.Instance.getTasksList().find((t) => t.request.loanId === props.loanId)
-    setLoadingTransaction(task && !task.error ? true : false)
-    setRequest(task && task.request instanceof LiquidationRequest ? task.request : undefined)
+    async function loadData() {
+      const task = TasksQueue.Instance.getTasksList().find(
+        (t: RequestTask) =>
+          t.request instanceof RolloverRequest && t.request.loanId === props.loanId
+      )
+      setLoadingTransaction(task && !task.error ? true : false)
+      setRequest(task && task.request instanceof RolloverRequest ? task.request : undefined)
+    }
+    loadData()
 
     ExplorerProvider.Instance.eventEmitter.on(
       ExplorerProviderEvents.AskToOpenProgressDlg,
@@ -69,27 +71,27 @@ export const LoanRow = (props: ILoanRowProps) => {
     }
   })
 
-  const onLiquidateClick = async () => {
-    // setLoadingTransaction(true)
+  const onRolloverClick = async () => {
+    const provider = ExplorerProvider.getLocalstorageItem('providerType')
+
+    if (
+      !provider ||
+      provider === 'None' ||
+      !ExplorerProvider.Instance.contractsSource ||
+      !ExplorerProvider.Instance.contractsSource.canWrite
+    ) {
+      props.doNetworkConnect()
+      return
+    }
+
+    setLoadingTransaction(true)
     const loanId = props.loanId
-    const decimals: number = AssetsDictionary.assets.get(props.loanToken)!.decimals || 18
 
-    const amountInBaseUnits = new BigNumber(
-      props.payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
-    )
+    const request = new RolloverRequest(loanId)
 
-    const rate = props.payOffAmount.dividedBy(props.seizeAmount)
-    const request = new LiquidationRequest(
-      loanId || '0x0000000000000000000000000000000000000000000000000000000000000000',
-      props.loanToken,
-      props.collateralToken,
-      amountInBaseUnits,
-      rate
-    )
-
-    props.onLiquidationRequested(request)
+    console.log(request)
     changeLoadingTransaction(true, request)
-    // await ExplorerProvider.Instance.onLiquidationConfirmed(request)
+    await ExplorerProvider.Instance.onRolloverConfirmed(request)
   }
 
   const getShortHash = (hash: string, count: number) => {
@@ -97,30 +99,47 @@ export const LoanRow = (props: ILoanRowProps) => {
   }
 
   const changeLoadingTransaction = (
-    isLoading: boolean,
-    request: LiquidationRequest | undefined
+    isLoadingTransaction: boolean,
+    request: RolloverRequest | undefined
   ) => {
-    setLoadingTransaction(isLoading)
+    setLoadingTransaction(isLoadingTransaction)
     setRequest(request)
   }
 
   const onAskToOpenProgressDlg = async (taskId: string) => {
-    if (!liquidationRequest || taskId !== liquidationRequest.loanId) return
-    changeLoadingTransaction(true, liquidationRequest)
+    if (!rolloverRequest || taskId !== rolloverRequest.loanId) return
+    changeLoadingTransaction(true, rolloverRequest)
+  }
+
+  const onCopyClick = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const loanId = e.currentTarget.dataset.id
+    if (!loanId) {
+      return
+    }
+
+    const tempInput = document.createElement('input')
+    tempInput.style.position = 'absolute'
+    tempInput.style.left = '-1000px'
+    tempInput.style.top = '-1000px'
+    tempInput.value = loanId
+    document.body.appendChild(tempInput)
+    tempInput.select()
+    document.execCommand('copy')
+    document.body.removeChild(tempInput)
   }
 
   const onAskToCloseProgressDlg = async (task: RequestTask) => {
-    if (!liquidationRequest || task.request.loanId !== liquidationRequest.loanId) return
+    if (!rolloverRequest || task.request.loanId !== rolloverRequest.loanId) return
 
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(async () => {
-        await ExplorerProvider.Instance.onTaskCancel(task)
+      window.setTimeout(() => {
+        ExplorerProvider.Instance.onTaskCancel(task)
         changeLoadingTransaction(false, undefined)
       }, 5000)
       return
     }
 
-    props.onLiquidationUpdated()
+    props.onRolloverUpdated()
     changeLoadingTransaction(false, undefined)
   }
 
@@ -165,16 +184,13 @@ export const LoanRow = (props: ILoanRowProps) => {
             </span>
             <ReactTooltip className="tooltip__info" id={props.loanId} event="fakeEvent" />
           </div>
-          <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">
-            {loanToken.logoSvg.render()} {props.payOffAmount.toFixed(3)}
-          </div>
-          <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">
-            {collateralToken.logoSvg.render()}
-            {props.seizeAmount.toFixed(3)}
+          <div className="table-row-loan__amount" />
+          <div title={props.gasRebate.toFixed()} className="table-row-loan__collateral">
+            {rebateToken.logoSvg.render()}&nbsp;{props.gasRebate.toFixed(2)}
           </div>
           <div className="table-row-loan__action">
-            <button className="action" onClick={onLiquidateClick}>
-              Liquidate
+            <button className="action" onClick={onRolloverClick}>
+              Rollover
             </button>
           </div>
         </div>
