@@ -1,10 +1,7 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 
 import {
-  MetamaskSubprovider,
   RPCSubprovider,
-  SignerSubprovider,
-  Subprovider,
   Web3ProviderEngine
 } from '@0x/subproviders'
 
@@ -20,7 +17,7 @@ export class Web3ConnectionFactory {
   public static networkId: number
   public static canWrite: boolean
   public static userAccount: string | undefined
-  public static currentWeb3Engine: Web3ProviderEngine
+  public static currentWeb3Engine: any
   public static currentWeb3Wrapper: Web3Wrapper
 
   public static async setWalletProvider(
@@ -28,77 +25,30 @@ export class Web3ConnectionFactory {
     providerType: ProviderType,
     web3ReactAccount?: string
   ) {
-    let canWrite = false
-    let networkId: number = 0
-    let web3Wrapper: Web3Wrapper
-
-    /*
-      TODO:
-      Set pollingInterval to 8000. Use https://github.com/MetaMask/eth-block-tracker with Web3ProviderEngine
-      to poll for new blocks and use events to update the UI.
-
-      interface Web3ProviderEngineOptions {
-          pollingInterval?: number;
-          blockTracker?: any;
-          blockTrackerProvider?: any;
-      }
-    */
-
-    const rpcSubprovider = await this.getRPCSubprovider()
-
-    let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }) // 1 hour polling
-
-    const provider = await connector.getProvider()
     try {
-      
+      const provider = await connector.getProvider()
       const account = await connector.getAccount()
       const chainId = (await connector.getChainId()).toString()
-      networkId = chainId.includes('0x') ? parseInt(chainId, 16) : parseInt(chainId, 10)
-      
-      let walletSubprovider: Subprovider
-      switch (providerType) {
-        case ProviderType.Ledger:
-          // Ledger connector is the Web3ProviderEngine itself
-          providerEngine = provider
-          break
-        case ProviderType.MetaMask:
-          walletSubprovider = new MetamaskSubprovider(provider)
-          providerEngine.addProvider(walletSubprovider)
-          providerEngine.addProvider(rpcSubprovider)
-          break
-        case ProviderType.Trezor:
-          // Trezor connector is the Web3ProviderEngine itself
-          providerEngine = provider
-          break
-        default:
-          walletSubprovider = new SignerSubprovider(provider)
-          providerEngine.addProvider(walletSubprovider)
-          providerEngine.addProvider(rpcSubprovider)
-          break;
-      }
-      await providerEngine.start()
-      
-      canWrite = true
+      const networkId = chainId.includes('0x') ? parseInt(chainId, 16) : parseInt(chainId, 10)
+      const web3Wrapper = new Web3Wrapper(provider)
+
+      const canWrite = true
       Web3ConnectionFactory.userAccount = account
         ? account
         : web3ReactAccount
         ? web3ReactAccount
         : undefined
+
+      Web3ConnectionFactory.currentWeb3Engine = provider
+      Web3ConnectionFactory.networkId = networkId
+        ? networkId
+        : await web3Wrapper.getNetworkIdAsync()
+      Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper
+      Web3ConnectionFactory.canWrite = canWrite
     } catch (e) {
-      console.log(e)
-
-      // rebuild providerEngine
-      providerEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }) // 1 hour polling
-      providerEngine.addProvider(rpcSubprovider)
-
-      await providerEngine.start()
+      console.error(e)
+      Web3ConnectionFactory.setReadonlyProvider()
     }
-    
-    web3Wrapper = new Web3Wrapper(providerEngine)
-    Web3ConnectionFactory.networkId = networkId ? networkId : await web3Wrapper.getNetworkIdAsync()
-    Web3ConnectionFactory.currentWeb3Engine = providerEngine
-    Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper
-    Web3ConnectionFactory.canWrite = canWrite
   }
 
   public static async setReadonlyProvider() {

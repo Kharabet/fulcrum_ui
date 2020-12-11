@@ -1,7 +1,6 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { Web3ReactProvider } from '@web3-react/core'
 import { AbstractConnector } from '@web3-react/abstract-connector'
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { StakingProvider } from '../services/StakingProvider'
 import { StakingProviderEvents } from '../services/events/StakingProviderEvents'
@@ -167,7 +166,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     
   }
 
-  public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
+  public getLibrary = async (provider: any, connector: any): Promise<any> => {
     console.log(provider)
     //handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)
