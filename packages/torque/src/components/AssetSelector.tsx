@@ -7,7 +7,6 @@ import AssetSelectorItem from './AssetSelectorItem'
 import { BorrowDlg } from './BorrowDlg'
 
 export interface IAssetSelectorProps {
-  isLoadingTransaction: boolean
   borrowDlgRef: React.RefObject<BorrowDlg>
   doNetworkConnect: () => void
 }
@@ -20,7 +19,7 @@ const AssetSelector = (props: IAssetSelectorProps) => {
   useEffect(() => {
     getInterestRates()
     getLiquidity()
-  }, [props.isLoadingTransaction])
+  }, [])
 
   // true includes ENS support
   let assetsShown: Asset[]

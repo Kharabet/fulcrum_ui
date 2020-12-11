@@ -1,11 +1,8 @@
 import React, { RefObject, useState } from 'react'
 import AssetSelector from '../components/AssetSelector'
 import { BorrowDlg } from '../components/BorrowDlg'
-import { Asset } from '../domain/Asset'
-import { ProviderType } from '../domain/ProviderType'
 import { Footer } from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
-import { TorqueProvider } from '../services/TorqueProvider'
 
 export interface IBorrowPageProps {
   doNetworkConnect: () => void
@@ -14,34 +11,7 @@ export interface IBorrowPageProps {
 }
 
 const BorrowPage = (props: IBorrowPageProps) => {
-  const [isLoadingTransaction, setLoadingTransaction] = useState<boolean>(false)
   const borrowDlgRef: RefObject<BorrowDlg> = React.createRef()
-
-  const onSelectAsset = async (asset: Asset) => {
-    if (!borrowDlgRef.current) return
-
-    if (
-      TorqueProvider.Instance.providerType === ProviderType.None ||
-      !TorqueProvider.Instance.contractsSource ||
-      !TorqueProvider.Instance.contractsSource.canWrite
-    ) {
-      props.doNetworkConnect()
-      return
-    }
-
-    try {
-      const borrowRequest = await borrowDlgRef.current.getValue(asset)
-      setLoadingTransaction(true)
-      await TorqueProvider.Instance.onDoBorrow(borrowRequest)
-      // if (receipt.status === 1) {
-      setLoadingTransaction(false)
-      // NavService.Instance.History.push("/dashboard");
-      // }
-    } catch (error) {
-      if (error.message !== 'Form closed') console.error(error)
-      setLoadingTransaction(false)
-    }
-  }
 
   return (
     <React.Fragment>
@@ -54,7 +24,6 @@ const BorrowPage = (props: IBorrowPageProps) => {
         />
         <main>
           <AssetSelector
-            isLoadingTransaction={isLoadingTransaction}
             borrowDlgRef={borrowDlgRef}
             doNetworkConnect={props.doNetworkConnect}
           />

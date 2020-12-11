@@ -17,7 +17,6 @@ import { TxProcessingLoader } from './TxProcessingLoader'
 
 export interface IAssetSelectorItemProps {
   asset: Asset
-  isLoadingTransaction: boolean
   interestRate: BigNumber
   yieldApr: BigNumber
   liquidity: BigNumber
