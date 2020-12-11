@@ -16,7 +16,6 @@
   "dependencies": {
     "@0x/base-contract": "^5.0.5",
     "@0x/utils": "^4.3.1",
-    "@alch/alchemy-web3": "0.1.18-bzx",
     "@types/react-sidebar": "^3.0.0",
     "chart.js": "^2.9.3",
     "clipboard": "^2.0.6",
