@@ -198,8 +198,8 @@ export class FulcrumProvider {
     this.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
 
     this.unsupportedNetwork = false
-    await Web3ConnectionFactory.setWalletProvider(connector, account)
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector)
+    await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     await this.setWeb3ProviderFinalize(providerType)
   }
 

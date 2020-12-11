@@ -323,14 +323,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       destToken,
       tradeAmountInLoanToken
     )
-    this.setState({ slippageRate })
+    this._isMounted && this.setState({ slippageRate })
   }
 
   private async setDepositTokenBalance(depositToken: Asset) {
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       depositToken
     )
-    this.setState({ depositTokenBalance })
+    this._isMounted && this.setState({ depositTokenBalance })
   }
 
   public async componentDidUpdate(
@@ -343,33 +343,20 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       await this.setSlippageRate(this.state.tradeAmountValue)
-      this.state.depositToken !== prevState.depositToken &&
-        (await this.setDepositTokenBalance(this.state.depositToken))
     }
-
+    if (this.state.depositToken !== prevState.depositToken) {
+      await this.setDepositTokenBalance(this.state.depositToken)
+    }
     if (
       this.props.tradeType !== prevProps.tradeType ||
       this.props.baseToken !== prevProps.baseToken ||
       this.props.positionType !== prevProps.positionType ||
       this.props.leverage !== prevProps.leverage ||
-      // this.state.depositToken !== prevState.depositToken ||
       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
-      if (this.state.depositToken !== prevState.depositToken) {
-        this._isMounted &&
-          this.setState({
-            ...this.state,
-            inputAmountText: '',
-            inputAmountValue: new BigNumber(0),
-            tradeAmountValue: new BigNumber(0)
-          })
-        await this.derivedUpdate()
-      } else {
-        // this.derivedUpdate();
-        if (this.props.tradeType === TradeType.SELL) {
-          // TODO: need to handle this with a feedback to the user?
-          await this.getLoanCloseAmount(this.state.returnedAsset)
-        }
+      if (this.props.tradeType === TradeType.SELL) {
+        // TODO: need to handle this with a feedback to the user?
+        await this.getLoanCloseAmount(this.state.returnedAsset)
       }
     }
   }
@@ -655,9 +642,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       })
   }
 
-  public onCollateralChange = async (asset: Asset) => {
-    this._isMounted && this.setState({ depositToken: asset })
-    await this.onInsertMaxValue(1)
+  public onCollateralChange = (asset: Asset) => {
+    this._isMounted &&
+      this.setState({ depositToken: asset }, async () => {
+        await this.onInsertMaxValue(1)
+      })
   }
 
   public onUpdateClick = async (event: any) => {
@@ -742,40 +731,49 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     multiplier: BigNumber
   ): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>((observer) => {
-      this._isMounted && this.setState({ ...this.state, isLoading: true, isExposureLoading: true })
-      FulcrumProvider.Instance.getMaxTradeValue(
-        this.props.tradeType,
-        this.props.baseToken,
-        this.props.quoteToken,
-        this.state.depositToken,
-        this.props.positionType,
-        this.props.loan
-      ).then((maxTradeValue) => {
-        this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier).then(
-          (limitedAmount) => {
-            this.createTradeAmountChangedEvent(limitedAmount, maxTradeValue).then((changeEvent) =>
-              observer.next(changeEvent)
-            )
-          }
+      this._isMounted &&
+        this.setState({ ...this.state, isLoading: true, isExposureLoading: true }, async () =>
+          FulcrumProvider.Instance.getMaxTradeValue(
+            this.props.tradeType,
+            this.props.baseToken,
+            this.props.quoteToken,
+            this.state.depositToken,
+            this.props.positionType,
+            this.props.loan
+          ).then(async (maxTradeValue) => {
+            await this.getInputAmountLimitedFromBigNumber(
+              maxTradeValue,
+              maxTradeValue,
+              multiplier
+            ).then(async (limitedAmount) => {
+              await this.createTradeAmountChangedEvent(
+                limitedAmount,
+                maxTradeValue
+              ).then((changeEvent) => observer.next(changeEvent))
+            })
+          })
         )
-      })
     })
   }
 
   private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>((observer) => {
-      this._isMounted && this.setState({ ...this.state, isExposureLoading: true })
-      FulcrumProvider.Instance.getMaxTradeValue(
-        this.props.tradeType,
-        this.props.baseToken,
-        this.props.quoteToken,
-        this.state.depositToken,
-        this.props.positionType,
-        this.props.loan
-      ).then((maxTradeValue) => {
-        this.getInputAmountLimitedFromText(value, maxTradeValue).then((limitedAmount) => {
-          this.createTradeAmountChangedEvent(limitedAmount, maxTradeValue).then((changeEvent) =>
-            observer.next(changeEvent)
+      this.setState({ ...this.state, isExposureLoading: true }, async () => {
+        await FulcrumProvider.Instance.getMaxTradeValue(
+          this.props.tradeType,
+          this.props.baseToken,
+          this.props.quoteToken,
+          this.state.depositToken,
+          this.props.positionType,
+          this.props.loan
+        ).then(async (maxTradeValue) => {
+          await this.getInputAmountLimitedFromText(value, maxTradeValue).then(
+            async (limitedAmount) => {
+              await this.createTradeAmountChangedEvent(
+                limitedAmount,
+                maxTradeValue
+              ).then((changeEvent) => observer.next(changeEvent))
+            }
           )
         })
       })

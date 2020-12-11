@@ -1,19 +1,19 @@
 import React, { Component } from 'react'
+import { LoanRow, ILoanRowProps } from './LoanRow'
 import { ReactComponent as ArrowPagination } from '../assets/images/icon_pagination.svg'
-import { LiquidationRequest } from '../domain/LiquidationRequest'
-import { ILoanRowProps, LoanRow } from './LoanRow'
+import { IRolloverRowProps, RolloverRow } from './RolloverRow'
 
-interface ILoanGridProps {
-  events: ILoanRowProps[]
+interface IRolloversGridProps {
+  events: IRolloverRowProps[]
 }
 
-interface ILoanGridState {
+interface IRolloversGridState {
   numberPagination: number
   quantityGrids: number
   isLastRow: boolean
 }
 
-export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
+export class RolloversGrid extends Component<IRolloversGridProps, IRolloversGridState> {
   private quantityVisibleRow = 10
 
   constructor(props: any) {
@@ -38,7 +38,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
         this.quantityVisibleRow * this.state.numberPagination,
         this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow
       )
-      .map((e, i) => <LoanRow key={i} {...e} />)
+      .map((e, i) => <RolloverRow key={i} {...e} />)
     if (assetItems.length === 0) return null
 
     return (
@@ -46,8 +46,8 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
         <div className="table table-loan">
           <div className="table-header table-header-loan">
             <div className="table-header-loan__id">Loan ID</div>
-            <div className="table-header-loan__amount">Amount to Pay Off</div>
-            <div className="table-header-loan__collateral">Collateral to Receive</div>
+            <div className="table-header-loan__amount" />
+            <div className="table-header-loan__collateral">Rollover Rebate to Recive</div> 
             <div className="table-header-loan__action">Action</div>
           </div>
           {assetItems}

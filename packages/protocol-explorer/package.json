@@ -19,6 +19,7 @@
     "@alch/alchemy-web3": "0.1.18-bzx",
     "@types/react-sidebar": "^3.0.0",
     "chart.js": "^2.9.3",
+    "clipboard": "^2.0.6",
     "events": "^3.0.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.1",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@0x/abi-gen": "^2.0.9",
     "@babel/core": "^7.0.0-0",
+    "@types/clipboard": "^2.0.1",
     "@types/events": "^3.0.0",
     "@types/jest": "24.0.11",
     "@types/lodash": "^4.14.123",
