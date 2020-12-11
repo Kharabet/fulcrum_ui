@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Loader } from '../components/Loader'
 import { Asset } from '../domain/Asset'
 import { TorqueProvider } from '../services/TorqueProvider'
-import { AssetSelectorItem } from './AssetSelectorItem'
+import AssetSelectorItem from './AssetSelectorItem'
 import { BorrowDlg } from './BorrowDlg'
 
 export interface IAssetSelectorProps {
@@ -12,7 +12,7 @@ export interface IAssetSelectorProps {
   doNetworkConnect: () => void
 }
 
-export const AssetSelector = (props: IAssetSelectorProps) => {
+const AssetSelector = (props: IAssetSelectorProps) => {
   const apiUrl = 'https://api.bzx.network/v1'
   const [interestRates, setInterestRates] = useState()
   const [liquidities, setLiquidity] = useState()
@@ -71,17 +71,16 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
     setLiquidity(liquidityData)
   }
 
-  const assetSelectorItems = assetsShown.map((asset) => {   
+  const assetSelectorItems = assetsShown.map((asset) => {
     const interestRate =
-    interestRates && interestRates![asset.toLowerCase()]
-        ? new BigNumber(interestRates![asset.toLowerCase()]["borrowApr"]).times(100)
+      interestRates && interestRates![asset.toLowerCase()]
+        ? new BigNumber(interestRates![asset.toLowerCase()]['borrowApr']).times(100)
         : new BigNumber(0)
 
-        const yieldApr =
-        interestRates && interestRates![asset.toLowerCase()]
-            ? new BigNumber(interestRates![asset.toLowerCase()]["yieldFarmingAPR"]).times(100)
-            : new BigNumber(0)
-    
+    const yieldApr =
+      interestRates && interestRates![asset.toLowerCase()]
+        ? new BigNumber(interestRates![asset.toLowerCase()]['yieldFarmingAPR']).times(100)
+        : new BigNumber(0)
 
     const liquidity =
       liquidities && liquidities![asset.toLowerCase()]
@@ -106,3 +105,5 @@ export const AssetSelector = (props: IAssetSelectorProps) => {
 
   return <div className="asset-selector">{assetSelectorItems}</div>
 }
+
+export default React.memo(AssetSelector)

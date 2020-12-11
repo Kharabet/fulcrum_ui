@@ -6,7 +6,7 @@ import Intercom from 'react-intercom'
 import { Redirect, Route, Router, Switch } from 'react-router-dom'
 import configProviders from '../config/providers.json'
 import { ProviderType } from '../domain/ProviderType'
-import { BorrowPage } from '../pages/BorrowPage'
+import BorrowPage from '../pages/BorrowPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { MaintenancePage } from '../pages/MaintenancePage'
 //import { RefinancePage } from "../pages/RefinancePage";
