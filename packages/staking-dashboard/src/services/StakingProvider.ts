@@ -1,4 +1,3 @@
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { EventEmitter } from 'events'
 
@@ -53,7 +52,7 @@ export class StakingProvider {
   public readonly successDisplayTimeout = 5000
   public readonly eventEmitter: EventEmitter
   public providerType: ProviderType = ProviderType.None
-  public providerEngine: Web3ProviderEngine | null = null
+  public providerEngine: any = null
   public web3Wrapper: Web3Wrapper | null = null
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
@@ -173,7 +172,7 @@ export class StakingProvider {
 
   public async setWeb3ProviderMobileFinalize(
     providerType: ProviderType,
-    providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]
+    providerData: [Web3Wrapper | null, any, boolean, number, string]
   ) {
     // : Promise<boolean> {
     this.web3Wrapper = providerData[0]
