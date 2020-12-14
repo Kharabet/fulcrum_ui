@@ -1825,7 +1825,7 @@ export class FulcrumProvider {
     result = loansData
       .filter(
         (e: any) =>
-          (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+          !e.principal.eq(zero) ||
           account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
       )
       .map((e: any) => {
@@ -1897,7 +1897,7 @@ export class FulcrumProvider {
     const zero = new BigNumber(0)
     const healthyUserLoans = loansData.filter(
       (e: any) =>
-        (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+        !e.principal.eq(zero) ||
         account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
     )
     const loansByPair: IBorrowedFundsState[] = []
