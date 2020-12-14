@@ -45,13 +45,17 @@ interface IBorrowFormState {
 
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private _input: HTMLInputElement | null = null
+  private _isMounted: boolean
 
+  private readonly _initDefaults: Subject<null>
   private readonly _borrowAmountChange: Subject<string>
   private readonly _depositAmountChange: Subject<string>
   private readonly _collateralChange: Subject<null>
 
   public constructor(props: IBorrowFormProps, context?: any) {
     super(props, context)
+
+    this._isMounted = false
 
     this.state = {
       borrowAmount: new BigNumber(0),
@@ -68,7 +72,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false,
       didSubmit: false,
-      isLoading: false,
+      isLoading: true,
       isEdit: false,
       minValue: 120,
       maxValue: 700,
@@ -76,9 +80,13 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       collateralValue: ''
     }
 
+    this._initDefaults = new Subject<null>()
+    this._initDefaults.pipe(debounceTime(50)).subscribe(() => {   
+      this.setInputDefaults()
+    })
+
     this._borrowAmountChange = new Subject<string>()
     this._collateralChange = new Subject<null>()
-
     merge(
       this._borrowAmountChange.pipe(
         debounceTime(100),
@@ -112,42 +120,28 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this._input = input
   }
 
-  private async setDefaultCollaterization() {
+  private async setInputDefaults() {  
+    const ethBalance = await TorqueProvider.Instance.getEthBalance()   
+    const maxAvailableLiquidity = await TorqueProvider.Instance.getAvailableLiquidaity(
+      this.props.borrowAsset
+    )      
     const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
       this.props.borrowAsset,
       this.state.collateralAsset
     )
     const selectedValue: BigNumber = minInitialMargin.plus(30)
-
     this.setState({
-      ...this.state,
+      isLoading: false,
+      maxAvailableLiquidity,
+      ethBalance,
       minValue: minInitialMargin.toNumber(),
       selectedValue: selectedValue.toNumber(),
       collateralValue: selectedValue.toFixed()
     })
   }
 
-  public async componentWillMount() {
-    await this.setDefaultCollaterization()
-  }
-
-  public async componentDidMount() {
-    this.setState({
-      isLoading: true
-    })
-
-    const maxAvailableLiquidity = await TorqueProvider.Instance.getAvailableLiquidaity(
-      this.props.borrowAsset
-    )
-
-    const ethBalance = await TorqueProvider.Instance.getEthBalance()
-    this.setState({
-      isLoading: false,
-      maxAvailableLiquidity,
-      ethBalance
-    })
-
-    this._borrowAmountChange.next(this.state.borrowAmountValue)
+  public async componentDidMount() {    
+    this._initDefaults.next()
   }
 
   public render() {
