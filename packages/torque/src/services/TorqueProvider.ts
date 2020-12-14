@@ -5,23 +5,23 @@ import { EventEmitter } from 'events'
 import Web3Utils from 'web3-utils'
 
 import constantAddress from '../config/constant.json'
-import { cdpManagerContract } from '../contracts/cdpManager'
-import { CompoundBridgeContract } from '../contracts/CompoundBridge'
-import { CompoundComptrollerContract } from '../contracts/CompoundComptroller'
-import { dsProxyJsonContract } from '../contracts/dsProxyJson'
+import { cdpManagerContract } from 'bzx-common/src/contracts/typescript-wrappers/cdpManager'
+import { CompoundBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/CompoundBridge'
+import { CompoundComptrollerContract } from 'bzx-common/src/contracts/typescript-wrappers/CompoundComptroller'
+import { dsProxyJsonContract } from 'bzx-common/src/contracts/typescript-wrappers/dsProxyJson'
 // import rawEncode  from "ethereumjs-abi";
-import { erc20Contract } from '../contracts/erc20'
-import { GetCdpsContract } from '../contracts/getCdps'
-import { instaRegistryContract } from '../contracts/instaRegistry'
-import { makerBridgeContract } from '../contracts/makerBridge'
-import { proxyRegistryContract } from '../contracts/proxyRegistry'
-import { saiToDAIBridgeContract } from '../contracts/saiToDaiBridge'
-import { SoloContract } from '../contracts/solo'
-import { SoloBridgeContract } from '../contracts/SoloBridge'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
+import { GetCdpsContract } from 'bzx-common/src/contracts/typescript-wrappers/getCdps'
+import { instaRegistryContract } from 'bzx-common/src/contracts/typescript-wrappers/instaRegistry'
+import { makerBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/makerBridge'
+import { proxyRegistryContract } from 'bzx-common/src/contracts/typescript-wrappers/proxyRegistry'
+import { saiToDAIBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/saiToDaiBridge'
+import { SoloContract } from 'bzx-common/src/contracts/typescript-wrappers/solo'
+import { SoloBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/SoloBridge'
 
-import { vatContract } from '../contracts/vat'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { vatContract } from 'bzx-common/src/contracts/typescript-wrappers/vat'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { BorrowRequestAwaiting } from '../domain/BorrowRequestAwaiting'
 import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
@@ -47,7 +47,7 @@ import { RepayLoanRequest } from '../domain/RepayLoanRequest'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { BorrowRequestAwaitingStore } from './BorrowRequestAwaitingStore'
-import { ContractsSource } from './ContractsSource'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { TorqueProviderEvents } from './events/TorqueProviderEvents'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
@@ -406,7 +406,7 @@ export class TorqueProvider {
     const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) }
 
     if (this.contractsSource && this.web3Wrapper) {
-      const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset)
+      const iTokenContract = await this.contractsSource.getITokenContract(borrowAsset)
       const iBZxContract = await this.contractsSource.getiBZxContract()
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || ''
       if (amount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
@@ -634,7 +634,7 @@ export class TorqueProvider {
     if (!this.contractsSource) {
       return null
     }
-    const iToken = await this.contractsSource.getiTokenContract(asset)
+    const iToken = await this.contractsSource.getITokenContract(asset)
     const iBZxContract = await this.contractsSource.getiBZxContract()
     const collateralTokenAddress =
       AssetsDictionary.assets
@@ -1453,7 +1453,7 @@ export class TorqueProvider {
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      const iTokenContract = await this.contractsSource.getiTokenContract(borrowRequest.borrowAsset);
+      const iTokenContract = await this.contractsSource.getITokenContract(borrowRequest.borrowAsset);
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(borrowRequest.collateralAsset) || "";
       if (account && iTokenContract && collateralAssetErc20Address) {
         const loanPrecision = AssetsDictionary.assets.get(borrowRequest.borrowAsset)!.decimals || 18;
@@ -1958,7 +1958,7 @@ export class TorqueProvider {
           try {
             await this.checkAndSetApproval(
               repayLoanRequest.borrowAsset,
-              this.contractsSource.getVaultAddress().toLowerCase(),
+              this.contractsSource.getBZxVaultAddress().toLowerCase(),
               closeAmountInBaseUnits
             );
           } catch (e) {
@@ -2037,7 +2037,7 @@ export class TorqueProvider {
           if (manageCollateralRequest.loanOrderState.collateralAsset !== Asset.ETH) {
             await this.checkAndSetApproval(
               manageCollateralRequest.loanOrderState.collateralAsset,
-              this.contractsSource.getVaultAddress().toLowerCase(),
+              this.contractsSource.getBZxVaultAddress().toLowerCase(),
               collateralAmountInBaseUnits
             );
           }
@@ -2172,7 +2172,7 @@ export class TorqueProvider {
         if (extendLoanRequest.borrowAsset !== Asset.ETH) {
           await this.checkAndSetApproval(
             extendLoanRequest.borrowAsset,
-            this.contractsSource.getVaultAddress().toLowerCase(),
+            this.contractsSource.getBZxVaultAddress().toLowerCase(),
             depositAmountInBaseUnits
           );
         }
@@ -2251,7 +2251,7 @@ export class TorqueProvider {
     let result = new BigNumber(0)
 
     if (this.contractsSource && this.web3Wrapper) {
-      const iTokenContract = await this.contractsSource.getiTokenContract(asset)
+      const iTokenContract = await this.contractsSource.getITokenContract(asset)
       if (iTokenContract) {
         let borrowRate = await iTokenContract.borrowInterestRate.callAsync()
         borrowRate = borrowRate.dividedBy(10 ** 18)
@@ -2273,7 +2273,7 @@ export class TorqueProvider {
     let result = new BigNumber(0)
 
     if (this.contractsSource && this.web3Wrapper) {
-      const iTokenContract = await this.contractsSource.getiTokenContract(asset)
+      const iTokenContract = await this.contractsSource.getITokenContract(asset)
       if (iTokenContract) {
         const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
         const totalAssetSupply = await iTokenContract.totalAssetSupply.callAsync()

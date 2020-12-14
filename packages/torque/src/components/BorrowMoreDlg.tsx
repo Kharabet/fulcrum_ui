@@ -4,7 +4,7 @@ import { IBorrowMoreState } from '../domain/IBorrowMoreState'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { DialogHeader } from './DialogHeader'
 import { BorrowMoreForm } from './BorrowMoreForm'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 
 interface IBorrowMoreDlgState {

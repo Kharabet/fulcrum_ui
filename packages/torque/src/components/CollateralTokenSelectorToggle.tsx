@@ -1,7 +1,7 @@
 import React, { Component, RefObject } from 'react'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { CollateralTokenSelector } from './CollateralTokenSelector'
 import { ReactComponent as ArrowSelect } from '../assets/images/arrow-select.svg'
 

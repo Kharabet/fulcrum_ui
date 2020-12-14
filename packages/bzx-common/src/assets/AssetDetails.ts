@@ -1,4 +1,4 @@
-export class AssetDetails {
+export default class AssetDetails {
   public addressErc20: Map<number, string | null> = new Map<number, string>()
   public displayName: string = ''
   public labelName: string = ''
@@ -12,6 +12,7 @@ export class AssetDetails {
   public tsSvg: any = null
   public textColor: string = '#FFFFFF'
   public textColor2: string = '#FFFFFF'
+  public bgBorrowItem: string = '#FFFFFF'
 
   constructor(
     displayName: string,
@@ -26,6 +27,7 @@ export class AssetDetails {
     bgColor: string,
     textColor: string,
     textColor2: string,
+    bgBorrowItem: string,
     addressErc20: Map<number, string | null>
   ) {
     this.addressErc20 = addressErc20
@@ -41,5 +43,6 @@ export class AssetDetails {
     this.bgColor = bgColor
     this.textColor = textColor
     this.textColor2 = textColor2
+    this.bgBorrowItem = bgBorrowItem
   }
 }
