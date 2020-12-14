@@ -198,8 +198,8 @@ export class FulcrumProvider {
     this.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
 
     this.unsupportedNetwork = false
-    await Web3ConnectionFactory.setWalletProvider(connector, account)
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector)
+    await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     await this.setWeb3ProviderFinalize(providerType)
   }
 
@@ -2023,7 +2023,7 @@ export class FulcrumProvider {
       if (account) {
         // @ts-ignore
         const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
-        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20)
+        const resp = await alchemyProvider.alchemyWeb3.alchemy.getTokenBalances(account, addressesErc20)
         if (resp) {
           // @ts-ignore
           result = resp.tokenBalances

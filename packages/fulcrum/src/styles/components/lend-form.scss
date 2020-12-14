@@ -9,7 +9,11 @@
   background-color: #444e5a;
   display: flex;
   flex-direction: row;
-
+  @media screen and (max-width: $mobile-version-width) {
+    max-width: 320px;
+    width: 320px;
+    flex-direction: column;
+  }
   .close-icon {
     position: absolute;
     right: 24px;
@@ -35,6 +39,9 @@
     .eth-svg {
       fill: #c8c8c8;
     }
+  }
+  @media screen and (max-width: $mobile-version-width) {
+    justify-content: center;
   }
 }
 .lend-form__notification {

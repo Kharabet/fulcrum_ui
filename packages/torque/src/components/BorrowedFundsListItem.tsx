@@ -412,7 +412,7 @@ export class BorrowedFundsListItem extends Component<
 
     try {
       const borroweMoreRequest = await this.props.borrowMoreDlgRef.current.getValue({
-        ...this.props.item
+        ...this.state.borrowedFundsItem
       })
       this.setState({ ...this.state, request: borroweMoreRequest })
       await TorqueProvider.Instance.onDoBorrow(borroweMoreRequest)

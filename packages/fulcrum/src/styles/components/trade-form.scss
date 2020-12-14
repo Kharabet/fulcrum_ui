@@ -89,11 +89,15 @@
     }
   }
   &__row-container {
+    @media screen and (max-width: $mobile-version-width) {
+    flex-wrap: wrap;
+    }
     display: flex;
     align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    justify-content: flex-end;
+    margin-bottom: 15px;
     .gas-limits-container {
+      padding-top: 10px;
       font-style: normal;
       font-weight: 600;
       font-size: 12px;
@@ -380,7 +384,7 @@
 //   }
 // }
 
-@media screen and (max-width: $breakpoint-mobile-max) {
+@media screen and (max-width: $mobile-version-width) {
   .trade-form {
     @include clearfix();
 
@@ -481,6 +485,8 @@
     }
 
     .trade-how-it-works-container {
+      margin-top: 0px;
+      margin-bottom: 0px;
       .hiw-icon {
         svg {
           width: 20px;

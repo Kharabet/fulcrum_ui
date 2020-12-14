@@ -16,9 +16,8 @@ import { Loader } from './Loader'
 import { ReactComponent as Edit } from '../assets/images/edit.svg'
 import { IDepositEstimate } from '../domain/IDepositEstimate'
 
-const isMainnetProd =
+const isMainnet =
   process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
   process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export interface IBorrowFormProps {
@@ -59,7 +58,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       borrowAmount: new BigNumber(0),
       collateralAsset: TorqueProvider.Instance.isETHAsset(props.borrowAsset)
         ? Asset.USDC
-        : isMainnetProd
+        : isMainnet
         ? Asset.ETH
         : Asset.fWETH,
       borrowAmountValue: '',
@@ -364,7 +363,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       let usdPrice = this.state.borrowAmount
       usdPrice = usdPrice.multipliedBy(usdAmount)
 
-      if (isMainnetProd) {
+      if (isMainnet) {
         const tagManagerArgs = {
           dataLayer: {
             event: 'purchase',

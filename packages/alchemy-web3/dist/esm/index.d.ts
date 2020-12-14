@@ -1,28 +1,19 @@
 import Web3 from "web3";
-import { Subprovider } from "@0x/subproviders";
-import { JSONRPCRequestPayload } from "ethereum-types";
-export declare type ErrorCallback = (err: Error | null, data?: any) => void;
-export declare type Callback = () => void;
-export interface AlchemyWeb3Config {
-    writeProvider?: Provider | null;
-    maxRetries?: number;
-    retryInterval?: number;
-    retryJitter?: number;
-}
-export declare type Provider = {
-    sendAsync: SendFunction;
-} | {
-    send: SendFunction;
-};
-export declare type SendFunction = (payload: any, callback: any) => void;
+import { Log, Transaction } from "web3-core";
+import { BlockHeader, Eth, LogsOptions, Subscription, Syncing } from "web3-eth";
+import { AlchemyWeb3Config, Provider, Web3Callback } from "./types";
+import { Callback, ErrorCallback, JSONRPCRequestPayload, Subprovider } from "@0x/subproviders";
+import { PayloadSender } from "./web3-adapter/sendPayload";
 export interface AlchemyWeb3 extends Web3 {
     alchemy: AlchemyMethods;
-    setWriteProvider(provider: Provider): void;
+    eth: AlchemyEth;
+    setWriteProvider(provider: Provider | null | undefined): void;
 }
 export interface AlchemyMethods {
     getTokenAllowance(params: TokenAllowanceParams, callback?: Web3Callback<TokenAllowanceResponse>): Promise<TokenAllowanceResponse>;
     getTokenBalances(address: string, contractAddresses: string[], callback?: Web3Callback<TokenBalancesResponse>): Promise<TokenBalancesResponse>;
     getTokenMetadata(address: string, callback?: Web3Callback<TokenMetadataResponse>): Promise<TokenMetadataResponse>;
+    getAssetTransfers(params: AssetTransfersParams, callback?: Web3Callback<AssetTransfersResponse>): Promise<AssetTransfersResponse>;
 }
 export interface TokenAllowanceParams {
     contract: string;
@@ -51,12 +42,57 @@ export interface TokenMetadataResponse {
     name: string | null;
     symbol: string | null;
 }
-export declare type Web3Callback<T> = (error: Error | null, result?: T) => void;
-export declare function createAlchemyWeb3(alchemyUrl: string, config: AlchemyWeb3Config): AlchemyWeb3;
+export interface AssetTransfersParams {
+    fromBlock?: string;
+    toBlock?: string;
+    fromAddress?: string;
+    toAddress?: string;
+    contractAddresses?: string[];
+    excludeZeroValue?: boolean;
+    maxCount?: number;
+    category?: AssetTransfersCategory[];
+    pageKey?: string;
+}
+export declare enum AssetTransfersCategory {
+    EXTERNAL = "external",
+    INTERNAL = "internal",
+    TOKEN = "token"
+}
+export interface AssetTransfersResponse {
+    transfers: AssetTransfersResult[];
+    pageKey?: string;
+}
+export interface AssetTransfersResult {
+    category: AssetTransfersCategory;
+    blockNum: string;
+    from: string;
+    to: string | null;
+    value: number | null;
+    erc721TokenId: string | null;
+    asset: string | null;
+    hash: string;
+    rawContract: RawContract;
+}
+export interface RawContract {
+    value: string | null;
+    address: string | null;
+    decimal: string | null;
+}
+/**
+ * Same as Eth, but with `subscribe` allowing more types.
+ */
+export interface AlchemyEth extends Eth {
+    subscribe(type: "logs", options?: LogsOptions, callback?: (error: Error, log: Log) => void): Subscription<Log>;
+    subscribe(type: "syncing", options?: null, callback?: (error: Error, result: Syncing) => void): Subscription<Syncing>;
+    subscribe(type: "newBlockHeaders", options?: null, callback?: (error: Error, blockHeader: BlockHeader) => void): Subscription<BlockHeader>;
+    subscribe(type: "pendingTransactions", options?: null, callback?: (error: Error, transactionHash: string) => void): Subscription<string>;
+    subscribe(type: "alchemy_fullPendingTransactions", options?: null, callback?: (error: Error, transaction: Transaction) => void): Subscription<Transaction>;
+    subscribe(type: "pendingTransactions" | "logs" | "syncing" | "newBlockHeaders" | "alchemy_fullPendingTransactions", options?: null | LogsOptions, callback?: (error: Error, item: Log | Syncing | BlockHeader | string | Transaction) => void): Subscription<Log | BlockHeader | Syncing | string>;
+}
+export declare function createAlchemyWeb3(alchemyUrl: string, config?: AlchemyWeb3Config): AlchemyWeb3;
 export declare class AlchemySubprovider extends Subprovider {
-    private readonly alchemyUrl;
-    private readonly config;
-    readonly alchemy: AlchemyMethods;
+    readonly alchemyWeb3: AlchemyWeb3;
+    readonly payloadSender: PayloadSender;
     /**
      * Instantiates a new AlchemySubprovider
      */
