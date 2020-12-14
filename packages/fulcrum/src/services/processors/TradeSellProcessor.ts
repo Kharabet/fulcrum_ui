@@ -4,8 +4,10 @@ import { TradeRequest } from '../../domain/TradeRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
 
 import { PositionType } from '../../domain/PositionType'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
-import { Asset } from '../../domain/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { TradeType } from '../../domain/TradeType'
 
 export class TradeSellProcessor {

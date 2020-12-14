@@ -1,12 +1,14 @@
 import { BigNumber } from '@0x/utils'
-import { erc20Contract } from '../../contracts/erc20'
-import { iTokenContract } from '../../contracts/iTokenContract'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
+import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTokenContract'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { LendRequest } from '../../domain/LendRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { FulcrumProviderEvents } from '../events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../FulcrumProvider'
-import { Asset } from '../../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 
 export class LendErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {

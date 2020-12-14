@@ -15,8 +15,10 @@ import { TradeTokenGrid } from '../components/TradeTokenGrid'
 import { ITradeTokenGridRowProps } from '../components/TradeTokenGridRow'
 import { TVChartContainer } from '../components/TVChartContainer'
 
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
 import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { LiquidationEvent } from '../domain/events/LiquidationEvent'

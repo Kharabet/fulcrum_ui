@@ -6,9 +6,12 @@ import React, { ChangeEvent, Component, FormEvent } from 'react'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
 import { FulcrumProvider } from '../services/FulcrumProvider'

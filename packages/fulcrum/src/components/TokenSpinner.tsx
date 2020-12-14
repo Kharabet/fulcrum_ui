@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 
 export interface ITokenSpinnerProps {
   asset: Asset

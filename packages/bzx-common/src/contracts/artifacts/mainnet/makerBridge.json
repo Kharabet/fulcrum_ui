@@ -1,0 +1,181 @@
+{
+  "name": "MakerBridge",
+  "address": "",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "owner", "type": "address" },
+        { "name": "cdps", "type": "uint256[]" },
+        { "name": "darts", "type": "uint256[]" },
+        { "name": "dinks", "type": "uint256[]" },
+        { "name": "collateralDinks", "type": "uint256[]" },
+        { "name": "loanAmount", "type": "uint256" },
+        { "name": "borrowAmounts", "type": "uint256[]" }
+      ],
+      "name": "_migrateLoan",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "_joinAdapters", "type": "address[]" },
+        { "name": "iTokens", "type": "address[]" }
+      ],
+      "name": "setAddresses",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "iDai",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "vat",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "joinDAI",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "cdps", "type": "uint256[]" },
+        { "name": "darts", "type": "uint256[]" },
+        { "name": "dinks", "type": "uint256[]" },
+        { "name": "collateralDinks", "type": "uint256[]" },
+        { "name": "borrowAmounts", "type": "uint256[]" }
+      ],
+      "name": "migrateLoan",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [{ "name": "", "type": "bytes32" }],
+      "name": "tokens",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [{ "name": "", "type": "bytes32" }],
+      "name": "joinAdapters",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [{ "name": "", "type": "bytes32" }],
+      "name": "gems",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "cdpManager",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "proxyFactory",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_newOwner", "type": "address" }],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "dai",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "name": "_iDai", "type": "address" },
+        { "name": "_cdpManager", "type": "address" },
+        { "name": "_joinDAI", "type": "address" },
+        { "name": "_proxyFactory", "type": "address" },
+        { "name": "_joinAdapters", "type": "address[]" },
+        { "name": "iTokens", "type": "address[]" }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "name": "ilk", "type": "bytes32" },
+        { "indexed": false, "name": "joinAdapter", "type": "address" },
+        { "indexed": false, "name": "iToken", "type": "address" }
+      ],
+      "name": "NewAddresses",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "name": "previousOwner", "type": "address" },
+        { "indexed": true, "name": "newOwner", "type": "address" }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    }
+  ]
+}

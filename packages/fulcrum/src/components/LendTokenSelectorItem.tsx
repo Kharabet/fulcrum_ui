@@ -1,7 +1,9 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { RequestStatus } from '../domain/RequestStatus'

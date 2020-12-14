@@ -2,8 +2,10 @@ import { Web3ProviderEngine } from '@0x/subproviders'
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { EventEmitter } from 'events'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { IPriceDataPoint } from '../domain/IPriceDataPoint'
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
@@ -21,7 +23,7 @@ import { TradeTokenKey } from '../domain/TradeTokenKey'
 import { TradeType } from '../domain/TradeType'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
-import { ContractsSource } from './ContractsSource'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { FulcrumProviderEvents } from './events/FulcrumProviderEvents'
 import { LendTransactionMinedEvent } from './events/LendTransactionMinedEvent'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
@@ -354,82 +356,82 @@ export class FulcrumProvider {
     return result
   }
 
-  public getTradeTokenInterestRate = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
-    let result = new BigNumber(0)
-    if (this.contractsSource) {
-      const assetContract = this.contractsSource.getITokenContract(selectedKey.loanAsset)
-      if (assetContract) {
-        result = await assetContract.avgBorrowInterestRate.callAsync()
-        result = result.dividedBy(10 ** 18)
-      }
-    }
+  // public getTradeTokenInterestRate = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
+  //   let result = new BigNumber(0)
+  //   if (this.contractsSource) {
+  //     const assetContract = this.contractsSource.getITokenContract(selectedKey.loanAsset)
+  //     if (assetContract) {
+  //       result = await assetContract.avgBorrowInterestRate.callAsync()
+  //       result = result.dividedBy(10 ** 18)
+  //     }
+  //   }
 
-    return result
-  }
+  //   return result
+  // }
 
-  public getTradeTokenAssetLatestDataPoint = async (
-    selectedKey: TradeTokenKey
-  ): Promise<IPriceDataPoint> => {
-    try {
-      const currentPrice = await this.getSwapToUsdRate(selectedKey.asset)
-      const priceLatestDataPoint = await this.getPriceDefaultDataPoint()
+  // public getTradeTokenAssetLatestDataPoint = async (
+  //   selectedKey: TradeTokenKey
+  // ): Promise<IPriceDataPoint> => {
+  //   try {
+  //     const currentPrice = await this.getSwapToUsdRate(selectedKey.asset)
+  //     const priceLatestDataPoint = await this.getPriceDefaultDataPoint()
 
-      priceLatestDataPoint.price = currentPrice.toNumber()
+  //     priceLatestDataPoint.price = currentPrice.toNumber()
 
-      if (this.contractsSource) {
-        const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
-        if (assetContract) {
-          const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10 ** 18)
-          const currentMargin = currentLeverage.gt(0)
-            ? new BigNumber(1).div(currentLeverage)
-            : new BigNumber(1).div(selectedKey.leverage)
+  //     if (this.contractsSource) {
+  //       const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
+  //       if (assetContract) {
+  //         const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10 ** 18)
+  //         const currentMargin = currentLeverage.gt(0)
+  //           ? new BigNumber(1).div(currentLeverage)
+  //           : new BigNumber(1).div(selectedKey.leverage)
 
-          const maintenanceMargin = new BigNumber(0.15)
+  //         const maintenanceMargin = new BigNumber(0.15)
 
-          if (currentMargin.lte(maintenanceMargin)) {
-            priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price
-          } else {
-            const initialLeverage = new BigNumber(selectedKey.leverage)
-            const initialMargin = new BigNumber(1).div(initialLeverage)
+  //         if (currentMargin.lte(maintenanceMargin)) {
+  //           priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price
+  //         } else {
+  //           const initialLeverage = new BigNumber(selectedKey.leverage)
+  //           const initialMargin = new BigNumber(1).div(initialLeverage)
 
-            // initial_price = current_price - (current_price / initial_leverage * (current_margin - initial_margin))
-            const offset = currentPrice
-              .dividedBy(initialLeverage)
-              .multipliedBy(currentMargin.minus(initialMargin))
+  //           // initial_price = current_price - (current_price / initial_leverage * (current_margin - initial_margin))
+  //           const offset = currentPrice
+  //             .dividedBy(initialLeverage)
+  //             .multipliedBy(currentMargin.minus(initialMargin))
 
-            const initialPrice =
-              selectedKey.positionType === PositionType.SHORT
-                ? currentPrice.plus(offset)
-                : currentPrice.minus(offset)
+  //           const initialPrice =
+  //             selectedKey.positionType === PositionType.SHORT
+  //               ? currentPrice.plus(offset)
+  //               : currentPrice.minus(offset)
 
-            // liquidation_price = initial_price * (maintenance_margin * current_leverage + initial_leverage) / (initial_leverage + 1)
-            let liquidationPrice = initialPrice
-              .multipliedBy(maintenanceMargin.times(currentLeverage).plus(initialLeverage))
-              .div(initialLeverage.plus(1))
+  //           // liquidation_price = initial_price * (maintenance_margin * current_leverage + initial_leverage) / (initial_leverage + 1)
+  //           let liquidationPrice = initialPrice
+  //             .multipliedBy(maintenanceMargin.times(currentLeverage).plus(initialLeverage))
+  //             .div(initialLeverage.plus(1))
 
-            if (selectedKey.positionType === PositionType.SHORT) {
-              liquidationPrice = initialPrice.plus(initialPrice).minus(liquidationPrice)
-            }
+  //           if (selectedKey.positionType === PositionType.SHORT) {
+  //             liquidationPrice = initialPrice.plus(initialPrice).minus(liquidationPrice)
+  //           }
 
-            /*console.log(`offset`,offset.toString());
-            console.log(`maintenanceMargin`,maintenanceMargin.toString());
-            console.log(`initialLeverage`,initialLeverage.toString());
-            console.log(`initialMargin`,initialMargin.toString())
-            console.log(`currentPrice`,currentPrice.toString());
-            console.log(`currentLeverage`,currentLeverage.toString());
-            console.log(`currentMargin`,currentMargin.toString());
-            console.log(`initialPrice`,initialPrice.toString());
-            console.log(`liquidationPrice`,liquidationPrice.toString());*/
+  //           /*console.log(`offset`,offset.toString());
+  //           console.log(`maintenanceMargin`,maintenanceMargin.toString());
+  //           console.log(`initialLeverage`,initialLeverage.toString());
+  //           console.log(`initialMargin`,initialMargin.toString())
+  //           console.log(`currentPrice`,currentPrice.toString());
+  //           console.log(`currentLeverage`,currentLeverage.toString());
+  //           console.log(`currentMargin`,currentMargin.toString());
+  //           console.log(`initialPrice`,initialPrice.toString());
+  //           console.log(`liquidationPrice`,liquidationPrice.toString());*/
 
-            priceLatestDataPoint.liquidationPrice = liquidationPrice.toNumber()
-          }
-        }
-      }
-      return priceLatestDataPoint
-    } catch (e) {
-      return this.getPriceDefaultDataPoint()
-    }
-  }
+  //           priceLatestDataPoint.liquidationPrice = liquidationPrice.toNumber()
+  //         }
+  //       }
+  //     }
+  //     return priceLatestDataPoint
+  //   } catch (e) {
+  //     return this.getPriceDefaultDataPoint()
+  //   }
+  // }
 
   /*
   public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
@@ -976,40 +978,40 @@ export class FulcrumProvider {
     return [maxLendAmount, maxTokenAmount, tokenPrice, chaiPrice, infoMessage]
   }
 
-  public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
-    let result = new BigNumber(0)
+  // public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
+  //   let result = new BigNumber(0)
 
-    if (this.contractsSource) {
-      const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
-      if (assetContract) {
-        result = await assetContract.tokenPrice.callAsync()
-      }
-    }
+  //   if (this.contractsSource) {
+  //     const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
+  //     if (assetContract) {
+  //       result = await assetContract.tokenPrice.callAsync()
+  //     }
+  //   }
 
-    return result.dividedBy(10 ** 18)
-  }
+  //   return result.dividedBy(10 ** 18)
+  // }
 
-  public getPTokenValueOfUser = async (
-    selectedKey: TradeTokenKey,
-    account?: string
-  ): Promise<BigNumber> => {
-    let result = new BigNumber(0)
+  // public getPTokenValueOfUser = async (
+  //   selectedKey: TradeTokenKey,
+  //   account?: string
+  // ): Promise<BigNumber> => {
+  //   let result = new BigNumber(0)
 
-    if (this.web3Wrapper && this.contractsSource) {
-      if (!account && this.contractsSource.canWrite) {
-        account = this.getCurrentAccount()
-      }
+  //   if (this.web3Wrapper && this.contractsSource) {
+  //     if (!account && this.contractsSource.canWrite) {
+  //       account = this.getCurrentAccount()
+  //     }
 
-      if (account) {
-        const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
-        if (assetContract) {
-          result = await assetContract.positionValue.callAsync(account)
-        }
-      }
-    }
+  //     if (account) {
+  //       const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
+  //       if (assetContract) {
+  //         result = await assetContract.positionValue.callAsync(account)
+  //       }
+  //     }
+  //   }
 
-    return result.dividedBy(10 ** 18)
-  }
+  //   return result.dividedBy(10 ** 18)
+  // }
 
   // public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
   //   let result = new BigNumber(0);
@@ -1941,32 +1943,32 @@ export class FulcrumProvider {
     return result
   }
 
-  public async getPTokenBalanceOfUser(selectedKey: TradeTokenKey): Promise<BigNumber> {
-    let result = new BigNumber(0)
+  // public async getPTokenBalanceOfUser(selectedKey: TradeTokenKey): Promise<BigNumber> {
+  //   let result = new BigNumber(0)
 
-    if (this.contractsSource) {
-      const baseAsset = this.getBaseAsset(selectedKey)
-      const precision = AssetsDictionary.assets.get(baseAsset)!.decimals || 18
-      const address = await this.contractsSource.getPTokenErc20Address(selectedKey)
-      if (address) {
-        result = await this.getErc20BalanceOfUser(address)
-        result = result.multipliedBy(10 ** (18 - precision))
-        if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
-          result = result.div(10 ** 10)
-        }
-      }
-    }
+  //   if (this.contractsSource) {
+  //     const baseAsset = this.getBaseAsset(selectedKey)
+  //     const precision = AssetsDictionary.assets.get(baseAsset)!.decimals || 18
+  //     const address = await this.contractsSource.getPTokenErc20Address(selectedKey)
+  //     if (address) {
+  //       result = await this.getErc20BalanceOfUser(address)
+  //       result = result.multipliedBy(10 ** (18 - precision))
+  //       if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
+  //         result = result.div(10 ** 10)
+  //       }
+  //     }
+  //   }
 
-    return result
-  }
+  //   return result
+  // }
 
-  public getPTokensAvailable(): TradeTokenKey[] {
-    return this.contractsSource ? this.contractsSource.getPTokensAvailable() : []
-  }
+  // public getPTokensAvailable(): TradeTokenKey[] {
+  //   return this.contractsSource ? this.contractsSource.getPTokensAvailable() : []
+  // }
 
-  public getPTokenErc20Address(key: TradeTokenKey): string | null {
-    return this.contractsSource ? this.contractsSource.getPTokenErc20Address(key) : null
-  }
+  // public getPTokenErc20Address(key: TradeTokenKey): string | null {
+  //   return this.contractsSource ? this.contractsSource.getPTokenErc20Address(key) : null
+  // }
 
   public getErc20AddressOfAsset(asset: Asset): string | null {
     let result: string | null = null

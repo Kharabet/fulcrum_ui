@@ -1,7 +1,8 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import siteConfig from '../config/SiteConfig.json'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'

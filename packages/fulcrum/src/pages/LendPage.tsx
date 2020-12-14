@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import LendTokenSelector from '../components/LendTokenSelector'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { FulcrumProvider } from '../services/FulcrumProvider'

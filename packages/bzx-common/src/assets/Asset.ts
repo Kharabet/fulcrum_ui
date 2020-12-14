@@ -1,4 +1,4 @@
-export enum Asset {
+enum Asset {
   ETHv1 = 'ETHv1',
   DAIv1 = 'DAIv1',
   SAIv1 = 'SAIv1',
@@ -38,3 +38,4 @@ export enum Asset {
   COMP = 'COMP',
   UNKNOWN = 'UNKNOWN'
 }
+export default Asset

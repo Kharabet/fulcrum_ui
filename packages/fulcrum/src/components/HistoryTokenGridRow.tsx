@@ -1,6 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { Preloader } from './Preloader'

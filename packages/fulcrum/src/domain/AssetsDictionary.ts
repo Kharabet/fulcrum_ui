@@ -1,5 +1,7 @@
-import { Asset } from './Asset'
-import { AssetDetails } from './AssetDetails'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
 
 import aave_logo, { ReactComponent as AAVELogo } from '../assets/images/ic_token_aave.svg'
 import bat_logo, { ReactComponent as BATLogo } from '../assets/images/ic_token_bat.svg'
