@@ -170,17 +170,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.getInnerOwnRowsData()
     await this.setRecentLiquidationsNumber()
     await this.fetchPositionsRecursive(10)
-    setTimeout(() => this.forceUpdate(), 5000)
+    setTimeout(() => {
+      this.forceUpdate() // solves bug with positions not appearing on the first render.
+    }, 5000)
   }
 
   private fetchPositionsRecursive = async (retries: number) => {
     await this.getInnerOwnRowsData()
     await this.getOwnRowsData()
     if (!this._isMounted || this.state.ownRowsData.length > 0 || retries === 0) {
-      console.log("Exit from fetchPositionsRecursive")
-      return //exit
+      return //exit recursive call
     } else {
-      console.log({retries})
       window.setTimeout(() => this.fetchPositionsRecursive(--retries), 1000)
     }
   }
