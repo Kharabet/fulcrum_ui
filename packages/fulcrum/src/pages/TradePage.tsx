@@ -170,6 +170,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.getInnerOwnRowsData()
     await this.setRecentLiquidationsNumber()
     await this.fetchPositionsRecursive(10)
+    setTimeout(() => this.forceUpdate(), 5000)
   }
 
   private fetchPositionsRecursive = async (retries: number) => {
