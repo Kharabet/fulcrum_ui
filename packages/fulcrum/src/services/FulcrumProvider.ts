@@ -1823,11 +1823,11 @@ export class FulcrumProvider {
     const zero = new BigNumber(0)
     //@ts-ignore
     result = loansData
-      .filter(
-        (e: any) =>
-          (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
-          account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-      )
+      // .filter(
+      //   (e: any) =>
+      //     (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+      //     account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+      // )
       .map((e: any) => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
         const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
@@ -1895,11 +1895,12 @@ export class FulcrumProvider {
       false
     )
     const zero = new BigNumber(0)
-    const healthyUserLoans = loansData.filter(
-      (e: any) =>
-        (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
-        account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-    )
+    const healthyUserLoans = loansData
+    // .filter(
+    //   (e: any) =>
+    //     (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+    //     account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+    // )
     const loansByPair: IBorrowedFundsState[] = []
     healthyUserLoans
       .filter(
