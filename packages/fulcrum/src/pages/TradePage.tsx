@@ -176,8 +176,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.getInnerOwnRowsData()
     await this.getOwnRowsData()
     if (!this._isMounted || this.state.ownRowsData.length > 0 || retries === 0) {
+      console.log("Exit from fetchPositionsRecursive")
       return //exit
     } else {
+      console.log({retries})
       window.setTimeout(() => this.fetchPositionsRecursive(--retries), 1000)
     }
   }
