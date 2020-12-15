@@ -169,20 +169,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.getTokenRowsData()
     await this.getInnerOwnRowsData()
     await this.setRecentLiquidationsNumber()
-    this.fetchPositionsWithRetries()
+    await this.fetchPositionsRecursive(10)
   }
 
-  private fetchPositionsWithRetries = () => {
-    let retries = 1
-    const interval = setInterval(async () => {
-      if (this.state.ownRowsData.length > 0 || retries > 10) {
-        clearInterval(interval)
-        return
-      }
-      await this.getInnerOwnRowsData()
-      await this.getOwnRowsData()
-      retries++
-    }, 1000)
+  private fetchPositionsRecursive = async (retries: number) => {
+    await this.getInnerOwnRowsData()
+    await this.getOwnRowsData()
+    if (!this._isMounted || this.state.ownRowsData.length > 0 || retries === 0) {
+      return //exit
+    } else {
+      window.setTimeout(() => this.fetchPositionsRecursive(--retries), 1000)
+    }
   }
 
   private async setRecentLiquidationsNumber() {
@@ -396,7 +393,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // await this.getInnerOwnRowsData()
     // await this.getOwnRowsData()
 
-    this.fetchPositionsWithRetries()
+    await this.fetchPositionsRecursive(10)
     await this.getHistoryEvents(this.state)
   }
 
