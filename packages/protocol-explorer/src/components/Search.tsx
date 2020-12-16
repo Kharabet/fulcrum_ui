@@ -1,7 +1,7 @@
-import React, { Component, ChangeEvent } from 'react'
+import React, { ChangeEvent, Component, FormEvent } from 'react'
 
-import { ReactComponent as IconSearch } from '../assets/images/icon-form-search.svg'
 import { ReactComponent as IconClear } from '../assets/images/icon-form-clear.svg'
+import { ReactComponent as IconSearch } from '../assets/images/icon-form-search.svg'
 interface ISearchProps {
   initialFilter?: string
   onSearch: (filter: string) => void
@@ -13,8 +13,10 @@ interface ISearchState {
 }
 
 export class Search extends Component<ISearchProps, ISearchState> {
+  private _input: React.RefObject<HTMLInputElement>
   constructor(props: any) {
     super(props)
+    this._input = React.createRef()
     this.state = {
       onFocus: false,
       inputValue: props.initialFilter || ''
@@ -25,6 +27,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
       <React.Fragment>
         <form className={`search ${this.state.onFocus ? `focus` : ``}`}>
           <input
+            ref={this._input}
             placeholder="Search"
             onFocus={this.onFocus}
             onBlur={this.onBlur}
@@ -37,7 +40,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
             </button>
           )}
           {this.state.inputValue.length === 0 && (
-            <button>
+            <button onClick={this.onSearchClick}>
               {' '}
               <IconSearch />
             </button>
@@ -54,8 +57,14 @@ export class Search extends Component<ISearchProps, ISearchState> {
     this.setState({ ...this.state, onFocus: false })
   }
 
+  public onSearchClick = (event: FormEvent) => {
+    event.preventDefault()
+
+    this._input.current && this._input.current.focus()
+  }
+
   public onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value ? event.target.value : ''
+    const value = event.target.value ? event.target.value : ''
     this.setState({ ...this.state, inputValue: value })
     this.props.onSearch(value.toLowerCase())
   }
