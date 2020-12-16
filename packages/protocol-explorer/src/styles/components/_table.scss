@@ -175,3 +175,35 @@
     align-items: center;
   }
 }
+.table-param {
+  .table-row-param,
+  .table-header-param {
+    &__hash {
+      width: 32%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &__value,&__pair {
+      width: 17%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .rotate-icon {
+      transform: rotate(180deg);
+    }
+  }
+  .table-row-param {
+    @media screen and (min-width: $width-min-sm) {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+    @media screen and (max-width: $width-max-sm) {
+      padding-top: 13px;
+      padding-bottom: 13px;
+    }  
+  }
+  
+}
