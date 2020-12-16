@@ -1784,8 +1784,9 @@ export class FulcrumProvider {
         .get(collateralAsset)!
         .addressErc20.get(this.web3ProviderSettings.networkId) || ''
     if (!iToken || !collateralTokenAddress || !iBZxContract) return null
+    // true for Torque, false for Fulcrum loan id
     // @ts-ignore
-    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, false))
     const loanId = await iToken.loanParamsIds.callAsync(id)
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
     const result = {
