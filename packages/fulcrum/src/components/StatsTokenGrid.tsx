@@ -59,6 +59,10 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
       FulcrumProviderEvents.ProviderAvailable,
       this.onProviderAvailable
     )
+    FulcrumProvider.Instance.eventEmitter.on(
+      FulcrumProviderEvents.ProviderChanged,
+      this.onProviderChanged
+    )
   }
 
   public async derivedUpdate() {
