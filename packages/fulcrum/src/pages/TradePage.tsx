@@ -714,15 +714,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public getOwnRowsData = async () => {
-    if (
-      !FulcrumProvider.Instance.web3Wrapper ||
-      !FulcrumProvider.Instance.contractsSource ||
-      !FulcrumProvider.Instance.contractsSource.canWrite
-    ) {
-      ;(await this._isMounted) &&
-        this.setState({ ownRowsData: [], loans: undefined, openedPositionsCount: 0 })
-      return null
-    }
+    // if (
+    //   !FulcrumProvider.Instance.web3Wrapper ||
+    //   !FulcrumProvider.Instance.contractsSource ||
+    //   !FulcrumProvider.Instance.contractsSource.canWrite
+    // ) {
+    //   ;(await this._isMounted) &&
+    //     this.setState({ ownRowsData: [], loans: undefined, openedPositionsCount: 0 })
+    //   return null
+    // }
     const ownRowsData: IOwnTokenGridRowProps[] = []
     let loans: IBorrowedFundsState[] | undefined
     loans = await FulcrumProvider.Instance.getUserMarginTradeLoans()
@@ -744,14 +744,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public getInnerOwnRowsData = async () => {
-    if (
-      !FulcrumProvider.Instance.web3Wrapper ||
-      !FulcrumProvider.Instance.contractsSource ||
-      !FulcrumProvider.Instance.contractsSource.canWrite
-    ) {
-      ;(await this._isMounted) && this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
-      return null
-    }
+    // if (
+    //   !FulcrumProvider.Instance.web3Wrapper ||
+    //   !FulcrumProvider.Instance.contractsSource ||
+    //   !FulcrumProvider.Instance.contractsSource!.canWrite
+    // ) {
+      
+    //   ;(await this._isMounted) && this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
+    //   return null
+    // }
     const innerOwnRowsData: IOwnTokenGridRowProps[] = []
     let loans: IBorrowedFundsState[] | undefined
 
@@ -785,14 +786,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public getHistoryEvents = async (state: ITradePageState) => {
-    if (
-      !FulcrumProvider.Instance.web3Wrapper ||
-      !FulcrumProvider.Instance.contractsSource ||
-      !FulcrumProvider.Instance.contractsSource.canWrite
-    ) {
-      ;(await this._isMounted) && this.setState({ historyEvents: undefined })
-      return null
-    }
+    // if (
+    //   !FulcrumProvider.Instance.web3Wrapper ||
+    //   !FulcrumProvider.Instance.contractsSource ||
+    //   !FulcrumProvider.Instance.contractsSource.canWrite
+    // ) {
+    //   ;(await this._isMounted) && this.setState({ historyEvents: undefined })
+    //   return null
+    // }
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory()
     const rolloverEvents = await FulcrumProvider.Instance.getRolloverHistory()
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory()

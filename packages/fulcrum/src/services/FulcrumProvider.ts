@@ -145,8 +145,8 @@ export class FulcrumProvider {
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId)
-    // setting up readonly provider
-    Web3ConnectionFactory.setReadonlyProvider().then(() => {
+    // setting up readonly provider only when user wasn't connected earlier with the wallet
+    providerType === null || providerType === ProviderType.None && Web3ConnectionFactory.setReadonlyProvider().then(() => {
       const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
       const engine = Web3ConnectionFactory.currentWeb3Engine
       const canWrite = Web3ConnectionFactory.canWrite
