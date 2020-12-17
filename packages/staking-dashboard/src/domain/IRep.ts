@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
 
-export interface IRep {
+export default interface IRep {
   index: number
   wallet: string
   BZRX: BigNumber

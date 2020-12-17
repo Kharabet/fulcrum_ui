@@ -1,4 +1,4 @@
-export enum Asset {
+enum Asset {
   BZRXv1 = 'BZRXv1',
   BZRX = 'BZRX',
   vBZRX = 'vBZRX',
@@ -17,3 +17,5 @@ export enum Asset {
   MKR = 'MKR',
   UNKNOWN = 'UNKNOWN'
 }
+
+export default Asset

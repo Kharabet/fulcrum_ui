@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
 
-export class ConvertRequest {
+export default class ConvertRequest {
   public id: number
   public name: string
   public tokenAmount: BigNumber

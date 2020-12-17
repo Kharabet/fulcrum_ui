@@ -24,6 +24,8 @@
   background-color: #ffffff;
   left: 0;
   border-radius: 16px;
+  text-align: center;
+
   svg {
     transform: rotate(-90deg);
   }
@@ -31,4 +33,9 @@
     display: flex;
     transform: rotate(-90deg) translateY(-30px);
   }
+}
+
+.animation-tx__link {
+  position: relative;
+  top: -44px;
 }

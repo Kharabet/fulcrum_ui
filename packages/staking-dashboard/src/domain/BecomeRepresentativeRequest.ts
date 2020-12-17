@@ -1,4 +1,4 @@
-export class BecomeRepresentativeRequest {
+export default class BecomeRepresentativeRequest {
   public id: number
   public name: string
   constructor() {

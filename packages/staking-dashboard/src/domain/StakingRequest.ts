@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
 
-export class StakingRequest {
+export default class StakingRequest {
   public id: number
   public name: string
   public bzrxAmount: BigNumber
