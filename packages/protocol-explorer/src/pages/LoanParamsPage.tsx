@@ -1,14 +1,15 @@
 import { BigNumber } from '@0x/utils'
-import React, { Component, useState } from 'react'
+import React, { useState } from 'react'
+import { Loader } from '../components/Loader'
 import ParamGrid from '../components/ParamGrid'
 import { IParamRowProps } from '../components/ParamRow'
+import { PlatformTabs } from '../components/PlatformTabs'
 import { Search } from '../components/Search'
 import { Asset } from '../domain/Asset'
+import { Platform } from '../domain/Platform'
 import { Header } from '../layout/Header'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
-
-import { Loader } from '../components/Loader'
 
 interface ILoanParamsPageProps {
   doNetworkConnect: () => void
@@ -20,7 +21,7 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
     {
       principal: Asset.AAVE,
       collateral: Asset.CHI,
-      platform: 'Fulcrum',
+      platform: Platform.Fulcrum,
       etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(2),
@@ -30,7 +31,7 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
     {
       principal: Asset.AAVE,
       collateral: Asset.CHI,
-      platform: 'Torque',
+      platform: Platform.Torque,
       etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(2),
@@ -40,7 +41,7 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
     {
       principal: Asset.ETH,
       collateral: Asset.CHI,
-      platform: 'Fulcrum',
+      platform: Platform.Fulcrum,
       etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(2),
@@ -49,8 +50,18 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
     },
     {
       principal: Asset.ETH,
+      collateral: Asset.WBTC,
+      platform: Platform.Fulcrum,
+      etherscanAddressUrl: '',
+      loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
+      initialMargin: new BigNumber(20),
+      maintenanceMargin: new BigNumber(21),
+      liquidationPenalty: new BigNumber(0)
+    },
+    {
+      principal: Asset.ETH,
       collateral: Asset.CHI,
-      platform: 'Torque',
+      platform: Platform.Torque,
       etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(2),
@@ -59,8 +70,9 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
     }
   ]
 
+  const [activePlatform, setActivePlatform] = useState(Platform.Fulcrum)
   const [filteredData, setFilteredData] = useState<IParamRowProps[]>(
-    data.filter((param) => param.platform === 'Fulcrum')
+    data.filter((param) => param.platform === Platform.Fulcrum)
   )
   const [params, setParams] = useState<IParamRowProps[]>(filteredData)
   const [isDataLoading, setIsDataLoading] = useState(true)
@@ -113,6 +125,13 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
     setParams(result)
   }
 
+  const onPlatformChange = (platform: Platform) => {    
+    const platformParams = data.filter((param) => param.platform === platform)
+    setActivePlatform(platform)
+    setParams(platformParams)
+    setFilteredData(platformParams)   
+  }
+
   return (
     <React.Fragment>
       <Header isMobileMedia={props.isMobileMedia} doNetworkConnect={props.doNetworkConnect} />
@@ -134,10 +153,11 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
                     </div>
                   </div>
                 </section>
+                <PlatformTabs activePlatform={activePlatform} onPlatformChange={onPlatformChange} />               
                 <section className="search-container pt-45">
                   <Search onSearch={onSearch} />
                 </section>
-                <section className="pt-90 pt-sm-30">
+                <section className="pt-45 pt-sm-30">
                   <div className="container">
                     <ParamGrid params={params} quantityTx={20} />
                   </div>

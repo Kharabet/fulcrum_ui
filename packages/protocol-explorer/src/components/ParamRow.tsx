@@ -2,11 +2,12 @@ import { BigNumber } from '@0x/utils'
 import React from 'react'
 import { ReactComponent as IconArrow } from '../assets/images/icon-tx-arrow.svg'
 import { Asset } from '../domain/Asset'
+import { Platform } from '../domain/Platform'
 
 export interface IParamRowProps {
   principal: Asset
   collateral: Asset
-  platform: string
+  platform: Platform
   loanId: string
   etherscanAddressUrl: string
   initialMargin: BigNumber
