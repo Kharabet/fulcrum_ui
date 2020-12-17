@@ -1,15 +1,14 @@
 import { BigNumber } from '@0x/utils'
 import React from 'react'
-import { ReactComponent as IconArrow } from '../assets/images/icon-tx-arrow.svg'
 import { Asset } from '../domain/Asset'
 import { Platform } from '../domain/Platform'
+import CopyToClipboard from './CopyToClipboard'
 
 export interface IParamRowProps {
   principal: Asset
   collateral: Asset
   platform: Platform
   loanId: string
-  etherscanAddressUrl: string
   initialMargin: BigNumber
   maintenanceMargin: BigNumber
   liquidationPenalty: BigNumber
@@ -25,14 +24,10 @@ const ParamRow = (props: IParamRowProps) => {
         <div className="table-row-param__pair">
           {props.principal}-{props.collateral}
         </div>
-        <a
-          href={props.etherscanAddressUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="table-row-param__hash">
-          <IconArrow />
-          <span className="table-row-param__from-address">{getShortHash(props.loanId, 12)}</span>
-        </a>
+        <div title={props.loanId} className="table-row-param__hash">
+          <span className="table-row-param__from-address">{getShortHash(props.loanId, 24)}</span>
+          <CopyToClipboard>{props.loanId}</CopyToClipboard>
+        </div>
         <div className="table-row-param__value">{props.maintenanceMargin.toFixed()}</div>
         <div className="table-row-param__value">{props.initialMargin.toFixed()}</div>
         <div className="table-row-param__value">{props.liquidationPenalty.toFixed()}</div>

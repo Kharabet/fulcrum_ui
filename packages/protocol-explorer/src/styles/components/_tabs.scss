@@ -1,5 +1,10 @@
-
 .platform-tab {
+  margin-bottom: -2px;
+  @media screen and (max-width: $width-max-sm) {
+    & + .search-container {
+      padding-top: 0;
+    }
+  }
   &__container {
     display: flex;
     align-items: center;
@@ -14,24 +19,32 @@
       display: flex;
       align-self: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 18px;
       line-height: 1.5;
-      font-weight: 800;
-      color: #8992a4;
+      font-weight: 600;
+      color: #283049;
       text-transform: capitalize;
       cursor: pointer;
-      border-bottom: 3px solid transparent;    
-      padding: 10px 20px;
+      padding: 16px 20px;
+     
+      
       &:hover {
         color: #5b88ff;
-      }    
-     
+      }
+
       &.active {
         position: relative;
-        color: var(--primary-text);
-          border-bottom-color: #276bfb;
-          border-radius: 2px;      
-     
+        color: #276bfb;
+        &:after{
+            content:"";
+            position: absolute;
+            z-index: -1;
+            width: 100%;
+            height: 6px;
+            border-radius: 6px;
+            background-color: #276bfb;
+            bottom: 0px;
+        }
       }
     }
   }
@@ -62,8 +75,7 @@
 
   @media screen and (min-width: $width-min-sm) {
     position: relative;
-   
-    
+
     &__selector {
       margin-right: 12px;
     }
@@ -83,12 +95,10 @@
   }
 
   @media screen and (max-width: $width-max-sm) {
-   
     &__selector {
       width: 100%;
       padding: 0 15px;
       text-align: center;
     }
-  
   }
 }

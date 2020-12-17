@@ -8,7 +8,6 @@ import { Search } from '../components/Search'
 import { Asset } from '../domain/Asset'
 import { Platform } from '../domain/Platform'
 import { Header } from '../layout/Header'
-import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 
 interface ILoanParamsPageProps {
@@ -22,7 +21,6 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
       principal: Asset.AAVE,
       collateral: Asset.CHI,
       platform: Platform.Fulcrum,
-      etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(2),
       maintenanceMargin: new BigNumber(2),
@@ -32,7 +30,6 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
       principal: Asset.AAVE,
       collateral: Asset.CHI,
       platform: Platform.Torque,
-      etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(2),
       maintenanceMargin: new BigNumber(2),
@@ -42,7 +39,6 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
       principal: Asset.ETH,
       collateral: Asset.CHI,
       platform: Platform.Fulcrum,
-      etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(2),
       maintenanceMargin: new BigNumber(2),
@@ -52,7 +48,6 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
       principal: Asset.ETH,
       collateral: Asset.WBTC,
       platform: Platform.Fulcrum,
-      etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(20),
       maintenanceMargin: new BigNumber(21),
@@ -62,7 +57,6 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
       principal: Asset.ETH,
       collateral: Asset.CHI,
       platform: Platform.Torque,
-      etherscanAddressUrl: '',
       loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
       initialMargin: new BigNumber(2),
       maintenanceMargin: new BigNumber(2),
@@ -77,39 +71,10 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
   const [params, setParams] = useState<IParamRowProps[]>(filteredData)
   const [isDataLoading, setIsDataLoading] = useState(true)
 
+  const copyEl = React.useRef<HTMLSpanElement | null>(null)
   useState(() => {
-    function onProviderChanged() {
-      setIsDataLoading(false)
-    }
-
-    function onProviderAvailable() {
-      setIsDataLoading(false)
-    }
-
-    ExplorerProvider.Instance.eventEmitter.on(
-      ExplorerProviderEvents.ProviderAvailable,
-      onProviderAvailable
-    )
-    ExplorerProvider.Instance.eventEmitter.on(
-      ExplorerProviderEvents.ProviderChanged,
-      onProviderChanged
-    )
-
-    return () => {
-      ExplorerProvider.Instance.eventEmitter.removeListener(
-        ExplorerProviderEvents.ProviderAvailable,
-        onProviderAvailable
-      )
-      ExplorerProvider.Instance.eventEmitter.removeListener(
-        ExplorerProviderEvents.ProviderChanged,
-        onProviderChanged
-      )
-    }
-  })
-
-  function derivedUpdate() {
     setIsDataLoading(false)
-  }
+  })
 
   const onSearch = (filter: string) => {
     const result =
@@ -125,11 +90,11 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
     setParams(result)
   }
 
-  const onPlatformChange = (platform: Platform) => {    
+  const onPlatformChange = (platform: Platform) => {
     const platformParams = data.filter((param) => param.platform === platform)
     setActivePlatform(platform)
     setParams(platformParams)
-    setFilteredData(platformParams)   
+    setFilteredData(platformParams)
   }
 
   return (
@@ -153,9 +118,9 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
                     </div>
                   </div>
                 </section>
-                <PlatformTabs activePlatform={activePlatform} onPlatformChange={onPlatformChange} />               
-                <section className="search-container pt-45">
-                  <Search onSearch={onSearch} />
+                <PlatformTabs activePlatform={activePlatform} onPlatformChange={onPlatformChange} />
+                <section className="search-container">
+                  <Search onSearch={onSearch}>Enter asset pair</Search>
                 </section>
                 <section className="pt-45 pt-sm-30">
                   <div className="container">
