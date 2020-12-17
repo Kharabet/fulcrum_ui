@@ -36,5 +36,6 @@ export enum Asset {
   AAVE = 'AAVE',
   LRC = 'LRC',
   COMP = 'COMP',
+  BNB = 'BNB',
   UNKNOWN = 'UNKNOWN'
 }

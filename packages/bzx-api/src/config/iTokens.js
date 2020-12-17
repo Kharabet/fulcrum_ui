@@ -126,5 +126,13 @@ export const iTokens = [
     displayName: 'COMP',
     iTokenName: 'iCOMP',
     decimals: 18
+  },
+  {
+    name: 'bnb',
+    address: '0x88183Ec0054F40D344e40EC934D5a9E2749a61d4',
+    erc20Address: '0xB8c77482e45F1F44dE1745F52C74426C631bDD52',
+    displayName: 'BNB',
+    iTokenName: 'iBNB',
+    decimals: 18
   }
 ]

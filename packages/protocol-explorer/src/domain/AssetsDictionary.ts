@@ -23,6 +23,7 @@ import { ReactComponent as WBTC } from '../assets/images/token-btc.svg'
 import { ReactComponent as WETH } from '../assets/images/token-weth.svg'
 import { ReactComponent as YFI } from '../assets/images/token-yfi.svg'
 import { ReactComponent as ZRX } from '../assets/images/token-zrx.svg'
+import { ReactComponent as BNB } from '../assets/images/token-bnb.svg'
 
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
@@ -384,6 +385,20 @@ export class AssetsDictionary {
         18,
         new Map<number, string | null>([
           [1, '0xc00e94cb662c3520282e6f5717214004a7f26888'],
+          [3, ''],
+          [42, '']
+        ])
+      )
+    ],
+    [
+      Asset.BNB,
+      new AssetDetails(
+        'BNB',
+        'BNB',
+        BNB,
+        18,
+        new Map<number, string | null>([
+          [1, '0xb8c77482e45f1f44de1745f52c74426c631bdd52'],
           [3, ''],
           [42, '']
         ])

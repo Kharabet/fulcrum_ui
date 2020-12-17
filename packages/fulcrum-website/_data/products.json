@@ -76,5 +76,11 @@
     "visibilityApr": true,
     "visibilityEarn": true,
     "visibilityChart": false
+  },
+  {
+    "name": "bnb",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": false
   }
 ]

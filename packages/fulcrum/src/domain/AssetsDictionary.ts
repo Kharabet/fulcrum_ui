@@ -24,6 +24,7 @@ import usdt_logo, { ReactComponent as USDTLogo } from '../assets/images/ic_token
 import weth_logo, { ReactComponent as WETHLogo } from '../assets/images/ic_token_weth.svg'
 import yfi_logo, { ReactComponent as YFILogo } from '../assets/images/ic_token_yfi.svg'
 import zrx_logo, { ReactComponent as ZRXLogo } from '../assets/images/ic_token_zrx.svg'
+import bnb_logo, { ReactComponent as BNBLogo } from '../assets/images/ic_token_bnb.svg'
 
 import bat_bg from '../assets/images/popup_left_token_bat.svg'
 import btc_bg from '../assets/images/popup_left_token_btc.svg'
@@ -614,6 +615,28 @@ export class AssetsDictionary {
         '#FFFFFF',
         new Map<number, string | null>([
           [1, '0xc00e94cb662c3520282e6f5717214004a7f26888'],
+          [3, ''],
+          [42, '']
+        ])
+      )
+    ],
+    [
+      Asset.BNB,
+      new AssetDetails(
+        'BNB',
+        'BNB',
+        'iBNB',
+        'https://fulcrum.trade/images/iBNB.svg',
+        18,
+        bnb_logo,
+        BNBLogo,
+        '',
+        '',
+        '',
+        '#FFFFFF',
+        '#FFFFFF',
+        new Map<number, string | null>([
+          [1, '0xB8c77482e45F1F44dE1745F52C74426C631bDD52'],
           [3, ''],
           [42, '']
         ])

@@ -42,6 +42,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
           Asset.AAVE,
           Asset.LRC,
           Asset.COMP,
+          Asset.BNB
         ]
       : [Asset.fWETH, Asset.USDC, Asset.WBTC]
 
@@ -160,10 +161,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
     reserveDetails.forEach((e) => {
       const yieldApr =
-        e.asset &&
-        yieldAPYJson &&
-        yieldAPYJson.success &&
-        yieldAPYJson.data[e.asset.toLowerCase()]
+        e.asset && yieldAPYJson && yieldAPYJson.success && yieldAPYJson.data[e.asset.toLowerCase()]
           ? new BigNumber(yieldAPYJson.data[e.asset.toLowerCase()])
           : new BigNumber(0)
 

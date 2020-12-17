@@ -200,6 +200,28 @@ export const iTokenList = [
     'iAAVE',
     '1'
   ],
-  ['1', '0x3da0e01472dee3746b4d324a65d7edfaeca9aa4f', '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd', 'Fulcrum LRC iToken', 'iLRC', '1'],
-  ['1', '0x6d29903bc2c4318b59b35d97ab98ab9ec08ed70d', '0xc00e94cb662c3520282e6f5717214004a7f26888', 'Fulcrum COMP iToken', 'iCOMP', '1']
+  [
+    '1',
+    '0x3da0e01472dee3746b4d324a65d7edfaeca9aa4f',
+    '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd',
+    'Fulcrum LRC iToken',
+    'iLRC',
+    '1'
+  ],
+  [
+    '1',
+    '0x6d29903bc2c4318b59b35d97ab98ab9ec08ed70d',
+    '0xc00e94cb662c3520282e6f5717214004a7f26888',
+    'Fulcrum COMP iToken',
+    'iCOMP',
+    '1'
+  ],
+  [
+    '1',
+    '0x88183Ec0054F40D344e40EC934D5a9E2749a61d4',
+    '0xB8c77482e45F1F44dE1745F52C74426C631bDD52',
+    'Fulcrum BNB iToken',
+    'iBNB',
+    '1'
+  ]
 ]
