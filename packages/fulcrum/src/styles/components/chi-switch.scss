@@ -1,6 +1,8 @@
+@import '../abstracts/variables';
 .chi-switch {
-  margin-top: -10px;
-  margin-bottom: 15px;
+  @media screen and (max-width: $mobile-version-width) {
+    width: 100%;
+  }
   .cb-container {
     color: #a2abb8;
     font-weight: 600;

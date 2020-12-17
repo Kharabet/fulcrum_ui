@@ -16,7 +16,6 @@ import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvent
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { Web3ReactProvider } from '@web3-react/core'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
@@ -74,7 +73,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this.doNetworkConnect()
   }
 
-  public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
+  public getLibrary = async (provider: any, connector: any): Promise<any> => {
     // console.log(provider)
     // handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)

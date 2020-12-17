@@ -47,6 +47,8 @@ import { PayTradingFeeEvent } from '../domain/events/PayTradingFeeEvent'
 import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
 import { ILoanParams } from '../domain/ILoanParams'
+import { RolloverRequest } from '../domain/RolloverRequest'
+import { RolloverEvent } from '../domain/events/RolloverEvent'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -79,6 +81,7 @@ export class FulcrumProvider {
 
   // gasBufferCoeff equal 110% gas reserve
   public readonly gasBufferCoeff = new BigNumber('1.06')
+  public readonly gasBufferCoeffForTrade = new BigNumber('1.1')
   // 5000ms
   public readonly successDisplayTimeout = 5000
 
@@ -143,8 +146,8 @@ export class FulcrumProvider {
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId)
-    // setting up readonly provider
-    Web3ConnectionFactory.setReadonlyProvider().then(() => {
+    // setting up readonly provider only when user wasn't connected earlier with the wallet
+    providerType === null || providerType === ProviderType.None && Web3ConnectionFactory.setReadonlyProvider().then(() => {
       const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
       const engine = Web3ConnectionFactory.currentWeb3Engine
       const canWrite = Web3ConnectionFactory.canWrite
@@ -196,8 +199,8 @@ export class FulcrumProvider {
     this.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
 
     this.unsupportedNetwork = false
-    await Web3ConnectionFactory.setWalletProvider(connector, account)
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector)
+    await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     await this.setWeb3ProviderFinalize(providerType)
   }
 
@@ -322,6 +325,12 @@ export class FulcrumProvider {
   }
 
   public onTradeConfirmed = async (request: TradeRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
+  public onRolloverConfirmed = async (request: RolloverRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
@@ -1775,8 +1784,9 @@ export class FulcrumProvider {
         .get(collateralAsset)!
         .addressErc20.get(this.web3ProviderSettings.networkId) || ''
     if (!iToken || !collateralTokenAddress || !iBZxContract) return null
+    // true for Torque, false for Fulcrum loan id
     // @ts-ignore
-    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, false))
     const loanId = await iToken.loanParamsIds.callAsync(id)
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
     const result = {
@@ -1814,13 +1824,11 @@ export class FulcrumProvider {
     const zero = new BigNumber(0)
     //@ts-ignore
     result = loansData
-      .filter(
-        (e: any) =>
-          (!e.principal.eq(zero) &&
-            !e.currentMargin.eq(zero) &&
-            !e.interestDepositRemaining.eq(zero)) ||
-          account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-      )
+      // .filter(
+      //   (e: any) =>
+      //     (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+      //     account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+      // )
       .map((e: any) => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
         const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
@@ -1888,13 +1896,12 @@ export class FulcrumProvider {
       false
     )
     const zero = new BigNumber(0)
-    const healthyUserLoans = loansData.filter(
-      (e: any) =>
-        (!e.principal.eq(zero) &&
-          !e.currentMargin.eq(zero) &&
-          !e.interestDepositRemaining.eq(zero)) ||
-        account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-    )
+    const healthyUserLoans = loansData
+    // .filter(
+    //   (e: any) =>
+    //     (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+    //     account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+    // )
     const loansByPair: IBorrowedFundsState[] = []
     healthyUserLoans
       .filter(
@@ -2018,7 +2025,7 @@ export class FulcrumProvider {
       if (account) {
         // @ts-ignore
         const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
-        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20)
+        const resp = await alchemyProvider.alchemyWeb3.alchemy.getTokenBalances(account, addressesErc20)
         if (resp) {
           // @ts-ignore
           result = resp.tokenBalances
@@ -2346,6 +2353,65 @@ export class FulcrumProvider {
     return result
   }
 
+  public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
+    let result: RolloverEvent[] = []
+    const account = this.getCurrentAccount()
+
+    if (!this.contractsSource) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api
+    let etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      RolloverEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+
+    const rolloverEventResponse = await fetch(etherscanApiUrl)
+    const rolloverEventResponseJson = await rolloverEventResponse.json()
+    if (rolloverEventResponseJson.status !== '1') return result
+    const events = rolloverEventResponseJson.result
+    result = events
+      .reverse()
+      .map((event: any) => {
+        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+        const caller = event.topics[2].replace('0x000000000000000000000000', '0x')
+        const loandId = event.topics[3]
+        const data = event.data.replace('0x', '')
+        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+        if (!dataSegments) return result
+        const lender = dataSegments[0].replace('000000000000000000000000', '0x')
+        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+        const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
+
+        const collateralAmountUsed = new BigNumber(parseInt(dataSegments[3], 16))
+        const interestAmountAdded = new BigNumber(parseInt(dataSegments[4], 16))
+        const loanEndTimestamp = new Date(parseInt(dataSegments[5], 16) * 1000)
+        const gasRebate = new BigNumber(parseInt(dataSegments[6], 16))
+        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
+        const txHash = event.transactionHash
+        return new RolloverEvent(
+          userAddress,
+          caller,
+          loandId,
+          lender,
+          loanToken,
+          collateralToken,
+          collateralAmountUsed,
+          interestAmountAdded,
+          loanEndTimestamp,
+          gasRebate,
+          timeStamp,
+          txHash
+        )
+      })
+      .filter((e: any) => e)
+    return result
+  }
+
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = []
     const account = this.getCurrentAccount()
@@ -2468,6 +2534,43 @@ export class FulcrumProvider {
       .filter((e: any) => e)
     return result
   }
+
+  public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
+    const result: number = 0
+    const account = this.getCurrentAccount()
+    const blocksPerDay = 10000 // 7-8k per day with a buffer
+    if (!account || !this.contractsSource || !this.web3Wrapper) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api
+    const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
+    const etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${blockNumber -
+      (days * blocksPerDay)}&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      LiquidationEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+
+    const liquidationEventResponse = await fetch(etherscanApiUrl)
+    const liquidationEventResponseJson = await liquidationEventResponse.json()
+    if (liquidationEventResponseJson.status !== '1') return result
+    const events = liquidationEventResponseJson.result
+    const liquidationEvents = events
+      .filter((event: any) => {
+        const data = event.data.replace('0x', '')
+        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+        if (!dataSegments) return false
+
+        const baseTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+        const quoteTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+        const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress)
+        const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress)
+        if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return false
+        return true
+      })
+    return liquidationEvents && liquidationEvents.length || result
+  }
+
 
   public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
     let result: DepositCollateralEvent[] = []
@@ -2645,6 +2748,10 @@ export class FulcrumProvider {
 
     if (task.request instanceof ManageCollateralRequest) {
       await this.processManageCollateralRequestTask(task, skipGas)
+    }
+
+    if (task.request instanceof RolloverRequest) {
+      await this.processRolloverRequestTask(task, skipGas)
     }
 
     return false
@@ -3012,9 +3119,41 @@ console.log(err, added);
     }
   }
 
+  private processRolloverRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.loanId)
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error('No provider available!')
+      }
+
+      const account = this.getCurrentAccount()
+      if (!account) {
+        throw new Error('Unable to get wallet address!')
+      }
+
+      const taskRequest: RolloverRequest = task.request as RolloverRequest
+
+      const { RolloverProcessor } = await import('./processors/RolloverProcessor')
+      const processor = new RolloverProcessor()
+      await processor.run(task, account, skipGas)
+
+      task.processingEnd(true, false, null)
+    } catch (e) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
+        // tslint:disable-next-line:no-console
+        console.log(e)
+      }
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task)
+    }
+  }
+
   public waitForTransactionMined = async (
     txHash: string,
-    request?: LendRequest | TradeRequest | ManageCollateralRequest
+    request?: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
       try {
@@ -3032,7 +3171,7 @@ console.log(err, added);
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest | ManageCollateralRequest | undefined,
+    request: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
     resolve: (value: any) => void,
     reject: (value: any) => void
   ) => {
@@ -3076,7 +3215,7 @@ console.log(err, added);
               }
             }
             isMainnetProd && TagManager.dataLayer(tagManagerArgs)
-          } else {
+          } else if (request instanceof TradeRequest) {
             const tagManagerArgs = {
               dataLayer: {
                 transactionId: randomNumber,

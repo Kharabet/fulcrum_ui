@@ -1,4 +1,3 @@
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 // import Web3 from 'web3';
@@ -30,11 +29,12 @@ import { Asset } from '../domain/Asset'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
-import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
 import { TasksQueue } from '../services/TasksQueue'
-import { LiquidationTransactionMinedEvent } from './events/LiquidationTransactionMinedEvent'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
+import { RequestStatus } from '../domain/RequestStatus'
+import { RolloverRequest } from '../domain/RolloverRequest'
+import { IRolloverData } from '../domain/IRolloverData'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -79,7 +79,7 @@ export class ExplorerProvider {
 
   public readonly eventEmitter: EventEmitter
   public providerType: ProviderType = ProviderType.None
-  public providerEngine: Web3ProviderEngine | null = null
+  public providerEngine: any = null
   public web3Wrapper: Web3Wrapper | null = null
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
@@ -184,7 +184,7 @@ export class ExplorerProvider {
     try {
       this.isLoading = true
       this.unsupportedNetwork = false
-      await Web3ConnectionFactory.setWalletProvider(connector, account)
+      await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     } catch (e) {
       // console.log(e);
       this.isLoading = false
@@ -321,6 +321,12 @@ export class ExplorerProvider {
   }
 
   public onLiquidationConfirmed = async (request: LiquidationRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
+  public onRolloverConfirmed = async (request: RolloverRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
@@ -649,6 +655,43 @@ export class ExplorerProvider {
     })
 
     return result
+  }
+
+  public getRollovers = async (start: number, count: number): Promise<IRolloverData[]> => {
+    const rollovers: IRolloverData[] = []
+    if (!this.contractsSource) return rollovers
+    const iBZxContract = await this.contractsSource.getiBZxContract()
+
+    if (!iBZxContract) return rollovers
+   
+    const activeLoans = await this.getBzxLoans(start, count, false)
+    const rolloverPendingLoans = activeLoans.filter(
+      (loan) => loan && loan.loanData && loan.loanData.interestDepositRemaining.eq(0)
+    )
+    for (const i in rolloverPendingLoans) {
+      if (!rolloverPendingLoans[i]) {
+        continue
+      }
+      const loan = rolloverPendingLoans[i]
+      try {
+        const rolloverEstimate = await iBZxContract.rollover.callAsync(
+          loan.loanId,
+          '0x'
+        )
+        const rebateAsset = this.contractsSource.getAssetFromAddress(rolloverEstimate[0])
+        const decimals = AssetsDictionary.assets.get(rebateAsset)?.decimals || 18
+        if (rebateAsset === Asset.UNKNOWN) {
+          continue
+        }
+        const gasRebate = rolloverEstimate[1].div(10 ** decimals)
+        const rollover = { ...loan, rebateAsset, gasRebate }
+        rollovers.push(rollover)
+      } catch (e) {
+        console.error(e)
+        console.log(loan)
+      }
+    }
+    return rollovers
   }
 
   public getBurnHistory = async (asset: Asset): Promise<BurnEvent[]> => {
@@ -1115,6 +1158,8 @@ export class ExplorerProvider {
   private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
     if (task.request instanceof LiquidationRequest) {
       await this.processLiquidationRequestTask(task, skipGas)
+    } else if (task.request instanceof RolloverRequest) {
+      await this.processRolloverRequestTask(task, skipGas)
     }
 
     return false
@@ -1154,9 +1199,43 @@ export class ExplorerProvider {
     }
   }
 
+  private processRolloverRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(ExplorerProviderEvents.AskToOpenProgressDlg, task.request.loanId)
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error('No provider available!')
+      }
+
+      const account =
+        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      if (!account) {
+        throw new Error('Unable to get wallet address!')
+      }
+
+      // Initializing loan
+      const taskRequest: RolloverRequest = task.request as RolloverRequest
+
+      const { RolloverProcessor } = await import('./processors/RolloverProcessor')
+      const processor = new RolloverProcessor()
+      await processor.run(task, account, skipGas)
+
+      task.processingEnd(true, false, null)
+    } catch (e) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
+        // tslint:disable-next-line:no-console
+        console.log(e)
+      }
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(ExplorerProviderEvents.AskToCloseProgressDlg, task)
+    }
+  }
+
   public waitForTransactionMined = async (
     txHash: string,
-    request?: LiquidationRequest
+    request?: LiquidationRequest | RolloverRequest
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
       try {
@@ -1174,21 +1253,15 @@ export class ExplorerProvider {
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LiquidationRequest | undefined,
+    request: LiquidationRequest | RolloverRequest | undefined,
     resolve: (value: any) => void,
     reject: (value: any) => void
   ) => {
     try {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash)
-      if (receipt && request && request instanceof LiquidationRequest) {
+      if (receipt) {
         resolve(receipt)
-
-        const randomNumber = Math.floor(Math.random() * 100000) + 1
-
-        this.eventEmitter.emit(
-          ExplorerProviderEvents.LiquidationTransactionMined,
-          new LiquidationTransactionMinedEvent(request.loanToken, txHash)
-        )
+      
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject)

@@ -129,6 +129,12 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
     color: #a2abb8;
     left: 0;
     top: 100%;
+    &.positive {
+      color: #00c0ab;
+    }
+    &.negative {
+      color: #ff4f4f;
+    }
   }
 
   &__col-asset-type {
@@ -200,7 +206,7 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
   &__col-action {
     display: flex;
     justify-content: flex-end;
-    justify-content: flex-end;
+    position: relative;
   }
   &_button {
     width: $width-button;
@@ -230,6 +236,10 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
   }
   &__sell-button {
     background-color: #ff4f4f;
+    &.rollover-warning {
+      color: #fcff7a;
+      text-transform: capitalize;
+    }
     &:hover {
       background-color: #fe7272;
     }
@@ -265,13 +275,11 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
         margin-bottom: 8px;
       }
       &__open-manage-collateral {
-       
         width: 18px;
         height: 18px;
         padding: 4px;
         top: 2px;
         right: -25px;
-      
       }
       &__col-token-name-full {
         order: 0;
@@ -289,7 +297,7 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
         font-size: 10px;
         right: -42px;
         left: auto;
-        top: -5px;        
+        top: -5px;
       }
       &__col-position-value {
         order: 1;

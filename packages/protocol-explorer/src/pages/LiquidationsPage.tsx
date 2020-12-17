@@ -3,22 +3,26 @@ import React, { Component } from 'react'
 import { Bar } from 'react-chartjs-2'
 import ReactModal from 'react-modal'
 import LiquidationForm from '../components/LiquidationForm'
-import { Loader } from '../components/Loader'
 import { LoanGrid } from '../components/LoanGrid'
-import { ILoanRowProps } from '../components/LoanRow'
 import { Search } from '../components/Search'
 import { TxGrid } from '../components/TxGrid'
 import { ITxRowProps } from '../components/TxRow'
 import { UnhealthyChart } from '../components/UnhealthyChart'
 import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { LiquidationEvent } from '../domain/LiquidationEvent'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { Header } from '../layout/Header'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { NavService } from '../services/NavService'
+
+import { Loader } from '../components/Loader'
+import { IActiveLoanData } from '../domain/IActiveLoanData'
+import { ILoanRowProps } from '../components/LoanRow'
+import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { RolloversGrid } from '../components/RolloversGrid'
+import { IRolloverRowProps } from '../components/RolloverRow'
+import { IRolloverData } from '../domain/IRolloverData'
 
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void
@@ -30,6 +34,7 @@ interface ILiquidationsPageState {
   transactionsCount30d: number
   events: ITxRowProps[]
   unhealthyLoans: ILoanRowProps[]
+  rollovers: IRolloverRowProps[]
   unhealthyLoansUsd: BigNumber
   healthyLoansUsd: BigNumber
   barChartDatasets: Array<{
@@ -88,6 +93,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       healthyLoansUsd: new BigNumber(0),
       events: [],
       unhealthyLoans: [],
+      rollovers: [],
       barChartDatasets: [] as Array<{
         label: Asset
         backgroundColor: string
@@ -209,6 +215,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory()
     const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, true)
     const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, false)
+    const rolloversData = await ExplorerProvider.Instance.getRollovers(0, 500)
     const unhealthyLoansUsd = unhealthyLoansData.reduce(
       (a, b) => a.plus(b.amountOwedUsd),
       new BigNumber(0)
@@ -259,7 +266,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
     this.getChartData(liquidationEventsWithUsd)
     const unhealthyLoans = unhealthyLoansData.map((e: IActiveLoanData) => ({
-      loanId: e.loanData!.loanId,
+      loanId: e.loanData.loanId,
       payOffAmount: e.maxLiquidatable,
       seizeAmount: e.maxSeizable,
       loanToken: e.loanAsset,
@@ -268,8 +275,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       onLiquidationRequested: this.onLiquidationRequested,
       doNetworkConnect: this.props.doNetworkConnect
     }))
-    this._isMounted &&
-      this.setState({
+
+    const rollovers = rolloversData.map((e: IRolloverData) => ({
+      loanId: e.loanData.loanId,
+      rebateAsset: e.rebateAsset,
+      gasRebate: e.gasRebate,
+      onRolloverUpdated: this.derivedUpdate.bind(this),
+      doNetworkConnect: this.props.doNetworkConnect
+    }))
+
+    await this.setState({
         ...this.state,
         volume30d,
         transactionsCount30d,
@@ -277,7 +292,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         unhealthyLoans,
         isDataLoading: false,
         unhealthyLoansUsd,
-        healthyLoansUsd
+      healthyLoansUsd,
+      rollovers
       })
   }
 
@@ -503,6 +519,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                       </div>
                     </div>
                   </section>
+                  {this.state.rollovers.length > 0 && (
+                    <section className="pt-75">
+                      <div className="container">
+                        <h2 className="h1">Rollovers</h2>
+                        <div className="pt-45">
+                          <RolloversGrid events={this.state.rollovers} />
+                        </div>
+                      </div>
+                    </section>
+                  )}
                 </React.Fragment>
               )}
             </React.Fragment>
@@ -577,6 +603,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   private onLiquidationRequested = (request: LiquidationRequest) => {
+    if (
+      !ExplorerProvider.Instance.contractsSource ||
+      !ExplorerProvider.Instance.contractsSource.canWrite ||
+      ExplorerProvider.Instance.unsupportedNetwork
+    ) {
+      this.props.doNetworkConnect()
+      return
+    }
     this.setState({ ...this.state, request, isModalOpen: true })
   }
 }

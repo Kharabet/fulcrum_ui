@@ -34,6 +34,11 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
       FulcrumProviderEvents.ProviderAvailable,
       this.onProviderAvailable
     )
+
+    FulcrumProvider.Instance.eventEmitter.on(
+      FulcrumProviderEvents.ProviderChanged,
+      this.onProviderChanged
+    )
   }
 
   private async derivedUpdate() {
@@ -49,10 +54,18 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
     this.derivedUpdate()
   }
 
+  private onProviderChanged = () => {
+    this.derivedUpdate()
+  }
+
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(
       FulcrumProviderEvents.ProviderAvailable,
       this.onProviderAvailable
+    )
+    FulcrumProvider.Instance.eventEmitter.removeListener(
+      FulcrumProviderEvents.ProviderChanged,
+      this.onProviderChanged
     )
   }
 

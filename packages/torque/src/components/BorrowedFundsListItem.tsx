@@ -1,24 +1,27 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
+import ReactTooltip from 'react-tooltip'
+import { ReactComponent as IconInfo } from '../assets/images/ic_info.svg'
 import { Asset } from '../domain/Asset'
 import { AssetDetails } from '../domain/AssetDetails'
 import { AssetsDictionary } from '../domain/AssetsDictionary'
+import { BorrowRequest } from '../domain/BorrowRequest'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { TorqueProvider } from '../services/TorqueProvider'
-import { TasksQueue } from '../services/TasksQueue'
-import { Rail } from './Rail'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
-import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
-import { BorrowRequest } from '../domain/BorrowRequest'
-import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
-import { TxProcessingLoader } from './TxProcessingLoader'
-import { ManageCollateralDlg } from './ManageCollateralDlg'
-import { RepayLoanDlg } from './RepayLoanDlg'
-import { ExtendLoanDlg } from './ExtendLoanDlg'
+import { RolloverRequest } from '../domain/RolloverRequest'
+import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
+import { TasksQueue } from '../services/TasksQueue'
+import { TorqueProvider } from '../services/TorqueProvider'
 import { BorrowMoreDlg } from './BorrowMoreDlg'
+import { ExtendLoanDlg } from './ExtendLoanDlg'
+import { ManageCollateralDlg } from './ManageCollateralDlg'
+import { Rail } from './Rail'
+import { RepayLoanDlg } from './RepayLoanDlg'
+import { TxProcessingLoader } from './TxProcessingLoader'
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState
@@ -41,8 +44,14 @@ interface IBorrowedFundsListItemState {
     | RepayLoanRequest
     | ExtendLoanRequest
     | BorrowRequest
+    | RolloverRequest
     | undefined
 }
+
+const isMainnetProd =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export class BorrowedFundsListItem extends Component<
   IBorrowedFundsListItemProps,
@@ -71,24 +80,18 @@ export class BorrowedFundsListItem extends Component<
     )
   }
   public async componentDidMount() {
-    const task = await TasksQueue.Instance.getTasksList().find(
+    const task = TasksQueue.Instance.getTasksList().find(
       (t) => t.request.loanId === this.state.borrowedFundsItem.loanId
     )
     const isLoadingTransaction = task && !task.error ? true : false
-    const request = task
-      ? (task.request as
-          | BorrowRequest
-          | ExtendLoanRequest
-          | ManageCollateralRequest
-          | RepayLoanRequest)
-      : undefined
+    const request = task ? task.request : undefined
     this.setState({
       ...this.state,
       isLoadingTransaction,
       request
     })
 
-    this.derivedUpdate()
+    await this.derivedUpdate()
   }
 
   public componentWillUnmount(): void {
@@ -106,33 +109,30 @@ export class BorrowedFundsListItem extends Component<
     if (!this.state.request || taskId !== this.state.request.id) return
     this.setState({ ...this.state, isLoadingTransaction: true })
   }
+
   private onAskToCloseProgressDlg = async (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(() => {
-        TorqueProvider.Instance.onTaskCancel(task)
+      window.setTimeout(async () => {
+        await TorqueProvider.Instance.onTaskCancel(task)
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
       return
     }
     await this.updateData()
-    await this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
   }
 
-  public componentDidUpdate(
-    prevProps: Readonly<IBorrowedFundsListItemProps>,
-    prevState: Readonly<IBorrowedFundsListItemState>,
-    snapshot?: any
-  ): void {
+  public async componentDidUpdate(prevProps: Readonly<IBorrowedFundsListItemProps>) {
     if (this.props.item.loanAsset !== prevProps.item.loanAsset) {
-      this.derivedUpdate()
+      await this.derivedUpdate()
     }
   }
 
   private updateData = async () => {
     const loans = await TorqueProvider.Instance.getLoansList()
     const thisLoan = loans.find((loan) => loan.loanId === this.props.item.loanId)
-    await this.setState({
+    this.setState({
       ...this.state,
       isEmpty: thisLoan ? false : true,
       borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem
@@ -152,8 +152,8 @@ export class BorrowedFundsListItem extends Component<
       this.state.borrowedFundsItem.loanAsset
     )
 
-    //liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
-    const liquidation_collateralToLoanRate = this.props.item
+    // liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
+    const liquidationCollateralToLoanRate = this.props.item
       .loanData!.maintenanceMargin.times(
         this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)
       )
@@ -161,10 +161,10 @@ export class BorrowedFundsListItem extends Component<
       .plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision))
       .div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision))
       .times(10 ** 18)
-    const liquidationPrice = liquidation_collateralToLoanRate
+    const liquidationPrice = liquidationCollateralToLoanRate
       .div(10 ** 18)
       .times(collateralToUSDCurrentRate)
-    await this.setState({
+    this.setState({
       ...this.state,
       assetDetails: assetDetails,
       interestRate: this.props.item.interestRate,
@@ -173,7 +173,8 @@ export class BorrowedFundsListItem extends Component<
   }
 
   public render() {
-    if (!this.state.assetDetails) {
+    const loanData = this.state.borrowedFundsItem.loanData
+    if (!this.state.assetDetails || !loanData) {
       return null
     }
 
@@ -185,21 +186,23 @@ export class BorrowedFundsListItem extends Component<
 
     // const firstInRowModifier = this.props.firstInTheRow ? "borrowed-funds-list-item--first-in-row" : "";
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
-    const maintenanceMargin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber()
-    const startMargin = borrowedFundsItem.loanData!.startMargin.div(10 ** 18).toNumber()
-    //115%
-    const sliderMin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber()
-    //300%
+    const maintenanceMargin = loanData.maintenanceMargin.div(10 ** 18).toNumber()
+    const startMargin = loanData.startMargin.div(10 ** 18).toNumber()
+    // 115%
+    const sliderMin = loanData.maintenanceMargin.div(10 ** 18).toNumber()
+    // 300%
     const sliderMax = sliderMin + 185
     const isUnhealthyLoan = this.state.borrowedFundsItem.collateralizedPercent
       .times(100)
       .plus(100)
       .lt(maintenanceMargin)
-    const isBoorowMoreDisabled = this.state.borrowedFundsItem.collateralizedPercent
+    const isBorrowMoreDisabled = this.state.borrowedFundsItem.collateralizedPercent
       .times(100)
       .plus(100)
       .lt(startMargin)
 
+    const remainingDays = loanData.interestDepositRemaining.div(loanData.interestOwedPerDay)
+    const isRollover = remainingDays.eq(0)
     let sliderValue = borrowedFundsItem.collateralizedPercent.multipliedBy(100).toNumber()
     if (sliderValue > sliderMax) {
       sliderValue = sliderMax
@@ -233,7 +236,7 @@ export class BorrowedFundsListItem extends Component<
             </div>
           </div>
           <div className="borrowed-funds-list-item__header-asset">
-            <div className="borrowed-funds-list-item__header-asset-img">
+            <div title={borrowedFundsItem.loanId} className="borrowed-funds-list-item__header-asset-img">
               <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
             </div>
             <div className="borrowed-funds-list-item__header-asset-name">
@@ -305,12 +308,32 @@ export class BorrowedFundsListItem extends Component<
             <button className={isUnhealthyLoan ? 'unsafe' : ''} onClick={this.onManageCollateral}>
               Manage Collateral
             </button>
-            <button className="" onClick={this.onExtendLoan}>
-              Front Interest
-            </button>
-            <button className="" onClick={this.onRepayLoan}>
-              Repay Loan
-            </button>
+
+            <div className="borrowed-funds-list-item__extend">
+              {remainingDays.lte(6) && (
+                <div
+                  className={`remaining ${
+                    isRollover ? `danger` : remainingDays.lte(3) ? `warning` : ``
+                  }`}>
+                  {isRollover ? `Warning` : `${remainingDays.toFixed(0, 1)} days`}
+                  <IconInfo
+                    className="tooltip__icon"
+                    data-tip="Your loan is required to front more interest payments, this will come from your collateral."
+                  />
+                  <ReactTooltip className="tooltip__info" place="top" effect="solid" />
+                </div>
+              )}
+              {isRollover ? (
+                <button className="rollover" onClick={this.onRollover}>
+                  Rollover
+                </button>
+              ) : (
+                <button onClick={this.onExtendLoan}>Front Interest</button>
+              )}
+            </div>
+
+            <button onClick={this.onRepayLoan}>Repay Loan</button>
+
             {/*<button className="" onClick={this.onRepayLoan}
                 title={isUnhealthyLoan ? "Collateral too low" : ""}
                 disabled={isUnhealthyLoan}>
@@ -319,8 +342,8 @@ export class BorrowedFundsListItem extends Component<
               </button>*/}
             <button
               className=""
-              title={isBoorowMoreDisabled ? 'Collateral too low' : ''}
-              disabled={isBoorowMoreDisabled}
+              title={isBorrowMoreDisabled ? 'Collateral too low' : ''}
+              disabled={isBorrowMoreDisabled}
               onClick={this.onBorrowMore}>
               Borrow More
             </button>
@@ -337,9 +360,10 @@ export class BorrowedFundsListItem extends Component<
       const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({
         ...this.state.borrowedFundsItem
       })
-      await this.setState({ ...this.state, request: manageCollateralRequest })
+      this.setState({ ...this.state, request: manageCollateralRequest })
       await TorqueProvider.Instance.onDoManageCollateral(manageCollateralRequest)
     } catch (error) {
+      // tslint:disable-next-line: no-console
       if (error.message !== 'Form closed') console.error(error)
     }
     // this.props.onManageCollateral({ ...this.props.item });
@@ -352,9 +376,10 @@ export class BorrowedFundsListItem extends Component<
       const repayLoanRequest = await this.props.repayLoanDlgRef.current.getValue({
         ...this.state.borrowedFundsItem
       })
-      await this.setState({ ...this.state, request: repayLoanRequest })
+      this.setState({ ...this.state, request: repayLoanRequest })
       await TorqueProvider.Instance.onDoRepayLoan(repayLoanRequest)
     } catch (error) {
+      // tslint:disable-next-line: no-console
       if (error.message !== 'Form closed') console.error(error)
     }
     // this.props.onRepayLoan({ ...this.props.item });
@@ -367,12 +392,19 @@ export class BorrowedFundsListItem extends Component<
       const extendLoanRequest = await this.props.extendLoanDlgRef.current.getValue({
         ...this.state.borrowedFundsItem
       })
-      await this.setState({ ...this.state, request: extendLoanRequest })
+      this.setState({ ...this.state, request: extendLoanRequest })
       await TorqueProvider.Instance.onDoExtendLoan(extendLoanRequest)
     } catch (error) {
+      // tslint:disable-next-line: no-console
       if (error.message !== 'Form closed') console.error(error)
     }
     // this.props.onExtendLoan({ ...this.props.item });
+  }
+
+  private onRollover = async () => {
+    const rolloverRequest = new RolloverRequest(this.props.item.loanData!.loanId)
+    this.setState({ ...this.state, request: rolloverRequest, isLoadingTransaction: true })
+    await TorqueProvider.Instance.onDoRollover(rolloverRequest)
   }
 
   private onBorrowMore = async () => {
@@ -380,11 +412,12 @@ export class BorrowedFundsListItem extends Component<
 
     try {
       const borroweMoreRequest = await this.props.borrowMoreDlgRef.current.getValue({
-        ...this.props.item
+        ...this.state.borrowedFundsItem
       })
-      await this.setState({ ...this.state, request: borroweMoreRequest })
+      this.setState({ ...this.state, request: borroweMoreRequest })
       await TorqueProvider.Instance.onDoBorrow(borroweMoreRequest)
     } catch (error) {
+      // tslint:disable-next-line: no-console
       if (error.message !== 'Form closed') console.error(error)
     }
   }

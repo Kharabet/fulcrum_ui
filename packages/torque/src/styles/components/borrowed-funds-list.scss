@@ -157,6 +157,8 @@
       }
     }
     &__actions-container {
+      position: relative;
+      margin-top: 10px;
       padding-top: 30px;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -173,6 +175,7 @@
         line-height: 150%;
         color: #276bfb;
         outline: none;
+        cursor: pointer;
         &.unsafe {
           // color: #de4a4a;
           color: #fff;
@@ -190,7 +193,44 @@
         &:hover {
           color: #fff;
           background: #5b88ff;
-          cursor: pointer;
+        }
+        &.rollover {
+          color: #de4a4a;
+          &:hover {
+            color: #fcff7a;
+            background-color: #fe7272;
+          }
+        }
+      }
+    }
+    &__extend {
+      .remaining {
+        font-size: 12px;
+        line-height: 18px;
+        font-weight: 700;
+        color: #fff;
+        padding: 4px 10px;
+        position: absolute;
+        top: 10px;
+        right: 3px;
+        border-radius: 20px;
+        background-color: #8e7df6;
+        &.danger {
+          background-color: #ff4f4f;
+        }
+        &.warning {
+          background-color: #f8a608;
+        }
+      }
+      &:hover {
+        .remaining {
+          background-color: #715df4;
+          &.danger {
+            background-color: #ff0000;
+          }
+          &.warning {
+            background-color: #f8a608;
+          }
         }
       }
     }

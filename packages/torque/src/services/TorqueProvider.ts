@@ -1,4 +1,3 @@
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { EventEmitter } from 'events'
@@ -32,9 +31,9 @@ import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
 import { ICollateralManagementParams } from '../domain/ICollateralManagementParams'
 import { IExtendEstimate } from '../domain/IExtendEstimate'
 import { IExtendState } from '../domain/IExtendState'
+import { ILoanParams } from '../domain/ILoanParams'
 import { IRepayEstimate } from '../domain/IRepayEstimate'
 import { IRepayState } from '../domain/IRepayState'
-import { ILoanParams } from '../domain/ILoanParams'
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { ProviderType } from '../domain/ProviderType'
@@ -45,35 +44,26 @@ import {
   RefinanceData
 } from '../domain/RefinanceData'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { BorrowRequestAwaitingStore } from './BorrowRequestAwaitingStore'
 import { ContractsSource } from './ContractsSource'
-import { ProviderChangedEvent } from './events/ProviderChangedEvent'
 import { TorqueProviderEvents } from './events/TorqueProviderEvents'
-import { NavService } from './NavService'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
-import { RequestTask } from '../domain/RequestTask'
 import { RequestStatus } from '../domain/RequestStatus'
-import { TasksQueue } from './TasksQueue'
+import { RequestTask } from '../domain/RequestTask'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
-import { BorrowProcessor } from './processors/BorrowProcessor'
-import { RepayLoanProcessor } from './processors/RepayLoanProcessor'
-import { ExtendLoanProcessor } from './processors/ExtendLoanProcessor'
-import { ManageCollateralProcessor } from './processors/ManageCollateralProcessor'
-// import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
-// import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
-// import { RefinanceCompoundRequest } from "../domain/RefinanceCompoundRequest";
-// import { RefinanceCompoundProcessor } from "./processors/RefinanceCompoundProcessor";
-// import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
-// import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
+import { TasksQueue } from './TasksQueue'
+import configProviders from '../config/providers.json'
+import { LiquidationEvent } from '../domain/events/LiquidationEvent'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
   process.env.NODE_ENV !== 'development' &&
   process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-  
+
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
   configAddress = constantAddress.mainnet
@@ -119,7 +109,7 @@ export class TorqueProvider {
 
   public readonly eventEmitter: EventEmitter
   public providerType: ProviderType = ProviderType.None
-  public providerEngine: Web3ProviderEngine | null = null
+  public providerEngine: any = null
   public web3Wrapper: Web3Wrapper | null = null
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
@@ -204,7 +194,7 @@ export class TorqueProvider {
     try {
       this.isLoading = true
       this.unsupportedNetwork = false
-      await Web3ConnectionFactory.setWalletProvider(connector, account)
+      await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     } catch (e) {
       console.log(e)
       this.isLoading = false
@@ -264,7 +254,7 @@ export class TorqueProvider {
 
   public async setWeb3ProviderMobileFinalize(
     providerType: ProviderType,
-    providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]
+    providerData: [Web3Wrapper | null, any, boolean, number, string]
   ) {
     // : Promise<boolean> {
     this.web3Wrapper = providerData[0]
@@ -1636,13 +1626,20 @@ export class TorqueProvider {
     )
     // console.log(loansData);
     const zero = new BigNumber(0)
-    result = loansData
-      .filter(
-        (e) =>
-          (!e.principal.eq(zero) &&
-            !e.currentMargin.eq(zero) &&
-            !e.interestDepositRemaining.eq(zero)) ||
-          account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+    const rolloverData = loansData.filter(
+      (e) =>
+        !e.principal.eq(zero) && !e.currentMargin.eq(zero) && e.interestDepositRemaining.eq(zero)
+    )
+
+    result = rolloverData
+      .concat(
+        loansData.filter(
+          (e) =>
+            (!e.principal.eq(zero) &&
+              !e.currentMargin.eq(zero) &&
+              !e.interestDepositRemaining.eq(zero)) ||
+            account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+        )
       )
       .map((e) => {
         let loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
@@ -2271,6 +2268,25 @@ export class TorqueProvider {
     return result
   }
 
+  
+  public getAvailableLiquidaity = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0)
+
+    if (this.contractsSource && this.web3Wrapper) {
+      const iTokenContract = await this.contractsSource.getiTokenContract(asset)
+      if (iTokenContract) {
+        const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
+        const totalAssetSupply = await iTokenContract.totalAssetSupply.callAsync()
+        const totalAssetBorrow = await iTokenContract.totalAssetBorrow.callAsync()
+
+        const marketLiquidity = totalAssetSupply.minus(totalAssetBorrow)
+        result = marketLiquidity.div(10 ** decimals);
+      }
+    }
+
+    return result
+  }
+
   public getErc20AddressOfAsset(asset: Asset): string | null {
     let result: string | null = null
 
@@ -2345,6 +2361,12 @@ export class TorqueProvider {
   }
 
   public onDoManageCollateral = async (request: ManageCollateralRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
+  public onDoRollover = async (request: RolloverRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
@@ -2455,37 +2477,33 @@ export class TorqueProvider {
 
       let processor
       if (task.request instanceof BorrowRequest) {
+        const { BorrowProcessor } = await import('./processors/BorrowProcessor')
         processor = new BorrowProcessor()
         await processor.run(task, account, skipGas)
       }
 
       if (task.request instanceof ExtendLoanRequest) {
+        const { ExtendLoanProcessor } = await import('./processors/ExtendLoanProcessor')
         processor = new ExtendLoanProcessor()
         await processor.run(task, account, skipGas)
       }
       if (task.request instanceof ManageCollateralRequest) {
+        const { ManageCollateralProcessor } = await import('./processors/ManageCollateralProcessor')
         processor = new ManageCollateralProcessor()
         await processor.run(task, account, skipGas)
       }
+
       if (task.request instanceof RepayLoanRequest) {
+        const { RepayLoanProcessor } = await import('./processors/RepayLoanProcessor')
         processor = new RepayLoanProcessor()
         await processor.run(task, account, skipGas)
       }
 
-      // if (task.request instanceof RefinanceMakerRequest) {
-      //   processor = new RefinanceMakerProcessor();
-      //   await processor.run(task, skipGas, configAddress, web3);
-      // }
-
-      // if (task.request instanceof RefinanceCompoundRequest) {
-      //   processor = new RefinanceCompoundProcessor();
-      //   await processor.run(task, account, skipGas);
-      // }
-
-      // if (task.request instanceof RefinanceDydxRequest) {
-      //   processor = new RefinanceDydxProcessor();
-      //   await processor.run(task, account, skipGas);
-      // }
+      if (task.request instanceof RolloverRequest) {
+        const { RolloverProcessor } = await import('./processors/RolloverProcessor')
+        processor = new RolloverProcessor()
+        await processor.run(task, account, skipGas)
+      }
 
       task.processingEnd(true, false, null)
     } catch (e) {
@@ -2538,6 +2556,43 @@ export class TorqueProvider {
 
   public sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
+  }
+
+  public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
+    const result: number = 0
+    if (!this.contractsSource) return result
+    const account =
+      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const blocksPerDay = 10000 // 7-8k per day with a buffer
+    if (!account || !this.contractsSource || !this.web3Wrapper) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api
+    const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
+    const etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${blockNumber -
+      days * blocksPerDay}&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      LiquidationEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+
+    const liquidationEventResponse = await fetch(etherscanApiUrl)
+    const liquidationEventResponseJson = await liquidationEventResponse.json()
+    if (liquidationEventResponseJson.status !== '1') return result
+    const events = liquidationEventResponseJson.result
+    const liquidationEvents = events.filter((event: any) => {
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return false
+
+      const baseTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const quoteTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress)
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress)
+      if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return false
+      return true
+    })
+    return (liquidationEvents && liquidationEvents.length) || result
   }
 }
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { PreloaderChart } from '../components/PreloaderChart'
-import { OwnTokenGridHeader } from './OwnTokenGridHeader'
+import OwnTokenGridHeader from './OwnTokenGridHeader'
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from './OwnTokenGridRow'
 
 import { ReactComponent as Placeholder } from '../assets/images/history_placeholder.svg'
