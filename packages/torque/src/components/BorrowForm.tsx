@@ -81,35 +81,36 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     }
 
     this._initDefaults = new Subject<null>()
-    this._initDefaults.pipe(debounceTime(50)).subscribe(() => {   
+    this._initDefaults.pipe(debounceTime(50)).subscribe(() => {
       this.setInputDefaults()
     })
 
     this._borrowAmountChange = new Subject<string>()
     this._collateralChange = new Subject<null>()
-    merge(
-      this._borrowAmountChange.pipe(
+    this._depositAmountChange = new Subject<string>()
+
+    this._borrowAmountChange
+      .pipe(
         debounceTime(100),
-        switchMap((value) => this.rxConvertToBigNumber(value))
-      ),
-      this._collateralChange.pipe(
-        switchMap(() => this.rxConvertToBigNumber(this.state.borrowAmountValue))
+        switchMap((value) => this.rxConvertToBigNumber(value)),
+        switchMap((value) => this.rxGetDepositEstimate(value))
       )
-    )
-      .pipe(switchMap((value) => this.rxGetDepositEstimate(value)))
       .subscribe(async (next) => {
         this.setDepositEstimate(next.depositAmount)
         this.changeStateLoading()
         await this.checkBalanceTooLow()
       })
 
-    this._depositAmountChange = new Subject<string>()
-    this._depositAmountChange
-      .pipe(
+    merge(
+      this._depositAmountChange.pipe(
         debounceTime(100),
-        switchMap((value) => this.rxConvertToBigNumber(value)),
-        switchMap((value) => this.rxGetBorrowEstimate(value))
+        switchMap((value) => this.rxConvertToBigNumber(value))
+      ),
+      this._collateralChange.pipe(
+        switchMap((value) => this.rxConvertToBigNumber(this.state.depositAmountValue))
       )
+    )
+      .pipe(switchMap((value) => this.rxGetBorrowEstimate(value)))
       .subscribe(async (next) => {
         this.setBorrowEstimate(next.borrowAmount)
         await this.checkBalanceTooLow()
@@ -120,11 +121,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this._input = input
   }
 
-  private async setInputDefaults() {  
-    const ethBalance = await TorqueProvider.Instance.getEthBalance()   
+  private async setInputDefaults() {
+    const ethBalance = await TorqueProvider.Instance.getEthBalance()
     const maxAvailableLiquidity = await TorqueProvider.Instance.getAvailableLiquidaity(
       this.props.borrowAsset
-    )      
+    )
     const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
       this.props.borrowAsset,
       this.state.collateralAsset
@@ -140,7 +141,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     })
   }
 
-  public async componentDidMount() {    
+  public async componentDidMount() {
     this._initDefaults.next()
   }
 
@@ -372,8 +373,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this.setState(
       {
         ...this.state,
-        collateralAsset: asset,
-        isLoading: true
+        collateralAsset: asset
       },
       () => {
         this._collateralChange.next()
