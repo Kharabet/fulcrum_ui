@@ -380,9 +380,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           ? 'Insufficient funds for gas'
           : this.state.depositTokenBalance && this.state.depositTokenBalance.eq(0)
           ? 'Your wallet is empty'
-          : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
-          ? `Slippage:`
-          : ''
+          : 'Slippage:'
       if (this.props.positionType === PositionType.SHORT) {
         submitButtonText = `SHORT`
       } else {
@@ -393,9 +391,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.state.ethBalance &&
         this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
           ? 'Insufficient funds for gas'
-          : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
-          ? `Slippage:`
-          : ''
+          : 'Slippage:'
       submitButtonText = `CLOSE`
     }
     if (this.state.isExpired) {
@@ -450,16 +446,17 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               <div className="trade-form__kv-container">
                 {amountMsg.includes('Slippage:') ? (
                   <div
-                    title={`${this.state.slippageRate.toFixed(18)}%`}
-                    className="trade-form__label slippage">
+                    title={`${this.state.slippageRate.toFixed()}%`}
+                    className={`trade-form__label slippage ${this.state.slippageRate.gt(0) &&
+                      'danger'}`}>
                     {amountMsg}
                     <span className="trade-form__slippage-amount">
                       &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}
-                      <SlippageDown />
+                      {this.state.slippageRate.gt(0) && <SlippageDown />}
                     </span>
                   </div>
                 ) : (
-                  <div className="trade-form__label">{amountMsg}</div>
+                  <div className="trade-form__label danger">{amountMsg}</div>
                 )}
               </div>
             )}
