@@ -288,6 +288,17 @@ export default class ContractsSource {
     return [assetList, addressList]
   }
 
+  
+  public getITokenByErc20Address(address: string): Asset {
+    let result = Asset.UNKNOWN
+
+    //@ts-ignore
+    result = ContractsSource.iTokenList
+      .filter((e: any) => e[1].toLowerCase() === address.toLowerCase())[0][4]
+      .substr(1) as Asset
+    return result
+  }
+
   public getITokenErc20Address(asset: Asset): string | null {
     let symbol
     if (asset === Asset.WETH) {

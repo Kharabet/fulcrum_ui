@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { Observable, Subject } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { GroupButton } from './GroupButton'
 import { Line } from 'react-chartjs-2'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { AssetDetails } from '../domain/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 
 interface IStatsChartProps {
@@ -299,7 +299,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         <div className="container">
           <div className="flex fw-w fd-sm-c jc-sb ai-c mb-30">
             <div className="flex ai-c as-sm-fs ">
-              <span className="flex mr-15 icon-wrapper">{asset.logoSvg.render()}</span>
+              <span className="flex mr-15 icon-wrapper">{asset.reactLogoSvg.render()}</span>
               <h1>{this.state.asset.toUpperCase()} Stats</h1>
             </div>
             <GroupButton setPeriodChart={this.setPeriodChart} />

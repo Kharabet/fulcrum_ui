@@ -1,14 +1,14 @@
 import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ChiSwitch } from './ChiSwitch'
 import { InputAmount } from './InputAmount'
 
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { useWeb3React } from '@web3-react/core'
 export interface ILiquidationFormProps {
   request: LiquidationRequest
@@ -133,14 +133,14 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
       <section className="dialog-content">
         {!isLoading && amountMsg && <div className="amount-warning">{amountMsg}</div>}
         <InputAmount
-          asset={loanToken.logoSvg}
+          asset={loanToken.reactLogoSvg}
           inputAmountText={formatPrecision(payOffAmount)}
           buttonValue={buttonValue}
           updateButton={onButtonChange}
           onAmountChange={onPayOffAmountChange}
         />
         <InputAmount
-          asset={collateralToken.logoSvg}
+          asset={collateralToken.reactLogoSvg}
           inputAmountText={formatPrecision(seizeAmount)}
           onAmountChange={onSeizeAmountChange}
         />

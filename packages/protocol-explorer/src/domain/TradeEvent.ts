@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from './Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export class TradeEvent {
   public static readonly topic0: string =

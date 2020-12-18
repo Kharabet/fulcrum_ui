@@ -59,7 +59,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
           )}
         </div>
         <div className="provider-menu__list-item-content-img">
-          {providerTypeDetails.reactLogoSvgShort.render()}
+          {providerTypeDetails.reactreactLogoSvgShort.render()}
         </div>
       </li>
     )
@@ -72,7 +72,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
         {props.isActivating ? (
           <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
         ) : (
-          providerTypeDetails.reactLogoSvgShort.render()
+          providerTypeDetails.reactreactLogoSvgShort.render()
         )}
       </div>
     </li>
