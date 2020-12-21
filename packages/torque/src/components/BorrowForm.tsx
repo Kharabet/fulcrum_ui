@@ -75,7 +75,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       isLoading: true,
       isEdit: false,
       minValue: 120,
-      maxValue: 700,
+      maxValue: 300,
       selectedValue: 0,
       collateralValue: ''
     }
@@ -212,7 +212,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             <div className="edit-input-wrapper">
               <span>Collateralized</span>
               <div className="edit-input-container">
-                {this.state.isEdit ? (
+              {this.state.collateralValue === '' ? (
+                  <div className="loader-container">
+                    <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
+                  </div>
+                ) : (
                   <React.Fragment>
                     <div className="edit-input-collateral">
                       <input
@@ -225,25 +229,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                       />
                     </div>
                   </React.Fragment>
-                ) : this.state.collateralValue === '' ? (
-                  <div className="loader-container">
-                    <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
-                  </div>
-                ) : (
-                  <React.Fragment>
-                    <span>
-                      {this.state.collateralValue}
-                      <span className="sign">%</span>
-                    </span>
-                    <div className="edit-icon-collateral" onClick={this.editCollateralInput}>
-                      <Edit />
-                    </div>
-                  </React.Fragment>
                 )}
               </div>
             </div>
-            <span className="borrow-form__label-safe">Safe</span>
-            {this.state.isEdit ? (
+            <span className="borrow-form__label-safe">Safe</span>          
               <React.Fragment>
                 <Slider
                   step={0.01}
@@ -251,13 +240,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                   max={this.state.maxValue}
                   value={this.state.selectedValue}
                   onChange={this.onChange}
+                  onAfterChange={this.onChange}
                 />
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <div className="rail" />
-              </React.Fragment>
-            )}
+              </React.Fragment>         
           </div>
         </section>
 
