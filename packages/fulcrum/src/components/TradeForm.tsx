@@ -380,7 +380,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           ? 'Insufficient funds for gas'
           : this.state.depositTokenBalance && this.state.depositTokenBalance.eq(0)
           ? 'Your wallet is empty'
-          : 'Slippage:'
+          : this.state.slippageRate.gt(0)
+          ? `Slippage:`
+          : ''
       if (this.props.positionType === PositionType.SHORT) {
         submitButtonText = `SHORT`
       } else {
@@ -391,7 +393,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.state.ethBalance &&
         this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
           ? 'Insufficient funds for gas'
-          : 'Slippage:'
+          : this.state.slippageRate.gt(0)
+          ? `Slippage:`
+          : ''
       submitButtonText = `CLOSE`
     }
     if (this.state.isExpired) {
