@@ -3,6 +3,7 @@
   flex-wrap: wrap;
   width: 535px;
   padding-top: 35px;
+
   &__content {
     width: 100%;
   }
@@ -240,6 +241,11 @@
   &__error {
     color: #de4a4a;
     width: 100%;
+  }
+  .rc-slider-handle{
+    width: 27px;
+    height: 27px;
+    margin-top: -10px;
   }
 }
 

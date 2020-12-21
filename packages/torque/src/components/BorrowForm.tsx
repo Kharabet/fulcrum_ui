@@ -507,7 +507,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           {
             ...this.state,
             depositAmount: depositAmount,
-            depositAmountValue: depositAmountValue
+            depositAmountValue: depositAmountValue,
+            selectedValue: this.state.maxValue,
+            collateralValue: this.state.maxValue.toFixed(2)
           },
           () => {
             this._depositAmountChange.next(depositAmountValue)
