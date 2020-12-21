@@ -113,6 +113,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       .pipe(switchMap((value) => this.rxGetBorrowEstimate(value)))
       .subscribe(async (next) => {
         this.setBorrowEstimate(next.borrowAmount)
+        this.changeStateLoading()
         await this.checkBalanceTooLow()
       })
   }
@@ -212,7 +213,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             <div className="edit-input-wrapper">
               <span>Collateralized</span>
               <div className="edit-input-container">
-              {this.state.collateralValue === '' ? (
+                {this.state.collateralValue === '' ? (
                   <div className="loader-container">
                     <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
                   </div>
@@ -232,17 +233,17 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 )}
               </div>
             </div>
-            <span className="borrow-form__label-safe">Safe</span>          
-              <React.Fragment>
-                <Slider
-                  step={0.01}
-                  min={this.state.minValue}
-                  max={this.state.maxValue}
-                  value={this.state.selectedValue}
-                  onChange={this.onChange}
-                  onAfterChange={this.onChange}
-                />
-              </React.Fragment>         
+            <span className="borrow-form__label-safe">Safe</span>
+            <React.Fragment>
+              <Slider
+                step={0.01}
+                min={this.state.minValue}
+                max={this.state.maxValue}
+                value={this.state.selectedValue}
+                onChange={this.onChange}
+                onAfterChange={this.onChange}
+              />
+            </React.Fragment>
           </div>
         </section>
 
@@ -505,7 +506,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         const depositAmountValue = depositAmount.dp(5, BigNumber.ROUND_CEIL).toString()
         this.setState(
           {
-            ...this.state,
+            isLoading: true,
             depositAmount: depositAmount,
             depositAmountValue: depositAmountValue,
             selectedValue: this.state.maxValue,

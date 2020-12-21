@@ -122,6 +122,8 @@
     cursor: pointer;
   }
   &__label-safe {
+    position: relative;
+    z-index: 1;
     font-weight: 800;
     color: #00c0ab;
     display: block;
