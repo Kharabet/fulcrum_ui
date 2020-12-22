@@ -147,8 +147,8 @@ export class FulcrumProvider {
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId)
-    // setting up readonly provider
-    Web3ConnectionFactory.setReadonlyProvider().then(() => {
+    // setting up readonly provider only when user wasn't connected earlier with the wallet
+    providerType === null || providerType === ProviderType.None && Web3ConnectionFactory.setReadonlyProvider().then(() => {
       const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
       const engine = Web3ConnectionFactory.currentWeb3Engine
       const canWrite = Web3ConnectionFactory.canWrite
@@ -1786,8 +1786,9 @@ export class FulcrumProvider {
         .get(collateralAsset)!
         .addressErc20.get(this.web3ProviderSettings.networkId) || ''
     if (!iToken || !collateralTokenAddress || !iBZxContract) return null
+    // true for Torque, false for Fulcrum loan id
     // @ts-ignore
-    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, false))
     const loanId = await iToken.loanParamsIds.callAsync(id)
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
     const result = {
@@ -1825,11 +1826,11 @@ export class FulcrumProvider {
     const zero = new BigNumber(0)
     //@ts-ignore
     result = loansData
-      .filter(
-        (e: any) =>
-          (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
-          account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-      )
+      // .filter(
+      //   (e: any) =>
+      //     (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+      //     account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+      // )
       .map((e: any) => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
         const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
@@ -1897,11 +1898,12 @@ export class FulcrumProvider {
       false
     )
     const zero = new BigNumber(0)
-    const healthyUserLoans = loansData.filter(
-      (e: any) =>
-        (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
-        account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-    )
+    const healthyUserLoans = loansData
+    // .filter(
+    //   (e: any) =>
+    //     (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+    //     account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+    // )
     const loansByPair: IBorrowedFundsState[] = []
     healthyUserLoans
       .filter(

@@ -76,6 +76,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.onProviderAvailable
     )
     FulcrumProvider.Instance.eventEmitter.on(
+      FulcrumProviderEvents.ProviderChanged,
+      this.onProviderChanged
+    )
+    FulcrumProvider.Instance.eventEmitter.on(
       FulcrumProviderEvents.AskToOpenProgressDlg,
       this.onAskToOpenProgressDlg
     )
@@ -136,6 +140,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private onProviderAvailable = async () => {
     await this.derivedUpdate()
   }
+  private onProviderChanged = async () => {
+    await this.derivedUpdate()
+  }
 
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return
@@ -171,6 +178,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.off(
       FulcrumProviderEvents.ProviderAvailable,
       this.onProviderAvailable
+    )
+    FulcrumProvider.Instance.eventEmitter.off(
+      FulcrumProviderEvents.ProviderChanged,
+      this.onProviderChanged
     )
     FulcrumProvider.Instance.eventEmitter.off(
       FulcrumProviderEvents.AskToOpenProgressDlg,

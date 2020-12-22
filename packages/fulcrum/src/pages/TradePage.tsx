@@ -65,7 +65,7 @@ interface ITradePageState {
   openedPositionsCount: number
   tokenRowsData: ITradeTokenGridRowProps[]
   innerOwnRowsData: IOwnTokenGridRowProps[]
-  ownRowsData: IOwnTokenGridRowProps[] | undefined
+  ownRowsData: IOwnTokenGridRowProps[]
   historyEvents: IHistoryEvents | undefined
   historyRowsData: IHistoryTokenGridRowProps[]
   tradeRequestId: number
@@ -124,7 +124,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       openedPositionsCount: 0,
       tokenRowsData: [],
       innerOwnRowsData: [],
-      ownRowsData: undefined,
+      ownRowsData: [],
       historyEvents: undefined,
       historyRowsData: [],
       tradeRequestId: 0,
@@ -168,9 +168,23 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === 'None')) {
       this.props.doNetworkConnect()
     }
-    await this.getTokenRowsData(this.state)
-    await this.getInnerOwnRowsData(this.state)
+    await this.getTokenRowsData()
+    await this.getInnerOwnRowsData()
     await this.setRecentLiquidationsNumber()
+    await this.fetchPositionsRecursive(10)
+    setTimeout(() => {
+      this.forceUpdate() // solves bug with positions not appearing on the first render.
+    }, 5000)
+  }
+
+  private fetchPositionsRecursive = async (retries: number) => {
+    await this.getInnerOwnRowsData()
+    await this.getOwnRowsData()
+    if (!this._isMounted || this.state.ownRowsData.length > 0 || retries === 0) {
+      return //exit recursive call
+    } else {
+      window.setTimeout(() => this.fetchPositionsRecursive(--retries), 1000)
+    }
   }
 
   private async setRecentLiquidationsNumber() {
@@ -186,20 +200,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     snapshot?: any
   ) {
     if (prevState.selectedMarket !== this.state.selectedMarket) {
-      await this.getTokenRowsData(this.state)
-      await this.getInnerOwnRowsData(this.state)
+      await this.getTokenRowsData()
+      await this.getInnerOwnRowsData()
     }
     if (
-      (prevState.isTxCompleted !== this.state.isTxCompleted) ||
+      prevState.isTxCompleted !== this.state.isTxCompleted ||
       prevProps.isMobileMedia !== this.props.isMobileMedia
-    ) {      
-      await this.getTokenRowsData(this.state)
-      await this.getInnerOwnRowsData(this.state)
-      await this.getOwnRowsData(this.state).then(() => {
+    ) {
+      await this.getTokenRowsData()
+      await this.getInnerOwnRowsData()
+      await this.getOwnRowsData().then(() => {
         this.setState({
           ...this.state,
           historyEvents: undefined,
-          historyRowsData:[]
+          historyRowsData: []
         })
       })
     }
@@ -368,7 +382,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private clearData = async () => {
     ;(await this._isMounted) &&
       this.setState({
-        ownRowsData: undefined,
+        ownRowsData: [],
         innerOwnRowsData: [],
         loans: [],
         openedPositionsCount: 0,
@@ -378,14 +392,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
-    if (event.providerType === ProviderType.None) {
-      await this.clearData()
-      return
-    }
+    await this.clearData()
     await this.setRecentLiquidationsNumber()
 
-    await this.getInnerOwnRowsData(this.state)
-    await this.getOwnRowsData(this.state)
+    // await this.getInnerOwnRowsData()
+    // await this.getOwnRowsData()
+
+    await this.fetchPositionsRecursive(10)
     await this.getHistoryEvents(this.state)
   }
 
@@ -481,8 +494,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     ;(await this._isMounted) && this.setState({ ...this.state, activeTokenGridTab })
 
     activeTokenGridTab === TokenGridTab.Open &&
-      this.state.ownRowsData === undefined &&
-      (await this.getOwnRowsData(this.state))
+      this.state.ownRowsData.length === 0 &&
+      (await this.getOwnRowsData())
 
     activeTokenGridTab === TokenGridTab.History &&
       this.state.historyEvents === undefined &&
@@ -702,16 +715,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     } as IOwnTokenGridRowProps
   }
 
-  public getOwnRowsData = async (state: ITradePageState) => {
-    if (
-      !FulcrumProvider.Instance.web3Wrapper ||
-      !FulcrumProvider.Instance.contractsSource ||
-      !FulcrumProvider.Instance.contractsSource.canWrite
-    ) {
-      ;(await this._isMounted) &&
-        this.setState({ ownRowsData: undefined, loans: undefined, openedPositionsCount: 0 })
-      return null
-    }
+  public getOwnRowsData = async () => {
+    // if (
+    //   !FulcrumProvider.Instance.web3Wrapper ||
+    //   !FulcrumProvider.Instance.contractsSource ||
+    //   !FulcrumProvider.Instance.contractsSource.canWrite
+    // ) {
+    //   ;(await this._isMounted) &&
+    //     this.setState({ ownRowsData: [], loans: undefined, openedPositionsCount: 0 })
+    //   return null
+    // }
     const ownRowsData: IOwnTokenGridRowProps[] = []
     let loans: IBorrowedFundsState[] | undefined
     loans = await FulcrumProvider.Instance.getUserMarginTradeLoans()
@@ -724,7 +737,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ownRowsData.push(ownRowDataProps)
     }
 
-  
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
@@ -733,15 +745,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       })
   }
 
-  public getInnerOwnRowsData = async (state: ITradePageState) => {
-    if (
-      !FulcrumProvider.Instance.web3Wrapper ||
-      !FulcrumProvider.Instance.contractsSource ||
-      !FulcrumProvider.Instance.contractsSource.canWrite
-    ) {
-      ;(await this._isMounted) && this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
-      return null
-    }
+  public getInnerOwnRowsData = async () => {
+    // if (
+    //   !FulcrumProvider.Instance.web3Wrapper ||
+    //   !FulcrumProvider.Instance.contractsSource ||
+    //   !FulcrumProvider.Instance.contractsSource!.canWrite
+    // ) {
+      
+    //   ;(await this._isMounted) && this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
+    //   return null
+    // }
     const innerOwnRowsData: IOwnTokenGridRowProps[] = []
     let loans: IBorrowedFundsState[] | undefined
 
@@ -775,14 +788,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public getHistoryEvents = async (state: ITradePageState) => {
-    if (
-      !FulcrumProvider.Instance.web3Wrapper ||
-      !FulcrumProvider.Instance.contractsSource ||
-      !FulcrumProvider.Instance.contractsSource.canWrite
-    ) {
-      ;(await this._isMounted) && this.setState({ historyEvents: undefined })
-      return null
-    }
+    // if (
+    //   !FulcrumProvider.Instance.web3Wrapper ||
+    //   !FulcrumProvider.Instance.contractsSource ||
+    //   !FulcrumProvider.Instance.contractsSource.canWrite
+    // ) {
+    //   ;(await this._isMounted) && this.setState({ historyEvents: undefined })
+    //   return null
+    // }
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory()
     const rolloverEvents = await FulcrumProvider.Instance.getRolloverHistory()
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory()
@@ -837,19 +850,19 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({ ...this.state, historyRowsData: [], historyEvents: historyEvents })
   }
 
-  public getTokenRowsData = async (state: ITradePageState) => {
+  public getTokenRowsData = async () => {
     const tokenRowsData: ITradeTokenGridRowProps[] = []
 
     const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`)
     const yieldAPYJson = await yieldAPYRequest.json()
     const yieldApr =
-      yieldAPYJson.success && yieldAPYJson.data[state.selectedMarket.baseToken.toLowerCase()]
-        ? new BigNumber(yieldAPYJson.data[state.selectedMarket.baseToken.toLowerCase()])
+      yieldAPYJson.success && yieldAPYJson.data[this.state.selectedMarket.baseToken.toLowerCase()]
+        ? new BigNumber(yieldAPYJson.data[this.state.selectedMarket.baseToken.toLowerCase()])
         : new BigNumber(0)
 
     tokenRowsData.push({
-      baseToken: state.selectedMarket.baseToken,
-      quoteToken: state.selectedMarket.quoteToken,
+      baseToken: this.state.selectedMarket.baseToken,
+      quoteToken: this.state.selectedMarket.quoteToken,
       positionType: PositionType.LONG,
       defaultLeverage: this.defaultLeverageLong,
       onTrade: this.onTradeRequested,
@@ -860,13 +873,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isMobileMedia: this.props.isMobileMedia,
       yieldApr,
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
-        state.selectedMarket.baseToken,
-        state.selectedMarket.quoteToken
+        this.state.selectedMarket.baseToken,
+        this.state.selectedMarket.quoteToken
       )
     })
     tokenRowsData.push({
-      baseToken: state.selectedMarket.baseToken,
-      quoteToken: state.selectedMarket.quoteToken,
+      baseToken: this.state.selectedMarket.baseToken,
+      quoteToken: this.state.selectedMarket.quoteToken,
       positionType: PositionType.SHORT,
       defaultLeverage: this.defaultLeverageShort,
       onTrade: this.onTradeRequested,
@@ -877,8 +890,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isMobileMedia: this.props.isMobileMedia,
       yieldApr,
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
-        state.selectedMarket.quoteToken,
-        state.selectedMarket.baseToken
+        this.state.selectedMarket.quoteToken,
+        this.state.selectedMarket.baseToken
       )
     })
     ;(await this._isMounted) && this.setState({ ...this.state, tokenRowsData: tokenRowsData })
@@ -890,7 +903,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public changeLoadingTransaction = async (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   ) => {
     ;(await this._isMounted) &&
       this.setState({
