@@ -152,7 +152,7 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
           </div>
         </div>
       </div>
-      <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgBorrowItem }} />
+      <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgLightColor }} />
     </div>
   )
 }

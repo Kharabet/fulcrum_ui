@@ -25,59 +25,15 @@ import weth_logo, { ReactComponent as WETHLogo } from './images/ic_token_weth.sv
 import yfi_logo, { ReactComponent as YFILogo } from './images/ic_token_yfi.svg'
 import zrx_logo, { ReactComponent as ZRXLogo } from './images/ic_token_zrx.svg'
 
-import bat_bg from './images/popup_left_token_bat.svg'
-import btc_bg from './images/popup_left_token_btc.svg'
-import bzrx_bg from './images/popup_left_token_bzrx.svg'
-import dai_bg from './images/popup_left_token_dai.svg'
-import eth_bg from './images/popup_left_token_eth.svg'
-import knc_bg from './images/popup_left_token_knc.svg'
-import lend_bg from './images/popup_left_token_lend.svg'
-import link_bg from './images/popup_left_token_link.svg'
-import mkr_bg from './images/popup_left_token_mkr.svg'
-import rep_bg from './images/popup_left_token_rep.svg'
-import sai_bg from './images/popup_left_token_sai.svg'
-import susd_bg from './images/popup_left_token_susd.svg'
-import usdc_bg from './images/popup_left_token_usdc.svg'
-import usdt_bg from './images/popup_left_token_usdt.svg'
-import yfi_bg from './images/popup_left_token_yfi.svg'
-import zrx_bg from './images/popup_left_token_zrx.svg'
-
-// import btc_bg_btm from "./images/popup_bottom_token_btc.svg";
-import eth_bg_btm from './images/popup_bottom_token_eth.svg'
-// import usdt_bg_btm from "./images/popup_bottom_token_susd.svg";
-
-import bat_ts from './images/ic___token_selector___bat.svg'
-import bzrx_ts from './images/ic___token_selector___bzrx.svg'
-import dai_ts from './images/ic___token_selector___dai.svg'
-import eth_ts from './images/ic___token_selector___eth.svg'
-import knc_ts from './images/ic___token_selector___knc.svg'
-import lend_ts from './images/ic___token_selector___lend.svg'
-import link_ts from './images/ic___token_selector___link.svg'
-import mkr_ts from './images/ic___token_selector___mkr.svg'
-import rep_ts from './images/ic___token_selector___rep.svg'
-import sai_ts from './images/ic___token_selector___sai.svg'
-import susd_ts from './images/ic___token_selector___susd.svg'
-import usdc_ts from './images/ic___token_selector___usdc.svg'
-import btc_ts from './images/ic___token_selector___wbtc.svg'
-import yfi_ts from './images/ic___token_selector___yfi.svg'
-import zrx_ts from './images/ic___token_selector___zrx.svg'
-
 export default class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
     [
       Asset.CHI,
       new AssetDetails(
         'CHI',
-        'Chi Gastoken by 1inch',
-        '',
-        '',
         0,
         chi_logo,
         CHILogo,
-        '',
-        '',
-        '',
-        '',
         '',
         '',
         new Map<number, string | null>([
@@ -90,17 +46,10 @@ export default class AssetsDictionary {
       Asset.BAT,
       new AssetDetails(
         'BAT',
-        'Basic Attention Token (BAT)',
-        'iBAT',
-        'https://fulcrum.trade/images/iBAT.svg',
         18,
         bat_logo,
         BATLogo,
-        bat_bg,
-        bat_ts,
         '#CC3D84',
-        '#FFFFFF',
-        '#FFFFFF',
         '#FFE1D3',
         new Map<number, string | null>([
           [1, '0x0d8775f648430679a709e98d2b0cb6250d2887ef'],
@@ -113,17 +62,10 @@ export default class AssetsDictionary {
       Asset.WBTC,
       new AssetDetails(
         'WBTC',
-        'Bitcoin (BTC)',
-        'iWBTC',
-        'https://fulcrum.trade/images/iWBTC.svg',
         8,
         btc_logo,
         BTCLogo,
-        btc_bg,
-        btc_ts,
-        '#884294',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#966AFF',
         '#E9CAEE',
         new Map<number, string | null>([
           [1, '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'],
@@ -136,17 +78,10 @@ export default class AssetsDictionary {
       Asset.LINK,
       new AssetDetails(
         'LINK',
-        'ChainLink Token (LINK)',
-        'iLINK',
-        'https://fulcrum.trade/images/iLINK.svg',
         18,
         link_logo,
         LINKLogo,
-        link_bg,
-        link_ts,
-        '#2A5ADA',
-        '#ffffff',
-        '#ffffff',
+        '#03288B',
         '#B9E9FF',
         new Map<number, string | null>([
           [1, '0x514910771af9ca656af840dff83e8264ecf986ca'],
@@ -159,17 +94,10 @@ export default class AssetsDictionary {
       Asset.USDT,
       new AssetDetails(
         'USDT',
-        'Tether USD (USDT)',
-        'iUSDT',
-        'https://fulcrum.trade/images/iUSDT.svg',
         6,
         usdt_logo,
         USDTLogo,
-        usdt_bg,
-        '',
-        '#8777B1',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#70E000',
         '#E1FFC4',
         new Map<number, string | null>([
           [1, '0xdac17f958d2ee523a2206206994597c13d831ec7'],
@@ -182,17 +110,10 @@ export default class AssetsDictionary {
       Asset.SAI,
       new AssetDetails(
         'SAI',
-        'Sai Stablecoin (SAI)',
-        'iSAI',
-        'https://fulcrum.trade/images/iSAI.svg',
         18,
         sai_logo,
         SAILogo,
-        sai_bg,
-        sai_ts,
         '#8777B1',
-        '#FFFFFF',
-        '#FFFFFF',
         '#E3D9FF',
         new Map<number, string | null>([
           [1, '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359'],
@@ -205,17 +126,10 @@ export default class AssetsDictionary {
       Asset.DAI,
       new AssetDetails(
         'DAI',
-        'Dai Stablecoin (DAI)',
-        'iDAI',
-        'https://fulcrum.trade/images/iDAI.svg',
         18,
         dai_logo,
         DAILogo,
-        dai_bg,
-        dai_ts,
-        '#8777B1',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#F8A608',
         '#FFE9BE',
         new Map<number, string | null>([
           [1, '0x6b175474e89094c44da98b954eedeac495271d0f'],
@@ -229,17 +143,10 @@ export default class AssetsDictionary {
       Asset.CHAI,
       new AssetDetails(
         'CHAI',
-        'CHai',
-        'iDAI',
-        'https://fulcrum.trade/images/iDAI.svg',
         18,
         chai_logo,
         CHAILogo,
-        dai_bg,
-        dai_ts,
         '#8777B1',
-        '#FFFFFF',
-        '#FFFFFF',
         '',
         new Map<number, string | null>([
           [1, '0x06af07097c9eeb7fd685c692751d5c66db49c215'],
@@ -253,17 +160,10 @@ export default class AssetsDictionary {
       Asset.USDC,
       new AssetDetails(
         'USDC',
-        'USD Coin (USDC)',
-        'iUSDC',
-        'https://fulcrum.trade/images/iUSDC.svg',
         6,
         usdc_logo,
         USDCLogo,
-        usdc_bg,
-        usdc_ts,
-        '#00000000',
-        '#444e5a',
-        '#acb5c2',
+        '#85D3FF',
         '#C8E0FA',
         new Map<number, string | null>([
           [1, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'],
@@ -276,17 +176,10 @@ export default class AssetsDictionary {
       Asset.SUSD,
       new AssetDetails(
         'SUSD',
-        'Synth sUSD (sUSD)',
-        'iSUSD',
-        'https://fulcrum.trade/images/iSUSD.svg',
         18,
         susd_logo,
         SUSDLogo,
-        susd_bg,
-        susd_ts,
         '#00000000',
-        '#444e5a',
-        '#acb5c2',
         '#D9D5E9',
         new Map<number, string | null>([
           [1, '0x57ab1ec28d129707052df4df418d58a2d46d5f51'],
@@ -299,17 +192,10 @@ export default class AssetsDictionary {
       Asset.ETH,
       new AssetDetails(
         'ETH',
-        'Ethereum (ETH)',
-        'iETH',
-        'https://fulcrum.trade/images/iETH.svg',
         18,
         eth_logo,
         ETHLogo,
-        eth_bg,
-        eth_ts,
-        '#FFFFFF',
-        '#444e5a',
-        '#acb5c2',
+        '#B0B0B0',
         '#ECECEC',
         new Map<number, string | null>([
           [1, '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'],
@@ -323,17 +209,10 @@ export default class AssetsDictionary {
       Asset.WETH,
       new AssetDetails(
         'WETH',
-        'Wrapped Ether (WETH)',
-        'iETH',
-        'https://fulcrum.trade/images/iETH.svg',
         18,
         weth_logo,
         WETHLogo,
-        eth_bg,
-        eth_ts,
         '#FFFFFF',
-        '#444e5a',
-        '#acb5c2',
         '#ECECEC',
         new Map<number, string | null>([
           [1, '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'],
@@ -347,17 +226,10 @@ export default class AssetsDictionary {
       Asset.fWETH,
       new AssetDetails(
         'fWETH',
-        'Fake Wrapped Ether (fWETH)',
-        'ifWETH',
-        'https://fulcrum.trade/images/iETH.svg',
         18,
         weth_logo,
         WETHLogo,
-        eth_bg,
-        eth_ts,
         '#FFFFFF',
-        '#444e5a',
-        '#acb5c2',
         '#B0B0B0',
         new Map<number, string | null>([[42, '0xfbe16ba4e8029b759d3c5ef8844124893f3ae470']])
       )
@@ -366,17 +238,10 @@ export default class AssetsDictionary {
       Asset.KNC,
       new AssetDetails(
         'KNC',
-        'Kyber Network (KNC)',
-        'iKNC',
-        'https://fulcrum.trade/images/iKNC.svg',
         18,
         knc_logo,
         KNCLogo,
-        knc_bg,
-        knc_ts,
-        '#49BC98',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#3BD8A7',
         '#B4EAD9',
         new Map<number, string | null>([
           [1, '0xdd974d5c2e2928dea5f71b9825b8b646686bd200'],
@@ -389,17 +254,10 @@ export default class AssetsDictionary {
       Asset.MKR,
       new AssetDetails(
         'MKR',
-        'Maker (MKR)',
-        'iMKR',
-        '',
         18,
         mkr_logo,
         MKRLogo,
-        mkr_bg,
-        mkr_ts,
-        '#00BB99',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#028858',
         '#CAF6D7',
         new Map<number, string | null>([
           [1, '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2'],
@@ -412,17 +270,10 @@ export default class AssetsDictionary {
       Asset.REP,
       new AssetDetails(
         'REP',
-        'Augur (REP)',
-        'iREP',
-        'https://fulcrum.trade/images/iREP.svg',
         18,
         rep_logo,
         REPLogo,
-        rep_bg,
-        rep_ts,
         '#8D3F76',
-        '#FFFFFF',
-        '#FFFFFF',
         '#EACAE2',
         new Map<number, string | null>([
           [1, '0x1985365e9f78359a9b6ad760e32412f4a445e862'],
@@ -436,17 +287,10 @@ export default class AssetsDictionary {
       Asset.ZRX,
       new AssetDetails(
         'ZRX',
-        '0x (ZRX)',
-        'iZRX',
-        'https://fulcrum.trade/images/iZRX.svg',
         18,
         zrx_logo,
         ZRXLogo,
-        zrx_bg,
-        zrx_ts,
         '#000004',
-        '#FFFFFF',
-        '#FFFFFF',
         '#D8D3FF',
         new Map<number, string | null>([
           [1, '0xe41d2489571d322189246dafa5ebde1f4699f498'],
@@ -460,17 +304,10 @@ export default class AssetsDictionary {
       Asset.BZRX,
       new AssetDetails(
         'BZRX',
-        'bZx Protocol Token',
-        'iBZRX',
-        'https://fulcrum.trade/images/iBZRX.svg',
         18,
         bzrx_logo,
         BZRXLogo,
-        bzrx_bg,
-        bzrx_ts,
-        '#7368D0',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#0056D7',
         '#D8D3FF',
         new Map<number, string | null>([
           [1, '0x56d811088235F11C8920698a204A5010a788f4b3'],
@@ -483,17 +320,10 @@ export default class AssetsDictionary {
       Asset.YFI,
       new AssetDetails(
         'YFI',
-        'YFI',
-        'iYFI',
-        'https://fulcrum.trade/images/iYFI.svg',
         18,
         yfi_logo,
         YFILogo,
-        yfi_bg,
-        yfi_ts,
-        '#7368D0',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#3D97FF',
         '#D8D3FF',
         new Map<number, string | null>([
           [1, '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e'],
@@ -506,17 +336,10 @@ export default class AssetsDictionary {
       Asset.LEND,
       new AssetDetails(
         'LEND',
-        'LEND',
-        'iLEND',
-        'https://fulcrum.trade/images/iLEND.svg',
         18,
         lend_logo,
         LENDLogo,
-        lend_bg,
-        lend_ts,
-        '#7368D0',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#00EFEF',
         '#D8D3FF',
         new Map<number, string | null>([
           [1, '0x80fb784b7ed66730e8b1dbd9820afd29931aab03'],
@@ -529,17 +352,10 @@ export default class AssetsDictionary {
       Asset.AAVE,
       new AssetDetails(
         'AAVE',
-        'AAVE',
-        'iAAVE',
-        'https://fulcrum.trade/images/iAAVE.svg',
         18,
         aave_logo,
         AAVELogo,
-        '',
-        '',
         '#2EBAC6',
-        '#FFFFFF',
-        '#FFFFFF',
         '#2EBAC6',
         new Map<number, string | null>([
           [1, '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'],
@@ -552,17 +368,10 @@ export default class AssetsDictionary {
       Asset.UNI,
       new AssetDetails(
         'UNI',
-        'UNI',
-        'iUNI',
-        'https://fulcrum.trade/images/iUNI.svg',
         18,
         uni_logo,
         UNILogo,
-        '',
-        '',
         '#FFE1EF',
-        '#FFFFFF',
-        '#FFFFFF',
         '#FFE1EF',
         new Map<number, string | null>([
           [1, '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'],
@@ -575,17 +384,10 @@ export default class AssetsDictionary {
       Asset.LRC,
       new AssetDetails(
         'LRC',
-        'LRC',
-        'iLRC',
-        'https://fulcrum.trade/images/iLRC.svg',
         18,
         lrc_logo,
         LRCLogo,
-        '',
-        '',
-        '#DCE7FF',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#1E61FF',
         '#DCE7FF',
         new Map<number, string | null>([
           [1, '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd'],
@@ -598,17 +400,10 @@ export default class AssetsDictionary {
       Asset.COMP,
       new AssetDetails(
         'COMP',
-        'COMP',
-        'iCOMP',
-        'https://fulcrum.trade/images/iCOMP.svg',
         18,
         comp_logo,
         COMPLogo,
-        '',
-        '',
-        '#9DFBDF',
-        '#FFFFFF',
-        '#FFFFFF',
+        '#00F9B0',
         '#9DFBDF',
         new Map<number, string | null>([
           [1, '0xc00e94cb662c3520282e6f5717214004a7f26888'],
