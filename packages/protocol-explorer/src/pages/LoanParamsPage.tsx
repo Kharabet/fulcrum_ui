@@ -105,7 +105,7 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
                 </section>
                 <section className="pt-45 pt-sm-30">
                   <div className="container">
-                    <ParamGrid params={params} quantityTx={20} />
+                    <ParamGrid params={params} quantityTx={10} />
                   </div>
                 </section>
               </React.Fragment>
