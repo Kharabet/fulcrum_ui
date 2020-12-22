@@ -346,19 +346,22 @@ export default class Fulcrum {
 
       const tokens = iTokens.filter(token => token.name !== 'ethv1')
 
-      for (const principal in tokens) {
+      for (const loan in tokens) {
         // console.log('call iTokenContract')
         this.logger.info('call iTokenContract')
-        const iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, tokens[principal].address)
+        const loanTokenAddress = tokens[loan].erc20Address
+        const iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, tokens[loan].address)
         if (!iTokenContract) return null
 
         for (const collateral in tokens) {
-          if (principal !== collateral) {
+          if (loan !== collateral) {
             const collateralTokenAddress = tokens[collateral].erc20Address
 
             if (!collateralTokenAddress) return null
-
             const fulcrumId = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, false))
+            const liquidationIncentivePercent = await iBZxContract.methods
+              .liquidationIncentivePercent(loanTokenAddress, collateralTokenAddress)
+              .call()
             let loanId = await iTokenContract.methods
               .loanParamsIds(fulcrumId)
               .call()
@@ -369,11 +372,11 @@ export default class Fulcrum {
               loansParams.loanParams.push(new loanParamsModel({
                 loanId: loanParams[0],
                 principal: this.getAssetFromAddress(loanParams[3]),
-                collateral:  this.getAssetFromAddress(loanParams[4]),
+                collateral: this.getAssetFromAddress(loanParams[4]),
                 platform: "Fulcrum",
                 initialMargin: new BigNumber(loanParams[5]).div(10 ** 18),
                 maintenanceMargin: new BigNumber(loanParams[6]).div(10 ** 18),
-                liquidationPenalty: 0
+                liquidationPenalty: new BigNumber(liquidationIncentivePercent).div(10 ** 18)
               }))
 
             const torqueId = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
@@ -385,12 +388,12 @@ export default class Fulcrum {
               .call()
             loanParams[3] !== "0x0000000000000000000000000000000000000000" && loansParams.loanParams.push(new loanParamsModel({
               loanId: loanParams[0],
-              principal:  this.getAssetFromAddress(loanParams[3]),
-              collateral:  this.getAssetFromAddress(loanParams[4]),
+              principal: this.getAssetFromAddress(loanParams[3]),
+              collateral: this.getAssetFromAddress(loanParams[4]),
               platform: "Torque",
               initialMargin: new BigNumber(loanParams[5]).div(10 ** 18),
               maintenanceMargin: new BigNumber(loanParams[6]).div(10 ** 18),
-              liquidationPenalty: 0
+              liquidationPenalty: new BigNumber(liquidationIncentivePercent).div(10 ** 18)
             }
             ))
           }
@@ -472,8 +475,8 @@ export default class Fulcrum {
         break
       case '0x0000000000004946c0e9f43f4dee607b0ef1fa1c':
         asset = 'CHI'
-        break   
-    } 
+        break
+    }
     return asset
   }
 
