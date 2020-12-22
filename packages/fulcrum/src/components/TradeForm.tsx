@@ -451,12 +451,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 {amountMsg.includes('Slippage:') ? (
                   <div
                     title={`${this.state.slippageRate.toFixed()}%`}
-                    className={`trade-form__label slippage ${this.state.slippageRate.gt(0) &&
+                    className={`trade-form__label slippage ${this.state.slippageRate.gte(0.01) &&
                       'danger'}`}>
                     {amountMsg}
                     <span className="trade-form__slippage-amount">
                       &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}
-                      {this.state.slippageRate.gt(0) && <SlippageDown />}
+                      {this.state.slippageRate.gte(0.01) && <SlippageDown />}
                     </span>
                   </div>
                 ) : (
