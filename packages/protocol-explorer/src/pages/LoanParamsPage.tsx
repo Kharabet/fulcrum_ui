@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Loader } from '../components/Loader'
 import ParamGrid from '../components/ParamGrid'
 import { IParamRowProps } from '../components/ParamRow'
@@ -8,6 +8,7 @@ import { Search } from '../components/Search'
 import { Asset } from '../domain/Asset'
 import { Platform } from '../domain/Platform'
 import { Header } from '../layout/Header'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 
 interface ILoanParamsPageProps {
@@ -16,64 +17,105 @@ interface ILoanParamsPageProps {
 }
 
 const LoanParamsPage = (props: ILoanParamsPageProps) => {
-  const data: IParamRowProps[] = [
-    {
-      principal: Asset.AAVE,
-      collateral: Asset.CHI,
-      platform: Platform.Fulcrum,
-      loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-      initialMargin: new BigNumber(2),
-      maintenanceMargin: new BigNumber(2),
-      liquidationPenalty: new BigNumber(0)
-    },
-    {
-      principal: Asset.AAVE,
-      collateral: Asset.CHI,
-      platform: Platform.Torque,
-      loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-      initialMargin: new BigNumber(2),
-      maintenanceMargin: new BigNumber(2),
-      liquidationPenalty: new BigNumber(0)
-    },
-    {
-      principal: Asset.ETH,
-      collateral: Asset.CHI,
-      platform: Platform.Fulcrum,
-      loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-      initialMargin: new BigNumber(2),
-      maintenanceMargin: new BigNumber(2),
-      liquidationPenalty: new BigNumber(0)
-    },
-    {
-      principal: Asset.ETH,
-      collateral: Asset.WBTC,
-      platform: Platform.Fulcrum,
-      loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-      initialMargin: new BigNumber(20),
-      maintenanceMargin: new BigNumber(21),
-      liquidationPenalty: new BigNumber(0)
-    },
-    {
-      principal: Asset.ETH,
-      collateral: Asset.CHI,
-      platform: Platform.Torque,
-      loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-      initialMargin: new BigNumber(2),
-      maintenanceMargin: new BigNumber(2),
-      liquidationPenalty: new BigNumber(0)
-    }
-  ]
+  // const data: IParamRowProps[] = [
+  //   {
+  //     principal: Asset.AAVE,
+  //     collateral: Asset.CHI,
+  //     platform: Platform.Fulcrum,
+  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
+  //     initialMargin: new BigNumber(2),
+  //     maintenanceMargin: new BigNumber(2),
+  //     liquidationPenalty: new BigNumber(0)
+  //   },
+  //   {
+  //     principal: Asset.AAVE,
+  //     collateral: Asset.CHI,
+  //     platform: Platform.Torque,
+  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
+  //     initialMargin: new BigNumber(2),
+  //     maintenanceMargin: new BigNumber(2),
+  //     liquidationPenalty: new BigNumber(0)
+  //   },
+  //   {
+  //     principal: Asset.ETH,
+  //     collateral: Asset.CHI,
+  //     platform: Platform.Fulcrum,
+  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
+  //     initialMargin: new BigNumber(2),
+  //     maintenanceMargin: new BigNumber(2),
+  //     liquidationPenalty: new BigNumber(0)
+  //   },
+  //   {
+  //     principal: Asset.ETH,
+  //     collateral: Asset.WBTC,
+  //     platform: Platform.Fulcrum,
+  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
+  //     initialMargin: new BigNumber(20),
+  //     maintenanceMargin: new BigNumber(21),
+  //     liquidationPenalty: new BigNumber(0)
+  //   },
+  //   {
+  //     principal: Asset.ETH,
+  //     collateral: Asset.CHI,
+  //     platform: Platform.Torque,
+  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
+  //     initialMargin: new BigNumber(2),
+  //     maintenanceMargin: new BigNumber(2),
+  //     liquidationPenalty: new BigNumber(0)
+  //   }
+  // ]
 
+  const [data, setData] = useState<IParamRowProps[]>([])
   const [activePlatform, setActivePlatform] = useState(Platform.Fulcrum)
   const [filteredData, setFilteredData] = useState<IParamRowProps[]>(
-    data.filter((param) => param.platform === Platform.Fulcrum)
+    []
+    // data.filter((param) => param.platform === Platform.Fulcrum)
   )
-  const [params, setParams] = useState<IParamRowProps[]>(filteredData)
+  const [params, setParams] = useState<IParamRowProps[]>([])
   const [isDataLoading, setIsDataLoading] = useState(true)
 
   const copyEl = React.useRef<HTMLSpanElement | null>(null)
-  useState(() => {
-    setIsDataLoading(false)
+
+  useEffect(() => {
+    const loadParams = async () => {
+      const loansParams = await fetch('https://api.bzx.network/v1/loans-params')
+
+      await loansParams.json().then((result) => {
+        const resultData: IParamRowProps[] = result.data.map((item: IParamRowProps) => {
+          return {
+            principal: item.principal,
+            collateral: item.collateral,
+            platform: item.platform,
+            loanId: item.loanId,
+            initialMargin: item.initialMargin,
+            maintenanceMargin: item.maintenanceMargin,
+            liquidationPenalty: item.liquidationPenalty
+          } as IParamRowProps
+        })
+        const filteredResult = resultData.filter((item) => item.platform === Platform.Fulcrum)
+        setData(resultData)
+        setFilteredData(filteredResult)
+        setParams(filteredResult)
+        setIsDataLoading(false)
+      })
+      
+      // await ExplorerProvider.Instance.getFulcrumParams().then((result) => {
+      //   setFilteredData(result || [])
+      //   setParams(result || [])
+      //   setIsDataLoading(false)
+      // })
+    }
+
+    loadParams()
+    // ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, loadParams)
+    // ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, loadParams)
+    // return () => {
+    //   ExplorerProvider.Instance.eventEmitter.off(
+    //     ExplorerProviderEvents.ProviderAvailable,
+    //     loadParams
+    //   )
+    //   ExplorerProvider.Instance.eventEmitter.off(ExplorerProviderEvents.ProviderChanged, loadParams)
+    // }
   })
 
   const onSearch = (filter: string) => {

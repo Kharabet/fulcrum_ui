@@ -2712,6 +2712,33 @@ export class iBZxContract extends BaseContract {
             return result;
         },
     };
+
+    public loanParamsIds = {
+        async callAsync(
+          index_0: BigNumber,
+          callData: Partial<CallData> = {},
+          defaultBlock?: BlockParam
+        ): Promise<string> {
+          const self = (this as any) as iBZxContract
+          const encodedData = self._strictEncodeArguments('loanParamsIds(uint256)', [index_0])
+          const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            {
+              to: self.address,
+              ...callData,
+              data: encodedData
+            },
+            self._web3Wrapper.getContractDefaults()
+          )
+          const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
+          BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+          const abiEncoder = self._lookupAbiEncoder('loanParamsIds(uint256)')
+          // tslint:disable boolean-naming
+          const result = abiEncoder.strictDecodeReturnValue<string>(rawCallResult)
+          // tslint:enable boolean-naming
+          return result
+        }
+      }
+
     public loanPoolToUnderlying = {
         async callAsync(
             index_0: string,
