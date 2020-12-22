@@ -3,7 +3,7 @@ import Fulcrum from '../fulcrum'
 import Torque from '../torque'
 import Web3 from 'web3'
 
-import { query, oneOf, validationResult } from 'express-validator'
+import { query, validationResult } from 'express-validator'
 import { iTokens } from '../config/iTokens'
 
 import QueuedStorage from '../QueuedStorage'
@@ -61,6 +61,11 @@ export default ({ config, logger }) => {
   api.get('/yield-farimng-apy', async (req, res) => {
     const apy = await fulcrum.getYieldFarmingAPY()
     res.json({ data: apy, success: true })
+  })
+
+  api.get('/loans-params', async (req, res) => {
+    const params = await fulcrum.getLoansParams()
+    res.json({ data: params, success: true })
   })
 
   api.get('/torque-borrow-rate-apr', async (req, res) => {

@@ -6,14 +6,17 @@ import {
   DappHelperJson,
   mainnetAddress as dappHelperAddress
 } from '../contracts/DappHelperContract'
+import Web3Utils from 'web3-utils'
 import { mainnetAddress as oracleAddress, oracleJson } from '../contracts/OracleContract'
 import { erc20Json } from '../contracts/erc20Contract'
 import { iTokenJson } from '../contracts/iTokenContract'
 import { pTokenJson } from '../contracts/pTokenContract'
+import { mainnetAddress as iBZxAddress, iBZxJson } from '../contracts/iBZxContract'
 import config from '../config.json'
 import { pTokenPricesModel, pTokenPriceModel } from '../models/pTokenPrices'
 import { iTokenPricesModel, iTokenPriceModel } from '../models/iTokenPrices'
 import { statsModel, tokenStatsModel, allTokensStatsModel } from '../models/stats'
+import { loansParamsModel, loanParamsModel } from '../models/loansParams'
 
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
 
@@ -23,8 +26,10 @@ export default class Fulcrum {
     this.logger = logger
     this.storage = storage
     setInterval(this.updateCache.bind(this), config.cache_ttl_sec * 1000)
+    setInterval(this.updateParamsCache.bind(this), config.cache_ttl_day * 1000)
     this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress)
     this.updateCache()
+    this.updateParamsCache()
   }
 
   async updateCache(key, value) {
@@ -40,6 +45,13 @@ export default class Fulcrum {
     // await this.storage.setItem("ptoken-prices", ptoken);
     this.logger.info('ptoken-prices updated')
   }
+
+  async updateParamsCache(key, value) {
+    await this.updateLoansParams()
+    // await this.storage.setItem("loan_params", params);
+    this.logger.info('loan_params updated')
+  }
+
 
   async getTotalAssetSupply() {
     const reserveData = await this.getReserveData()
@@ -297,7 +309,98 @@ export default class Fulcrum {
         pTokenPrices.pTokenPrices.push(pTokenPrice)
       }
       await pTokenPrices.save()
-    } catch (e) {
+    }
+    catch (e) {
+      this.logger.error(e)
+    }
+    return result
+  }
+
+  async getLoansParams() {
+    const lastLoansParams = (
+      await loansParamsModel
+        .find()
+        .sort({ _id: -1 })
+        .select({ loanParams: 1 })
+        .lean()
+        .limit(1)
+    )[0]
+    if (!lastLoansParams) {
+      this.logger.info('No loan-params in db!')
+      await this.updateLoansParams()
+      // await this.storage.setItem("loan-params", result);
+      // console.dir(`loan-params:`);
+      // console.dir(result);
+    }    
+    return lastLoansParams.loanParams  
+  }
+
+  async updateLoansParams() {
+    const result = {}
+    const loansParams = new loansParamsModel()
+    loansParams.loanParams = []
+    try {
+      const iBZxContract = new this.web3.eth.Contract(iBZxJson.abi, iBZxAddress)
+      console.log('call iBZxContract')
+      if (!iBZxContract) return null
+
+      const tokens = iTokens.filter(token => token.name !== 'ethv1')
+
+      for (const principal in tokens) {
+        console.log('call iTokenContract')
+        this.logger.info('call iTokenContract')
+        const iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, tokens[principal].address)
+        if (!iTokenContract) return null
+
+        for (const collateral in tokens) {
+          if (principal !== collateral) {
+            const collateralTokenAddress = tokens[collateral].erc20Address
+
+            if (!collateralTokenAddress) return null
+
+            const fulcrumId = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, false))
+            let loanId = await iTokenContract.methods
+              .loanParamsIds(fulcrumId)
+              .call()
+            let loanParams = await iBZxContract.methods
+              .loanParams(loanId)
+              .call()
+            loanParams[3] !== "0x0000000000000000000000000000000000000000" &&
+              loansParams.loanParams.push(new loanParamsModel({
+                loanId: loanParams[0],
+                principal: loanParams[3],
+                collateral: loanParams[4],
+                platform: "Fulcrum",
+                initialMargin: new BigNumber(loanParams[5]).div(10 ** 18),
+                maintenanceMargin: new BigNumber(loanParams[6]).div(10 ** 18),
+                liquidationPenalty: 0
+              }))
+
+            const torqueId = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
+            loanId = await iTokenContract.methods
+              .loanParamsIds(torqueId)
+              .call()
+            loanParams = await iBZxContract.methods
+              .loanParams(loanId)
+              .call()
+            loanParams[3] !== "0x0000000000000000000000000000000000000000" && loansParams.loanParams.push(new loanParamsModel({
+              loanId: loanParams[0],
+              principal: loanParams[3],
+              collateral: loanParams[4],
+              platform: "Torque",
+              initialMargin: new BigNumber(loanParams[5]).div(10 ** 18),
+              maintenanceMargin: new BigNumber(loanParams[6]).div(10 ** 18),
+              liquidationPenalty: 0
+            }
+            ))
+          }
+        }
+      }
+
+      if (loansParams.loanParams)
+        await loansParams.save()
+    }
+    catch (e) {
       this.logger.error(e)
     }
     return result
@@ -345,7 +448,8 @@ export default class Fulcrum {
       .erc20Address
     if (!srcAmount) {
       srcAmount = UNLIMITED_ALLOWANCE_IN_BASE_UNITS
-    } else {
+    }
+    else {
       srcAmount = new BigNumber(srcAmount.toFixed(0, 1))
     }
 
@@ -367,7 +471,8 @@ export default class Fulcrum {
           .div(destAssetPrecision)
           .dividedBy(10 ** 18)
           .multipliedBy(swapPriceData[1].dividedBy(10 ** 18))
-      } catch (e) {
+      }
+      catch (e) {
         this.logger.info(e)
         result = new BigNumber(0)
       }
@@ -376,6 +481,7 @@ export default class Fulcrum {
   }
 
   async getReserveData() {
+    let result = []
     const lastReserveData = (
       await statsModel
         .find()
@@ -392,7 +498,7 @@ export default class Fulcrum {
       // console.dir(`reserve_data:`);
       // console.dir(result);
     }
-    let result = []
+
     lastReserveData.tokensStats.forEach((tokensStat) => {
       result.push(tokensStat)
     })
@@ -569,7 +675,7 @@ export default class Fulcrum {
           let usdSupply = new BigNumber(0)
           let usdTotalLocked = new BigNumber(0)
 
-          if (token.name == 'ethv1') {
+          if (token.name === 'ethv1') {
             vaultBalance = await this.getAssetTokenBalanceOfUser(
               token.name,
               '0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633'
