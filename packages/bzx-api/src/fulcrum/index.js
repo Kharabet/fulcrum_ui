@@ -26,7 +26,7 @@ export default class Fulcrum {
     this.logger = logger
     this.storage = storage
     setInterval(this.updateCache.bind(this), config.cache_ttl_sec * 1000)
-    setInterval(this.updateParamsCache.bind(this), config.cache_ttl_day * 1000)
+    setInterval(this.updateParamsCache.bind(this), config.cache_params_ttl_day * 86400 * 1000)
     this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress)
     this.updateCache()
     this.updateParamsCache()
