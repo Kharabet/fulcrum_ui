@@ -22,7 +22,7 @@ import { SoloContract } from './typescript-wrappers/solo'
 import { SoloBridgeContract } from './typescript-wrappers/SoloBridge'
 import { vatContract } from './typescript-wrappers/vat'
 
-const getNetworkNameById= (networkId: number): string => {
+const getNetworkNameById = (networkId: number): string => {
   let networkName
   switch (networkId) {
     case 1:
@@ -57,6 +57,7 @@ export default class ContractsSource {
   private readonly provider: any
 
   private static isInit = false
+  private static iTokenList: any
 
   private static iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<
     string,
@@ -69,7 +70,6 @@ export default class ContractsSource {
   private DAppHelperJson: any
   private iBZxJson: any
 
-  
   private cdpsJson: any
   private compoundComptrollerJson: any
   private cTokenJson: any
@@ -106,8 +106,6 @@ export default class ContractsSource {
     this.DAppHelperJson = await import(`./artifacts/${networkName}/DAppHelper.json`)
     this.iBZxJson = await import(`./artifacts/${networkName}/iBZx.json`)
 
-
-    
     this.cdpsJson = await import(`./artifacts/${networkName}/GetCdps.json`)
     this.compoundComptrollerJson = await import(
       `./artifacts/${networkName}/CompoundComptroller.json`
@@ -126,9 +124,9 @@ export default class ContractsSource {
     this.saiToDAIBridgeJson = await import(`./artifacts/${networkName}/saiToDAIBridge.json`)
     this.instaRegistryJson = await import(`./artifacts/${networkName}/instaRegistry.json`)
 
-    const iTokenList = (await import(`./artifacts/${networkName}/iTokenList.js`)).iTokenList
+    ContractsSource.iTokenList = (await import(`./artifacts/${networkName}/iTokenList.js`)).iTokenList
 
-    iTokenList.forEach((val: any, index: any) => {
+    ContractsSource.iTokenList.forEach((val: any, index: any) => {
       const t = {
         token: val[1],
         asset: val[2],
@@ -226,11 +224,7 @@ export default class ContractsSource {
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init()
-    return new erc20Contract(
-      this.erc20Json.abi,
-      addressErc20.toLowerCase(),
-      this.provider
-    )
+    return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider)
   }
 
   private getITokenContractRaw(asset: Asset): iTokenContract | null {
@@ -288,15 +282,12 @@ export default class ContractsSource {
     return [assetList, addressList]
   }
 
-  
   public getITokenByErc20Address(address: string): Asset {
-    let result = Asset.UNKNOWN
-
-    //@ts-ignore
-    result = ContractsSource.iTokenList
-      .filter((e: any) => e[1].toLowerCase() === address.toLowerCase())[0][4]
-      .substr(1) as Asset
-    return result
+    const iToken = ContractsSource.iTokenList.find(
+      (e: any) => e[1].toLowerCase() === address.toLowerCase()
+    )
+    const asset = (iToken[4].substr(1) as Asset) || Asset.UNKNOWN
+    return asset
   }
 
   public getITokenErc20Address(asset: Asset): string | null {
@@ -335,7 +326,6 @@ export default class ContractsSource {
     return new iBZxContract(this.iBZxJson.abi, this.getiBZxAddress().toLowerCase(), this.provider)
   }
 
-  
   private getCompoundComptrollerAddress(): string {
     let address: string = ''
     switch (this.networkId) {
@@ -440,7 +430,6 @@ export default class ContractsSource {
     )
   }
 
-  
   private async getCdpContractRaw(addressCdp: string): Promise<GetCdpsContract> {
     await this.Init()
     return new GetCdpsContract(this.cdpsJson.abi, addressCdp.toLowerCase(), this.provider)
@@ -500,7 +489,7 @@ export default class ContractsSource {
   private async getProxyMigrationJSON() {
     return this.proxyMigrationsJson
   }
-  
+
   private static getAssetFromIlkRaw(ilk: string): Asset {
     const hex = ilk.toString() // force conversion
     let str = ''
@@ -520,7 +509,6 @@ export default class ContractsSource {
   public getiBZxContract = _.memoize(this.getiBZxContractRaw)
   public getAddressFromAsset = _.memoize(this.getAddressFromAssetRaw)
 
-  
   public getProxyMigration = _.memoize(this.getProxyMigrationJSON)
   public dsProxyAllowJson = _.memoize(this.getDsProxyAllowJSON)
   public getInstaRegistry = _.memoize(this.getInstaRegistryRaw)
