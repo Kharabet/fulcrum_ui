@@ -9,13 +9,8 @@ interface IParamGridProps {
 
 
 const ParamGrid = (props: IParamGridProps) => {
-  const assetItems = props.params
-    // .sort((a, b) => {
-    //   return this.state.typeSort === 'up'
-    //     ? b.age.getTime() - a.age.getTime()
-    //     : a.age.getTime() - b.age.getTime()
-    // })
-    //.slice(0, props.quantityTx)
+  const assetItems = props.params  
+    .slice(0, props.quantityTx)
     .map((e: IParamRowProps, i: number) => <ParamRow key={i} {...e} />)
 
   return (

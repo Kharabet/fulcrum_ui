@@ -17,62 +17,13 @@ interface ILoanParamsPageProps {
 }
 
 const LoanParamsPage = (props: ILoanParamsPageProps) => {
-  // const data: IParamRowProps[] = [
-  //   {
-  //     principal: Asset.AAVE,
-  //     collateral: Asset.CHI,
-  //     platform: Platform.Fulcrum,
-  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-  //     initialMargin: new BigNumber(2),
-  //     maintenanceMargin: new BigNumber(2),
-  //     liquidationPenalty: new BigNumber(0)
-  //   },
-  //   {
-  //     principal: Asset.AAVE,
-  //     collateral: Asset.CHI,
-  //     platform: Platform.Torque,
-  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-  //     initialMargin: new BigNumber(2),
-  //     maintenanceMargin: new BigNumber(2),
-  //     liquidationPenalty: new BigNumber(0)
-  //   },
-  //   {
-  //     principal: Asset.ETH,
-  //     collateral: Asset.CHI,
-  //     platform: Platform.Fulcrum,
-  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-  //     initialMargin: new BigNumber(2),
-  //     maintenanceMargin: new BigNumber(2),
-  //     liquidationPenalty: new BigNumber(0)
-  //   },
-  //   {
-  //     principal: Asset.ETH,
-  //     collateral: Asset.WBTC,
-  //     platform: Platform.Fulcrum,
-  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-  //     initialMargin: new BigNumber(20),
-  //     maintenanceMargin: new BigNumber(21),
-  //     liquidationPenalty: new BigNumber(0)
-  //   },
-  //   {
-  //     principal: Asset.ETH,
-  //     collateral: Asset.CHI,
-  //     platform: Platform.Torque,
-  //     loanId: '0xaf9E002A4e71f886E1082c40322181f022d338d8',
-  //     initialMargin: new BigNumber(2),
-  //     maintenanceMargin: new BigNumber(2),
-  //     liquidationPenalty: new BigNumber(0)
-  //   }
-  // ]
-
+ 
   const [data, setData] = useState<IParamRowProps[]>([])
-  const [activePlatform, setActivePlatform] = useState(Platform.Fulcrum)
-  const [filteredData, setFilteredData] = useState<IParamRowProps[]>(
-    []
-    // data.filter((param) => param.platform === Platform.Fulcrum)
-  )
+  const [activePlatform, setActivePlatform] = useState<Platform>(Platform.Fulcrum)
+  const [filteredData, setFilteredData] = useState<IParamRowProps[]>([])
   const [params, setParams] = useState<IParamRowProps[]>([])
-  const [isDataLoading, setIsDataLoading] = useState(true)
+  const [filter, setFilter] = useState<string>('')
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(true)
 
   const copyEl = React.useRef<HTMLSpanElement | null>(null)
 
@@ -98,45 +49,33 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
         setParams(filteredResult)
         setIsDataLoading(false)
       })
-      
-      // await ExplorerProvider.Instance.getFulcrumParams().then((result) => {
-      //   setFilteredData(result || [])
-      //   setParams(result || [])
-      //   setIsDataLoading(false)
-      // })
     }
-
     loadParams()
-    // ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, loadParams)
-    // ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, loadParams)
-    // return () => {
-    //   ExplorerProvider.Instance.eventEmitter.off(
-    //     ExplorerProviderEvents.ProviderAvailable,
-    //     loadParams
-    //   )
-    //   ExplorerProvider.Instance.eventEmitter.off(ExplorerProviderEvents.ProviderChanged, loadParams)
-    // }
-  })
+  }, [])
 
-  const onSearch = (filter: string) => {
-    const result =
-      filter === ''
-        ? filteredData
-        : filteredData.filter(
-            (item) =>
-              item.principal.toLowerCase().includes(filter) ||
-              item.collateral.toLowerCase().includes(filter) ||
-              `${item.principal.toLowerCase()}-${item.collateral.toLowerCase()}`.includes(filter)
-          )
+  const onSearch = (searchString: string) => {
+    setFilter(searchString)
+    setParams(search(searchString, filteredData))
+  }
 
-    setParams(result)
+  const search = (searchString: string, loanParams: IParamRowProps[]) => {
+    return searchString === ''
+      ? loanParams
+      : loanParams.filter(
+          (item) =>
+            item.principal.toLowerCase().includes(searchString) ||
+            item.collateral.toLowerCase().includes(searchString) ||
+            `${item.principal.toLowerCase()}-${item.collateral.toLowerCase()}`.includes(
+              searchString
+            )
+        )
   }
 
   const onPlatformChange = (platform: Platform) => {
     const platformParams = data.filter((param) => param.platform === platform)
     setActivePlatform(platform)
-    setParams(platformParams)
     setFilteredData(platformParams)
+    setParams(search(filter, platformParams))
   }
 
   return (
