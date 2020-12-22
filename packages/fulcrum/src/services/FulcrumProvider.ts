@@ -148,25 +148,27 @@ export class FulcrumProvider {
 
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId)
     // setting up readonly provider only when user wasn't connected earlier with the wallet
-    providerType === null || providerType === ProviderType.None && Web3ConnectionFactory.setReadonlyProvider().then(() => {
-      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
-      const engine = Web3ConnectionFactory.currentWeb3Engine
-      const canWrite = Web3ConnectionFactory.canWrite
+    providerType === null ||
+      (providerType === ProviderType.None &&
+        Web3ConnectionFactory.setReadonlyProvider().then(() => {
+          const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
+          const engine = Web3ConnectionFactory.currentWeb3Engine
+          const canWrite = Web3ConnectionFactory.canWrite
 
-      if (web3Wrapper && this.web3ProviderSettings) {
-        const contractsSource = new ContractsSource(
-          engine,
-          this.web3ProviderSettings.networkId,
-          canWrite
-        )
-        contractsSource.Init().then(() => {
-          this.web3Wrapper = web3Wrapper
-          this.providerEngine = engine
-          this.contractsSource = contractsSource
-          this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable)
-        })
-      }
-    })
+          if (web3Wrapper && this.web3ProviderSettings) {
+            const contractsSource = new ContractsSource(
+              engine,
+              this.web3ProviderSettings.networkId,
+              canWrite
+            )
+            contractsSource.Init().then(() => {
+              this.web3Wrapper = web3Wrapper
+              this.providerEngine = engine
+              this.contractsSource = contractsSource
+              this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable)
+            })
+          }
+        }))
 
     return FulcrumProvider.Instance
   }
@@ -1723,36 +1725,35 @@ export class FulcrumProvider {
         )
 
         const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-        
+
         try {
-        //@ts-ignore
-        result =
-          isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
-            ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
-                request.loanId,
-                account,
-                account,
-                amountInBaseUnits,
-                request.returnTokenIsCollateral, // returnTokenIsCollateral
-                request.loanDataBytes,
-                {
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-            : await iBZxContract.closeWithSwap.callAsync(
-                request.loanId,
-                account,
-                amountInBaseUnits,
-                request.returnTokenIsCollateral, // returnTokenIsCollateral
-                request.loanDataBytes,
-                {
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-        }
-        catch (e){
+          //@ts-ignore
+          result =
+            isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
+              ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
+                  request.loanId,
+                  account,
+                  account,
+                  amountInBaseUnits,
+                  request.returnTokenIsCollateral, // returnTokenIsCollateral
+                  request.loanDataBytes,
+                  {
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit
+                  }
+                )
+              : await iBZxContract.closeWithSwap.callAsync(
+                  request.loanId,
+                  account,
+                  amountInBaseUnits,
+                  request.returnTokenIsCollateral, // returnTokenIsCollateral
+                  request.loanDataBytes,
+                  {
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit
+                  }
+                )
+        } catch (e) {
           console.log(e)
         }
         console.log(result)
@@ -1897,19 +1898,15 @@ export class FulcrumProvider {
       false,
       false
     )
-    const zero = new BigNumber(0)
-    const healthyUserLoans = loansData
-    // .filter(
-    //   (e: any) =>
-    //     (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
-    //     account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-    // )
+
     const loansByPair: IBorrowedFundsState[] = []
-    healthyUserLoans
+    loansData
       .filter(
         (e: any) =>
-          (e.loanToken === baseTokenAddress && e.collateralToken === quoteTokenAddress) ||
-          (e.loanToken === quoteTokenAddress && e.collateralToken === baseTokenAddress)
+          (e.loanToken.toLowerCase() === baseTokenAddress.toLowerCase() &&
+            e.collateralToken.toLowerCase() === quoteTokenAddress.toLowerCase()) ||
+          (e.loanToken.toLowerCase() === quoteTokenAddress.toLowerCase() &&
+            e.collateralToken.toLowerCase() === baseTokenAddress.toLowerCase())
       )
       .forEach((e: any) => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
@@ -1940,7 +1937,7 @@ export class FulcrumProvider {
         } as IBorrowedFundsState)
       })
 
-    result.allUsersLoansCount = healthyUserLoans.length
+    result.allUsersLoansCount = loansData.length
     result.loans = loansByPair
     return result
   }
@@ -2027,7 +2024,10 @@ export class FulcrumProvider {
       if (account) {
         // @ts-ignore
         const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
-        const resp = await alchemyProvider.alchemyWeb3.alchemy.getTokenBalances(account, addressesErc20)
+        const resp = await alchemyProvider.alchemyWeb3.alchemy.getTokenBalances(
+          account,
+          addressesErc20
+        )
         if (resp) {
           // @ts-ignore
           result = resp.tokenBalances
@@ -2549,7 +2549,7 @@ export class FulcrumProvider {
     const etherscanApiUrl = `https://${
       networkName === 'kovan' ? 'api-kovan' : 'api'
     }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${blockNumber -
-      (days * blocksPerDay)}&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      days * blocksPerDay}&toBlock=latest&address=${bzxContractAddress}&topic0=${
       LiquidationEvent.topic0
     }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
 
@@ -2557,22 +2557,20 @@ export class FulcrumProvider {
     const liquidationEventResponseJson = await liquidationEventResponse.json()
     if (liquidationEventResponseJson.status !== '1') return result
     const events = liquidationEventResponseJson.result
-    const liquidationEvents = events
-      .filter((event: any) => {
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return false
+    const liquidationEvents = events.filter((event: any) => {
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return false
 
-        const baseTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const quoteTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
-        const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress)
-        const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress)
-        if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return false
-        return true
-      })
-    return liquidationEvents && liquidationEvents.length || result
+      const baseTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const quoteTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress)
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress)
+      if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return false
+      return true
+    })
+    return (liquidationEvents && liquidationEvents.length) || result
   }
-
 
   public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
     let result: DepositCollateralEvent[] = []
