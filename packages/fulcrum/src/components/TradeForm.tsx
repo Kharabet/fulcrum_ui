@@ -371,7 +371,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? 'trade-form__submit-button--buy'
         : 'trade-form__submit-button--sell'
 
-    let amountMsg = ``
+    let amountMsg = undefined
     let submitButtonText = ``
     if (this.props.tradeType === TradeType.BUY) {
       amountMsg =
@@ -382,7 +382,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           ? 'Your wallet is empty'
           : this.state.slippageRate.gt(0)
           ? `Slippage:`
-          : ''
+          : undefined
       if (this.props.positionType === PositionType.SHORT) {
         submitButtonText = `SHORT`
       } else {
@@ -395,7 +395,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           ? 'Insufficient funds for gas'
           : this.state.slippageRate.gt(0)
           ? `Slippage:`
-          : ''
+          : undefined
       submitButtonText = `CLOSE`
     }
     if (this.state.isExpired) {
@@ -446,7 +446,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
 
-            {!this.state.isLoading && (
+            {!this.state.isLoading && amountMsg !== undefined && (
               <div className="trade-form__kv-container">
                 {amountMsg.includes('Slippage:') ? (
                   <div
