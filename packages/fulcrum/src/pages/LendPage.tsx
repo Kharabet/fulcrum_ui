@@ -30,6 +30,12 @@ function LendPage(props: ILendPageProps) {
       FulcrumProviderEvents.ProviderChanged,
       onProviderChanged
     )
+    return () => {
+      FulcrumProvider.Instance.eventEmitter.off(
+        FulcrumProviderEvents.ProviderChanged,
+        onProviderChanged
+      )
+    }
   }, [])
 
   const onLendRequested = (request: LendRequest) => {
