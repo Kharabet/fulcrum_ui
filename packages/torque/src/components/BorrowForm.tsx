@@ -412,12 +412,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   private setBorrowEstimate = (amount: BigNumber) => {
-    const borrowAmount = amount.div(this.state.selectedValue).times(this.state.minValue)
-    const borrowAmountValue = borrowAmount.dp(5, BigNumber.ROUND_CEIL).toString()
+    const borrowAmountValue = amount.dp(5, BigNumber.ROUND_CEIL).toString()
 
     this.setState({
       ...this.state,
-      borrowAmount: borrowAmount,
+      borrowAmount: amount,
       borrowAmountValue: borrowAmountValue
     })
   }

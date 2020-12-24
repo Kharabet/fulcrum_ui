@@ -420,7 +420,7 @@ export class TorqueProvider {
           collateralAssetErc20Address
         )
 
-        result.depositAmount = borrowEstimate.dividedBy(10 ** collateralPrecision) // safety buffer
+        result.depositAmount = borrowEstimate.dividedBy(10 ** collateralPrecision)
       }
     }
 
@@ -448,8 +448,15 @@ export class TorqueProvider {
           new BigNumber(7884000), // approximately 3 months
           collateralAssetErc20Address
         )
-
-        result.borrowAmount = borrowEstimate.dividedBy(10 ** loanPrecision) // safety buffer
+        const minInitialMargin = await this.getMinInitialMargin(borrowAsset, collateralAsset)
+        // getBorrowAmountForDeposit estimates borrow amount for 20% less collaterization than getDepositAmountForBorrow
+        // example: borrow 52USDC for 1ETH (1eth = 100USDC) with desired collaterization 200%
+        // by default, it will create a loan with borrowed 52USDC, 1ETH collateral and 180% collaterization
+        // so we need to compensate this 20%
+        const realBorrowAmount = borrowEstimate
+          .div(collaterizationPercent.plus(20))
+          .times(minInitialMargin)
+        result.borrowAmount = realBorrowAmount.dividedBy(10 ** loanPrecision)
       }
     }
 
@@ -2298,7 +2305,6 @@ export class TorqueProvider {
     return result
   }
 
-  
   public getAvailableLiquidaity = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
@@ -2310,7 +2316,7 @@ export class TorqueProvider {
         const totalAssetBorrow = await iTokenContract.totalAssetBorrow.callAsync()
 
         const marketLiquidity = totalAssetSupply.minus(totalAssetBorrow)
-        result = marketLiquidity.div(10 ** decimals);
+        result = marketLiquidity.div(10 ** decimals)
       }
     }
 
