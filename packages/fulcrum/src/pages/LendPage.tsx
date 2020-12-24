@@ -85,9 +85,7 @@ function LendPage(props: ILendPageProps) {
             </Modal>
           </React.Fragment>
         ) : (
-          <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-            <div style={{ cursor: `pointer` }}>You are connected to the wrong network.</div>
-          </div>
+          <div className="message-wrong-network">You are connected to the wrong network.</div>
         )}
       </main>
     </div>
