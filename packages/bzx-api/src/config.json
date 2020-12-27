@@ -4,5 +4,5 @@
   "corsHeaders": ["Link"],
   "cache_ttl_sec": 900,
   "cache_params_ttl_day": 1,
-  "web3_provider_url": "https://mainnet.infura.io/v3/090248ae4e924e70a074376505dcee8c"
+  "web3_provider_url": "https://eth-mainnet.alchemyapi.io/v2/DXcS3vM0PJ320XCinLat00Y_UXJNwL_n"
 }
