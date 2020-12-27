@@ -63,8 +63,8 @@ export default ({ config, logger }) => {
     res.json({ data: apy, success: true })
   })
 
-  api.get('/loans-params', async (req, res) => {
-    const params = await fulcrum.getLoansParams()
+  api.get('/loan-params', async (req, res) => {
+    const params = await fulcrum.getLoanParams()
     res.json({ data: params, success: true })
   })
 

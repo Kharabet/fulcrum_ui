@@ -16,7 +16,7 @@ import config from '../config.json'
 import { pTokenPricesModel, pTokenPriceModel } from '../models/pTokenPrices'
 import { iTokenPricesModel, iTokenPriceModel } from '../models/iTokenPrices'
 import { statsModel, tokenStatsModel, allTokensStatsModel } from '../models/stats'
-import { loansParamsModel, loanParamsModel } from '../models/loansParams'
+import { loanParamsListModel, loanParamsModel } from '../models/loanParams'
 
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
 
@@ -47,7 +47,7 @@ export default class Fulcrum {
   }
 
   async updateParamsCache(key, value) {
-    await this.updateLoansParams()
+    await this.updateLoanParams()
     // await this.storage.setItem("loan_params", params);
     this.logger.info('loan_params updated')
   }
@@ -316,29 +316,29 @@ export default class Fulcrum {
     return result
   }
 
-  async getLoansParams() {
-    const lastLoansParams = (
-      await loansParamsModel
+  async getLoanParams() {
+    const lastLoanParams = (
+      await loanParamsListModel
         .find()
         .sort({ _id: -1 })
         .select({ loanParams: 1 })
         .lean()
         .limit(1)
     )[0]
-    if (!lastLoansParams) {
+    if (!lastLoanParams) {
       this.logger.info('No loan-params in db!')
-      await this.updateLoansParams()
+      await this.updateLoanParams()
       // await this.storage.setItem("loan-params", result);
       // console.dir(`loan-params:`);
       // console.dir(result);
     }
-    return lastLoansParams.loanParams
+    return lastLoanParams.loanParams
   }
 
-  async updateLoansParams() {
+  async updateLoanParams() {
     const result = {}
-    const loansParams = new loansParamsModel()
-    loansParams.loanParams = []
+    const loanParamsList = new loanParamsListModel()
+    loanParamsList.loanParams = []
     try {
       const iBZxContract = new this.web3.eth.Contract(iBZxJson.abi, iBZxAddress)
       // console.log('call iBZxContract')
@@ -369,7 +369,7 @@ export default class Fulcrum {
               .loanParams(loanId)
               .call()
             loanParams[3] !== "0x0000000000000000000000000000000000000000" &&
-              loansParams.loanParams.push(new loanParamsModel({
+              loanParamsList.loanParams.push(new loanParamsModel({
                 loanId: loanParams[0],
                 principal: this.getAssetFromAddress(loanParams[3]),
                 collateral: this.getAssetFromAddress(loanParams[4]),
@@ -386,7 +386,7 @@ export default class Fulcrum {
             loanParams = await iBZxContract.methods
               .loanParams(loanId)
               .call()
-            loanParams[3] !== "0x0000000000000000000000000000000000000000" && loansParams.loanParams.push(new loanParamsModel({
+            loanParams[3] !== "0x0000000000000000000000000000000000000000" && loanParamsList.loanParams.push(new loanParamsModel({
               loanId: loanParams[0],
               principal: this.getAssetFromAddress(loanParams[3]),
               collateral: this.getAssetFromAddress(loanParams[4]),
@@ -400,8 +400,8 @@ export default class Fulcrum {
         }
       }
 
-      if (loansParams.loanParams)
-        await loansParams.save()
+      if (loanParamsList.loanParams)
+        await loanParamsList.save()
     }
     catch (e) {
       this.logger.error(e)

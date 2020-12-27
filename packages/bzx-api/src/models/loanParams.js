@@ -32,7 +32,7 @@ const loanParamsSchema = new mongoose.Schema({
   }
 })
 
-const loansParamsSchema = new mongoose.Schema({
+const loanParamsListSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now,
@@ -46,4 +46,4 @@ const loansParamsSchema = new mongoose.Schema({
 })
 
 exports.loanParamsModel = mongoose.model('loan_params', loanParamsSchema)
-exports.loansParamsModel = mongoose.model('loans_params', loansParamsSchema)
+exports.loanParamsListModel = mongoose.model('loans_params', loanParamsListSchema)

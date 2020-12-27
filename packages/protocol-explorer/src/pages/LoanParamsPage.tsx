@@ -29,9 +29,9 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
 
   useEffect(() => {
     const loadParams = async () => {
-      const loansParams = await fetch('https://api.bzx.network/v1/loans-params')
+      const loanParamsList = await fetch('https://api.bzx.network/v1/loan-params')
 
-      await loansParams.json().then((result) => {
+      await loanParamsList.json().then((result) => {
         const resultData: IParamRowProps[] = result.data.map((item: IParamRowProps) => {
           return {
             principal: item.principal,
