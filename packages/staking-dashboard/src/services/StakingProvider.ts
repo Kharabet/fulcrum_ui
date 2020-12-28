@@ -9,7 +9,6 @@ import AssetsDictionary from '../domain/AssetsDictionary'
 import BecomeRepresentativeRequest from '../domain/BecomeRepresentativeRequest'
 import ClaimRebateRewardsRequest from '../domain/ClaimRebateRewardsRequest'
 import ClaimRequest from '../domain/ClaimRequest'
-import ConvertRequest from '../domain/ConvertRequest'
 import IWeb3ProviderSettings from '../domain/IWeb3ProviderSettings'
 import ProviderType from '../domain/ProviderType'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
@@ -638,7 +637,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   }
 
   public onRequestConfirmed = async (
-    request: StakingRequest | ConvertRequest | ClaimRequest | BecomeRepresentativeRequest
+    request: StakingRequest | ClaimRequest | BecomeRepresentativeRequest
   ) => {
     return this.processRequestTask(new RequestTask(request))
   }
@@ -677,31 +676,17 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
       const taskRequest = task.request
 
-      if (taskRequest instanceof ConvertRequest) {
-        task.processingStart([
-          'Initializing',
-          'Detecting token allowance',
-          'Prompting token allowance',
-          'Waiting for token allowance',
-          'Submitting ' + taskRequest.name,
-          'Updating the blockchain',
-          'Transaction completed'
-        ])
-      } else {
-        task.processingStart([
-          'Initializing',
-          'Submitting ' + taskRequest.name,
-          'Updating the blockchain',
-          'Transaction completed'
-        ])
-      }
+      task.processingStart([
+        'Initializing',
+        'Submitting ' + taskRequest.name,
+        'Updating the blockchain',
+        'Transaction completed'
+      ])
+
       let txHash
       switch (taskRequest.constructor) {
         case StakingRequest:
           txHash = await this.processStakingRequestTask(task, account)
-          break
-        case ConvertRequest:
-          txHash = await this.processConvertRequestTask(task, account)
           break
         case ClaimRebateRewardsRequest:
           txHash = await this.processClaimRebateRewardsRequestTask(task, account)
@@ -819,67 +804,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
               }
             )
 
-      task.setTxHash(txHash)
-    } catch (e) {
-      console.log(e)
-      throw e
-    }
-    return txHash
-  }
-
-  private processConvertRequestTask = async (task: RequestTask, account: string) => {
-    const tokenAmount = (task.request as ConvertRequest).tokenAmount
-
-    const convertContract = await this.contractsSource!.getConvertContract()
-    if (!convertContract) throw new Error('No ERC20 contract available!')
-
-    const assetErc20Address = this.getErc20AddressOfAsset(Asset.BZRXv1)
-    if (!assetErc20Address) throw new Error('No ERC20 contract available!')
-
-    const tokenErc20Contract = await this.contractsSource!.getErc20Contract(assetErc20Address)
-    // Detecting token allowance
-    task.processingStepNext()
-    const erc20allowance = await tokenErc20Contract.allowance.callAsync(
-      account,
-      convertContract.address
-    )
-    // Prompting token allowance
-    task.processingStepNext()
-    // Waiting for token allowance
-    task.processingStepNext()
-    if (tokenAmount.gt(erc20allowance)) {
-      const approveHash = await tokenErc20Contract.approve.sendTransactionAsync(
-        convertContract.address,
-        tokenAmount,
-        { from: account }
-      )
-      await this.waitForTransactionMined(approveHash)
-    }
-    // Submitting loan
-    task.processingStepNext()
-
-    let gasAmountBN
-    let gasAmount
-    let txHash = ''
-    try {
-      gasAmount = await convertContract.convert.estimateGasAsync(tokenAmount, {
-        from: account,
-        gas: this.gasLimit
-      })
-      gasAmountBN = new BigNumber(gasAmount)
-        .multipliedBy(this.gasBufferCoeff)
-        .integerValue(BigNumber.ROUND_UP)
-    } catch (e) {
-      console.error(e)
-      throw e
-    }
-
-    try {
-      txHash = await convertContract.convert.sendTransactionAsync(tokenAmount, {
-        from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-        gasPrice: await this.gasPrice()
-      })
       task.setTxHash(txHash)
     } catch (e) {
       console.log(e)

@@ -1,7 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import stakingUtils from 'app-lib/stakingUtils'
 import * as mobx from 'mobx'
-import ConvertRequest from 'src/domain/ConvertRequest'
 import { StakingProvider } from 'src/services/StakingProvider'
 import RootStore from 'src/stores/RootStore'
 import Representatives from './Representatives'
@@ -65,13 +64,6 @@ export default class StakingStore {
       this.set('stakingError', err)
       throw err // Rethrowing for now, until we have proper error handling for users
     }
-  }
-
-  public convertBzrxV1ToV2() {
-    const bzrxAmount = this.userBalances.wallet.bzrxV1.times(10 ** 18)
-    this.stakingProvider.onRequestConfirmed(new ConvertRequest(bzrxAmount)).catch((err) => {
-      console.error(err)
-    })
   }
 
   public async syncData() {

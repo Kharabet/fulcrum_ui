@@ -44,19 +44,6 @@ export default function StakingForm({ vm }: { vm: StakingFormVM }) {
 
               <Rewards rootStore={vm.rootStore} />
 
-              {userBalances.wallet.bzrxV1.gt(0) && (
-                <div className="convert-button">
-                  <button
-                    className="button button-full-width"
-                    onClick={vm.stakingStore.convertBzrxV1ToV2}>
-                    Convert BZRX v1 to v2
-                    <span className="notice">
-                      You will need to confirm 2 transactions in your wallet.
-                    </span>
-                  </button>
-                </div>
-              )}
-
               {vm.repListLoaded && vm.rootStore.web3Connection.isConnected && (
                 <React.Fragment>
                   <TopRepList vm={vm} />

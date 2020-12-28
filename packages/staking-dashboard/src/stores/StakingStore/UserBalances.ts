@@ -6,12 +6,11 @@ import Asset from 'src/domain/Asset'
 import { StakingProvider } from 'src/services/StakingProvider'
 
 type userBalanceProp = 'pending' | 'stakingProvider' | 'error'
-type tokens = 'bpt' | 'bzrx' | 'bzrxV1' | 'vbzrx'
+type tokens = 'bpt' | 'bzrx' | 'vbzrx'
 
 class TokenBalances {
   public bpt = new BigNumber(0)
   public bzrx = new BigNumber(0)
-  public bzrxV1 = new BigNumber(0)
   public vbzrx = new BigNumber(0)
 
   /**
@@ -45,7 +44,6 @@ export default class UserBalances {
     try {
       const sp = this.stakingProvider
       this.set('pending', true)
-      this.wallet.set('bzrxV1', (await sp.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18))
       this.wallet.set('bzrx', (await sp.stakeableByAsset(Asset.BZRX)).div(10 ** 18))
       this.wallet.set('vbzrx', (await sp.stakeableByAsset(Asset.vBZRX)).div(10 ** 18))
       this.wallet.set('bpt', (await sp.stakeableByAsset(Asset.BPT)).div(appConfig.bptDecimals))

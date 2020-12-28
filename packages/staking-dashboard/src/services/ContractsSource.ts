@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import appConfig from '../config/appConfig'
 import { BZRXStakingInterimContract } from '../contracts/BZRXStakingInterim'
-import { convertContract } from '../contracts/convert'
 import { erc20Contract } from '../contracts/erc20'
 import { iBZxContract } from '../contracts/iBZxContract'
 import { oracleContract } from '../contracts/oracle'
@@ -13,7 +12,6 @@ export class ContractsSource {
 
   private static isInit = false
 
-  private static convertJson: any
   private static erc20Json: any
   private static BZRXStakingInterimJson: any
   private static iBZxJson: any
@@ -33,7 +31,6 @@ export class ContractsSource {
     if (ContractsSource.isInit) {
       return
     }
-    ContractsSource.convertJson = await import(`./../assets/artifacts/${appNetwork}/convert.json`)
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${appNetwork}/erc20.json`)
     ContractsSource.BZRXStakingInterimJson = await import(
       `./../assets/artifacts/${appNetwork}/BZRXStakingInterim.json`
@@ -188,14 +185,6 @@ export class ContractsSource {
     )
   }
 
-  private async getConvertContractRaw(): Promise<convertContract> {
-    await this.Init()
-    return new convertContract(
-      ContractsSource.convertJson.abi,
-      this.getConvertAddress().toLowerCase(),
-      this.provider
-    )
-  }
 
   private async getOracleContractRaw(): Promise<oracleContract> {
     await this.Init()
@@ -225,7 +214,6 @@ export class ContractsSource {
   }
 
   public getErc20Contract = _.memoize(this.getErc20ContractRaw)
-  public getConvertContract = _.memoize(this.getConvertContractRaw)
   public getBZRXStakingInterimContract = _.memoize(this.getBZRXStakingInterimContractRaw)
   public getiBZxContract = _.memoize(this.getiBZxContractRaw)
   public getOracleContract = _.memoize(this.getOracleContractRaw)

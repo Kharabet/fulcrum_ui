@@ -26,11 +26,7 @@ export function UserBalances({ rootStore }: { rootStore: RootStore }) {
       <div className="balance-item">
         <div className="row-header">Wallet Balance:</div>
         <FormAssetBalance
-          link={`${etherscanURL}token/${
-            wallet.bzrxV1.gt(0)
-              ? '0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9'
-              : '0x56d811088235F11C8920698a204A5010a788f4b3'
-          }`}
+          link={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3`}
           tokenLogo={<BzrxIcon />}
           balance={wallet.bzrx}
           name="BZRX"

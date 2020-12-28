@@ -3,18 +3,15 @@ import * as mobx from 'mobx'
 import BecomeRepresentativeRequest from 'src/domain/BecomeRepresentativeRequest'
 import ClaimRebateRewardsRequest from 'src/domain/ClaimRebateRewardsRequest'
 import ClaimRequest from 'src/domain/ClaimRequest'
-import ConvertRequest from 'src/domain/ConvertRequest'
 import StakingRequest from 'src/domain/StakingRequest'
 import { StakingProvider } from 'src/services/StakingProvider'
 
 type transactionStatusProp = 'status' | 'request' | 'steps' | 'stepCurrent' | 'txHash' | 'error'
 
 export default class TransactionStatus {
-  // private task: RequestTask
   private stakingProvider: StakingProvider
   public request:
     | StakingRequest
-    | ConvertRequest
     | ClaimRequest
     | ClaimRebateRewardsRequest
     | BecomeRepresentativeRequest
@@ -100,7 +97,6 @@ export default class TransactionStatus {
     })
   }
 
-  // constructor (stakingProvider: StakingProvider, task: RequestTask) {
   constructor(stakingProvider: StakingProvider) {
     this.stakingProvider = stakingProvider
     this.init()

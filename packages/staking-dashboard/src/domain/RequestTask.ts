@@ -2,7 +2,6 @@ import { EventEmitter } from 'events'
 import BecomeRepresentativeRequest from './BecomeRepresentativeRequest'
 import ClaimRebateRewardsRequest from './ClaimRebateRewardsRequest'
 import ClaimRequest from './ClaimRequest'
-import ConvertRequest from './ConvertRequest'
 import RequestStatus from './RequestStatus'
 import StakingRequest from './StakingRequest'
 
@@ -11,7 +10,6 @@ export default class RequestTask {
 
   public readonly request:
     | StakingRequest
-    | ConvertRequest
     | ClaimRequest
     | ClaimRebateRewardsRequest
     | BecomeRepresentativeRequest
@@ -24,7 +22,6 @@ export default class RequestTask {
   constructor(
     request:
       | StakingRequest
-      | ConvertRequest
       | ClaimRequest
       | ClaimRebateRewardsRequest
       | BecomeRepresentativeRequest
