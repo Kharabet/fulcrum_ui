@@ -327,7 +327,19 @@ export default class Fulcrum {
       this.logger.info('No loan-params in db!')
       await this.updateLoanParams()
     }
-    return lastLoanParams.loanParams
+    return (
+      lastLoanParams.loanParams.map((params) => {
+        console.log(params)
+        return {
+          loanId: params.loanId,
+          principal: params.principal,
+          collateral: params.collateral,
+          platform: params.platform,
+          initialMargin: params.initialMargin,
+          maintenanceMargin: params.maintenanceMargin,
+          liquidationPenalty: params.liquidationPenalty
+        }
+      }))
   }
 
   async updateLoanParams() {
