@@ -4,8 +4,8 @@ import { Route, Router, Switch } from 'react-router-dom'
 import configProviders from '../config/providers.json'
 import { ProviderType } from '../domain/ProviderType'
 import { Footer } from '../layout/Footer'
-import { Header } from '../layout/Header'
 import { LiquidationsPage } from '../pages/LiquidationsPage'
+import LoanParamsPage from '../pages/LoanParamsPage'
 import { MainPage } from '../pages/MainPage'
 import { SearchResultPage } from '../pages/SearchResultPage'
 import { StatsPage } from '../pages/StatsPage'
@@ -132,6 +132,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 />
                 <Route path="/liquidations">
                   <LiquidationsPage
+                    isMobileMedia={this.state.isMobileMedia}
+                    doNetworkConnect={this.doNetworkConnect}
+                  />
+                </Route>
+                <Route path="/loan-params">
+                  <LoanParamsPage
                     isMobileMedia={this.state.isMobileMedia}
                     doNetworkConnect={this.doNetworkConnect}
                   />
