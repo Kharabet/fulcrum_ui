@@ -73,6 +73,7 @@ interface ITradePageState {
   activePositionType: PositionType
 
   recentLiquidationsNumber: number
+  isSupportNetwork: boolean
 }
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
@@ -130,7 +131,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isLoadingTransaction: false,
       isTxCompleted: false,
       request: undefined,
-      activePositionType: PositionType.LONG
+      activePositionType: PositionType.LONG,
+      isSupportNetwork: true
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -162,6 +164,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public async componentDidMount() {
     this._isMounted = true
+    const isSupportedNetwork = FulcrumProvider.Instance.unsupportedNetwork
+    this.setState({ ...this.state, isSupportNetwork: isSupportedNetwork })
     const provider = FulcrumProvider.getLocalstorageItem('providerType')
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === 'None')) {
       this.props.doNetworkConnect()
@@ -224,137 +228,141 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.state.request && this.state.loans?.find((e) => e.loanId === this.state.request!.loanId)
     return (
       <div className="trade-page">
-        <main>
-          {this.state.recentLiquidationsNumber > 0 && (
-            <InfoBlock localstorageItemProp="past-liquidations-info">
-              {this.state.recentLiquidationsNumber === 1
-                ? 'One'
-                : this.state.recentLiquidationsNumber}
-              &nbsp;of your loans&nbsp;
-              {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated during
-              the past {this.daysNumberForLoanActionNotification} days. For more information visit
-              your&nbsp;
-              <a
-                href="#"
-                className="regular-link"
-                onClick={(e) => {
-                  e.preventDefault()
-                  this.onTokenGridTabChange(TokenGridTab.History)
-                }}>
-                Trade History
-              </a>
-              .
-            </InfoBlock>
-          )}
-          <TokenGridTabs
-            baseTokens={this.baseTokens}
-            quoteTokens={this.quoteTokens}
-            selectedMarket={this.state.selectedMarket}
-            activeTokenGridTab={this.state.activeTokenGridTab}
-            onMarketSelect={this.onTabSelect}
-            onTokenGridTabChange={this.onTokenGridTabChange}
-            isMobile={this.props.isMobileMedia}
-            openedPositionsCount={this.state.openedPositionsCount}
-          />
-
-          <div
-            className={`chart-wrapper${
-              this.state.activeTokenGridTab !== TokenGridTab.Chart ? ' hidden' : ''
-            }`}>
-            <TVChartContainer
-              symbol={`${tvBaseToken}_${tvQuoteToken}`}
-              preset={this.props.isMobileMedia ? 'mobile' : undefined}
-            />
-          </div>
-
-          {this.state.activeTokenGridTab === TokenGridTab.Chart && (
-            <TradeTokenGrid
-              isMobileMedia={this.props.isMobileMedia}
-              tokenRowsData={this.state.tokenRowsData.filter(
-                (e) =>
-                  e.baseToken === this.state.selectedMarket.baseToken &&
-                  e.quoteToken === this.state.selectedMarket.quoteToken
-              )}
-              innerOwnRowsData={this.state.innerOwnRowsData.filter(
-                (e) =>
-                  (this.checkWethOrFwethToken(e.baseToken) ===
-                    this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) ||
-                    e.baseToken === this.state.selectedMarket.baseToken) &&
-                  (this.checkWethOrFwethToken(e.quoteToken) ===
-                    this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) ||
-                    e.quoteToken === this.state.selectedMarket.quoteToken)
-              )}
-              changeLoadingTransaction={this.changeLoadingTransaction}
-              onTransactionsCompleted={this.onTransactionsCompleted}
-              request={this.state.request}
-              isLoadingTransaction={this.state.isLoadingTransaction}
-              isTxCompleted={this.state.isTxCompleted}
-              changeGridPositionType={this.changeGridPositionType}
-              activePositionType={this.state.activePositionType}
-            />
-          )}
-
-          {this.state.activeTokenGridTab === TokenGridTab.Open && (
-            <OwnTokenGrid
-              ownRowsData={this.state.ownRowsData}
-              isMobileMedia={this.props.isMobileMedia}
-            />
-          )}
-
-          {this.state.activeTokenGridTab === TokenGridTab.History && (
-            <HistoryTokenGrid
-              historyEvents={this.state.historyEvents}
-              historyRowsData={this.state.historyRowsData}
-              isMobileMedia={this.props.isMobileMedia}
-              stablecoins={this.stablecoins}
+        {!this.state.isSupportNetwork ? (
+          <main>
+            {this.state.recentLiquidationsNumber > 0 && (
+              <InfoBlock localstorageItemProp="past-liquidations-info">
+                {this.state.recentLiquidationsNumber === 1
+                  ? 'One'
+                  : this.state.recentLiquidationsNumber}
+                &nbsp;of your loans&nbsp;
+                {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated during
+                the past {this.daysNumberForLoanActionNotification} days. For more information visit
+                your&nbsp;
+                <a
+                  href="#"
+                  className="regular-link"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    this.onTokenGridTabChange(TokenGridTab.History)
+                  }}>
+                  Trade History
+                </a>
+                .
+              </InfoBlock>
+            )}
+            <TokenGridTabs
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
-              updateHistoryRowsData={this.updateHistoryRowsData}
-              changeLoadingTransaction={this.changeLoadingTransaction}
+              selectedMarket={this.state.selectedMarket}
+              activeTokenGridTab={this.state.activeTokenGridTab}
+              onMarketSelect={this.onTabSelect}
+              onTokenGridTabChange={this.onTokenGridTabChange}
+              isMobile={this.props.isMobileMedia}
+              openedPositionsCount={this.state.openedPositionsCount}
             />
-          )}
 
-          {this.state.request &&
-            this.state.request instanceof TradeRequest &&
-            (this.state.tradeType === TradeType.BUY ||
-              (this.state.tradeType === TradeType.SELL && loan && loan.loanData)) && (
+            <div
+              className={`chart-wrapper${
+                this.state.activeTokenGridTab !== TokenGridTab.Chart ? ' hidden' : ''
+              }`}>
+              <TVChartContainer
+                symbol={`${tvBaseToken}_${tvQuoteToken}`}
+                preset={this.props.isMobileMedia ? 'mobile' : undefined}
+              />
+            </div>
+
+            {this.state.activeTokenGridTab === TokenGridTab.Chart && (
+              <TradeTokenGrid
+                isMobileMedia={this.props.isMobileMedia}
+                tokenRowsData={this.state.tokenRowsData.filter(
+                  (e) =>
+                    e.baseToken === this.state.selectedMarket.baseToken &&
+                    e.quoteToken === this.state.selectedMarket.quoteToken
+                )}
+                innerOwnRowsData={this.state.innerOwnRowsData.filter(
+                  (e) =>
+                    (this.checkWethOrFwethToken(e.baseToken) ===
+                      this.checkWethOrFwethToken(this.state.selectedMarket.baseToken) ||
+                      e.baseToken === this.state.selectedMarket.baseToken) &&
+                    (this.checkWethOrFwethToken(e.quoteToken) ===
+                      this.checkWethOrFwethToken(this.state.selectedMarket.quoteToken) ||
+                      e.quoteToken === this.state.selectedMarket.quoteToken)
+                )}
+                changeLoadingTransaction={this.changeLoadingTransaction}
+                onTransactionsCompleted={this.onTransactionsCompleted}
+                request={this.state.request}
+                isLoadingTransaction={this.state.isLoadingTransaction}
+                isTxCompleted={this.state.isTxCompleted}
+                changeGridPositionType={this.changeGridPositionType}
+                activePositionType={this.state.activePositionType}
+              />
+            )}
+
+            {this.state.activeTokenGridTab === TokenGridTab.Open && (
+              <OwnTokenGrid
+                ownRowsData={this.state.ownRowsData}
+                isMobileMedia={this.props.isMobileMedia}
+              />
+            )}
+
+            {this.state.activeTokenGridTab === TokenGridTab.History && (
+              <HistoryTokenGrid
+                historyEvents={this.state.historyEvents}
+                historyRowsData={this.state.historyRowsData}
+                isMobileMedia={this.props.isMobileMedia}
+                stablecoins={this.stablecoins}
+                baseTokens={this.baseTokens}
+                quoteTokens={this.quoteTokens}
+                updateHistoryRowsData={this.updateHistoryRowsData}
+                changeLoadingTransaction={this.changeLoadingTransaction}
+              />
+            )}
+
+            {this.state.request &&
+              this.state.request instanceof TradeRequest &&
+              (this.state.tradeType === TradeType.BUY ||
+                (this.state.tradeType === TradeType.SELL && loan && loan.loanData)) && (
+                <Modal
+                  isOpen={this.state.isTradeModalOpen}
+                  onRequestClose={this.onTradeRequestClose}
+                  className="modal-content-div modal-content-div-form"
+                  overlayClassName="modal-overlay-div">
+                  <TradeForm
+                    stablecoins={this.quoteTokens}
+                    loan={loan}
+                    isMobileMedia={this.props.isMobileMedia}
+                    tradeType={this.state.tradeType}
+                    baseToken={this.state.request.asset}
+                    positionType={this.state.tradePositionType}
+                    leverage={this.state.tradeLeverage}
+                    quoteToken={this.state.request.quoteToken}
+                    onSubmit={this.onTradeConfirmed}
+                    onCancel={this.onTradeRequestClose}
+                  />
+                </Modal>
+              )}
+            {this.state.request !== undefined && loan !== undefined && (
               <Modal
-                isOpen={this.state.isTradeModalOpen}
-                onRequestClose={this.onTradeRequestClose}
-                className="modal-content-div modal-content-div-form"
+                isOpen={this.state.isManageCollateralModalOpen}
+                onRequestClose={this.onManageCollateralRequestClose}
+                className="modal-content-div"
                 overlayClassName="modal-overlay-div">
-                <TradeForm
-                  stablecoins={this.quoteTokens}
+                <ManageCollateralForm
                   loan={loan}
+                  request={this.state.request as ManageCollateralRequest}
+                  onSubmit={this.onManageCollateralConfirmed}
+                  onCancel={this.onManageCollateralRequestClose}
+                  isOpenModal={this.state.isManageCollateralModalOpen}
                   isMobileMedia={this.props.isMobileMedia}
-                  tradeType={this.state.tradeType}
-                  baseToken={this.state.request.asset}
-                  positionType={this.state.tradePositionType}
-                  leverage={this.state.tradeLeverage}
-                  quoteToken={this.state.request.quoteToken}
-                  onSubmit={this.onTradeConfirmed}
-                  onCancel={this.onTradeRequestClose}
+                  changeLoadingTransaction={this.changeLoadingTransaction}
                 />
               </Modal>
             )}
-          {this.state.request !== undefined && loan !== undefined && (
-            <Modal
-              isOpen={this.state.isManageCollateralModalOpen}
-              onRequestClose={this.onManageCollateralRequestClose}
-              className="modal-content-div"
-              overlayClassName="modal-overlay-div">
-              <ManageCollateralForm
-                loan={loan}
-                request={this.state.request as ManageCollateralRequest}
-                onSubmit={this.onManageCollateralConfirmed}
-                onCancel={this.onManageCollateralRequestClose}
-                isOpenModal={this.state.isManageCollateralModalOpen}
-                isMobileMedia={this.props.isMobileMedia}
-                changeLoadingTransaction={this.changeLoadingTransaction}
-              />
-            </Modal>
-          )}
-        </main>
+          </main>
+        ) : (
+          <div className="message-wrong-network">You are connected to the wrong network.</div>
+        )}
       </div>
     )
   }
@@ -390,6 +398,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
+    const isSupportedNetwork = FulcrumProvider.Instance.unsupportedNetwork
+    this.setState({ ...this.state, isSupportNetwork: isSupportedNetwork })
     await this.clearData()
     await this.setRecentLiquidationsNumber()
 
@@ -749,7 +759,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     //   !FulcrumProvider.Instance.contractsSource ||
     //   !FulcrumProvider.Instance.contractsSource!.canWrite
     // ) {
-      
+
     //   ;(await this._isMounted) && this.setState({ innerOwnRowsData: [], openedPositionsCount: 0 })
     //   return null
     // }
