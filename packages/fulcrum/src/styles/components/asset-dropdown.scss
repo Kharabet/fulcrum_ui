@@ -50,14 +50,16 @@
     &__name {
       font-size: 12px;
       font-weight: 600;
-      letter-spacing: 0.05em;
       color: #ffffff;
     }
     &__image-container {
       margin-right: 7px;
       svg {
-        width: 25px;
-        height: 25px;
+        width: 24px;
+        height: 24px;
+        @media screen and (max-width: $mobile-version-width) {
+          display: none;
+        }
       }
     }
   }
@@ -70,19 +72,19 @@
   box-sizing: border-box;
   border-radius: 26px;
   background-color: #586473;
-  width: 105px;
+  width: 154px;
   align-items: center;
-  padding: 4px;
+  padding: 8px;
   position: relative;
-  @media only screen and (max-width: $mobile-version-max-width) {
-    width: 95px;
+  @media screen and (max-width: $mobile-version-width) {
+    width: 125px;
   }
   svg {
-    width: 25px;
-    height: 25px;
-    margin-right: 7px;
-    @media only screen and (max-width: $mobile-version-max-width) {
-      margin-right: 3px;
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    @media screen and (max-width: $mobile-version-width) {
+      display: none;
     }
     .eth-svg {
       fill: #c8c8c8;
@@ -96,10 +98,10 @@
     top: calc(50% - 2px);
     transform: translate(0, -50%);
     width: 8px;
-    border: 5px solid transparent;
-    @media only screen and (max-width: $mobile-version-max-width) {
-      right: 10px;
-    }
+    border: 4px solid transparent;
+    // @media only screen and (max-width: $mobile-version-max-width) {
+    //   right: 10px;
+    // }
   }
   &.closed {
     &::after {
@@ -116,10 +118,7 @@
   span {
     font-size: 12px;
     font-weight: 600;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 1.5;
-    letter-spacing: 0.05em;
     color: #ffffff;
+    margin-top: 2px;
   }
 }

@@ -1,5 +1,6 @@
 @import '../abstracts/mixins';
 @import '../abstracts/variables';
+@import './rc-slider.scss';
 
 .trade-form {
   @include clearfix();
@@ -90,11 +91,11 @@
   }
   &__row-container {
     @media screen and (max-width: $mobile-version-width) {
-    flex-wrap: wrap;
+      flex-wrap: wrap;
     }
     display: flex;
     align-items: flex-end;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-bottom: 15px;
     .gas-limits-container {
       padding-top: 10px;
@@ -330,15 +331,15 @@
       display: flex;
       background-color: #394049;
       width: auto;
-      height: 65px;
+      height: 72px;
       position: relative;
-      padding-right: 15px;
+      padding-right: 10px;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
     }
     &__input {
-      width: calc(100% - 120px);
+      width: calc(100% - 154px);
       padding-left: 15px;
       border: none;
       font-size: 32px;
@@ -355,11 +356,34 @@
       }
     }
   }
+  .buy {
+    .input-amount {
+      &__container {
+        height: 72px;
+      }
+    }
+  }
   .expired {
     .input-receive__input {
       color: #495460;
     }
   }
+  .rc-slider{
+    margin-top: 30px;
+    margin-bottom: 56px;
+  }
+  .rc-slider-handle {
+  &:after {
+    content: attr(aria-valuenow) " %";
+    position: absolute;
+    color: #33DFCC;
+    font-weight: 600;
+     font-size: 12px;
+    top: 34px;
+    width: 40px;
+    height: 16px;
+  }
+}
 }
 
 // .trade-form__form-info {
@@ -675,6 +699,7 @@
         background-color: #ff5353;
       }
     }
+
     .input-receive {
       &__title {
         font-size: 18px;
@@ -684,6 +709,15 @@
       }
       &__input {
         font-size: 24px;
+        width: calc(100% - 125px);
+      }
+    }
+
+    .buy {
+      .input-amount {
+        &__container {
+          height: 52px;
+        }
       }
     }
   }

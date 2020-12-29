@@ -49,7 +49,7 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
               {assetDetails.reactLogoSvg.render()}
             </div>
             <div className="asset-dropdown-item__description-container">
-              <div className="asset-dropdown-item__name">{assetDetails.displayName}</div>
+              <div className="asset-dropdown-item__name">Collateral {assetDetails.displayName}</div>
             </div>
           </div>
         )
@@ -79,7 +79,7 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
           }`}
           onClick={this.onOpenClick}>
           {activeAssetDetails.reactLogoSvg.render()}
-          <span>{activeAssetDetails.displayName}</span>
+          <span>Collateral {activeAssetDetails.displayName}</span>
         </div>
         {this.state.isOpened ? (
           <React.Fragment>

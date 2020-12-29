@@ -1,9 +1,9 @@
 import React, { Component, ChangeEvent } from 'react'
+import Slider from 'rc-slider'
 
 import { Asset } from '../domain/Asset'
 import { TradeType } from '../domain/TradeType'
 import { Preloader } from './Preloader'
-
 import '../styles/components/input-amount.scss'
 import { AssetDropdown } from './AssetDropdown'
 
@@ -14,14 +14,13 @@ interface IInputAmountProps {
   buttonValue: number
   selectorAssets?: Asset[]
   tradeType?: TradeType
+  withSlider?: boolean
   onInsertMaxValue: (value: number) => void
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void
   onCollateralChange: (asset: Asset) => void
 }
 
 interface IInputAmountState {
-  buttonValue: number
-  tradeType: TradeType | null
   isChangeCollateralOpen: boolean
 }
 
@@ -31,12 +30,11 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
   constructor(props: IInputAmountProps) {
     super(props)
     this.state = {
-      buttonValue: 0,
-      tradeType: this.props.tradeType ?? null,
       isChangeCollateralOpen: false
     }
   }
-  public async componentDidMount() {
+
+  public componentDidMount() {
     if (this._input) {
       this._input.focus()
     }
@@ -81,51 +79,64 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
             />
           )}
         </div>
-
-        <div className="input-amount__group-button">
-          <button
-            data-value="0.25"
-            className={this.props.buttonValue === 0.25 ? 'active' : ''}
-            onClick={this.setButtonValue}>
-            25%
-          </button>
-          <button
-            data-value="0.5"
-            className={this.props.buttonValue === 0.5 ? 'active' : ''}
-            onClick={this.setButtonValue}>
-            50%
-          </button>
-          <button
-            data-value="0.75"
-            className={this.props.buttonValue === 0.75 ? 'active' : ''}
-            onClick={this.setButtonValue}>
-            75%
-          </button>
-          <button
-            data-value="1"
-            className={this.props.buttonValue === 1 ? 'active' : ''}
-            onClick={this.setButtonValue}>
-            100%
-          </button>
-        </div>
+        {!this.props.withSlider ? (
+          <div className="input-amount__group-button">
+            <button
+              data-value="0.25"
+              className={this.props.buttonValue === 0.25 ? 'active' : ''}
+              onClick={this.setButtonValue}>
+              25%
+            </button>
+            <button
+              data-value="0.5"
+              className={this.props.buttonValue === 0.5 ? 'active' : ''}
+              onClick={this.setButtonValue}>
+              50%
+            </button>
+            <button
+              data-value="0.75"
+              className={this.props.buttonValue === 0.75 ? 'active' : ''}
+              onClick={this.setButtonValue}>
+              75%
+            </button>
+            <button
+              data-value="1"
+              className={this.props.buttonValue === 1 ? 'active' : ''}
+              onClick={this.setButtonValue}>
+              100%
+            </button>
+          </div>
+        ) : (
+          <Slider
+            step={1}
+            min={0}
+            max={100}
+            value={this.props.buttonValue * 100}
+            onChange={this.onChange}
+          />
+        )}
       </div>
     )
   }
+
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault()
 
-    this.setState({ ...this.state, isChangeCollateralOpen: true })
+    this.setState({ isChangeCollateralOpen: true })
   }
 
   private onChangeCollateralClose = () => {
-    this.setState({ ...this.state, isChangeCollateralOpen: false })
+    this.setState({ isChangeCollateralOpen: false })
+  }
+
+  private onChange = (value: number) => {
+    this.props.onInsertMaxValue(value / 100)
   }
 
   public setButtonValue = (event: any) => {
     event.preventDefault()
     let buttonElement = event.currentTarget as HTMLButtonElement
     let value = parseFloat(buttonElement.dataset.value!)
-    this.setState({ ...this.state, buttonValue: value })
 
     this.props.onInsertMaxValue(value)
   }

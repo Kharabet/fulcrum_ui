@@ -45,7 +45,6 @@ interface ITradeAmountChangeEvent {
   inputAmountValue: BigNumber
   tradeAmountValue: BigNumber
   maxTradeValue: BigNumber
-
   exposureValue: BigNumber
 }
 
@@ -86,6 +85,7 @@ interface ITradeFormState {
   ethBalance: BigNumber
   depositTokenBalance: BigNumber
   collateralToPrincipalRate: BigNumber
+  estimatedFee: BigNumber
 
   baseTokenPrice: BigNumber
   returnedAsset: Asset
@@ -125,6 +125,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       ethBalance: new BigNumber(0),
       collateralToPrincipalRate: new BigNumber(0),
       depositTokenBalance: new BigNumber(0),
+      estimatedFee: new BigNumber(0),
       maybeNeedsApproval: false,
       liquidationPrice: liquidationPrice,
       exposureValue: exposureValue,
@@ -255,17 +256,25 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.state.depositToken
     )
+    // tradeRequest.amount = depositTokenBalance.div(10000)
+    // const gasPrice = await FulcrumProvider.Instance.gasPrice()
+    // const rate = await FulcrumProvider.Instance.getSwapToUsdRate(Asset.ETH)
+    // const estimatedFee = await FulcrumProvider.Instance.getTradeEstimatedGas(tradeRequest).then(
+    //   (result) => {
+    //     return result
+    //       .times(gasPrice)
+    //       .div(10 ** 18)
+    //       .times(rate)
+    //   }
+    // )
     this._isMounted &&
       this.setState({
         ...this.state,
         assetDetails: assetDetails || null,
-        // inputAmountText: limitedAmount.inputAmountText,// "",
-        // inputAmountValue: limitedAmount.inputAmountValue,// new BigNumber(0),
-        // tradeAmountValue: limitedAmount.tradeAmountValue,// new BigNumber(0),
-        // maxTradeValue: limitedAmount.maxTradeValue,
         maxTradeValue,
         interestRate: interestRate,
         liquidationPrice: liquidationPrice,
+    //    estimatedFee: estimatedFee,
         baseTokenPrice,
         exposureValue: exposureValue,
         isExposureLoading: false,
@@ -330,6 +339,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       depositToken
     )
+  
     this._isMounted && this.setState({ depositTokenBalance })
   }
 
@@ -386,7 +396,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       if (this.props.positionType === PositionType.SHORT) {
         submitButtonText = `SHORT`
       } else {
-        submitButtonText = `LEVERAGE`
+        submitButtonText = `LONG`
       }
     } else {
       amountMsg =
@@ -473,6 +483,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
               onCollateralChange={this.onCollateralChange}
+              withSlider
             />
             {this.props.tradeType === TradeType.SELL && (
               <InputReceive
@@ -495,6 +506,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           </div>
           <div className="trade-form__row-container">
             <ChiSwitch />
+
             <div className="gas-limits-container">
               Gas limits are overestimated
               <IconInfo
@@ -535,6 +547,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           </div>
           {this.props.tradeType === TradeType.BUY ? (
             <div className="trade-how-it-works-container">
+              {/* <div>Slippage {this.state.slippageRate.toFixed()}</div>
+              <div>Estimated Fee {this.state.estimatedFee.toFixed()}</div> */}
+
               <CollapsibleContainer
                 titleOpen="What is this?"
                 titleClose="What is this?"
@@ -578,7 +593,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         {
           ...this.state,
           inputAmountText: amountText,
-          buttonValue: 0,
+          buttonValue: Number(new BigNumber(amountText).div(this.state.maxTradeValue)),
           tradeAmountValue: new BigNumber(amountText)
         },
         () => {
