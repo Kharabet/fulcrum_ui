@@ -389,7 +389,7 @@ export class InnerOwnTokenGridRow extends Component<
               )}
             </div>
             <div
-              title={`$${this.props.liquidationPrice.toFixed(18)}`}
+              title={`${this.props.liquidationPrice.toFixed(18)}`}
               className="inner-own-token-grid-row__col-liquidation-price opacityIn">
               <span className="inner-own-token-grid-row__body-header">
                 Liquidation Price <label className="text-asset">{this.props.quoteToken}</label>

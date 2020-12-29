@@ -83,7 +83,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     super(props)
     if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.baseTokens = [Asset.fWETH, Asset.WBTC]
-      this.quoteTokens = [Asset.USDC]
+      this.quoteTokens = [Asset.USDC, Asset.WBTC]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
       // this.baseTokens = [
       // ];
@@ -115,7 +115,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTradeModalOpen: false,
       activeTokenGridTab: TokenGridTab.Chart,
       tradeType: TradeType.BUY,
-      // defaultquoteToken: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       isManageCollateralModalOpen: false,
