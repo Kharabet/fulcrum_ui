@@ -842,6 +842,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       events.sort((a: any, b: any) => b.timeStamp.getTime() - a.timeStamp.getTime()),
       'loanId'
     )
+
+    for (const loanId of Object.keys(groupedEvents)){
+      const eventsById = groupedEvents[loanId];
+      const isContainTradeEvent = eventsById.some((e: any) => e instanceof TradeEvent) 
+      if (!isContainTradeEvent)
+      {
+        delete groupedEvents[loanId]
+      }
+    }
     const historyEvents = { groupedEvents, earnRewardEvents, payTradingFeeEvents }
     ;(await this._isMounted) &&
       this.setState({ ...this.state, historyRowsData: [], historyEvents: historyEvents })

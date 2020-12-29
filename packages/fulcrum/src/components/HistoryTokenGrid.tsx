@@ -78,8 +78,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   public async componentDidMount() {
-    if (!this.props.historyRowsData.length) {  
-      await this.getHistoryRowsData(this.state)
+    if (!this.props.historyRowsData.length) {
+      await this.getHistoryRowsData()
     } else {
       this.setState({ ...this.state, isLoading: true })
       const historyEvents = this.props.historyEvents
@@ -104,9 +104,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     prevProps: IHistoryTokenGridProps,
     prevState: IHistoryTokenGridState
   ) {
-    
     if (prevProps.historyEvents !== this.props.historyEvents) {
-      await this.getHistoryRowsData(this.state)
+      await this.getHistoryRowsData()
     }
     if (prevState.numberPagination !== this.state.numberPagination) {
       const historyEvents = this.props.historyEvents
@@ -158,7 +157,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     const startIndex = this.quantityVisibleRow * this.state.numberPagination
     const endIndex = this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow
     const historyRows = this.state.historyRowsData.map((e, i) => {
-      e.isHidden = i >= startIndex && i < endIndex ? false : true
+      // e.isHidden = i >= startIndex && i < endIndex ? false : true
       return <HistoryTokenGridRow key={i} {...e} />
     })
     return (
@@ -187,7 +186,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     )
   }
 
-  public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
+  public getHistoryRowsData = async () => {
     this.setState({ ...this.state, isLoading: true })
     const dateWhenPricePrecisionWasChanged = new Date(
       process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1605557075000 : 1603991752000
@@ -195,7 +194,11 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     const historyRowsData: IHistoryTokenGridRowProps[] = []
     const historyEvents = this.props.historyEvents
     if (!historyEvents) return
-    const loanIds = Object.keys(historyEvents.groupedEvents)
+
+    const startIndex = this.quantityVisibleRow * this.state.numberPagination
+    const endIndex = this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow
+    
+    const loanIds = Object.keys(historyEvents.groupedEvents).slice(startIndex, endIndex)
     for (const loanId of loanIds) {
       // @ts-ignore
       const events = historyEvents.groupedEvents[loanId].sort(
@@ -483,7 +486,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       historyRowsData.push({
         eventsGroup: positionEventsGroup,
         stablecoins: this.props.stablecoins,
-        isHidden: true
+        isHidden: false,
+        getAssetUSDRate: this.getAssetUSDRate
       })
     }
     const quantityEvents = Object.keys(historyEvents.groupedEvents).length
@@ -502,28 +506,36 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     this.props.updateHistoryRowsData(historyRowsData)
   }
 
-  public getAssetUSDRate = async (asset: Asset, date: Date) => {
+  public getAssetUSDRate = async (asset: Asset, date: Date): Promise<BigNumber> => {
     const token = asset === Asset.WETH || asset === Asset.fWETH ? Asset.ETH : asset
-
+    if(this.props.stablecoins.includes(asset)){
+      return new BigNumber(1)
+    }
     const swapToUsdHistoryRateRequest = await fetch(
       `https://api.bzx.network/v1/asset-history-price?asset=${token.toLowerCase()}&date=${date.getTime()}`
     )
     const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
-    return swapToUsdHistoryRateResponse.swapToUSDPrice
+    return new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice)
   }
   public nextPagination = () => {
     if (this.state.numberPagination !== this.state.quantityGrids && !this.state.isLastRow) {
-      this.setState({ ...this.state, numberPagination: this.state.numberPagination + 1 })
+      this.setState(
+        { ...this.state, numberPagination: this.state.numberPagination + 1 },
+        this.getHistoryRowsData
+      )
     }
   }
 
   public prevPagination = () => {
     if (this.state.numberPagination !== 0) {
-      this.setState({
-        ...this.state,
-        numberPagination: this.state.numberPagination - 1,
-        isLastRow: false
-      })
+      this.setState(
+        {
+          ...this.state,
+          numberPagination: this.state.numberPagination - 1,
+          isLastRow: false
+        },
+        this.getHistoryRowsData
+      )
     }
   }
 }
