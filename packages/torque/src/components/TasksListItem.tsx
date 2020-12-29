@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
 import { TasksListItemDetails } from './TasksListItemDetails'

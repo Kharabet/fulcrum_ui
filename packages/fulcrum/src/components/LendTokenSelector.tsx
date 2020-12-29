@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { PreloaderChart } from '../components/PreloaderChart'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { LendRequest } from '../domain/LendRequest'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import LendTokenSelectorItem, { ILendTokenSelectorItemProps } from './LendTokenSelectorItem'

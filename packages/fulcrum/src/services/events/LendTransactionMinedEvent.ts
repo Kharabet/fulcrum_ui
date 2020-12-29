@@ -1,4 +1,5 @@
-import { Asset } from '../../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 
 export class LendTransactionMinedEvent {
   public asset: Asset

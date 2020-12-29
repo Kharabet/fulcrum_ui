@@ -1,7 +1,7 @@
 import React from 'react'
 import { ReactComponent as IconArrow } from '../assets/images/icon-tx-arrow.svg'
 import { BigNumber } from '@0x/utils'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export interface ITxRowProps {
   hash: string

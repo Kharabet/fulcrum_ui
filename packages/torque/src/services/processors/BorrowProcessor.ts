@@ -1,11 +1,11 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from '../../domain/Asset'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { BorrowRequest } from '../../domain/BorrowRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { TorqueProvider } from '../TorqueProvider'
 import { BorrowRequestAwaiting } from '../../domain/BorrowRequestAwaiting'
-import { erc20Contract } from '../../contracts/erc20'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 
 export class BorrowProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -38,7 +38,7 @@ export class BorrowProcessor {
       ])
     }
     // Initializing loan
-    const iTokenContract = await TorqueProvider.Instance.contractsSource.getiTokenContract(
+    const iTokenContract = await TorqueProvider.Instance.contractsSource.getITokenContract(
       taskRequest.borrowAsset
     )
     const collateralAssetErc20Address =

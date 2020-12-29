@@ -5,9 +5,12 @@ import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { ReactComponent as QuestionIcon } from '../assets/images/ic__question_mark.svg'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'

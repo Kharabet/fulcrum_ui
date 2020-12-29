@@ -2,9 +2,10 @@ import { BigNumber } from '@0x/utils'
 import { RequestTask } from '../../domain/RequestTask'
 import { ManageCollateralRequest } from '../../domain/ManageCollateralRequest'
 
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { FulcrumProvider } from '../FulcrumProvider'
-import { erc20Contract } from '../../contracts/erc20'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 
 import { BigNumber } from '@0x/utils'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
 import { LiquidationEvent } from '../domain/events/LiquidationEvent'
 import { TradeEvent } from '../domain/events/TradeEvent'
@@ -16,7 +17,8 @@ import { HistoryTokenGridHeader } from './HistoryTokenGridHeader'
 import { HistoryTokenGridRow, IHistoryTokenGridRowProps } from './HistoryTokenGridRow'
 
 import { ReactComponent as Placeholder } from '../assets/images/history_placeholder.svg'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'

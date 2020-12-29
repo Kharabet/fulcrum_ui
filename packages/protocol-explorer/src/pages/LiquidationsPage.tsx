@@ -8,7 +8,7 @@ import { Search } from '../components/Search'
 import { TxGrid } from '../components/TxGrid'
 import { ITxRowProps } from '../components/TxRow'
 import { UnhealthyChart } from '../components/UnhealthyChart'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { LiquidationEvent } from '../domain/LiquidationEvent'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { Header } from '../layout/Header'
@@ -19,7 +19,7 @@ import { NavService } from '../services/NavService'
 import { Loader } from '../components/Loader'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { ILoanRowProps } from '../components/LoanRow'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { RolloversGrid } from '../components/RolloversGrid'
 import { IRolloverRowProps } from '../components/RolloverRow'
 import { IRolloverData } from '../domain/IRolloverData'
@@ -50,38 +50,29 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   private _isMounted: boolean
 
   private readonly stablecoins: Asset[] = [Asset.DAI, Asset.USDC, Asset.USDT]
-  private readonly assetsShown: Array<{ token: Asset; color: string }>
+  private readonly assetsShown: Asset[]
 
   constructor(props: any) {
     super(props)
     if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
-      this.assetsShown = [
-        { token: Asset.USDC, color: '#85D3FF' },
-        { token: Asset.fWETH, color: '#B0B0B0' },
-        { token: Asset.WBTC, color: '#966AFF' }
-      ]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
-      this.assetsShown = [
-        { token: Asset.ETH, color: '#B0B0B0' },
-        { token: Asset.DAI, color: '#F8A608' }
-      ]
+      this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
     } else {
       this.assetsShown = [
-        { token: Asset.ETH, color: '#B0B0B0' },
-        { token: Asset.DAI, color: '#F8A608' },
-        { token: Asset.USDC, color: '#85D3FF' },
-        { token: Asset.USDT, color: '#70E000' },
-        { token: Asset.WBTC, color: '#966AFF' },
-        { token: Asset.LINK, color: '#03288B' },
-        { token: Asset.YFI, color: '#3D97FF' },
-        { token: Asset.BZRX, color: '#0056D7' },
-        { token: Asset.MKR, color: '#028858' },
-        { token: Asset.LEND, color: '#00EFEF' },
-        { token: Asset.KNC, color: '#3BD8A7' },
-        { token: Asset.UNI, color: '#FFE1EF' },
-        { token: Asset.AAVE, color: '#2EBAC6' },
-        { token: Asset.LRC, color: '#1E61FF' },
-        { token: Asset.COMP, color: '#00F9B0' }
+        Asset.ETH,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
+        Asset.KNC,
+        Asset.UNI,
+        Asset.AAVE,
+        Asset.LRC,
+        Asset.COMP
       ]
     }
 
@@ -135,14 +126,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       label: Asset
       backgroundColor: string
       data: Array<{ x: string; y: number }>
-    }> = this.assetsShown.map((e: { token: Asset; color: string }) => ({
-      label: e.token,
-      data: [] as Array<{ x: string; y: number }>,
-      backgroundColor: e.color
-    }))
+    }> = this.assetsShown
+      .filter((e: Asset) => !!AssetsDictionary.assets.get(e))
+      .map((e: Asset) => ({
+        label: e,
+        data: [] as Array<{ x: string; y: number }>,
+        backgroundColor: AssetsDictionary.assets.get(e)!.bgBrightColor
+      }))
     Object.keys(eventsWithDayByDay).forEach((day: string) => {
       for (const assetShown of this.assetsShown) {
-        const token: Asset = assetShown.token
+        const token: Asset = assetShown
         if (!eventsWithDayByDay[day]) continue
         const eventsWithDayByAsset: Array<{
           event: LiquidationEvent
@@ -230,7 +223,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
     for (const assetShown of this.assetsShown) {
       const tokenLiqudiations30d = liqudiations30d.filter((e: LiquidationEvent) => {
-        return e.loanToken === assetShown.token
+        return e.loanToken === assetShown
       })
 
       for (const e of tokenLiqudiations30d) {
@@ -284,16 +277,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }))
 
     await this.setState({
-        ...this.state,
-        volume30d,
-        transactionsCount30d,
-        events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
-        unhealthyLoans,
-        isDataLoading: false,
-        unhealthyLoansUsd,
+      ...this.state,
+      volume30d,
+      transactionsCount30d,
+      events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
+      unhealthyLoans,
+      isDataLoading: false,
+      unhealthyLoansUsd,
       healthyLoansUsd,
       rollovers
-      })
+    })
   }
 
   private numberWithCommas = (x: number | string) => {
@@ -463,12 +456,15 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                         </div>
                       </div>
                       <div className="flex jc-c labels-container">
-                        {this.assetsShown.map((e: { token: Asset; color: string }) => (
-                          <div key={e.color} className="label-chart">
-                            <span style={{ backgroundColor: e.color }} />
-                            {e.token}
-                          </div>
-                        ))}
+                        {this.assetsShown.map((e: Asset) => {
+                          const assetDetails = AssetsDictionary.assets.get(e)
+                          return assetDetails && (
+                            <div key={assetDetails.bgBrightColor} className="label-chart">
+                              <span style={{ backgroundColor: assetDetails.bgBrightColor }} />
+                              {e}
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   </section>

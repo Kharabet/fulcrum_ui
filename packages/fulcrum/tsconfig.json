@@ -1,11 +1,4 @@
 {
-  "extends": "../../tsconfig",
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "./src/charting_library",
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {}
 }

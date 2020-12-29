@@ -1,8 +1,10 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import { ReactComponent as OpenManageCollateral } from '../assets/images/openManageCollateral.svg'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { PositionType } from '../domain/PositionType'

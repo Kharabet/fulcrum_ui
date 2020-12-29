@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { TokenGridTab } from '../domain/TokenGridTab'
 import { IMarketPair } from '../pages/TradePage'
 import '../styles/components/token-grid-tabs.scss'

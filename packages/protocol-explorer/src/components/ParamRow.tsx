@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import React from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { Platform } from '../domain/Platform'
 import CopyToClipboard from './CopyToClipboard'
 

@@ -1,6 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import '../styles/components/chi-switch.scss'
 import { CheckBox } from './CheckBox'

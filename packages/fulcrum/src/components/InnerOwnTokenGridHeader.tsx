@@ -1,7 +1,8 @@
 import React from 'react'
 import ReactTooltip from 'react-tooltip'
 import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import '../styles/components/tooltip.scss'
 
 export interface IInnerOwnTokenGridHeaderProps {
