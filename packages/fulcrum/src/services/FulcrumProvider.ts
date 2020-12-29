@@ -1263,7 +1263,10 @@ export class FulcrumProvider {
     }
 
     const srcDecimals = AssetsDictionary.assets.get(srcToken)?.decimals || 18
-    const amount = tradedAmountEstimate.times(10 ** srcDecimals)
+    const amount = tradedAmountEstimate.times(10 ** srcDecimals).dp(0, BigNumber.ROUND_HALF_UP)
+    if (amount.lte(10 ** srcDecimals)) {
+      return new BigNumber(0)
+    }
     const srcAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(srcToken)
     const destAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(destToken)
     const slippageJsonOneTokenWorth = await fetch(

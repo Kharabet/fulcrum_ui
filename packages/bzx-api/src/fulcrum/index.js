@@ -6,14 +6,17 @@ import {
   DappHelperJson,
   mainnetAddress as dappHelperAddress
 } from '../contracts/DappHelperContract'
+import Web3Utils from 'web3-utils'
 import { mainnetAddress as oracleAddress, oracleJson } from '../contracts/OracleContract'
 import { erc20Json } from '../contracts/erc20Contract'
 import { iTokenJson } from '../contracts/iTokenContract'
 import { pTokenJson } from '../contracts/pTokenContract'
+import { mainnetAddress as iBZxAddress, iBZxJson } from '../contracts/iBZxContract'
 import config from '../config.json'
 import { pTokenPricesModel, pTokenPriceModel } from '../models/pTokenPrices'
 import { iTokenPricesModel, iTokenPriceModel } from '../models/iTokenPrices'
 import { statsModel, tokenStatsModel, allTokensStatsModel } from '../models/stats'
+import { loanParamsListModel, loanParamsModel } from '../models/loanParams'
 
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
 
@@ -23,8 +26,10 @@ export default class Fulcrum {
     this.logger = logger
     this.storage = storage
     setInterval(this.updateCache.bind(this), config.cache_ttl_sec * 1000)
+    setInterval(this.updateParamsCache.bind(this), config.cache_params_ttl_day * 86400 * 1000)
     this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress)
     this.updateCache()
+    this.updateParamsCache()
   }
 
   async updateCache(key, value) {
@@ -39,6 +44,12 @@ export default class Fulcrum {
     await this.updatePTokensPrices()
     // await this.storage.setItem("ptoken-prices", ptoken);
     this.logger.info('ptoken-prices updated')
+  }
+
+  async updateParamsCache(key, value) {
+    await this.updateLoanParams()
+    // await this.storage.setItem("loan_params", params);
+    this.logger.info('loan_params updated')
   }
 
   async getTotalAssetSupply() {
@@ -303,6 +314,122 @@ export default class Fulcrum {
     return result
   }
 
+  async getLoanParams() {
+    const lastLoanParams = (
+      await loanParamsListModel
+        .find()
+        .sort({ _id: -1 })
+        .select({ loanParams: 1 })
+        .lean()
+        .limit(1)
+    )[0]
+    if (!lastLoanParams) {
+      this.logger.info('No loan-params in db!')
+      await this.updateLoanParams()
+    }
+    return (
+      lastLoanParams.loanParams.map((params) => {
+        console.log(params)
+        return {
+          loanId: params.loanId,
+          principal: params.principal,
+          collateral: params.collateral,
+          platform: params.platform,
+          initialMargin: params.initialMargin,
+          maintenanceMargin: params.maintenanceMargin,
+          liquidationPenalty: params.liquidationPenalty
+        }
+      }))
+  }
+
+  async updateLoanParams() {
+    const result = {}
+    const loanParamsList = new loanParamsListModel()
+    loanParamsList.loanParams = []
+    const iBZxContract = new this.web3.eth.Contract(iBZxJson.abi, iBZxAddress)
+    if (!iBZxContract) return null
+
+    const tokens = iTokens.filter((token) => token.name !== 'ethv1')
+
+    for (const loan in tokens) {
+      const loanTokenAddress = tokens[loan].erc20Address
+      const iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, tokens[loan].address)
+      if (!iTokenContract) return null
+
+      for (const collateral in tokens) {
+        if (loan === collateral) {
+          continue
+        }
+        const collateralTokenAddress = tokens[collateral].erc20Address
+
+        if (!collateralTokenAddress) return null
+        const fulcrumId = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, false))
+        const liquidationIncentivePercent = await iBZxContract.methods
+          .liquidationIncentivePercent(loanTokenAddress, collateralTokenAddress)
+          .call()
+
+        try {
+          const fulcrumLoanId = await iTokenContract.methods.loanParamsIds(fulcrumId).call()
+          const fulcrumLoanParams = await iBZxContract.methods.loanParams(fulcrumLoanId).call()
+          const loanToken = iTokens.find(
+            (token) => token.erc20Address.toLowerCase() === fulcrumLoanParams[3].toLowerCase()
+          ).displayName
+          const collateralToken = iTokens.find(
+            (token) => token.erc20Address.toLowerCase() === fulcrumLoanParams[4].toLowerCase()
+          ).displayName
+          fulcrumLoanParams &&
+            fulcrumLoanParams[1] === true &&
+            loanParamsList.loanParams.push(
+              new loanParamsModel({
+                loanId: fulcrumLoanParams[0],
+                principal: loanToken,
+                collateral: collateralToken,
+                platform: 'Fulcrum',
+                initialMargin: new BigNumber(fulcrumLoanParams[5]).div(10 ** 18),
+                maintenanceMargin: new BigNumber(fulcrumLoanParams[6]).div(10 ** 18),
+                liquidationPenalty: new BigNumber(liquidationIncentivePercent).div(10 ** 18)
+              })
+            )
+        } catch (e) {
+          this.logger.error(e)
+        }
+
+        try {
+          const torqueId = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
+          const torqueLoanId = await iTokenContract.methods.loanParamsIds(torqueId).call()
+          const torqueLoanParams = await iBZxContract.methods.loanParams(torqueLoanId).call()
+          const loanToken = iTokens.find(
+            (token) => token.erc20Address.toLowerCase() === torqueLoanParams[3].toLowerCase()
+          ).displayName
+          const collateralToken = iTokens.find(
+            (token) => token.erc20Address.toLowerCase() === torqueLoanParams[4].toLowerCase()
+          ).displayName
+          torqueLoanParams &&
+            torqueLoanParams[1] === true &&
+            loanParamsList.loanParams.push(
+              new loanParamsModel({
+                loanId: torqueLoanParams[0],
+                principal: loanToken,
+                collateral: collateralToken,
+                platform: 'Torque',
+                initialMargin: new BigNumber(torqueLoanParams[5]).div(10 ** 18),
+                maintenanceMargin: new BigNumber(torqueLoanParams[6]).div(10 ** 18),
+                liquidationPenalty: new BigNumber(liquidationIncentivePercent).div(10 ** 18)
+              })
+            )
+        } catch (e) {
+          this.logger.error(e)
+        }
+      }
+    }
+
+    if (loanParamsList.loanParams.length > 0) {
+      await loanParamsList.save()
+    }
+
+    return result
+  }
+
   getBaseAsset(pToken) {
     return pToken.direction === 'SHORT' ? pToken.unit : pToken.asset
   }
@@ -376,6 +503,7 @@ export default class Fulcrum {
   }
 
   async getReserveData() {
+    let result = []
     const lastReserveData = (
       await statsModel
         .find()
@@ -392,7 +520,7 @@ export default class Fulcrum {
       // console.dir(`reserve_data:`);
       // console.dir(result);
     }
-    let result = []
+
     lastReserveData.tokensStats.forEach((tokensStat) => {
       result.push(tokensStat)
     })
@@ -569,7 +697,7 @@ export default class Fulcrum {
           let usdSupply = new BigNumber(0)
           let usdTotalLocked = new BigNumber(0)
 
-          if (token.name == 'ethv1') {
+          if (token.name === 'ethv1') {
             vaultBalance = await this.getAssetTokenBalanceOfUser(
               token.name,
               '0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633'
@@ -653,7 +781,10 @@ export default class Fulcrum {
 
         const reward = rebate.plus(monthlyRewardPerToken)
         const yieldMonthlyRate = reward.div(totalBorrowUSD)
-        const yieldYearlyPercents = yieldMonthlyRate.times(12).times(100).div(2)
+        const yieldYearlyPercents = yieldMonthlyRate
+          .times(12)
+          .times(100)
+          .div(2)
 
         tokenStat.yieldFarmingAPR =
           isNaN(yieldYearlyPercents.toFixed()) || yieldYearlyPercents.toFixed() === 'Infinity'

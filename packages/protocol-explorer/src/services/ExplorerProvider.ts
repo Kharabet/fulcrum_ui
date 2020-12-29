@@ -4,6 +4,7 @@ import { Web3Wrapper } from '@0x/web3-wrapper'
 import { EventEmitter } from 'events'
 
 import Web3 from 'web3'
+import Web3Utils from 'web3-utils'
 
 import constantAddress from '../config/constant.json'
 
@@ -23,19 +24,20 @@ import { MintEvent } from '../domain/MintEvent'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import { TradeEvent } from '../domain/TradeEvent'
 
+import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'
 import configProviders from '../config/providers.json'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
+import { IRolloverData } from '../domain/IRolloverData'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { Platform } from '../domain/Platform'
+import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { TasksQueue } from '../services/TasksQueue'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RolloverRequest } from '../domain/RolloverRequest'
-import { IRolloverData } from '../domain/IRolloverData'
-
 const isMainnetProd =
   process.env.NODE_ENV &&
   process.env.NODE_ENV !== 'development' &&
@@ -662,7 +664,7 @@ export class ExplorerProvider {
     const iBZxContract = await this.contractsSource.getiBZxContract()
 
     if (!iBZxContract) return rollovers
-   
+
     const activeLoans = await this.getBzxLoans(start, count, false)
     const rolloverPendingLoans = activeLoans.filter(
       (loan) => loan && loan.loanData && loan.loanData.interestDepositRemaining.eq(0)
@@ -673,10 +675,7 @@ export class ExplorerProvider {
       }
       const loan = rolloverPendingLoans[i]
       try {
-        const rolloverEstimate = await iBZxContract.rollover.callAsync(
-          loan.loanId,
-          '0x'
-        )
+        const rolloverEstimate = await iBZxContract.rollover.callAsync(loan.loanId, '0x')
         const rebateAsset = this.contractsSource.getAssetFromAddress(rolloverEstimate[0])
         const decimals = AssetsDictionary.assets.get(rebateAsset)?.decimals || 18
         if (rebateAsset === Asset.UNKNOWN) {
@@ -1260,7 +1259,6 @@ export class ExplorerProvider {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash)
       if (receipt) {
         resolve(receipt)
-      
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject)
@@ -1354,6 +1352,63 @@ export class ExplorerProvider {
 
     return result
   }
+
+  private getLoanParams = async (
+    asset: Asset,
+    collateralAsset: Asset,
+    platform: Platform
+  ): Promise<IParamRowProps | null> => {
+    if (!this.contractsSource) {
+      return null
+    }
+    const iToken = await this.contractsSource.getITokenContract(asset)
+    const iBZxContract = await this.contractsSource.getiBZxContract()
+    const collateralTokenAddress =
+      AssetsDictionary.assets
+        .get(collateralAsset)!
+        .addressErc20.get(this.web3ProviderSettings.networkId) || ''
+    if (!iToken || !collateralTokenAddress || !iBZxContract) return null
+    // @ts-ignore
+    const id = new BigNumber(
+      Web3Utils.soliditySha3(collateralTokenAddress, platform === Platform.Torque) || 0
+    )
+    const loanId = await iToken.loanParamsIds.callAsync(id)
+    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
+    const result = {
+      loanId: loanParams[0],
+      principal: loanParams[3],
+      collateral: loanParams[4],
+      platform: platform,
+      initialMargin: loanParams[5].div(10 ** 18),
+      maintenanceMargin: loanParams[6].div(10 ** 18),
+      liquidationPenalty: new BigNumber(0)
+    } as IParamRowProps
+    return result
+  }
+  public getFulcrumParams = async (): Promise<IParamRowProps[] | undefined> => {
+    const params: IParamRowProps[] = []
+    const assets = Object.values(Asset).filter((key) => key !== Asset.UNKNOWN)
+    const pairs: any[] = []
+    assets.forEach((asset) => {
+      assets.forEach((collateralAsset) => {
+        if (asset !== collateralAsset) {
+          pairs.push({
+            asset,
+            collateralAsset
+          })
+        }
+      })
+    })
+
+    pairs.forEach(async (pair) => {
+      const param = await this.getLoanParams(pair.asset, pair.collateralAsset, Platform.Fulcrum)
+      if (param) params.push(param)
+    })
+    //  const param = await this.getLoanParams(Asset.ETH, Asset.DAI, Platform.Fulcrum)
+    // param && params.push(param)
+    return Promise.all(params)
+  }
+
   public isETHAsset = (asset: Asset): boolean => {
     return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
   }

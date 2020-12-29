@@ -840,7 +840,7 @@ export const iTokenJson = {
       inputs: [
         {
           internalType: 'uint256',
-          name: '',
+          name: 'id',
           type: 'uint256'
         }
       ],
@@ -848,7 +848,7 @@ export const iTokenJson = {
       outputs: [
         {
           internalType: 'bytes32',
-          name: '',
+          name: 'id',
           type: 'bytes32'
         }
       ],

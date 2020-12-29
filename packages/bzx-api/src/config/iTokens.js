@@ -1,18 +1,18 @@
 export const iTokens = [
   {
-    name: 'ethv1',
-    address: '0x77f973FCaF871459aa58cd81881Ce453759281bC',
-    erc20Address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    displayName: 'ETHv1',
-    iTokenName: 'iETHv1',
-    decimals: 18
-  },
-  {
     name: 'eth',
     address: '0xb983e01458529665007ff7e0cddecdb74b967eb6',
     erc20Address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     displayName: 'ETH',
     iTokenName: 'iETH',
+    decimals: 18
+  },
+  {
+    name: 'ethv1',
+    address: '0x77f973FCaF871459aa58cd81881Ce453759281bC',
+    erc20Address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    displayName: 'ETHv1',
+    iTokenName: 'iETHv1',
     decimals: 18
   },
   {

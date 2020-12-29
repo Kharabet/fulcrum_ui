@@ -374,7 +374,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         ? 'trade-form__submit-button--buy'
         : 'trade-form__submit-button--sell'
 
-    let amountMsg = ``
+    let amountMsg = undefined
     let submitButtonText = ``
     if (this.props.tradeType === TradeType.BUY) {
       amountMsg =
@@ -383,9 +383,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           ? 'Insufficient funds for gas'
           : this.state.depositTokenBalance && this.state.depositTokenBalance.eq(0)
           ? 'Your wallet is empty'
-          : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
+          : this.state.slippageRate.gt(0)
           ? `Slippage:`
-          : ''
+          : undefined
       if (this.props.positionType === PositionType.SHORT) {
         submitButtonText = `SHORT`
       } else {
@@ -396,9 +396,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.state.ethBalance &&
         this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
           ? 'Insufficient funds for gas'
-          : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
+          : this.state.slippageRate.gt(0)
           ? `Slippage:`
-          : ''
+          : undefined
       submitButtonText = `CLOSE`
     }
     if (this.state.isExpired) {
@@ -449,20 +449,21 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             ) : null}
 
-            {!this.state.isLoading && (
+            {!this.state.isLoading && amountMsg !== undefined && (
               <div className="trade-form__kv-container">
                 {amountMsg.includes('Slippage:') ? (
                   <div
-                    title={`${this.state.slippageRate.toFixed(18)}%`}
-                    className="trade-form__label slippage">
+                    title={`${this.state.slippageRate.toFixed()}%`}
+                    className={`trade-form__label slippage ${this.state.slippageRate.gte(0.01) &&
+                      'danger'}`}>
                     {amountMsg}
                     <span className="trade-form__slippage-amount">
                       &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}
-                      <SlippageDown />
+                      {this.state.slippageRate.gte(0.01) && <SlippageDown />}
                     </span>
                   </div>
                 ) : (
-                  <div className="trade-form__label">{amountMsg}</div>
+                  <div className="trade-form__label danger">{amountMsg}</div>
                 )}
               </div>
             )}

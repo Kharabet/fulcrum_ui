@@ -3,6 +3,7 @@ import AssetSelector from '../components/AssetSelector'
 import { BorrowDlg } from '../components/BorrowDlg'
 import { Footer } from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
+import { TorqueProvider } from '../services/TorqueProvider'
 
 export interface IBorrowPageProps {
   doNetworkConnect: () => void
@@ -23,10 +24,13 @@ const BorrowPage = (props: IBorrowPageProps) => {
           isRiskDisclosureModalOpen={props.isRiskDisclosureModalOpen}
         />
         <main>
-          <AssetSelector
-            borrowDlgRef={borrowDlgRef}
-            doNetworkConnect={props.doNetworkConnect}
-          />
+          {!TorqueProvider.Instance.unsupportedNetwork ? (
+            <AssetSelector borrowDlgRef={borrowDlgRef} doNetworkConnect={props.doNetworkConnect} />
+          ) : (
+            <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+              <div style={{ cursor: `pointer` }}>You are connected to the wrong network.</div>
+            </div>
+          )}
         </main>
         <Footer isRiskDisclosureModalOpen={props.isRiskDisclosureModalOpen} />
       </div>

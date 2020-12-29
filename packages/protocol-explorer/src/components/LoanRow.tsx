@@ -1,6 +1,5 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
-import { ReactComponent as IconCopy } from '../assets/images/ic__copy.svg'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
@@ -11,10 +10,8 @@ import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvent
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
+import CopyToClipboard from './CopyToClipboard'
 import { TxLoaderStep } from './TxLoaderStep'
-
-import Clipboard from 'clipboard'
-import ReactTooltip from 'react-tooltip'
 
 export interface ILoanRowProps {
   loanId: string
@@ -38,8 +35,6 @@ export const LoanRow = (props: ILoanRowProps) => {
   const [isLoadingTransaction, setLoadingTransaction] = useState(false)
   const [liquidationRequest, setRequest] = useState<LiquidationRequest>()
 
-  const copyEl = React.useRef<HTMLSpanElement | null>(null)
-  let clipboard: Clipboard | undefined
   useEffect(() => {
     const task = TasksQueue.Instance.getTasksList().find((t) => t.request.loanId === props.loanId)
     setLoadingTransaction(task && !task.error ? true : false)
@@ -63,10 +58,7 @@ export const LoanRow = (props: ILoanRowProps) => {
         ExplorerProviderEvents.AskToCloseProgressDlg,
         onAskToCloseProgressDlg
       )
-      if (clipboard) {
-        clipboard.destroy()
       }
-    }
   })
 
   const onLiquidateClick = async () => {
@@ -124,27 +116,6 @@ export const LoanRow = (props: ILoanRowProps) => {
     changeLoadingTransaction(false, undefined)
   }
 
-  if (copyEl.current !== null && !clipboard) {
-    clipboard = new Clipboard(copyEl.current)
-    clipboard.on('success', (e) => {
-      if (!copyEl.current) {
-        return
-      }
-      copyEl.current.dataset.tip = 'Copied!'
-      ReactTooltip.show(copyEl.current)
-      window.setTimeout(() => ReactTooltip.hide(copyEl.current), 1000)
-      e.clearSelection()
-    })
-    clipboard.on('error', (e) => {
-      if (!copyEl.current) {
-        return
-      }
-      copyEl.current.dataset.tip = 'Copy failed!'
-      ReactTooltip.show(copyEl.current)
-      window.setTimeout(() => ReactTooltip.hide(copyEl.current), 1000)
-    })
-  }
-
   return (
     <React.Fragment>
       {isLoadingTransaction ? (
@@ -156,14 +127,7 @@ export const LoanRow = (props: ILoanRowProps) => {
         <div className="table-row table-row-loan">
           <div title={props.loanId} className="table-row-loan__id">
             {getShortHash(props.loanId, 45)}&nbsp;
-            <span
-              className="table-row-loan__id-copy"
-              ref={copyEl}
-              data-clipboard-text={props.loanId}
-              data-for={props.loanId}>
-              <IconCopy />
-            </span>
-            <ReactTooltip className="tooltip__info" id={props.loanId} event="fakeEvent" />
+            <CopyToClipboard>{props.loanId}</CopyToClipboard>
           </div>
           <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">
             {loanToken.reactLogoSvg.render()} {props.payOffAmount.toFixed(3)}
