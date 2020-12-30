@@ -210,14 +210,14 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             {this.props.profitCollateralToken.toFixed(2)}&nbsp;
             <span className="own-token-grid-row__line" />
             &nbsp;
-            {this.props.profitLoanToken.toFixed(2)}
+            {this.props.profitLoanToken.toFixed(precisionDigits)}
           </React.Fragment>
         ) : (
           <React.Fragment>
             {this.props.profitLoanToken.toFixed(2)}&nbsp;
             <span className="own-token-grid-row__line" />
             &nbsp;
-            {this.props.profitCollateralToken.toFixed(2)}
+            {this.props.profitCollateralToken.toFixed(precisionDigits)}
           </React.Fragment>
         )
     }
@@ -339,7 +339,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <br />
           {!this.state.isLoading ? (
             this.props.value ? (
-              <React.Fragment>{this.props.value.toFixed(2)}</React.Fragment>
+              <React.Fragment>{this.props.value.toFixed(precisionDigits)}</React.Fragment>
             ) : (
               '$0.00'
             )

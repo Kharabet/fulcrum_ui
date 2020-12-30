@@ -251,14 +251,14 @@ export class InnerOwnTokenGridRow extends Component<
             {this.props.profitCollateralToken.toFixed(2)}&nbsp;
             <span className="inner-own-token-grid-row__line" />
             &nbsp;
-            {this.props.profitLoanToken.toFixed(2)}
+            {this.props.profitLoanToken.toFixed(precisionDigits)}
           </React.Fragment>
         ) : (
           <React.Fragment>
             {this.props.profitLoanToken.toFixed(2)}&nbsp;
             <span className="inner-own-token-grid-row__line" />
             &nbsp;
-            {this.props.profitCollateralToken.toFixed(2)}
+            {this.props.profitCollateralToken.toFixed(precisionDigits)}
           </React.Fragment>
         )
     }
@@ -317,7 +317,7 @@ export class InnerOwnTokenGridRow extends Component<
               {!this.state.isLoading ? (
                 <React.Fragment>
                   <span className="value-currency">
-                    {this.props.value.toFixed(2)}
+                    {this.props.value.toFixed(precisionDigits)}
                     <span
                       title={this.state.valueChange.toFixed()}
                       className={`inner-own-token-grid-row__col-asset-price-small ${
