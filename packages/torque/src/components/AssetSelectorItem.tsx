@@ -1,9 +1,9 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
 import { ReactComponent as ArrowRight } from '../assets/images/ic_arrow_right.svg'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { ProviderType } from '../domain/ProviderType'
 import { RequestStatus } from '../domain/RequestStatus'
@@ -152,7 +152,7 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
           </div>
         </div>
       </div>
-      <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgBorrowItem }} />
+      <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgLightColor }} />
     </div>
   )
 }

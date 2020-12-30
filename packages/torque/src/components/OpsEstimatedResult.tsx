@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
-import { AssetDetails } from '../domain/AssetDetails'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 
 export interface IOpsEstimateResultProps {
   actionTitle: string

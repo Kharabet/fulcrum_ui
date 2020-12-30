@@ -1,7 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
 import { Loader } from '../components/Loader'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { TorqueProvider } from '../services/TorqueProvider'
 import AssetSelectorItem from './AssetSelectorItem'
 import { BorrowDlg } from './BorrowDlg'

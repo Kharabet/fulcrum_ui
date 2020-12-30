@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { IRefinanceLoan, RefinanceData } from '../domain/RefinanceData'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'

@@ -1,4 +1,5 @@
-import { Asset } from './Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { PositionType } from './PositionType'
 import { PositionHistoryData } from './PositionHistoryData'
 

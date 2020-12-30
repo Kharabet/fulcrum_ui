@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react'
 import SimpleBar from 'simplebar-react'
 import 'simplebar/dist/simplebar.min.css'
 
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { AssetDetails } from '../domain/AssetDetails'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
 
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { ReactComponent as SearchIcon } from '../assets/images/ic__search.svg'

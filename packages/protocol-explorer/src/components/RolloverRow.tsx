@@ -1,9 +1,9 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
 import { ReactComponent as IconCopy } from '../assets/images/ic__copy.svg'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
 import { RolloverRequest } from '../domain/RolloverRequest'
@@ -186,7 +186,7 @@ export const RolloverRow = (props: IRolloverRowProps) => {
           </div>
           <div className="table-row-loan__amount" />
           <div title={props.gasRebate.toFixed()} className="table-row-loan__collateral">
-            {rebateToken.logoSvg.render()}&nbsp;{props.gasRebate.toFixed(2)}
+            {rebateToken.reactLogoSvg.render()}&nbsp;{props.gasRebate.toFixed(2)}
           </div>
           <div className="table-row-loan__action">
             <button className="action" onClick={onRolloverClick}>

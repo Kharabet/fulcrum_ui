@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { Line } from 'react-chartjs-2'
 import { Link } from 'react-router-dom'
 
@@ -132,7 +132,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       <Link to={`/stats/${asset.displayName.toLocaleLowerCase()}`} className="asset-selector-item">
         <div className="asset-selector-item-row">
           <span className="asset-selector-icon">
-            {this.props.asset !== Asset.UNKNOWN && asset.logoSvg.render()}
+            {this.props.asset !== Asset.UNKNOWN && asset.reactLogoSvg.render()}
           </span>
           <span className="asset-selector-name">{asset.displayName}</span>
         </div>

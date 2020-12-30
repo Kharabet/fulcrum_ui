@@ -4,6 +4,12 @@ import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import { useWeb3React } from '@web3-react/core'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { Loader } from './Loader'
+import TagManager from 'react-gtm-module'
+
+const isMainnet =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export interface IProviderMenuListItemProps {
   providerType: ProviderType
@@ -24,6 +30,15 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
   const onClick = () => {
     // if (props.isConnected) return;
     props.onSelect(props.providerType)
+    if (isMainnet) {
+      const tagManagerArgs = {
+        dataLayer: {
+          event: 'select-provider',
+          providerName: props.providerType
+        }
+      }
+      TagManager.dataLayer(tagManagerArgs)
+    }
   }
   if (props.isConnected) {
     const isUnSupportedNetwork = ExplorerProvider.Instance.unsupportedNetwork
@@ -59,7 +74,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
           )}
         </div>
         <div className="provider-menu__list-item-content-img">
-          {providerTypeDetails.reactLogoSvgShort.render()}
+          {providerTypeDetails.reactreactLogoSvgShort.render()}
         </div>
       </li>
     )
@@ -72,7 +87,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
         {props.isActivating ? (
           <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
         ) : (
-          providerTypeDetails.reactLogoSvgShort.render()
+          providerTypeDetails.reactreactLogoSvgShort.render()
         )}
       </div>
     </li>

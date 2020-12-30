@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import ReactModal from 'react-modal'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { BorrowForm } from './BorrowForm'
 import { DialogHeader } from './DialogHeader'

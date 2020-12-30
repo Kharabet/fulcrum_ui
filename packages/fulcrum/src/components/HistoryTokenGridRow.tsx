@@ -1,6 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { Preloader } from './Preloader'
@@ -9,7 +10,7 @@ import { PositionHistoryData } from '../domain/PositionHistoryData'
 import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { RolloverEvent } from '../domain/events/RolloverEvent'
 import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 export interface IHistoryTokenGridRowProps {
   eventsGroup: PositionEventsGroup

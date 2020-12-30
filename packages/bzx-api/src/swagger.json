@@ -158,6 +158,20 @@
         }
       }
     },
+    "/loan-params": {
+      "get": {
+        "tags": ["Stats"],
+        "summary": "Loan Parameters",
+        "description": "",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/borrow-deposit-estimate": {
       "get": {
         "tags": ["Torque"],
