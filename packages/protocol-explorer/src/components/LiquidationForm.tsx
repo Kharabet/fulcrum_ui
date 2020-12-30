@@ -1,13 +1,15 @@
 import { BigNumber } from '@0x/utils'
-import React, { ChangeEvent, FormEvent, useState } from 'react'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ChiSwitch } from './ChiSwitch'
 import { InputAmount } from './InputAmount'
 
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
+import Asset from 'bzx-common/src/assets/Asset'
+import { useWeb3React } from '@web3-react/core'
 export interface ILiquidationFormProps {
   request: LiquidationRequest
   onSubmit: (request: LiquidationRequest) => void
@@ -21,11 +23,35 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
   const decimals: number = loanToken.decimals || 18
   const maxPayOffAmount: BigNumber = props.request.closeAmount.dividedBy(10 ** decimals)
   const maxSeizeAmount: BigNumber = maxPayOffAmount.dividedBy(props.request.rate)
+  const { account } = useWeb3React()
+  const [payOffAmount, setPayOffAmount] = useState<BigNumber>(maxPayOffAmount)
+  const [seizeAmount, setSeizeAmount] = useState<BigNumber>(maxSeizeAmount)
+  const [buttonValue, setButtonValue] = useState<BigNumber>(new BigNumber(1))
+  const [didSubmit, setDidSubmit] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const [payOffAmount, setPayOffAmount] = useState(maxPayOffAmount)
-  const [seizeAmount, setSeizeAmount] = useState(maxSeizeAmount)
-  const [buttonValue, setButtonValue] = useState(new BigNumber(1))
-  const [didSubmit, setDidSubmit] = useState(false)
+  const [ethBalance, setEthBalance] = useState<BigNumber>(new BigNumber(0))
+  const [repayAssetBalance, setRepayAssetBalance] = useState<BigNumber>(new BigNumber(0))
+
+  useEffect(() => {
+    if (!account) {
+      return
+    }
+    setIsLoading(true)
+    Promise.all([
+      ExplorerProvider.Instance.getAssetTokenBalanceOfUser(Asset.ETH, account),
+      ExplorerProvider.Instance.getAssetTokenBalanceOfUser(
+        ExplorerProvider.Instance.wethToEth(props.request.loanToken),
+        account
+      )
+    ])
+      .then(([ethBalanceResp, repayAssetBalanceResp]) => {
+        setEthBalance(ethBalanceResp)
+        setRepayAssetBalance(repayAssetBalanceResp)
+        setIsLoading(false)
+      })
+      .catch(console.error)
+  }, [])
 
   function onPayOffAmountChange(event: ChangeEvent<HTMLInputElement>) {
     let amount = new BigNumber(event.target.value ? event.target.value : 0)
@@ -61,23 +87,21 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
     if (amount.lt(0)) {
       return new BigNumber(0)
     }
-    if (amount.gt(maxPayOffAmount)) {
-      return maxPayOffAmount
+    if (amount.gt(maxAmount)) {
+      return maxAmount
     }
     return amount
   }
 
-  const onSubmitClick = async(event: FormEvent<HTMLFormElement>)=> {
+  const onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    
+
     setDidSubmit(true)
     const request = props.request
 
-    const amountInBaseUnits = new BigNumber(
-        payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
-      )
+    const amountInBaseUnits = new BigNumber(payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1))
     request.closeAmount = amountInBaseUnits
-    
+
     await ExplorerProvider.Instance.onLiquidationConfirmed(request)
     setDidSubmit(false)
     props.onClose()
@@ -94,6 +118,12 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
     return (Math.floor(outputNumber * m) / m).toString()
   }
 
+  const amountMsg =
+    ethBalance && ethBalance.lte(ExplorerProvider.Instance.gasBufferForTrade.div(10 ** 18))
+      ? 'Insufficient funds for gas'
+      : repayAssetBalance.lt(payOffAmount)
+      ? `Your wallet has not enough ${props.request.loanToken}`
+      : undefined
   return (
     <form className="liquidation-form" onSubmit={onSubmitClick}>
       <section className="dialog-header">
@@ -101,15 +131,16 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
         <div className="dialog-header__title">Liquidate</div>
       </section>
       <section className="dialog-content">
+        {!isLoading && amountMsg && <div className="amount-warning">{amountMsg}</div>}
         <InputAmount
-          asset={loanToken.logoSvg}
+          asset={loanToken.reactLogoSvg}
           inputAmountText={formatPrecision(payOffAmount)}
           buttonValue={buttonValue}
           updateButton={onButtonChange}
           onAmountChange={onPayOffAmountChange}
         />
         <InputAmount
-          asset={collateralToken.logoSvg}
+          asset={collateralToken.reactLogoSvg}
           inputAmountText={formatPrecision(seizeAmount)}
           onAmountChange={onSeizeAmountChange}
         />
@@ -119,7 +150,8 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
         <div className="actions-container">
           <button
             type="submit"
-            className={`btn btn-submit action ${didSubmit ? `btn-disabled` : ``}`}>
+            disabled={didSubmit || !!amountMsg}
+            className={`btn btn-submit action`}>
             {didSubmit ? 'Submitting...' : 'Liquidate'}
           </button>
         </div>

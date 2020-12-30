@@ -4,8 +4,10 @@ import { TradeRequest } from '../../domain/TradeRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
 
 import { PositionType } from '../../domain/PositionType'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
-import { Asset } from '../../domain/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { TradeType } from '../../domain/TradeType'
 
 export class TradeSellProcessor {
@@ -117,7 +119,7 @@ export class TradeSellProcessor {
                 }
               )
         gasAmountBN = new BigNumber(gasAmount)
-          .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
+          .multipliedBy(FulcrumProvider.Instance.gasBufferCoeffForTrade)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
         console.log(e)

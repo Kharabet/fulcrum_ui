@@ -85,7 +85,17 @@
       padding-bottom: 15px;
     }
   }
-
+  &__insufficient-balance {
+    position: absolute;
+    margin-top: 7px;
+    left: 0;
+    font-size: 12px;
+    width: 100%;
+    text-align: center;
+  }
+  &__error {
+    color: #de4a4a;
+  }
   &__actions-container {
     display: flex;
     flex-direction: row;

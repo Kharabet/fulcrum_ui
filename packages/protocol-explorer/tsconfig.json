@@ -1,13 +1,4 @@
 {
-  "extends": "../../tsconfig",
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ],
-  "compilerOptions": {
-    "isolatedModules": true
-  }
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {}
 }

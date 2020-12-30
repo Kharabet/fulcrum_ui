@@ -1,10 +1,10 @@
 import { BigNumber } from '@0x/utils'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { RequestTask } from '../../domain/RequestTask'
 import { TorqueProvider } from '../TorqueProvider'
-import { erc20Contract } from '../../contracts/erc20'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 import { ExtendLoanRequest } from '../../domain/ExtendLoanRequest'
-import { Asset } from '../../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export class ExtendLoanProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -69,7 +69,7 @@ export class ExtendLoanProcessor {
       task.processingStepNext()
       erc20allowance = await tokenErc20Contract.allowance.callAsync(
         account,
-        TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase()
+        TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
       )
 
       // Prompting token allowance
@@ -78,7 +78,7 @@ export class ExtendLoanProcessor {
       // Waiting for token allowance
       task.processingStepNext()
       if (depositAmountInBaseUnits.gt(erc20allowance)) {
-        const spender = TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase()
+        const spender = TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
         const approveHash = await TorqueProvider.Instance.setApproval(
           spender,
           taskRequest.borrowAsset,
@@ -96,13 +96,14 @@ export class ExtendLoanProcessor {
 
     let gasAmountBN = new BigNumber(0)
     let txHash: string = ''
+    const loanData = '0x'
 
     try {
       const gasAmount = await bZxContract.extendLoanDuration.estimateGasAsync(
         taskRequest.loanId,
         depositAmountInBaseUnits,
         false,
-        '',
+        loanData,
         {
           from: account,
           value: isETHBorrowAsset ? depositAmountInBaseUnits : undefined,
@@ -122,7 +123,7 @@ export class ExtendLoanProcessor {
         taskRequest.loanId, // loanId
         depositAmountInBaseUnits, // depositAmount
         false, // useCollateral
-        '',
+        loanData,
         {
           from: account,
           value: isETHBorrowAsset ? depositAmountInBaseUnits : undefined,

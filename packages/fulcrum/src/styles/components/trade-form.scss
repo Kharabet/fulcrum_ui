@@ -88,9 +88,26 @@
       padding-top: 55px;
     }
   }
+  &__row-container {
+    @media screen and (max-width: $mobile-version-width) {
+      flex-wrap: wrap;
+    }
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+    .gas-limits-container {
+      padding-top: 10px;
+      font-style: normal;
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 150%;
+      color: #fff;
+    }
+  }
 
   &__form-values-container {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   &__actions-container {
@@ -123,6 +140,9 @@
     &.slippage {
       font-size: 14px;
       display: flex;
+    }
+    &.danger {
+      color: #fe7272;
     }
 
     &--no-bg {
@@ -363,7 +383,13 @@
         background-color: #5b88ff;
       }
     }
-
+    &.update {
+      z-index: 2;
+      background-color: #00c0ab;
+      &:hover {
+        background-color: #33dfcc;
+      }
+    }
     &--sell {
       background-color: #ff5353;
       &:hover {
@@ -420,6 +446,11 @@
       }
     }
   }
+  .expired {
+    .input-receive__input {
+      color: #495460;
+    }
+  }
 }
 
 // .trade-form__form-info {
@@ -444,7 +475,7 @@
 //   }
 // }
 
-@media screen and (max-width: $breakpoint-mobile-max) {
+@media screen and (max-width: $mobile-version-width) {
   .trade-form {
     @include clearfix();
 
@@ -545,6 +576,8 @@
     }
 
     .trade-how-it-works-container {
+      margin-top: 0px;
+      margin-bottom: 0px;
       .hiw-icon {
         svg {
           width: 20px;
@@ -609,9 +642,11 @@
       font-weight: 600;
       font-size: 10px;
       line-height: 150%;
-      color: #fe7272;
       &.slippage {
         font-size: 12px;
+      }
+      &.danger {
+        color: #fe7272;
       }
 
       &--no-bg {

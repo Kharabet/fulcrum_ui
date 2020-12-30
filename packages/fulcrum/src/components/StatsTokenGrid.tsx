@@ -1,6 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { ReserveDetails } from '../domain/ReserveDetails'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
@@ -39,7 +40,9 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
           Asset.LEND,
           Asset.KNC,
           Asset.UNI,
-          Asset.AAVE
+          Asset.AAVE,
+          Asset.LRC,
+          Asset.COMP,
         ]
       : [Asset.fWETH, Asset.USDC, Asset.WBTC]
 
@@ -56,6 +59,10 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     FulcrumProvider.Instance.eventEmitter.on(
       FulcrumProviderEvents.ProviderAvailable,
       this.onProviderAvailable
+    )
+    FulcrumProvider.Instance.eventEmitter.on(
+      FulcrumProviderEvents.ProviderChanged,
+      this.onProviderChanged
     )
   }
 

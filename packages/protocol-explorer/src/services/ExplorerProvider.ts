@@ -1,17 +1,17 @@
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 // import Web3 from 'web3';
 import { EventEmitter } from 'events'
 
 import Web3 from 'web3'
+import Web3Utils from 'web3-utils'
 
 import constantAddress from '../config/constant.json'
 
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ProviderType } from '../domain/ProviderType'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
-import { ContractsSource } from './ContractsSource'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { ExplorerProviderEvents } from './events/ExplorerProviderEvents'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
@@ -24,18 +24,20 @@ import { MintEvent } from '../domain/MintEvent'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import { TradeEvent } from '../domain/TradeEvent'
 
+import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'
 import configProviders from '../config/providers.json'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
+import { IRolloverData } from '../domain/IRolloverData'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { Platform } from '../domain/Platform'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
+import { RolloverRequest } from '../domain/RolloverRequest'
 import { TasksQueue } from '../services/TasksQueue'
-import { LiquidationTransactionMinedEvent } from './events/LiquidationTransactionMinedEvent'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
-
 const isMainnetProd =
   process.env.NODE_ENV &&
   process.env.NODE_ENV !== 'development' &&
@@ -74,9 +76,12 @@ export class ExplorerProvider {
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
   // 5000ms
   public readonly successDisplayTimeout = 5000
+
+  public readonly gasBufferForTrade = new BigNumber(5 * 10 ** 16) // 0.05 ETH
+
   public readonly eventEmitter: EventEmitter
   public providerType: ProviderType = ProviderType.None
-  public providerEngine: Web3ProviderEngine | null = null
+  public providerEngine: any = null
   public web3Wrapper: Web3Wrapper | null = null
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
@@ -108,7 +113,9 @@ export class ExplorerProvider {
         Asset.LEND,
         Asset.KNC,
         Asset.UNI,
-        Asset.AAVE
+        Asset.AAVE,
+        Asset.LRC,
+        Asset.COMP
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
@@ -178,7 +185,7 @@ export class ExplorerProvider {
     try {
       this.isLoading = true
       this.unsupportedNetwork = false
-      await Web3ConnectionFactory.setWalletProvider(connector, account)
+      await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     } catch (e) {
       // console.log(e);
       this.isLoading = false
@@ -315,6 +322,12 @@ export class ExplorerProvider {
   }
 
   public onLiquidationConfirmed = async (request: LiquidationRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
+  public onRolloverConfirmed = async (request: RolloverRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
@@ -643,6 +656,40 @@ export class ExplorerProvider {
     })
 
     return result
+  }
+
+  public getRollovers = async (start: number, count: number): Promise<IRolloverData[]> => {
+    const rollovers: IRolloverData[] = []
+    if (!this.contractsSource) return rollovers
+    const iBZxContract = await this.contractsSource.getiBZxContract()
+
+    if (!iBZxContract) return rollovers
+
+    const activeLoans = await this.getBzxLoans(start, count, false)
+    const rolloverPendingLoans = activeLoans.filter(
+      (loan) => loan && loan.loanData && loan.loanData.interestDepositRemaining.eq(0)
+    )
+    for (const i in rolloverPendingLoans) {
+      if (!rolloverPendingLoans[i]) {
+        continue
+      }
+      const loan = rolloverPendingLoans[i]
+      try {
+        const rolloverEstimate = await iBZxContract.rollover.callAsync(loan.loanId, '0x')
+        const rebateAsset = this.contractsSource.getAssetFromAddress(rolloverEstimate[0])
+        const decimals = AssetsDictionary.assets.get(rebateAsset)?.decimals || 18
+        if (rebateAsset === Asset.UNKNOWN) {
+          continue
+        }
+        const gasRebate = rolloverEstimate[1].div(10 ** decimals)
+        const rollover = { ...loan, rebateAsset, gasRebate }
+        rollovers.push(rollover)
+      } catch (e) {
+        console.error(e)
+        console.log(loan)
+      }
+    }
+    return rollovers
   }
 
   public getBurnHistory = async (asset: Asset): Promise<BurnEvent[]> => {
@@ -1109,6 +1156,8 @@ export class ExplorerProvider {
   private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
     if (task.request instanceof LiquidationRequest) {
       await this.processLiquidationRequestTask(task, skipGas)
+    } else if (task.request instanceof RolloverRequest) {
+      await this.processRolloverRequestTask(task, skipGas)
     }
 
     return false
@@ -1148,9 +1197,43 @@ export class ExplorerProvider {
     }
   }
 
+  private processRolloverRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(ExplorerProviderEvents.AskToOpenProgressDlg, task.request.loanId)
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error('No provider available!')
+      }
+
+      const account =
+        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      if (!account) {
+        throw new Error('Unable to get wallet address!')
+      }
+
+      // Initializing loan
+      const taskRequest: RolloverRequest = task.request as RolloverRequest
+
+      const { RolloverProcessor } = await import('./processors/RolloverProcessor')
+      const processor = new RolloverProcessor()
+      await processor.run(task, account, skipGas)
+
+      task.processingEnd(true, false, null)
+    } catch (e) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
+        // tslint:disable-next-line:no-console
+        console.log(e)
+      }
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(ExplorerProviderEvents.AskToCloseProgressDlg, task)
+    }
+  }
+
   public waitForTransactionMined = async (
     txHash: string,
-    request?: LiquidationRequest
+    request?: LiquidationRequest | RolloverRequest
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
       try {
@@ -1168,21 +1251,14 @@ export class ExplorerProvider {
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LiquidationRequest | undefined,
+    request: LiquidationRequest | RolloverRequest | undefined,
     resolve: (value: any) => void,
     reject: (value: any) => void
   ) => {
     try {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash)
-      if (receipt && request && request instanceof LiquidationRequest) {
+      if (receipt) {
         resolve(receipt)
-
-        const randomNumber = Math.floor(Math.random() * 100000) + 1
-
-        this.eventEmitter.emit(
-          ExplorerProviderEvents.LiquidationTransactionMined,
-          new LiquidationTransactionMinedEvent(request.loanToken, txHash)
-        )
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject)
@@ -1263,24 +1339,81 @@ export class ExplorerProvider {
       result = new BigNumber(0)
     } else if (asset === Asset.ETH) {
       // get eth (wallet) balance
-      result = await this.getEthBalance()
+      result = (await this.getEthBalance()).div(10 ** 18)
     } else {
       // get erc20 token balance
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
+      const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
       const assetErc20Address = this.getErc20AddressOfAsset(asset)
       if (assetErc20Address) {
         result = await this.getErc20BalanceOfUser(assetErc20Address, account)
-        result = result.multipliedBy(10 ** (18 - precision))
+        result = result.div(10 ** decimals)
       }
     }
 
     return result
   }
+
+  private getLoanParams = async (
+    asset: Asset,
+    collateralAsset: Asset,
+    platform: Platform
+  ): Promise<IParamRowProps | null> => {
+    if (!this.contractsSource) {
+      return null
+    }
+    const iToken = await this.contractsSource.getITokenContract(asset)
+    const iBZxContract = await this.contractsSource.getiBZxContract()
+    const collateralTokenAddress =
+      AssetsDictionary.assets
+        .get(collateralAsset)!
+        .addressErc20.get(this.web3ProviderSettings.networkId) || ''
+    if (!iToken || !collateralTokenAddress || !iBZxContract) return null
+    // @ts-ignore
+    const id = new BigNumber(
+      Web3Utils.soliditySha3(collateralTokenAddress, platform === Platform.Torque) || 0
+    )
+    const loanId = await iToken.loanParamsIds.callAsync(id)
+    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
+    const result = {
+      loanId: loanParams[0],
+      principal: loanParams[3],
+      collateral: loanParams[4],
+      platform: platform,
+      initialMargin: loanParams[5].div(10 ** 18),
+      maintenanceMargin: loanParams[6].div(10 ** 18),
+      liquidationPenalty: new BigNumber(0)
+    } as IParamRowProps
+    return result
+  }
+  public getFulcrumParams = async (): Promise<IParamRowProps[] | undefined> => {
+    const params: IParamRowProps[] = []
+    const assets = Object.values(Asset).filter((key) => key !== Asset.UNKNOWN)
+    const pairs: any[] = []
+    assets.forEach((asset) => {
+      assets.forEach((collateralAsset) => {
+        if (asset !== collateralAsset) {
+          pairs.push({
+            asset,
+            collateralAsset
+          })
+        }
+      })
+    })
+
+    pairs.forEach(async (pair) => {
+      const param = await this.getLoanParams(pair.asset, pair.collateralAsset, Platform.Fulcrum)
+      if (param) params.push(param)
+    })
+    //  const param = await this.getLoanParams(Asset.ETH, Asset.DAI, Platform.Fulcrum)
+    // param && params.push(param)
+    return Promise.all(params)
+  }
+
   public isETHAsset = (asset: Asset): boolean => {
     return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
   }
   public wethToEth = (asset: Asset): Asset => {
-    return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH ? Asset.ETH : asset
+    return asset === Asset.ETH || asset === Asset.WETH ? Asset.ETH : asset
   }
 }
 

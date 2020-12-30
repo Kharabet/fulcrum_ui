@@ -3,9 +3,11 @@ import { RequestTask } from '../../domain/RequestTask'
 import { TradeRequest } from '../../domain/TradeRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
 import { PositionType } from '../../domain/PositionType'
-import { Asset } from '../../domain/Asset'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
-import { erc20Contract } from '../../contracts/erc20'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 
 export class TradeBuyProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -178,7 +180,7 @@ export class TradeBuyProcessor {
               }
             )
       gasAmountBN = new BigNumber(gasAmount)
-        .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
+        .multipliedBy(FulcrumProvider.Instance.gasBufferCoeffForTrade)
         .integerValue(BigNumber.ROUND_UP)
     }
 

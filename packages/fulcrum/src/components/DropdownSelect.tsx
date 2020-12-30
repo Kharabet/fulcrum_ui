@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react'
 import SimpleBar from 'simplebar-react'
 import 'simplebar/dist/simplebar.min.css'
 
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { AssetDetails } from '../domain/AssetDetails'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
 
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { ReactComponent as SearchIcon } from '../assets/images/ic__search.svg'
@@ -96,8 +99,8 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        {asset.reactLogoSvg.render()} 
-        {props.selectedOption.baseToken} - {props.selectedOption.quoteToken}
+        {asset.reactLogoSvg.render()}
+        {props.selectedOption.baseToken}/{props.selectedOption.quoteToken}
       </div>
       <ul className="select-options">
         <div className="select-options__search">
@@ -123,7 +126,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
               key={i}
               onClick={onLiClick}>
               {AssetsDictionary.assets.get(option.baseToken)!.reactLogoSvg.render()}
-              {option.baseToken}-{option.quoteToken}
+              {option.baseToken}/{option.quoteToken}
             </li>
           ))}
         </SimpleBar>

@@ -6,12 +6,14 @@
 @import 'components/buttons';
 @import 'components/search';
 @import 'components/table';
+@import 'components/tabs';
 @import 'components/tvl';
 @import 'components/chart';
 @import 'components/on-chain-indicator';
 @import 'components/provider-menu';
 @import 'components/loader';
 @import 'components/circle-loader';
+@import 'components/tooltip';
 @import 'components/tx-animation';
 @import 'components/pagination';
 @import 'components/switch-wrapper';
@@ -19,6 +21,7 @@
 @import 'components/dialog';
 @import 'components/input-amount';
 @import 'components/chi-switch';
+@import 'components/clipboard';
 
 @import 'layout/footer';
 @import 'layout/header';

@@ -4,8 +4,8 @@ import { Route, Router, Switch } from 'react-router-dom'
 import configProviders from '../config/providers.json'
 import { ProviderType } from '../domain/ProviderType'
 import { Footer } from '../layout/Footer'
-import { Header } from '../layout/Header'
 import { LiquidationsPage } from '../pages/LiquidationsPage'
+import LoanParamsPage from '../pages/LoanParamsPage'
 import { MainPage } from '../pages/MainPage'
 import { SearchResultPage } from '../pages/SearchResultPage'
 import { StatsPage } from '../pages/StatsPage'
@@ -16,7 +16,6 @@ import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvent
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { Web3ReactProvider } from '@web3-react/core'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
@@ -74,7 +73,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this.doNetworkConnect()
   }
 
-  public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
+  public getLibrary = async (provider: any, connector: any): Promise<any> => {
     // console.log(provider)
     // handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)
@@ -133,6 +132,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 />
                 <Route path="/liquidations">
                   <LiquidationsPage
+                    isMobileMedia={this.state.isMobileMedia}
+                    doNetworkConnect={this.doNetworkConnect}
+                  />
+                </Route>
+                <Route path="/loan-params">
+                  <LoanParamsPage
                     isMobileMedia={this.state.isMobileMedia}
                     doNetworkConnect={this.doNetworkConnect}
                   />

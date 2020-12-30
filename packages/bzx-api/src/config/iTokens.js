@@ -1,18 +1,18 @@
 export const iTokens = [
   {
-    name: 'ethv1',
-    address: '0x77f973FCaF871459aa58cd81881Ce453759281bC',
-    erc20Address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    displayName: 'ETHv1',
-    iTokenName: 'iETHv1',
-    decimals: 18
-  },
-  {
     name: 'eth',
     address: '0xb983e01458529665007ff7e0cddecdb74b967eb6',
     erc20Address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     displayName: 'ETH',
     iTokenName: 'iETH',
+    decimals: 18
+  },
+  {
+    name: 'ethv1',
+    address: '0x77f973FCaF871459aa58cd81881Ce453759281bC',
+    erc20Address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    displayName: 'ETHv1',
+    iTokenName: 'iETHv1',
     decimals: 18
   },
   {
@@ -109,6 +109,22 @@ export const iTokens = [
     erc20Address: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
     displayName: 'AAVE',
     iTokenName: 'iAAVE',
+    decimals: 18
+  },
+  {
+    name: 'lrc',
+    address: '0x3da0e01472dee3746b4d324a65d7edfaeca9aa4f',
+    erc20Address: '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd',
+    displayName: 'LRC',
+    iTokenName: 'iLRC',
+    decimals: 18
+  },
+  {
+    name: 'comp',
+    address: '0x6d29903bc2c4318b59b35d97ab98ab9ec08ed70d',
+    erc20Address: '0xc00e94cb662c3520282e6f5717214004a7f26888',
+    displayName: 'COMP',
+    iTokenName: 'iCOMP',
     decimals: 18
   }
 ]

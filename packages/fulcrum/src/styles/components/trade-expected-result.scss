@@ -26,8 +26,11 @@
       line-height: 150%;
       text-align: left;
       display: flex;
+      &,
+      .expired & .value {
+        color: #939fac;
+      }
 
-      color: #939fac;
       .value {
         color: #1cd8c4;
       }

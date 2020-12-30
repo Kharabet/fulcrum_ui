@@ -13,6 +13,7 @@ import { TorusConnector } from '@web3-react/torus-connector'
 import fulcrumLogo from '../assets/images/fulcrum_logo.svg'
 
 import configProviders from '../config/providers.json'
+import { Web3ConnectionFactory } from './Web3ConnectionFactory'
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
     case 'mainnet':
@@ -30,10 +31,7 @@ const getNetworkIdByString = (networkName: string | undefined) => {
 const networkName = process.env.REACT_APP_ETH_NETWORK
 const networkId = getNetworkIdByString(networkName)
 
-const RPC_URL =
-  networkId === 42
-    ? `https://eth-${networkName}.alchemyapi.io/v2/${configProviders.Alchemy_ApiKey_kovan}`
-    : `https://eth-${networkName}.alchemyapi.io/v2/${configProviders.Alchemy_ApiKey}`
+const RPC_URL = Web3ConnectionFactory.getRPCUrl()
 
 const POLLING_INTERVAL = 3600000
 
@@ -61,7 +59,12 @@ export const walletlink = new WalletLinkConnector({
 export const ledger = new LedgerConnector({
   chainId: networkId,
   url: RPC_URL,
-  pollingInterval: POLLING_INTERVAL
+  pollingInterval: POLLING_INTERVAL,
+  accountFetchingConfigs: {
+    shouldAskForOnDeviceConfirmation: true,
+    numAddressesToReturn: 100,
+    addressSearchLimit: 1000
+  }
 })
 
 export const trezor = new TrezorConnector({
@@ -69,7 +72,15 @@ export const trezor = new TrezorConnector({
   url: RPC_URL,
   pollingInterval: POLLING_INTERVAL,
   manifestEmail: 'hello@bzx.network',
-  manifestAppUrl: window.location.origin
+  manifestAppUrl: window.location.origin,
+  config: {
+    networkId: networkId,
+    accountFetchingConfigs: {
+      shouldAskForOnDeviceConfirmation: true,
+      numAddressesToReturn: 100,
+      addressSearchLimit: 1000
+    }
+  }
 })
 
 // export const frame = new FrameConnector({ supportedChainIds: [1] })

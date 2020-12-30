@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import SimpleBar from 'simplebar-react'
 import 'simplebar/dist/simplebar.min.css'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { CollateralTokenSelectorItem } from './CollateralTokenSelectorItem'
 
 interface ICollateralTokenSelectorProps {
@@ -44,7 +44,9 @@ export class CollateralTokenSelector extends Component<
         // Asset.LEND,
         Asset.KNC,
         Asset.UNI,
-        Asset.AAVE
+        Asset.AAVE,
+        Asset.LRC,
+        Asset.COMP
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assets = [Asset.fWETH, Asset.USDC, Asset.WBTC]

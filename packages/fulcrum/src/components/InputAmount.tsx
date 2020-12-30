@@ -1,6 +1,7 @@
 import React, { Component, ChangeEvent } from 'react'
 
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { TradeType } from '../domain/TradeType'
 import { Preloader } from './Preloader'
 

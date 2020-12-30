@@ -1,8 +1,11 @@
 import React, { Component, MouseEvent } from 'react'
 import { ReactComponent as IcTokenSelectorDown } from '../assets/images/ic___token_selector___down.svg'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 
 import '../styles/components/collateral-token-button.scss'
 

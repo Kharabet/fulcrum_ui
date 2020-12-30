@@ -48,8 +48,11 @@ var TorusConnector = /*#__PURE__*/function (_AbstractConnector) {
 
       var _temp4 = function () {
         if (!_this3.torus) {
-          return Promise.resolve(import('@toruslabs/torus-embed')).then(function (_ref2) {
-            var Torus = _ref2["default"];
+          return Promise.resolve(import('@toruslabs/torus-embed').then(function (m) {
+            var _m$default;
+
+            return (_m$default = m == null ? void 0 : m["default"]) != null ? _m$default : m;
+          })).then(function (Torus) {
             _this3.torus = new Torus(_this3.constructorOptions);
             return Promise.resolve(_this3.torus.init(_this3.initOptions)).then(function () {});
           });
@@ -95,23 +98,15 @@ var TorusConnector = /*#__PURE__*/function (_AbstractConnector) {
   };
 
   _proto.deactivate = function deactivate() {
-    try {
-      var _this11 = this;
-
-      return Promise.resolve(_this11.torus.cleanUp()).then(function () {
-        _this11.torus = undefined;
-      });
-    } catch (e) {
-      return Promise.reject(e);
-    }
+    return Promise.resolve();
   };
 
   _proto.close = function close() {
     try {
-      var _this13 = this;
+      var _this11 = this;
 
-      return Promise.resolve(_this13.torus.logout()).then(function () {
-        _this13.emitDeactivate();
+      return Promise.resolve(_this11.torus.cleanUp()).then(function () {
+        _this11.emitDeactivate();
       });
     } catch (e) {
       return Promise.reject(e);

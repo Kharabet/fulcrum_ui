@@ -37,9 +37,15 @@ a {
 
 .labels-container {
   margin-top: 35px;
+  flex-wrap: wrap;
+  @media screen and (max-width: $width-max-sm) {
+    overflow: auto;
+    flex-wrap: nowrap;
+  }
   .label-chart {
     display: flex;
     align-items: center;
+    margin-bottom: 10px;
     @media screen and (min-width: $width-min-sm) {
       &:not(:last-child) {
         margin-right: 35px;

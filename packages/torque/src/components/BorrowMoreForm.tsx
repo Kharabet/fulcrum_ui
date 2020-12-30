@@ -3,7 +3,7 @@ import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { Subject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { TorqueProvider } from '../services/TorqueProvider'
@@ -99,6 +99,11 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       sliderValue = sliderMin
     }
 
+    const collateralizationTooLow = loan.collateralizedPercent
+      .times(100)
+      .plus(100)
+      .lte(this.state.borrowMoreColalterizationMin)
+
     return (
       <form className="borrow-more-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
@@ -133,7 +138,12 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
           </div>
 
           <Rail sliderValue={sliderValue} sliderMax={sliderMax} />
-
+          {collateralizationTooLow && (
+            <div className="borrow-more-loan-form__insufficient-balance borrow-more-loan-form__error">
+              A minimum of {this.state.borrowMoreColalterizationMin.toFixed(2)}% collaterilization
+              is requited to borrow
+            </div>
+          )}
           <div className="input-container mt-30">
             <div className="input-row">
               <span className="asset-icon">{assetDetails.reactLogoSvg.render()}</span>
@@ -152,18 +162,15 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
         <ChiSwitch />
         <section className="dialog-actions">
           <div className="borrow-more-loan-form__actions-container">
-            {loan.collateralizedPercent
-              .times(100)
-              .plus(100)
-              .lte(this.state.borrowMoreColalterizationMin) ||
-            !Number(this.state.inputAmountText) ? (
+            {!Number(this.state.inputAmountText) ? (
               <button type="button" className="btn btn-size--small" onClick={this.props.onDecline}>
                 Close
               </button>
             ) : (
               <button
                 type="submit"
-                className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+                className="btn btn-size--small"
+                disabled={this.state.didSubmit || collateralizationTooLow}>
                 {this.state.didSubmit ? 'Submitting...' : 'Borrow'}
               </button>
             )}
@@ -175,7 +182,19 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (this.state.borrowAmount.lte(0)) {
+
+    const loan =
+      this.state.inputAmountText === ''
+        ? this.props.loanOrderState
+        : this.state.borrowMoreLoanOrderState
+    if (
+      this.state.borrowAmount.lte(0) ||
+      loan.collateralizedPercent
+        .times(100)
+        .plus(100)
+        .lte(this.state.borrowMoreColalterizationMin) ||
+      !Number(this.state.inputAmountText)
+    ) {
       return
     }
 

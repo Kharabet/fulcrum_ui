@@ -1,11 +1,15 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { Preloader } from './Preloader'
 import { PositionEventsGroup } from '../domain/PositionEventsGroup'
 import { PositionHistoryData } from '../domain/PositionHistoryData'
+import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
+import { RolloverEvent } from '../domain/events/RolloverEvent'
+import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
 
 export interface IHistoryTokenGridRowProps {
   eventsGroup: PositionEventsGroup
@@ -204,21 +208,21 @@ export class HistoryTokenGridRow extends Component<
               <span>{event.action.replace(event.loanId, '')}</span>
             </div>
             <div
-              title={event.positionValue.toFixed(18)}
+              title={event.positionValue.toFixed()}
               className="history-token-grid-row-inner__col history-token-grid-row-inner__col-position">
               <span className="label">Position</span>
-              {event.positionValue.toFixed(4)}
+              {event.positionValue.gt(0) ? event.positionValue.toFixed(4) : '-'}
             </div>
             <div className="history-token-grid-row-inner__col history-token-grid-row-inner__col-asset-price">
               <span className="label">Trade Price</span>
               {!this.state.isLoading ? (
-                event.action !== 'Withdrew' && event.action !== 'Deposited' ? (
+                event.action === 'Deposited' || event.action === 'Withdrew' || event.action === 'Rollovered' ? (
+                  '-'
+                ) : (
                   <React.Fragment>
                     <span className="sign-currency">$</span>
                     {event.tradePrice.toFixed(2)}
                   </React.Fragment>
-                ) : (
-                  '-'
                 )
               ) : (
                 <Preloader width="74px" />
@@ -229,13 +233,13 @@ export class HistoryTokenGridRow extends Component<
               className="history-token-grid-row-inner__col history-token-grid-row-inner__col-position-value">
               <span className="label">Value</span>
               {!this.state.isLoading ? (
-                event.action !== 'Withdrew' && event.action !== 'Deposited' ? (
+                event.action === 'Deposited' || event.action === 'Withdrew' || event.action === 'Rollovered'  ? (
+                  '-'
+                ) : (
                   <React.Fragment>
                     <span className="sign-currency">$</span>
                     {event.value.toFixed(2)}
                   </React.Fragment>
-                ) : (
-                  '-'
                 )
               ) : (
                 <Preloader width="74px" />
@@ -315,7 +319,7 @@ export class HistoryTokenGridRow extends Component<
             title={this.props.eventsGroup.loanId}
             className="history-token-grid-row__col history-token-grid-row__col-token-asset">
             <span className="label">Pair</span>
-            {this.props.eventsGroup.baseToken}-{this.props.eventsGroup.quoteToken}
+            {this.props.eventsGroup.baseToken}/{this.props.eventsGroup.quoteToken}
           </div>
           <div className="history-token-grid-row__col history-token-grid-row__col-type">
             <span className="label">Type</span>
@@ -330,20 +334,20 @@ export class HistoryTokenGridRow extends Component<
             title={latestEvent.positionValue.toFixed(18)}
             className="history-token-grid-row__col history-token-grid-row__col-position">
             <span className="label">Position</span>
-            {latestEvent.positionValue.toFixed(4)}
+            {latestEvent.positionValue.gt(0) ? latestEvent.positionValue.toFixed(4) : '-'}
           </div>
           <div
             title={latestEvent.tradePrice.toFixed(18)}
             className="history-token-grid-row__col history-token-grid-row__col-asset-price">
             <span className="label">Trade Price</span>
             {!this.state.isLoading ? (
-              latestEvent.action !== 'Withdrew' && latestEvent.action !== 'Deposited' ? (
+              latestEvent.action === 'Deposited' || latestEvent.action === 'Withdrew' || latestEvent.action === 'Rollovered' ? (
+                '-'
+              ) : (
                 <React.Fragment>
                   <span className="sign-currency">$</span>
                   {latestEvent.tradePrice.toFixed(2)}
                 </React.Fragment>
-              ) : (
-                '-'
               )
             ) : (
               <Preloader width="74px" />
@@ -364,13 +368,13 @@ export class HistoryTokenGridRow extends Component<
             className="history-token-grid-row__col history-token-grid-row__col-position-value">
             <span className="label">Value</span>
             {!this.state.isLoading ? (
-              latestEvent.action !== 'Withdrew' && latestEvent.action !== 'Deposited' ? (
+              latestEvent.action === 'Deposited' || latestEvent.action === 'Withdrew' || latestEvent.action === 'Rollovered' ? (
+                '-'
+              ) : (
                 <React.Fragment>
                   <span className="sign-currency">$</span>
                   {latestEvent.value.toFixed(2)}
                 </React.Fragment>
-              ) : (
-                '-'
               )
             ) : (
               <Preloader width="74px" />

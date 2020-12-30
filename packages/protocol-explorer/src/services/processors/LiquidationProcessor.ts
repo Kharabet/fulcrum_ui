@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
-import { erc20Contract } from '../../contracts/erc20'
-import { Asset } from '../../domain/Asset'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
+import Asset from 'bzx-common/src/assets/Asset'
 import { LiquidationRequest } from '../../domain/LiquidationRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { ExplorerProvider } from '../ExplorerProvider'
@@ -22,7 +22,11 @@ export class LiquidationProcessor {
     if (!iBZxContract) {
       throw new Error('No bzxContract contract available!')
     }
-    const taskRequest: LiquidationRequest = task.request
+    const taskRequest = task.request
+    
+    if (!(taskRequest instanceof LiquidationRequest)) {
+      throw new Error('Incorrect request type!')
+    }
     let sendAmountForValue = new BigNumber(0)
 
     if (taskRequest.loanToken === Asset.WETH || taskRequest.loanToken === Asset.ETH) {
