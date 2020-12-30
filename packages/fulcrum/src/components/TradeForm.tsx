@@ -86,6 +86,7 @@ interface ITradeFormState {
   depositTokenBalance: BigNumber
   collateralToPrincipalRate: BigNumber
   estimatedFee: BigNumber
+  estimatedFeeChi: BigNumber
 
   baseTokenPrice: BigNumber
   returnedAsset: Asset
@@ -126,6 +127,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       collateralToPrincipalRate: new BigNumber(0),
       depositTokenBalance: new BigNumber(0),
       estimatedFee: new BigNumber(0),
+      estimatedFeeChi: new BigNumber(0),
       maybeNeedsApproval: false,
       liquidationPrice: liquidationPrice,
       exposureValue: exposureValue,
@@ -274,7 +276,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         maxTradeValue,
         interestRate: interestRate,
         liquidationPrice: liquidationPrice,
-    //    estimatedFee: estimatedFee,
+        //    estimatedFee: estimatedFee,
         baseTokenPrice,
         exposureValue: exposureValue,
         isExposureLoading: false,
@@ -339,7 +341,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       depositToken
     )
-  
+
     this._isMounted && this.setState({ depositTokenBalance })
   }
 
@@ -393,11 +395,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
           ? `Slippage:`
           : ''
-      if (this.props.positionType === PositionType.SHORT) {
-        submitButtonText = `SHORT`
-      } else {
-        submitButtonText = `LONG`
-      }
+          
+        submitButtonText = `BUY / ${this.props.positionType}`
+        
     } else {
       amountMsg =
         this.state.ethBalance &&
@@ -406,7 +406,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
           ? `Slippage:`
           : ''
-      submitButtonText = `CLOSE`
+      submitButtonText = `CLOSE / ${this.props.positionType}`
     }
     if (this.state.isExpired) {
       amountMsg = 'Price has changed'
@@ -505,23 +505,50 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             ) : null}
           </div>
           <div className="trade-form__row-container">
-            <ChiSwitch />
-
-            <div className="gas-limits-container">
-              Gas limits are overestimated
+            <div className="trade-form__label-container">
+              Use CHI gas token
               <IconInfo
                 className="tooltip__icon"
                 data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
-                data-for="gas-limits-tooltip"
+                data-for="chi-tooltip"
+              />
+              <ReactTooltip id="chi-tooltip" className="tooltip__info" place="top" effect="solid" />
+            </div>
+            <ChiSwitch />
+          </div>
+
+          <div className="trade-form__row-container">
+            <div className="trade-form__label-container">Slippage</div>
+            <div className="trade-form__value-container" title={this.state.slippageRate.toFixed()}>
+              {this.state.slippageRate.toFixed(1)}%
+            </div>
+          </div>
+          <div className="trade-form__row-container">
+            <div className="trade-form__label-container">Estimated Fee</div>
+            <div className="trade-form__value-container" title={this.state.estimatedFee.toFixed()}>
+              ~${this.state.estimatedFee.toFixed(2)}
+            </div>
+          </div>
+          <div className="trade-form__row-container">
+            <div className="trade-form__label-container">
+              Estimated Fee with CHI Token
+              <IconInfo
+                className="tooltip__icon"
+                data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
+                data-for="chi-estimated"
               />
               <ReactTooltip
-                id="gas-limits-tooltip"
+                id="chi-estimated"
                 className="tooltip__info"
                 place="top"
                 effect="solid"
               />
             </div>
+            <div className="trade-form__value-container" title={this.state.estimatedFeeChi.toFixed()}>
+              ~${this.state.estimatedFeeChi.toFixed(2)}
+            </div>
           </div>
+
           <div className="trade-form__actions-container">
             {this.state.isExpired ? (
               <button onClick={this.onUpdateClick} className={`trade-form__submit-button update`}>
@@ -546,37 +573,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             )}
           </div>
           {this.props.tradeType === TradeType.BUY ? (
-            <div className="trade-how-it-works-container">
-              {/* <div>Slippage {this.state.slippageRate.toFixed()}</div>
-              <div>Estimated Fee {this.state.estimatedFee.toFixed()}</div> */}
-
-              <CollapsibleContainer
-                titleOpen="What is this?"
-                titleClose="What is this?"
-                isTransparent={false}>
-                <div className="trade-form__how-it-works">
-                  <div className="hiw-icon">
-                    <QuestionIcon />
-                  </div>
-                  <div className="hiw-content">
-                    You are opening {this.props.leverage}x {this.props.positionType}{' '}
-                    {this.state.assetDetails.displayName} position. This will borrow{' '}
-                    {this.props.positionType === PositionType.LONG
-                      ? this.props.quoteToken
-                      : this.state.assetDetails.displayName}{' '}
-                    from a Fulcrum lending pool and that{' '}
-                    {this.props.positionType === PositionType.LONG
-                      ? this.props.quoteToken
-                      : this.state.assetDetails.displayName}{' '}
-                    is swapped into{' '}
-                    {this.props.positionType === PositionType.LONG
-                      ? this.state.assetDetails.displayName
-                      : this.props.quoteToken}{' '}
-                    using an on-chain DEX.
-                  </div>
-                </div>
-              </CollapsibleContainer>
-            </div>
+            <div className="trade-how-it-works-container"></div>
           ) : null}
         </div>
       </form>

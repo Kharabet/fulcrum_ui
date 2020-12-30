@@ -6,7 +6,7 @@
   @include clearfix();
   display: flex;
   box-sizing: border-box;
-  width: 575px;
+  width: 600px;
   min-height: 285px;
   background-color: #444e5a;
   position: relative;
@@ -96,6 +96,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
+    padding: 0 15px;
     margin-bottom: 15px;
     .gas-limits-container {
       padding-top: 10px;
@@ -112,11 +113,8 @@
   }
 
   &__actions-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-
-    margin-top: auto;
+    margin-top: 10px;
+    margin-bottom: 25px;
   }
   &__kv-container {
     display: flex;
@@ -159,7 +157,14 @@
       margin-left: 2px;
     }
   }
-
+  &__row-container {
+    font-weight: 600;
+    font-size: 14px;
+    color: #a2abb8;
+  }
+  &__value-container {
+    color: #ffffff;
+  }
   .trade-how-it-works-container {
     margin-top: -30px;
     margin-bottom: 10px;
@@ -278,21 +283,16 @@
   &__submit-button {
     display: block;
     cursor: pointer;
+    width: 100%;
     border: 0;
     border-radius: 100px;
     color: #ffffff;
     text-transform: uppercase;
     outline: none;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
-    padding: 12px 25px;
-    &--buy {
-      z-index: 2;
-      background-color: #407bf7;
-      &:hover {
-        background-color: #5b88ff;
-      }
-    }
+    padding: 18px 25px;
+    &--buy,
     &.update {
       z-index: 2;
       background-color: #00c0ab;
@@ -300,6 +300,7 @@
         background-color: #33dfcc;
       }
     }
+
     &--sell {
       background-color: #ff5353;
       &:hover {
@@ -368,22 +369,22 @@
       color: #495460;
     }
   }
-  .rc-slider{
+  .rc-slider {
     margin-top: 30px;
     margin-bottom: 56px;
   }
   .rc-slider-handle {
-  &:after {
-    content: attr(aria-valuenow) " %";
-    position: absolute;
-    color: #33DFCC;
-    font-weight: 600;
-     font-size: 12px;
-    top: 34px;
-    width: 40px;
-    height: 16px;
+    &:after {
+      content: attr(aria-valuenow) ' %';
+      position: absolute;
+      color: #33dfcc;
+      font-weight: 600;
+      font-size: 12px;
+      top: 34px;
+      width: 40px;
+      height: 16px;
+    }
   }
-}
 }
 
 // .trade-form__form-info {
@@ -548,13 +549,6 @@
       margin-bottom: 20px;
     }
 
-    &__actions-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-
-      margin-top: 0;
-    }
     &__position-type-container {
       margin-bottom: 1rem;
     }
@@ -682,7 +676,7 @@
 
       cursor: pointer;
       border: 0;
-      height: 2.5rem;
+      // height: 2.5rem;
       //width: 6.5rem;
       padding-left: 1rem;
       padding-right: 1rem;
