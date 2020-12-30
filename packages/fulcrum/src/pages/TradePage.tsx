@@ -100,7 +100,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.LRC,
         Asset.COMP
       ]
-      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT]
+      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.WBTC]
     }
     this.stablecoins = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.SUSD]
     const activePair = window.localStorage.getItem('activePair') || undefined

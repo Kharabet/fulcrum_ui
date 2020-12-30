@@ -231,6 +231,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   public render() {
+    const precisionDigits = this.props.quoteToken === Asset.WBTC ? 4 : 2
     return (
       <React.Fragment>
         {this.props.isMobileMedia && (
@@ -301,8 +302,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             this.state.baseTokenPrice.toFixed() !== 'Infinity' &&
             !this.state.isLoading ? (
               <React.Fragment>
-                <div title={`$${this.state.baseTokenPrice.toFixed(18)}`}>
-                  {this.state.baseTokenPrice.toFixed(2)}
+                <div title={`${this.state.baseTokenPrice.toFixed(18)}`}>
+                  {this.state.baseTokenPrice.toFixed(precisionDigits)}
                 </div>
               </React.Fragment>
             ) : (
@@ -310,13 +311,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             )}
           </div>
           <div
-            title={`$${this.state.liquidationPrice.toFixed(18)}`}
+            title={`${this.state.liquidationPrice.toFixed(18)}`}
             className="trade-token-grid-row__col-liquidation">
             {this.props.isMobileMedia && (
               <span className="trade-token-grid-row__title">Liquidation Price</span>
             )}
             {this.state.liquidationPrice.gt(0) && !this.state.isLoading ? (
-              <React.Fragment>{this.state.liquidationPrice.toFixed(2)}</React.Fragment>
+              <React.Fragment>{this.state.liquidationPrice.toFixed(precisionDigits)}</React.Fragment>
             ) : (
               <Preloader width="74px" />
             )}

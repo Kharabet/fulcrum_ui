@@ -186,6 +186,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   }
 
   public render() {
+    const precisionDigits = this.props.quoteToken === Asset.WBTC ? 4 : 2 
     const remainingDays = this.props.loan.loanData.interestDepositRemaining.div(
       this.props.loan.loanData.interestOwedPerDay
     )
@@ -272,7 +273,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <span className="own-token-grid-row__asset">{this.props.quoteToken}</span>
           <br />
           {!this.state.isLoading ? (
-            <React.Fragment>{this.props.openPrice.toFixed(2)}</React.Fragment>
+            <React.Fragment>{this.props.openPrice.toFixed(precisionDigits)}</React.Fragment>
           ) : (
             <Preloader width="74px" />
           )}
@@ -285,7 +286,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <br />
 
           {!this.state.isLoading ? (
-            <React.Fragment>{this.props.liquidationPrice.toFixed(2)}</React.Fragment>
+            <React.Fragment>{this.props.liquidationPrice.toFixed(precisionDigits)}</React.Fragment>
           ) : (
             <Preloader width="74px" />
           )}
