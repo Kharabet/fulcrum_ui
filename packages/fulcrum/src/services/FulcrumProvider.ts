@@ -3245,7 +3245,7 @@ console.log(err, added);
     }
   }
 
-  public async getTradeEstimatedGas(request: TradeRequest) {
+  public async getTradeEstimatedGas(request: TradeRequest, isGasTokenEnabled: boolean) {
     let result = new BigNumber(0)
     const account = this.getCurrentAccount()
     if (!this.contractsSource || !account || !request.amount) return result
@@ -3256,8 +3256,6 @@ console.log(err, added);
     const collateralToken = isLong ? request.asset : request.quoteToken
     const depositToken = request.depositToken
 
-    const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-    const ChiTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
     const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18
     const amountInBaseUnits = new BigNumber(
       request.amount.multipliedBy(10 ** decimals).toFixed(0, 1)
@@ -3287,7 +3285,7 @@ console.log(err, added);
       if (!tokenContract) return result
       try {
         gasAmount =
-          isGasTokenEnabled && ChiTokenBalance.gt(0)
+          isGasTokenEnabled
             ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
                 '0x0000000000000000000000000000000000000000000000000000000000000000',
                 new BigNumber(request.leverage),

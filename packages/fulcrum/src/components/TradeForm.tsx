@@ -258,17 +258,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.state.depositToken
     )
-    // tradeRequest.amount = depositTokenBalance.div(10000)
-    // const gasPrice = await FulcrumProvider.Instance.gasPrice()
-    // const rate = await FulcrumProvider.Instance.getSwapToUsdRate(Asset.ETH)
-    // const estimatedFee = await FulcrumProvider.Instance.getTradeEstimatedGas(tradeRequest).then(
-    //   (result) => {
-    //     return result
-    //       .times(gasPrice)
-    //       .div(10 ** 18)
-    //       .times(rate)
-    //   }
-    // )
+
+    await this.setEstimatedFee(tradeRequest)
+
     this._isMounted &&
       this.setState({
         ...this.state,
@@ -276,7 +268,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         maxTradeValue,
         interestRate: interestRate,
         liquidationPrice: liquidationPrice,
-        //    estimatedFee: estimatedFee,
         baseTokenPrice,
         exposureValue: exposureValue,
         isExposureLoading: false,
@@ -345,6 +336,31 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this._isMounted && this.setState({ depositTokenBalance })
   }
 
+  private async setEstimatedFee(tradeRequest: TradeRequest) {
+    const gasPrice = await FulcrumProvider.Instance.gasPrice()
+    const rate = await FulcrumProvider.Instance.getSwapToUsdRate(Asset.ETH)
+    const estimatedFee = await FulcrumProvider.Instance.getTradeEstimatedGas(
+      tradeRequest,
+      false
+    ).then((result) => {
+      return result
+        .times(gasPrice)
+        .div(10 ** 18)
+        .times(rate)
+    })
+    const estimatedFeeChi = await FulcrumProvider.Instance.getTradeEstimatedGas(
+      tradeRequest,
+      true
+    ).then((result) => {
+      return result
+        .times(gasPrice)
+        .div(10 ** 18)
+        .times(rate)
+    })
+
+    this._isMounted && this.setState({ estimatedFee, estimatedFeeChi })
+  }
+
   public async componentDidUpdate(
     prevProps: Readonly<ITradeFormProps>,
     prevState: Readonly<ITradeFormState>,
@@ -358,6 +374,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
     if (this.state.depositToken !== prevState.depositToken) {
       await this.setDepositTokenBalance(this.state.depositToken)
+      await this.derivedUpdate()
     }
     if (
       this.props.tradeType !== prevProps.tradeType ||
@@ -395,9 +412,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
           ? `Slippage:`
           : ''
-          
-        submitButtonText = `BUY / ${this.props.positionType}`
-        
+
+      submitButtonText = `BUY / ${this.props.positionType}`
     } else {
       amountMsg =
         this.state.ethBalance &&
@@ -544,7 +560,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 effect="solid"
               />
             </div>
-            <div className="trade-form__value-container" title={this.state.estimatedFeeChi.toFixed()}>
+            <div
+              className="trade-form__value-container"
+              title={this.state.estimatedFeeChi.toFixed()}>
               ~${this.state.estimatedFeeChi.toFixed(2)}
             </div>
           </div>
