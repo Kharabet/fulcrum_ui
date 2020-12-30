@@ -24,6 +24,7 @@ import usdt_logo, { ReactComponent as USDTLogo } from './images/ic_token_usdt.sv
 import weth_logo, { ReactComponent as WETHLogo } from './images/ic_token_weth.svg'
 import yfi_logo, { ReactComponent as YFILogo } from './images/ic_token_yfi.svg'
 import zrx_logo, { ReactComponent as ZRXLogo } from './images/ic_token_zrx.svg'
+import vbzrx_logo, { ReactComponent as vBZRXLogo } from './images/ic_token_vbzrx.svg'
 
 export default class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
@@ -313,6 +314,21 @@ export default class AssetsDictionary {
           [1, '0x56d811088235F11C8920698a204A5010a788f4b3'],
           [3, ''],
           [42, '']
+        ])
+      )
+    ],
+    [
+      Asset.vBZRX,
+      new AssetDetails(
+        'vBZRX',
+        18,
+        vbzrx_logo,
+        vBZRXLogo,
+        '#0056D7',
+        '#D8D3FF',
+        new Map<number, string | null>([
+          [1, '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F'],
+          [42, '0x6F8304039f34fd6A6acDd511988DCf5f62128a32']
         ])
       )
     ],

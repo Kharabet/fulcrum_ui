@@ -86,7 +86,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     super(props)
     if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.baseTokens = [Asset.fWETH, Asset.WBTC]
-      this.quoteTokens = [Asset.USDC]
+      this.quoteTokens = [Asset.USDC, Asset.WBTC]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
       // this.baseTokens = [
       // ];
@@ -103,7 +103,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.LRC,
         Asset.COMP
       ]
-      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT]
+      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.WBTC]
     }
     this.stablecoins = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.SUSD]
     const activePair = window.localStorage.getItem('activePair') || undefined
@@ -118,7 +118,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTradeModalOpen: false,
       activeTokenGridTab: TokenGridTab.Chart,
       tradeType: TradeType.BUY,
-      // defaultquoteToken: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       isManageCollateralModalOpen: false,
@@ -855,6 +854,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       events.sort((a: any, b: any) => b.timeStamp.getTime() - a.timeStamp.getTime()),
       'loanId'
     )
+
+    for (const loanId of Object.keys(groupedEvents)){
+      const eventsById = groupedEvents[loanId];
+      const isContainTradeEvent = eventsById.some((e: any) => e instanceof TradeEvent) 
+      if (!isContainTradeEvent)
+      {
+        delete groupedEvents[loanId]
+      }
+    }
     const historyEvents = { groupedEvents, earnRewardEvents, payTradingFeeEvents }
     ;(await this._isMounted) &&
       this.setState({ ...this.state, historyRowsData: [], historyEvents: historyEvents })
