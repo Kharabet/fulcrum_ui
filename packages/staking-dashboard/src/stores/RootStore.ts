@@ -4,6 +4,21 @@ import StakingStore from './StakingStore'
 import UIStore from './UIStore'
 import Web3Connection from './Web3Connection'
 
+function getErrorStackMessages (error: any, message = ''): string {
+  console.log(error.message)
+  if (error.message) {
+    message += error.message
+    if (error.code) {
+      message += ` (${error.code})`
+    }
+    message += '\n'
+  }
+  if (!error.data) {
+    return message
+  }
+  return getErrorStackMessages(error.data, message)
+}
+
 export default class RootStore {
   public stakingStore: StakingStore
   public stakingProvider: StakingProvider
@@ -11,11 +26,27 @@ export default class RootStore {
   public uiStore: UIStore
   public etherscanURL = ''
 
+  public get appError (): {error: any, stackMessages: string} | null {
+    // TODO: fix typescript any
+    const error = this.stakingStore.error
+    if (error) {
+      return {
+        error,
+        stackMessages: getErrorStackMessages(error)
+      }
+    }
+    return null
+  }
+
   /**
    * Helper to assign multiple props values through a mobx action.
    */
   public assign(props: { [key: string]: any }) {
     Object.assign(this, props)
+  }
+
+  public clearError () {
+    this.stakingStore.clearError()
   }
 
   public init() {

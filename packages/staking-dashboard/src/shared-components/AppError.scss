@@ -1,0 +1,26 @@
+.app-error {
+  color: #ff4f4f;
+  position: fixed;
+  bottom: 15px;
+  background-color: #fff;
+  width: 100%;
+  padding: 24px;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 15px rgba(0,0,0,0.2);
+  right: 15px;
+  transform: translate3d(0, 200px, 0);
+  transition: transform 0.2s ease-out;
+}
+
+.app-error--visible {
+  @extend .app-error;
+  transform: translate3d(0, 0, 0);
+}
+
+.app-error__message {
+  width: 100%;
+  border-radius: 4px;
+  height: 60px;
+  padding: 5px;
+}

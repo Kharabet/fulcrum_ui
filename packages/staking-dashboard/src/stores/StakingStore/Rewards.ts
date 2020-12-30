@@ -35,6 +35,7 @@ export default class Rewards {
       this.set('rebateRewards', (await sp.getRebateRewards()).div(10 ** 18))
       return { userEarnings: this.userEarnings, rebateRewards: this.rebateRewards }
     } catch (err) {
+      err.title = 'Staking | Failed to get rewards'
       this.set('error', err)
     } finally {
       this.set('pending', false)

@@ -2,13 +2,14 @@ import { Web3ReactProvider } from '@web3-react/core'
 import React from 'react'
 import Intercom from 'react-intercom'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import AppError from 'shared-components/AppError'
+import Web3ReactExporter from 'shared-components/Web3ReactExporter'
 import appConfig from 'src/config/appConfig'
 import AppVM from './AppVM'
 import Footer from './Footer'
 import Header from './Header'
 import ProviderMenu from './ProviderMenu'
 import Staking from './Staking'
-import Web3ReactExporter from 'shared-components/Web3ReactExporter'
 
 export default function App({ vm }: { vm: AppVM }) {
   const { stakingProvider } = vm.rootStore
@@ -29,6 +30,7 @@ export default function App({ vm }: { vm: AppVM }) {
           </Switch>
         </>
       </Router>
+      <AppError rootStore={vm.rootStore}/>
       <Footer />
     </React.Fragment>
   )

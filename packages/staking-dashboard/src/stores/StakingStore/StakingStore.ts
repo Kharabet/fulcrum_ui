@@ -9,7 +9,7 @@ import Rewards from './Rewards'
 import UserBalances from './UserBalances'
 import TransactionStatus from './TransactionStatus'
 
-type stakingStoreProp = 'error' | 'transactionStatus'
+type stakingStoreProp = 'transactionStatus' | 'stakingError'
 
 export default class StakingStore {
   public rootStore: RootStore
@@ -19,7 +19,11 @@ export default class StakingStore {
   public userBalances: UserBalances
   public etherscanURL = ''
   public transactionStatus: TransactionStatus
-  public error: Error | null = null
+  public stakingError: Error | null = null
+
+  public get error () {
+    return this.stakingError || this.userBalances.error || this.rewards.error
+  }
 
   /**
    * Helper to set values through mobx actions.
@@ -35,6 +39,16 @@ export default class StakingStore {
     Object.assign(this, props)
   }
 
+  /**
+   * Reset error state to null for any model that might have an error.
+   * stakingStore.error computed value will be null as a result.
+   */
+  public clearError() {
+    this.stakingError = null
+    this.userBalances.error = null
+    this.rewards.error = null
+  }
+
   public async stake(
     tokenToStake: { bzrx: BigNumber; vbzrx: BigNumber; bpt: BigNumber },
     repAddress: string
@@ -48,7 +62,7 @@ export default class StakingStore {
       }
       return this.stakingProvider.stakeTokens(tokenToStake, repAddress)
     } catch (err) {
-      this.set('error', err)
+      this.set('stakingError', err)
       throw err // Rethrowing for now, until we have proper error handling for users
     }
   }
@@ -62,7 +76,7 @@ export default class StakingStore {
 
   public async syncData() {
     this.representatives.updateAll().catch((err) => {
-      this.set('error', err)
+      this.set('stakingError', err)
       console.error(err)
     })
     await this.userBalances.getUserBalances()

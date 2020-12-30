@@ -55,6 +55,7 @@ export default class UserBalances {
       this.set('pending', false)
     }
     catch (err) {
+      err.message = 'Failed to get balances ' + err.message + ' | '
       this.set('error', err)
       console.error(err)
     }
