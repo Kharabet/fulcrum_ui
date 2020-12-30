@@ -4,6 +4,7 @@ import { BZRXStakingInterimContract } from '../contracts/BZRXStakingInterim'
 import { erc20Contract } from '../contracts/erc20'
 import { iBZxContract } from '../contracts/iBZxContract'
 import { oracleContract } from '../contracts/oracle'
+import { StakingV1Contract } from '../contracts/stakingV1'
 
 const { appNetwork } = appConfig
 
@@ -12,10 +13,11 @@ export class ContractsSource {
 
   private static isInit = false
 
-  private static erc20Json: any
   private static BZRXStakingInterimJson: any
+  private static erc20Json: any
   private static iBZxJson: any
   private static oracleJson: any
+  private static stakingV1Json: any
 
   public networkId: number
   public canWrite: boolean
@@ -35,6 +37,7 @@ export class ContractsSource {
     ContractsSource.BZRXStakingInterimJson = await import(
       `./../assets/artifacts/${appNetwork}/BZRXStakingInterim.json`
     )
+    ContractsSource.stakingV1Json = await import(`./../assets/artifacts/${appNetwork}/stakingV1.json`)
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${appNetwork}/iBZx.json`)
     ContractsSource.oracleJson = await import(`./../assets/artifacts/${appNetwork}/oracle.json`)
 
@@ -75,6 +78,26 @@ export class ContractsSource {
         break
       case 42:
         address = '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a'
+        break
+    }
+
+    return address
+  }
+
+  public getStakingV1Address(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0xE7eD6747FaC5360f88a2EFC03E00d25789F69291'
+        break
+      case 3:
+        address = ''
+        break
+      case 4:
+        address = ''
+        break
+      case 42:
+        address = '0xE7eD6747FaC5360f88a2EFC03E00d25789F69291'
         break
     }
 
@@ -138,25 +161,6 @@ export class ContractsSource {
     return address
   }
 
-  public getConvertAddress(): string {
-    let address: string = ''
-    switch (this.networkId) {
-      case 1:
-        address = '0x266732e2fC94227C4EE5EC0E8394E1c05709f7DF'
-        break
-      case 3:
-        address = ''
-        break
-      case 4:
-        address = ''
-        break
-      case 42:
-        address = '0x6E7E8545BF1182695d5095D005Fdb1C0D46EB0b3'
-        break
-    }
-    return address
-  }
-
   public getBZRXStakingInterimAddress(): string {
     let address: string = ''
     switch (this.networkId) {
@@ -195,6 +199,15 @@ export class ContractsSource {
     )
   }
 
+  private async getStakingV1ContractRaw(): Promise<StakingV1Contract> {
+    await this.Init()
+    return new StakingV1Contract(
+      ContractsSource.stakingV1Json.abi,
+      this.getStakingV1Address().toLowerCase(),
+      this.provider
+    )
+  }
+
   private async getBZRXStakingInterimContractRaw(): Promise<BZRXStakingInterimContract> {
     await this.Init()
     return new BZRXStakingInterimContract(
@@ -217,4 +230,5 @@ export class ContractsSource {
   public getBZRXStakingInterimContract = _.memoize(this.getBZRXStakingInterimContractRaw)
   public getiBZxContract = _.memoize(this.getiBZxContractRaw)
   public getOracleContract = _.memoize(this.getOracleContractRaw)
+  public getStakingV1Contract = _.memoize(this.getStakingV1ContractRaw)
 }
