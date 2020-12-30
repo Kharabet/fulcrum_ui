@@ -121,7 +121,7 @@ export class HistoryTokenGridRow extends Component<
     const quoteToken = AssetsDictionary.assets.get(this.props.eventsGroup.quoteToken)!
     const baseToken = AssetsDictionary.assets.get(this.props.eventsGroup.baseToken)!
 
-    const numberDigits = this.props.eventsGroup.quoteToken === Asset.WBTC ? 4 : 2
+    const precisionDigits = this.props.eventsGroup.quoteToken === Asset.WBTC ? 4 : 2
 
     return (
       this.state.otherEvents &&
@@ -173,7 +173,7 @@ export class HistoryTokenGridRow extends Component<
                 ) : (
                   <React.Fragment>
                     {quoteToken.reactLogoSvg.render()}&nbsp;
-                    {event.tradePrice.toFixed(numberDigits)}
+                    {event.tradePrice.toFixed(precisionDigits)}
                   </React.Fragment>
                 )
               ) : (
@@ -192,7 +192,7 @@ export class HistoryTokenGridRow extends Component<
                 ) : (
                   <React.Fragment>
                     {quoteToken.reactLogoSvg.render()}&nbsp;
-                    {event.value.toFixed(numberDigits)}
+                    {event.value.toFixed(precisionDigits)}
                   </React.Fragment>
                 )
               ) : (
@@ -258,7 +258,7 @@ export class HistoryTokenGridRow extends Component<
       (latestEvent.payTradingFeeEvent &&
         AssetsDictionary.assets.get(latestEvent.payTradingFeeEvent!.token as Asset)!) ||
       undefined
-    const numberDigits = this.props.eventsGroup.quoteToken === Asset.WBTC ? 4 : 2
+    const precisionDigits = this.props.eventsGroup.quoteToken === Asset.WBTC ? 4 : 2
     return (
       <div>
         <div className="history-token-grid-row">
@@ -315,7 +315,7 @@ export class HistoryTokenGridRow extends Component<
               ) : (
                 <React.Fragment>
                   {quoteToken.reactLogoSvg.render()}&nbsp;
-                  {latestEvent.tradePrice.toFixed(numberDigits)}
+                  {latestEvent.tradePrice.toFixed(precisionDigits)}
                 </React.Fragment>
               )
             ) : (
@@ -344,7 +344,7 @@ export class HistoryTokenGridRow extends Component<
               ) : (
                 <React.Fragment>
                   {quoteToken.reactLogoSvg.render()}&nbsp;
-                  {latestEvent.value.toFixed(numberDigits)}
+                  {latestEvent.value.toFixed(precisionDigits)}
                 </React.Fragment>
               )
             ) : (

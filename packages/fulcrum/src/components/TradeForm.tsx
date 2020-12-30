@@ -29,7 +29,7 @@ import { InputAmount } from './InputAmount'
 import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
-import { TradeExpectedResult } from './TradeExpectedResult'
+import TradeExpectedResult from './TradeExpectedResult'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -90,7 +90,7 @@ interface ITradeFormState {
   depositTokenBalance: BigNumber
   collateralToPrincipalRate: BigNumber
 
-  baseTokenPrice: BigNumber
+  baseToQuoteTokenRate: BigNumber
   returnedAsset: Asset
   returnedAmount: BigNumber
   returnTokenIsCollateral: boolean
@@ -133,7 +133,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       exposureValue: exposureValue,
       isLoading: true,
       isExposureLoading: true,
-      baseTokenPrice: new BigNumber(0),
+      baseToQuoteTokenRate: new BigNumber(0),
       returnedAsset: props.baseToken,
       returnedAmount: new BigNumber(0),
       returnTokenIsCollateral: props.positionType === PositionType.LONG ? true : false,
@@ -183,7 +183,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.baseToken)
-    const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken)
+    const baseToQuoteTokenRate = await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(
       this.props.tradeType,
       this.props.baseToken,
@@ -269,7 +269,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         maxTradeValue,
         interestRate: interestRate,
         liquidationPrice: liquidationPrice,
-        baseTokenPrice,
+        baseToQuoteTokenRate,
         exposureValue: exposureValue,
         isExposureLoading: false,
         isLoading: false,
@@ -444,8 +444,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           <div className="trade-form__form-values-container">
             {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult
-                entryPrice={this.state.baseTokenPrice}
+                entryPrice={this.state.baseToQuoteTokenRate}
                 liquidationPrice={this.state.liquidationPrice}
+                quoteToken={this.props.quoteToken}
               />
             ) : null}
 
@@ -492,8 +493,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
             {this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult
-                entryPrice={this.state.baseTokenPrice}
+                entryPrice={this.state.baseToQuoteTokenRate}
                 liquidationPrice={this.state.liquidationPrice}
+                quoteToken={this.props.quoteToken}
               />
             ) : null}
           </div>
