@@ -1,0 +1,13 @@
+button {
+  cursor: pointer;
+}
+
+.btn--link {
+  border: 0;
+  background-color: transparent;
+  color: #276bfb;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

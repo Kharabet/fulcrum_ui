@@ -5,6 +5,7 @@
 @import 'base/typography';
 @import 'base/flex';
 @import 'base/modal';
+@import '../ui-framework/styles/index.scss';
 
 @import 'components/buttons';
 @import 'components/grid';
@@ -19,3 +20,4 @@
 @import 'layout/footer';
 
 @import 'layout/header';
+@import '../shared-components/AppError.scss';
