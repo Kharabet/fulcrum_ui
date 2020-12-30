@@ -264,11 +264,11 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         const timeStamp = event.timeStamp
         const txHash = event.txHash
         const payTradingFeeEvent = historyEvents.payTradingFeeEvents.find(
-          (e) => e.timeStamp.getTime() === timeStamp.getTime()
+          (e) => new BigNumber(e.timeStamp.getTime() - timeStamp.getTime()).abs().lte(100) 
         )
 
         const earnRewardEvent = historyEvents.earnRewardEvents.find(
-          (e) => e.timeStamp.getTime() === timeStamp.getTime()
+          (e) => new BigNumber(e.timeStamp.getTime() - timeStamp.getTime()).abs().lte(100)
         )
         if (event instanceof TradeEvent) {
           const action = 'Opened'
@@ -407,9 +407,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.depositAmount.div(10 ** depositTokenDecimals)
             tradePrice = new BigNumber(0)
           } else {
-            const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
-            const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
-            tradePrice = new BigNumber(swapRateQuoteToken).div(swapRateBaseToken)
+            tradePrice = new BigNumber(0)
             positionValue = event.depositAmount.div(10 ** depositTokenDecimals).times(tradePrice)
           }
 
@@ -437,9 +435,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.withdrawAmount.div(10 ** withdrawTokenDecimals)
             tradePrice = new BigNumber(0)
           } else {
-            const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
-            const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
-            tradePrice = new BigNumber(swapRateQuoteToken).div(swapRateBaseToken)
+            tradePrice = new BigNumber(0)
             positionValue = event.withdrawAmount.div(10 ** withdrawTokenDecimals).times(tradePrice)
           }
 
