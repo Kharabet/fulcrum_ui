@@ -6,12 +6,10 @@ import { HeaderLogo } from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
 import { HeaderMenuToggle } from './HeaderMenuToggle'
 import { InfoBlock } from '../components/InfoBlock'
-import { FooterMenu } from './FooterMenu'
-import { FooterVersion } from './FooterVersion'
 
 import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
 import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
-import { Footer } from './Footer'
+import Footer from './Footer'
 
 import siteConfig from '../config/SiteConfig.json'
 export interface IHeaderOpsProps {

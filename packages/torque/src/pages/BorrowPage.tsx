@@ -1,7 +1,7 @@
 import React, { RefObject, useState } from 'react'
 import AssetSelector from '../components/AssetSelector'
 import { BorrowDlg } from '../components/BorrowDlg'
-import { Footer } from '../layout/Footer'
+import Footer from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
 import { TorqueProvider } from '../services/TorqueProvider'
 
