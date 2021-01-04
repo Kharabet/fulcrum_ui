@@ -294,7 +294,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         </div>
         <div className="own-token-grid-row__col-collateral opacityIn">
           <span className="body-header">Collateral&nbsp;</span>
-          <span className="own-token-grid-row__asset">{this.props.quoteToken}</span>
+          <span className="own-token-grid-row__asset">{this.props.baseToken}</span>
           <br />
           <div>
           <div
