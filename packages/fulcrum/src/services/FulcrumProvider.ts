@@ -185,7 +185,7 @@ export class FulcrumProvider {
     try {
       response = localStorage.getItem(item) || ''
     } catch (e) {
-      console.error(e);
+      // console.log(e);
     }
     return response
   }
@@ -194,7 +194,7 @@ export class FulcrumProvider {
     try {
       localStorage.setItem(item, val)
     } catch (e) {
-      console.error(e);
+      // console.log(e);
     }
   }
 
@@ -287,7 +287,7 @@ export class FulcrumProvider {
       try {
         this.accounts = [sellectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch (e) {
-        console.error(e);
+        // console.log(e);
         this.accounts = []
       }
       if (this.accounts.length === 0) {
@@ -599,7 +599,7 @@ export class FulcrumProvider {
         try {
           swapRates = (await this.getSwapToUsdRateBatch(assets, Asset.DAI))[0]
         } catch (e) {
-          console.error(e);
+          //console.log(e);
         }
 
         //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
@@ -1124,7 +1124,7 @@ export class FulcrumProvider {
         )
         result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18)
       } catch (e) {
-        console.error(e);
+        // console.log(e);
         result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100)
       }
     }
@@ -1181,7 +1181,7 @@ export class FulcrumProvider {
         }
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       result = new BigNumber(500).multipliedBy(10 ** 9) // error default 60 gwei
     }
 
@@ -1757,7 +1757,7 @@ export class FulcrumProvider {
                   }
                 )
         } catch (e) {
-          console.error(e)
+          console.log(e)
         }
         console.log(result)
       }
@@ -2140,7 +2140,7 @@ export class FulcrumProvider {
           .dividedBy(10 ** 18)
           .multipliedBy(swapPriceData[1].dividedBy(10 ** 18)) // swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
-        console.error(e)
+        console.log(e)
         result = new BigNumber(0)
       }
     }
@@ -2852,7 +2852,7 @@ console.log(err, added);
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.error(e)
+        console.log(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -2886,7 +2886,7 @@ console.log(err, added);
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.error(e)
+        console.log(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -3114,7 +3114,7 @@ console.log(err, added);
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.error(e)
+        console.log(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -3146,7 +3146,7 @@ console.log(err, added);
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.error(e)
+        console.log(e)
       }
       task.processingEnd(false, false, e)
     } finally {

@@ -122,7 +122,7 @@ export class TradeSellProcessor {
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeffForTrade)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.error(e)
+        console.log(e)
         // throw e;
       }
     }
@@ -160,7 +160,7 @@ export class TradeSellProcessor {
 
       task.setTxHash(txHash)
     } catch (e) {
-      console.error(e)
+      console.log(e)
       // throw e;
     }
 

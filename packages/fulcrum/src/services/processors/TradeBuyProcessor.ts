@@ -103,7 +103,7 @@ export class TradeBuyProcessor {
         // Waiting for token allowance
         task.processingStepNext()
       } catch (e) {
-        console.error(e);
+        //console.log(e);
       }
     }
     //Submitting loan

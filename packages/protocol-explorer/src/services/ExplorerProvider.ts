@@ -1048,7 +1048,7 @@ export class ExplorerProvider {
           .dividedBy(10 ** 18)
           .multipliedBy(swapPriceData[1].dividedBy(10 ** 18)) // swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
-        console.error(e)
+        console.log(e)
         result = new BigNumber(0)
       }
     }
@@ -1189,7 +1189,7 @@ export class ExplorerProvider {
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.error(e)
+        console.log(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -1223,7 +1223,7 @@ export class ExplorerProvider {
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.error(e)
+        console.log(e)
       }
       task.processingEnd(false, false, e)
     } finally {
