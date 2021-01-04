@@ -1,3 +1,4 @@
+const webpack = require('webpack')
 const path = require('path')
 
 module.exports = {
@@ -26,7 +27,12 @@ module.exports = {
         }
       }
       return webpackConfig
-    }
+    },
+    plugins: [
+      new webpack.NormalModuleReplacementPlugin(/(.*)BUILD_APP_NETWORK(\.*)/, function (resource) {
+        resource.request = resource.request.replace(/BUILD_APP_NETWORK/, process.env.REACT_APP_ETH_NETWORK)
+      }),
+    ]
   },
   babel: {
     plugins: [

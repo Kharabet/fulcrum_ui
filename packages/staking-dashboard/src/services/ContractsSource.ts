@@ -1,47 +1,35 @@
 import _ from 'lodash'
-import appConfig from '../config/appConfig'
 import { BZRXStakingInterimContract } from '../contracts/BZRXStakingInterim'
 import { erc20Contract } from '../contracts/erc20'
 import { iBZxContract } from '../contracts/iBZxContract'
 import { oracleContract } from '../contracts/oracle'
 import { StakingV1Contract } from '../contracts/stakingV1'
-
-const { appNetwork } = appConfig
+// @ts-ignore
+import erc20Json from '../assets/artifacts/BUILD_APP_NETWORK/erc20.json'
+// @ts-ignore
+import BZRXStakingInterimJson from '../assets/artifacts/BUILD_APP_NETWORK/BZRXStakingInterim.json'
+// @ts-ignore
+import stakingV1Json from '../assets/artifacts/BUILD_APP_NETWORK/stakingV1.json'
+// @ts-ignore
+import iBZxJson from '../assets/artifacts/BUILD_APP_NETWORK/iBZx.json'
+// @ts-ignore
+import oracleJson from '../assets/artifacts/BUILD_APP_NETWORK/oracle.json'
 
 export class ContractsSource {
   private readonly provider: any
-
-  private static isInit = false
-
-  private static BZRXStakingInterimJson: any
-  private static erc20Json: any
-  private static iBZxJson: any
-  private static oracleJson: any
-  private static stakingV1Json: any
+  private static BZRXStakingInterimJson = BZRXStakingInterimJson
+  private static erc20Json = erc20Json
+  private static iBZxJson = iBZxJson
+  private static oracleJson = oracleJson
+  private static stakingV1Json = stakingV1Json
 
   public networkId: number
   public canWrite: boolean
-  public saiToDAIBridgeJson: any
 
   public constructor(provider: any, networkId: number, canWrite: boolean) {
     this.provider = provider
     this.networkId = networkId
     this.canWrite = canWrite
-  }
-
-  public async Init() {
-    if (ContractsSource.isInit) {
-      return
-    }
-    ContractsSource.erc20Json = await import(`./../assets/artifacts/${appNetwork}/erc20.json`)
-    ContractsSource.BZRXStakingInterimJson = await import(
-      `./../assets/artifacts/${appNetwork}/BZRXStakingInterim.json`
-    )
-    ContractsSource.stakingV1Json = await import(`./../assets/artifacts/${appNetwork}/stakingV1.json`)
-    ContractsSource.iBZxJson = await import(`./../assets/artifacts/${appNetwork}/iBZx.json`)
-    ContractsSource.oracleJson = await import(`./../assets/artifacts/${appNetwork}/oracle.json`)
-
-    ContractsSource.isInit = true
   }
 
   public getOracleAddress(): string {
@@ -104,25 +92,6 @@ export class ContractsSource {
     return address
   }
 
-  public getBzrxV1Address(): string {
-    let address: string = ''
-    switch (this.networkId) {
-      case 1:
-        address = '0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9'
-        break
-      case 3:
-        address = ''
-        break
-      case 4:
-        address = ''
-        break
-      case 42:
-        address = '0xe3e682A8Fc7EFec410E4099cc09EfCC0743C634a'
-        break
-    }
-    return address
-  }
-
   public getBzrxAddress(): string {
     let address: string = ''
     switch (this.networkId) {
@@ -180,8 +149,7 @@ export class ContractsSource {
     return address
   }
 
-  private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
-    await this.Init()
+  private getErc20ContractRaw(addressErc20: string): erc20Contract {
     return new erc20Contract(
       ContractsSource.erc20Json.abi,
       addressErc20.toLowerCase(),
@@ -189,9 +157,7 @@ export class ContractsSource {
     )
   }
 
-
-  private async getOracleContractRaw(): Promise<oracleContract> {
-    await this.Init()
+  private getOracleContractRaw(): oracleContract {
     return new oracleContract(
       ContractsSource.oracleJson.abi,
       this.getOracleAddress().toLowerCase(),
@@ -199,8 +165,7 @@ export class ContractsSource {
     )
   }
 
-  private async getStakingV1ContractRaw(): Promise<StakingV1Contract> {
-    await this.Init()
+  private getStakingV1ContractRaw(): StakingV1Contract {
     return new StakingV1Contract(
       ContractsSource.stakingV1Json.abi,
       this.getStakingV1Address().toLowerCase(),
@@ -208,8 +173,7 @@ export class ContractsSource {
     )
   }
 
-  private async getBZRXStakingInterimContractRaw(): Promise<BZRXStakingInterimContract> {
-    await this.Init()
+  private getBZRXStakingInterimContractRaw(): BZRXStakingInterimContract {
     return new BZRXStakingInterimContract(
       ContractsSource.BZRXStakingInterimJson.abi,
       this.getBZRXStakingInterimAddress().toLowerCase(),
@@ -217,8 +181,7 @@ export class ContractsSource {
     )
   }
 
-  private async getiBZxContractRaw(): Promise<iBZxContract> {
-    await this.Init()
+  private getiBZxContractRaw(): iBZxContract {
     return new iBZxContract(
       ContractsSource.iBZxJson.abi,
       this.getiBZxAddress().toLowerCase(),

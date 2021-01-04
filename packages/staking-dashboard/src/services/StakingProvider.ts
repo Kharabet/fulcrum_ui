@@ -74,18 +74,10 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
               this.web3ProviderSettings.networkId,
               canWrite
             )
-            contractsSource
-              .Init()
-              .then(() => {
-                this.web3Wrapper = web3Wrapper
-                this.providerEngine = engine
-                this.contractsSource = contractsSource
-                this.emit('ProviderAvailable')
-              })
-              .catch((err) => {
-                // TODO: actually handle error
-                console.error(err)
-              })
+            this.web3Wrapper = web3Wrapper
+            this.providerEngine = engine
+            this.contractsSource = contractsSource
+            this.emit('ProviderAvailable')
           }
         })
         .catch((err) => {
@@ -174,7 +166,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         this.web3ProviderSettings.networkId,
         canWrite
       )
-      await newContractsSource.Init()
       this.contractsSource = newContractsSource
     } else {
       this.contractsSource = null
@@ -260,7 +251,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       }
 
       if (account) {
-        const tokenContract = await this.contractsSource.getErc20Contract(addressErc20)
+        const tokenContract = this.contractsSource.getErc20Contract(addressErc20)
         if (tokenContract) {
           result = await tokenContract.balanceOf.callAsync(account)
         }
@@ -369,7 +360,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       return result
     }
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    const bzrxStakingContract = this.contractsSource.getBZRXStakingInterimContract()
     if (!account || !bzrxStakingContract) return result
 
     const repVotes = await bzrxStakingContract.getRepVotes.callAsync(
@@ -392,7 +383,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       return result
     }
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    const bzrxStakingContract = this.contractsSource.getBZRXStakingInterimContract()
     if (!bzrxStakingContract) {
       return result
     }
@@ -417,7 +408,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       return result
     }
 
-    const bZxContract = await this.contractsSource.getBZRXStakingInterimContract()
+    const bZxContract = this.contractsSource.getBZRXStakingInterimContract()
 
     if (!bZxContract) {
       return result
@@ -446,7 +437,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       return result
     }
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    const bzrxStakingContract = this.contractsSource.getBZRXStakingInterimContract()
     if (!bzrxStakingContract) {
       return result
     }
@@ -474,7 +465,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       return result
     }
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    const bzrxStakingContract = this.contractsSource.getBZRXStakingInterimContract()
     if (!bzrxStakingContract) {
       return result
     }
@@ -523,7 +514,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       return result
     }
 
-    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract()
+    const bzrxStakingContract = this.contractsSource.getBZRXStakingInterimContract()
     if (!bzrxStakingContract) return result
 
     result = await bzrxStakingContract.delegate.callAsync(account, {
@@ -590,7 +581,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
 
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-      const oracleContract = await this.contractsSource.getOracleContract()
+      const oracleContract = this.contractsSource.getOracleContract()
 
       const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
       const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals))
@@ -849,7 +840,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   }
 
   private processBecomeRepresentativeRequestTask = async (task: RequestTask, account: string) => {
-    const bzrxStakingContract = await this.contractsSource!.getBZRXStakingInterimContract()
+    const bzrxStakingContract = this.contractsSource!.getBZRXStakingInterimContract()
     if (!bzrxStakingContract) throw new Error('No ERC20 contract available!')
     // Submitting loan
     task.processingStepNext()
