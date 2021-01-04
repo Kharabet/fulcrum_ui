@@ -6,6 +6,15 @@ import services from './services'
 
 import './styles/index.scss'
 
+const isMainnetProd =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+
+if (isMainnetProd && window) {
+  window.console.log = () => {}
+}
+
 services.start()
 
 Modal.setAppElement('#root')

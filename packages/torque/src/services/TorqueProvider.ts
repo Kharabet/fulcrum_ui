@@ -197,7 +197,7 @@ export class TorqueProvider {
       this.unsupportedNetwork = false
       await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     } catch (e) {
-      console.log(e)
+      console.error(e)
       this.isLoading = false
 
       return
@@ -510,7 +510,7 @@ export class TorqueProvider {
         // result = swapPriceData[0].multipliedBy(swapPriceData[1]);
         result = swapPriceData[0].dividedBy(10 ** 18)
       } catch (e) {
-        console.log(e)
+        console.error(e)
         result = new BigNumber(0)
       }
     }
@@ -2547,7 +2547,7 @@ export class TorqueProvider {
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.log(e)
+        console.error(e)
       }
       task.processingEnd(false, false, e)
     } finally {
