@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import React, { Component, useEffect } from 'react'
 import { ProviderType } from '../domain/ProviderType'
 import { ProviderMenuListItem } from './ProviderMenuListItem'
@@ -94,7 +95,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
             //@ts-ignore
             setActivatingConnector(currentConnector)
             activate(currentConnector, (err) => {
-              console.error(err)
+              log.error(err)
               props.onDeactivate()
             })
           }}

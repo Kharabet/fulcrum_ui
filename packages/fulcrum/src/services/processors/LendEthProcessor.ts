@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { BigNumber } from '@0x/utils'
 import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTokenContract'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
@@ -40,7 +41,7 @@ export class LendEthProcessor {
 
     let gasAmountBN
 
-    console.log(
+    log.info(
       tokenContract.address,
       await tokenContract.mintWithEther.getABIEncodedTransactionData(account)
     )

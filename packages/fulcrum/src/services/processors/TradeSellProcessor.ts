@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { BigNumber } from '@0x/utils'
 import { RequestTask } from '../../domain/RequestTask'
 import { TradeRequest } from '../../domain/TradeRequest'
@@ -63,7 +64,7 @@ export class TradeSellProcessor {
         .div(maxAmountInBaseUnits)
         .lte(0.05)
     ) {
-      console.log('close full amount')
+      log.info('close full amount')
       amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1))
     }
 
@@ -122,13 +123,13 @@ export class TradeSellProcessor {
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeffForTrade)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
+        log.info(e)
         // throw e;
       }
     }
 
     try {
-      console.log('amountInBaseUnits ' + amountInBaseUnits)
+      log.info('amountInBaseUnits ' + amountInBaseUnits)
       // Closing trade
       const txHash =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
@@ -160,7 +161,7 @@ export class TradeSellProcessor {
 
       task.setTxHash(txHash)
     } catch (e) {
-      console.log(e)
+      log.info(e)
       // throw e;
     }
 

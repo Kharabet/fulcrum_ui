@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { BigNumber } from '@0x/utils'
 import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTokenContract'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
@@ -47,7 +48,7 @@ export class UnlendEthProcessor {
       amountInBaseUnits = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS
     }
 
-    console.log(
+    log.info(
       tokenContract.address,
       await tokenContract.burnToEther.getABIEncodedTransactionData(account, amountInBaseUnits)
     )

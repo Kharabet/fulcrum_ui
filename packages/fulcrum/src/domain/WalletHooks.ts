@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { useState, useEffect } from 'react'
 import { useWeb3React } from '@web3-react/core'
 
@@ -37,21 +38,21 @@ export function useInactiveListener(suppress: boolean = false) {
     const { ethereum } = window as any
     if (ethereum && ethereum.on && !active && !error && !suppress) {
       const handleConnect = () => {
-        console.log("Handling 'connect' event")
+        log.info("Handling 'connect' event")
         activate(injected)
       }
       const handleChainChanged = (chainId: string | number) => {
-        console.log("Handling 'chainChanged' event with payload", chainId)
+        log.info("Handling 'chainChanged' event with payload", chainId)
         activate(injected)
       }
       const handleAccountsChanged = (accounts: string[]) => {
-        console.log("Handling 'accountsChanged' event with payload", accounts)
+        log.info("Handling 'accountsChanged' event with payload", accounts)
         if (accounts.length > 0) {
           activate(injected)
         }
       }
       const handleNetworkChanged = (networkId: string | number) => {
-        console.log("Handling 'networkChanged' event with payload", networkId)
+        log.info("Handling 'networkChanged' event with payload", networkId)
         activate(injected)
       }
 

@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import React, { Component, Suspense } from 'react'
 
@@ -22,7 +23,6 @@ import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
-
 import { PreloaderChart } from '../components/PreloaderChart'
 
 const Intercom = React.lazy(() => import('react-intercom'))
@@ -96,7 +96,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public getLibrary = async (provider: any, connector: any): Promise<any> => {
-    console.log(provider)
+    log.info(provider)
     //handle connectors events (i.e. network changed)
     // await this.onProviderTypeSelect(connector)
     if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated)) {
@@ -322,7 +322,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public async onConnectorUpdated(update: ConnectorUpdate) {
-    console.log('onConnectorUpdated')
+    log.info('onConnectorUpdated')
     FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
 
     await Web3ConnectionFactory.updateConnector(update)

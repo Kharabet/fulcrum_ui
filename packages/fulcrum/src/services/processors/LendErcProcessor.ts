@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { BigNumber } from '@0x/utils'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTokenContract'
@@ -85,7 +86,7 @@ export class LendErcProcessor {
         skipGas = true
       }
 
-      console.log(
+      log.info(
         tokenContract.address,
         await tokenContract.mint.getABIEncodedTransactionData(account, amountInBaseUnits)
       )

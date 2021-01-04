@@ -52,6 +52,8 @@ import { ILoanParams } from '../domain/ILoanParams'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { RolloverEvent } from '../domain/events/RolloverEvent'
 
+import log from 'loglevel'
+
 const isMainnetProd =
   process.env.NODE_ENV &&
   process.env.NODE_ENV !== 'development' &&
@@ -185,7 +187,7 @@ export class FulcrumProvider {
     try {
       response = localStorage.getItem(item) || ''
     } catch (e) {
-      // console.log(e);
+      // log.info(e);
     }
     return response
   }
@@ -194,7 +196,7 @@ export class FulcrumProvider {
     try {
       localStorage.setItem(item, val)
     } catch (e) {
-      // console.log(e);
+      // log.info(e);
     }
   }
 
@@ -246,8 +248,8 @@ export class FulcrumProvider {
       )
       await newContractsSource.Init()
       this.contractsSource = newContractsSource
-      console.log(`contractsource: ${this.contractsSource}`)
-      console.log(`contractsource can write: ${this.contractsSource.canWrite}`)
+      log.info(`contractsource: ${this.contractsSource}`)
+      log.info(`contractsource can write: ${this.contractsSource.canWrite}`)
     } else {
       this.contractsSource = null
     }
@@ -287,7 +289,7 @@ export class FulcrumProvider {
       try {
         this.accounts = [sellectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch (e) {
-        // console.log(e);
+        // log.info(e);
         this.accounts = []
       }
       if (this.accounts.length === 0) {
@@ -415,15 +417,15 @@ export class FulcrumProvider {
   //             liquidationPrice = initialPrice.plus(initialPrice).minus(liquidationPrice)
   //           }
 
-  //           /*console.log(`offset`,offset.toString());
-  //           console.log(`maintenanceMargin`,maintenanceMargin.toString());
-  //           console.log(`initialLeverage`,initialLeverage.toString());
-  //           console.log(`initialMargin`,initialMargin.toString())
-  //           console.log(`currentPrice`,currentPrice.toString());
-  //           console.log(`currentLeverage`,currentLeverage.toString());
-  //           console.log(`currentMargin`,currentMargin.toString());
-  //           console.log(`initialPrice`,initialPrice.toString());
-  //           console.log(`liquidationPrice`,liquidationPrice.toString());*/
+  //           /*log.info(`offset`,offset.toString());
+  //           log.info(`maintenanceMargin`,maintenanceMargin.toString());
+  //           log.info(`initialLeverage`,initialLeverage.toString());
+  //           log.info(`initialMargin`,initialMargin.toString())
+  //           log.info(`currentPrice`,currentPrice.toString());
+  //           log.info(`currentLeverage`,currentLeverage.toString());
+  //           log.info(`currentMargin`,currentMargin.toString());
+  //           log.info(`initialPrice`,initialPrice.toString());
+  //           log.info(`liquidationPrice`,liquidationPrice.toString());*/
 
   //           priceLatestDataPoint.liquidationPrice = liquidationPrice.toNumber()
   //         }
@@ -599,7 +601,7 @@ export class FulcrumProvider {
         try {
           swapRates = (await this.getSwapToUsdRateBatch(assets, Asset.DAI))[0]
         } catch (e) {
-          //console.log(e);
+          //log.info(e);
         }
 
         //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
@@ -1124,7 +1126,7 @@ export class FulcrumProvider {
         )
         result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18)
       } catch (e) {
-        // console.log(e);
+        // log.info(e);
         result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100)
       }
     }
@@ -1141,7 +1143,7 @@ export class FulcrumProvider {
       const account = this.getCurrentAccount()
       const bZxContract = await this.contractsSource.getiBZxContract()
       if (account && bZxContract) {
-        // console.log(bZxContract.address, borrowedFundsState.loanId, account);
+        // log.info(bZxContract.address, borrowedFundsState.loanId, account);
         result = await bZxContract.withdrawCollateral.callAsync(
           borrowedFundsState.loanId,
           account,
@@ -1154,7 +1156,7 @@ export class FulcrumProvider {
         const precision =
           AssetsDictionary.assets.get(borrowedFundsState.collateralAsset)!.decimals || 18
         result = result.dividedBy(10 ** precision)
-        // console.log(result.toString());
+        // log.info(result.toString());
       }
     }
     return result
@@ -1169,7 +1171,7 @@ export class FulcrumProvider {
     try {
       const response = await fetch(url)
       const jsonData = await response.json()
-      // console.log(jsonData);
+      // log.info(jsonData);
       if (jsonData.average) {
         // ethgasstation values need divide by 10 to get gwei
         const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8)
@@ -1181,7 +1183,7 @@ export class FulcrumProvider {
         }
       }
     } catch (error) {
-      // console.log(error);
+      // log.info(error);
       result = new BigNumber(500).multipliedBy(10 ** 9) // error default 60 gwei
     }
 
@@ -1339,7 +1341,7 @@ export class FulcrumProvider {
   //                 return null;
   //               }
   //             } catch (e) {
-  //               // console.log(e);
+  //               // log.info(e);
   //               return null;
   //             }
   //           } else {
@@ -1359,7 +1361,7 @@ export class FulcrumProvider {
   //               }
   //               tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
   //             } catch (e) {
-  //               // console.log(e);
+  //               // log.info(e);
   //               return null;
   //             }
   //           }
@@ -1390,7 +1392,7 @@ export class FulcrumProvider {
   //                 return null;
   //               }
   //             } catch (e) {
-  //               // console.log(e);
+  //               // log.info(e);
   //               return null;
   //             }
   //           } else {
@@ -1411,7 +1413,7 @@ export class FulcrumProvider {
   //                 }
   //               );
   //             } catch (e) {
-  //               // console.log(e);
+  //               // log.info(e);
   //               return null;
   //             }
   //           }
@@ -1423,10 +1425,10 @@ export class FulcrumProvider {
   //   tradeAmountActual = tradeAmountActual.dividedBy(10 ** 18);
   //   const slippage = tradeAmountActual.minus(tradedAmountEstimate).div(tradedAmountEstimate).multipliedBy(-100);
 
-  //   /*console.log(`---------`);
-  //   console.log(`tradedAmountEstimate`,tradedAmountEstimate.toString());
-  //   console.log(`tradeAmountActual`,tradeAmountActual.toString());
-  //   console.log(`slippage`,slippage.toString());*/
+  //   /*log.info(`---------`);
+  //   log.info(`tradedAmountEstimate`,tradedAmountEstimate.toString());
+  //   log.info(`tradeAmountActual`,tradeAmountActual.toString());
+  //   log.info(`slippage`,slippage.toString());*/
 
   //   return slippage;
   // }
@@ -1461,7 +1463,7 @@ export class FulcrumProvider {
     const account = this.getCurrentAccount()
 
     if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      console.log('iToken ', loanToken)
+      log.info('iToken ', loanToken)
       const tokenContract = this.contractsSource.getITokenContract(loanToken)
       if (!tokenContract) return result
       const leverageAmount =
@@ -1488,11 +1490,11 @@ export class FulcrumProvider {
       )
 
       try {
-        console.log('leverageAmount' + leverageAmount)
-        console.log('loanTokenSent' + loanTokenSent)
-        console.log('collateralTokenSent' + collateralTokenSent)
-        console.log('collateralTokenAddress' + collateralTokenAddress)
-        console.log('iTokenAddress' + tokenContract.address)
+        log.info('leverageAmount' + leverageAmount)
+        log.info('loanTokenSent' + loanTokenSent)
+        log.info('collateralTokenSent' + collateralTokenSent)
+        log.info('collateralTokenAddress' + collateralTokenAddress)
+        log.info('iTokenAddress' + tokenContract.address)
 
         const marginDetails = await tokenContract.getEstimatedMarginDetails.callAsync(
           leverageAmount,
@@ -1507,7 +1509,7 @@ export class FulcrumProvider {
           request.positionType === PositionType.SHORT ? result.principal : result.collateral
         result.interestRate = marginDetails[2].div(10 ** 18)
       } catch (e) {
-        console.error(e)
+        log.error(e)
       }
     }
     return result
@@ -1712,11 +1714,11 @@ export class FulcrumProvider {
             .div(maxAmountInBaseUnits)
             .lte(0.01)
         ) {
-          console.log('close full amount')
+          log.info('close full amount')
           amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1))
         }
 
-        console.log(
+        log.info(
           iBZxContract.address,
           await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
             request.loanId,
@@ -1757,9 +1759,9 @@ export class FulcrumProvider {
                   }
                 )
         } catch (e) {
-          console.log(e)
+          log.info(e)
         }
-        console.log(result)
+        log.info(result)
       }
     }
     return result
@@ -1826,7 +1828,7 @@ export class FulcrumProvider {
       false,
       false
     )
-    // console.log(loansData);
+    // log.info(loansData);
     const zero = new BigNumber(0)
     //@ts-ignore
     result = loansData
@@ -1864,7 +1866,7 @@ export class FulcrumProvider {
         } as IBorrowedFundsState
       })
       .filter((e: IBorrowedFundsState | undefined) => e)
-    console.log(result)
+    log.info(result)
     return result
   }
 
@@ -2110,7 +2112,7 @@ export class FulcrumProvider {
     ) {
       return new BigNumber(1)
     }
-    // console.log("srcAmount 11 = "+srcAmount)
+    // log.info("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
@@ -2133,14 +2135,14 @@ export class FulcrumProvider {
           srcAssetErc20Address,
           destAssetErc20Address
         )
-        // console.log("swapPriceData- ",swapPriceData[0])
+        // log.info("swapPriceData- ",swapPriceData[0])
         result = swapPriceData[0]
           .times(srcAssetPrecision)
           .div(destAssetPrecision)
           .dividedBy(10 ** 18)
           .multipliedBy(swapPriceData[1].dividedBy(10 ** 18)) // swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
-        console.log(e)
+        log.info(e)
         result = new BigNumber(0)
       }
     }
@@ -2762,16 +2764,16 @@ export class FulcrumProvider {
 
   public addTokenToMetaMask = async (task: RequestTask) => {
     return /*, (err: any, added: any) => {
-// console.log('provider returned', err, added)
+// log.info('provider returned', err, added)
 if (err || 'error' in added) {
-console.log(err, added);
+log.info(err, added);
 }
 }*/ /*);
                                                     }
                                                     }
                                                     }
                                                     } catch(e) {
-                                                    // console.log(e);
+                                                    // log.info(e);
                                                     }
                                                     }*/
     /*if (this.providerType === ProviderType.MetaMask && this.contractsSource) {
@@ -2852,7 +2854,7 @@ console.log(err, added);
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.log(e)
+        log.info(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -2886,7 +2888,7 @@ console.log(err, added);
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.log(e)
+        log.info(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -3019,9 +3021,9 @@ console.log(err, added);
       // }
 
       // if (zeroXTargetAmountInBaseUnits.gt(0) && zeroXTargetType !== "") {
-      //   /*console.log(srcTokenAddress);
-      //   console.log(destTokenAddress);
-      //   console.log(new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)).toString());*/
+      //   /*log.info(srcTokenAddress);
+      //   log.info(destTokenAddress);
+      //   log.info(new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)).toString());*/
 
       //   //zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmountInBaseUnits.dividedBy(2).toFixed(0, 1));
 
@@ -3039,8 +3041,8 @@ console.log(err, added);
       //     if (!response.protocolFee || !response.data) {
       //       throw new Error(JSON.stringify(response));
       //     }
-      //     //console.log(response);
-      //     //console.log(srcTokenAddress, destTokenAddress, zeroXTargetAmountInBaseUnits.toString());
+      //     //log.info(response);
+      //     //log.info(srcTokenAddress, destTokenAddress, zeroXTargetAmountInBaseUnits.toString());
 
       //     if (response.protocolFee) { // && response.buyAmount && response.sellAmount) {
       //       /*const SwapRate0x = new BigNumber(
@@ -3049,7 +3051,7 @@ console.log(err, added);
       //         .dividedBy(response.sellAmount)
       //         .toFixed(0, 1)
       //       ).toString();
-      //       console.log(`swapRate`, SwapRate0x);*/
+      //       log.info(`swapRate`, SwapRate0x);*/
 
       //       taskRequest.zeroXFee = new BigNumber(response.protocolFee);
       //       const Web3Utils = await import("web3-utils");
@@ -3064,14 +3066,14 @@ console.log(err, added);
       //       throw new Error("0x payload has missing params");
       //     }
       //   } catch (e) {
-      //     console.log(e);
+      //     log.info(e);
 
       //     taskRequest.zeroXFee = new BigNumber(0);
       //     taskRequest.loanDataBytes = "";
       //   }
 
-      //   //console.log(taskRequest.zeroXFee.toString());
-      //   //console.log(taskRequest.loanDataBytes)
+      //   //log.info(taskRequest.zeroXFee.toString());
+      //   //log.info(taskRequest.loanDataBytes)
       // }
 
       if (taskRequest.tradeType === TradeType.BUY) {
@@ -3114,7 +3116,7 @@ console.log(err, added);
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.log(e)
+        log.info(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -3146,7 +3148,7 @@ console.log(err, added);
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
         // tslint:disable-next-line:no-console
-        console.log(e)
+        log.info(e)
       }
       task.processingEnd(false, false, e)
     } finally {

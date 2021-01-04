@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { BigNumber } from '@0x/utils'
 import { RequestTask } from '../../domain/RequestTask'
 import { ManageCollateralRequest } from '../../domain/ManageCollateralRequest'
@@ -123,7 +124,7 @@ export class ManageCollateralProcessor {
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
+        log.info(e)
         throw e
       }
 
@@ -140,7 +141,7 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
+        log.info(e)
         throw e
       }
     } else {
@@ -156,7 +157,7 @@ export class ManageCollateralProcessor {
         )
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(2).integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
+        log.info(e)
         throw e
       }
 
@@ -173,7 +174,7 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
+        log.info(e)
         throw e
       }
     }

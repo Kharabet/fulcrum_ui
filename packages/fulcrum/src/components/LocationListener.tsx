@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { FulcrumProvider } from '../services/FulcrumProvider'
@@ -30,7 +31,7 @@ export class LocationListener extends Component<ILocationListenerProps> {
         doNetworkConnect()
       }
     }
-    // console.log(`location`, location.pathname);
+    // log.info(`location`, location.pathname);
   }
 
   public render() {

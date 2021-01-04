@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { BigNumber } from '@0x/utils'
 import { RequestTask } from '../../domain/RequestTask'
 import { TradeRequest } from '../../domain/TradeRequest'
@@ -103,7 +104,7 @@ export class TradeBuyProcessor {
         // Waiting for token allowance
         task.processingStepNext()
       } catch (e) {
-        //console.log(e);
+        //log.info(e);
       }
     }
     //Submitting loan
@@ -128,14 +129,14 @@ export class TradeBuyProcessor {
         : FulcrumProvider.ZERO_ADDRESS
     const loanData = '0x'
 
-    //console.log("depositAmount: " + amountInBaseUnits.toFixed());
-    console.log('leverageAmount: ' + leverageAmount.toFixed())
-    console.log('loanTokenSent: ' + loanTokenSent.toFixed())
-    console.log('collateralTokenSent: ' + collateralTokenSent.toFixed())
-    //console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
-    console.log('collateral token: ' + collateralToken + ' address: ' + collateralTokenAddress!)
-    console.log('trader: ' + account)
-    console.log('loan data: ' + loanData)
+    //log.info("depositAmount: " + amountInBaseUnits.toFixed());
+    log.info('leverageAmount: ' + leverageAmount.toFixed())
+    log.info('loanTokenSent: ' + loanTokenSent.toFixed())
+    log.info('collateralTokenSent: ' + collateralTokenSent.toFixed())
+    //log.info("deposit token: " + depositToken + " address: " + depositTokenAddress!);
+    log.info('collateral token: ' + collateralToken + ' address: ' + collateralTokenAddress!)
+    log.info('trader: ' + account)
+    log.info('loan data: ' + loanData)
 
     const sendAmountForValue =
       taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH

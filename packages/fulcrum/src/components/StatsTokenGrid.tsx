@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import Asset from 'bzx-common/src/assets/Asset'
@@ -68,7 +69,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
   public async derivedUpdate() {
     const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(StatsTokenGrid.assets)
-    // console.log(reserveDetails);
+    // log.info(reserveDetails);
     const rowData = await StatsTokenGrid.getRowsData(reserveDetails, this.state.yieldAPYJson)
     let totalsRow: IStatsTokenGridRowProps | null = null
     if (rowData.length > 0) {

@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 
 import {
@@ -47,7 +48,7 @@ export class Web3ConnectionFactory {
       Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper
       Web3ConnectionFactory.canWrite = canWrite
     } catch (e) {
-      console.error(e)
+      log.error(e)
       Web3ConnectionFactory.setReadonlyProvider()
     }
   }

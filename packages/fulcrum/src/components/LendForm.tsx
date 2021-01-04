@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
@@ -594,7 +595,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       assetOrWrapped = this.props.asset
     }
 
-    // console.log(`send amount`,sendAmount.toString());
+    // log.info(`send amount`,sendAmount.toString());
 
     if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
       // indicates a 100% burn
