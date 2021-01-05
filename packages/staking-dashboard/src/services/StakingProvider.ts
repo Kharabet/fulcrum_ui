@@ -300,7 +300,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     switch (asset) {
       case Asset.BZRX:
-      case Asset.BZRXv1:
+      case Asset.BZRXV1:
       case Asset.BPT:
         return new BigNumber(10 ** 18).multipliedBy(25000000)
       case Asset.ETH:
@@ -721,7 +721,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
 
     const bzrxErc20Address = this.getErc20AddressOfAsset(Asset.BZRX)
-    const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.vBZRX)
+    const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.VBZRX)
     const bptErc20Address = this.getErc20AddressOfAsset(Asset.BPT)
     if (!bzrxErc20Address || !vbzrxErc20Address || !bptErc20Address) {
       throw new Error('No ERC20 contract available!')
