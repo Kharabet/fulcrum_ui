@@ -602,10 +602,22 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
       collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
 
+      // earlier startRate was stored from Chainlink and had this format 
       openPrice = loan.loanData.startRate
         .div(10 ** 18)
         .times(loanAssetPrecision)
         .div(collateralAssetPrecision)
+      // https://github.com/bZxNetwork/contractsV2/commit/2afdeb8c6b9951456d835fbd90a6bc38c699de89
+      // but then we started to store startRate as a price from Kyber (the real swap rate from trade event)
+      // that has another format and should be handled in the following way:
+      const newOpenPrice = new BigNumber(10 ** 36)
+        .div(loan.loanData.startRate)
+        .div(10 ** 18)
+        .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+
+      // the wrong price will be much larger. 
+      // For example 307854115598597579198986971899 and 0.03263155. The latest is the correct price
+      openPrice = openPrice.gt(newOpenPrice) ? newOpenPrice : openPrice
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
       if (
@@ -652,9 +664,21 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .minus(shortsDiff)
 
       value = positionValue.div(currentCollateralToPrincipalRate)
+      // earlier startRate was stored from Chainlink and had this format 
       openPrice = new BigNumber(10 ** 36)
         .div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision))
         .div(10 ** 18)
+        
+      // https://github.com/bZxNetwork/contractsV2/commit/2afdeb8c6b9951456d835fbd90a6bc38c699de89
+      // but then we started to store startRate as a price from Kyber (the real swap rate from trade event)
+      // that has another format and should be handled in the following way:
+      const newOpenPrice = loan.loanData.startRate
+        .div(10 ** 18)
+        .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
+        
+      // the wrong price will be much larger. 
+      // For example 307854115598597579198986971899 and 0.03263155. The latest is the correct price
+      openPrice = openPrice.gt(newOpenPrice) ? newOpenPrice : openPrice
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
 
       if (
