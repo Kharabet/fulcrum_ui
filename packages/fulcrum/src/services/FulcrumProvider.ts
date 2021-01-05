@@ -2067,15 +2067,15 @@ export class FulcrumProvider {
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (
-      asset === Asset.SAI ||
-      asset === Asset.DAI ||
-      asset === Asset.USDC ||
-      asset === Asset.SUSD ||
-      asset === Asset.USDT
-    ) {
-      return new BigNumber(1)
-    }
+    // if (
+    //   asset === Asset.SAI ||
+    //   asset === Asset.DAI ||
+    //   asset === Asset.USDC ||
+    //   asset === Asset.SUSD ||
+    //   asset === Asset.USDT
+    // ) {
+    //   return new BigNumber(1)
+    // }
 
     /*const swapRates = await this.getSwapToUsdRateBatch(
       [asset],
@@ -2103,13 +2103,13 @@ export class FulcrumProvider {
     destAsset: Asset,
     srcAmount?: BigNumber
   ): Promise<BigNumber> {
-    if (
-      srcAsset === destAsset ||
-      (srcAsset === Asset.USDC && destAsset === Asset.DAI) ||
-      (srcAsset === Asset.DAI && destAsset === Asset.USDC)
-    ) {
-      return new BigNumber(1)
-    }
+    // if (
+    //   srcAsset === destAsset ||
+    //   (srcAsset === Asset.USDC && destAsset === Asset.DAI) ||
+    //   (srcAsset === Asset.DAI && destAsset === Asset.USDC)
+    // ) {
+    //   return new BigNumber(1)
+    // }
     // console.log("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)

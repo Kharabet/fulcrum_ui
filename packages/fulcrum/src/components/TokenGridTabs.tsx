@@ -144,6 +144,16 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
           quoteToken: Asset.WBTC
         })
       }
+      if (baseToken === Asset.DAI){
+        dropDownSelectOptions.push({
+          baseToken: baseToken,
+          quoteToken: Asset.USDC
+        })
+        dropDownSelectOptions.push({
+          baseToken: baseToken,
+          quoteToken: Asset.USDT
+        })
+      }
     })
 
     const activeDropDownOption = dropDownSelectOptions.find(
