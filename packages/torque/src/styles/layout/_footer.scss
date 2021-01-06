@@ -44,6 +44,24 @@
     &:not(:first-child) {
       margin-left: 20px;
     }
+    .impersonate-button {
+      opacity: 0.2;
+    }
+
+    .impersonate-container {
+      display: inline-block;
+      margin-left: 20px;
+      button {
+        margin-left: 10px;
+      }
+      input {
+        background-color: #f5f7f9;
+        color: #8992a4;
+        border: 2px solid #e7ebf0;
+        border: none;
+        outline: none;
+      }
+    }
 
     a,
     button {

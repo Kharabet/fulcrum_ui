@@ -91,6 +91,7 @@ const initialNetworkId = getNetworkIdByString(networkName)
 
 export class TorqueProvider {
   public static Instance: TorqueProvider
+  public impersonateAddress = ''
 
   public readonly gasLimit = '4000000'
 
@@ -170,6 +171,14 @@ export class TorqueProvider {
     }
 
     return TorqueProvider.Instance
+  }
+
+    public getCurrentAccount(): string | undefined {
+    return this.impersonateAddress
+      ? this.impersonateAddress
+      : this.accounts.length > 0 && this.accounts[0]
+      ? this.accounts[0].toLowerCase()
+      : undefined
   }
 
   public static getLocalstorageItem(item: string): string {
@@ -378,8 +387,7 @@ export class TorqueProvider {
     let result = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.getCurrentAccount()
 
       if (account) {
         const assetAddress = this.getErc20AddressOfAsset(Asset.CHI)
@@ -585,8 +593,7 @@ export class TorqueProvider {
       return result
     }
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
     const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
 
     if (!account || !tokenErc20Contract) {
@@ -627,8 +634,7 @@ export class TorqueProvider {
       } else {
         throw new Error('No ERC20 contract available!')
       }
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.getCurrentAccount()
       if (account && tokenErc20Contract) {
         const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, spender)
         if (amountInBaseUnits.gt(erc20allowance)) {
@@ -743,8 +749,7 @@ export class TorqueProvider {
   }
 
   public getCompoundLoans = async (): Promise<IRefinanceLoan[]> => {
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
     if (!this.contractsSource || !account) {
       return []
     }
@@ -842,8 +847,7 @@ export class TorqueProvider {
   }
 
   public getSoloLoans = async (): Promise<IRefinanceLoan[]> => {
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
     if (!this.contractsSource || !account) {
       return []
     }
@@ -912,8 +916,7 @@ export class TorqueProvider {
   }
 
   public migrateCompoundLoan = async (loan: IRefinanceLoan, amount: BigNumber) => {
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return
     }
@@ -993,8 +996,7 @@ export class TorqueProvider {
   }
 
   public migrateSoloLoan = async (loan: IRefinanceLoan, amount: BigNumber) => {
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return
     }
@@ -1072,8 +1074,7 @@ export class TorqueProvider {
   public getMakerLoans = async (): Promise<RefinanceCdpData[]> => {
     let result: RefinanceCdpData[] = []
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
 
     if (this.web3Wrapper && this.contractsSource && account) {
       const cdps: GetCdpsContract = await this.contractsSource.getCdpContract(
@@ -1465,8 +1466,7 @@ export class TorqueProvider {
       const bridge: saiToDAIBridgeContract = await this.contractsSource.getSaiToDaiBridge(
         configAddress.SAI_TO_DAI_BRIDGE
       )
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : ''
+      const account = this.getCurrentAccount()
       try {
         return await bridge.migrateLoan.sendTransactionAsync(loanId, new BigNumber(0), {
           from: account
@@ -1489,7 +1489,7 @@ export class TorqueProvider {
     }
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const account = this.getCurrentAccount()
       const iTokenContract = await this.contractsSource.getITokenContract(borrowRequest.borrowAsset);
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(borrowRequest.collateralAsset) || "";
       if (account && iTokenContract && collateralAssetErc20Address) {
@@ -1648,8 +1648,7 @@ export class TorqueProvider {
     if (!this.contractsSource) return result
 
     const iBZxContract = await this.contractsSource.getiBZxContract()
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
 
     if (!iBZxContract || !account) return result
 
@@ -1714,8 +1713,7 @@ export class TorqueProvider {
 
   public getLoansAwaitingList = async (): Promise<ReadonlyArray<BorrowRequestAwaiting>> => {
     let result: ReadonlyArray<BorrowRequestAwaiting> = []
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
 
     if (!this.borrowRequestAwaitingStore || !account) return result
 
@@ -1726,8 +1724,7 @@ export class TorqueProvider {
 
   // noinspection JSUnusedGlobalSymbols
   public getLoansListTest = async (): Promise<IBorrowedFundsState[]> => {
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.getCurrentAccount()
     // noinspection SpellCheckingInspection
     return [
       {
@@ -1971,7 +1968,7 @@ export class TorqueProvider {
   /*public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
     let receipt;
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const account = this.getCurrentAccount()
       const bZxContract = await this.contractsSource.getiBZxContract();
       if (account && bZxContract) {
         const loanPrecision = AssetsDictionary.assets.get(repayLoanRequest.borrowAsset)!.decimals || 18;
@@ -2061,7 +2058,7 @@ export class TorqueProvider {
     }
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const account = this.getCurrentAccount()
       const bZxContract = await this.contractsSource.getiBZxContract();
       if (account && bZxContract) {
         const collateralPrecision = AssetsDictionary.assets.get(manageCollateralRequest.loanOrderState.collateralAsset)!.decimals || 18;
@@ -2200,7 +2197,7 @@ export class TorqueProvider {
     let receipt;
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const account = this.getCurrentAccount()
       const bZxContract = await this.contractsSource.getiBZxContract();
       if (account && bZxContract) {
         const loanPrecision = AssetsDictionary.assets.get(extendLoanRequest.borrowAsset)!.decimals || 18;
@@ -2261,8 +2258,7 @@ export class TorqueProvider {
     let result = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.getCurrentAccount()
       const bZxContract = await this.contractsSource.getiBZxContract()
       if (account && bZxContract) {
         // console.log(bZxContract.address, borrowedFundsState.loanId, account);
@@ -2337,8 +2333,7 @@ export class TorqueProvider {
     let result: BigNumber = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.getCurrentAccount()
       if (account) {
         const balance = await this.web3Wrapper.getBalanceInWeiAsync(account)
         result = new BigNumber(balance)
@@ -2503,8 +2498,7 @@ export class TorqueProvider {
         throw new Error('No provider available!')
       }
 
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+      const account = this.getCurrentAccount()
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
