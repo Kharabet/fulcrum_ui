@@ -75,7 +75,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       isLoading: true,
       isEdit: false,
       minValue: 120,
-      maxValue: 300,
+      maxValue: 3000,
       selectedValue: 0,
       collateralValue: ''
     }
