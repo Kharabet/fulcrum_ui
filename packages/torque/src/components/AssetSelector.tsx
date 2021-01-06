@@ -76,11 +76,6 @@ const AssetSelector = (props: IAssetSelectorProps) => {
         ? new BigNumber(interestRates![asset.toLowerCase()]['borrowApr']).times(100)
         : new BigNumber(0)
 
-    const yieldApr =
-      interestRates && interestRates![asset.toLowerCase()]
-        ? new BigNumber(interestRates![asset.toLowerCase()]['yieldFarmingAPR']).times(100)
-        : new BigNumber(0)
-
     const liquidity =
       liquidities && liquidities![asset.toLowerCase()]
         ? new BigNumber(liquidities![asset.toLowerCase()])
@@ -90,7 +85,6 @@ const AssetSelector = (props: IAssetSelectorProps) => {
       <AssetSelectorItem
         key={asset}
         interestRate={interestRate}
-        yieldApr={yieldApr}
         liquidity={liquidity}
         asset={asset}
         {...props}

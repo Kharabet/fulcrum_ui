@@ -60,7 +60,7 @@ const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
         </span>
       </div>
       <div className="trade-token-grid-header__col-profit">
-        <span className="trade-token-grid-header__text">Est. Yield, vBZRX</span>
+        <span className="trade-token-grid-header__text">Interest APR</span>
       </div>
     </div>
   )

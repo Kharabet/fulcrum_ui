@@ -20,7 +20,6 @@ export interface IStatsTokenGridProps {
 interface IStatsTokenGridState {
   tokenRowsData: IStatsTokenGridRowProps[] | null
   totalsRow: IStatsTokenGridRowProps | null
-  yieldAPYJson: any
 }
 
 export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenGridState> {
@@ -52,8 +51,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
     this.state = {
       tokenRowsData: null,
-      totalsRow: null,
-      yieldAPYJson: undefined
+      totalsRow: null
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -69,7 +67,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
   public async derivedUpdate() {
     const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(StatsTokenGrid.assets)
     // console.log(reserveDetails);
-    const rowData = await StatsTokenGrid.getRowsData(reserveDetails, this.state.yieldAPYJson)
+    const rowData = await StatsTokenGrid.getRowsData(reserveDetails)
     let totalsRow: IStatsTokenGridRowProps | null = null
     if (rowData.length > 0) {
       totalsRow = rowData.pop()!
@@ -108,9 +106,6 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
       FulcrumProviderEvents.ProviderChanged,
       this.onProviderChanged
     )
-    const yieldAPYRequest = await fetch(`${StatsTokenGrid.apiUrl}/yield-farimng-apy`)
-    const yieldAPYJson = await yieldAPYRequest.json()
-    this.setState({ ...this.state, yieldAPYJson })
     await this.derivedUpdate()
   }
 
@@ -154,23 +149,13 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
   }
 
   private static getRowsData = async (
-    reserveDetails: ReserveDetails[],
-    yieldAPYJson: any
+    reserveDetails: ReserveDetails[]
   ): Promise<IStatsTokenGridRowProps[]> => {
     const rowsData: IStatsTokenGridRowProps[] = []
 
     reserveDetails.forEach((e) => {
-      const yieldApr =
-        e.asset &&
-        yieldAPYJson &&
-        yieldAPYJson.success &&
-        yieldAPYJson.data[e.asset.toLowerCase()]
-          ? new BigNumber(yieldAPYJson.data[e.asset.toLowerCase()])
-          : new BigNumber(0)
-
       rowsData.push({
-        reserveDetails: e,
-        yieldApr: yieldApr
+        reserveDetails: e
       })
     })
 

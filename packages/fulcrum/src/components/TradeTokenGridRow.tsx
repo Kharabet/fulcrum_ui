@@ -32,7 +32,6 @@ export interface ITradeTokenGridRowProps {
   defaultLeverage: number
   isTxCompleted: boolean
   maintenanceMargin: BigNumber
-  yieldApr: BigNumber
   onTrade: (request: TradeRequest) => void
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
@@ -324,21 +323,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             )}
           </div>
           <div
-            title={this.props.yieldApr.gt(0) ? `${this.props.yieldApr.toFixed(18)}%` : ``}
+            title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``}
             className="trade-token-grid-row__col-profit">
             {this.props.isMobileMedia && (
-              <div className="trade-token-grid-row__title">Est. Yield, vBZRX</div>
+              <div className="trade-token-grid-row__title">Interest APR</div>
             )}
 
-            {this.props.yieldApr.gt(0) && !this.state.isLoading ? (
+            {this.state.interestRate.gt(0) && !this.state.isLoading ? (
               <React.Fragment>
-                {this.props.yieldApr.toFixed(0)}
+                {this.state.interestRate.toFixed(2)}
                 <span className="fw-sign">%</span>
-                <span
-                  title={this.state.interestRate.toFixed(18)}
-                  className="trade-token-grid-row__yield">
-                  APR <span>{this.state.interestRate.toFixed(2)}%</span>
-                </span>
               </React.Fragment>
             ) : (
               <Preloader width="74px" />

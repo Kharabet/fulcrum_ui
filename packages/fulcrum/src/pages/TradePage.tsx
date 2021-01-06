@@ -900,14 +900,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public getTokenRowsData = async () => {
     const tokenRowsData: ITradeTokenGridRowProps[] = []
-
-    const yieldAPYRequest = await fetch(`${this.apiUrl}/yield-farimng-apy`)
-    const yieldAPYJson = await yieldAPYRequest.json()
-    const yieldApr =
-      yieldAPYJson.success && yieldAPYJson.data[this.state.selectedMarket.baseToken.toLowerCase()]
-        ? new BigNumber(yieldAPYJson.data[this.state.selectedMarket.baseToken.toLowerCase()])
-        : new BigNumber(0)
-
     tokenRowsData.push({
       baseToken: this.state.selectedMarket.baseToken,
       quoteToken: this.state.selectedMarket.quoteToken,
@@ -919,7 +911,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
-      yieldApr,
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
         this.state.selectedMarket.baseToken,
         this.state.selectedMarket.quoteToken
@@ -936,7 +927,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted,
       changeGridPositionType: this.changeGridPositionType,
       isMobileMedia: this.props.isMobileMedia,
-      yieldApr,
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
         this.state.selectedMarket.quoteToken,
         this.state.selectedMarket.baseToken
