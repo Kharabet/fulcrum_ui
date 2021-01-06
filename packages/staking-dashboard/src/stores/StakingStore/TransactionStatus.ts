@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import * as mobx from 'mobx'
-import BecomeRepresentativeRequest from 'src/domain/BecomeRepresentativeRequest'
 import ClaimRebateRewardsRequest from 'src/domain/ClaimRebateRewardsRequest'
 import ClaimRequest from 'src/domain/ClaimRequest'
 import StakingRequest from 'src/domain/StakingRequest'
@@ -14,7 +13,6 @@ export default class TransactionStatus {
     | StakingRequest
     | ClaimRequest
     | ClaimRebateRewardsRequest
-    | BecomeRepresentativeRequest
     | null = null
 
   public status: 'AWAITING' | 'IN_PROGRESS' | 'FAILED' | 'FAILED_SKIPGAS' | 'DONE' = 'AWAITING'

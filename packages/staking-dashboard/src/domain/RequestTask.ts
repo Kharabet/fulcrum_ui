@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events'
-import BecomeRepresentativeRequest from './BecomeRepresentativeRequest'
 import ClaimRebateRewardsRequest from './ClaimRebateRewardsRequest'
 import ClaimRequest from './ClaimRequest'
 import RequestStatus from './RequestStatus'
@@ -12,7 +11,6 @@ export default class RequestTask {
     | StakingRequest
     | ClaimRequest
     | ClaimRebateRewardsRequest
-    | BecomeRepresentativeRequest
   public status: RequestStatus
   public steps: string[]
   public stepCurrent: number
@@ -24,7 +22,6 @@ export default class RequestTask {
       | StakingRequest
       | ClaimRequest
       | ClaimRebateRewardsRequest
-      | BecomeRepresentativeRequest
   ) {
     this.request = request
     this.status = RequestStatus.AWAITING

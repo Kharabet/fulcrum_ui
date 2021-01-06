@@ -6,7 +6,6 @@ import { TypedEmitter } from 'tiny-typed-emitter'
 import appConfig from '../config/appConfig'
 import Asset from '../domain/Asset'
 import AssetsDictionary from '../domain/AssetsDictionary'
-import BecomeRepresentativeRequest from '../domain/BecomeRepresentativeRequest'
 import ClaimRebateRewardsRequest from '../domain/ClaimRebateRewardsRequest'
 import ClaimRequest from '../domain/ClaimRequest'
 import IWeb3ProviderSettings from '../domain/IWeb3ProviderSettings'
@@ -628,7 +627,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   }
 
   public onRequestConfirmed = async (
-    request: StakingRequest | ClaimRequest | BecomeRepresentativeRequest
+    request: StakingRequest | ClaimRequest
   ) => {
     return this.processRequestTask(new RequestTask(request))
   }
@@ -681,9 +680,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
           break
         case ClaimRebateRewardsRequest:
           txHash = await this.processClaimRebateRewardsRequestTask(task, account)
-          break
-        case BecomeRepresentativeRequest:
-          txHash = await this.processBecomeRepresentativeRequestTask(task, account)
           break
         default:
           throw new Error('Unknown request!')

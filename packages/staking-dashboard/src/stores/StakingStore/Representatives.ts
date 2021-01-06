@@ -2,7 +2,6 @@ import hashUtils from 'app-lib/hashUtils'
 import stakingApi from 'app-lib/stakingApi'
 import stakingUtils from 'app-lib/stakingUtils'
 import * as mobx from 'mobx'
-import BecomeRepresentativeRequest from 'src/domain/BecomeRepresentativeRequest'
 import IRep from 'src/domain/IRep'
 import { StakingProvider } from 'src/services/StakingProvider'
 
@@ -103,15 +102,6 @@ export default class Representatives {
         this.set('topRepsList', this.topRepsList.concat([delegate]))
       }
     }
-  }
-
-  /**
-   * Create a request to become a representative for the current connected user wallet
-   * TODO: this should refactored to pass the user address
-   * instead of relying on internal provider state
-   */
-  public becomeRepresentative() {
-    return this.stakingProvider.onRequestConfirmed(new BecomeRepresentativeRequest())
   }
 
   /**
