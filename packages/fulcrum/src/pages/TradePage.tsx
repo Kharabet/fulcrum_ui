@@ -608,7 +608,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     if (positionType === PositionType.LONG) {
       positionValue = collateralAssetAmount
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
-      collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
+      collateral = collateralAssetAmount
 
       // earlier startRate was stored from Chainlink and had this format 
       openPrice = loan.loanData.startRate
@@ -629,7 +629,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
       if (
-        isRolloverPending ||
         loan.loanData.depositValueAsCollateralToken.eq(0) ||
         loan.loanData.depositValueAsLoanToken.eq(0)
       ) {
@@ -661,7 +660,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           : undefined
       }
     } else {
-      collateral = collateralAssetAmount
+      collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
 
       const shortsDiff = collateralAssetAmount
         .times(currentCollateralToPrincipalRate)
@@ -690,7 +689,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
 
       if (
-        isRolloverPending ||
         loan.loanData.depositValueAsCollateralToken.eq(0) ||
         loan.loanData.depositValueAsLoanToken.eq(0)
       ) {
