@@ -516,6 +516,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     loan: IBorrowedFundsState,
     collateralToPrincipalRate?: BigNumber
   ): Promise<IOwnTokenGridRowProps> => {
+
+    // approx date when Open Price precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/2afdeb8c6b9951456d835fbd90a6bc38c699de89
+    // https://etherscan.io/tx/0xd69e0d550a665975ce963b4069206257c279223bf3fda4cbe019efff2b70bf61
+    const dateWhenOpenPricePrecisionWasChanged = new Date(
+      process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1609867118000 : 1609867118000
+    ) 
+    
     const maintenanceMargin = loan.loanData.maintenanceMargin
     const currentCollateralToPrincipalRate = collateralToPrincipalRate
       ? collateralToPrincipalRate
@@ -598,15 +605,28 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       false // false - return in loan token
     )
     const isRolloverPending = loan.loanData.interestDepositRemaining.eq(0)
+    const startDate = loan.loanData.endTimestamp.minus(28*24*60*60) // timestamp in seconds
     if (positionType === PositionType.LONG) {
       positionValue = collateralAssetAmount
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
       collateral = collateralAssetAmount.times(currentCollateralToPrincipalRate)
 
+      // earlier startRate was stored from Chainlink and had this format 
       openPrice = loan.loanData.startRate
         .div(10 ** 18)
         .times(loanAssetPrecision)
         .div(collateralAssetPrecision)
+      // https://github.com/bZxNetwork/contractsV2/commit/2afdeb8c6b9951456d835fbd90a6bc38c699de89
+      // but then we started to store startRate as a price from Kyber (the real swap rate from trade event)
+      // that has another format and should be handled in the following way:
+      const newOpenPrice = new BigNumber(10 ** 36)
+        .div(loan.loanData.startRate)
+        .div(10 ** 18)
+        .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+
+      // the wrong price will be much larger. 
+      // For example 307854115598597579198986971899 and 0.03263155. The latest is the correct price
+      openPrice = startDate.gt(dateWhenOpenPricePrecisionWasChanged.getTime()/1000) ? newOpenPrice : openPrice
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18)
 
       if (
@@ -653,9 +673,21 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         .minus(shortsDiff)
 
       value = positionValue.div(currentCollateralToPrincipalRate)
+      // earlier startRate was stored from Chainlink and had this format 
       openPrice = new BigNumber(10 ** 36)
         .div(loan.loanData.startRate.times(loanAssetPrecision).div(collateralAssetPrecision))
         .div(10 ** 18)
+        
+      // https://github.com/bZxNetwork/contractsV2/commit/2afdeb8c6b9951456d835fbd90a6bc38c699de89
+      // but then we started to store startRate as a price from Kyber (the real swap rate from trade event)
+      // that has another format and should be handled in the following way:
+      const newOpenPrice = loan.loanData.startRate
+        .div(10 ** 18)
+        .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
+        
+      // the wrong price will be much larger. 
+      // For example 307854115598597579198986971899 and 0.03263155. The latest is the correct price
+      openPrice = startDate.gt(dateWhenOpenPricePrecisionWasChanged.getTime()/1000) ? newOpenPrice : openPrice
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18)
 
       if (
