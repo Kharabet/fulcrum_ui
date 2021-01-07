@@ -37,8 +37,8 @@ interface IBorrowFormState {
   isEdit: boolean
   minValue: number
   maxValue: number
-  selectedValue: number
-  collateralValue: string
+  sliderValue: number
+  collaterizationPercents: string
   ethBalance: BigNumber
   maxAvailableLiquidity: BigNumber
 }
@@ -74,10 +74,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       didSubmit: false,
       isLoading: true,
       isEdit: false,
-      minValue: 120,
+      minValue: 120.3019,
       maxValue: 3000,
-      selectedValue: 0,
-      collateralValue: ''
+      sliderValue: 0,
+      collaterizationPercents: ''
     }
 
     this._initDefaults = new Subject<null>()
@@ -131,19 +131,28 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       this.props.borrowAsset,
       this.state.collateralAsset
     )
-    const selectedValue: BigNumber = minInitialMargin.plus(30)
+    const sliderValue: BigNumber = minInitialMargin.plus(30)
     this.setState({
       isLoading: false,
       maxAvailableLiquidity,
       ethBalance,
-      minValue: minInitialMargin.toNumber(),
-      selectedValue: selectedValue.toNumber(),
-      collateralValue: selectedValue.toFixed()
+      minValue: minInitialMargin.plus(.3019).toNumber(),
+      sliderValue: this.inverseCurve(sliderValue.toNumber()),
+      collaterizationPercents: sliderValue.toFixed()
     })
   }
 
   public async componentDidMount() {
     this._initDefaults.next()
+  }
+
+  // custom logarithmic-like scale for slider
+  // based on https://codesandbox.io/s/qxm182k0mw
+  private sliderCurve(x: number): number{
+    return new BigNumber((0.30194*Math.exp(2.30097*x)+120)).dp(2, BigNumber.ROUND_HALF_UP).toNumber()
+  }
+  private inverseCurve(x: number): number{
+    return new BigNumber(Math.log((x-120)/0.30194)/2.30097).dp(2, BigNumber.ROUND_HALF_UP).toNumber()
   }
 
   public render() {
@@ -213,7 +222,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             <div className="edit-input-wrapper">
               <span>Collateralized</span>
               <div className="edit-input-container">
-                {this.state.collateralValue === '' ? (
+                {this.state.collaterizationPercents === '' ? (
                   <div className="loader-container">
                     <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
                   </div>
@@ -224,7 +233,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                         type="number"
                         step="any"
                         placeholder={`Enter`}
-                        value={this.state.collateralValue}
+                        value={this.state.collaterizationPercents}
                         className="input-collateral"
                         onChange={this.onCollateralAmountChange}
                       />
@@ -236,10 +245,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             <span className="borrow-form__label-safe">Safe</span>
             <React.Fragment>
               <Slider
-                step={0.01}
-                min={this.state.minValue}
-                max={this.state.maxValue}
-                value={this.state.selectedValue}
+                step={(this.inverseCurve(this.state.maxValue) - this.inverseCurve(this.state.minValue)) / 100}
+                min={this.inverseCurve(this.state.minValue)}
+                max={this.inverseCurve(this.state.maxValue)}
+                value={this.state.sliderValue}
                 onChange={this.onChange}
                 onAfterChange={this.onChange}
               />
@@ -283,7 +292,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         this.props.borrowAsset,
         this.state.collateralAsset,
         borrowAmount,
-        new BigNumber(this.state.selectedValue)
+        new BigNumber(this.sliderCurve(this.state.sliderValue))
       ).then((value) => {
         observer.next(value)
       })
@@ -296,7 +305,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         this.props.borrowAsset,
         this.state.collateralAsset,
         depositAmount,
-        new BigNumber(this.state.selectedValue)
+        new BigNumber(this.sliderCurve(this.state.sliderValue))
       ).then((value) => {
         observer.next(value)
       })
@@ -400,7 +409,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   private setDepositEstimate = (amount: BigNumber) => {
-    const depositAmount = amount.times(this.state.selectedValue).div(this.state.minValue)
+    const depositAmount = amount.times(this.state.collaterizationPercents).div(this.state.minValue)
 
     const depositAmountValue = depositAmount.dp(5, BigNumber.ROUND_CEIL).toString()
     this.setState({
@@ -432,16 +441,16 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     if (parseFloat(inputCollateralText) < 0) return
 
     const collateralText = inputCollateralText
-    let collateralValue = inputCollateralValue
+    let collaterizationPercents = inputCollateralValue
 
-    if (inputCollateralValue < this.state.minValue) collateralValue = this.state.minValue
-    if (inputCollateralValue > this.state.maxValue) collateralValue = this.state.maxValue
+    if (inputCollateralValue < this.state.minValue) collaterizationPercents = this.state.minValue
+    if (inputCollateralValue > this.state.maxValue) collaterizationPercents = this.state.maxValue
 
     this.setState(
       {
         ...this.state,
-        collateralValue: collateralText,
-        selectedValue: collateralValue
+        collaterizationPercents: collateralText,
+        sliderValue: this.inverseCurve(collaterizationPercents)
       },
       () => {
         this._collateralChange.next()
@@ -456,21 +465,20 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   public onClickForm = (event: FormEvent<HTMLFormElement>) => {
     if (this.state.isEdit && (event.target as Element).className !== 'input-collateral') {
       this.setState({ isEdit: false })
-      if (this.state.minValue > Number(this.state.collateralValue)) {
-        this.setState({ ...this.state, collateralValue: this.state.minValue.toFixed() })
-      } else if (Number(this.state.collateralValue) > this.state.maxValue) {
-        this.setState({ ...this.state, collateralValue: this.state.maxValue.toFixed() })
+      if (this.state.minValue > Number(this.state.collaterizationPercents)) {
+        this.setState({ ...this.state, collaterizationPercents: this.state.minValue.toFixed() })
+      } else if (Number(this.state.collaterizationPercents) > this.state.maxValue) {
+        this.setState({ ...this.state, collaterizationPercents: this.state.maxValue.toFixed() })
       }
     }
   }
 
   private onChange = async (value: number) => {
-    const selectedValue = Number(value.toFixed(2))
     this.setState(
       {
         ...this.state,
-        selectedValue: selectedValue,
-        collateralValue: selectedValue.toFixed(2)
+        sliderValue: Number(value.toFixed(2)),
+        collaterizationPercents: this.sliderCurve(value).toFixed(2)
       },
       () => this._collateralChange.next()
     )
@@ -508,8 +516,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             isLoading: true,
             depositAmount: depositAmount,
             depositAmountValue: depositAmountValue,
-            selectedValue: this.state.maxValue,
-            collateralValue: this.state.maxValue.toFixed(2)
+            sliderValue: this.state.maxValue,
+            collaterizationPercents: this.state.maxValue.toFixed(2)
           },
           () => {
             this._depositAmountChange.next(depositAmountValue)
