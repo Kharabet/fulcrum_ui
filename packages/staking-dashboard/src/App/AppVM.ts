@@ -1,6 +1,7 @@
 import * as mobx from 'mobx'
 import { RootStore } from 'src/stores'
 import { DialogVM } from 'ui-framework'
+import ProviderType from 'src/domain/ProviderType'
 
 type AppVMProps = 'pending'
 
@@ -10,6 +11,9 @@ export default class AppVM {
   public pending = false
   public headerMenu = new DialogVM()
   public providerMenu = new DialogVM()
+  public section: 'dao' | 'stake' | 'rewards' = 'stake'
+  private stopAutoHidingProviderMenu: mobx.IReactionDisposer | null = null
+  private stopAutoSettingBodyOverflow: mobx.IReactionDisposer | null = null
 
   /**
    * Helper to set values through mobx actions.
@@ -25,17 +29,18 @@ export default class AppVM {
     Object.assign(this, props)
   }
 
-  public init() {
-    mobx.reaction(
-      () => this.rootStore.web3Connection.providerIsChanging,
-      (isChanging) => {
-        if (!isChanging) {
-          this.providerMenu.hide()
-        }
-      }
-    )
+  public connect (providerType: ProviderType) {
+    this.providerMenu.hide()
+    this.rootStore.web3Connection.connect(providerType)
+  }
 
-    mobx.reaction(
+  public disconnect () {
+    this.providerMenu.hide()
+    this.rootStore.web3Connection.disconnect()
+  }
+
+  public init() {
+    this.stopAutoSettingBodyOverflow = mobx.reaction(
       () => this.headerMenu.visible || this.providerMenu.visible,
       (menuVisible) => {
         if (menuVisible) {
@@ -45,6 +50,30 @@ export default class AppVM {
         }
       }
     )
+
+    // This is purely to help performance issue when loading contracts
+    this.stopPreloadContract = mobx.reaction(
+      () => this.section === 'rewards',
+      (shouldPreload) => {
+        if (shouldPreload) {
+          setTimeout(() => {
+            this.rootStore.stakingProvider.preloadIBZXContract()
+          }, 1000)
+        }
+      }
+    )
+  }
+
+  public destroyVM() {
+    if (this.stopAutoHidingProviderMenu) {
+      this.stopAutoHidingProviderMenu()
+    }
+    if (this.stopAutoSettingBodyOverflow) {
+      this.stopAutoSettingBodyOverflow()
+    }
+    if (this.stopPreloadContract) {
+      this.stopPreloadContract()
+    }
   }
 
   constructor({ rootStore }: { rootStore: RootStore }) {

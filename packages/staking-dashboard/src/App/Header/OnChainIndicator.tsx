@@ -6,57 +6,77 @@ export function OnChainIndicator({ appVM }: { appVM: AppVM }) {
   const { etherscanURL, web3Connection } = appVM.rootStore
   const {
     providerTypeDetails,
-    supportedNetwork,
+    wrongNetwork,
+    isConnected,
     walletAddress,
-    providerIsChanging
+    isDisconnecting,
+    isLoadingWallet,
+    hasProvider,
   } = web3Connection
-  const walletAddressText = supportedNetwork ? web3Connection.shortWalletAddress : 'Wrong Network!'
+
+  if (!hasProvider) {
+    if (wrongNetwork) {
+      return (
+        <button className="btn--onchain-indicator">
+          <div>
+            <i>Wrong Network!</i>
+          </div>
+        </button>
+      )
+    }
+
+    return (
+      <button className="btn--onchain-indicator" onClick={appVM.providerMenu.show}>
+        <div className="on-chain-indicator__provider-txt">Click To Connect Wallet</div>
+      </button>
+    )
+  }
+
+  if (providerTypeDetails === null) {
+    return (
+      <button className="btn--onchain-indicator">
+        <div className="on-chain-indicator__provider-txt">Unknown provider</div>
+      </button>
+    )
+  }
 
   return (
-    <div
-      className={`on-chain-indicator ${providerTypeDetails !== null ? `connect` : 'disconnect'}`}>
-      <button
-        className="on-chain-indicator__container"
-        onClick={appVM.providerMenu.show}>
-        {providerTypeDetails !== null && providerTypeDetails.reactLogoSvgShort !== null && (
-          <React.Fragment>
-            <div className="on-chain-indicator__svg">
-              {providerTypeDetails.reactLogoSvgShort.render()}
-            </div>
-            <div className="on-chain-indicator__description">
-              <span>{providerTypeDetails.displayName}</span>
-              {walletAddressText ? (
-                supportedNetwork && walletAddress && etherscanURL ? (
-                  <a
-                    className="on-chain-indicator__wallet-address"
-                    href={`${etherscanURL}address/${walletAddress}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(event) => event.stopPropagation()}>
-                    {walletAddressText}
-                  </a>
-                ) : (
-                  <span className="on-chain-indicator__wallet-address">{walletAddressText}</span>
-                )
-              ) : (
-                <i>Loading Wallet...</i>
-              )}
-            </div>
-          </React.Fragment>
-        )}
-        {!providerIsChanging &&
-          (providerTypeDetails === null || providerTypeDetails.reactLogoSvgShort === null) && (
-            <React.Fragment>
-              <span className="on-chain-indicator__provider-txt">Click To Connect Wallet</span>
-              {!supportedNetwork ? (
-                <span className="on-chain-indicator__wallet-address">{walletAddressText}</span>
-              ) : (
-                ``
-              )}
-            </React.Fragment>
+    <button className="btn--onchain-indicator" onClick={appVM.providerMenu.show}>
+      <div className="flex-row-center">
+        <div className="on-chain-indicator__svg">
+          {providerTypeDetails.reactLogoSvgShort !== null &&
+            providerTypeDetails.reactLogoSvgShort.render()}
+        </div>
+        <div className="margin-left-05 txt-left">
+          <div className="on-chain-indicator__description">{providerTypeDetails.displayName}</div>
+          {isConnected && !isDisconnecting && etherscanURL && (
+            <a
+              className="on-chain-indicator__wallet-address"
+              href={`${etherscanURL}address/${walletAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => event.stopPropagation()}>
+              <small>{web3Connection.shortWalletAddress}</small>
+            </a>
           )}
-      </button>
-    </div>
+          {isConnected && !isDisconnecting && !etherscanURL && (
+            <div className="on-chain-indicator__wallet-address">
+              <small>{web3Connection.shortWalletAddress}</small>
+            </div>
+          )}
+          {isLoadingWallet && (
+            <div>
+              <i>Loading Wallet...</i>
+            </div>
+          )}
+          {isDisconnecting &&
+            <div>
+              <i>Disconnecting...</i>
+            </div>
+          }
+        </div>
+      </div>
+    </button>
   )
 }
 

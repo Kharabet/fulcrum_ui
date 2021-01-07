@@ -38,12 +38,13 @@ export function ProviderMenu({ appVM }: { appVM: AppVM }) {
                 isConnected={connected}
                 isActivating={activating}
                 disabled={disabled}
+                connect={appVM.connect}
                 web3Connection={web3Connection}
               />
             )
           })}
         </div>
-        <button type="button" className="disconnect" onClick={web3Connection.disconnect}>
+        <button type="button" className="disconnect" onClick={appVM.disconnect}>
           Disconnect
         </button>
       </div>

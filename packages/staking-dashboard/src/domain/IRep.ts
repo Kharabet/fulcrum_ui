@@ -1,11 +1,11 @@
 import { BigNumber } from '@0x/utils'
 
 export default interface IRep {
-  index: number
-  wallet: string
-  BZRX: BigNumber
-  vBZRX: BigNumber
-  LPToken: BigNumber
+  bpt: BigNumber
+  bzrx: BigNumber
+  ibzrx: BigNumber
+  imageSrc?: string
   name: string
-  imageSrc: string
+  vbzrx: BigNumber
+  wallet: string
 }

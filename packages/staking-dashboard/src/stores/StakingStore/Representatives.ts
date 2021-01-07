@@ -1,4 +1,3 @@
-import hashUtils from 'app-lib/hashUtils'
 import stakingApi from 'app-lib/stakingApi'
 import stakingUtils from 'app-lib/stakingUtils'
 import * as mobx from 'mobx'
@@ -6,6 +5,8 @@ import IRep from 'src/domain/IRep'
 import { StakingProvider } from 'src/services/StakingProvider'
 
 type representativesProp =
+  | 'error'
+  | 'pending'
   | 'repsList'
   | 'topRepsList'
   | 'delegateAddress'
@@ -13,14 +14,23 @@ type representativesProp =
 
 export default class Representatives {
   [prop: string]: any
+  public pending = false
   public stakingProvider: StakingProvider
   public repsList: IRep[] = []
   public topRepsList: IRep[] = []
   public delegateAddress: string = ''
   public isAlreadyRepresentative = false
+  public error: Error | null = null
 
   get delegateAlreadyChosen() {
     return stakingUtils.isValidRepAddress(this.delegateAddress)
+  }
+
+  get currentDelegate() {
+    if (this.repsList.length === 0 || !this.delegateAlreadyChosen) {
+      return null
+    }
+    return this.findRepByWallet(this.delegateAddress)
   }
 
   /**
@@ -28,6 +38,13 @@ export default class Representatives {
    */
   public set(prop: representativesProp, value: any) {
     ;(this[prop] as any) = value
+  }
+
+  /**
+   * Helper to assign multiple props values through a mobx action.
+   */
+  public assign(props: { [key: string]: any }) {
+    Object.assign(this, props)
   }
 
   /**
@@ -60,26 +77,20 @@ export default class Representatives {
   }
 
   public async checkIsRep() {
-    const isRep = await this.stakingProvider.checkIsRep()
-    this.set('isAlreadyRepresentative', isRep)
+    // const isRep = await this.stakingProvider.checkIsRep()
+    // this.set('isAlreadyRepresentative', isRep)
   }
 
   public async getTopReps() {
-    const topReps = this.repsList.sort((a, b) => b.BZRX.minus(a.BZRX).toNumber()).slice(0, 3)
+    const topReps = this.repsList.sort((a, b) => b.bzrx.minus(a.bzrx).toNumber()).slice(0, 3)
     this.set('topRepsList', topReps)
-    const topRepsWithProfiles = await Promise.all(
-      topReps.map((rep, index) => stakingApi.getRepInfo(rep, index))
-    )
+    const topRepsWithProfiles = await Promise.all(topReps.map((rep) => stakingApi.getRepInfo(rep)))
     this.set('topRepsList', topRepsWithProfiles)
     return this.topRepsList
   }
 
   public async getRepresentatives() {
-    const repsList = ((await this.stakingProvider.getRepresentatives()) as IRep[]).map((rep, i) => {
-      rep.index = i
-      rep.name = hashUtils.shortHash(rep.wallet, 6, 4)
-      return rep
-    })
+    const repsList = (await this.stakingProvider.getRepresentatives()) as IRep[]
     this.set('repsList', repsList)
 
     const topReps = await this.getTopReps()
@@ -104,6 +115,19 @@ export default class Representatives {
     }
   }
 
+  public async changeDelegate(delegateAddress: string) {
+    this.assign({ error: null, pending: true })
+    try {
+      await this.stakingProvider.changeDelegate(delegateAddress)
+    } catch (err) {
+      err.title = 'Could not change delegate'
+      this.set('error', err)
+      throw err
+    } finally {
+      this.set('pending', false)
+    }
+  }
+
   /**
    * Helper function meant to be called when the provider has changed.
    * Updates all things related to representatives and delegate.
@@ -113,7 +137,7 @@ export default class Representatives {
       // Only load repsList if it has not been loaded yet
       await this.getRepresentatives()
     }
-    await this.checkIsRep()
+    // await this.checkIsRep()
     await this.getDelegate()
   }
 

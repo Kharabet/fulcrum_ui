@@ -1,14 +1,15 @@
-import React, { MouseEvent } from 'react'
+import React from 'react'
+
+const contactClick = (event: React.SyntheticEvent) => {
+  event.preventDefault()
+  // @ts-ignore
+  if (window.Intercom) {
+    // @ts-ignore
+    window.Intercom('show')
+  }
+}
 
 export function FooterMenu() {
-  const contactClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault()
-    // @ts-ignore
-    if (window.Intercom) {
-      // @ts-ignore
-      window.Intercom('show')
-    }
-  }
   return (
     <div className="footer-menu">
       <div className="column-menu">

@@ -1,30 +1,19 @@
 import * as mobx from 'mobx'
 import { StakingProvider } from 'src/services/StakingProvider'
 import StakingStore from './StakingStore'
+import TransactionStore from './TransactionStore'
 import UIStore from './UIStore'
 import Web3Connection from './Web3Connection'
-
-function getErrorStackMessages (error: any, message = ''): string {
-  console.log(error.message)
-  if (error.message) {
-    message += error.message
-    if (error.code) {
-      message += ` (${error.code})`
-    }
-    message += '\n'
-  }
-  if (!error.data) {
-    return message
-  }
-  return getErrorStackMessages(error.data, message)
-}
+import appConfig from 'src/config/appConfig'
+import errorUtils from 'app-lib/errorUtils'
 
 export default class RootStore {
   public stakingStore: StakingStore
+  public transactionStore: TransactionStore
   public stakingProvider: StakingProvider
   public web3Connection: Web3Connection
   public uiStore: UIStore
-  public etherscanURL = ''
+  public etherscanURL = appConfig.web3ProviderSettings.etherscanURL
 
   public get appError (): {error: any, stackMessages: string} | null {
     // TODO: fix typescript any
@@ -32,7 +21,7 @@ export default class RootStore {
     if (error) {
       return {
         error,
-        stackMessages: getErrorStackMessages(error)
+        stackMessages: errorUtils.getErrorStackMessages(error)
       }
     }
     return null
@@ -50,33 +39,28 @@ export default class RootStore {
   }
 
   public init() {
-    const sp = this.stakingProvider
-    sp.on(
-      'ProviderIsChanging',
-      mobx.action(() => {
-        this.web3Connection.providerIsChanging = true
-      })
-    )
-    sp.on(
-      'ProviderChanged',
-      mobx.action((event) => {
-        this.web3Connection.providerIsChanging = false
-        this.web3Connection.supportedNetwork = !sp.unsupportedNetwork
-        this.web3Connection.providerType = event.providerType
-        this.web3Connection.activatingProvider = null
-        this.web3Connection.walletAddress = sp.getCurrentAccount() || ''
-        this.etherscanURL = sp.web3ProviderSettings ? sp.web3ProviderSettings.etherscanURL : ''
-      })
-    )
+    this.web3Connection.init()
     this.stakingStore.init()
-    mobx.when(
-      () => !!this.web3Connection.web3React,
-      () => this.web3Connection.checkAndStartStoredProvider()
-    )
+    this.transactionStore.init()
+
+    /**
+     * Trying to manage errors in a centralized way.
+     * Some "errors" that may popup are actually voluntary. eg: user decides to cancel transaction
+     * In this cases, we try to detect it and set a flag. If it's not a "real" error, we dismiss it
+     * after a short time. @see lib/errorUtils.js
+     */
+    mobx.autorun(() => {
+      if (this.appError && this.appError.error.noError) {
+        setTimeout(() => {
+          this.clearError()
+        }, 4000)
+      }
+    })
   }
 
   constructor({ stakingProvider }: { stakingProvider: StakingProvider }) {
     this.stakingProvider = stakingProvider
+    this.transactionStore = new TransactionStore(this)
     this.stakingStore = new StakingStore(this)
     this.web3Connection = new Web3Connection(this)
     this.uiStore = new UIStore(this)

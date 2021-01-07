@@ -23,7 +23,7 @@ if (appConfig.isMainnetProd) {
   TagManager.initialize(tagManagerArgs)
 }
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' || localStorage.getItem('devExposeStore')) {
   // Expose the rootStore to window for easy debug in dev
   // @ts-ignore
   window.rootStore = rootStore

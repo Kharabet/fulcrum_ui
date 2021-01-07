@@ -17,21 +17,21 @@ export default function App({ vm }: { vm: AppVM }) {
     <React.Fragment>
       <Web3ReactProvider getLibrary={stakingProvider.getLibrary}>
         <Web3ReactExporter web3Connection={vm.rootStore.web3Connection} />
-        <ProviderMenu appVM={vm} />
       </Web3ReactProvider>
-      {appConfig.isMainnetProd ? <Intercom appID="dfk4n5ut" /> : null}
+      <ProviderMenu appVM={vm} />
       <Router>
         <>
           <Header appVM={vm} />
           <Switch>
             <Route exact={true} path="/">
-              <Staking />
+              <Staking appVM={vm}/>
             </Route>
           </Switch>
         </>
       </Router>
       <AppError rootStore={vm.rootStore}/>
       <Footer />
+      {appConfig.isMainnetProd ? <Intercom appID="dfk4n5ut" /> : null}
     </React.Fragment>
   )
 }

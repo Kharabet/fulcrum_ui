@@ -1,31 +1,14 @@
 .add-to-balance {
-  background-color: #e7ebf0;
   flex-wrap: wrap;
   label {
-    width: 100%;
     color: #283049;
     font-weight: bold;
     font-size: 16px;
-    margin-bottom: 30px;
-    margin-left: 15px;
   }
   .calc-item {
     position: relative;
     margin-bottom: 30px;
     width: 100%;
-  }
-  button {
-    width: 100%;
-    margin-bottom: 12px;
-    &:disabled,
-    &[disabled] {
-      &,
-      &:hover {
-        background: none;
-        border: 1px solid #b9c7d6;
-        color: #b9c7d6;
-      }
-    }
   }
   &__input {
     width: 100%;
@@ -33,9 +16,8 @@
     font-weight: 800;
     font-size: 36px;
     border: none;
-    border-radius: 16px;
     outline: none;
-    padding: 30px 63px;
+    padding: 16px 44px;
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -48,8 +30,7 @@
   }
   &__range {
     position: relative;
-    margin: 0 24px;
-    margin-top: -8px;
+    // margin-top: -8px;
     input {
       position: relative;
       cursor: pointer;
@@ -99,22 +80,23 @@
     }
   }
 
-  .token-logo {
-    position: absolute;
-    pointer-events: none;
-    left: 16px;
-    top: 19px;
-    width: 32px;
-    height: 32px;
-  }
   .sign {
     position: absolute;
     pointer-events: none;
     text-align: right;
-    top: 23px;
-    right: 23px;
+    top: 27px;
+    right: 0;
     font-weight: 600;
     font-size: 18px;
     color: #758295;
   }
+}
+
+.add-to-balance__icon {
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  top: 20px;
+  width: 32px;
+  height: 32px;
 }

@@ -13,7 +13,7 @@ export function HeaderMobile({ appVM }: { appVM: AppVM }) {
   return (
     <header className={`${appVM.headerMenu.visible ? `open-menu` : ``}`}>
       <div className="flex fd-c h-100">
-        <div className="flex jc-sb ai-c w-100 px-15">
+        <div className="flex jc-sb ai-c px-15">
           <Link to="/" className="logo">
             <div className="logo-sign">
               <LogoSign />
@@ -32,7 +32,9 @@ export function HeaderMobile({ appVM }: { appVM: AppVM }) {
         </div>
         <div className={`mobile-menu ${appVM.headerMenu.visible ? `shown` : `hidden`}`}>
           <div className="w-100">
-            <OnChainIndicator appVM={appVM} />
+            <div className="flex-center">
+              <OnChainIndicator appVM={appVM} />
+            </div>
             <div className="header-menu">
               <Link
                 to="/"

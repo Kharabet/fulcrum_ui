@@ -60,6 +60,19 @@ export default class AssetsDictionary {
       )
     ],
     [
+      Asset.CRV,
+      new AssetDetails(
+        'CRV',
+        '3 Curve token',
+        '',
+        18,
+        new Map<number, string | null>([
+          [1, '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'],
+          [42, '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490']
+        ])
+      )
+    ],
+    [
       Asset.IBZRX,
       new AssetDetails(
         'iBZRX',
@@ -264,4 +277,11 @@ export default class AssetsDictionary {
       )
     ]
   ])
+
+  /**
+   * Get the asset with a simple string without the need to import asset enum
+   */
+  public static getAsset(token: keyof typeof Asset) {
+    return AssetsDictionary.assets.get(token as Asset)
+  }
 }

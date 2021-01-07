@@ -1,0 +1,48 @@
+
+.st-asset-balance {
+  font-weight: 800;
+  line-height: 1;
+  color: #283049;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 15px;
+  @media screen and (min-width: $width-min-xs) {
+    font-size: 36px;
+  }
+  @media screen and (max-width: $width-max-xs) {
+    font-size: 26px;
+  }
+  .value {
+    position: relative;
+  }
+  .icon {
+    display: flex;
+    svg {
+      width: 32px;
+      height: auto;
+      margin-right: 14px;
+    }
+  }
+}
+
+.st-asset-balance--green {
+  @extend .st-asset-balance;
+  color: $green-color;
+}
+
+.st-asset-balance--small {
+  font-size: 18px;
+
+  .icon {
+    svg {
+      width: 24px;
+      margin-right: 8px;
+    }
+  }
+
+  .token-label {
+    left: 32px;
+  }
+}

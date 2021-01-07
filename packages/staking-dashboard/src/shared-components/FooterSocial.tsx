@@ -47,7 +47,7 @@ export function FooterSocial(props: IFooterSocialProps) {
         </a>
         <div className="flex data-year">
           <p className="light-gray-color">© {new Date().getFullYear()} bZeroX, LLC</p>
-          <div className="flex">
+          <div className="flex-center">
             <a href="https://bzx.network/tos" target="_blank" rel="noopener noreferrer">
               Terms of use
             </a>

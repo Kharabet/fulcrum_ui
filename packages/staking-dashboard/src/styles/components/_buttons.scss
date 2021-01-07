@@ -1,22 +1,8 @@
 .group-buttons {
   display: flex;
   flex-wrap: wrap;
-  .notice {
-    margin: 0 auto;
-    margin-bottom: 20px;
-    font-size: 14px;
-    font-weight: 200;
-    line-height: 1.8;
-  }
   @media screen and (min-width: $width-min-sm) {
     justify-content: space-between;
-  }
-  @media screen and (max-width: $width-max-sm) {
-    justify-content: center;
-    .notice {
-      width: 100%;
-      text-align: center;
-    }
   }
   .button {
     margin-bottom: 20px;
@@ -51,20 +37,10 @@
   font-size: 16px;
   line-height: 1.5;
   color: #276bfb;
+  position: relative;
+
   &-full-width {
     width: 100%;
-  }
-  @media screen and (min-width: $width-min-sm) {
-    min-width: 320px;
-    &-full-width {
-      max-width: 630px;
-    }
-  }
-  @media screen and (max-width: $width-max-sm) {
-    min-width: 255px;
-    &-full-width {
-      max-width: 540px;
-    }
   }
   &.blue {
     background-color: #276bfb;
@@ -96,8 +72,8 @@
   }
   &:disabled,
   &[disabled] {
-    background: #e7ebf0;
-    color: #ffffff;
+    background: #d9e0e7 !important;
+    color: #ffffff !important;
     cursor: not-allowed;
     &:hover {
       cursor: not-allowed;
@@ -124,17 +100,6 @@
   &.active {
     border: 2px solid #276bfb;
     position: relative;
-    &:before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, 0%);
-      bottom: -7px;
-      border-left: 5px solid transparent;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-top: 6px solid #276bfb;
-    }
   }
   .photo {
     margin-right: 12px;

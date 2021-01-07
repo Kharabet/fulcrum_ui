@@ -1,0 +1,9 @@
+$border-radius-base: 8px;
+
+@mixin border-rounded-1 {
+  border-radius: $border-radius-base;
+}
+
+.border-rounded-1 {
+  @include border-rounded-1;
+}

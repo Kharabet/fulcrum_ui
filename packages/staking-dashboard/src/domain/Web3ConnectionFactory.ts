@@ -97,6 +97,7 @@ export default class Web3ConnectionFactory {
       url = `https://eth-${appConfig.appNetwork}.alchemyapi.io/v2/${key}`
     } else {
       key = process.env.REACT_APP_INFURA_KEY // own developer's infura key
+      // url = 'http://localhost:8545'
       url = `https://${appConfig.appNetwork}.infura.io/v3/${key}`
     }
     return url

@@ -40,7 +40,7 @@ async function getRepsInfo(repsBaseInfoList: IRep[]): Promise<IRep[]> {
  * Get profile of a representative
  * @param rep
  */
-async function getRepInfo(rep: IRep, index: number): Promise<IRep> {
+async function getRepInfo(rep: IRep): Promise<IRep> {
   // Note: getProfile returns an empty object when profile does not exist
   const profile = await box.getProfile(rep.wallet)
   const name = profile.name || rep.name
@@ -48,7 +48,7 @@ async function getRepInfo(rep: IRep, index: number): Promise<IRep> {
     ? `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl['/']}`
     : rep.imageSrc
 
-  return { ...rep, name, imageSrc, index }
+  return { ...rep, name, imageSrc }
 }
 
 export default {

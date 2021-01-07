@@ -2,6 +2,7 @@ import { observer } from 'mobx-react'
 import React from 'react'
 import { RootStore } from 'src/stores'
 import { ButtonBasic } from 'ui-framework'
+import { ReactComponent as CloseIcon } from 'app-images/ic__close.svg'
 
 export function AppError({ rootStore }: { rootStore: RootStore }) {
   const { appError } = rootStore
@@ -9,19 +10,19 @@ export function AppError({ rootStore }: { rootStore: RootStore }) {
   return (
     <div className={appError === null ? 'app-error' : 'app-error--visible'}>
       {appError !== null && (
-        <div className="flex-row">
-          <div className="flex-fill margin-right-1">
-            <h3>
-              <small>Error: {appError.error.title || appError.error.message}</small>
-            </h3>
+        <div>
+          <h3 className="app-error__title">
+            <small>{appError.error.title || 'Error'}</small>
+          </h3>
+          {!appError.error.noError &&
             <textarea
               className="app-error__message"
               defaultValue={appError.stackMessages}
               readOnly={true}
             />
-          </div>
-          <ButtonBasic className="btn--link" onClick={rootStore.clearError}>
-            Close
+          }
+          <ButtonBasic className="app-error__close btn--invisible" onClick={rootStore.clearError}>
+            <CloseIcon title="Close"/>
           </ButtonBasic>
         </div>
       )}

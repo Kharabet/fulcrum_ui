@@ -5,7 +5,11 @@ import ProviderTypeDetails from 'src/domain/ProviderTypeDetails'
 import ProviderTypeDictionary from 'src/domain/ProviderTypeDictionary'
 import RootStore from 'src/stores/RootStore'
 
-type connectionStatusProp = 'supportedNetwork' | 'providerIsChanging' | 'activatingProvider'
+type connectionStatusProp =
+  | 'supportedNetwork'
+  | 'providerIsChanging'
+  | 'activatingProvider'
+  | 'isDisconnecting'
 
 export default class Web3Connection {
   public rootStore: RootStore
@@ -15,7 +19,10 @@ export default class Web3Connection {
   public providerIsChanging = false
   public storedProvider: ProviderType = ProviderType.None
   public activatingProvider: ProviderType | null = null
-  public web3React: any
+  public isDisconnecting = false
+  public web3React:
+    | { connector: any; activate: any; deactivate: any; active: any; error: any }
+    | undefined
 
   /**
    * eg: 0x1ba2...edf
@@ -44,7 +51,25 @@ export default class Web3Connection {
   }
 
   get isConnected() {
-    return this.providerType !== ProviderType.None && this.walletAddress
+    return this.providerType !== ProviderType.None && !!this.walletAddress
+  }
+
+  get wrongNetwork() {
+    return !this.supportedNetwork
+  }
+
+  /**
+   * We have a provider but no account selected yet
+   */
+  get isLoadingWallet() {
+    return this.activatingProvider !== null && this.activatingProvider !== ProviderType.None
+  }
+
+  get hasProvider() {
+    return (
+      (this.activatingProvider !== null && this.activatingProvider !== ProviderType.None) ||
+      this.providerType !== ProviderType.None
+    )
   }
 
   /**
@@ -79,7 +104,9 @@ export default class Web3Connection {
     }
     const connector = ProviderTypeDictionary.getConnectorByProviderType(providerType)
     this.set('activatingProvider', providerType)
-    this.web3React.activate(connector)
+    if (this.web3React) {
+      this.web3React.activate(connector)
+    }
   }
 
   /**
@@ -92,15 +119,54 @@ export default class Web3Connection {
       const storedConnector = ProviderTypeDictionary.getConnectorByProviderType(this.storedProvider)
       if (storedConnector) {
         this.activatingProvider = this.storedProvider
-        this.web3React.activate(storedConnector)
+        if (this.web3React) {
+          this.web3React.activate(storedConnector)
+        }
       }
+    } else {
+      this.rootStore.stakingProvider.setReadonlyWeb3Provider()
     }
     return this.storedProvider
   }
 
-  public disconnect() {
-    this.web3React.deactivate()
-    return this.rootStore.stakingProvider.setReadonlyWeb3Provider()
+  public async disconnect() {
+    if (this.web3React) {
+      try {
+        this.set('isDisconnecting', true)
+        this.web3React.deactivate()
+        await this.rootStore.stakingProvider.setReadonlyWeb3Provider()
+      } catch (err) {
+        console.error(err)
+      } finally {
+        this.set('isDisconnecting', false)
+      }
+    }
+  }
+
+  public init() {
+    const sp = this.rootStore.stakingProvider
+    sp.on(
+      'ProviderIsChanging',
+      mobx.action(() => {
+        this.providerIsChanging = true
+      })
+    )
+    sp.on(
+      'ProviderChanged',
+      mobx.action((event) => {
+        this.providerIsChanging = false
+        this.supportedNetwork = !sp.unsupportedNetwork
+        this.providerType = event.providerType
+        this.activatingProvider = null
+        this.walletAddress = sp.getCurrentAccount() || ''
+      })
+    )
+    mobx.when(
+      () => !!this.web3React,
+      () => setTimeout(() => {
+        this.checkAndStartStoredProvider()
+      }, 100)
+    )
   }
 
   constructor(rootStore: RootStore) {

@@ -8,21 +8,26 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
  * @param tokensToStake The amount of tokens to be staked
  */
 function verifyStake(
-  userBalances: { bzrx: BigNumber; vbzrx: BigNumber; bpt: BigNumber },
-  tokensToStake: { bzrx: BigNumber; vbzrx: BigNumber; bpt: BigNumber }
+  userBalances: { bzrx: BigNumber; vbzrx: BigNumber; ibzrx: BigNumber; bpt: BigNumber },
+  tokensToStake: { bzrx: BigNumber; vbzrx: BigNumber; ibzrx: BigNumber; bpt: BigNumber }
 ) {
-  const { bzrx, vbzrx, bpt } = tokensToStake
+  const { bzrx, vbzrx, ibzrx, bpt } = tokensToStake
 
   // All zeros
-  if (bzrx.eq(0) && vbzrx.eq(0) && bpt.eq(0)) {
+  if (bzrx.eq(0) && vbzrx.eq(0) && ibzrx.eq(0) && bpt.eq(0)) {
     return false
   }
   // Some negative
-  if (bzrx.isNegative() || vbzrx.isNegative() || bpt.isNegative()) {
+  if (bzrx.isNegative() || vbzrx.isNegative() || ibzrx.isNegative() || bpt.isNegative()) {
     return false
   }
   // Some bigger than total balance
-  if (bzrx.gt(userBalances.bzrx) || vbzrx.gt(userBalances.vbzrx) || bpt.gt(userBalances.bpt)) {
+  if (
+    bzrx.gt(userBalances.bzrx) ||
+    vbzrx.gt(userBalances.vbzrx) ||
+    ibzrx.gt(userBalances.ibzrx) ||
+    bpt.gt(userBalances.bpt)
+  ) {
     return false
   }
   return true

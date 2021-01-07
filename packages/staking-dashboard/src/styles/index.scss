@@ -15,9 +15,50 @@
 @import 'components/loader';
 @import 'components/add-to-balance';
 @import 'components/representative';
-@import 'components/animation-tx';
 
 @import 'layout/footer';
 
 @import 'layout/header';
 @import '../shared-components/AppError.scss';
+@import '../shared-components/AssetBalance.scss';
+
+.st-side-dialog {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.2s ease-out;
+  z-index: 3;
+  margin-left: -150px;
+  border: 1px solid #fff;
+  border-radius: 8px;
+  box-shadow: 0px 0px 13px 0px rgba(0, 0, 0, 0.1);
+  background-color: $color-bg-darken;
+  width: 300px;
+  min-height: 100px;
+}
+
+.st-side-dialog--visible {
+  @extend .st-side-dialog;
+  transform: translate3d(0, 0, 0);
+}
+
+.st-side-dialog--hidden {
+  @extend .st-side-dialog;
+  transform: translate3d(0, -200px, 0);
+}
+
+.st-side-dialog--showing {
+  @extend .st-side-dialog;
+  transform: translate3d(0, -200px, 0);
+}
+
+.st-wallet-changes__tokens {
+  display: grid;
+  grid-gap: $spacing-base;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.st-wallet-changes__diff {
+  color: $green-color;
+}

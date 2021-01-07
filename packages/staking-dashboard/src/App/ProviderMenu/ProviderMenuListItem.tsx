@@ -8,6 +8,7 @@ import Web3Connection from 'src/stores/Web3Connection'
 const loader = <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
 
 export interface IProviderMenuListItemProps {
+  connect: (providerType: ProviderType) => void
   web3Connection: Web3Connection
   disabled: boolean
   providerType: ProviderType
@@ -31,7 +32,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       <ButtonBasic
         className="provider-menu__list-item provider-menu__list-item--selected"
         disabled={true}
-        onClick={web3Connection.connect}
+        onClick={props.connect}
         onClickEmit="value"
         value={props.providerType}>
         <div className="provider-menu__list-item-description">
@@ -59,7 +60,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
   return (
     <ButtonBasic
       className="provider-menu__list-item"
-      onClick={web3Connection.connect}
+      onClick={props.connect}
       onClickEmit="value"
       value={props.providerType}
       disabled={props.disabled}>

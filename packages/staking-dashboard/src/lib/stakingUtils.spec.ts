@@ -4,7 +4,8 @@ import stakingUtils from './stakingUtils'
 const userBalancesMock = {
   bzrx: new BigNumber(100),
   vbzrx: new BigNumber(100),
-  bpt: new BigNumber(100)
+  ibzrx: new BigNumber(100),
+  bpt: new BigNumber(100),
 }
 
 describe('stakingUtils', () => {
@@ -14,7 +15,8 @@ describe('stakingUtils', () => {
       const tokensToStake = {
         bzrx: new BigNumber(0),
         vbzrx: new BigNumber(0),
-        bpt: new BigNumber(0)
+        bpt: new BigNumber(0),
+        ibzrx: new BigNumber(0),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(false)
     })
@@ -23,21 +25,24 @@ describe('stakingUtils', () => {
       let tokensToStake = {
         bzrx: new BigNumber(-1),
         vbzrx: new BigNumber(0),
-        bpt: new BigNumber(0)
+        bpt: new BigNumber(0),
+        ibzrx: new BigNumber(0),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(false)
 
       tokensToStake = {
         bzrx: new BigNumber(0),
         vbzrx: new BigNumber(-1),
-        bpt: new BigNumber(0)
+        bpt: new BigNumber(0),
+        ibzrx: new BigNumber(0),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(false)
 
       tokensToStake = {
         bzrx: new BigNumber(0),
         vbzrx: new BigNumber(0),
-        bpt: new BigNumber(-1)
+        bpt: new BigNumber(-1),
+        ibzrx: new BigNumber(0),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(false)
     })
