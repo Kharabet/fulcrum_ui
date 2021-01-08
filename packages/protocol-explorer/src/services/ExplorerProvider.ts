@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { Web3Wrapper } from '@0x/web3-wrapper'
+import { Web3Wrapper, LogEntry } from '@0x/web3-wrapper'
 // import Web3 from 'web3';
 import { EventEmitter } from 'events'
 
@@ -333,19 +333,61 @@ export class ExplorerProvider {
     }
   }
 
-  public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
+  private getEtherscanApiUrl = (
+    fromBlock: string,
+    toBlock: string,
+    address: string,
+    topic: string,
+    apiKey: string
+  ) =>
+    `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&address=${address}&topic0=${topic}&apikey=${apiKey}`
+
+  private getLogsFromEtherscan = async (
+    fromBlock: string,
+    toBlock: string,
+    address: string,
+    topic: string
+  ): Promise<any> => {
+    const etherscanApiKey = configProviders.Etherscan_Api
+    const etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&address=${address}&topic0=${topic}&apikey=${etherscanApiKey}`
+    const liquidationResponse = await fetch(etherscanApiUrl)
+    const liquidationResponseJson = await liquidationResponse.json()
+    return liquidationResponseJson.status === '1' ? liquidationResponseJson.result : undefined
+  }
+
+  public getLiquidationHistoryWithTimestamps = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = []
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    const etherscanApiKey = configProviders.Etherscan_Api
-    const etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
-    const liquidationResponse = await fetch(etherscanApiUrl)
-    const liquidationResponseJson = await liquidationResponse.json()
-    if (liquidationResponseJson.status !== '1') return result
-    const events = liquidationResponseJson.result
+    
+    const eventsBatch0 =
+      (await this.getLogsFromEtherscan(
+        '10500001',
+        '11000000',
+        bzxContractAddress,
+        LiquidationEvent.topic0
+      )) || []
+    const eventsBatch1 =
+      (await this.getLogsFromEtherscan(
+        '11000001',
+        '11500000',
+        bzxContractAddress,
+        LiquidationEvent.topic0
+      )) || []
+    const eventsBatch2 =
+      (await this.getLogsFromEtherscan(
+        '11500001',
+        'latest',
+        bzxContractAddress,
+        LiquidationEvent.topic0
+      )) || []
+    const events = eventsBatch0
+      .concat(eventsBatch1)
+      .concat(eventsBatch2)
     result = events
       .reverse()
       .map((event: any) => {
@@ -366,6 +408,7 @@ export class ExplorerProvider {
         const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16))
         const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16))
         const currentMargin = new BigNumber(parseInt(dataSegments[6], 16))
+        const blockNumber = new BigNumber(event.blockNumber)
         const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
         const txHash = event.transactionHash
         return new LiquidationEvent(
@@ -379,52 +422,103 @@ export class ExplorerProvider {
           collateralWithdrawAmount,
           collateralToLoanRate,
           currentMargin,
-          timeStamp,
-          txHash
+          blockNumber,
+          txHash,
+          timeStamp
         )
       })
       .filter((e: any) => e)
     return result
   }
 
+  public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
+    let result: LiquidationEvent[] = []
+    if (!this.contractsSource || !this.web3Wrapper) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    const events = await this.web3Wrapper.getLogsAsync({
+      topics: [LiquidationEvent.topic0],
+      fromBlock: '0x989680',
+      toBlock: 'latest',
+      address: bzxContractAddress
+    })
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      const event: LogEntry = reverseEvents[i]
+      const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const liquidatorAddress = event.topics[2].replace('0x000000000000000000000000', '0x')
+      const loanId = event.topics[3]
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments || !event.blockNumber) continue
+      const lender = dataSegments[0].replace('000000000000000000000000', '0x')
+
+      const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) continue
+      const repayAmount = new BigNumber(parseInt(dataSegments[3], 16))
+      const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16))
+      const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16))
+      const currentMargin = new BigNumber(parseInt(dataSegments[6], 16))
+      const blockNumber = new BigNumber(event.blockNumber)
+      const txHash = event.transactionHash
+      result.push(
+        new LiquidationEvent(
+          userAddress,
+          liquidatorAddress,
+          loanId,
+          lender,
+          loanToken,
+          collateralToken,
+          repayAmount,
+          collateralWithdrawAmount,
+          collateralToLoanRate,
+          currentMargin,
+          blockNumber,
+          txHash
+        )
+      )
+    }
+    return result
+  }
+
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = []
-    if (!this.contractsSource) return result
+    if (!this.contractsSource || !this.web3Wrapper) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
-    const tradeEventResponse = await fetch(etherscanApiUrl)
-    const tradeEventResponseJson = await tradeEventResponse.json()
-    if (tradeEventResponseJson.status !== '1') return result
-    const events = tradeEventResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
-        const collateralTokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
-        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
-        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
-        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
-        const positionSize = new BigNumber(parseInt(dataSegments[2], 16))
-        const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16))
-        const interestRate = new BigNumber(parseInt(dataSegments[4], 16))
-        const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000)
-        const entryPrice = new BigNumber(parseInt(dataSegments[6], 16))
-        const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16))
-        const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new TradeEvent(
+    const events = await this.web3Wrapper.getLogsAsync({
+      topics: [TradeEvent.topic0],
+      fromBlock: '0x989680',
+      toBlock: 'latest',
+      address: bzxContractAddress
+    })
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      const event: LogEntry = reverseEvents[i]
+      const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
+      const loandId = event.topics[3]
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments || !event.blockNumber) continue
+      const collateralTokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
+      const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) continue
+      const positionSize = new BigNumber(parseInt(dataSegments[2], 16))
+      const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16))
+      const interestRate = new BigNumber(parseInt(dataSegments[4], 16))
+      const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000)
+      const entryPrice = new BigNumber(parseInt(dataSegments[6], 16))
+      const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16))
+      const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16))
+      const blockNumber = new BigNumber(event.blockNumber)
+      const txHash = event.transactionHash
+      result.push(
+        new TradeEvent(
           userAddress,
           lender,
           loandId,
@@ -437,50 +531,49 @@ export class ExplorerProvider {
           entryPrice,
           entryLeverage,
           currentLeverage,
-          timeStamp,
+          blockNumber,
           txHash
         )
-      })
-      .filter((e: any) => e)
+      )
+    }
+
     return result
   }
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = []
-    if (!this.contractsSource) return result
+    if (!this.contractsSource || !this.web3Wrapper) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
-    const closeWithSwapResponse = await fetch(etherscanApiUrl)
-    const closeWithSwapResponseJson = await closeWithSwapResponse.json()
-    if (closeWithSwapResponseJson.status !== '1') return result
-    const events = closeWithSwapResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
-        const collateralTokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
-        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
-        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
-        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
-        const closer = dataSegments[2].replace('000000000000000000000000', '0x')
-        const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16))
-        const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16))
-        const exitPrice = new BigNumber(parseInt(dataSegments[5], 16))
-        const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new CloseWithSwapEvent(
+    const events = await this.web3Wrapper.getLogsAsync({
+      topics: [CloseWithSwapEvent.topic0],
+      fromBlock: '0x989680',
+      toBlock: 'latest',
+      address: bzxContractAddress
+    })
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      const event: LogEntry = reverseEvents[i]
+      const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
+      const loandId = event.topics[3]
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments || !event.blockNumber) continue
+      const collateralTokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
+      const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) continue
+      const closer = dataSegments[2].replace('000000000000000000000000', '0x')
+      const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16))
+      const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16))
+      const exitPrice = new BigNumber(parseInt(dataSegments[5], 16))
+      const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16))
+      const blockNumber = new BigNumber(event.blockNumber)
+      const txHash = event.transactionHash
+      result.push(
+        new CloseWithSwapEvent(
           userAddress,
           collateralToken,
           loanToken,
@@ -491,50 +584,48 @@ export class ExplorerProvider {
           loanCloseAmount,
           exitPrice,
           currentLeverage,
-          timeStamp,
+          blockNumber,
           txHash
         )
-      })
-      .filter((e: any) => e)
+      )
+    }
     return result
   }
 
   public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
     let result: CloseWithDepositEvent[] = []
-    if (!this.contractsSource) return result
+    if (!this.contractsSource || !this.web3Wrapper) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
-    const closeWithDepositResponse = await fetch(etherscanApiUrl)
-    const closeWithDepositResponseJson = await closeWithDepositResponse.json()
-    if (closeWithDepositResponseJson.status !== '1') return result
-    const events = closeWithDepositResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
-        const closer = dataSegments[0].replace('000000000000000000000000', '0x')
-        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
-        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
-        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
-        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
-        const repayAmount = new BigNumber(parseInt(dataSegments[3], 16))
-        const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16))
-        const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16))
-        const currentMargin = new BigNumber(parseInt(dataSegments[6], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new CloseWithDepositEvent(
+    const events = await this.web3Wrapper.getLogsAsync({
+      topics: [CloseWithDepositEvent.topic0],
+      fromBlock: '0x989680',
+      toBlock: 'latest',
+      address: bzxContractAddress
+    })
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      const event: LogEntry = reverseEvents[i]
+      const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
+      const loandId = event.topics[3]
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments || !event.blockNumber) continue
+      const closer = dataSegments[0].replace('000000000000000000000000', '0x')
+      const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) continue
+      const repayAmount = new BigNumber(parseInt(dataSegments[3], 16))
+      const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16))
+      const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16))
+      const currentMargin = new BigNumber(parseInt(dataSegments[6], 16))
+      const blockNumber = new BigNumber(event.blockNumber)
+      const txHash = event.transactionHash
+      result.push(
+        new CloseWithDepositEvent(
           userAddress,
           lender,
           loandId,
@@ -545,51 +636,49 @@ export class ExplorerProvider {
           collateralWithdrawAmount,
           collateralToLoanRate,
           currentMargin,
-          timeStamp,
+          blockNumber,
           txHash
         )
-      })
-      .filter((e: any) => e)
+      )
+    }
     return result
   }
 
   public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
     let result: BorrowEvent[] = []
-    if (!this.contractsSource) return result
+    if (!this.contractsSource || !this.web3Wrapper) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
-    const borrowResponse = await fetch(etherscanApiUrl)
-    const borrowResponseJson = await borrowResponse.json()
-    if (borrowResponseJson.status !== '1') return result
-    const events = borrowResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
-        const loanTokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
-        const collateralTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
-        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
-        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
-        const newPrincipal = new BigNumber(parseInt(dataSegments[2], 16))
-        const newCollateral = new BigNumber(parseInt(dataSegments[3], 16))
-        const interestRate = new BigNumber(parseInt(dataSegments[4], 16))
-        const interestDuration = new BigNumber(parseInt(dataSegments[5], 16))
-        const collateralToLoanRate = new BigNumber(parseInt(dataSegments[6], 16))
-        const currentMargin = new BigNumber(parseInt(dataSegments[7], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new BorrowEvent(
+    const events = await this.web3Wrapper.getLogsAsync({
+      topics: [BorrowEvent.topic0],
+      fromBlock: '0x989680',
+      toBlock: 'latest',
+      address: bzxContractAddress
+    })
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      const event: LogEntry = reverseEvents[i]
+      const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
+      const loandId = event.topics[3]
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments || !event.blockNumber) continue
+      const loanTokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
+      const collateralTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) continue
+      const newPrincipal = new BigNumber(parseInt(dataSegments[2], 16))
+      const newCollateral = new BigNumber(parseInt(dataSegments[3], 16))
+      const interestRate = new BigNumber(parseInt(dataSegments[4], 16))
+      const interestDuration = new BigNumber(parseInt(dataSegments[5], 16))
+      const collateralToLoanRate = new BigNumber(parseInt(dataSegments[6], 16))
+      const currentMargin = new BigNumber(parseInt(dataSegments[7], 16))
+      const blockNumber = new BigNumber(event.blockNumber)
+      const txHash = event.transactionHash
+      result.push(
+        new BorrowEvent(
           userAddress,
           lender,
           loandId,
@@ -601,11 +690,11 @@ export class ExplorerProvider {
           interestDuration,
           collateralToLoanRate,
           currentMargin,
-          timeStamp,
+          blockNumber,
           txHash
         )
-      })
-      .filter((e: any) => e)
+      )
+    }
     return result
   }
 
@@ -694,69 +783,65 @@ export class ExplorerProvider {
 
   public getBurnHistory = async (asset: Asset): Promise<BurnEvent[]> => {
     let result: BurnEvent[] = []
-    if (!this.contractsSource) return result
+    if (!this.contractsSource || !this.web3Wrapper) return result
     const tokenContractAddress = this.contractsSource.getITokenErc20Address(asset)
     if (!tokenContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
-    const burnResponse = await fetch(etherscanApiUrl)
-    const burnResponseJson = await burnResponse.json()
-    if (burnResponseJson.status !== '1') return result
-    const events = burnResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const burner = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
-        const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16))
-        const assetAmount = new BigNumber(parseInt(dataSegments[1], 16))
-        const price = new BigNumber(parseInt(dataSegments[2], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        const asset = this.contractsSource!.getITokenByErc20Address(event.address)
-        if (asset === Asset.UNKNOWN) return null
-        return new BurnEvent(burner, tokenAmount, assetAmount, price, timeStamp, txHash, asset)
-      })
-      .filter((e: any) => e)
+    const events = await this.web3Wrapper.getLogsAsync({
+      topics: [BurnEvent.topic0],
+      fromBlock: '0x989680',
+      toBlock: 'latest',
+      address: tokenContractAddress
+    })
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      const event: LogEntry = reverseEvents[i]
+      const burner = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments || !event.blockNumber) continue
+      const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16))
+      const assetAmount = new BigNumber(parseInt(dataSegments[1], 16))
+      const price = new BigNumber(parseInt(dataSegments[2], 16))
+      const blockNumber = new BigNumber(event.blockNumber)
+      const txHash = event.transactionHash
+      const asset = this.contractsSource!.getITokenByErc20Address(event.address)
+      if (asset === Asset.UNKNOWN) continue
+      result.push(
+        new BurnEvent(burner, tokenAmount, assetAmount, price, blockNumber, txHash, asset)
+      )
+    }
     return result
   }
 
   public getMintHistory = async (asset: Asset): Promise<MintEvent[]> => {
     let result: MintEvent[] = []
-    if (!this.contractsSource) return result
+    if (!this.contractsSource || !this.web3Wrapper) return result
     const tokenContractAddress = this.contractsSource.getITokenErc20Address(asset)
     if (!tokenContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
-    const mintResponse = await fetch(etherscanApiUrl)
-    const mintResponseJson = await mintResponse.json()
-    if (mintResponseJson.status !== '1') return result
-    const events = mintResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const minter = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
-        const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16))
-        const assetAmount = new BigNumber(parseInt(dataSegments[1], 16))
-        const price = new BigNumber(parseInt(dataSegments[2], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        const asset = this.contractsSource!.getITokenByErc20Address(event.address)
-        if (asset === Asset.UNKNOWN) return null
-        return new MintEvent(minter, tokenAmount, assetAmount, price, timeStamp, txHash, asset)
-      })
-      .filter((e: any) => e)
+    const events = await this.web3Wrapper.getLogsAsync({
+      topics: [MintEvent.topic0],
+      fromBlock: '0x989680',
+      toBlock: 'latest',
+      address: tokenContractAddress
+    })
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      const event: LogEntry = reverseEvents[i]
+      const minter = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments || !event.blockNumber) continue
+      const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16))
+      const assetAmount = new BigNumber(parseInt(dataSegments[1], 16))
+      const price = new BigNumber(parseInt(dataSegments[2], 16))
+      const blockNumber = new BigNumber(event.blockNumber)
+      const txHash = event.transactionHash
+      const asset = this.contractsSource!.getITokenByErc20Address(event.address)
+      if (asset === Asset.UNKNOWN) continue
+      result.push(
+        new MintEvent(minter, tokenAmount, assetAmount, price, blockNumber, txHash, asset)
+      )
+    }
     return result
   }
 
@@ -781,7 +866,7 @@ export class ExplorerProvider {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
-          age: e.timeStamp,
+          blockNumber: e.blockNumber,
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.borrowedAmount.div(10 ** decimals),
@@ -793,7 +878,7 @@ export class ExplorerProvider {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
-          age: e.timeStamp,
+          blockNumber: e.blockNumber,
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.loanCloseAmount.div(10 ** decimals),
@@ -805,7 +890,7 @@ export class ExplorerProvider {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
-          age: e.timeStamp,
+          blockNumber: e.blockNumber,
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.repayAmount.div(10 ** decimals),
@@ -817,7 +902,7 @@ export class ExplorerProvider {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
-          age: e.timeStamp,
+          blockNumber: e.blockNumber,
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.repayAmount.div(10 ** decimals),
@@ -829,7 +914,7 @@ export class ExplorerProvider {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
-          age: e.timeStamp,
+          blockNumber: e.blockNumber,
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.newPrincipal.div(10 ** decimals),
@@ -841,7 +926,7 @@ export class ExplorerProvider {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
-          age: e.timeStamp,
+          blockNumber: e.blockNumber,
           account: e.burner,
           etherscanAddressUrl: `${etherscanUrl}address/${e.burner}`,
           quantity: e.assetAmount.div(10 ** decimals),
@@ -854,7 +939,7 @@ export class ExplorerProvider {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
-          age: e.timeStamp,
+          blockNumber: e.blockNumber,
           account: e.minter,
           etherscanAddressUrl: `${etherscanUrl}address/${e.minter}`,
           quantity: e.assetAmount.div(10 ** decimals),

@@ -8,7 +8,7 @@ export class BurnEvent {
   public readonly tokenAmount: BigNumber
   public readonly assetAmount: BigNumber
   public readonly price: BigNumber
-  public readonly timeStamp: Date
+  public readonly blockNumber: BigNumber
   public readonly txHash: string
   public readonly asset: Asset
 
@@ -17,7 +17,7 @@ export class BurnEvent {
     tokenAmount: BigNumber,
     assetAmount: BigNumber,
     price: BigNumber,
-    timeStamp: Date,
+    blockNumber: BigNumber,
     txHash: string,
     asset: Asset
   ) {
@@ -25,7 +25,7 @@ export class BurnEvent {
     this.tokenAmount = tokenAmount
     this.assetAmount = assetAmount
     this.price = price
-    this.timeStamp = timeStamp
+    this.blockNumber = blockNumber
     this.txHash = txHash
     this.asset = asset
   }

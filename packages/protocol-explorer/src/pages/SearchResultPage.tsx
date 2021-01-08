@@ -20,6 +20,7 @@ import { BurnEvent } from '../domain/BurnEvent'
 import { MintEvent } from '../domain/MintEvent'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
+import { Loader } from '../components/Loader'
 
 const getWeb3ProviderSettings = (networkId: number): string => {
   let etherscanURL = ''
@@ -74,6 +75,7 @@ interface ISearchResultPageState {
   filter: string
   filteredEvents: ITxRowProps[]
   showSearchResult: boolean
+  isLoading: boolean
 }
 export class SearchResultPage extends Component<ISearchResultPageProps, ISearchResultPageState> {
   constructor(props: any) {
@@ -82,6 +84,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       events: [],
       filteredEvents: [],
       showSearchResult: false,
+      isLoading: false,
       filter: this.props.match.params.filter.toLowerCase()
     }
     this._isMounted = false
@@ -118,6 +121,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   }
 
   derivedUpdate = async () => {
+    this.setState({ isLoading: true })
     const liquidationEvents = ExplorerProvider.Instance.getGridItems(
       await ExplorerProvider.Instance.getLiquidationHistory()
     )
@@ -142,7 +146,8 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
     this._isMounted &&
       this.setState({
         ...this.state,
-        events
+        events,
+        isLoading: false
       })
     this.onSearch(this.state.filter)
   }
@@ -163,7 +168,9 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       return
     }
     const filteredEvents = this.state.events.filter(
-      (e) => e.hash === filter || e.account === filter
+      (e) =>
+        e.hash.toLowerCase() === filter.toLowerCase() ||
+        e.account.toLowerCase() === filter.toLowerCase()
     )
     this._isMounted &&
       this.setState({
@@ -182,15 +189,23 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
           doNetworkConnect={this.props.doNetworkConnect}
         />
         <section className="search-container pt-45">
-          <Search onSearch={this.onSearch} initialFilter={this.state.filter} />
+          <Search onSearch={this.onSearch.bind(this)} initialFilter={this.state.filter} />
         </section>
         <section className="pt-90">
           <div className="container">
             <h1>Result:</h1>
-            <TxGrid
-              events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents}
-              quantityTx={25}
-            />
+            {this.state.isLoading ? (
+              <div className="pt-90 pb-45">
+                <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+              </div>
+            ) : (
+              <TxGrid
+                events={
+                  !this.state.showSearchResult ? this.state.events : this.state.filteredEvents
+                }
+                quantityTx={25}
+              />
+            )}
           </div>
         </section>
       </React.Fragment>
