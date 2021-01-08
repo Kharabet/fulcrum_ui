@@ -38,6 +38,7 @@ import { RequestTask } from '../domain/RequestTask'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { TasksQueue } from '../services/TasksQueue'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
+import { RolloverEvent } from '../domain/RolloverEvent'
 const isMainnetProd =
   process.env.NODE_ENV &&
   process.env.NODE_ENV !== 'development' &&
@@ -333,17 +334,6 @@ export class ExplorerProvider {
     }
   }
 
-  private getEtherscanApiUrl = (
-    fromBlock: string,
-    toBlock: string,
-    address: string,
-    topic: string,
-    apiKey: string
-  ) =>
-    `https://${
-      networkName === 'kovan' ? 'api-kovan' : 'api'
-    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&address=${address}&topic0=${topic}&apikey=${apiKey}`
-
   private getLogsFromEtherscan = async (
     fromBlock: string,
     toBlock: string,
@@ -363,7 +353,7 @@ export class ExplorerProvider {
     let result: LiquidationEvent[] = []
     if (!this.contractsSource) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    
+
     const eventsBatch0 =
       (await this.getLogsFromEtherscan(
         '10500001',
@@ -385,9 +375,7 @@ export class ExplorerProvider {
         bzxContractAddress,
         LiquidationEvent.topic0
       )) || []
-    const events = eventsBatch0
-      .concat(eventsBatch1)
-      .concat(eventsBatch2)
+    const events = eventsBatch0.concat(eventsBatch1).concat(eventsBatch2)
     result = events
       .reverse()
       .map((event: any) => {
@@ -531,6 +519,60 @@ export class ExplorerProvider {
           entryPrice,
           entryLeverage,
           currentLeverage,
+          blockNumber,
+          txHash
+        )
+      )
+    }
+
+    return result
+  }
+
+  public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
+    let result: RolloverEvent[] = []
+    if (!this.contractsSource || !this.web3Wrapper) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!bzxContractAddress) return result
+    const events = await this.web3Wrapper.getLogsAsync({
+      topics: [RolloverEvent.topic0],
+      fromBlock: '0x989680',
+      toBlock: 'latest',
+      address: bzxContractAddress
+    })
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      const event: LogEntry = reverseEvents[i]
+      const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+      const caller = event.topics[2].replace('0x000000000000000000000000', '0x')
+      const loandId = event.topics[3]
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments || !event.blockNumber) continue
+      const lender = dataSegments[0].replace('000000000000000000000000', '0x')
+      const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) continue
+
+      const collateralAmountUsed = new BigNumber(parseInt(dataSegments[3], 16))
+      const interestAmountAdded = new BigNumber(parseInt(dataSegments[4], 16))
+      const loanEndTimestamp = new Date(parseInt(dataSegments[5], 16) * 1000)
+      const gasRebate = new BigNumber(parseInt(dataSegments[6], 16))
+      const blockNumber = new BigNumber(event.blockNumber)
+      const txHash = event.transactionHash
+      result.push(
+        new RolloverEvent(
+          userAddress,
+          caller,
+          loandId,
+          lender,
+          loanToken,
+          collateralToken,
+          collateralAmountUsed,
+          interestAmountAdded,
+          loanEndTimestamp,
+          gasRebate,
           blockNumber,
           txHash
         )
@@ -854,6 +896,7 @@ export class ExplorerProvider {
       | BurnEvent
       | MintEvent
       | CloseWithDepositEvent
+      | RolloverEvent
     )[]
   ): ITxRowProps[] => {
     if (events.length === 0) return []
@@ -871,6 +914,18 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.borrowedAmount.div(10 ** decimals),
           action: 'Open Fulcrum Loan',
+          asset: e.loanToken
+        } as ITxRowProps
+      } else if (e instanceof RolloverEvent) {
+        const decimals = AssetsDictionary.assets.get(e.collateralToken)!.decimals! || 18
+        return {
+          hash: e.txHash,
+          etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
+          blockNumber: e.blockNumber,
+          account: e.user,
+          etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
+          quantity: e.collateralAmountUsed.div(10 ** decimals),
+          action: 'Rollover Fulcrum Loan',
           asset: e.loanToken
         } as ITxRowProps
       } else if (e instanceof CloseWithSwapEvent) {

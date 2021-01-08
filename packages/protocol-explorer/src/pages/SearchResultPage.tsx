@@ -128,6 +128,9 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
     const tradeEvents = ExplorerProvider.Instance.getGridItems(
       await ExplorerProvider.Instance.getTradeHistory()
     )
+    const rolloverEvents = ExplorerProvider.Instance.getGridItems(
+      await ExplorerProvider.Instance.getRolloverHistory()
+    )
     const closeEvents = ExplorerProvider.Instance.getGridItems(
       await ExplorerProvider.Instance.getCloseWithSwapHistory()
     )
@@ -142,6 +145,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       .concat(tradeEvents)
       .concat(closeWithDepositEvents)
       .concat(borrowEvents)
+      .concat(rolloverEvents)
 
     this._isMounted &&
       this.setState({
