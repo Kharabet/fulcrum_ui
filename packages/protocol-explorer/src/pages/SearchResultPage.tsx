@@ -1,65 +1,13 @@
 import React, { Component } from 'react'
 import { Header } from '../layout/Header'
-import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
-import { LiquidationEvent } from '../domain/LiquidationEvent'
-import { BigNumber } from '@0x/utils'
 import { ITxRowProps } from '../components/TxRow'
-import configProviders from '../config/providers.json'
 import { TxGrid } from '../components/TxGrid'
-import { LoanGrid } from '../components/LoanGrid'
-import Asset from 'bzx-common/src/assets/Asset'
-import { Bar } from 'react-chartjs-2'
 import { Search } from '../components/Search'
-import { UnhealthyChart } from '../components/UnhealthyChart'
 import { RouteComponentProps } from 'react-router'
-import { TradeEvent } from '../domain/TradeEvent'
-import { CloseWithSwapEvent } from '../domain/CloseWithSwapEvent'
-import { CloseWithDepositEvent } from '../domain/CloseWithDepositEvent'
-import { BorrowEvent } from '../domain/BorrowEvent'
-import { BurnEvent } from '../domain/BurnEvent'
-import { MintEvent } from '../domain/MintEvent'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { Loader } from '../components/Loader'
-
-const getWeb3ProviderSettings = (networkId: number): string => {
-  let etherscanURL = ''
-  switch (networkId) {
-    case 1:
-      etherscanURL = 'https://etherscan.io/'
-      break
-    case 3:
-      etherscanURL = 'https://ropsten.etherscan.io/'
-      break
-    case 4:
-      etherscanURL = 'https://rinkeby.etherscan.io/'
-      break
-    case 42:
-      etherscanURL = 'https://kovan.etherscan.io/'
-      break
-    default:
-      etherscanURL = ''
-      break
-  }
-  return etherscanURL
-}
-
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1
-    case 'ropsten':
-      return 3
-    case 'rinkeby':
-      return 4
-    case 'kovan':
-      return 42
-    default:
-      return 0
-  }
-}
-const networkName = process.env.REACT_APP_ETH_NETWORK
-const initialNetworkId = getNetworkIdByString(networkName)
+import { NavService } from '../services/NavService'
 
 interface MatchParams {
   filter: string
@@ -176,6 +124,8 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
         e.hash.toLowerCase() === filter.toLowerCase() ||
         e.account.toLowerCase() === filter.toLowerCase()
     )
+    NavService.Instance.History.push(`/search/${filter}`)
+
     this._isMounted &&
       this.setState({
         ...this.state,
@@ -197,9 +147,9 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
         </section>
         <section className="pt-90">
           <div className="container">
-            <h1>Result:</h1>
+            <h1 className="pb-45">Result:</h1>
             {this.state.isLoading ? (
-              <div className="pt-90 pb-45">
+              <div className="pt-45 pb-45">
                 <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
               </div>
             ) : (
