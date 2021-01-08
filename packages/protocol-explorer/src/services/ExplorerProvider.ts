@@ -340,6 +340,9 @@ export class ExplorerProvider {
     address: string,
     topic: string
   ): Promise<any> => {
+    // this method can return only first 1000 events
+    // so be careful with fromBlock → toBlock range 
+    // also, etherscan api allows only up to 5 request/sec
     const etherscanApiKey = configProviders.Etherscan_Api
     const etherscanApiUrl = `https://${
       networkName === 'kovan' ? 'api-kovan' : 'api'

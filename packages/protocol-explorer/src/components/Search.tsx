@@ -58,12 +58,12 @@ export const Search = (props: ISearchProps) => {
           value={inputValue}
         />
         {inputValue.length > 0 && (
-          <button onClick={resetInput}>
+          <button type="button" onClick={resetInput}>
             <IconClear />
           </button>
         )}
         {inputValue.length === 0 && (
-          <button onClick={onSearchClick}>
+          <button type="button" onClick={onSearchClick}>
             {' '}
             <IconSearch />
           </button>
