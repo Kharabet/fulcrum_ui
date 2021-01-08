@@ -69,6 +69,13 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   }
 
   derivedUpdate = async () => {
+    if (
+      !ExplorerProvider.Instance.contractsSource ||
+      !ExplorerProvider.Instance.contractsSource.canWrite
+    ) {
+      this.props.doNetworkConnect()
+      return
+    }
     this.setState({ isLoading: true })
     const liquidationEvents = ExplorerProvider.Instance.getGridItems(
       await ExplorerProvider.Instance.getLiquidationHistory()
