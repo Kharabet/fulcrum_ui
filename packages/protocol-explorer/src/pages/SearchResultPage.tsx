@@ -154,7 +154,13 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
         </section>
         <section className="pt-90">
           <div className="container">
-            <h1 className="pb-45">Result:</h1>
+            {!ExplorerProvider.Instance.contractsSource ||
+            !ExplorerProvider.Instance.contractsSource.canWrite ? (
+              <h1 className="pb-45 flex jc-c">Please connect your wallet</h1>
+            ) : (
+              <h1 className="pb-45">Result:</h1>
+            )}
+
             {this.state.isLoading ? (
               <div className="pt-45 pb-45">
                 <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
