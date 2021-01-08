@@ -136,12 +136,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     doNetworkConnect={this.doNetworkConnect}
                   />
                 </Route>
-                <Route path="/loan-params">
+                {/* <Route path="/loan-params">
                   <LoanParamsPage
                     isMobileMedia={this.state.isMobileMedia}
                     doNetworkConnect={this.doNetworkConnect}
                   />
-                </Route>
+                </Route> */}
               </Switch>
             </Router>
             <Footer />
