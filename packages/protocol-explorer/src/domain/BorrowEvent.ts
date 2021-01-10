@@ -15,7 +15,7 @@ export class BorrowEvent {
   public readonly interestDuration: BigNumber
   public readonly collateralToLoanRate: BigNumber // one unit of loanToken, denominated in collateralToken
   public readonly currentMargin: BigNumber
-  public readonly timeStamp: Date
+  public readonly blockNumber: BigNumber
   public readonly txHash: string
 
   constructor(
@@ -30,7 +30,7 @@ export class BorrowEvent {
     interestDuration: BigNumber,
     collateralToLoanRate: BigNumber,
     currentMargin: BigNumber,
-    timeStamp: Date,
+    blockNumber: BigNumber,
     txHash: string
   ) {
     this.user = user
@@ -44,7 +44,7 @@ export class BorrowEvent {
     this.interestDuration = interestDuration
     this.collateralToLoanRate = collateralToLoanRate
     this.currentMargin = currentMargin
-    this.timeStamp = timeStamp
+    this.blockNumber = blockNumber
     this.txHash = txHash
   }
 }

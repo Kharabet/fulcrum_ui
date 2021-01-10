@@ -39,10 +39,16 @@ export const Search = (props: ISearchProps) => {
     setInputValue('')
     props.onSearch('')
   }
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const input = _input.current
+    const value = input ? input.value : ''
+    props.onSearch(value.toLowerCase())
+  }
 
   return (
     <React.Fragment>
-      <form className={`search ${isFocus ? `focus` : ``}`}>
+      <form className={`search ${isFocus ? `focus` : ``}`} onSubmit={onSubmit}>
         <input
           ref={_input}
           placeholder="Search"
@@ -52,12 +58,12 @@ export const Search = (props: ISearchProps) => {
           value={inputValue}
         />
         {inputValue.length > 0 && (
-          <button onClick={resetInput}>
+          <button type="button" onClick={resetInput}>
             <IconClear />
           </button>
         )}
         {inputValue.length === 0 && (
-          <button onClick={onSearchClick}>
+          <button type="button" onClick={onSearchClick}>
             {' '}
             <IconSearch />
           </button>
