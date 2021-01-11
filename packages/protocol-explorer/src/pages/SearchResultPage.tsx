@@ -8,6 +8,7 @@ import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { Loader } from '../components/Loader'
 import { NavService } from '../services/NavService'
+import { ProviderType } from '../domain/ProviderType'
 
 interface MatchParams {
   filter: string
@@ -69,11 +70,8 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   }
 
   derivedUpdate = async () => {
-    if (
-      !ExplorerProvider.Instance.contractsSource ||
-      !ExplorerProvider.Instance.contractsSource.canWrite
-    ) {
-      this.props.doNetworkConnect()
+    if (ExplorerProvider.Instance.providerType === ProviderType.None) {
+      this.setState({ filter: '' })
       return
     }
     this.setState({ isLoading: true })
@@ -143,6 +141,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   }
 
   public render() {
+    const isWalletConnected = ExplorerProvider.Instance.providerType !== ProviderType.None
     return (
       <React.Fragment>
         <Header
@@ -152,29 +151,26 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
         <section className="search-container pt-45">
           <Search onSearch={this.onSearch.bind(this)} initialFilter={this.state.filter} />
         </section>
-        <section className="pt-90">
-          <div className="container">
-            {!ExplorerProvider.Instance.contractsSource ||
-            !ExplorerProvider.Instance.contractsSource.canWrite ? (
-              <h1 className="pb-45 flex jc-c">Please connect your wallet</h1>
-            ) : (
+        {isWalletConnected && (
+          <section className="pt-90">
+            <div className="container">
               <h1 className="pb-45">Result:</h1>
-            )}
 
-            {this.state.isLoading ? (
-              <div className="pt-45 pb-45">
-                <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
-              </div>
-            ) : (
-              <TxGrid
-                events={
-                  !this.state.showSearchResult ? this.state.events : this.state.filteredEvents
-                }
-                quantityTx={25}
-              />
-            )}
-          </div>
-        </section>
+              {this.state.isLoading ? (
+                <div className="pt-45 pb-45">
+                  <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+                </div>
+              ) : (
+                <TxGrid
+                  events={
+                    !this.state.showSearchResult ? this.state.events : this.state.filteredEvents
+                  }
+                  quantityTx={25}
+                />
+              )}
+            </div>
+          </section>
+        )}
       </React.Fragment>
     )
   }
