@@ -21,6 +21,7 @@ import { saiToDAIBridgeContract } from './typescript-wrappers/saiToDaiBridge'
 import { SoloContract } from './typescript-wrappers/solo'
 import { SoloBridgeContract } from './typescript-wrappers/SoloBridge'
 import { vatContract } from './typescript-wrappers/vat'
+import { IKyberNetworkProxyContract } from './typescript-wrappers/IKyberNetworkProxy'
 
 const getNetworkNameById = (networkId: number): string => {
   let networkName
@@ -68,6 +69,7 @@ export default class ContractsSource {
   private iTokenJson: any
   private oracleJson: any
   private DAppHelperJson: any
+  private IKyberNetworkProxyJson: any
   private iBZxJson: any
 
   private cdpsJson: any
@@ -104,6 +106,7 @@ export default class ContractsSource {
     this.iTokenJson = await import(`./artifacts/${networkName}/iToken.json`)
     this.oracleJson = await import(`./artifacts/${networkName}/oracle.json`)
     this.DAppHelperJson = await import(`./artifacts/${networkName}/DAppHelper.json`)
+    this.IKyberNetworkProxyJson = await import(`./artifacts/${networkName}/IKyberNetworkProxy.json`)
     this.iBZxJson = await import(`./artifacts/${networkName}/iBZx.json`)
 
     this.cdpsJson = await import(`./artifacts/${networkName}/GetCdps.json`)
@@ -221,6 +224,26 @@ export default class ContractsSource {
 
     return address
   }
+  
+  private getIKyberNetworkProxyContractAddress(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0x9AAb3f75489902f3a48495025729a0AF77d4b11e'
+        break
+      case 3:
+        address = '0xd719c34261e099Fdb33030ac8909d5788D3039C4'
+        break
+      case 4:
+        address = '0x0d5371e5EE23dec7DF251A8957279629aa79E9C5'
+        break
+      case 42:
+        address = '0xc153eeAD19e0DBbDb3462Dcc2B703cC6D738A37c'
+        break
+    }
+
+    return address
+  }
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init()
@@ -256,6 +279,14 @@ export default class ContractsSource {
     return new DAppHelperContract(
       this.DAppHelperJson.abi,
       this.getDAppHelperAddress().toLowerCase(),
+      this.provider
+    )
+  }
+  private async getIKyberNetworkProxyContractRaw(): Promise<IKyberNetworkProxyContract> {
+    await this.Init()
+    return new IKyberNetworkProxyContract(
+      this.IKyberNetworkProxyJson.abi,
+      this.getIKyberNetworkProxyContractAddress().toLowerCase(),
       this.provider
     )
   }
@@ -505,6 +536,7 @@ export default class ContractsSource {
   public getITokenContract = _.memoize(this.getITokenContractRaw)
   public getOracleContract = _.memoize(this.getOracleContractRaw)
   public getDAppHelperContract = _.memoize(this.getDAppHelperContractRaw)
+  public getIKyberNetworkProxyContract = _.memoize(this.getIKyberNetworkProxyContractRaw)
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw)
   public getiBZxContract = _.memoize(this.getiBZxContractRaw)
   public getAddressFromAsset = _.memoize(this.getAddressFromAssetRaw)

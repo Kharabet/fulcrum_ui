@@ -183,7 +183,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.baseToken)
-    const baseToQuoteTokenRate = await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(
       this.props.tradeType,
       this.props.baseToken,
@@ -211,8 +210,18 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     const collateralToPrincipalRate =
       this.props.positionType === PositionType.LONG
-        ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
-        : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken)
+        ? await FulcrumProvider.Instance.getKyberSwapRate(
+            this.props.baseToken,
+            this.props.quoteToken
+          )
+        : await FulcrumProvider.Instance.getKyberSwapRate(
+            this.props.quoteToken,
+            this.props.baseToken
+          )
+    const baseToQuoteTokenRate =
+      this.props.positionType === PositionType.LONG
+        ? collateralToPrincipalRate
+        : new BigNumber(1).div(collateralToPrincipalRate)
 
     const initialMargin =
       this.props.positionType === PositionType.LONG

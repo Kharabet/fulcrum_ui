@@ -223,7 +223,7 @@ export default class ManageCollateralForm extends Component<
                 ) {
                   assetBalanceNormalizedBN = new BigNumber(collateralState.minValue)
                 }
-                const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(
+                const collateralToLoanRate = await FulcrumProvider.Instance.getKyberSwapRate(
                   this.props.loan!.collateralAsset,
                   this.props.loan!.loanAsset
                 )
