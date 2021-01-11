@@ -2146,6 +2146,45 @@ export class FulcrumProvider {
     }
     return result
   }
+  
+  public async getKyberSwapRate(
+    srcAsset: Asset,
+    destAsset: Asset,
+    srcAmount?: BigNumber
+  ): Promise<BigNumber> {
+    let result: BigNumber = new BigNumber(0)
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
+    
+
+    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+      const kyberContract = await this.contractsSource.getIKyberNetworkProxyContract()
+
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
+      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals))
+      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18
+      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals))
+      if (!srcAmount) {
+        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
+      } else {
+        srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
+      }
+      try {
+        const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
+          srcAssetErc20Address,
+          destAssetErc20Address,
+          srcAmount
+        )
+        // console.log("swapPriceData- ",swapPriceData[0])
+        result = swapPriceData[0]
+          .dividedBy(10 ** 18)
+      } catch (e) {
+        console.log(e)
+        result = new BigNumber(0)
+      }
+    }
+    return result
+  }
 
   private getOldRewradEvents = async (
     bzxContractAddress: string,

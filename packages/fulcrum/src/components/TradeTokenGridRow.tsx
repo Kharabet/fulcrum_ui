@@ -93,8 +93,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private async derivedUpdate() {
     const collateralToPrincipalRate =
       this.props.positionType === PositionType.LONG
-        ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
-        : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken)
+        ? await FulcrumProvider.Instance.getKyberSwapRate(this.props.baseToken, this.props.quoteToken)
+        : await FulcrumProvider.Instance.getKyberSwapRate(this.props.quoteToken, this.props.baseToken)
 
     const baseTokenPrice =
       this.props.positionType === PositionType.LONG
