@@ -1261,29 +1261,53 @@ export class FulcrumProvider {
     if (tradedAmountEstimate.eq(0) || srcToken === destToken) {
       return new BigNumber(0)
     }
+    
+    const srcAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(srcToken)
+    const destAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(destToken)
 
+    if (!this.contractsSource || !srcAssetErc20Address || !destAssetErc20Address) {
+      return new BigNumber(0)
+    }
+    const kyberContract = await this.contractsSource.getIKyberNetworkProxyContract()
+    if (!kyberContract) {
+      return new BigNumber(0)
+    }
     const srcDecimals = AssetsDictionary.assets.get(srcToken)?.decimals || 18
     const amount = tradedAmountEstimate.times(10 ** srcDecimals).dp(0, BigNumber.ROUND_HALF_UP)
     if (amount.lte(10 ** srcDecimals)) {
       return new BigNumber(0)
     }
-    const srcAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(srcToken)
-    const destAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(destToken)
-    const slippageJsonOneTokenWorth = await fetch(
-      `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${10 **
-        srcDecimals}`
-    ).then((resp) => resp.json())
-    const slippageJsonTradeAmount = await fetch(
-      `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${amount}`
-    ).then((resp) => resp.json())
+    const oneEthWorthTokenAmount = await fetch(
+      `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`
+    )
+      .then((resp) => resp.json())
+      .then((resp) => 1 / resp.data[0].src_qty[0])
+      .catch(console.error)
+    let srcOneTokenWorthAmount = new BigNumber(10 ** srcDecimals)
+    if (oneEthWorthTokenAmount) {
+      srcOneTokenWorthAmount = new BigNumber(oneEthWorthTokenAmount)
+        .times(10 ** srcDecimals)
+        .dp(0, BigNumber.ROUND_HALF_UP)
+    }
 
-    if (!slippageJsonOneTokenWorth.expectedRate || !slippageJsonTradeAmount.expectedRate) {
+    const swapPriceOneTokenWorth: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
+      srcAssetErc20Address,
+      destAssetErc20Address,
+      srcOneTokenWorthAmount
+    )
+    const swapPriceTradeAmount: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
+      srcAssetErc20Address,
+      destAssetErc20Address,
+      amount
+    )
+
+    if (swapPriceOneTokenWorth[0].isZero() || swapPriceTradeAmount[0].isZero()) {
       return new BigNumber(0)
     }
-    const slippage = new BigNumber(slippageJsonOneTokenWorth.expectedRate)
-      .minus(slippageJsonTradeAmount.expectedRate)
+    const slippage = swapPriceOneTokenWorth[0]
+      .minus(swapPriceTradeAmount[0])
       .abs()
-      .div(slippageJsonTradeAmount.expectedRate)
+      .div(swapPriceTradeAmount[0])
       .times(100)
 
     return slippage
@@ -1482,10 +1506,6 @@ export class FulcrumProvider {
 
       const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18
       const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18
-      const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(
-        collateralToken,
-        loanToken
-      )
 
       try {
         console.log('leverageAmount' + leverageAmount)
@@ -2098,11 +2118,8 @@ export class FulcrumProvider {
     }
   }
 
-  public async getSwapRate(
-    srcAsset: Asset,
-    destAsset: Asset,
-    srcAmount?: BigNumber
-  ): Promise<BigNumber> {
+  // Returns swap rate from Chainlink Oracle
+  public async getSwapRate(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
     if (
       srcAsset === destAsset ||
       (srcAsset === Asset.USDC && destAsset === Asset.DAI) ||
@@ -2110,15 +2127,9 @@ export class FulcrumProvider {
     ) {
       return new BigNumber(1)
     }
-    // console.log("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
-    if (!srcAmount) {
-      srcAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS
-    } else {
-      srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
-    }
 
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const oracleContract = await this.contractsSource.getOracleContract()
@@ -2127,7 +2138,6 @@ export class FulcrumProvider {
       const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals))
       const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18
       const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals))
-
       try {
         const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
           srcAssetErc20Address,
@@ -2146,7 +2156,8 @@ export class FulcrumProvider {
     }
     return result
   }
-  
+
+  // Returns swap rate from Kyber
   public async getKyberSwapRate(
     srcAsset: Asset,
     destAsset: Asset,
@@ -2155,29 +2166,37 @@ export class FulcrumProvider {
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
-    
 
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const kyberContract = await this.contractsSource.getIKyberNetworkProxyContract()
-
+      if (!kyberContract) {
+        return result
+      }
       const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
-      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals))
-      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18
-      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals))
       if (!srcAmount) {
         srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
       }
       try {
+        const oneEthWorthTokenAmount = await fetch(
+          `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`
+        )
+          .then((resp) => resp.json())
+          .then((resp) => 1 / resp.data[0].src_qty[0])
+          .catch(console.error)
+        if (oneEthWorthTokenAmount) {
+          srcAmount = new BigNumber(oneEthWorthTokenAmount)
+            .times(10 ** srcAssetDecimals)
+            .dp(0, BigNumber.ROUND_HALF_UP)
+        }
+
         const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
           srcAssetErc20Address,
           destAssetErc20Address,
           srcAmount
         )
-        // console.log("swapPriceData- ",swapPriceData[0])
-        result = swapPriceData[0]
-          .dividedBy(10 ** 18)
+        result = new BigNumber(swapPriceData[0]).dividedBy(10 ** 18)
       } catch (e) {
         console.log(e)
         result = new BigNumber(0)

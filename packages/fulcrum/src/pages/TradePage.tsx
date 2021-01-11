@@ -525,7 +525,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     const maintenanceMargin = loan.loanData.maintenanceMargin
     const currentCollateralToPrincipalRate = collateralToPrincipalRate
       ? collateralToPrincipalRate
-      : await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset)
+      : await FulcrumProvider.Instance.getKyberSwapRate(loan.collateralAsset, loan.loanAsset)
 
     const isLoanTokenOnlyInQuoteTokens =
       !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
@@ -807,7 +807,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     loans = loansByPair.loans
 
-    const selectMarketBaseToQuoteTokenRate = await FulcrumProvider.Instance.getSwapRate(
+    const selectMarketBaseToQuoteTokenRate = await FulcrumProvider.Instance.getKyberSwapRate(
       this.state.selectedMarket.baseToken,
       this.state.selectedMarket.quoteToken
     )
