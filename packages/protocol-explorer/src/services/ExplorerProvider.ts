@@ -768,9 +768,11 @@ export class ExplorerProvider {
         console.log('unknown', loanAsset, collateralAsset)
         return null
       }
-      const assetIndex = mappedAssetsShown.indexOf(this.wethToEth(loanAsset))
-      const loandAssetUsdRate = usdPrices[assetIndex]
+      const loanAssetIndex = mappedAssetsShown.indexOf(this.wethToEth(loanAsset))
+      const loanAssetUsdRate = usdPrices[loanAssetIndex]
       const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18
+      const collateralAssetIndex = mappedAssetsShown.indexOf(this.wethToEth(collateralAsset))
+      const collateralAssetUsdRate = usdPrices[collateralAssetIndex]
       const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
       let amountOwned = e.principal.minus(e.interestDepositRemaining)
       if (amountOwned.lte(0)) {
@@ -778,11 +780,16 @@ export class ExplorerProvider {
       } else {
         amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL)
       }
+      const maxSeizableUsd = e.maxSeizable.dividedBy(10 ** collateralPrecision).times(collateralAssetUsdRate)
+      const maxLiquidatableUsd = e.maxLiquidatable.dividedBy(10 ** loanPrecision).times(loanAssetUsdRate)
+      if (isUnhealthy && (e.maxSeizable.isZero() || maxSeizableUsd.lte(maxLiquidatableUsd))){
+        return null
+      }
       result.push({
         loanId: e.loanId,
         loanAsset: loanAsset,
         collateralAsset: collateralAsset,
-        amountOwedUsd: amountOwned.times(loandAssetUsdRate),
+        amountOwedUsd: amountOwned.times(loanAssetUsdRate),
         maxLiquidatable: e.maxLiquidatable.dividedBy(10 ** loanPrecision),
         maxSeizable: e.maxSeizable.dividedBy(10 ** collateralPrecision),
         loanData: e
