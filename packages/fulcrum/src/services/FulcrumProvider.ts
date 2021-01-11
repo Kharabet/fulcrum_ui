@@ -2865,6 +2865,118 @@ console.log(err, added);
     }
   }
 
+  public async getTradeEstimatedGas(request: TradeRequest, isGasTokenEnabled: boolean) {
+    let result = new BigNumber(0)
+    const account = this.getCurrentAccount()
+    if (!this.contractsSource || !account || !request.amount) return result
+
+    const isLong = request.positionType === PositionType.LONG
+
+    const loanToken = isLong ? request.quoteToken : request.asset
+    const collateralToken = isLong ? request.asset : request.quoteToken
+    const depositToken = request.depositToken
+
+    const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18
+    const amountInBaseUnits = new BigNumber(
+      request.amount.multipliedBy(10 ** decimals).toFixed(0, 1)
+    )
+
+    const loanTokenSent = depositToken === loanToken ? amountInBaseUnits : new BigNumber(0)
+
+    const collateralTokenSent =
+      depositToken === collateralToken ? amountInBaseUnits : new BigNumber(0)
+
+    const collateralTokenAddress =
+    //  collateralToken !== Asset.ETH
+         FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
+        //: FulcrumProvider.ZERO_ADDRESS
+
+    const sendAmountForValue =
+      depositToken === Asset.WETH || depositToken === Asset.ETH
+        ? amountInBaseUnits
+        : new BigNumber(0)
+
+    let gasAmount
+    console.log('loanTokenSent: ' + loanToken + loanTokenSent.toFixed())
+    console.log('collateralTokenSent: ' + collateralToken + collateralTokenSent.toFixed())
+
+    if (request.tradeType === TradeType.BUY) {
+      const tokenContract = this.contractsSource.getITokenContract(loanToken)
+      if (!tokenContract) return result
+      try {
+        gasAmount =
+          isGasTokenEnabled
+            ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(request.leverage),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                account,
+                '0x',
+                {
+                  from: account,
+                  value: sendAmountForValue,
+                  gas: FulcrumProvider.Instance.gasLimit
+                }
+              )
+            : await tokenContract.marginTrade.estimateGasAsync(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(request.leverage),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                '0x',
+                {
+                  from: account,
+                  value: sendAmountForValue,
+                  gas: FulcrumProvider.Instance.gasLimit
+                }
+              )
+      } catch (e) {
+        gasAmount = 0
+      }
+    } 
+    // else {
+    //   const tokenContract = await this.contractsSource.getiBZxContract()
+    //   if (!tokenContract) return result
+    //   try {
+    //     gasAmount =
+    //       isGasTokenEnabled && ChiTokenBalance.gt(0)
+    //         ? await tokenContract.closeWithSwapWithGasToken.estimateGasAsync(
+    //             request.loanId,
+    //             account,
+    //             account,
+    //             amountInBaseUnits,
+    //             request.returnTokenIsCollateral,
+    //             '0x',
+    //             {
+    //               from: account,
+    //               gas: FulcrumProvider.Instance.gasLimit
+    //             }
+    //           )
+    //         : await tokenContract.closeWithSwap.estimateGasAsync(
+    //             request.loanId,
+    //             account,
+    //             amountInBaseUnits,
+    //             request.returnTokenIsCollateral,
+    //             '0x',
+    //             {
+    //               from: account,
+    //               gas: FulcrumProvider.Instance.gasLimit
+    //             }
+    //           )
+    //   } catch (e) {
+    //     gasAmount = 0
+    //   }
+    // }
+    return new BigNumber(gasAmount || 0)
+      .multipliedBy(this.gasBufferCoeffForTrade)
+      .integerValue(BigNumber.ROUND_UP)
+  }
+
   public sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
