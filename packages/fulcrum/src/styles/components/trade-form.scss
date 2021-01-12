@@ -112,12 +112,10 @@
   }
 
   &__actions-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-
-    margin-top: auto;
+    margin-top: 10px;
+    margin-bottom: 25px;
   }
+
   &__kv-container {
     display: flex;
     flex-direction: row;
@@ -148,14 +146,24 @@
       background-color: transparent;
     }
   }
+
   &__slippage-amount {
     font-weight: 800;
-
     display: flex;
     align-items: center;
     svg {
       margin-left: 2px;
     }
+  }
+
+  &__row-container {
+    font-weight: 600;
+    font-size: 14px;
+    color: #a2abb8;
+  }
+
+  &__value-container {
+    color: #ffffff;
   }
 
   .trade-how-it-works-container {
@@ -273,24 +281,19 @@
     outline: none;
   }
 
-  &__submit-button {
+ &__submit-button {
     display: block;
     cursor: pointer;
+    width: 100%;
     border: 0;
     border-radius: 100px;
     color: #ffffff;
     text-transform: uppercase;
     outline: none;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
-    padding: 12px 25px;
-    &--buy {
-      z-index: 2;
-      background-color: #407bf7;
-      &:hover {
-        background-color: #5b88ff;
-      }
-    }
+    padding: 18px 25px;
+    &--buy,
     &.update {
       z-index: 2;
       background-color: #00c0ab;
@@ -298,6 +301,7 @@
         background-color: #33dfcc;
       }
     }
+
     &--sell {
       background-color: #ff5353;
       &:hover {
@@ -305,6 +309,7 @@
       }
     }
   }
+
   .trade-form__submit-button--buy:disabled,
   .trade-form__submit-button--sell:disabled {
     background-color: #a9b5c7;
@@ -371,7 +376,7 @@
     margin-bottom: 56px;
   }
   .rc-slider-handle {
-    &:after {
+      &:after {
       content: attr(aria-valuenow) ' %';
       position: absolute;
       color: #33dfcc;
@@ -524,16 +529,11 @@
       margin-bottom: 20px;
     }
 
-    &__actions-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-
-      margin-top: 0;
-    }
+  
     &__position-type-container {
       margin-bottom: 1rem;
     }
+
     &__kv-container {
       display: flex;
       flex-direction: row;
@@ -655,7 +655,7 @@
 
       cursor: pointer;
       border: 0;
-      height: 2.5rem;
+      //height: 2.5rem;
       //width: 6.5rem;
       padding-left: 1rem;
       padding-right: 1rem;

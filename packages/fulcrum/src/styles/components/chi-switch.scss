@@ -1,31 +1,51 @@
 @import '../abstracts/variables';
 .chi-switch {
-  @media screen and (max-width: $mobile-version-width) {
-    width: 100%;
-  }
+  display: flex;
+  align-items: center;
+  z-index: 10001;
   .cb-container {
-    color: #a2abb8;
-    font-weight: 600;
-    font-size: 12px;
+    position: relative;
+    display: inline-flex;
+    height: 25px;
+    width: 44px;
     .cb-label {
-      padding-left: 28px;
+      padding: 0;
+    }
+
+    input[type='checkbox'] {
+      display: none;
+
+      &:checked + .cb-checkmark,
+      .cb-checkmark {
+        background-color: #333C46;
+        &:before {
+          background-color: #ffffff;
+          transform: translateX(0px);
+        }
+      }
     }
     .cb-checkmark {
-      width: 20px;
-      height: 20px;
-      top: -3px;
-      left: 20px;
-    }
-    input[type='checkbox']:checked + .cb-checkmark,
-    .cb-checkmark {
-      background-color: #394049;
+      background-color: #333C46;
+      cursor: pointer;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 19px;
       &:after {
-        background-color: #00c0ab;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
         border: none;
-        top: 5px;
+      }
+      &:before {
+        content: '';
+        position: absolute;
+        height: 19px;
+        width: 19px;
+        background-color: #758295;
+        bottom: 3px;
+        right: 3px;
+        transition: 0.4s;
+        border-radius: 50%;
+        transform: translateX(-19px);
+        z-index: 2;
       }
     }
   }
