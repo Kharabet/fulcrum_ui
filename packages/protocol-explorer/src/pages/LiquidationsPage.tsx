@@ -209,7 +209,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, false)
     const rolloversData = await ExplorerProvider.Instance.getRollovers(0, 500)
     const unhealthyLoansUsd = unhealthyLoansData.reduce(
-      (a, b) => a.plus(b.amountOwedUsd),
+      (a, b) => a.plus(b.maxLiquidatableUsd),
       new BigNumber(0)
     )
     const healthyLoansUsd = healthyLoansData.reduce(

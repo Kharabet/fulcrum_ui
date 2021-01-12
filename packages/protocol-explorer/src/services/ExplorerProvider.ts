@@ -791,6 +791,7 @@ export class ExplorerProvider {
         collateralAsset: collateralAsset,
         amountOwedUsd: amountOwned.times(loanAssetUsdRate),
         maxLiquidatable: e.maxLiquidatable.dividedBy(10 ** loanPrecision),
+        maxLiquidatableUsd: maxLiquidatableUsd,
         maxSeizable: e.maxSeizable.dividedBy(10 ** collateralPrecision),
         loanData: e
       })
