@@ -2163,6 +2163,10 @@ export class FulcrumProvider {
     destAsset: Asset,
     srcAmount?: BigNumber
   ): Promise<BigNumber> {
+    if (!isMainnetProd) {
+      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract 
+      return await this.getSwapRate(srcAsset, destAsset)
+    }
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
