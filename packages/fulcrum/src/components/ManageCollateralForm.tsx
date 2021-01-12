@@ -127,11 +127,6 @@ export default class ManageCollateralForm extends Component<
           ),
           inputAmountText: this.formatPrecision(next!.collateralAmount.toString())
         })
-
-        // console.log("collateralAmount2 " + this.state.collateralizedPercent.dividedBy(persent).minus(1).multipliedBy(this.props.loan!.collateralAmount).toFixed(6));
-        //  console.log("1 " + this.state.collateralAmount.dividedBy(this.props.loan!.collateralAmount).toFixed(6));
-
-        //console.log("2  " + this.state.collateralizedPercent.dividedBy(persent).minus(1).toFixed(6));
       })
   }
 
@@ -380,7 +375,6 @@ export default class ManageCollateralForm extends Component<
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    // console.log(this.state.collateralAmount.toString(), new BigNumber(this.state.loanValue).dividedBy(10**18).toString(), new BigNumber(this.state.selectedValue).dividedBy(10**18).toString());
     if (!this.state.didSubmit && this.state.collateralAmount.gt(0)) {
       this.setState({ ...this.state, didSubmit: true })
 
@@ -499,8 +493,6 @@ export default class ManageCollateralForm extends Component<
             )
         }
         this.setState({ ...this.state, collateralAmount: collateralAmount })
-
-        // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loan!.collateralAmount.toString());
       }
 
       FulcrumProvider.Instance.getManageCollateralChangeEstimate(

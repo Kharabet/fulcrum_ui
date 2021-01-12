@@ -594,7 +594,6 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       assetOrWrapped = this.props.asset
     }
 
-    // console.log(`send amount`,sendAmount.toString());
 
     if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
       // indicates a 100% burn

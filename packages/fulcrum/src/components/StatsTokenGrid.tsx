@@ -66,7 +66,6 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
   public async derivedUpdate() {
     const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(StatsTokenGrid.assets)
-    // console.log(reserveDetails);
     const rowData = await StatsTokenGrid.getRowsData(reserveDetails)
     let totalsRow: IStatsTokenGridRowProps | null = null
     if (rowData.length > 0) {

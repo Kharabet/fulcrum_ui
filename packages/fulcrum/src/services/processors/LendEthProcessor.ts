@@ -40,10 +40,10 @@ export class LendEthProcessor {
 
     let gasAmountBN
 
-    console.log(
-      tokenContract.address,
-      await tokenContract.mintWithEther.getABIEncodedTransactionData(account)
-    )
+    // console.log(
+    //   tokenContract.address,
+    //   await tokenContract.mintWithEther.getABIEncodedTransactionData(account)
+    // )
 
     // Waiting for token allowance
     if (skipGas) {

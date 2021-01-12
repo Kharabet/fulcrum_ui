@@ -123,7 +123,6 @@ export class ManageCollateralProcessor {
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
         throw e
       }
 
@@ -140,7 +139,6 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
     } else {
@@ -156,7 +154,6 @@ export class ManageCollateralProcessor {
         )
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(2).integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
         throw e
       }
 
@@ -173,7 +170,6 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
     }
