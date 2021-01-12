@@ -119,8 +119,7 @@ export class ManageCollateralProcessor {
           .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
-        throw e
+        // throw e
       }
 
       try {
@@ -136,7 +135,6 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
     } else {
@@ -152,8 +150,7 @@ export class ManageCollateralProcessor {
         )
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(2).integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
-        throw e
+        // throw e
       }
 
       try {
@@ -169,7 +166,6 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
     }

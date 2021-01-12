@@ -103,7 +103,6 @@ export class RepayLoanProcessor {
 
       let gasAmountBN = new BigNumber(0)
       try {
-        // console.log(bZxContract.address);
         const gasAmount =
           isGasTokenEnabled && ChiTokenBalance.gt(0)
             ? await bZxContract.closeWithDepositWithGasToken.estimateGasAsync(
@@ -131,8 +130,7 @@ export class RepayLoanProcessor {
           .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
-        throw e
+        // throw e
       }
 
       //Submitting loan
@@ -167,7 +165,6 @@ export class RepayLoanProcessor {
               )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
 

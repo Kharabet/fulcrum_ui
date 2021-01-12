@@ -61,8 +61,7 @@ export class RolloverProcessor {
         .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
     } catch (e) {
-      console.log(e)
-      throw e
+      // throw e
     }
 
     try {
@@ -86,7 +85,6 @@ export class RolloverProcessor {
 
       task.setTxHash(txHash)
     } catch (e) {
-      console.log(e)
       throw e
     }
 
