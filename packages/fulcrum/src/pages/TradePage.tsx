@@ -97,7 +97,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.WBTC,
         Asset.LINK,
         Asset.MKR,
-        // Asset.LEND,
+        Asset.YFI,
         Asset.KNC,
         Asset.UNI,
         Asset.AAVE,
