@@ -160,10 +160,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value))
         )
       )
-      .subscribe((next) => {
+      .subscribe(async(next) => {
         if (next) {
           this._isMounted &&
             this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false })
+            await this.setEstimatedFee()
         } else {
           this._isMounted &&
             this.setState({
@@ -270,7 +271,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.state.depositToken
     )
-    await this.setEstimatedFee(tradeRequest)
+
     this._isMounted &&
       this.setState({
         ...this.state,
@@ -347,7 +348,25 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this._isMounted && this.setState({ depositTokenBalance })
   }
 
-  private async setEstimatedFee(tradeRequest: TradeRequest) {
+  private async setEstimatedFee() {
+    if (this.state.tradeAmountValue.eq(0))
+      return (
+        this._isMounted &&
+        this.setState({ estimatedFee: new BigNumber(0), estimatedFeeChi: new BigNumber(0) })
+      )
+
+    const tradeRequest = new TradeRequest(
+      this.props.loan?.loanId ||
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      this.props.tradeType,
+      this.props.baseToken,
+      this.props.quoteToken,
+      this.state.depositToken,
+      this.props.positionType,
+      this.props.leverage,
+      this.state.tradeAmountValue,
+      this.state.returnTokenIsCollateral
+    )
     const gasPrice = await FulcrumProvider.Instance.gasPrice()
     const rate = await FulcrumProvider.Instance.getSwapToUsdRate(Asset.ETH)
     const estimatedFee = await FulcrumProvider.Instance.getTradeEstimatedGas(
@@ -359,15 +378,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         .div(10 ** 18)
         .times(rate)
     })
-    const estimatedFeeChi = await FulcrumProvider.Instance.getTradeEstimatedGas(
-      tradeRequest,
-      true
-    ).then((result) => {
-      return result
-        .times(gasPrice)
-        .div(10 ** 18)
-        .times(rate)
-    })
+
+    const estimatedFeeChi = estimatedFee.times(0.4)
 
     this._isMounted && this.setState({ estimatedFee, estimatedFeeChi })
   }
@@ -382,10 +394,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       await this.setSlippageRate(this.state.tradeAmountValue)
+     
     }
     if (this.state.depositToken !== prevState.depositToken) {
       await this.setDepositTokenBalance(this.state.depositToken)
-      await this.derivedUpdate()
     }
     if (
       this.props.tradeType !== prevProps.tradeType ||
