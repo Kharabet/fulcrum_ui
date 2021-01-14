@@ -487,6 +487,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
               onCollateralChange={this.onCollateralChange}
+              withSlider={false}
             />
             {this.props.tradeType === TradeType.SELL && (
               <InputReceive

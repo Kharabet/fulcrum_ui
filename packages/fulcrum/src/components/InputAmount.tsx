@@ -4,6 +4,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 
 import { TradeType } from '../domain/TradeType'
 import { Preloader } from './Preloader'
+import { SliderPercent } from './SliderPercent'
 
 import '../styles/components/input-amount.scss'
 import { AssetDropdown } from './AssetDropdown'
@@ -18,6 +19,7 @@ interface IInputAmountProps {
   onInsertMaxValue: (value: number) => void
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void
   onCollateralChange: (asset: Asset) => void
+  withSlider: boolean
 }
 
 interface IInputAmountState {
@@ -82,33 +84,39 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
             />
           )}
         </div>
-
-        <div className="input-amount__group-button">
-          <button
-            data-value="0.25"
-            className={this.props.buttonValue === 0.25 ? 'active' : ''}
-            onClick={this.setButtonValue}>
-            25%
-          </button>
-          <button
-            data-value="0.5"
-            className={this.props.buttonValue === 0.5 ? 'active' : ''}
-            onClick={this.setButtonValue}>
-            50%
-          </button>
-          <button
-            data-value="0.75"
-            className={this.props.buttonValue === 0.75 ? 'active' : ''}
-            onClick={this.setButtonValue}>
-            75%
-          </button>
-          <button
-            data-value="1"
-            className={this.props.buttonValue === 1 ? 'active' : ''}
-            onClick={this.setButtonValue}>
-            100%
-          </button>
-        </div>
+        {this.props.withSlider ? (
+          <SliderPercent
+            onInsertMaxValue={this.props.onInsertMaxValue}
+            percentSlider={this.props.buttonValue}
+          />
+        ) : (
+          <div className="input-amount__group-button">
+            <button
+              data-value="0.25"
+              className={this.props.buttonValue === 0.25 ? 'active' : ''}
+              onClick={this.setButtonValue}>
+              25%
+            </button>
+            <button
+              data-value="0.5"
+              className={this.props.buttonValue === 0.5 ? 'active' : ''}
+              onClick={this.setButtonValue}>
+              50%
+            </button>
+            <button
+              data-value="0.75"
+              className={this.props.buttonValue === 0.75 ? 'active' : ''}
+              onClick={this.setButtonValue}>
+              75%
+            </button>
+            <button
+              data-value="1"
+              className={this.props.buttonValue === 1 ? 'active' : ''}
+              onClick={this.setButtonValue}>
+              100%
+            </button>
+          </div>
+        )}
       </div>
     )
   }

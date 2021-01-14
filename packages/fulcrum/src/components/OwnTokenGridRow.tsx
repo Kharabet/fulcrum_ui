@@ -5,6 +5,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
@@ -37,6 +38,7 @@ export interface IOwnTokenGridRowProps {
   isTxCompleted: boolean
   onTrade: (request: TradeRequest) => void
   onManageCollateralOpen: (request: ManageCollateralRequest) => void
+  onExtendLoanOpen: (request: ExtendLoanRequest) => void
   onRolloverConfirmed: (request: RolloverRequest) => void
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
@@ -113,12 +115,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       window.setTimeout(async () => {
         await FulcrumProvider.Instance.onTaskCancel(task)
         this._isMounted &&
-        this.setState({
-          ...this.state,
-          isLoadingTransaction: false,
-          request: undefined,
-          resultTx: false
-        })
+          this.setState({
+            ...this.state,
+            isLoadingTransaction: false,
+            request: undefined,
+            resultTx: false
+          })
         this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }, 5000)
       return
@@ -168,7 +170,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     const isLoadingTransaction = task && task.error ? true : false
     const request = task ? (task.request as TradeRequest | ManageCollateralRequest) : undefined
     this._isMounted &&
-    this.setState({ ...this.state, resultTx: true, isLoadingTransaction, request })
+      this.setState({ ...this.state, resultTx: true, isLoadingTransaction, request })
     await this.derivedUpdate()
   }
 
@@ -180,14 +182,14 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     if (prevProps.isTxCompleted !== this.props.isTxCompleted) {
       if (this.state.isLoadingTransaction) {
         this._isMounted &&
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+          this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
         this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }
     }
   }
 
   public render() {
-    const precisionDigits = this.props.quoteToken === Asset.WBTC ? 4 : 2 
+    const precisionDigits = this.props.quoteToken === Asset.WBTC ? 4 : 2
     const remainingDays = this.props.loan.loanData.interestDepositRemaining.div(
       this.props.loan.loanData.interestOwedPerDay
     )
@@ -297,11 +299,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <span className="own-token-grid-row__asset">{this.props.baseToken}</span>
           <br />
           <div>
-          <div
-            title={this.props.collateral.toFixed(18)}
-            className="own-token-grid-row__col-collateral-wrapper">
-            {!this.state.isLoading ? (
-              <React.Fragment>
+            <div
+              title={this.props.collateral.toFixed(18)}
+              className="own-token-grid-row__col-collateral-wrapper">
+              {!this.state.isLoading ? (
+                <React.Fragment>
                   <span className="value-currency">
                     {this.props.collateral.toFixed(2)}
                     <div
@@ -313,22 +315,22 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
                       onClick={this.onManageClick}>
                       <OpenManageCollateral />
                     </div>
-                <span
-                  className={`own-token-grid-row__col-asset-collateral-small ${
-                    this.props.loan.collateralizedPercent.lte(
-                      this.props.maintenanceMargin.plus(0.1)
-                    )
-                      ? 'danger'
-                      : ''
-                  }`}>
-                  {this.props.loan.collateralizedPercent.multipliedBy(100).toFixed(2)}%
-                </span>
+                    <span
+                      className={`own-token-grid-row__col-asset-collateral-small ${
+                        this.props.loan.collateralizedPercent.lte(
+                          this.props.maintenanceMargin.plus(0.1)
+                        )
+                          ? 'danger'
+                          : ''
+                      }`}>
+                      {this.props.loan.collateralizedPercent.multipliedBy(100).toFixed(2)}%
+                    </span>
                   </span>
-              </React.Fragment>
-            ) : (
-              <Preloader width="74px" />
-            )}
-          </div>
+                </React.Fragment>
+              ) : (
+                <Preloader width="74px" />
+              )}
+            </div>
           </div>
         </div>
         <div

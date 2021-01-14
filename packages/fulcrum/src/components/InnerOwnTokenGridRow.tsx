@@ -7,6 +7,7 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
@@ -40,6 +41,8 @@ export interface IInnerOwnTokenGridRowProps {
   isTxCompleted: boolean
   onTrade: (request: TradeRequest) => void
   onManageCollateralOpen: (request: ManageCollateralRequest) => void
+  onExtendLoanOpen: (request: ExtendLoanRequest) => void
+
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
     request: TradeRequest | ManageCollateralRequest | undefined
@@ -355,6 +358,9 @@ export class InnerOwnTokenGridRow extends Component<
                         onClick={this.onManageClick}>
                         <OpenManageCollateral />
                       </div>
+                      <div onClick={this.onExtendLoanClick}>
+                        <OpenManageCollateral />
+                      </div>
                     </span>
 
                     <span
@@ -399,7 +405,9 @@ export class InnerOwnTokenGridRow extends Component<
               </span>
 
               {!this.state.isLoading ? (
-                <React.Fragment>{this.props.liquidationPrice.toFixed(precisionDigits)}</React.Fragment>
+                <React.Fragment>
+                  {this.props.liquidationPrice.toFixed(precisionDigits)}
+                </React.Fragment>
               ) : (
                 <Preloader width="74px" />
               )}
@@ -453,6 +461,22 @@ export class InnerOwnTokenGridRow extends Component<
 
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request)
     this.props.onManageCollateralOpen(request)
+  }
+
+  public onExtendLoanClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation()
+
+    const request = new ExtendLoanRequest(
+      this.props.loan.loanAsset,
+      this.props.loan.accountAddress,
+      this.props.loan.loanId,
+      this.props.loan.amount
+    )
+
+    this._isMounted && this.setState({ ...this.state, request: request })
+
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request)
+    this.props.onExtendLoanOpen(request)
   }
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {

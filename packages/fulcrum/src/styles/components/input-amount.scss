@@ -10,12 +10,14 @@
   }
   &__container {
     display: flex;
-    background: #394049;
+    background: #1e262e;
     width: auto;
     height: 65px;
     position: relative;
     padding-right: 15px;
     align-items: center;
+    border-radius: 4px;
+    margin-bottom: 24px;
   }
   &__input {
     width: calc(100% - 105px);

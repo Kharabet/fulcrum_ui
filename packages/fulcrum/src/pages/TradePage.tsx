@@ -14,6 +14,7 @@ import { TokenGridTabs } from '../components/TokenGridTabs'
 import { TradeTokenGrid } from '../components/TradeTokenGrid'
 import { ITradeTokenGridRowProps } from '../components/TradeTokenGridRow'
 import { TVChartContainer } from '../components/TVChartContainer'
+import { ExtendLoanForm } from '../components/ExtendLoanForm'
 
 import Asset from 'bzx-common/src/assets/Asset'
 
@@ -27,6 +28,7 @@ import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEven
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
 import { ProviderType } from '../domain/ProviderType'
 import { TokenGridTab } from '../domain/TokenGridTab'
@@ -39,6 +41,7 @@ import { InfoBlock } from '../components/InfoBlock'
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
+//const ExtendLoanForm = React.lazy(() => import('../components/ExtendLoanForm'))
 
 export interface ITradePageProps {
   doNetworkConnect: () => void
@@ -61,6 +64,7 @@ interface ITradePageState {
   loanId?: string
   loans: IBorrowedFundsState[] | undefined
   isManageCollateralModalOpen: boolean
+  isExtendLoanModalOpen: boolean
 
   openedPositionsCount: number
   tokenRowsData: ITradeTokenGridRowProps[]
@@ -70,7 +74,7 @@ interface ITradePageState {
   historyRowsData: IHistoryTokenGridRowProps[]
   tradeRequestId: number
   isLoadingTransaction: boolean
-  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | ExtendLoanRequest | undefined
   isTxCompleted: boolean
   activePositionType: PositionType
 
@@ -122,6 +126,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       isManageCollateralModalOpen: false,
+      isExtendLoanModalOpen: false,
       openedPositionsCount: 0,
       tokenRowsData: [],
       innerOwnRowsData: [],
@@ -361,6 +366,23 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 />
               </Modal>
             )}
+            {this.state.request !== undefined && loan !== undefined && (
+              <Modal
+                isOpen={this.state.isExtendLoanModalOpen}
+                onRequestClose={this.onExtendLoanRequestClose}
+                className="modal-content-div"
+                overlayClassName="modal-overlay-div">
+                <ExtendLoanForm
+                  loan={loan}
+                  request={this.state.request as ExtendLoanRequest}
+                  onSubmit={this.onExtendLoanConfirmed}
+                  onCancel={this.onExtendLoanRequestClose}
+                  isOpenModal={this.state.isExtendLoanModalOpen}
+                  isMobileMedia={this.props.isMobileMedia}
+                  changeLoadingTransaction={this.changeLoadingTransaction}
+                />
+              </Modal>
+            )}
           </main>
         ) : (
           <div className="message-wrong-network">You are connected to the wrong network.</div>
@@ -446,6 +468,46 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ...this.state,
         isManageCollateralModalOpen: false
       })
+  }
+
+  public onExtendLoanRequested = async (request: ExtendLoanRequest) => {
+    if (
+      !FulcrumProvider.Instance.contractsSource ||
+      !FulcrumProvider.Instance.contractsSource.canWrite
+    ) {
+      this.props.doNetworkConnect()
+      return
+    }
+
+    if (request) {
+      // if (this.state.activeTokenGridTab === TokenGridTab.Open) {
+      //   await this.onTabSelect(request.asset, request.collateralAsset)
+      // }
+      ;(await this._isMounted) &&
+        this.setState({
+          ...this.state,
+          isExtendLoanModalOpen: true,
+          loanId: request.loanId,
+          request
+        })
+    }
+  }
+
+  public onExtendLoanRequestClose = async () => {
+    ;(await this._isMounted) &&
+      this.setState({
+        ...this.state,
+        isExtendLoanModalOpen: false
+      })
+  }
+  public onExtendLoanConfirmed = async (request: ExtendLoanRequest) => {
+    request.id = this.state.tradeRequestId
+    FulcrumProvider.Instance.onExtendLoanConfirmed(request)
+    this.setState({
+      ...this.state,
+      isExtendLoanModalOpen: false,
+      request
+    })
   }
 
   public onTradeRequested = async (request: TradeRequest) => {
@@ -750,6 +812,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maintenanceMargin: maintenanceMargin.div(10 ** 20),
       onTrade: this.onTradeRequested,
       onManageCollateralOpen: this.onManageCollateralRequested,
+      onExtendLoanOpen: this.onExtendLoanRequested,
       onRolloverConfirmed: this.onRolloverConfirmed,
       changeLoadingTransaction: this.changeLoadingTransaction,
       onTransactionsCompleted: this.onTransactionsCompleted,
@@ -897,7 +960,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
     const historyEvents = { groupedEvents, earnRewardEvents, payTradingFeeEvents }
     ;(await this._isMounted) &&
-      this.setState({ ...this.state, historyRowsData: [], historyEvents: historyEvents })
+      this.setState({
+        ...this.state,
+        historyRowsData: [],
+        historyEvents: historyEvents
+      })
   }
 
   public getTokenRowsData = async () => {
@@ -943,7 +1010,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public changeLoadingTransaction = async (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | RolloverRequest | undefined
   ) => {
     ;(await this._isMounted) &&
       this.setState({

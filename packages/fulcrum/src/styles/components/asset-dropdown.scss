@@ -72,7 +72,7 @@
   background-color: #586473;
   width: 105px;
   align-items: center;
-  padding: 4px;
+  padding: 8px;
   position: relative;
   @media only screen and (max-width: $mobile-version-max-width) {
     width: 95px;
@@ -114,11 +114,10 @@
     }
   }
   span {
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 600;
     font-style: normal;
     font-stretch: normal;
-    line-height: 1.5;
     letter-spacing: 0.05em;
     color: #ffffff;
   }

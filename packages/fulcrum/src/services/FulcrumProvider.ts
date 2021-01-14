@@ -13,6 +13,7 @@ import { ICollateralManagementParams } from '../domain/ICollateralManagementPara
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
 import { ProviderType } from '../domain/ProviderType'
 import { RequestStatus } from '../domain/RequestStatus'
@@ -51,6 +52,8 @@ import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEven
 import { ILoanParams } from '../domain/ILoanParams'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { RolloverEvent } from '../domain/events/RolloverEvent'
+import { IExtendState } from '../domain/IExtendState'
+import { IExtendEstimate } from '../domain/IExtendEstimate'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -108,6 +111,7 @@ export class FulcrumProvider {
   public unsupportedNetwork: boolean = false
 
   public readonly lendAssetsShown: Asset[]
+  public readonly gasBufferForTxn = new BigNumber(5 * 10 ** 16) // 0.05 ETH
 
   constructor() {
     // init
@@ -340,6 +344,12 @@ export class FulcrumProvider {
   }
 
   public onManageCollateralConfirmed = async (request: ManageCollateralRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
+  public onExtendLoanConfirmed = async (request: ExtendLoanRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
@@ -1261,7 +1271,7 @@ export class FulcrumProvider {
     if (tradedAmountEstimate.eq(0) || srcToken === destToken) {
       return new BigNumber(0)
     }
-    
+
     const srcAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(srcToken)
     const destAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(destToken)
 
@@ -2164,7 +2174,7 @@ export class FulcrumProvider {
     srcAmount?: BigNumber
   ): Promise<BigNumber> {
     if (!isMainnetProd) {
-      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract 
+      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract
       return await this.getSwapRate(srcAsset, destAsset)
     }
     let result: BigNumber = new BigNumber(0)
@@ -2819,6 +2829,10 @@ export class FulcrumProvider {
       await this.processRolloverRequestTask(task, skipGas)
     }
 
+    if (task.request instanceof ExtendLoanRequest) {
+      await this.processExtendLoanRequestTask(task, skipGas)
+    }
+
     return false
   }
 
@@ -3216,6 +3230,38 @@ console.log(err, added);
     }
   }
 
+  private processExtendLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.loanId)
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error('No provider available!')
+      }
+
+      const account = this.getCurrentAccount()
+      if (!account) {
+        throw new Error('Unable to get wallet address!')
+      }
+
+      const taskRequest: ExtendLoanRequest = task.request as ExtendLoanRequest
+
+      const { ExtendLoanProcessor } = await import('./processors/ExtendLoanProcessor')
+      const processor = new ExtendLoanProcessor()
+      await processor.run(task, account, skipGas)
+
+      task.processingEnd(true, false, null)
+    } catch (e) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
+        // tslint:disable-next-line:no-console
+        console.log(e)
+      }
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task)
+    }
+  }
+
   public waitForTransactionMined = async (
     txHash: string,
     request?: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest
@@ -3312,6 +3358,28 @@ console.log(err, added);
 
   public isETHAsset = (asset: Asset): boolean => {
     return asset === Asset.ETH // || asset === Asset.WETH;
+  }
+
+  public getLoanExtendParams = async (
+    borrowedFundsState: IBorrowedFundsState
+  ): Promise<IExtendState> => {
+    return { minValue: 1, maxValue: 28, currentValue: 14 }
+  }
+
+  public getLoanExtendManagementAddress = async (
+    borrowedFundsState: IBorrowedFundsState
+  ): Promise<string | null> => {
+    return `extend.${borrowedFundsState.loanAsset.toLowerCase()}.tokenloan.eth`
+  }
+
+  public getLoanExtendGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1000000)
+  }
+  public getLoanExtendEstimate = async (
+    interestOwedPerDay: BigNumber,
+    daysToAdd: number
+  ): Promise<IExtendEstimate> => {
+    return { depositAmount: interestOwedPerDay.multipliedBy(daysToAdd) }
   }
 }
 
