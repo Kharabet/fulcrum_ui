@@ -4,8 +4,6 @@ import { ProviderType } from '../domain/ProviderType'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { HeaderLogo } from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
-import { HeaderMenuToggle } from './HeaderMenuToggle'
-import { InfoBlock } from '../components/InfoBlock'
 
 import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
 import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
@@ -96,17 +94,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div> */}
           </div>
         </div>
-
-        {
-          <InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-            Earn farming rewards! When trading or borrowing you are earning vBZRX while your
-            position is open. Rewards are deposited weekly in your{' '}
-            <a href="https://staking.bzx.network" className="regular-link" target="blank">
-              staking dashboard
-            </a>
-            .
-          </InfoBlock>
-        }
       </header>
     )
   }
@@ -149,14 +136,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
           ) : null}
         </header>
-        <InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position
-          is open. Rewards are deposited weekly in your{' '}
-          <a href="https://staking.bzx.network" className="regular-link" target="blank">
-            staking dashboard
-          </a>
-          .
-        </InfoBlock>
       </React.Fragment>
     )
   }
