@@ -8,14 +8,12 @@ import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
 import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
 import Footer from './Footer'
 import { SwitchButtonInput } from '../components/SwitchButtonInput'
-import { truncate } from 'fs'
-import { InfoBlock } from '../components/InfoBlock'
+
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void
   isRiskDisclosureModalOpen: () => void
   isMobileMedia: boolean
   headerClass: string
-  //isV1ITokenInWallet: boolean;
 }
 
 interface IHeaderOpsState {
@@ -104,7 +102,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     }
 
     return (
-      <React.Fragment>
         <header className={`header ${this.props.headerClass}`}>
           <div className="header__row">
             <div className="header__left">
@@ -119,20 +116,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
           </div>
         </header>
-        <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
-          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position
-          is open. Rewards are deposited weekly in your{' '}
-          <a href="https://staking.bzx.network" className="regular-link" target="blank">
-            staking dashboard
-          </a>
-          .
-        </InfoBlock>
-        {/* {this.props.isV1ITokenInWallet &&
-          <InfoBlock localstorageItemProp="v1Balance">
-            If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
-          </InfoBlock>
-        } */}
-      </React.Fragment>
     )
   }
 
@@ -157,7 +140,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
 
     return (
-      <React.Fragment>
         <header className={`header ${this.props.headerClass}`}>
           <div className="header__row">
             <div className="header__left">
@@ -198,20 +180,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
           ) : null}
         </header>
-        <InfoBlock localstorageItemProp="fulcrum-page-info" isAccept={true}>
-          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position
-          is open. Rewards are deposited weekly in your{' '}
-          <a href="https://staking.bzx.network" className="regular-link" target="blank">
-            staking dashboard
-          </a>
-          .
-        </InfoBlock>
-        {/* {this.props.isV1ITokenInWallet &&
-          <InfoBlock localstorageItemProp="v1Balance">
-            If you supplied assets to Fulcrum prior to September 2 you can access them on our <a href="https://legacy.fulcrum.trade/#/lend" className="disclosure-link">Legacy dApp</a>.
-          </InfoBlock>
-        } */}
-      </React.Fragment>
     )
   }
 
