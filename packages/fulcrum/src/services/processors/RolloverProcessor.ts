@@ -62,7 +62,6 @@ export class RolloverProcessor {
         .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
     } catch (e) {
-      console.log(e)
       throw e
     }
 
@@ -87,7 +86,6 @@ export class RolloverProcessor {
 
       task.setTxHash(txHash)
     } catch (e) {
-      console.log(e)
       throw e
     }
 

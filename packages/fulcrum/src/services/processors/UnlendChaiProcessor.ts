@@ -43,10 +43,10 @@ export class UnlendChaiProcessor {
 
     let gasAmountBN
 
-    console.log(
-      tokenContract.address,
-      await tokenContract.burnToChai.getABIEncodedTransactionData(account, amountInBaseUnits)
-    )
+    // console.log(
+    //   tokenContract.address,
+    //   await tokenContract.burnToChai.getABIEncodedTransactionData(account, amountInBaseUnits)
+    // )
 
     skipGas = true
 

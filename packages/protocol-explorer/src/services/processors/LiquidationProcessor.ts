@@ -120,8 +120,7 @@ export class LiquidationProcessor {
         .multipliedBy(ExplorerProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
     } catch (e) {
-      console.log(e)
-      throw e
+      // throw e
     }
 
     try {
@@ -153,7 +152,6 @@ export class LiquidationProcessor {
 
       task.setTxHash(txHash)
     } catch (e) {
-      console.log(e)
       throw e
     }
 

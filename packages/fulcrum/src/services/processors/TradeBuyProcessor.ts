@@ -128,15 +128,6 @@ export class TradeBuyProcessor {
         : FulcrumProvider.ZERO_ADDRESS
     const loanData = '0x'
 
-    //console.log("depositAmount: " + amountInBaseUnits.toFixed());
-    console.log('leverageAmount: ' + leverageAmount.toFixed())
-    console.log('loanTokenSent: ' + loanTokenSent.toFixed())
-    console.log('collateralTokenSent: ' + collateralTokenSent.toFixed())
-    //console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
-    console.log('collateral token: ' + collateralToken + ' address: ' + collateralTokenAddress!)
-    console.log('trader: ' + account)
-    console.log('loan data: ' + loanData)
-
     const sendAmountForValue =
       taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH
         ? amountInBaseUnits

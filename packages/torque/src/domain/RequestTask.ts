@@ -53,7 +53,6 @@ export class RequestTask {
     steps.forEach((e) => this.steps.push(e))
     this.status = RequestStatus.IN_PROGRESS
     this.stepCurrent = 1
-    console.log('step ', this.stepCurrent)
 
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged)
@@ -62,7 +61,6 @@ export class RequestTask {
 
   public processingStepNext() {
     this.stepCurrent++
-    console.log('step ', this.stepCurrent)
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged)
     }

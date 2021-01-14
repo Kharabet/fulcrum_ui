@@ -165,20 +165,12 @@ export class ExplorerProvider {
 
   public static getLocalstorageItem(item: string): string {
     let response = ''
-    try {
-      response = localStorage.getItem(item) || ''
-    } catch (e) {
-      // console.log(e);
-    }
+    response = localStorage.getItem(item) || ''
     return response
   }
 
   public static setLocalstorageItem(item: string, val: string) {
-    try {
-      localStorage.setItem(item, val)
-    } catch (e) {
-      // console.log(e);
-    }
+    localStorage.setItem(item, val)
   }
 
   public async setWeb3Provider(connector: AbstractConnector, account?: string) {
@@ -188,7 +180,7 @@ export class ExplorerProvider {
       this.unsupportedNetwork = false
       await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     } catch (e) {
-      // console.log(e);
+      console.error(e)
       this.isLoading = false
 
       return
@@ -341,7 +333,7 @@ export class ExplorerProvider {
     topic: string
   ): Promise<any> => {
     // this method can return only first 1000 events
-    // so be careful with fromBlock → toBlock range 
+    // so be careful with fromBlock → toBlock range
     // also, etherscan api allows only up to 5 request/sec
     const etherscanApiKey = configProviders.Etherscan_Api
     const etherscanApiUrl = `https://${
@@ -765,7 +757,6 @@ export class ExplorerProvider {
       const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
       const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
       if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) {
-        console.log('unknown', loanAsset, collateralAsset)
         return null
       }
       const loanAssetIndex = mappedAssetsShown.indexOf(this.wethToEth(loanAsset))
@@ -780,9 +771,13 @@ export class ExplorerProvider {
       } else {
         amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL)
       }
-      const maxSeizableUsd = e.maxSeizable.dividedBy(10 ** collateralPrecision).times(collateralAssetUsdRate)
-      const maxLiquidatableUsd = e.maxLiquidatable.dividedBy(10 ** loanPrecision).times(loanAssetUsdRate)
-      if (isUnhealthy && (e.maxSeizable.isZero() || maxSeizableUsd.lte(maxLiquidatableUsd))){
+      const maxSeizableUsd = e.maxSeizable
+        .dividedBy(10 ** collateralPrecision)
+        .times(collateralAssetUsdRate)
+      const maxLiquidatableUsd = e.maxLiquidatable
+        .dividedBy(10 ** loanPrecision)
+        .times(loanAssetUsdRate)
+      if (isUnhealthy && (e.maxSeizable.isZero() || maxSeizableUsd.lte(maxLiquidatableUsd))) {
         return null
       }
       result.push({
@@ -828,7 +823,6 @@ export class ExplorerProvider {
         rollovers.push(rollover)
       } catch (e) {
         console.error(e)
-        console.log(loan)
       }
     }
     return rollovers
@@ -1024,7 +1018,6 @@ export class ExplorerProvider {
     try {
       const response = await fetch(url)
       const jsonData = await response.json()
-      // console.log(jsonData);
       if (jsonData.average) {
         // ethgasstation values need divide by 10 to get gwei
         const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8)
@@ -1036,7 +1029,6 @@ export class ExplorerProvider {
         }
       }
     } catch (error) {
-      // console.log(error);
       result = new BigNumber(12).multipliedBy(10 ** 9) // error default 8 gwei
     }
 
@@ -1169,7 +1161,6 @@ export class ExplorerProvider {
     ) {
       return new BigNumber(1)
     }
-    // console.log("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
@@ -1192,14 +1183,13 @@ export class ExplorerProvider {
           srcAssetErc20Address,
           destAssetErc20Address
         )
-        // console.log("swapPriceData- ",swapPriceData[0])
         result = swapPriceData[0]
           .times(srcAssetPrecision)
           .div(destAssetPrecision)
           .dividedBy(10 ** 18)
           .multipliedBy(swapPriceData[1].dividedBy(10 ** 18)) // swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
-        console.log(e)
+        console.error(e)
         result = new BigNumber(0)
       }
     }
@@ -1336,12 +1326,7 @@ export class ExplorerProvider {
 
       task.processingEnd(true, false, null)
     } catch (e) {
-      if (
-        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
-      ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
-      }
+      console.error(e)
       task.processingEnd(false, false, e)
     } finally {
       this.eventEmitter.emit(ExplorerProviderEvents.AskToCloseProgressDlg, task)
@@ -1370,12 +1355,7 @@ export class ExplorerProvider {
 
       task.processingEnd(true, false, null)
     } catch (e) {
-      if (
-        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
-      ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
-      }
+      console.error(e)
       task.processingEnd(false, false, e)
     } finally {
       this.eventEmitter.emit(ExplorerProviderEvents.AskToCloseProgressDlg, task)

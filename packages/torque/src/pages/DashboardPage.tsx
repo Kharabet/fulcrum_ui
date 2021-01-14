@@ -107,7 +107,6 @@ export class DashboardPage extends PureComponent<
     let itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting> = []
 
     items = await TorqueProvider.Instance.getLoansList()
-    console.log(items)
     itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList()
     ;(await this._isMounted) &&
       this.setState({
@@ -232,7 +231,9 @@ export class DashboardPage extends PureComponent<
       const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item)
       // await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
     } catch (error) {
-      if (error.message !== 'Form closed') console.error(error)
+      if (error.message !== 'Form closed') {
+        console.error(error)
+      }
     }
   }
 }
