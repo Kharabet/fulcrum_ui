@@ -351,7 +351,7 @@ export class ExplorerProvider {
         '10500001',
         '11000000',
         bzxContractAddress,
-        LiquidationEvent.topic0,
+        [LiquidationEvent.topic0],
         networkName!,
         configProviders.Etherscan_Api
       )) || []
@@ -360,7 +360,7 @@ export class ExplorerProvider {
         '11000001',
         '11500000',
         bzxContractAddress,
-        LiquidationEvent.topic0,
+        [LiquidationEvent.topic0],
         networkName!,
         configProviders.Etherscan_Api
       )) || []
@@ -369,7 +369,7 @@ export class ExplorerProvider {
         '11500001',
         'latest',
         bzxContractAddress,
-        LiquidationEvent.topic0,
+        [LiquidationEvent.topic0],
         networkName!,
         configProviders.Etherscan_Api
       )) || []

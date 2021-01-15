@@ -6,6 +6,11 @@ import LiquidationEvent from './LiquidationEvent'
 import MintEvent from './MintEvent'
 import RolloverEvent from './RolloverEvent'
 import TradeEvent from './TradeEvent'
+import EarnRewardEvent from './EarnRewardEvent'
+import EarnRewardEventNew from './EarnRewardEventNew'
+import PayTradingFeeEvent from './PayTradingFeeEvent'
+import WithdrawCollateralEvent from './WithdrawCollateralEvent'
+import DepositCollateralEvent from './DepositCollateralEvent'
 
 export {
   BorrowEvent,
@@ -15,5 +20,10 @@ export {
   LiquidationEvent,
   MintEvent,
   RolloverEvent,
-  TradeEvent
+  TradeEvent,
+  EarnRewardEvent,
+  EarnRewardEventNew,
+  PayTradingFeeEvent,
+  WithdrawCollateralEvent,
+  DepositCollateralEvent
 }

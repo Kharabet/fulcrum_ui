@@ -19,16 +19,19 @@ import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
-import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
-import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
-import { TradeEvent } from '../domain/events/TradeEvent'
-import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
+import {
+  CloseWithSwapEvent,
+  DepositCollateralEvent,
+  LiquidationEvent,
+  RolloverEvent,
+  TradeEvent,
+  WithdrawCollateralEvent
+} from 'bzx-common/src/domain/events'
+
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { PositionType } from '../domain/PositionType'
-import { ProviderType } from '../domain/ProviderType'
 import { TokenGridTab } from '../domain/TokenGridTab'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
@@ -80,7 +83,6 @@ interface ITradePageState {
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   private _isMounted: boolean = false
-  private apiUrl = 'https://api.bzx.network/v1'
   private readonly daysNumberForLoanActionNotification = 2
   private readonly loanIdsWithOldOpenPriceFormat = loansWithOldOpenPriceFormat
   constructor(props: any) {
@@ -399,7 +401,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       })
   }
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     const isSupportedNetwork = FulcrumProvider.Instance.unsupportedNetwork
     this.setState({ ...this.state, isSupportNetwork: isSupportedNetwork })
     await this.clearData()
@@ -409,7 +411,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // await this.getOwnRowsData()
 
     await this.fetchPositionsRecursive(10)
-    await this.getHistoryEvents(this.state)
+    await this.getHistoryEvents()
   }
 
   public onManageCollateralRequested = async (request: ManageCollateralRequest) => {
@@ -509,7 +511,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     activeTokenGridTab === TokenGridTab.History &&
       this.state.historyEvents === undefined &&
-      (await this.getHistoryEvents(this.state))
+      (await this.getHistoryEvents())
   }
 
   private getOwnRowDataProps = async (
@@ -518,9 +520,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   ): Promise<IOwnTokenGridRowProps> => {
     // approx date when Open Price precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/2afdeb8c6b9951456d835fbd90a6bc38c699de89
     // https://etherscan.io/tx/0xd69e0d550a665975ce963b4069206257c279223bf3fda4cbe019efff2b70bf61
-    const dateWhenOpenPricePrecisionWasChanged = new Date(
-      process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1609867118000 : 1609867118000
-    )
 
     const maintenanceMargin = loan.loanData.maintenanceMargin
     const currentCollateralToPrincipalRate = collateralToPrincipalRate
@@ -603,7 +602,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maxTradeAmount,
       false // false - return in loan token
     )
-    const isRolloverPending = loan.loanData.interestDepositRemaining.eq(0)
     if (positionType === PositionType.LONG) {
       positionValue = collateralAssetAmount
       value = collateralAssetAmount.times(currentCollateralToPrincipalRate)
@@ -829,7 +827,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       })
   }
 
-  public getHistoryEvents = async (state: ITradePageState) => {
+  public getHistoryEvents = async () => {
     // if (
     //   !FulcrumProvider.Instance.web3Wrapper ||
     //   !FulcrumProvider.Instance.contractsSource ||
@@ -860,6 +858,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         | CloseWithSwapEvent
         | DepositCollateralEvent
         | WithdrawCollateralEvent
+        | RolloverEvent
       )[],
       key: any
     ) {
@@ -884,7 +883,24 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       .concat(withdrawCollateralEvents)
     // @ts-ignore
     const groupedEvents = groupBy(
-      events.sort((a: any, b: any) => b.timeStamp.getTime() - a.timeStamp.getTime()),
+      events.sort(
+        (
+          a:
+            | TradeEvent
+            | LiquidationEvent
+            | CloseWithSwapEvent
+            | DepositCollateralEvent
+            | WithdrawCollateralEvent
+            | RolloverEvent,
+          b:
+            | TradeEvent
+            | LiquidationEvent
+            | CloseWithSwapEvent
+            | DepositCollateralEvent
+            | WithdrawCollateralEvent
+            | RolloverEvent
+        ) => b.blockNumber.minus(a.blockNumber).toNumber()
+      ),
       'loanId'
     )
 

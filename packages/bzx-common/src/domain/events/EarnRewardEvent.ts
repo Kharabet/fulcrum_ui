@@ -2,39 +2,29 @@ import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
 
-export class EarnRewardEventNew {
+export default class EarnRewardEvent {
   public static readonly topic0: string =
-    '0xe6c5d7a78caa3f3f24c92ef7f180efb19eb4cc6decff0d5b9cbc4d164b718d09'
+    '0x7d67a06b653c0fa85ccea3aa013f859cf520653f6d581e121b77dc82a4c10412'
   public readonly reciever: string //indexed
+  public readonly token: Asset //indexed
   public readonly loanId: string //indexed
-  public readonly feeType: FeeType //indexed
-  public readonly token: Asset 
-  public amount: BigNumber
-  public readonly timeStamp: Date
+  public readonly amount: BigNumber
+  public readonly blockNumber: BigNumber
   public readonly txHash: string
 
   constructor(
     reciever: string,
-    loanId: string,
-    feeType: number,
     token: Asset,
+    loanId: string,
     amount: BigNumber,
-    timeStamp: Date,
+    blockNumber: BigNumber,
     txHash: string
   ) {
     this.reciever = reciever
     this.token = token
     this.loanId = loanId
-    this.feeType = feeType
     this.amount = amount
-    this.timeStamp = timeStamp
+    this.blockNumber = blockNumber
     this.txHash = txHash
   }
-}
-
-export enum FeeType {
-    Lending,
-    Trading,
-    Borrowing,
-    SettleInterest
 }
