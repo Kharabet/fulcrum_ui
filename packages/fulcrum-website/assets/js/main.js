@@ -139,7 +139,12 @@ function getFontSize(el) {
 function updateAppLink() {
   const pathname = window.location.pathname
   if (pathname === '/lending') {
-    const appLink = document.getElementById('app-link')
-    if (appLink) appLink.setAttribute('href', 'https://app.fulcrum.trade/lend')
+    const appLinksNode = document.querySelectorAll('.app-link')
+    if (appLinksNode) {
+      const appLinks = [].slice.call(appLinksNode)
+      appLinks.forEach((item) => {
+        item.setAttribute('href', 'https://app.fulcrum.trade/lend')
+      })
+    }
   }
 }
