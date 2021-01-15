@@ -1,50 +1,51 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
+import { timeStamp } from 'console'
 
-export class BorrowEvent {
-  public static topic0: string =
-    '0x7bd8cbb7ba34b33004f3deda0fd36c92fc0360acbd97843360037b467a538f90'
+export default class LiquidationEvent {
+  public static readonly topic0: string =
+    '0x46fa03303782eb2f686515f6c0100f9a62dabe587b0d3f5a4fc0c822d6e532d3'
   public readonly user: string //indexed
-  public readonly lender: string //indexed
+  public readonly liquidator: string //indexed
   public readonly loanId: string //indexed
+  public readonly lender: string
   public readonly loanToken: Asset
   public readonly collateralToken: Asset
-  public readonly newPrincipal: BigNumber
-  public readonly newCollateral: BigNumber
-  public readonly interestRate: BigNumber
-  public readonly interestDuration: BigNumber
-  public readonly collateralToLoanRate: BigNumber // one unit of loanToken, denominated in collateralToken
+  public readonly repayAmount: BigNumber
+  public readonly collateralWithdrawAmount: BigNumber
+  public readonly collateralToLoanRate: BigNumber // one unit of baseToken, denominated in quoteToken
   public readonly currentMargin: BigNumber
   public readonly blockNumber: BigNumber
   public readonly txHash: string
+  public readonly timeStamp?: Date
 
   constructor(
     user: string,
-    lender: string,
+    liquidator: string,
     loanId: string,
+    lender: string,
     loanToken: Asset,
     collateralToken: Asset,
-    newPrincipal: BigNumber,
-    newCollateral: BigNumber,
-    interestRate: BigNumber,
-    interestDuration: BigNumber,
+    repayAmount: BigNumber,
+    collateralWithdrawAmount: BigNumber,
     collateralToLoanRate: BigNumber,
     currentMargin: BigNumber,
     blockNumber: BigNumber,
-    txHash: string
+    txHash: string,
+    timeStamp?: Date
   ) {
     this.user = user
-    this.lender = lender
+    this.liquidator = liquidator
     this.loanId = loanId
+    this.lender = lender
     this.loanToken = loanToken
     this.collateralToken = collateralToken
-    this.newPrincipal = newPrincipal
-    this.newCollateral = newCollateral
-    this.interestRate = interestRate
-    this.interestDuration = interestDuration
+    this.repayAmount = repayAmount
+    this.collateralWithdrawAmount = collateralWithdrawAmount
     this.collateralToLoanRate = collateralToLoanRate
     this.currentMargin = currentMargin
     this.blockNumber = blockNumber
     this.txHash = txHash
+    this.timeStamp = timeStamp
   }
 }

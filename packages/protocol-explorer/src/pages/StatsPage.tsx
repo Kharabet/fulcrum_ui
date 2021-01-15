@@ -5,20 +5,21 @@ import { TxGrid } from '../components/TxGrid'
 import { Header } from '../layout/Header'
 import { RouteComponentProps } from 'react-router'
 import Asset from 'bzx-common/src/assets/Asset'
-import { LiquidationEvent } from '../domain/LiquidationEvent'
-import { BigNumber } from '@0x/utils'
-import { TradeEvent } from '../domain/TradeEvent'
-import { CloseWithSwapEvent } from '../domain/CloseWithSwapEvent'
-import { CloseWithDepositEvent } from '../domain/CloseWithDepositEvent'
-import { BurnEvent } from '../domain/BurnEvent'
-import { MintEvent } from '../domain/MintEvent'
-import { BorrowEvent } from '../domain/BorrowEvent'
+import {
+  BorrowEvent,
+  BurnEvent,
+  CloseWithDepositEvent,
+  CloseWithSwapEvent,
+  LiquidationEvent,
+  MintEvent,
+  RolloverEvent,
+  TradeEvent
+} from 'bzx-common/src/domain/events'
 import { ITxRowProps } from '../components/TxRow'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { NavService } from '../services/NavService'
 import { Loader } from '../components/Loader'
-import { RolloverEvent } from 'src/domain/RolloverEvent'
 
 interface MatchParams {
   token: string

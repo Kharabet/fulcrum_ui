@@ -1,7 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
-export class BurnEvent {
+export default class BurnEvent {
   public static topic0: string =
     '0x743033787f4738ff4d6a7225ce2bd0977ee5f86b91a902a58f5e4d0b297b4644'
   public readonly burner: string //indexed
