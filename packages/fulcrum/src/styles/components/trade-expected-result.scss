@@ -3,61 +3,88 @@
 .trade-expected-result {
   display: flex;
   flex-direction: row;
-
-  border: 1px solid #586473;
+  justify-content: space-between;
   box-sizing: border-box;
   border-radius: 4px;
 
   margin-bottom: 20px;
 
-  .trade-expected-result__column {
+  &__column {
     display: flex;
     flex-direction: column;
-    width: 50%;
-    padding: 13px 17px;
+    width: calc(50% - 8px);
+    padding: 13px;
 
-    + .trade-expected-result__column {
-      border-left: 1px solid #586473;
+    border: 1px solid #586473;
+  }
+  &__column-value {
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 150%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+
+    &,
+    .expired & .value {
+      color: #939fac;
     }
 
-    .trade-expected-result__column-value {
-      font-weight: bold;
-      font-size: 20px;
-      line-height: 150%;
-      text-align: left;
-      display: flex;
-      &,
-      .expired & .value {
-        color: #939fac;
-      }
-
-      .value {
-        color: #1cd8c4;
-      }
+    .value {
+      color: #1cd8c4;
     }
 
-    .trade-expected-result__column-title {
-      font-weight: 600;
-      font-size: 12px;
-      line-height: 150%;
-      text-align: left;
+    & + .trade-expected-result__column-title {
+      margin-top: 10px;
+    }   
+  }
+  &__fee {
+    .value {
+      color: #fff;
+    }
+    .expired & .value {
       color: #939fac;
     }
   }
-
+  &__column-title {
+    margin-bottom: 2px;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 150%;
+    text-align: left;
+    color: #939fac;
+  }
+  &__chi {
+    font-weight: 600;
+    font-size: 14px;
+    color: #fff;
+    .expired & {
+      color: #939fac;
+    }
+  }
+  .tooltip__icon {
+    width: 16px;
+    margin-top: -2px;
+    float: right;
+  }
   @media screen and (max-width: $breakpoint-mobile-max) {
+  
+    display: block;
     margin-top: 20px;
     margin-bottom: 0;
-    .trade-expected-result__column {
+    &__column {
+      width: 100%;
       padding: 12px 15px;
-
-      .trade-expected-result__column-value {
-        font-size: 16px;
+      & + .trade-expected-result__column{
+        margin-top: 15px;
       }
+    }
+    &__column-value {
+      font-size: 16px;
+    }
 
-      .trade-expected-result__column-title {
-        font-size: 10px;
-      }
+    &__column-title {
+      font-size: 10px;
     }
   }
 }

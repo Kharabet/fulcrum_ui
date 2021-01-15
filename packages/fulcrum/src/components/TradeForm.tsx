@@ -4,7 +4,6 @@ import TagManager from 'react-gtm-module'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
-import { ReactComponent as QuestionIcon } from '../assets/images/ic__question_mark.svg'
 import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
@@ -19,12 +18,7 @@ import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
-import ReactTooltip from 'react-tooltip'
-import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
-import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
 import '../styles/components/trade-form.scss'
-import { ChiSwitch } from './ChiSwitch'
-import { CollapsibleContainer } from './CollapsibleContainer'
 import { InputAmount } from './InputAmount'
 import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
@@ -160,11 +154,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value))
         )
       )
-      .subscribe(async(next) => {
+      .subscribe(async (next) => {
         if (next) {
           this._isMounted &&
             this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false })
-            await this.setEstimatedFee()
+          await this.setEstimatedFee()
         } else {
           this._isMounted &&
             this.setState({
@@ -394,7 +388,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       await this.setSlippageRate(this.state.tradeAmountValue)
-     
     }
     if (this.state.depositToken !== prevState.depositToken) {
       await this.setDepositTokenBalance(this.state.depositToken)
@@ -482,36 +475,24 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             </div>
           </div>
         </div>
+
         <div
           className={`trade-form__form-container ${
             this.props.tradeType === TradeType.BUY ? 'buy' : 'sell'
           }${this.state.isExpired ? ' expired' : ''}`}>
           <div className="trade-form__form-values-container">
-            {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
+            {/* {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult
                 entryPrice={this.state.baseTokenPrice}
                 liquidationPrice={this.state.liquidationPrice}
                 quoteToken={this.props.quoteToken}
               />
-            ) : null}
-
-            {!this.state.isLoading && (
-              <div className="trade-form__kv-container">
-                {amountMsg.includes('Slippage:') ? (
-                  <div
-                    title={`${this.state.slippageRate.toFixed(18)}%`}
-                    className="trade-form__label slippage">
-                    {amountMsg}
-                    <span className="trade-form__slippage-amount">
-                      &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}
-                      <SlippageDown />
-                    </span>
-                  </div>
-                ) : (
-                  <div className="trade-form__label">{amountMsg}</div>
-                )}
-              </div>
-            )}
+            ) : null} */}
+          
+            <div className="trade-form__row-container">
+              <div className="trade-form__label-container">Amount</div>
+              <div className="trade-form__label-collateral">Collateral</div>
+            </div>
             <InputAmount
               inputAmountText={this.state.inputAmountText}
               selectorAssets={[this.props.baseToken, this.props.quoteToken]}
@@ -524,6 +505,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               onCollateralChange={this.onCollateralChange}
               withSlider
             />
+
             {this.props.tradeType === TradeType.SELL && (
               <InputReceive
                 receiveAmout={this.state.returnedAmount}
@@ -536,62 +518,35 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             )}
 
-            {this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
+            <div className="trade-form__row-container">
+              <div className="trade-form__slippage">
+                Slippage:
+                <span
+                  className={`trade-form__slippage-value${
+                    this.state.slippageRate.gte(0.02) ? ' danger' : ''
+                  }`}
+                  title={this.state.slippageRate.toFixed()}>
+                  {this.state.slippageRate.toFixed(2)}%
+                </span>
+              </div>
+            </div>
+
+            {this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult
                 entryPrice={this.state.baseTokenPrice}
                 liquidationPrice={this.state.liquidationPrice}
+                estimatedFee={this.state.estimatedFee}
                 quoteToken={this.props.quoteToken}
               />
             ) : null}
           </div>
-          <div className="trade-form__row-container">
-            <div className="trade-form__label-container">
-              Use CHI gas token
-              <IconInfo
-                className="tooltip__icon"
-                data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
-                data-for="chi-tooltip"
-              />
-              <ReactTooltip id="chi-tooltip" className="tooltip__info" place="top" effect="solid" />
-            </div>
-            <ChiSwitch />
-          </div>
 
-          <div className="trade-form__row-container">
-            <div className="trade-form__label-container">Slippage</div>
-            <div className="trade-form__value-container" title={this.state.slippageRate.toFixed()}>
-              {this.state.slippageRate.toFixed(1)}%
-            </div>
-          </div>
-          <div className="trade-form__row-container">
-            <div className="trade-form__label-container">Estimated Fee</div>
-            <div className="trade-form__value-container" title={this.state.estimatedFee.toFixed()}>
-              ~${this.state.estimatedFee.toFixed(2)}
-            </div>
-          </div>
-
-          <div className="trade-form__row-container">
-            <div className="trade-form__label-container">
-              Estimated Fee with CHI Token
-              <IconInfo
-                className="tooltip__icon"
-                data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
-                data-for="chi-estimated"
-              />
-              <ReactTooltip
-                id="chi-estimated"
-                className="tooltip__info"
-                place="top"
-                effect="solid"
-              />
-            </div>
-            <div
-              className="trade-form__value-container"
-              title={this.state.estimatedFeeChi.toFixed()}>
-              ~${this.state.estimatedFeeChi.toFixed(2)}
-            </div>
-          </div>
-
+          {!this.state.isLoading && (
+              <div className="trade-form__kv-container">
+                <div className="trade-form__label">{amountMsg}</div>
+              </div>
+            )}
+            
           <div className="trade-form__actions-container">
             {this.state.isExpired ? (
               <button onClick={this.onUpdateClick} className={`trade-form__submit-button update`}>

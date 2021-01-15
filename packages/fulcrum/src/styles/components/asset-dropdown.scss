@@ -7,7 +7,7 @@
   position: absolute;
   top: calc(50% + 20px);
   border-radius: 4px;
-  background-color: #758295;
+  background-color: #444e5a;
   box-sizing: border-box;
   width: 100%;
   z-index: 100004;
@@ -56,10 +56,7 @@
       margin-right: 7px;
       svg {
         width: 24px;
-        height: 24px;
-        @media screen and (max-width: $mobile-version-width) {
-          display: none;
-        }
+        height: 24px;        
       }
     }
   }
@@ -72,19 +69,20 @@
   box-sizing: border-box;
   border-radius: 26px;
   background-color: #586473;
-  width: 154px;
+  width: 112px;
   align-items: center;
   padding: 8px;
   position: relative;
   @media screen and (max-width: $mobile-version-width) {
-    width: 125px;
+    width: 86px;
+    padding: 4px;
   }
   svg {
     width: 24px;
     height: 24px;
     margin-right: 4px;
     @media screen and (max-width: $mobile-version-width) {
-      display: none;
+      margin-right: 2px;
     }
     .eth-svg {
       fill: #c8c8c8;
@@ -99,9 +97,9 @@
     transform: translate(0, -50%);
     width: 8px;
     border: 4px solid transparent;
-    // @media only screen and (max-width: $mobile-version-max-width) {
-    //   right: 10px;
-    // }
+    @media only screen and (max-width: $mobile-version-max-width) {
+      right: 10px;
+    }
   }
   &.closed {
     &::after {
@@ -116,9 +114,12 @@
     }
   }
   span {
-    font-size: 12px;
-    font-weight: 600;   
+    font-size: 16px;
+    font-weight: 600;
     color: #ffffff;
-    margin-top: 2px;
+    // margin-top: 2px;
+    @media screen and (max-width: $mobile-version-width) {
+      font-size: 12px;
+    }
   }
 }

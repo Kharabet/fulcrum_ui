@@ -6,9 +6,9 @@
   @include clearfix();
   display: flex;
   box-sizing: border-box;
-  width: 610px;
+  width: 600px;
   min-height: 285px;
-  background-color: #444e5a;
+  background-color: #333c46;
   position: relative;
   .close-icon {
     position: absolute;
@@ -22,10 +22,21 @@
     display: flex;
     align-items: center;
     background-color: #ffffff;
+    &:before {
+      content: '';
+      position: absolute;
+      border: 16px solid transparent;
+      border-left: 16px solid #ffffff;
+      left: 175px;
+      top: 105px;
+      margin: auto;
+      height: 24px;
+      transform: translate(-50%, 0);
+    }
   }
   &__info_block__logo {
     position: relative;
-    padding: 0 40px;
+    padding: 0 35px;
     svg {
       width: 90px;
       height: 90px;
@@ -36,7 +47,7 @@
     .position-type-marker-alt {
       position: absolute;
       top: 32px;
-      right: 26.5px;
+      right: 21.5px;
       border: 4px solid #fff;
       border-radius: 50%;
       width: 27px;
@@ -96,7 +107,8 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
+    margin-top: 7px;
     .gas-limits-container {
       padding-top: 10px;
       font-style: normal;
@@ -120,8 +132,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
-    padding: 0.22rem 0;
+    margin-top: -17px;
+    height: 17px;
     &.jc-fe {
       justify-content: flex-end;
     }
@@ -134,10 +146,7 @@
     margin-bottom: 10px;
     color: #b9c7d6;
 
-    &.slippage {
-      font-size: 14px;
-      display: flex;
-    }
+   
     &.danger {
       color: #fe7272;
     }
@@ -146,7 +155,23 @@
       background-color: transparent;
     }
   }
-
+  &__slippage {
+  font-size: 14px;
+  margin-bottom: 10px;
+  }
+  &__slippage-value {
+    font-size: 12px;
+    color: #fff;
+    margin-left: 8px;
+   
+    &.danger {
+      background-color: #FF4F4F;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .expired &{ background-color:transparent;
+      color: #b9c7d6;}
+  }
   &__slippage-amount {
     font-weight: 800;
     display: flex;
@@ -158,8 +183,12 @@
 
   &__row-container {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
     color: #a2abb8;
+  }
+
+  &__label-collateral {
+    margin-right: 75px;
   }
 
   &__value-container {
@@ -281,7 +310,7 @@
     outline: none;
   }
 
- &__submit-button {
+  &__submit-button {
     display: block;
     cursor: pointer;
     width: 100%;
@@ -376,7 +405,7 @@
     margin-bottom: 56px;
   }
   .rc-slider-handle {
-      &:after {
+    &:after {
       content: attr(aria-valuenow) ' %';
       position: absolute;
       color: #33dfcc;
@@ -422,15 +451,10 @@
       align-items: flex-start;
       position: relative;
       &:before {
-        content: '';
-        position: absolute;
         border: 16px solid transparent;
         border-top: 16px solid #ffffff;
         left: 50%;
-        bottom: -30px;
-        margin: auto;
-        height: 24px;
-        transform: translate(-50%, 0);
+        top: 93px;
       }
     }
     &__info_block {
@@ -529,7 +553,6 @@
       margin-bottom: 20px;
     }
 
-  
     &__position-type-container {
       margin-bottom: 1rem;
     }
@@ -545,22 +568,38 @@
     &__label {
       font-weight: 600;
       font-size: 10px;
-      line-height: 150%;
-      &.slippage {
-        font-size: 12px;
-      }
+      line-height: 150%;     
       &.danger {
-        color: #fe7272;
+        background-color: #fe7272;
       }
 
       &--no-bg {
         background-color: transparent;
       }
     }
+    &__slippage {
+      font-size: 12px;
+      
+    }
+    &__slippage-value {
+      margin-left: 4px;
+    }
+
+    .danger {
+      background-color: #fe7272;
+    }
     &__slippage-amount img {
       width: 10px;
       height: auto;
       margin-left: 2px;
+    }
+
+    &__row-container {
+      font-size: 10px;
+    }
+
+    &__label-collateral {
+      margin-right: 60px;
     }
 
     // &__token-message-container {
@@ -677,17 +716,17 @@
         font-size: 18px;
       }
       &__container {
-        height: 52px;
+        height: 56px;
       }
       &__input {
-        font-size: 24px;
+        font-size: 26px;
         width: calc(100% - 125px);
       }
     }
     .buy {
       .input-amount {
         &__container {
-          height: 52px;
+          height: 56px;
         }
       }
     }
