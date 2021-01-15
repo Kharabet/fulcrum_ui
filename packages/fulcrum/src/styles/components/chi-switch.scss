@@ -8,6 +8,9 @@
     display: inline-flex;
     height: 24px;
     width: 44px;
+    @media screen and (max-width: $mobile-version-width) {
+      width: 40px;
+    }
     .cb-label {
       padding: 0;
     }

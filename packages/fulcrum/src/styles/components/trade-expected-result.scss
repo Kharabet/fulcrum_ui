@@ -24,19 +24,18 @@
     text-align: left;
     display: flex;
     justify-content: space-between;
-
-    &,
-    .expired & .value {
-      color: #939fac;
-    }
-
-    .value {
-      color: #1cd8c4;
-    }
+    color: #939fac;
 
     & + .trade-expected-result__column-title {
       margin-top: 10px;
-    }   
+    }
+  }
+  .expired & .value {
+    color: #939fac;
+  }
+
+  .value {
+    color: #1cd8c4;
   }
   &__fee {
     .value {
@@ -53,6 +52,9 @@
     line-height: 150%;
     text-align: left;
     color: #939fac;
+    br{
+      display: none;
+    }
   }
   &__chi {
     font-weight: 600;
@@ -67,16 +69,22 @@
     margin-top: -2px;
     float: right;
   }
-  @media screen and (max-width: $breakpoint-mobile-max) {
-  
+  @media screen and (max-width: $mobile-version-width) {
     display: block;
     margin-top: 20px;
     margin-bottom: 0;
     &__column {
+      flex-direction: row;
       width: 100%;
       padding: 12px 15px;
-      & + .trade-expected-result__column{
+      & + .trade-expected-result__column {
         margin-top: 15px;
+      }
+    }
+    &__column-row {
+      width: 50%;
+      + .trade-expected-result__column-row {
+        margin-left: 15px;
       }
     }
     &__column-value {
@@ -84,7 +92,23 @@
     }
 
     &__column-title {
+      position: relative;
       font-size: 10px;
+      padding-right: 16px;
+      .value {
+        word-wrap: break-word
+      }
+      br{
+        display: block;
+      }
+    }
+    &__chi {
+      font-size: 12px;
+    }
+    .tooltip__icon {
+      position: absolute;
+      top: 1px;
+      right: 1px;
     }
   }
 }

@@ -31,40 +31,45 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
   return (
     <div className="trade-expected-result">
       <div className="trade-expected-result__column">
-        <div className="trade-expected-result__column-title">Entry Price</div>
-      
+        <div className="trade-expected-result__column-row">
+          <div className="trade-expected-result__column-title">Entry Price</div>
+
           <div
             title={`${props.entryPrice.toFixed(18)}`}
             className="trade-expected-result__column-value">
-                <div>
-            <span className="value">
-              {props.entryPrice.eq(0) ? (
-                <Preloader width="55px" />
-              ) : (
-                props.entryPrice.toFixed(precisionDigits)
-              )}
-            </span>
-            &nbsp;{props.quoteToken}
+            <div>
+              <span className="value">
+                {props.entryPrice.eq(0) ? (
+                  <Preloader width="55px" />
+                ) : (
+                  props.entryPrice.toFixed(precisionDigits)
+                )}
+              </span>
+              &nbsp;{props.quoteToken}
+            </div>
           </div>
         </div>
-        <div className="trade-expected-result__column-title">Liquidation Price</div>       
+        <div className="trade-expected-result__column-row">
+          <div className="trade-expected-result__column-title">Liquidation Price</div>
           <div
             title={`${props.liquidationPrice.toFixed(18)}`}
             className="trade-expected-result__column-value">
-                <div>
-            <span className="value">
-              {props.liquidationPrice.eq(0) ? (
-                <Preloader width="55px" />
-              ) : (
-                props.liquidationPrice.toFixed(precisionDigits)
-              )}
-            </span>
-            &nbsp;{props.quoteToken}
+            <div>
+              <span className="value">
+                {props.liquidationPrice.eq(0) ? (
+                  <Preloader width="55px" />
+                ) : (
+                  props.liquidationPrice.toFixed(precisionDigits)
+                )}
+              </span>
+              &nbsp;{props.quoteToken}
+            </div>
           </div>
         </div>
       </div>
 
       <div className="trade-expected-result__column">
+      <div className="trade-expected-result__column-row">
         <div className="trade-expected-result__column-title">
           Fees (Overestimated)
           <IconInfo
@@ -85,8 +90,10 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
             </span>
           )}
         </div>
+        </div>
+        <div className="trade-expected-result__column-row">
         <div className="trade-expected-result__column-title">
-          Save <span title={estimatedFeeChi.toFixed()}>{formatPrecision(estimatedFeeChi)}$</span>{' '}
+          Save <span className="value" title={estimatedFeeChi.toFixed()}>{formatPrecision(estimatedFeeChi)}$</span> <br/>
           with CHI
           <IconInfo
             className="tooltip__icon"
@@ -98,7 +105,13 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
             <a href='#' class='tooltip__button'>Learn More</a>"
             data-for="chi-estimated"
           />
-          <ReactTooltip id="chi-estimated" className="tooltip__info" place="top" delayHide={500} effect="solid" />
+          <ReactTooltip
+            id="chi-estimated"
+            className="tooltip__info"
+            place="top"
+            delayHide={500}
+            effect="solid"
+          />
         </div>
         <div
           title={`${props.estimatedFee.toFixed(18)}`}
@@ -107,6 +120,7 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
           <ChiSwitch />
         </div>
       </div>
+    </div>
     </div>
   )
 }
