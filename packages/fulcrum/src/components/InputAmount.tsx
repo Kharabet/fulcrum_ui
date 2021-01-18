@@ -15,7 +15,7 @@ interface IInputAmountProps {
   selectedAsset: Asset
   buttonValue: number
   selectorAssets?: Asset[]
-  tradeType?: TradeType  
+  tradeType?: TradeType
   withSlider?: boolean
   onInsertMaxValue: (value: number) => void
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void
@@ -49,9 +49,13 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
   public render() {
     return (
       <div className="input-amount">
-        {this.props.tradeType === TradeType.SELL && (
-          <div className="input-amount__title">Position</div>
-        )}
+        <div className="input-amount__row-container">
+          <div>Amount</div>
+          {this.props.tradeType === TradeType.BUY && (
+            <div className="input-amount__label-collateral">Collateral</div>
+          )}
+        </div>
+
         <div className="input-amount__container">
           <input
             type="number"

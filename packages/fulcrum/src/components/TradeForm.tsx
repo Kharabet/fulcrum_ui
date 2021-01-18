@@ -488,11 +488,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 quoteToken={this.props.quoteToken}
               />
             ) : null} */}
-          
-            <div className="trade-form__row-container">
-              <div className="trade-form__label-container">Amount</div>
-              <div className="trade-form__label-collateral">Collateral</div>
-            </div>
+        
             <InputAmount
               inputAmountText={this.state.inputAmountText}
               selectorAssets={[this.props.baseToken, this.props.quoteToken]}
@@ -530,23 +526,20 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 </span>
               </div>
             </div>
-
-            {this.props.tradeType === TradeType.BUY ? (
-              <TradeExpectedResult
-                entryPrice={this.state.baseTokenPrice}
-                liquidationPrice={this.state.liquidationPrice}
-                estimatedFee={this.state.estimatedFee}
-                quoteToken={this.props.quoteToken}
-              />
-            ) : null}
+            <TradeExpectedResult
+              entryPrice={this.state.baseTokenPrice}
+              liquidationPrice={this.state.liquidationPrice}
+              estimatedFee={this.state.estimatedFee}
+              quoteToken={this.props.quoteToken}
+            />
           </div>
 
           {!this.state.isLoading && (
-              <div className="trade-form__kv-container">
-                <div className="trade-form__label">{amountMsg}</div>
-              </div>
-            )}
-            
+            <div className="trade-form__kv-container">
+              <div className="trade-form__label">{amountMsg}</div>
+            </div>
+          )}
+
           <div className="trade-form__actions-container">
             {this.state.isExpired ? (
               <button onClick={this.onUpdateClick} className={`trade-form__submit-button update`}>

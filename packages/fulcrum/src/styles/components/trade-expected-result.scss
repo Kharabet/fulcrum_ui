@@ -8,14 +8,37 @@
   border-radius: 4px;
 
   margin-bottom: 20px;
-
+  margin-top: 35px;
+  .sell & {
+    margin-top: 0;
+  }
   &__column {
     display: flex;
     flex-direction: column;
     width: calc(50% - 8px);
     padding: 13px;
-
     border: 1px solid #586473;
+    .sell & {
+      width: 100%;
+      flex-direction: row;
+      &:first-child {
+        display: none;
+      }
+     
+      &-row {
+        width: 50%;
+        margin-right: 20px;
+      }
+
+      &-title {
+        position: relative;
+      }
+      .tooltip__icon {
+        position: absolute;
+        top: 1px;
+        right: 1px;
+      }
+    }
   }
   &__column-value {
     font-weight: bold;
@@ -52,7 +75,7 @@
     line-height: 150%;
     text-align: left;
     color: #939fac;
-    br{
+    br {
       display: none;
     }
   }
@@ -83,6 +106,9 @@
     }
     &__column-row {
       width: 50%;
+      .expired & {
+        margin-right: 0;
+      }
       + .trade-expected-result__column-row {
         margin-left: 15px;
       }
@@ -96,9 +122,9 @@
       font-size: 10px;
       padding-right: 16px;
       .value {
-        word-wrap: break-word
+        word-wrap: break-word;
       }
-      br{
+      br {
         display: block;
       }
     }
