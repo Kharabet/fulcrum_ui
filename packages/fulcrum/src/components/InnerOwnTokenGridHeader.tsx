@@ -20,15 +20,10 @@ const InnerOwnTokenGridHeader = (props: IInnerOwnTokenGridHeaderProps) => {
           props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`
         }`}>
         <span className="inner-own-token-grid-header__text">
-          Position <label className="text-asset">{props.asset}</label>
+         
         </span>
       </div>
-      <div
-        className={`inner-own-token-grid-header__col-asset-type ${
-          props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`
-        }`}>
-        <span className="inner-own-token-grid-header__text">Type</span>
-      </div>
+  
       <div
         className={`inner-own-token-grid-header__col-asset-price ${
           props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`

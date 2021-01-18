@@ -297,17 +297,12 @@ export class InnerOwnTokenGridRow extends Component<
               title={this.props.positionValue.toFixed(18)}
               className="inner-own-token-grid-row__col-token-name-full opacityIn">
               <span className="inner-own-token-grid-row__body-header">
-                Position <label className="text-asset">{this.props.baseToken}</label>
+              <label className="text-asset">{this.props.baseToken} {`${this.props.leverage}x`}&nbsp; {this.props.positionType}</label>  
+                
               </span>
               {this.props.positionValue.toFixed(4)}
             </div>
-            <div
-              title={this.props.loan.loanId}
-              className="inner-own-token-grid-row__col-asset-type">
-              <span className="position-type-marker">
-                {`${this.props.leverage}x`}&nbsp; {this.props.positionType}
-              </span>
-            </div>
+         
             <div
               title={`${this.props.value.toFixed(18)}`}
               className="inner-own-token-grid-row__col-asset-price">
@@ -419,7 +414,7 @@ export class InnerOwnTokenGridRow extends Component<
                   'rollover-warning'}`}
                 onClick={isRollover ? this.onRolloverClick : this.onSellClick}
                 disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
-                {isRollover ? 'Rollover' : TradeType.SELL}
+                {isRollover ? 'Rollover' : 'Close Position'}
               </button>
               {remainingDays.lte(6) && (
                 <NotificationRollover

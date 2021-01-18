@@ -21,7 +21,7 @@
     @media screen and (min-width: $breakpoint-mobile-min) {
       display: grid;
       column-gap: 35px;
-      grid-template-columns: 10% 7% 17% 14% 13% 10% 9%;
+      grid-template-columns: 10% 17% 14% 13% 10% 15%;
     }
     @media screen and (max-width: $breakpoint-mobile-max) {
       display: flex;
@@ -145,10 +145,12 @@
       border-radius: 43px;
       background-color: #00c0ab;
       outline: none;
+      
+      font-size: 14px;
+      width: 154px;
       @media screen and(min-width: $breakpoint-mobile-min) {
-        width: 95px;
+        
         height: 44px;
-        font-size: 16px;
       }
       @media screen and(max-width: $breakpoint-mobile-max) {
         padding: 6px 20px;
