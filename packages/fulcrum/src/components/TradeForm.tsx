@@ -437,7 +437,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
           ? `Slippage:`
           : ''
-      submitButtonText = `CLOSE / ${this.props.positionType}`
+      submitButtonText = `SELL / ${this.props.positionType}`
     }
     if (this.state.isExpired) {
       amountMsg = 'Price has changed'

@@ -1,5 +1,6 @@
 import React, { Component, ChangeEvent } from 'react'
-import Slider from 'rc-slider'
+import { SliderPercent } from './SliderPercent'
+
 
 import Asset from 'bzx-common/src/assets/Asset'
 
@@ -113,12 +114,9 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
             </button>
           </div>
         ) : (
-          <Slider
-            step={1}
-            min={0}
-            max={100}
-            value={this.props.buttonValue * 100}
-            onChange={this.onChange}
+          <SliderPercent
+            onInsertMaxValue={this.props.onInsertMaxValue}
+            percentSlider={this.props.buttonValue}
           />
         )}
       </div>
@@ -129,14 +127,6 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
     event.preventDefault()
 
     this.setState({ isChangeCollateralOpen: true })
-  }
-
-  private onChangeCollateralClose = () => {
-    this.setState({ isChangeCollateralOpen: false })
-  }
-
-  private onChange = (value: number) => {
-    this.props.onInsertMaxValue(value / 100)
   }
 
   public setButtonValue = (event: any) => {

@@ -1,6 +1,6 @@
 @import '../abstracts/mixins';
 @import '../abstracts/variables';
-@import './rc-slider.scss';
+@import './slider.scss';
 
 .trade-form {
   @include clearfix();
@@ -93,12 +93,10 @@
   }
 
   &__form-container {
-    padding: 75px 45px 30px 30px;
+    padding: 55px 45px 30px 30px;
     display: flex;
     flex-direction: column;
-    &.buy {
-      padding-top: 55px;
-    }
+   
   }
   &__row-container {
     font-weight: 600;
@@ -125,7 +123,9 @@
 
   &__actions-container {
     margin-top: 10px;
-    margin-bottom: 25px;
+    .buy &{
+      margin-bottom: 25px;}
+
   }
 
   &__kv-container {
@@ -344,10 +344,9 @@
     }
   }
   .input-receive {
-    
-    padding-top: 30px;
     &__title {
-      color: #a9b5c7;     
+      color: #a9b5c7;
+      padding-top: 22px;
       margin-bottom: 8px;
       font-weight: 600;
       font-size: 12px;
@@ -394,22 +393,6 @@
       color: #495460;
     }
   }
-  .rc-slider {
-    margin-top: 30px;
-    margin-bottom: 56px;
-  }
-  .rc-slider-handle {
-    &:after {
-      content: attr(aria-valuenow) ' %';
-      position: absolute;
-      color: #33dfcc;
-      font-weight: 600;
-      font-size: 12px;
-      top: 34px;
-      width: 40px;
-      height: 16px;
-    }
-  }
 }
 
 @media screen and (max-width: $mobile-version-width) {
@@ -418,8 +401,6 @@
 
     max-width: 320px;
     width: 320px;
-
-    background-color: #444e5a;
 
     display: flex;
     flex-direction: column;
@@ -534,11 +515,7 @@
 
       padding: 30px 20px;
       display: flex;
-      flex-direction: column;
-
-      &.buy {
-        padding-top: 30px;
-      }
+      flex-direction: column;     
     }
 
     &__form-values-container {
@@ -679,25 +656,16 @@
 
     &__submit-button {
       display: inline-block;
-
+      font-size: 16px;
       cursor: pointer;
       border: 0;
-      //height: 2.5rem;
-      //width: 6.5rem;
+      height: 56px;
       padding-left: 1rem;
       padding-right: 1rem;
       border-radius: 100px;
       color: #ffffff;
       text-transform: uppercase;
       outline: none;
-
-      &--buy {
-        background-color: #407bf7;
-      }
-
-      &--sell {
-        background-color: #ff5353;
-      }
     }
     .input-receive {
       &__title {

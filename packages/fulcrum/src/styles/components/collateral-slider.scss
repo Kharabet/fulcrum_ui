@@ -1,0 +1,74 @@
+.rc-slider {
+    position: relative;
+    width: 100%;
+    border-radius: 10px;
+  }
+  
+  .rc-slider-handle {
+    position: absolute;
+    width: 43px;
+    height: 31px;
+    cursor: pointer;
+    margin-top: -16px;
+    background-color: #444e5a;
+    -ms-touch-action: pan-x;
+    touch-action: pan-x;
+    &:before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      width: 31px;
+      height: 31px;
+      background-color: #276bfb;
+      border-radius: 50%;
+    }
+    &:after {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 8px;
+      width: 16px;
+      height: 16px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'  fill='white' viewBox='0 0 14 14'%3E%3Cpath d='M5.89339 0H8.10384L8.54876 1.7797C8.91539 1.88828 9.26588 2.03442 9.59577 2.21367L11.1674 1.27068L12.7304 2.8337L11.7874 4.40541C11.966 4.73411 12.1117 5.08325 12.2201 5.44842L14 5.89339V8.10384L12.2215 8.54846C12.113 8.91519 11.9668 9.26579 11.7876 9.59577L12.7316 11.1691L11.1686 12.7321L9.59524 11.7881C9.26628 11.9668 8.91684 12.1126 8.55135 12.221L8.10661 14H5.89616L5.45162 12.2218C5.0842 12.113 4.733 11.9665 4.40248 11.7867L2.83145 12.7293L1.26843 11.1663L2.21182 9.59398C2.03352 9.26545 1.88804 8.9165 1.77979 8.55156L0 8.10661V5.89616L1.77939 5.45132C1.88793 5.08504 2.03396 4.73488 2.21304 4.40528L1.2684 2.83088L2.83142 1.26786L4.40627 2.21277C4.73465 2.03448 5.08343 1.889 5.44821 1.78071L5.89339 0ZM7 10.5C8.933 10.5 10.5 8.933 10.5 7C10.5 5.067 8.933 3.5 7 3.5C5.067 3.5 3.5 5.067 3.5 7C3.5 8.933 5.067 10.5 7 10.5Z'/%3E%3C/svg%3E");
+    }
+  
+    @media screen and (max-width: $mobile-version-max-width) {
+      margin-top: -13px;
+      width: 36px;
+      &:before {
+        left: 5px;
+        width: 25px;
+        height: 25px;
+      }
+      &:after {
+        left: 11px;
+        top: 6.5px;
+        width: 13px;
+        height: 13px;
+      }
+    }
+  }
+  
+  .rc-slider-handle:focus {
+    outline: none;
+  }
+  
+  .rc-slider-step {
+    position: absolute;
+    width: 100%;
+    height: 26px;
+    top: -13px;
+    border-radius: 10px;
+    cursor: pointer;
+  
+    &:before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      height: 6px;
+      border-radius: 10px;
+      background-image: linear-gradient(90deg, #ff4f4f 0%, #f0e93f 52.16%, #33dfcc 101.16%);
+    }
+  }
+  
