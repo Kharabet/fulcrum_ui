@@ -20,6 +20,7 @@ interface IInputAmountProps {
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void
   onCollateralChange: (asset: Asset) => void
   withSlider: boolean
+  readonly?: boolean
 }
 
 interface IInputAmountState {
@@ -63,6 +64,7 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
             className="input-amount__input"
             value={!this.props.isLoading ? this.formatPrecision(this.props.inputAmountText) : ''}
             onChange={this.props.onTradeAmountChange}
+            readOnly={this.props.readonly}
           />
           {this.props.isLoading && (
             <div className="preloader-container">

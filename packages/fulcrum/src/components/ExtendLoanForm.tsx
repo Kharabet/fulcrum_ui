@@ -169,7 +169,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
         <section className="dialog-content">
           <div className="extend-loan-form__info-extended-by-container">
-            <div className="extend-loan-form__info-extended-by-msg">
+            <div className="extend-loan-form__info-extended-by-msg jc-c">
               Your rollover date will be extended by
             </div>
             <div className="extend-loan-form__info-extended-by-date">
@@ -182,39 +182,30 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               })}
             </div>
           </div>
-          <div className="extend-loan-form__tips">
-            <div className="extend-loan-form__tip">Min</div>
-            <div className="extend-loan-form__tip">Max</div>
-          </div>
-          <div className="green-slider">
-            <Slider
-              min={this.state.minValue}
-              max={this.state.maxValue}
-              step={1}
-              value={this.state.selectedValue}
-              onChange={this.onChange}
-              onAfterChange={this.onAfterChange}
+          <div className="extend-loan-form__info-extended-by-container mt-70">
+            <div className="extend-loan-form__info-extended-by-msg jc-sb mb-8">
+              <div className="extend-loan-form__tip">You will send</div>
+              <div className="extend-loan-form__tip collateral">Collateral</div>
+            </div>
+            <InputAmount
+              inputAmountText={this.state.inputAmountText}
+              isLoading={this.state.isLoading}
+              selectedAsset={this.props.loan!.collateralAsset}
+              buttonValue={this.state.buttonValue}
+              onInsertMaxValue={this.onInsertMaxValue}
+              onTradeAmountChange={this.onTradeAmountChange}
+              onCollateralChange={this.onCollateralChange}
+              withSlider={true}
+              readonly
             />
+            {this.state.balanceTooLow ? (
+              <React.Fragment>
+                <div className="extend-loan-form__insufficient-balance">
+                  Insufficient {this.state.assetDetails.displayName} balance in your wallet!
+                </div>
+              </React.Fragment>
+            ) : null}
           </div>
-
-          <div className="extend-loan-form__info-extended-by-msg mb-8 mt-70">You will send</div>
-          <InputAmount
-            inputAmountText={this.state.inputAmountText}
-            isLoading={this.state.isLoading}
-            selectedAsset={this.props.loan!.collateralAsset}
-            buttonValue={this.state.buttonValue}
-            onInsertMaxValue={this.onInsertMaxValue}
-            onTradeAmountChange={this.onTradeAmountChange}
-            onCollateralChange={this.onCollateralChange}
-            withSlider={true}
-          />
-          {this.state.balanceTooLow ? (
-            <React.Fragment>
-              <div className="extend-loan-form__insufficient-balance">
-                Insufficient {this.state.assetDetails.displayName} balance in your wallet!
-              </div>
-            </React.Fragment>
-          ) : null}
         </section>
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">

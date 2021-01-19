@@ -19,6 +19,7 @@
       border-radius: 50%;
       background-color: #333c46;
       z-index: 2;
+      margin-top: -4px;
       &:before {
         content: '';
         position: absolute;
@@ -30,11 +31,21 @@
         margin-top: 3px;
       }
     }
+    .rc-slider {
+      position: relative;
+      width: 100%;
+      border-radius: 10px;
+    }
 
     .rc-slider-handle {
       margin-top: -10px;
       background-color: transparent;
       z-index: 4;
+      position: absolute;
+      width: 43px;
+      height: 31px;
+      cursor: pointer;
+      touch-action: pan-x;
       &:before {
         content: '';
         position: absolute;
@@ -45,6 +56,13 @@
         border: 3px solid #333c46;
         border-radius: 50%;
         z-index: 4;
+        top: -2px;
+      }
+      &:after {
+        background-image: none;
+      }
+      &:focus {
+        outline: none;
       }
     }
     .rc-slider-step {
@@ -81,10 +99,19 @@
         width: 100%;
         position: absolute;
         z-index: 3;
-        top: 0;
+        top: -2px;
         border-radius: 4px;
       }
     }
+  }
+  .label-percent {
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: #33dfcc;
+    position: absolute;
+    top: -30px;
+    margin-left: -30px;
   }
 }
 

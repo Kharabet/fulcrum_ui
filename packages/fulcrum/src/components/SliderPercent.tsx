@@ -22,7 +22,6 @@ export class SliderPercent extends Component<ISliderPercentProps, ISliderPercent
     if (this._input) {
       this._input.focus()
     }
-    this.setState({ selectedPercent: 25 })
   }
   public render() {
     return (
@@ -30,13 +29,18 @@ export class SliderPercent extends Component<ISliderPercentProps, ISliderPercent
         <div className="wrapper-slider-percent">
           <div className="slider-percent">
             <Slider
-              min={0}
-              max={100}
+              min={1}
+              max={28}
               step={1}
               value={this.props.percentSlider}
               onChange={this.onChange}
               onAfterChange={this.onAfterChange}
             />
+            <div
+              style={{ left: `${(this.props.percentSlider / 28) * 100}%` }}
+              className="label-percent">
+              {this.props.percentSlider}&nbsp;days
+            </div>
             <div className="dots-percent">
               <div className="dot-percent"></div>
               <div className="dot-percent"></div>
