@@ -141,7 +141,6 @@ export class FulcrumProvider {
         Asset.YFI,
         Asset.BZRX,
         Asset.MKR,
-        Asset.LEND,
         Asset.KNC,
         Asset.UNI,
         Asset.AAVE,
@@ -513,7 +512,6 @@ export class FulcrumProvider {
         amount = new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
         amount = new BigNumber(10 ** 18).multipliedBy(750000);
-      case Asset.LEND:
       case Asset.KNC:
         amount = new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.BAT:
@@ -547,7 +545,7 @@ export class FulcrumProvider {
     asset: Asset,
     amountInBaseUnits: BigNumber
   ): Promise<string> => {
-    const resetRequiredAssets = [Asset.USDT, Asset.KNC, Asset.LEND] // these assets require to set approve to 0 before approve larger amount than the current spend limit
+    const resetRequiredAssets = [Asset.USDT, Asset.KNC] // these assets require to set approve to 0 before approve larger amount than the current spend limit
     let result = ''
     const assetErc20Address = this.getErc20AddressOfAsset(asset)
 
