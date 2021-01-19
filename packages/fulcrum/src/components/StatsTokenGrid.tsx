@@ -36,7 +36,6 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
           Asset.YFI,
           Asset.BZRX,
           Asset.MKR,
-          Asset.LEND,
           Asset.KNC,
           Asset.UNI,
           Asset.AAVE,

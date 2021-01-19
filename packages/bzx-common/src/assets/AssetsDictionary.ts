@@ -11,7 +11,6 @@ import comp_logo, { ReactComponent as COMPLogo } from './images/ic_token_comp.sv
 import dai_logo, { ReactComponent as DAILogo } from './images/ic_token_dai.svg'
 import eth_logo, { ReactComponent as ETHLogo } from './images/ic_token_eth.svg'
 import knc_logo, { ReactComponent as KNCLogo } from './images/ic_token_knc.svg'
-import lend_logo, { ReactComponent as LENDLogo } from './images/ic_token_lend.svg'
 import link_logo, { ReactComponent as LINKLogo } from './images/ic_token_link.svg'
 import lrc_logo, { ReactComponent as LRCLogo } from './images/ic_token_lrc.svg'
 import mkr_logo, { ReactComponent as MKRLogo } from './images/ic_token_mkr.svg'
@@ -343,22 +342,6 @@ export default class AssetsDictionary {
         '#D8D3FF',
         new Map<number, string | null>([
           [1, '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e'],
-          [3, ''],
-          [42, '']
-        ])
-      )
-    ],
-    [
-      Asset.LEND,
-      new AssetDetails(
-        'LEND',
-        18,
-        lend_logo,
-        LENDLogo,
-        '#00EFEF',
-        '#D8D3FF',
-        new Map<number, string | null>([
-          [1, '0x80fb784b7ed66730e8b1dbd9820afd29931aab03'],
           [3, ''],
           [42, '']
         ])

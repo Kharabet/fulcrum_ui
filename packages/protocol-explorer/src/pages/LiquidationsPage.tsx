@@ -67,7 +67,6 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         Asset.YFI,
         Asset.BZRX,
         Asset.MKR,
-        Asset.LEND,
         Asset.KNC,
         Asset.UNI,
         Asset.AAVE,
