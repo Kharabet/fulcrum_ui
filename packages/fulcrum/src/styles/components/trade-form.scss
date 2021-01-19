@@ -128,11 +128,6 @@
     }
   }
 
-  &__kv-container--w_dots {
-    background-image: url('../../assets/images/dotted_line.png');
-    background-repeat: repeat-x;
-    background-position-y: 1.25rem;
-  }
   &__label {
     font-weight: 600;
     font-size: 12px;
@@ -365,28 +360,6 @@
   }
 }
 
-// .trade-form__form-info {
-//   font-size: 12px;
-//   color: #ffffff;
-//   margin-bottom: 20px;
-//   display: block;
-//   letter-spacing: 0.1px;
-//   background: #fff;
-//   color: #394049;
-//   padding: 12px;
-//   padding-left: 27px;
-//   position: relative;
-//   &:before {
-//     content: "";
-//     position: absolute;
-//     width: 24px;
-//     height: 24px;
-//     background: url("../../assets/images/error_icon.svg");
-//     left: -12px;
-//     top: 10px;
-//   }
-// }
-
 @media screen and (max-width: $mobile-version-width) {
   .trade-form {
     @include clearfix();
@@ -545,11 +518,6 @@
       padding: 0.22rem 0;
     }
 
-    &__kv-container--w_dots {
-      background-image: url('../../assets/images/dotted_line.png');
-      background-repeat: repeat-x;
-      background-position-y: 1.25rem;
-    }
     &__label {
       font-weight: 600;
       font-size: 10px;

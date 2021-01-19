@@ -1,5 +1,4 @@
 import React, { Component, MouseEvent } from 'react'
-import { ReactComponent as IcTokenSelectorDown } from '../assets/images/ic___token_selector___down.svg'
 import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
