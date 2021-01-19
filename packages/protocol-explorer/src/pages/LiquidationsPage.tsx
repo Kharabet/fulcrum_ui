@@ -3,22 +3,26 @@ import React, { Component } from 'react'
 import { Bar } from 'react-chartjs-2'
 import ReactModal from 'react-modal'
 import LiquidationForm from '../components/LiquidationForm'
-import { Loader } from '../components/Loader'
 import { LoanGrid } from '../components/LoanGrid'
-import { ILoanRowProps } from '../components/LoanRow'
 import { Search } from '../components/Search'
 import { TxGrid } from '../components/TxGrid'
 import { ITxRowProps } from '../components/TxRow'
 import { UnhealthyChart } from '../components/UnhealthyChart'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { IActiveLoanData } from '../domain/IActiveLoanData'
+import Asset from 'bzx-common/src/assets/Asset'
 import { LiquidationEvent } from '../domain/LiquidationEvent'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { Header } from '../layout/Header'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { NavService } from '../services/NavService'
+
+import { Loader } from '../components/Loader'
+import { IActiveLoanData } from '../domain/IActiveLoanData'
+import { ILoanRowProps } from '../components/LoanRow'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import { RolloversGrid } from '../components/RolloversGrid'
+import { IRolloverRowProps } from '../components/RolloverRow'
+import { IRolloverData } from '../domain/IRolloverData'
 
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void
@@ -30,6 +34,7 @@ interface ILiquidationsPageState {
   transactionsCount30d: number
   events: ITxRowProps[]
   unhealthyLoans: ILoanRowProps[]
+  rollovers: IRolloverRowProps[]
   unhealthyLoansUsd: BigNumber
   healthyLoansUsd: BigNumber
   barChartDatasets: Array<{
@@ -45,38 +50,29 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   private _isMounted: boolean
 
   private readonly stablecoins: Asset[] = [Asset.DAI, Asset.USDC, Asset.USDT]
-  private readonly assetsShown: Array<{ token: Asset; color: string }>
+  private readonly assetsShown: Asset[]
 
   constructor(props: any) {
     super(props)
     if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
-      this.assetsShown = [
-        { token: Asset.USDC, color: '#85D3FF' },
-        { token: Asset.fWETH, color: '#B0B0B0' },
-        { token: Asset.WBTC, color: '#966AFF' }
-      ]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
-      this.assetsShown = [
-        { token: Asset.ETH, color: '#B0B0B0' },
-        { token: Asset.DAI, color: '#F8A608' }
-      ]
+      this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
     } else {
       this.assetsShown = [
-        { token: Asset.ETH, color: '#B0B0B0' },
-        { token: Asset.DAI, color: '#F8A608' },
-        { token: Asset.USDC, color: '#85D3FF' },
-        { token: Asset.USDT, color: '#70E000' },
-        { token: Asset.WBTC, color: '#966AFF' },
-        { token: Asset.LINK, color: '#03288B' },
-        { token: Asset.YFI, color: '#3D97FF' },
-        { token: Asset.BZRX, color: '#0056D7' },
-        { token: Asset.MKR, color: '#028858' },
-        { token: Asset.LEND, color: '#00EFEF' },
-        { token: Asset.KNC, color: '#3BD8A7' },
-        { token: Asset.UNI, color: '#FFE1EF' },
-        { token: Asset.AAVE, color: '#2EBAC6' },
-        { token: Asset.LRC, color: '#1E61FF' },
-        { token: Asset.COMP, color: '#00F9B0' }
+        Asset.ETH,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
+        Asset.KNC,
+        Asset.UNI,
+        Asset.AAVE,
+        Asset.LRC,
+        Asset.COMP
       ]
     }
 
@@ -87,6 +83,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       healthyLoansUsd: new BigNumber(0),
       events: [],
       unhealthyLoans: [],
+      rollovers: [],
       barChartDatasets: [] as Array<{
         label: Asset
         backgroundColor: string
@@ -121,7 +118,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const eventsWithDay = events.map(
       (e: { event: LiquidationEvent; repayAmountUsd: BigNumber }) => ({
         ...e,
-        day: Math.floor(e.event.timeStamp.getTime() / (1000 * 60 * 60 * 24))
+        day: Math.floor(e.event.timeStamp!.getTime() / (1000 * 60 * 60 * 24))
       })
     )
     const eventsWithDayByDay = groupBy(eventsWithDay, 'day')
@@ -129,14 +126,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       label: Asset
       backgroundColor: string
       data: Array<{ x: string; y: number }>
-    }> = this.assetsShown.map((e: { token: Asset; color: string }) => ({
-      label: e.token,
-      data: [] as Array<{ x: string; y: number }>,
-      backgroundColor: e.color
-    }))
+    }> = this.assetsShown
+      .filter((e: Asset) => !!AssetsDictionary.assets.get(e))
+      .map((e: Asset) => ({
+        label: e,
+        data: [] as Array<{ x: string; y: number }>,
+        backgroundColor: AssetsDictionary.assets.get(e)!.bgBrightColor
+      }))
     Object.keys(eventsWithDayByDay).forEach((day: string) => {
       for (const assetShown of this.assetsShown) {
-        const token: Asset = assetShown.token
+        const token: Asset = assetShown
         if (!eventsWithDayByDay[day]) continue
         const eventsWithDayByAsset: Array<{
           event: LiquidationEvent
@@ -205,11 +204,12 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       event: LiquidationEvent
       repayAmountUsd: BigNumber
     }> = []
-    const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory()
+    const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistoryWithTimestamps()
     const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, true)
     const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, false)
+    const rolloversData = await ExplorerProvider.Instance.getRollovers(0, 500)
     const unhealthyLoansUsd = unhealthyLoansData.reduce(
-      (a, b) => a.plus(b.amountOwedUsd),
+      (a, b) => a.plus(b.maxLiquidatableUsd),
       new BigNumber(0)
     )
     const healthyLoansUsd = healthyLoansData.reduce(
@@ -217,20 +217,21 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       new BigNumber(0)
     )
     const liqudiations30d = liquidationEvents.filter(
-      (e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30)
+      (e: LiquidationEvent) =>
+        e.timeStamp!.getTime() > new Date().setDate(new Date().getDate() - 30)
     )
     const transactionsCount30d = liqudiations30d.length
 
     for (const assetShown of this.assetsShown) {
       const tokenLiqudiations30d = liqudiations30d.filter((e: LiquidationEvent) => {
-        return e.loanToken === assetShown.token
+        return e.loanToken === assetShown
       })
 
       for (const e of tokenLiqudiations30d) {
         const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18
         const collateralAssetDecimals =
           AssetsDictionary.assets.get(e.collateralToken)!.decimals || 18
-         
+
         let swapToUSDPrice = this.stablecoins.includes(e.loanToken)
           ? new BigNumber(1)
           : new BigNumber(10 ** 18)
@@ -244,7 +245,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
           const swapToUsdHistoryRateRequest = await fetch(
             `https://api.bzx.network/v1/asset-history-price?asset=${
               e.loanToken === Asset.fWETH ? 'eth' : e.loanToken.toLowerCase()
-            }&date=${e.timeStamp.getTime()}`
+            }&date=${e.timeStamp!.getTime()}`
           )
           const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
           if (!swapToUsdHistoryRateResponse) continue
@@ -258,7 +259,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
     this.getChartData(liquidationEventsWithUsd)
     const unhealthyLoans = unhealthyLoansData.map((e: IActiveLoanData) => ({
-      loanId: e.loanData!.loanId,
+      loanId: e.loanData.loanId,
       payOffAmount: e.maxLiquidatable,
       seizeAmount: e.maxSeizable,
       loanToken: e.loanAsset,
@@ -267,17 +268,26 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       onLiquidationRequested: this.onLiquidationRequested,
       doNetworkConnect: this.props.doNetworkConnect
     }))
-    this._isMounted &&
-      this.setState({
-        ...this.state,
-        volume30d,
-        transactionsCount30d,
-        events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
-        unhealthyLoans,
-        isDataLoading: false,
-        unhealthyLoansUsd,
-        healthyLoansUsd
-      })
+
+    const rollovers = rolloversData.map((e: IRolloverData) => ({
+      loanId: e.loanData.loanId,
+      rebateAsset: e.rebateAsset,
+      gasRebate: e.gasRebate,
+      onRolloverUpdated: this.derivedUpdate.bind(this),
+      doNetworkConnect: this.props.doNetworkConnect
+    }))
+
+    await this.setState({
+      ...this.state,
+      volume30d,
+      transactionsCount30d,
+      events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
+      unhealthyLoans,
+      isDataLoading: false,
+      unhealthyLoansUsd,
+      healthyLoansUsd,
+      rollovers
+    })
   }
 
   private numberWithCommas = (x: number | string) => {
@@ -447,12 +457,17 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                         </div>
                       </div>
                       <div className="flex jc-c labels-container">
-                        {this.assetsShown.map((e: { token: Asset; color: string }) => (
-                          <div key={e.color} className="label-chart">
-                            <span style={{ backgroundColor: e.color }} />
-                            {e.token}
-                          </div>
-                        ))}
+                        {this.assetsShown.map((e: Asset) => {
+                          const assetDetails = AssetsDictionary.assets.get(e)
+                          return (
+                            assetDetails && (
+                              <div key={assetDetails.bgBrightColor} className="label-chart">
+                                <span style={{ backgroundColor: assetDetails.bgBrightColor }} />
+                                {e}
+                              </div>
+                            )
+                          )
+                        })}
                       </div>
                     </div>
                   </section>
@@ -502,6 +517,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                       </div>
                     </div>
                   </section>
+                  {this.state.rollovers.length > 0 && (
+                    <section className="pt-75">
+                      <div className="container">
+                        <h2 className="h1">Rollovers</h2>
+                        <div className="pt-45">
+                          <RolloversGrid events={this.state.rollovers} />
+                        </div>
+                      </div>
+                    </section>
+                  )}
                 </React.Fragment>
               )}
             </React.Fragment>
@@ -576,6 +601,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   private onLiquidationRequested = (request: LiquidationRequest) => {
+    if (
+      !ExplorerProvider.Instance.contractsSource ||
+      !ExplorerProvider.Instance.contractsSource.canWrite ||
+      ExplorerProvider.Instance.unsupportedNetwork
+    ) {
+      this.props.doNetworkConnect()
+      return
+    }
     this.setState({ ...this.state, request, isModalOpen: true })
   }
 }

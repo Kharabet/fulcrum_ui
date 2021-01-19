@@ -1,9 +1,13 @@
-import React, { Component, ChangeEvent } from 'react'
+import React, { ChangeEvent, Component, FormEvent, useState } from 'react'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
+import { ExplorerProvider } from '../services/ExplorerProvider'
 
-import { ReactComponent as IconSearch } from '../assets/images/icon-form-search.svg'
 import { ReactComponent as IconClear } from '../assets/images/icon-form-clear.svg'
+import { ReactComponent as IconSearch } from '../assets/images/icon-form-search.svg'
+import { ProviderType } from '../domain/ProviderType'
 interface ISearchProps {
   initialFilter?: string
+  children?: string
   onSearch: (filter: string) => void
 }
 
@@ -12,55 +16,97 @@ interface ISearchState {
   inputValue: string
 }
 
-export class Search extends Component<ISearchProps, ISearchState> {
-  constructor(props: any) {
-    super(props)
-    this.state = {
-      onFocus: false,
-      inputValue: props.initialFilter || ''
+export const Search = (props: ISearchProps) => {
+  const _input: React.RefObject<HTMLInputElement> = React.createRef()
+  const [isFocus, setIsFocus] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [inputValue, setInputValue] = useState<string>(props.initialFilter || '')
+
+  React.useEffect(() => {
+    if (ExplorerProvider.Instance.providerType === ProviderType.None) {
+      setIsDisabled(true)
+    }
+    ExplorerProvider.Instance.eventEmitter.on(
+      ExplorerProviderEvents.ProviderChanged,
+      onProviderChanged
+    )
+    return () => {
+      ExplorerProvider.Instance.eventEmitter.removeListener(
+        ExplorerProviderEvents.ProviderChanged,
+        onProviderChanged
+      )
+    }
+  })
+
+  React.useEffect(() => {
+    if (ExplorerProvider.Instance.providerType === ProviderType.None) {
+      !isDisabled && setIsDisabled(true)
+    } else {
+      isDisabled && setIsDisabled(false)
+    }
+  })
+
+  const onProviderChanged = () => {
+    if (ExplorerProvider.Instance.providerType === ProviderType.None) {
+      setIsDisabled(true)
+      setInputValue('')
+    } else {
+      setIsDisabled(false)
     }
   }
-  public render() {
-    return (
-      <React.Fragment>
-        <form className={`search ${this.state.onFocus ? `focus` : ``}`}>
-          <input
-            placeholder="Search"
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-            onChange={this.onChange}
-            value={this.state.inputValue}
-          />
-          {this.state.inputValue.length > 0 && (
-            <button onClick={this.resetInput}>
-              <IconClear />
-            </button>
-          )}
-          {this.state.inputValue.length === 0 && (
-            <button>
-              {' '}
-              <IconSearch />
-            </button>
-          )}
-        </form>
-        <p>Enter transaction hash or user address </p>
-      </React.Fragment>
-    )
+  const onFocus = () => {
+    setIsFocus(true)
   }
-  public onFocus = () => {
-    this.setState({ ...this.state, onFocus: true })
-  }
-  public onBlur = () => {
-    this.setState({ ...this.state, onFocus: false })
+  const onBlur = () => {
+    setIsFocus(false)
   }
 
-  public onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value ? event.target.value : ''
-    this.setState({ ...this.state, inputValue: value })
-    this.props.onSearch(value.toLowerCase())
+  const onSearchClick = (event: FormEvent) => {
+    event.preventDefault()
+    _input.current && _input.current.focus()
   }
-  public resetInput = () => {
-    this.setState({ ...this.state, inputValue: '' })
-    this.props.onSearch('')
+
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value ? event.target.value : ''
+    setInputValue(value)
+    props.onSearch(value.toLowerCase())
   }
+  const resetInput = () => {
+    setInputValue('')
+    props.onSearch('')
+  }
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const input = _input.current
+    const value = input ? input.value : ''
+    props.onSearch(value.toLowerCase())
+  }
+
+  return (
+    <React.Fragment>
+      <form className={`search ${isFocus ? `focus` : ``}`} onSubmit={onSubmit}>
+        <input
+          ref={_input}
+          placeholder={isDisabled ? 'Connect your wallet' : 'Search'}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onChange={onChange}
+          value={inputValue}
+          disabled={isDisabled}
+        />
+        {inputValue.length > 0 && (
+          <button type="button" onClick={resetInput}>
+            <IconClear />
+          </button>
+        )}
+        {inputValue.length === 0 && (
+          <button type="button" onClick={onSearchClick}>
+            {' '}
+            <IconSearch />
+          </button>
+        )}
+      </form>
+      <p>{props.children || 'Enter transaction hash or user address'} </p>
+    </React.Fragment>
+  )
 }

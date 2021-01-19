@@ -3,8 +3,8 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import { useWeb3React } from '@web3-react/core'
 import React, { useEffect } from 'react'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { ProviderType } from '../domain/ProviderType'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import { injected } from '../domain/WalletConnectors'
@@ -122,7 +122,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       localStorage.setItem('isGasTokenEnabled', 'false')
     }
   }
-  const ChiTokenLogo = AssetsDictionary.assets.get(Asset.CHI)!.logoSvg
+  const ChiTokenLogo = AssetsDictionary.assets.get(Asset.CHI)!.reactLogoSvg
   return (
     <div className="provider-menu">
       <div className="provider-menu__title">

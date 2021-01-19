@@ -24,10 +24,11 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -58,78 +59,157 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var fetch_ponyfill_1 = __importDefault(require("fetch-ponyfill"));
+exports.AlchemySubprovider = exports.createAlchemyWeb3 = exports.AssetTransfersCategory = void 0;
 var web3_1 = __importDefault(require("web3"));
+var web3_utils_1 = require("web3-utils");
+var promises_1 = require("./util/promises");
+var alchemyContext_1 = require("./web3-adapter/alchemyContext");
+var fullTransactionsSubscription_1 = __importDefault(require("./web3-adapter/fullTransactionsSubscription"));
 var subproviders_1 = require("@0x/subproviders");
-//import { VERSION } from "./version";
-var _a = fetch_ponyfill_1.default(), fetch = _a.fetch, Headers = _a.Headers;
-var RATE_LIMIT_STATUS = 429;
+var alchemySendHttp_1 = require("./web3-adapter/alchemySendHttp");
+var sendPayload_1 = require("./web3-adapter/sendPayload");
 var DEFAULT_MAX_RETRIES = 3;
 var DEFAULT_RETRY_INTERVAL = 1000;
 var DEFAULT_RETRY_JITTER = 250;
-var ALCHEMY_DISALLOWED_METHODS = [
-    "eth_accounts",
-    "eth_sendRawTransaction",
-    "eth_sendTransaction",
-    "eth_sign",
-    "eth_signTypedData_v3",
-    "eth_signTypedData",
-    "personal_sign",
-];
-var ALCHEMY_HEADERS = new Headers({
-//"Accept": "application/json",
-//"Content-Type": "text/plain"
-//"Content-Type": "application/json",
-//"Alchemy-Web3-Version": VERSION, // causes excessive OPTIONS requests
-});
+var AssetTransfersCategory;
+(function (AssetTransfersCategory) {
+    AssetTransfersCategory["EXTERNAL"] = "external";
+    AssetTransfersCategory["INTERNAL"] = "internal";
+    AssetTransfersCategory["TOKEN"] = "token";
+})(AssetTransfersCategory = exports.AssetTransfersCategory || (exports.AssetTransfersCategory = {}));
 function createAlchemyWeb3(alchemyUrl, config) {
     var fullConfig = fillInConfigDefaults(config);
-    var currentProvider = fullConfig.writeProvider;
-    function sendAsync(payload, callback) {
-        callWhenDone(promisedSend(payload, alchemyUrl, currentProvider, fullConfig), callback);
-    }
-    var alchemyWeb3 = new web3_1.default({ sendAsync: sendAsync });
+    var _a = alchemyContext_1.makeAlchemyContext(alchemyUrl, fullConfig), provider = _a.provider, setWriteProvider = _a.setWriteProvider;
+    var alchemyWeb3 = new web3_1.default(provider);
     alchemyWeb3.setProvider = function () {
         throw new Error("setProvider is not supported in Alchemy Web3. To change the provider used for writes, use setWriteProvider() instead.");
     };
-    alchemyWeb3.setWriteProvider = function (provider) { return (currentProvider = provider); };
+    alchemyWeb3.setWriteProvider = setWriteProvider;
+    var send = alchemyWeb3.currentProvider.send.bind(alchemyWeb3.currentProvider);
     alchemyWeb3.alchemy = {
         getTokenAllowance: function (params, callback) {
             return callAlchemyMethod({
-                alchemyUrl: alchemyUrl,
+                send: send,
                 callback: callback,
-                params: [params],
                 method: "alchemy_getTokenAllowance",
-                config: fullConfig,
+                params: [params],
             });
         },
         getTokenBalances: function (address, contractAddresses, callback) {
             return callAlchemyMethod({
-                alchemyUrl: alchemyUrl,
+                send: send,
                 callback: callback,
                 method: "alchemy_getTokenBalances",
                 params: [address, contractAddresses],
                 processResponse: processTokenBalanceResponse,
-                config: fullConfig,
             });
         },
         getTokenMetadata: function (address, callback) {
             return callAlchemyMethod({
-                alchemyUrl: alchemyUrl,
+                send: send,
                 callback: callback,
                 params: [address],
                 method: "alchemy_getTokenMetadata",
-                config: fullConfig,
+            });
+        },
+        getAssetTransfers: function (params, callback) {
+            return callAlchemyMethod({
+                send: send,
+                callback: callback,
+                params: [
+                    __assign(__assign({}, params), { maxCount: params.maxCount != null ? web3_utils_1.toHex(params.maxCount) : undefined }),
+                ],
+                method: "alchemy_getAssetTransfers",
             });
         },
     };
+    patchSubscriptions(alchemyWeb3);
     return alchemyWeb3;
 }
 exports.createAlchemyWeb3 = createAlchemyWeb3;
+function fillInConfigDefaults(_a) {
+    var _b = _a === void 0 ? {} : _a, _c = _b.writeProvider, writeProvider = _c === void 0 ? getWindowProvider() : _c, _d = _b.maxRetries, maxRetries = _d === void 0 ? DEFAULT_MAX_RETRIES : _d, _e = _b.retryInterval, retryInterval = _e === void 0 ? DEFAULT_RETRY_INTERVAL : _e, _f = _b.retryJitter, retryJitter = _f === void 0 ? DEFAULT_RETRY_JITTER : _f;
+    return { writeProvider: writeProvider, maxRetries: maxRetries, retryInterval: retryInterval, retryJitter: retryJitter };
+}
+function getWindowProvider() {
+    return typeof window !== "undefined" ? window.ethereum : null;
+}
+function callAlchemyMethod(_a) {
+    var _this = this;
+    var method = _a.method, params = _a.params, send = _a.send, _b = _a.callback, callback = _b === void 0 ? noop : _b, _c = _a.processResponse, processResponse = _c === void 0 ? identity : _c;
+    var promise = (function () { return __awaiter(_this, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, send(method, params)];
+                case 1:
+                    result = _a.sent();
+                    return [2 /*return*/, processResponse(result)];
+            }
+        });
+    }); })();
+    promises_1.callWhenDone(promise, callback);
+    return promise;
+}
+function processTokenBalanceResponse(rawResponse) {
+    // Convert token balance fields from hex-string to decimal-string.
+    var fixedTokenBalances = rawResponse.tokenBalances.map(function (balance) {
+        return balance.tokenBalance != null
+            ? __assign(__assign({}, balance), { tokenBalance: web3_utils_1.hexToNumberString(balance.tokenBalance) }) : balance;
+    });
+    return __assign(__assign({}, rawResponse), { tokenBalances: fixedTokenBalances });
+}
+/**
+ * Updates Web3's internal subscription architecture to also handle Alchemy
+ * specific subscriptions.
+ */
+function patchSubscriptions(web3) {
+    var subscriptionsFactory = web3.eth.subscriptionsFactory;
+    var oldGetSubscription = subscriptionsFactory.getSubscription.bind(subscriptionsFactory);
+    subscriptionsFactory.getSubscription = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var _a = __read(args, 2), moduleInstance = _a[0], type = _a[1];
+        if (type === "alchemy_fullPendingTransactions") {
+            return new fullTransactionsSubscription_1.default(subscriptionsFactory.utils, subscriptionsFactory.formatters, moduleInstance);
+        }
+        else {
+            return oldGetSubscription.apply(void 0, __spread(args));
+        }
+    };
+}
+function noop() {
+    // Nothing.
+}
+function identity(x) {
+    return x;
+}
 var AlchemySubprovider = /** @class */ (function (_super) {
     __extends(AlchemySubprovider, _super);
     /**
@@ -137,38 +217,10 @@ var AlchemySubprovider = /** @class */ (function (_super) {
      */
     function AlchemySubprovider(alchemyUrl, config) {
         var _this = _super.call(this) || this;
-        _this.alchemyUrl = alchemyUrl;
-        _this.config = fillInConfigDefaults(config);
-        _this.alchemy = {
-            getTokenAllowance: function (params, callback) {
-                return callAlchemyMethod({
-                    alchemyUrl: alchemyUrl,
-                    callback: callback,
-                    params: [params],
-                    method: "alchemy_getTokenAllowance",
-                    config: _this.config,
-                });
-            },
-            getTokenBalances: function (address, contractAddresses, callback) {
-                return callAlchemyMethod({
-                    alchemyUrl: alchemyUrl,
-                    callback: callback,
-                    method: "alchemy_getTokenBalances",
-                    params: [address, contractAddresses],
-                    processResponse: processTokenBalanceResponse,
-                    config: _this.config,
-                });
-            },
-            getTokenMetadata: function (address, callback) {
-                return callAlchemyMethod({
-                    alchemyUrl: alchemyUrl,
-                    callback: callback,
-                    params: [address],
-                    method: "alchemy_getTokenMetadata",
-                    config: _this.config,
-                });
-            },
-        };
+        var fullConfig = fillInConfigDefaults(config);
+        _this.alchemyWeb3 = createAlchemyWeb3(alchemyUrl, config);
+        var alchemySend = alchemySendHttp_1.makeHttpSender(alchemyUrl);
+        _this.payloadSender = sendPayload_1.makePayloadSender(alchemySend, fullConfig);
         return _this;
     }
     /**
@@ -181,32 +233,89 @@ var AlchemySubprovider = /** @class */ (function (_super) {
      */
     AlchemySubprovider.prototype.handleRequest = function (payload, next, end) {
         return __awaiter(this, void 0, void 0, function () {
-            var data, alchemyError_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var _a, _b, contract, owner, spender, tokenAllowanceParams, tokenAllowanceResponse, _c, address, tokenAddresses, tokenBalancesResponse, _d, contract, tokenMetadataResponse, _e, fromBlock, toBlock, fromAddress, toAddress, contractAddresses, excludeZeroValue, maxCount, category, pageKey, assetTransfersParams, assetTransfersResponse, params, method, id, alchemyPayload, data, e_1;
+            return __generator(this, function (_f) {
+                switch (_f.label) {
                     case 0:
-                        if (!(ALCHEMY_DISALLOWED_METHODS.indexOf(payload.method) === -1)) return [3 /*break*/, 5];
-                        _a.label = 1;
+                        _a = payload.method;
+                        switch (_a) {
+                            case "alchemy_getTokenAllowance": return [3 /*break*/, 1];
+                            case "alchemy_getTokenBalances": return [3 /*break*/, 3];
+                            case "alchemy_getTokenMetadata": return [3 /*break*/, 5];
+                            case "alchemy_getAssetTransfers": return [3 /*break*/, 7];
+                        }
+                        return [3 /*break*/, 9];
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, sendToAlchemyWithRetries(payload, this.alchemyUrl, this.config)];
+                        _b = __read(payload.params, 3), contract = _b[0], owner = _b[1], spender = _b[2];
+                        tokenAllowanceParams = {
+                            contract: contract,
+                            owner: owner,
+                            spender: spender,
+                        };
+                        return [4 /*yield*/, this.alchemyWeb3.alchemy.getTokenAllowance(tokenAllowanceParams)];
                     case 2:
-                        data = _a.sent();
+                        tokenAllowanceResponse = _f.sent();
+                        end(null, tokenAllowanceResponse);
+                        return [3 /*break*/, 14];
+                    case 3:
+                        _c = __read(payload.params, 2), address = _c[0], tokenAddresses = _c[1];
+                        return [4 /*yield*/, this.alchemyWeb3.alchemy.getTokenBalances(address, tokenAddresses)];
+                    case 4:
+                        tokenBalancesResponse = _f.sent();
+                        end(null, tokenBalancesResponse);
+                        return [3 /*break*/, 14];
+                    case 5:
+                        _d = __read(payload.params, 1), contract = _d[0];
+                        return [4 /*yield*/, this.alchemyWeb3.alchemy.getTokenMetadata(contract)];
+                    case 6:
+                        tokenMetadataResponse = _f.sent();
+                        end(null, tokenMetadataResponse);
+                        return [3 /*break*/, 14];
+                    case 7:
+                        _e = __read(payload.params, 9), fromBlock = _e[0], toBlock = _e[1], fromAddress = _e[2], toAddress = _e[3], contractAddresses = _e[4], excludeZeroValue = _e[5], maxCount = _e[6], category = _e[7], pageKey = _e[8];
+                        assetTransfersParams = {
+                            fromBlock: fromBlock,
+                            toBlock: toBlock,
+                            fromAddress: fromAddress,
+                            toAddress: toAddress,
+                            contractAddresses: contractAddresses,
+                            excludeZeroValue: excludeZeroValue,
+                            maxCount: maxCount,
+                            category: category,
+                            pageKey: pageKey,
+                        };
+                        return [4 /*yield*/, this.alchemyWeb3.alchemy.getAssetTransfers(assetTransfersParams)];
+                    case 8:
+                        assetTransfersResponse = _f.sent();
+                        end(null, assetTransfersResponse);
+                        return [3 /*break*/, 14];
+                    case 9:
+                        params = payload.params, method = payload.method, id = payload.id;
+                        alchemyPayload = {
+                            params: params,
+                            method: method,
+                            id: id,
+                            jsonrpc: "2.0",
+                        };
+                        _f.label = 10;
+                    case 10:
+                        _f.trys.push([10, 12, , 13]);
+                        return [4 /*yield*/, this.payloadSender.sendPayload(alchemyPayload)];
+                    case 11:
+                        data = _f.sent();
                         if (data.error) {
-                            next();
-                            return [2 /*return*/];
+                            // @ts-ignore
+                            end(data.error, data);
+                            return [3 /*break*/, 14];
                         }
                         end(null, data.result);
-                        return [2 /*return*/];
-                    case 3:
-                        alchemyError_1 = _a.sent();
+                        return [3 /*break*/, 13];
+                    case 12:
+                        e_1 = _f.sent();
                         next();
-                        return [2 /*return*/];
-                    case 4: return [3 /*break*/, 6];
-                    case 5:
-                        next();
-                        return [2 /*return*/];
-                    case 6: return [2 /*return*/];
+                        return [3 /*break*/, 13];
+                    case 13: return [3 /*break*/, 14];
+                    case 14: return [2 /*return*/];
                 }
             });
         });
@@ -214,180 +323,3 @@ var AlchemySubprovider = /** @class */ (function (_super) {
     return AlchemySubprovider;
 }(subproviders_1.Subprovider));
 exports.AlchemySubprovider = AlchemySubprovider;
-function fillInConfigDefaults(_a) {
-    var _b = _a.writeProvider, writeProvider = _b === void 0 ? getWindowProvider() : _b, _c = _a.maxRetries, maxRetries = _c === void 0 ? DEFAULT_MAX_RETRIES : _c, _d = _a.retryInterval, retryInterval = _d === void 0 ? DEFAULT_RETRY_INTERVAL : _d, _e = _a.retryJitter, retryJitter = _e === void 0 ? DEFAULT_RETRY_JITTER : _e;
-    return { writeProvider: writeProvider, maxRetries: maxRetries, retryInterval: retryInterval, retryJitter: retryJitter };
-}
-function promisedSend(payload, alchemyUrl, writeProvider, config) {
-    return __awaiter(this, void 0, void 0, function () {
-        var alchemyError_2, _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    if (!(ALCHEMY_DISALLOWED_METHODS.indexOf(payload.method) === -1)) return [3 /*break*/, 9];
-                    _b.label = 1;
-                case 1:
-                    _b.trys.push([1, 3, , 8]);
-                    return [4 /*yield*/, sendToAlchemyWithRetries(payload, alchemyUrl, config)];
-                case 2: return [2 /*return*/, _b.sent()];
-                case 3:
-                    alchemyError_2 = _b.sent();
-                    // Fallback to write provider, but if both fail throw the error from
-                    // Alchemy.
-                    if (!writeProvider) {
-                        throw alchemyError_2;
-                    }
-                    _b.label = 4;
-                case 4:
-                    _b.trys.push([4, 6, , 7]);
-                    return [4 /*yield*/, sendToProvider(payload, writeProvider)];
-                case 5: return [2 /*return*/, _b.sent()];
-                case 6:
-                    _a = _b.sent();
-                    throw alchemyError_2;
-                case 7: return [3 /*break*/, 8];
-                case 8: return [3 /*break*/, 10];
-                case 9:
-                    if (!writeProvider) {
-                        throw new Error("No provider available for method \"" + payload.method + "\"");
-                    }
-                    return [2 /*return*/, sendToProvider(payload, writeProvider)];
-                case 10: return [2 /*return*/];
-            }
-        });
-    });
-}
-function sendToAlchemyWithRetries(payload, alchemyUrl, _a) {
-    var maxRetries = _a.maxRetries, retryInterval = _a.retryInterval, retryJitter = _a.retryJitter;
-    return __awaiter(this, void 0, void 0, function () {
-        var lastResponse, i;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    i = 0;
-                    _b.label = 1;
-                case 1:
-                    if (!(i < maxRetries + 1)) return [3 /*break*/, 5];
-                    return [4 /*yield*/, sendToAlchemyOnce(payload, alchemyUrl)];
-                case 2:
-                    lastResponse = _b.sent();
-                    if (lastResponse.status !== RATE_LIMIT_STATUS) {
-                        return [2 /*return*/, lastResponse.json()];
-                    }
-                    return [4 /*yield*/, delay(retryInterval + ((retryJitter * Math.random()) | 0))];
-                case 3:
-                    _b.sent();
-                    _b.label = 4;
-                case 4:
-                    i++;
-                    return [3 /*break*/, 1];
-                case 5: return [2 /*return*/, lastResponse.json()];
-            }
-        });
-    });
-}
-function sendToAlchemyOnce(payload, alchemyUrl) {
-    return fetch(alchemyUrl, {
-        method: "POST",
-        headers: ALCHEMY_HEADERS,
-        body: JSON.stringify(payload),
-    });
-}
-function sendToProvider(payload, provider) {
-    var anyProvider = provider;
-    if (anyProvider.sendAsync) {
-        return promisify(function (callback) { return anyProvider.sendAsync(payload, callback); });
-    }
-    else {
-        return promisify(function (callback) { return anyProvider.send(payload, callback); });
-    }
-}
-function getWindowProvider() {
-    return typeof window !== "undefined" ? window.ethereum : null;
-}
-function callAlchemyMethod(_a) {
-    var _this = this;
-    var method = _a.method, params = _a.params, alchemyUrl = _a.alchemyUrl, config = _a.config, _b = _a.callback, callback = _b === void 0 ? noop : _b, _c = _a.processResponse, processResponse = _c === void 0 ? identity : _c;
-    var promise = (function () { return __awaiter(_this, void 0, void 0, function () {
-        var payload, _a, error, result;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    payload = { method: method, params: params, jsonrpc: "2.0", id: 0 };
-                    return [4 /*yield*/, sendToAlchemyWithRetries(payload, alchemyUrl, config)];
-                case 1:
-                    _a = _b.sent(), error = _a.error, result = _a.result;
-                    if (error != null) {
-                        throw new Error(error);
-                    }
-                    return [2 /*return*/, processResponse(result)];
-            }
-        });
-    }); })();
-    callWhenDone(promise, callback);
-    return promise;
-}
-function processTokenBalanceResponse(rawResponse) {
-    // Convert token balance fields from hex-string to decimal-string.
-    var fixedTokenBalances = rawResponse.tokenBalances.map(function (balance) {
-        return balance.tokenBalance != null
-            ? __assign({}, balance, { tokenBalance: hexToDecimal(balance.tokenBalance) }) : balance;
-    });
-    return __assign({}, rawResponse, { tokenBalances: fixedTokenBalances });
-}
-/**
- * Helper for converting functions which take a callback as their final argument
- * to functions which return a promise.
- */
-function promisify(f) {
-    return new Promise(function (resolve, reject) {
-        return f(function (error, result) {
-            if (error != null) {
-                reject(error);
-            }
-            else {
-                resolve(result);
-            }
-        });
-    });
-}
-/**
- * Helper for converting functions which return a promise to functions which
- * take a callback as their final argument.
- */
-function callWhenDone(promise, callback) {
-    promise.then(function (result) { return callback(null, result); }, function (error) { return callback(error); });
-}
-function delay(ms) {
-    return new Promise(function (resolve) { return setTimeout(resolve, ms); });
-}
-/**
- * Converts a hex string to a string of a decimal number. Works even with
- * numbers so large that they cannot fit into a double without losing precision.
- */
-function hexToDecimal(hex) {
-    if (hex.startsWith("0x")) {
-        return hexToDecimal(hex.slice(2));
-    }
-    // https://stackoverflow.com/a/21675915/2695248
-    var digits = [0];
-    for (var i = 0; i < hex.length; i += 1) {
-        var carry = parseInt(hex.charAt(i), 16);
-        for (var j = 0; j < digits.length; j += 1) {
-            digits[j] = digits[j] * 16 + carry;
-            carry = (digits[j] / 10e16) | 0;
-            digits[j] %= 10e16;
-        }
-        while (carry > 0) {
-            digits.push(carry % 10e16);
-            carry = (carry / 10e16) | 0;
-        }
-    }
-    return digits.reverse().join("");
-}
-function noop() {
-    // Nothing.
-}
-function identity(x) {
-    return x;
-}

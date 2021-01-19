@@ -1,7 +1,8 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import siteConfig from '../config/SiteConfig.json'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
@@ -31,7 +32,6 @@ export interface ITradeTokenGridRowProps {
   defaultLeverage: number
   isTxCompleted: boolean
   maintenanceMargin: BigNumber
-  yieldApr: BigNumber
   onTrade: (request: TradeRequest) => void
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
@@ -75,6 +75,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.onProviderAvailable
     )
     FulcrumProvider.Instance.eventEmitter.on(
+      FulcrumProviderEvents.ProviderChanged,
+      this.onProviderChanged
+    )
+    FulcrumProvider.Instance.eventEmitter.on(
       FulcrumProviderEvents.AskToOpenProgressDlg,
       this.onAskToOpenProgressDlg
     )
@@ -89,8 +93,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private async derivedUpdate() {
     const collateralToPrincipalRate =
       this.props.positionType === PositionType.LONG
-        ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
-        : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken)
+        ? await FulcrumProvider.Instance.getKyberSwapRate(this.props.baseToken, this.props.quoteToken)
+        : await FulcrumProvider.Instance.getKyberSwapRate(this.props.quoteToken, this.props.baseToken)
 
     const baseTokenPrice =
       this.props.positionType === PositionType.LONG
@@ -135,6 +139,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private onProviderAvailable = async () => {
     await this.derivedUpdate()
   }
+  private onProviderChanged = async () => {
+    await this.derivedUpdate()
+  }
 
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return
@@ -172,6 +179,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.onProviderAvailable
     )
     FulcrumProvider.Instance.eventEmitter.off(
+      FulcrumProviderEvents.ProviderChanged,
+      this.onProviderChanged
+    )
+    FulcrumProvider.Instance.eventEmitter.off(
       FulcrumProviderEvents.AskToOpenProgressDlg,
       this.onAskToOpenProgressDlg
     )
@@ -186,10 +197,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
     const task = TasksQueue.Instance.getTasksList().find(
       (t) =>
+        t.request instanceof TradeRequest &&
         t.request.loanId === '0x0000000000000000000000000000000000000000000000000000000000000000' &&
         t.request.asset === this.props.baseToken &&
-        (t.request as TradeRequest).quoteToken === this.props.quoteToken &&
-        (t.request as TradeRequest).positionType === this.props.positionType
+        t.request.quoteToken === this.props.quoteToken &&
+        t.request.positionType === this.props.positionType
     )
     const isLoadingTransaction = task && !task.error ? true : false
     const request = task ? (task.request as TradeRequest) : undefined
@@ -219,6 +231,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   public render() {
+    const precisionDigits = this.props.quoteToken === Asset.WBTC ? 4 : 2
     return (
       <React.Fragment>
         {this.props.isMobileMedia && (
@@ -289,8 +302,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             this.state.baseTokenPrice.toFixed() !== 'Infinity' &&
             !this.state.isLoading ? (
               <React.Fragment>
-                <div title={`$${this.state.baseTokenPrice.toFixed(18)}`}>
-                  {this.state.baseTokenPrice.toFixed(2)}
+                <div title={`${this.state.baseTokenPrice.toFixed(18)}`}>
+                  {this.state.baseTokenPrice.toFixed(precisionDigits)}
                 </div>
               </React.Fragment>
             ) : (
@@ -298,33 +311,28 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             )}
           </div>
           <div
-            title={`$${this.state.liquidationPrice.toFixed(18)}`}
+            title={`${this.state.liquidationPrice.toFixed(18)}`}
             className="trade-token-grid-row__col-liquidation">
             {this.props.isMobileMedia && (
               <span className="trade-token-grid-row__title">Liquidation Price</span>
             )}
             {this.state.liquidationPrice.gt(0) && !this.state.isLoading ? (
-              <React.Fragment>{this.state.liquidationPrice.toFixed(2)}</React.Fragment>
+              <React.Fragment>{this.state.liquidationPrice.toFixed(precisionDigits)}</React.Fragment>
             ) : (
               <Preloader width="74px" />
             )}
           </div>
           <div
-            title={this.props.yieldApr.gt(0) ? `${this.props.yieldApr.toFixed(18)}%` : ``}
+            title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``}
             className="trade-token-grid-row__col-profit">
             {this.props.isMobileMedia && (
-              <div className="trade-token-grid-row__title">Est. Yield, vBZRX</div>
+              <div className="trade-token-grid-row__title">Interest APR</div>
             )}
 
-            {this.props.yieldApr.gt(0) && !this.state.isLoading ? (
+            {this.state.interestRate.gt(0) && !this.state.isLoading ? (
               <React.Fragment>
-                {this.props.yieldApr.toFixed(0)}
+                {this.state.interestRate.toFixed(2)}
                 <span className="fw-sign">%</span>
-                <span
-                  title={this.state.interestRate.toFixed(18)}
-                  className="trade-token-grid-row__yield">
-                  APR <span>{this.state.interestRate.toFixed(2)}%</span>
-                </span>
               </React.Fragment>
             ) : (
               <Preloader width="74px" />

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 
 export interface IEthOrWethSelectorProps {
   items: Asset[]

@@ -167,19 +167,6 @@
       }
      
     }
-  
-   
-    &__yield {
-      position: absolute;
-      font-size: 12px;
-      font-weight: 600;
-      text-indent: 7px;
-      top: 30px;
-      color: #a2abb8;
-      span {
-        color: #00c0ab;
-      }
-    }
   }
 
   .fw-sign {
@@ -245,10 +232,6 @@
         color: #a2abb8;
         margin-top: 20px;
       }
-       &__yield {
-         font-size: 10px;
-         top: 36px;
-       }
     }
   }
 }

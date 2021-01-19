@@ -4,6 +4,12 @@ import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { useWeb3React } from '@web3-react/core'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { Loader } from './Loader'
+import TagManager from 'react-gtm-module'
+
+const isMainnet =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export interface IProviderMenuListItemProps {
   providerType: ProviderType
@@ -24,7 +30,17 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
   const onClick = () => {
     // if (props.isConnected) return;
     props.onSelect(props.providerType)
+    if (isMainnet) {
+      const tagManagerArgs = {
+        dataLayer: {
+          event: 'select-provider',
+          providerName: props.providerType
+        }
+      }
+      TagManager.dataLayer(tagManagerArgs)
+    }
   }
+
   if (props.isConnected) {
     const isUnSupportedNetwork = TorqueProvider.Instance.unsupportedNetwork
 

@@ -1,7 +1,7 @@
 {
   "private": true,
   "dependencies": {
-    "axios": "^0.19.1",
+    "axios": "^0.21.1",
     "promise-polyfill": "6.0.2",
     "rollup": "^1.29.0",
     "rollup-plugin-node-builtins": "^2.1.2",

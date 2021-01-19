@@ -6,7 +6,7 @@ import Intercom from 'react-intercom'
 import { Redirect, Route, Router, Switch } from 'react-router-dom'
 import configProviders from '../config/providers.json'
 import { ProviderType } from '../domain/ProviderType'
-import { BorrowPage } from '../pages/BorrowPage'
+import BorrowPage from '../pages/BorrowPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { MaintenancePage } from '../pages/MaintenancePage'
 //import { RefinancePage } from "../pages/RefinancePage";
@@ -20,7 +20,6 @@ import Modal from 'react-modal'
 
 import { ProviderMenu } from './ProviderMenu'
 import { Web3ReactProvider } from '@web3-react/core'
-import { Web3ProviderEngine } from '@0x/subproviders'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { AbstractConnector } from '@web3-react/abstract-connector'
@@ -92,8 +91,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this.doNetworkConnect()
   }
 
-  public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
-    console.log(provider)
+  public getLibrary = async (provider: any, connector: any): Promise<any> => {
     //handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)
     if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated))
@@ -208,7 +206,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public async onConnectorUpdated(update: ConnectorUpdate) {
-    console.log('onConnectorUpdated')
     await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging)
 
     await Web3ConnectionFactory.updateConnector(update)

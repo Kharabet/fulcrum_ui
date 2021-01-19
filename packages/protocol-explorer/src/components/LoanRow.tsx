@@ -1,8 +1,8 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
@@ -10,6 +10,7 @@ import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvent
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { TasksQueue } from '../services/TasksQueue'
 import { CircleLoader } from './CircleLoader'
+import CopyToClipboard from './CopyToClipboard'
 import { TxLoaderStep } from './TxLoaderStep'
 
 export interface ILoanRowProps {
@@ -37,7 +38,7 @@ export const LoanRow = (props: ILoanRowProps) => {
   useEffect(() => {
     const task = TasksQueue.Instance.getTasksList().find((t) => t.request.loanId === props.loanId)
     setLoadingTransaction(task && !task.error ? true : false)
-    setRequest(task ? task.request : undefined)
+    setRequest(task && task.request instanceof LiquidationRequest ? task.request : undefined)
 
     ExplorerProvider.Instance.eventEmitter.on(
       ExplorerProviderEvents.AskToOpenProgressDlg,
@@ -57,7 +58,7 @@ export const LoanRow = (props: ILoanRowProps) => {
         ExplorerProviderEvents.AskToCloseProgressDlg,
         onAskToCloseProgressDlg
       )
-    }
+      }
   })
 
   const onLiquidateClick = async () => {
@@ -65,9 +66,9 @@ export const LoanRow = (props: ILoanRowProps) => {
     const loanId = props.loanId
     const decimals: number = AssetsDictionary.assets.get(props.loanToken)!.decimals || 18
 
-     const amountInBaseUnits = new BigNumber(
-       props.payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
-     )
+    const amountInBaseUnits = new BigNumber(
+      props.payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1)
+    )
 
     const rate = props.payOffAmount.dividedBy(props.seizeAmount)
     const request = new LiquidationRequest(
@@ -79,7 +80,7 @@ export const LoanRow = (props: ILoanRowProps) => {
     )
 
     props.onLiquidationRequested(request)
-     changeLoadingTransaction(true, request)
+    changeLoadingTransaction(true, request)
     // await ExplorerProvider.Instance.onLiquidationConfirmed(request)
   }
 
@@ -125,13 +126,14 @@ export const LoanRow = (props: ILoanRowProps) => {
       ) : (
         <div className="table-row table-row-loan">
           <div title={props.loanId} className="table-row-loan__id">
-            {getShortHash(props.loanId, 45)}
+            {getShortHash(props.loanId, 45)}&nbsp;
+            <CopyToClipboard>{props.loanId}</CopyToClipboard>
           </div>
           <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">
-            {loanToken.logoSvg.render()} {props.payOffAmount.toFixed(3)}
+            {loanToken.reactLogoSvg.render()} {props.payOffAmount.toFixed(3)}
           </div>
           <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">
-            {collateralToken.logoSvg.render()}
+            {collateralToken.reactLogoSvg.render()}
             {props.seizeAmount.toFixed(3)}
           </div>
           <div className="table-row-loan__action">

@@ -142,7 +142,9 @@
       width: 45%;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;     
     }
     &__amount,
     &__collateral {
@@ -163,5 +165,40 @@
     padding-top: 17px;
     padding-bottom: 17px;
     align-items: center;
+  }
+}
+.table-param {
+  .table-row-param,
+  .table-header-param {
+    &__hash {
+      width: 32%;
+      display: flex;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      justify-content: space-between;
+      padding-right: 20px;
+    }
+    &__value,
+    &__pair {
+      width: 17%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+   
+    .rotate-icon {
+      transform: rotate(180deg);
+    }
+  }
+  .table-row-param {
+    @media screen and (min-width: $width-min-sm) {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+    @media screen and (max-width: $width-max-sm) {
+      padding-top: 13px;
+      padding-bottom: 13px;
+    }
   }
 }

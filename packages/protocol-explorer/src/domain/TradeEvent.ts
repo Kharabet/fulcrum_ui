@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from './Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export class TradeEvent {
   public static readonly topic0: string =
@@ -16,7 +16,7 @@ export class TradeEvent {
   public readonly entryPrice: BigNumber // one unit of baseToken, denominated in quoteToken
   public readonly entryLeverage: BigNumber
   public readonly currentLeverage: BigNumber
-  public readonly timeStamp: Date
+  public readonly blockNumber: BigNumber
   public readonly txHash: string
 
   constructor(
@@ -32,7 +32,7 @@ export class TradeEvent {
     entryPrice: BigNumber,
     entryLeverage: BigNumber,
     currentLeverage: BigNumber,
-    timeStamp: Date,
+    blockNumber: BigNumber,
     txHash: string
   ) {
     this.user = user
@@ -47,7 +47,7 @@ export class TradeEvent {
     this.entryPrice = entryPrice
     this.entryLeverage = entryLeverage
     this.currentLeverage = currentLeverage
-    this.timeStamp = timeStamp
+    this.blockNumber = blockNumber
     this.txHash = txHash
   }
 }

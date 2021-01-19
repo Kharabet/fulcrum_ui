@@ -1,12 +1,12 @@
 import { EventEmitter } from 'events'
 import { TasksQueueEvents } from '../services/events/TasksQueueEvents'
-import { RequestStatus } from './RequestStatus'
 import { BorrowRequest } from './BorrowRequest'
-import { ManageCollateralRequest } from './ManageCollateralRequest'
 import { ExtendLoanRequest } from './ExtendLoanRequest'
+import { ManageCollateralRequest } from './ManageCollateralRequest'
 import { RepayLoanRequest } from './RepayLoanRequest'
-import { RefinanceMakerRequest } from './RefinanceMakerRequest'
-import { RefinanceCompoundRequest } from './RefinanceCompoundRequest'
+import { RequestStatus } from './RequestStatus'
+import { RolloverRequest } from './RolloverRequest'
+
 
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null
@@ -16,6 +16,7 @@ export class RequestTask {
     | ManageCollateralRequest
     | ExtendLoanRequest
     | RepayLoanRequest
+    | RolloverRequest
   public status: RequestStatus
   public steps: string[]
   public stepCurrent: number
@@ -23,7 +24,7 @@ export class RequestTask {
   public error: Error | null
 
   constructor(
-    request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest
+    request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | RolloverRequest
   ) {
     this.request = request
     this.status = RequestStatus.AWAITING
@@ -52,7 +53,6 @@ export class RequestTask {
     steps.forEach((e) => this.steps.push(e))
     this.status = RequestStatus.IN_PROGRESS
     this.stepCurrent = 1
-    console.log('step ', this.stepCurrent)
 
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged)
@@ -61,7 +61,6 @@ export class RequestTask {
 
   public processingStepNext() {
     this.stepCurrent++
-    console.log('step ', this.stepCurrent)
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged)
     }

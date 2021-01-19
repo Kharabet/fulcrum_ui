@@ -1,5 +1,6 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from './Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+import { timeStamp } from 'console'
 
 export class LiquidationEvent {
   public static readonly topic0: string =
@@ -14,8 +15,9 @@ export class LiquidationEvent {
   public readonly collateralWithdrawAmount: BigNumber
   public readonly collateralToLoanRate: BigNumber // one unit of baseToken, denominated in quoteToken
   public readonly currentMargin: BigNumber
-  public readonly timeStamp: Date
+  public readonly blockNumber: BigNumber
   public readonly txHash: string
+  public readonly timeStamp?: Date
 
   constructor(
     user: string,
@@ -28,8 +30,9 @@ export class LiquidationEvent {
     collateralWithdrawAmount: BigNumber,
     collateralToLoanRate: BigNumber,
     currentMargin: BigNumber,
-    timeStamp: Date,
-    txHash: string
+    blockNumber: BigNumber,
+    txHash: string,
+    timeStamp?: Date
   ) {
     this.user = user
     this.liquidator = liquidator
@@ -41,7 +44,8 @@ export class LiquidationEvent {
     this.collateralWithdrawAmount = collateralWithdrawAmount
     this.collateralToLoanRate = collateralToLoanRate
     this.currentMargin = currentMargin
-    this.timeStamp = timeStamp
+    this.blockNumber = blockNumber
     this.txHash = txHash
+    this.timeStamp = timeStamp
   }
 }

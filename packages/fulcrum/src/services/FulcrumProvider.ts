@@ -2,8 +2,10 @@ import { Web3ProviderEngine } from '@0x/subproviders'
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { EventEmitter } from 'events'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { IPriceDataPoint } from '../domain/IPriceDataPoint'
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
@@ -21,7 +23,7 @@ import { TradeTokenKey } from '../domain/TradeTokenKey'
 import { TradeType } from '../domain/TradeType'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
-import { ContractsSource } from './ContractsSource'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { FulcrumProviderEvents } from './events/FulcrumProviderEvents'
 import { LendTransactionMinedEvent } from './events/LendTransactionMinedEvent'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
@@ -47,6 +49,8 @@ import { PayTradingFeeEvent } from '../domain/events/PayTradingFeeEvent'
 import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
 import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
 import { ILoanParams } from '../domain/ILoanParams'
+import { RolloverRequest } from '../domain/RolloverRequest'
+import { RolloverEvent } from '../domain/events/RolloverEvent'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -79,6 +83,7 @@ export class FulcrumProvider {
 
   // gasBufferCoeff equal 110% gas reserve
   public readonly gasBufferCoeff = new BigNumber('1.06')
+  public readonly gasBufferCoeffForTrade = new BigNumber('1.1')
   // 5000ms
   public readonly successDisplayTimeout = 5000
 
@@ -142,26 +147,28 @@ export class FulcrumProvider {
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId)
-    // setting up readonly provider
-    Web3ConnectionFactory.setReadonlyProvider().then(() => {
-      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
-      const engine = Web3ConnectionFactory.currentWeb3Engine
-      const canWrite = Web3ConnectionFactory.canWrite
+    // setting up readonly provider only when user wasn't connected earlier with the wallet
+    providerType === null ||
+      (providerType === ProviderType.None &&
+        Web3ConnectionFactory.setReadonlyProvider().then(() => {
+          const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
+          const engine = Web3ConnectionFactory.currentWeb3Engine
+          const canWrite = Web3ConnectionFactory.canWrite
 
-      if (web3Wrapper && this.web3ProviderSettings) {
-        const contractsSource = new ContractsSource(
-          engine,
-          this.web3ProviderSettings.networkId,
-          canWrite
-        )
-        contractsSource.Init().then(() => {
-          this.web3Wrapper = web3Wrapper
-          this.providerEngine = engine
-          this.contractsSource = contractsSource
-          this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable)
-        })
-      }
-    })
+          if (web3Wrapper && this.web3ProviderSettings) {
+            const contractsSource = new ContractsSource(
+              engine,
+              this.web3ProviderSettings.networkId,
+              canWrite
+            )
+            contractsSource.Init().then(() => {
+              this.web3Wrapper = web3Wrapper
+              this.providerEngine = engine
+              this.contractsSource = contractsSource
+              this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable)
+            })
+          }
+        }))
 
     return FulcrumProvider.Instance
   }
@@ -178,7 +185,7 @@ export class FulcrumProvider {
     try {
       response = localStorage.getItem(item) || ''
     } catch (e) {
-      // console.log(e);
+      console.error(e);
     }
     return response
   }
@@ -187,7 +194,7 @@ export class FulcrumProvider {
     try {
       localStorage.setItem(item, val)
     } catch (e) {
-      // console.log(e);
+      console.error(e);
     }
   }
 
@@ -195,8 +202,8 @@ export class FulcrumProvider {
     this.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging)
 
     this.unsupportedNetwork = false
-    await Web3ConnectionFactory.setWalletProvider(connector, account)
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector)
+    await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     await this.setWeb3ProviderFinalize(providerType)
   }
 
@@ -239,8 +246,6 @@ export class FulcrumProvider {
       )
       await newContractsSource.Init()
       this.contractsSource = newContractsSource
-      console.log(`contractsource: ${this.contractsSource}`)
-      console.log(`contractsource can write: ${this.contractsSource.canWrite}`)
     } else {
       this.contractsSource = null
     }
@@ -280,7 +285,7 @@ export class FulcrumProvider {
       try {
         this.accounts = [sellectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch (e) {
-        // console.log(e);
+        console.error(e);
         this.accounts = []
       }
       if (this.accounts.length === 0) {
@@ -326,6 +331,12 @@ export class FulcrumProvider {
     }
   }
 
+  public onRolloverConfirmed = async (request: RolloverRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
   public onManageCollateralConfirmed = async (request: ManageCollateralRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
@@ -345,82 +356,82 @@ export class FulcrumProvider {
     return result
   }
 
-  public getTradeTokenInterestRate = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
-    let result = new BigNumber(0)
-    if (this.contractsSource) {
-      const assetContract = this.contractsSource.getITokenContract(selectedKey.loanAsset)
-      if (assetContract) {
-        result = await assetContract.avgBorrowInterestRate.callAsync()
-        result = result.dividedBy(10 ** 18)
-      }
-    }
+  // public getTradeTokenInterestRate = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
+  //   let result = new BigNumber(0)
+  //   if (this.contractsSource) {
+  //     const assetContract = this.contractsSource.getITokenContract(selectedKey.loanAsset)
+  //     if (assetContract) {
+  //       result = await assetContract.avgBorrowInterestRate.callAsync()
+  //       result = result.dividedBy(10 ** 18)
+  //     }
+  //   }
 
-    return result
-  }
+  //   return result
+  // }
 
-  public getTradeTokenAssetLatestDataPoint = async (
-    selectedKey: TradeTokenKey
-  ): Promise<IPriceDataPoint> => {
-    try {
-      const currentPrice = await this.getSwapToUsdRate(selectedKey.asset)
-      const priceLatestDataPoint = await this.getPriceDefaultDataPoint()
+  // public getTradeTokenAssetLatestDataPoint = async (
+  //   selectedKey: TradeTokenKey
+  // ): Promise<IPriceDataPoint> => {
+  //   try {
+  //     const currentPrice = await this.getSwapToUsdRate(selectedKey.asset)
+  //     const priceLatestDataPoint = await this.getPriceDefaultDataPoint()
 
-      priceLatestDataPoint.price = currentPrice.toNumber()
+  //     priceLatestDataPoint.price = currentPrice.toNumber()
 
-      if (this.contractsSource) {
-        const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
-        if (assetContract) {
-          const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10 ** 18)
-          const currentMargin = currentLeverage.gt(0)
-            ? new BigNumber(1).div(currentLeverage)
-            : new BigNumber(1).div(selectedKey.leverage)
+  //     if (this.contractsSource) {
+  //       const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
+  //       if (assetContract) {
+  //         const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10 ** 18)
+  //         const currentMargin = currentLeverage.gt(0)
+  //           ? new BigNumber(1).div(currentLeverage)
+  //           : new BigNumber(1).div(selectedKey.leverage)
 
-          const maintenanceMargin = new BigNumber(0.15)
+  //         const maintenanceMargin = new BigNumber(0.15)
 
-          if (currentMargin.lte(maintenanceMargin)) {
-            priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price
-          } else {
-            const initialLeverage = new BigNumber(selectedKey.leverage)
-            const initialMargin = new BigNumber(1).div(initialLeverage)
+  //         if (currentMargin.lte(maintenanceMargin)) {
+  //           priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price
+  //         } else {
+  //           const initialLeverage = new BigNumber(selectedKey.leverage)
+  //           const initialMargin = new BigNumber(1).div(initialLeverage)
 
-            // initial_price = current_price - (current_price / initial_leverage * (current_margin - initial_margin))
-            const offset = currentPrice
-              .dividedBy(initialLeverage)
-              .multipliedBy(currentMargin.minus(initialMargin))
+  //           // initial_price = current_price - (current_price / initial_leverage * (current_margin - initial_margin))
+  //           const offset = currentPrice
+  //             .dividedBy(initialLeverage)
+  //             .multipliedBy(currentMargin.minus(initialMargin))
 
-            const initialPrice =
-              selectedKey.positionType === PositionType.SHORT
-                ? currentPrice.plus(offset)
-                : currentPrice.minus(offset)
+  //           const initialPrice =
+  //             selectedKey.positionType === PositionType.SHORT
+  //               ? currentPrice.plus(offset)
+  //               : currentPrice.minus(offset)
 
-            // liquidation_price = initial_price * (maintenance_margin * current_leverage + initial_leverage) / (initial_leverage + 1)
-            let liquidationPrice = initialPrice
-              .multipliedBy(maintenanceMargin.times(currentLeverage).plus(initialLeverage))
-              .div(initialLeverage.plus(1))
+  //           // liquidation_price = initial_price * (maintenance_margin * current_leverage + initial_leverage) / (initial_leverage + 1)
+  //           let liquidationPrice = initialPrice
+  //             .multipliedBy(maintenanceMargin.times(currentLeverage).plus(initialLeverage))
+  //             .div(initialLeverage.plus(1))
 
-            if (selectedKey.positionType === PositionType.SHORT) {
-              liquidationPrice = initialPrice.plus(initialPrice).minus(liquidationPrice)
-            }
+  //           if (selectedKey.positionType === PositionType.SHORT) {
+  //             liquidationPrice = initialPrice.plus(initialPrice).minus(liquidationPrice)
+  //           }
 
-            /*console.log(`offset`,offset.toString());
-            console.log(`maintenanceMargin`,maintenanceMargin.toString());
-            console.log(`initialLeverage`,initialLeverage.toString());
-            console.log(`initialMargin`,initialMargin.toString())
-            console.log(`currentPrice`,currentPrice.toString());
-            console.log(`currentLeverage`,currentLeverage.toString());
-            console.log(`currentMargin`,currentMargin.toString());
-            console.log(`initialPrice`,initialPrice.toString());
-            console.log(`liquidationPrice`,liquidationPrice.toString());*/
+  //           /*console.log(`offset`,offset.toString());
+  //           console.log(`maintenanceMargin`,maintenanceMargin.toString());
+  //           console.log(`initialLeverage`,initialLeverage.toString());
+  //           console.log(`initialMargin`,initialMargin.toString())
+  //           console.log(`currentPrice`,currentPrice.toString());
+  //           console.log(`currentLeverage`,currentLeverage.toString());
+  //           console.log(`currentMargin`,currentMargin.toString());
+  //           console.log(`initialPrice`,initialPrice.toString());
+  //           console.log(`liquidationPrice`,liquidationPrice.toString());*/
 
-            priceLatestDataPoint.liquidationPrice = liquidationPrice.toNumber()
-          }
-        }
-      }
-      return priceLatestDataPoint
-    } catch (e) {
-      return this.getPriceDefaultDataPoint()
-    }
-  }
+  //           priceLatestDataPoint.liquidationPrice = liquidationPrice.toNumber()
+  //         }
+  //       }
+  //     }
+  //     return priceLatestDataPoint
+  //   } catch (e) {
+  //     return this.getPriceDefaultDataPoint()
+  //   }
+  // }
 
   /*
   public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
@@ -967,40 +978,40 @@ export class FulcrumProvider {
     return [maxLendAmount, maxTokenAmount, tokenPrice, chaiPrice, infoMessage]
   }
 
-  public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
-    let result = new BigNumber(0)
+  // public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
+  //   let result = new BigNumber(0)
 
-    if (this.contractsSource) {
-      const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
-      if (assetContract) {
-        result = await assetContract.tokenPrice.callAsync()
-      }
-    }
+  //   if (this.contractsSource) {
+  //     const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
+  //     if (assetContract) {
+  //       result = await assetContract.tokenPrice.callAsync()
+  //     }
+  //   }
 
-    return result.dividedBy(10 ** 18)
-  }
+  //   return result.dividedBy(10 ** 18)
+  // }
 
-  public getPTokenValueOfUser = async (
-    selectedKey: TradeTokenKey,
-    account?: string
-  ): Promise<BigNumber> => {
-    let result = new BigNumber(0)
+  // public getPTokenValueOfUser = async (
+  //   selectedKey: TradeTokenKey,
+  //   account?: string
+  // ): Promise<BigNumber> => {
+  //   let result = new BigNumber(0)
 
-    if (this.web3Wrapper && this.contractsSource) {
-      if (!account && this.contractsSource.canWrite) {
-        account = this.getCurrentAccount()
-      }
+  //   if (this.web3Wrapper && this.contractsSource) {
+  //     if (!account && this.contractsSource.canWrite) {
+  //       account = this.getCurrentAccount()
+  //     }
 
-      if (account) {
-        const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
-        if (assetContract) {
-          result = await assetContract.positionValue.callAsync(account)
-        }
-      }
-    }
+  //     if (account) {
+  //       const assetContract = await this.contractsSource.getPTokenContract(selectedKey)
+  //       if (assetContract) {
+  //         result = await assetContract.positionValue.callAsync(account)
+  //       }
+  //     }
+  //   }
 
-    return result.dividedBy(10 ** 18)
-  }
+  //   return result.dividedBy(10 ** 18)
+  // }
 
   // public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
   //   let result = new BigNumber(0);
@@ -1248,26 +1259,53 @@ export class FulcrumProvider {
     if (tradedAmountEstimate.eq(0) || srcToken === destToken) {
       return new BigNumber(0)
     }
-
-    const srcDecimals = AssetsDictionary.assets.get(srcToken)?.decimals || 18
-    const amount = tradedAmountEstimate.times(10 ** srcDecimals)
+    
     const srcAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(srcToken)
     const destAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(destToken)
-    const slippageJsonOneTokenWorth = await fetch(
-      `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${10 **
-        srcDecimals}`
-    ).then((resp) => resp.json())
-    const slippageJsonTradeAmount = await fetch(
-      `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${amount}`
-    ).then((resp) => resp.json())
 
-    if (!slippageJsonOneTokenWorth.expectedRate || !slippageJsonTradeAmount.expectedRate) {
+    if (!this.contractsSource || !srcAssetErc20Address || !destAssetErc20Address) {
       return new BigNumber(0)
     }
-    const slippage = new BigNumber(slippageJsonOneTokenWorth.expectedRate)
-      .minus(slippageJsonTradeAmount.expectedRate)
+    const kyberContract = await this.contractsSource.getIKyberNetworkProxyContract()
+    if (!kyberContract) {
+      return new BigNumber(0)
+    }
+    const srcDecimals = AssetsDictionary.assets.get(srcToken)?.decimals || 18
+    const amount = tradedAmountEstimate.times(10 ** srcDecimals).dp(0, BigNumber.ROUND_HALF_UP)
+    if (amount.lte(10 ** srcDecimals)) {
+      return new BigNumber(0)
+    }
+    const oneEthWorthTokenAmount = await fetch(
+      `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`
+    )
+      .then((resp) => resp.json())
+      .then((resp) => 1 / resp.data[0].src_qty[0])
+      .catch(console.error)
+    let srcOneTokenWorthAmount = new BigNumber(10 ** srcDecimals)
+    if (oneEthWorthTokenAmount) {
+      srcOneTokenWorthAmount = new BigNumber(oneEthWorthTokenAmount)
+        .times(10 ** srcDecimals)
+        .dp(0, BigNumber.ROUND_HALF_UP)
+    }
+
+    const swapPriceOneTokenWorth: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
+      srcAssetErc20Address,
+      destAssetErc20Address,
+      srcOneTokenWorthAmount
+    )
+    const swapPriceTradeAmount: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
+      srcAssetErc20Address,
+      destAssetErc20Address,
+      amount
+    )
+
+    if (swapPriceOneTokenWorth[0].isZero() || swapPriceTradeAmount[0].isZero()) {
+      return new BigNumber(0)
+    }
+    const slippage = swapPriceOneTokenWorth[0]
+      .minus(swapPriceTradeAmount[0])
       .abs()
-      .div(slippageJsonTradeAmount.expectedRate)
+      .div(swapPriceTradeAmount[0])
       .times(100)
 
     return slippage
@@ -1445,7 +1483,6 @@ export class FulcrumProvider {
     const account = this.getCurrentAccount()
 
     if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      console.log('iToken ', loanToken)
       const tokenContract = this.contractsSource.getITokenContract(loanToken)
       if (!tokenContract) return result
       const leverageAmount =
@@ -1466,18 +1503,8 @@ export class FulcrumProvider {
 
       const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18
       const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18
-      const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(
-        collateralToken,
-        loanToken
-      )
 
       try {
-        console.log('leverageAmount' + leverageAmount)
-        console.log('loanTokenSent' + loanTokenSent)
-        console.log('collateralTokenSent' + collateralTokenSent)
-        console.log('collateralTokenAddress' + collateralTokenAddress)
-        console.log('iTokenAddress' + tokenContract.address)
-
         const marginDetails = await tokenContract.getEstimatedMarginDetails.callAsync(
           leverageAmount,
           loanTokenSent,
@@ -1696,55 +1723,52 @@ export class FulcrumProvider {
             .div(maxAmountInBaseUnits)
             .lte(0.01)
         ) {
-          console.log('close full amount')
           amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1))
         }
 
-        console.log(
-          iBZxContract.address,
-          await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
-            request.loanId,
-            account,
-            amountInBaseUnits,
-            request.returnTokenIsCollateral, // returnTokenIsCollateral
-            request.loanDataBytes
-          )
-        )
+        // console.log(
+        //   iBZxContract.address,
+        //   await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
+        //     request.loanId,
+        //     account,
+        //     amountInBaseUnits,
+        //     request.returnTokenIsCollateral, // returnTokenIsCollateral
+        //     request.loanDataBytes
+        //   )
+        // )
 
         const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-        
+
         try {
-        //@ts-ignore
-        result =
-          isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
-            ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
-                request.loanId,
-                account,
-                account,
-                amountInBaseUnits,
-                request.returnTokenIsCollateral, // returnTokenIsCollateral
-                request.loanDataBytes,
-                {
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-            : await iBZxContract.closeWithSwap.callAsync(
-                request.loanId,
-                account,
-                amountInBaseUnits,
-                request.returnTokenIsCollateral, // returnTokenIsCollateral
-                request.loanDataBytes,
-                {
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
+          //@ts-ignore
+          result =
+            isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
+              ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
+                  request.loanId,
+                  account,
+                  account,
+                  amountInBaseUnits,
+                  request.returnTokenIsCollateral, // returnTokenIsCollateral
+                  request.loanDataBytes,
+                  {
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit
+                  }
+                )
+              : await iBZxContract.closeWithSwap.callAsync(
+                  request.loanId,
+                  account,
+                  amountInBaseUnits,
+                  request.returnTokenIsCollateral, // returnTokenIsCollateral
+                  request.loanDataBytes,
+                  {
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit
+                  }
+                )
+        } catch (e) {
+          console.error(e)
         }
-        catch (e){
-          console.log(e)
-        }
-        console.log(result)
       }
     }
     return result
@@ -1775,8 +1799,9 @@ export class FulcrumProvider {
         .get(collateralAsset)!
         .addressErc20.get(this.web3ProviderSettings.networkId) || ''
     if (!iToken || !collateralTokenAddress || !iBZxContract) return null
+    // true for Torque, false for Fulcrum loan id
     // @ts-ignore
-    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, true))
+    const id = new BigNumber(Web3Utils.soliditySha3(collateralTokenAddress, false))
     const loanId = await iToken.loanParamsIds.callAsync(id)
     const loanParams = await iBZxContract.loanParams.callAsync(loanId)
     const result = {
@@ -1814,13 +1839,11 @@ export class FulcrumProvider {
     const zero = new BigNumber(0)
     //@ts-ignore
     result = loansData
-      .filter(
-        (e: any) =>
-          (!e.principal.eq(zero) &&
-            !e.currentMargin.eq(zero) &&
-            !e.interestDepositRemaining.eq(zero)) ||
-          account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-      )
+      // .filter(
+      //   (e: any) =>
+      //     (!e.principal.eq(zero) && !e.currentMargin.eq(zero)) ||
+      //     account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
+      // )
       .map((e: any) => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
         const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
@@ -1850,7 +1873,6 @@ export class FulcrumProvider {
         } as IBorrowedFundsState
       })
       .filter((e: IBorrowedFundsState | undefined) => e)
-    console.log(result)
     return result
   }
 
@@ -1887,20 +1909,15 @@ export class FulcrumProvider {
       false,
       false
     )
-    const zero = new BigNumber(0)
-    const healthyUserLoans = loansData.filter(
-      (e: any) =>
-        (!e.principal.eq(zero) &&
-          !e.currentMargin.eq(zero) &&
-          !e.interestDepositRemaining.eq(zero)) ||
-        account.toLowerCase() === '0x4abb24590606f5bf4645185e20c4e7b97596ca3b'
-    )
+
     const loansByPair: IBorrowedFundsState[] = []
-    healthyUserLoans
+    loansData
       .filter(
         (e: any) =>
-          (e.loanToken === baseTokenAddress && e.collateralToken === quoteTokenAddress) ||
-          (e.loanToken === quoteTokenAddress && e.collateralToken === baseTokenAddress)
+          (e.loanToken.toLowerCase() === baseTokenAddress.toLowerCase() &&
+            e.collateralToken.toLowerCase() === quoteTokenAddress.toLowerCase()) ||
+          (e.loanToken.toLowerCase() === quoteTokenAddress.toLowerCase() &&
+            e.collateralToken.toLowerCase() === baseTokenAddress.toLowerCase())
       )
       .forEach((e: any) => {
         const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
@@ -1931,37 +1948,37 @@ export class FulcrumProvider {
         } as IBorrowedFundsState)
       })
 
-    result.allUsersLoansCount = healthyUserLoans.length
+    result.allUsersLoansCount = loansData.length
     result.loans = loansByPair
     return result
   }
 
-  public async getPTokenBalanceOfUser(selectedKey: TradeTokenKey): Promise<BigNumber> {
-    let result = new BigNumber(0)
+  // public async getPTokenBalanceOfUser(selectedKey: TradeTokenKey): Promise<BigNumber> {
+  //   let result = new BigNumber(0)
 
-    if (this.contractsSource) {
-      const baseAsset = this.getBaseAsset(selectedKey)
-      const precision = AssetsDictionary.assets.get(baseAsset)!.decimals || 18
-      const address = await this.contractsSource.getPTokenErc20Address(selectedKey)
-      if (address) {
-        result = await this.getErc20BalanceOfUser(address)
-        result = result.multipliedBy(10 ** (18 - precision))
-        if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
-          result = result.div(10 ** 10)
-        }
-      }
-    }
+  //   if (this.contractsSource) {
+  //     const baseAsset = this.getBaseAsset(selectedKey)
+  //     const precision = AssetsDictionary.assets.get(baseAsset)!.decimals || 18
+  //     const address = await this.contractsSource.getPTokenErc20Address(selectedKey)
+  //     if (address) {
+  //       result = await this.getErc20BalanceOfUser(address)
+  //       result = result.multipliedBy(10 ** (18 - precision))
+  //       if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
+  //         result = result.div(10 ** 10)
+  //       }
+  //     }
+  //   }
 
-    return result
-  }
+  //   return result
+  // }
 
-  public getPTokensAvailable(): TradeTokenKey[] {
-    return this.contractsSource ? this.contractsSource.getPTokensAvailable() : []
-  }
+  // public getPTokensAvailable(): TradeTokenKey[] {
+  //   return this.contractsSource ? this.contractsSource.getPTokensAvailable() : []
+  // }
 
-  public getPTokenErc20Address(key: TradeTokenKey): string | null {
-    return this.contractsSource ? this.contractsSource.getPTokenErc20Address(key) : null
-  }
+  // public getPTokenErc20Address(key: TradeTokenKey): string | null {
+  //   return this.contractsSource ? this.contractsSource.getPTokenErc20Address(key) : null
+  // }
 
   public getErc20AddressOfAsset(asset: Asset): string | null {
     let result: string | null = null
@@ -2018,7 +2035,10 @@ export class FulcrumProvider {
       if (account) {
         // @ts-ignore
         const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider()
-        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20)
+        const resp = await alchemyProvider.alchemyWeb3.alchemy.getTokenBalances(
+          account,
+          addressesErc20
+        )
         if (resp) {
           // @ts-ignore
           result = resp.tokenBalances
@@ -2086,11 +2106,8 @@ export class FulcrumProvider {
     }
   }
 
-  public async getSwapRate(
-    srcAsset: Asset,
-    destAsset: Asset,
-    srcAmount?: BigNumber
-  ): Promise<BigNumber> {
+  // Returns swap rate from Chainlink Oracle
+  public async getSwapRate(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
     if (
       srcAsset === destAsset ||
       (srcAsset === Asset.USDC && destAsset === Asset.DAI) ||
@@ -2098,15 +2115,9 @@ export class FulcrumProvider {
     ) {
       return new BigNumber(1)
     }
-    // console.log("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
-    if (!srcAmount) {
-      srcAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS
-    } else {
-      srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
-    }
 
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const oracleContract = await this.contractsSource.getOracleContract()
@@ -2115,7 +2126,6 @@ export class FulcrumProvider {
       const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals))
       const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18
       const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals))
-
       try {
         const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
           srcAssetErc20Address,
@@ -2128,7 +2138,59 @@ export class FulcrumProvider {
           .dividedBy(10 ** 18)
           .multipliedBy(swapPriceData[1].dividedBy(10 ** 18)) // swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
-        console.log(e)
+        console.error(e)
+        result = new BigNumber(0)
+      }
+    }
+    return result
+  }
+
+  // Returns swap rate from Kyber
+  public async getKyberSwapRate(
+    srcAsset: Asset,
+    destAsset: Asset,
+    srcAmount?: BigNumber
+  ): Promise<BigNumber> {
+    if (networkName !== 'mainnet') {
+      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract 
+      return this.getSwapRate(srcAsset, destAsset)
+    }
+    let result: BigNumber = new BigNumber(0)
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
+
+    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+      const kyberContract = await this.contractsSource.getIKyberNetworkProxyContract()
+      if (!kyberContract) {
+        return result
+      }
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
+      if (!srcAmount) {
+        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
+      } else {
+        srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
+      }
+      try {
+        const oneEthWorthTokenAmount = await fetch(
+          `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`
+        )
+          .then((resp) => resp.json())
+          .then((resp) => 1 / resp.data[0].src_qty[0])
+          .catch(console.error)
+        if (oneEthWorthTokenAmount) {
+          srcAmount = new BigNumber(oneEthWorthTokenAmount)
+            .times(10 ** srcAssetDecimals)
+            .dp(0, BigNumber.ROUND_HALF_UP)
+        }
+
+        const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
+          srcAssetErc20Address,
+          destAssetErc20Address,
+          srcAmount
+        )
+        result = new BigNumber(swapPriceData[0]).dividedBy(10 ** 18)
+      } catch (e) {
+        console.error(e)
         result = new BigNumber(0)
       }
     }
@@ -2346,6 +2408,65 @@ export class FulcrumProvider {
     return result
   }
 
+  public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
+    let result: RolloverEvent[] = []
+    const account = this.getCurrentAccount()
+
+    if (!this.contractsSource) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api
+    let etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      RolloverEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+
+    const rolloverEventResponse = await fetch(etherscanApiUrl)
+    const rolloverEventResponseJson = await rolloverEventResponse.json()
+    if (rolloverEventResponseJson.status !== '1') return result
+    const events = rolloverEventResponseJson.result
+    result = events
+      .reverse()
+      .map((event: any) => {
+        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
+        const caller = event.topics[2].replace('0x000000000000000000000000', '0x')
+        const loandId = event.topics[3]
+        const data = event.data.replace('0x', '')
+        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+        if (!dataSegments) return result
+        const lender = dataSegments[0].replace('000000000000000000000000', '0x')
+        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+        const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
+        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
+        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
+
+        const collateralAmountUsed = new BigNumber(parseInt(dataSegments[3], 16))
+        const interestAmountAdded = new BigNumber(parseInt(dataSegments[4], 16))
+        const loanEndTimestamp = new Date(parseInt(dataSegments[5], 16) * 1000)
+        const gasRebate = new BigNumber(parseInt(dataSegments[6], 16))
+        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
+        const txHash = event.transactionHash
+        return new RolloverEvent(
+          userAddress,
+          caller,
+          loandId,
+          lender,
+          loanToken,
+          collateralToken,
+          collateralAmountUsed,
+          interestAmountAdded,
+          loanEndTimestamp,
+          gasRebate,
+          timeStamp,
+          txHash
+        )
+      })
+      .filter((e: any) => e)
+    return result
+  }
+
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = []
     const account = this.getCurrentAccount()
@@ -2467,6 +2588,41 @@ export class FulcrumProvider {
       })
       .filter((e: any) => e)
     return result
+  }
+
+  public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
+    const result: number = 0
+    const account = this.getCurrentAccount()
+    const blocksPerDay = 10000 // 7-8k per day with a buffer
+    if (!account || !this.contractsSource || !this.web3Wrapper) return result
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api
+    const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
+    const etherscanApiUrl = `https://${
+      networkName === 'kovan' ? 'api-kovan' : 'api'
+    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${blockNumber -
+      days * blocksPerDay}&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      LiquidationEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+
+    const liquidationEventResponse = await fetch(etherscanApiUrl)
+    const liquidationEventResponseJson = await liquidationEventResponse.json()
+    if (liquidationEventResponseJson.status !== '1') return result
+    const events = liquidationEventResponseJson.result
+    const liquidationEvents = events.filter((event: any) => {
+      const data = event.data.replace('0x', '')
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return false
+
+      const baseTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
+      const quoteTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress)
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress)
+      if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return false
+      return true
+    })
+    return (liquidationEvents && liquidationEvents.length) || result
   }
 
   public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
@@ -2647,6 +2803,10 @@ export class FulcrumProvider {
       await this.processManageCollateralRequestTask(task, skipGas)
     }
 
+    if (task.request instanceof RolloverRequest) {
+      await this.processRolloverRequestTask(task, skipGas)
+    }
+
     return false
   }
 
@@ -2741,8 +2901,7 @@ console.log(err, added);
       if (
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
+        console.error(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -2775,8 +2934,7 @@ console.log(err, added);
       if (
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
+        console.error(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -3003,8 +3161,38 @@ console.log(err, added);
       if (
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
+        console.error(e)
+      }
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task)
+    }
+  }
+
+  private processRolloverRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.loanId)
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error('No provider available!')
+      }
+
+      const account = this.getCurrentAccount()
+      if (!account) {
+        throw new Error('Unable to get wallet address!')
+      }
+
+      const taskRequest: RolloverRequest = task.request as RolloverRequest
+
+      const { RolloverProcessor } = await import('./processors/RolloverProcessor')
+      const processor = new RolloverProcessor()
+      await processor.run(task, account, skipGas)
+
+      task.processingEnd(true, false, null)
+    } catch (e) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
+        console.error(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -3014,7 +3202,7 @@ console.log(err, added);
 
   public waitForTransactionMined = async (
     txHash: string,
-    request?: LendRequest | TradeRequest | ManageCollateralRequest
+    request?: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
       try {
@@ -3032,7 +3220,7 @@ console.log(err, added);
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest | ManageCollateralRequest | undefined,
+    request: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest | undefined,
     resolve: (value: any) => void,
     reject: (value: any) => void
   ) => {
@@ -3076,7 +3264,7 @@ console.log(err, added);
               }
             }
             isMainnetProd && TagManager.dataLayer(tagManagerArgs)
-          } else {
+          } else if (request instanceof TradeRequest) {
             const tagManagerArgs = {
               dataLayer: {
                 transactionId: randomNumber,

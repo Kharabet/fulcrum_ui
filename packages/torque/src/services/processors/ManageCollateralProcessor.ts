@@ -1,10 +1,10 @@
 import { BigNumber } from '@0x/utils'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { ManageCollateralRequest } from '../../domain/ManageCollateralRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { TorqueProvider } from '../TorqueProvider'
-import { erc20Contract } from '../../contracts/erc20'
-import { Asset } from '../../domain/Asset'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -76,7 +76,7 @@ export class ManageCollateralProcessor {
       task.processingStepNext()
       erc20allowance = await tokenErc20Contract.allowance.callAsync(
         account,
-        TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase()
+        TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
       )
 
       // Prompting token allowance
@@ -85,7 +85,7 @@ export class ManageCollateralProcessor {
       // Waiting for token allowance
       task.processingStepNext()
       if (collateralAmountInBaseUnits.gt(erc20allowance)) {
-        const spender = TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase()
+        const spender = TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
         const approveHash = await TorqueProvider.Instance.setApproval(
           spender,
           taskRequest.collateralAsset,
@@ -119,8 +119,7 @@ export class ManageCollateralProcessor {
           .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
-        throw e
+        // throw e
       }
 
       try {
@@ -136,7 +135,6 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
     } else {
@@ -152,8 +150,7 @@ export class ManageCollateralProcessor {
         )
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(2).integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
-        throw e
+        // throw e
       }
 
       try {
@@ -169,7 +166,6 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
     }

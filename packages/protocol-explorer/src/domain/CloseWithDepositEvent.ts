@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from './Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export class CloseWithDepositEvent {
   public static topic0: string =
@@ -14,7 +14,7 @@ export class CloseWithDepositEvent {
   public readonly collateralWithdrawAmount: BigNumber
   public readonly collateralToLoanRate: BigNumber // one unit of loanToken, denominated in collateralToken
   public readonly currentMargin: BigNumber
-  public readonly timeStamp: Date
+  public readonly blockNumber: BigNumber
   public readonly txHash: string
 
   constructor(
@@ -28,7 +28,7 @@ export class CloseWithDepositEvent {
     collateralWithdrawAmount: BigNumber,
     collateralToLoanRate: BigNumber,
     currentMargin: BigNumber,
-    timeStamp: Date,
+    blockNumber: BigNumber,
     txHash: string
   ) {
     this.user = user
@@ -41,7 +41,7 @@ export class CloseWithDepositEvent {
     this.collateralWithdrawAmount = collateralWithdrawAmount
     this.collateralToLoanRate = collateralToLoanRate
     this.currentMargin = currentMargin
-    this.timeStamp = timeStamp
+    this.blockNumber = blockNumber
     this.txHash = txHash
   }
 }

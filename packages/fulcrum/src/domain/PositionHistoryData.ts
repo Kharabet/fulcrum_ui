@@ -1,7 +1,8 @@
 import { BigNumber } from '@0x/utils'
 import { PayTradingFeeEvent } from './events/PayTradingFeeEvent'
 import { EarnRewardEvent } from './events/EarnRewardEvent'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { EarnRewardEventNew } from './events/EarnRewardEventNew'
 
 export class PositionHistoryData {

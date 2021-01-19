@@ -69,6 +69,18 @@
         color: #5b88ff;
         border-color: #5b88ff;
         cursor: pointer;
+        outline: none;
+      }
+      &[disabled] {
+        color: #e9f4ff;
+        background-color: #d1ddea;
+        cursor: not-allowed;
+        &:hover,
+        &:focus,
+        &.active {
+          color: #e9f4ff;
+          border-color: #d1ddea;
+        }
       }
     }
   }

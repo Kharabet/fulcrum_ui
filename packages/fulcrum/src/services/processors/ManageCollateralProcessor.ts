@@ -2,9 +2,10 @@ import { BigNumber } from '@0x/utils'
 import { RequestTask } from '../../domain/RequestTask'
 import { ManageCollateralRequest } from '../../domain/ManageCollateralRequest'
 
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { FulcrumProvider } from '../FulcrumProvider'
-import { erc20Contract } from '../../contracts/erc20'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -122,7 +123,6 @@ export class ManageCollateralProcessor {
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
         throw e
       }
 
@@ -139,7 +139,6 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
     } else {
@@ -155,7 +154,6 @@ export class ManageCollateralProcessor {
         )
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(2).integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
         throw e
       }
 
@@ -172,7 +170,6 @@ export class ManageCollateralProcessor {
         )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
     }

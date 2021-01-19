@@ -6,9 +6,12 @@ import React, { ChangeEvent, Component, FormEvent } from 'react'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
 import { FulcrumProvider } from '../services/FulcrumProvider'
@@ -50,6 +53,7 @@ interface IManageCollateralFormState {
   collateralExcess: BigNumber
   gasAmountNeeded: BigNumber
   collateralizedPercent: BigNumber
+  collateralToLoanRate: BigNumber
   balanceTooLow: boolean
   collateralTooLow: boolean
 
@@ -84,6 +88,7 @@ export default class ManageCollateralForm extends Component<
       collateralAmount: new BigNumber(0),
       collateralExcess: new BigNumber(0),
       collateralizedPercent: new BigNumber(0),
+      collateralToLoanRate: new BigNumber(0),
       balanceTooLow: false,
       collateralTooLow: false,
       inputAmountText: '',
@@ -117,14 +122,11 @@ export default class ManageCollateralForm extends Component<
           ...this.state,
           collateralAmount: next!.collateralAmount,
           collateralizedPercent: next!.collateralizedPercent,
-          collateralTooLow: next!.collateralizedPercent.lt(this.props.loan!.loanData!.maintenanceMargin.div(10**18).plus(10) || 25),
+          collateralTooLow: next!.collateralizedPercent.lt(
+            this.props.loan!.loanData!.maintenanceMargin.div(10 ** 18).plus(10) || 25
+          ),
           inputAmountText: this.formatPrecision(next!.collateralAmount.toString())
         })
-
-        // console.log("collateralAmount2 " + this.state.collateralizedPercent.dividedBy(persent).minus(1).multipliedBy(this.props.loan!.collateralAmount).toFixed(6));
-        //  console.log("1 " + this.state.collateralAmount.dividedBy(this.props.loan!.collateralAmount).toFixed(6));
-
-        //console.log("2  " + this.state.collateralizedPercent.dividedBy(persent).minus(1).toFixed(6));
       })
   }
 
@@ -147,9 +149,10 @@ export default class ManageCollateralForm extends Component<
             (collateralExcess) => {
               FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
                 this.props.loan!.collateralAsset
-              ).then((assetBalance) => {
-                const collateralizedPercent = this.props
-                  .loan!.collateralizedPercent.multipliedBy(100)
+              ).then(async (assetBalance) => {
+                const collateralizedPercent = this.props.loan!.collateralizedPercent.multipliedBy(
+                  100
+                )
 
                 let minCollateral
                 let maxCollateral
@@ -161,6 +164,17 @@ export default class ManageCollateralForm extends Component<
                 maxCollateral = minCollateral
                   .times(collateralState.maxValue - collateralState.minValue)
                   .dividedBy(10 ** 20)
+
+                // set range for case when loan has zero margin. Actually it don't affect slider range.
+                // TODO: review the logic of the component
+                if (this.props.loan!.loanData!.collateral.isZero()) {
+                  minCollateral = new BigNumber(
+                    this.props.loan!.loanData.maintenanceMargin.div(10 ** 18).plus(5)
+                  )
+                  maxCollateral = new BigNumber(
+                    this.props.loan!.loanData.maintenanceMargin.div(10 ** 18).plus(50)
+                  )
+                }
 
                 const currentCollateral = this.props.loan!.collateralAmount.times(10 ** 18)
 
@@ -204,10 +218,15 @@ export default class ManageCollateralForm extends Component<
                 ) {
                   assetBalanceNormalizedBN = new BigNumber(collateralState.minValue)
                 }
+                const collateralToLoanRate = await FulcrumProvider.Instance.getKyberSwapRate(
+                  this.props.loan!.collateralAsset,
+                  this.props.loan!.loanAsset
+                )
 
                 this.setState(
                   {
                     ...this.state,
+                    collateralToLoanRate,
                     assetDetails:
                       AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null,
                     loanValue: currentCollateralNormalizedBN.toNumber(),
@@ -356,7 +375,6 @@ export default class ManageCollateralForm extends Component<
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    // console.log(this.state.collateralAmount.toString(), new BigNumber(this.state.loanValue).dividedBy(10**18).toString(), new BigNumber(this.state.selectedValue).dividedBy(10**18).toString());
     if (!this.state.didSubmit && this.state.collateralAmount.gt(0)) {
       this.setState({ ...this.state, didSubmit: true })
 
@@ -415,9 +433,20 @@ export default class ManageCollateralForm extends Component<
   private rxFromInputAmount = (value: string): Observable<number> => {
     return new Observable<number>((observer) => {
       let collateralAmount = new BigNumber(Math.abs(Number(value)))
+
+      const decimals = AssetsDictionary.assets.get(this.props.loan!.loanAsset)!.decimals || 18
+      // collateral amount enough to get maintenance margin + 200%
+      const maxCollateralForZeroMarginLoan = this.props
+        .loan!.loanData.principal.div(10 ** decimals)
+        .times(this.props.loan!.loanData!.maintenanceMargin.div(10 ** 20).plus(3))
+        .div(this.state.collateralToLoanRate)
       let selectedValue = (Number(value) > 0
         ? collateralAmount
-            .dividedBy(this.props.loan!.collateralAmount)
+            .dividedBy(
+              this.props.loan!.collateralAmount.isZero()
+                ? maxCollateralForZeroMarginLoan
+                : this.props.loan!.collateralAmount
+            )
             .multipliedBy(this.state.maxValue - this.state.loanValue)
             .plus(this.state.loanValue)
         : new BigNumber(this.state.loanValue).minus(
@@ -440,6 +469,13 @@ export default class ManageCollateralForm extends Component<
   private rxFromCurrentAmount = (value: number): Observable<ICollateralChangeEstimate> => {
     return new Observable<ICollateralChangeEstimate>((observer) => {
       let collateralAmount = new BigNumber(0)
+
+      const decimals = AssetsDictionary.assets.get(this.props.loan!.loanAsset)!.decimals || 18
+      // collateral amount enough to get maintenance margin + 200%
+      const maxCollateralForZeroMarginLoan = this.props
+        .loan!.loanData.principal.div(10 ** decimals)
+        .times(this.props.loan!.loanData!.maintenanceMargin.div(10 ** 20).plus(3))
+        .div(this.state.collateralToLoanRate)
       if (this.state.loanValue !== value && this.props.loan!.loanData) {
         if (value < this.state.loanValue) {
           collateralAmount = new BigNumber(this.state.loanValue)
@@ -450,11 +486,13 @@ export default class ManageCollateralForm extends Component<
           collateralAmount = new BigNumber(value)
             .minus(this.state.loanValue)
             .dividedBy(this.state.maxValue - this.state.loanValue)
-            .multipliedBy(this.props.loan!.collateralAmount)
+            .multipliedBy(
+              this.props.loan!.collateralAmount.isZero()
+                ? maxCollateralForZeroMarginLoan
+                : this.props.loan!.collateralAmount
+            )
         }
         this.setState({ ...this.state, collateralAmount: collateralAmount })
-
-        // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loan!.collateralAmount.toString());
       }
 
       FulcrumProvider.Instance.getManageCollateralChangeEstimate(

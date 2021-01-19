@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from './Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export class CloseWithSwapEvent {
   public static topic0: string =
@@ -14,7 +14,7 @@ export class CloseWithSwapEvent {
   public readonly loanCloseAmount: BigNumber
   public readonly exitPrice: BigNumber // one unit of loanToken, denominated in collateralToken
   public readonly currentLeverage: BigNumber
-  public readonly timeStamp: Date
+  public readonly blockNumber: BigNumber
   public readonly txHash: string
 
   constructor(
@@ -28,7 +28,7 @@ export class CloseWithSwapEvent {
     loanCloseAmount: BigNumber,
     exitPrice: BigNumber,
     currentLeverage: BigNumber,
-    timeStamp: Date,
+    blockNumber: BigNumber,
     txHash: string
   ) {
     this.user = user
@@ -41,7 +41,7 @@ export class CloseWithSwapEvent {
     this.loanCloseAmount = loanCloseAmount
     this.exitPrice = exitPrice
     this.currentLeverage = currentLeverage
-    this.timeStamp = timeStamp
+    this.blockNumber = blockNumber
     this.txHash = txHash
   }
 }

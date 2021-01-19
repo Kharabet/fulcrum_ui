@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { AssetDetails } from '../domain/AssetDetails'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
 import { PositionType } from '../domain/PositionType'
 
 import '../styles/components/position-type-marker-alt.scss'
