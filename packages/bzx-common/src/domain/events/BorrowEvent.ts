@@ -1,17 +1,18 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
-export class CloseWithDepositEvent {
+export default class BorrowEvent {
   public static topic0: string =
-    '0x6349c1a02ec126f7f4fc6e6837e1859006e90e9901635c442d29271e77b96fb6'
+    '0x7bd8cbb7ba34b33004f3deda0fd36c92fc0360acbd97843360037b467a538f90'
   public readonly user: string //indexed
   public readonly lender: string //indexed
   public readonly loanId: string //indexed
-  public readonly closer: string
   public readonly loanToken: Asset
   public readonly collateralToken: Asset
-  public readonly repayAmount: BigNumber
-  public readonly collateralWithdrawAmount: BigNumber
+  public readonly newPrincipal: BigNumber
+  public readonly newCollateral: BigNumber
+  public readonly interestRate: BigNumber
+  public readonly interestDuration: BigNumber
   public readonly collateralToLoanRate: BigNumber // one unit of loanToken, denominated in collateralToken
   public readonly currentMargin: BigNumber
   public readonly blockNumber: BigNumber
@@ -21,24 +22,26 @@ export class CloseWithDepositEvent {
     user: string,
     lender: string,
     loanId: string,
-    closer: string,
     loanToken: Asset,
     collateralToken: Asset,
-    repayAmount: BigNumber,
-    collateralWithdrawAmount: BigNumber,
+    newPrincipal: BigNumber,
+    newCollateral: BigNumber,
+    interestRate: BigNumber,
+    interestDuration: BigNumber,
     collateralToLoanRate: BigNumber,
     currentMargin: BigNumber,
     blockNumber: BigNumber,
     txHash: string
   ) {
     this.user = user
+    this.lender = lender
+    this.loanId = loanId
     this.loanToken = loanToken
     this.collateralToken = collateralToken
-    this.lender = lender
-    this.closer = closer
-    this.loanId = loanId
-    this.repayAmount = repayAmount
-    this.collateralWithdrawAmount = collateralWithdrawAmount
+    this.newPrincipal = newPrincipal
+    this.newCollateral = newCollateral
+    this.interestRate = interestRate
+    this.interestDuration = interestDuration
     this.collateralToLoanRate = collateralToLoanRate
     this.currentMargin = currentMargin
     this.blockNumber = blockNumber

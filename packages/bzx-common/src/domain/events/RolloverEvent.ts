@@ -2,7 +2,7 @@ import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
 
-export class RolloverEvent {
+export default class RolloverEvent {
   public static readonly topic0: string =
     '0x21e656d09cbbafac02fd00fc98d308d0df53e46fa0a7b4358eca09302afc2e58'
   public readonly user: string //indexed

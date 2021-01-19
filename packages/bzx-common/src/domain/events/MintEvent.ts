@@ -1,7 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
-export class MintEvent {
+export default class MintEvent {
   public static topic0: string =
     '0xb4c03061fb5b7fed76389d5af8f2e0ddb09f8c70d1333abbb62582835e10accb'
   public readonly minter: string //indexed

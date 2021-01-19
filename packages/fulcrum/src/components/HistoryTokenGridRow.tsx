@@ -7,9 +7,7 @@ import { FulcrumProvider } from '../services/FulcrumProvider'
 import { Preloader } from './Preloader'
 import { PositionEventsGroup } from '../domain/PositionEventsGroup'
 import { PositionHistoryData } from '../domain/PositionHistoryData'
-import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
-import { RolloverEvent } from '../domain/events/RolloverEvent'
-import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
+
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 export interface IHistoryTokenGridRowProps {
