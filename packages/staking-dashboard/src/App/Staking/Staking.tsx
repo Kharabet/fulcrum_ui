@@ -4,10 +4,11 @@ import { Button } from 'ui-framework'
 import AppVM from '../AppVM'
 import Rewards from './Rewards'
 import StakingForm from './StakingForm'
+import Governance from './Governance'
 import WalletUpdate from './WalletUpdate'
 
 export function StakingDashboard({ appVM }: { appVM: AppVM }) {
-  const {rewards} = appVM.rootStore.stakingStore
+  const { rewards } = appVM.rootStore.stakingStore
   return (
     <section className="calculator padded-h-2">
       <div className="margin-bottom-2">
@@ -21,17 +22,26 @@ export function StakingDashboard({ appVM }: { appVM: AppVM }) {
         </Button>
         <Button
           notify={rewards.canClaimStakingRewards || rewards.canClaimRebateRewards}
-          className={`btn--tab ${appVM.section === 'rewards' ? 'active' : ''}`}
+          className={`btn--tab margin-right-2 ${appVM.section === 'rewards' ? 'active' : ''}`}
           name="section"
           value="rewards"
           onClick={appVM.set}
           onClickEmit="name-value">
           Rewards
         </Button>
+        <Button
+          className={`btn--tab ${appVM.section === 'governance' ? 'active' : ''}`}
+          name="section"
+          value="governance"
+          onClick={appVM.set}
+          onClickEmit="name-value">
+          Governance
+        </Button>
       </div>
       {appVM.section === 'stake' && <StakingForm />}
-      {appVM.section === 'rewards' && <Rewards appVM={appVM}/>}
-      <WalletUpdate appVM={appVM}/>
+      {appVM.section === 'rewards' && <Rewards appVM={appVM} />}
+      {appVM.section === 'governance' && <Governance appVM={appVM} />}
+      <WalletUpdate appVM={appVM} />
     </section>
   )
 }
