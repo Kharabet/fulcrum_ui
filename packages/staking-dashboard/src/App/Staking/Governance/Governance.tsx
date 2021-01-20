@@ -28,7 +28,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
   return (
     <React.Fragment>
       <Proposals vm={vm} />
-      <div className="governance">
+      <div className="panel--white padded-2 margin-bottom-2 governance">
         <div className="governance__search">
           <input value={inputValue} placeholder="Search" onChange={onChange} />
           <SearchIcon />

@@ -21,6 +21,7 @@ import { saiToDAIBridgeContract } from './typescript-wrappers/saiToDaiBridge'
 import { SoloContract } from './typescript-wrappers/solo'
 import { SoloBridgeContract } from './typescript-wrappers/SoloBridge'
 import { vatContract } from './typescript-wrappers/vat'
+import { CompoundGovernorAlphaContract } from './typescript-wrappers/CompoundGovernorAlpha'
 import { IKyberNetworkProxyContract } from './typescript-wrappers/IKyberNetworkProxy'
 
 const getNetworkNameById = (networkId: number): string => {
@@ -87,6 +88,7 @@ export default class ContractsSource {
   private proxyMigrationsJson: any
   public saiToDAIBridgeJson: any
   public instaRegistryJson: any
+  public compoundGovernorAlphaJson: any
 
   public networkId: number
   public canWrite: boolean
@@ -115,6 +117,7 @@ export default class ContractsSource {
     )
     this.cTokenJson = await import(`./artifacts/${networkName}/CToken.json`)
     this.compoundBridgeJson = await import(`./artifacts/${networkName}/CompoundBridge.json`)
+    this.compoundGovernorAlphaJson = await import(`./artifacts/${networkName}/CompoundGovernorAlpha.json`)
     this.soloJson = await import(`./artifacts/${networkName}/Solo.json`)
     this.soloBridgeJson = await import(`./artifacts/${networkName}/SoloBridge.json`)
     this.vatJson = await import(`./artifacts/${networkName}/vat.json`)
@@ -370,6 +373,28 @@ export default class ContractsSource {
     return address
   }
 
+  private getCompoundGovernorAlphaAddress(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'
+        break
+      case 42:
+        address = ''
+        break
+    }
+    return address
+  }
+
+  private async getCompoundGovernorAlphaContractRaw(): Promise<CompoundComptrollerContract> {
+    await this.Init()
+    return new CompoundGovernorAlphaContract(
+      this.compoundGovernorAlphaJson.abi,
+      this.getCompoundGovernorAlphaAddress().toLowerCase(),
+      this.provider
+    )
+  }
+
   private async getCompoundComptrollerContractRaw(): Promise<CompoundComptrollerContract> {
     await this.Init()
     return new CompoundComptrollerContract(
@@ -552,6 +577,7 @@ export default class ContractsSource {
   public getVatContract = _.memoize(this.getVatContractRaw)
   public getCdpContract = _.memoize(this.getCdpContractRaw)
   public getCompoundComptrollerContract = _.memoize(this.getCompoundComptrollerContractRaw)
+  public getCompoundGovernorAlphaContrac = _.memoize(this.getCompoundGovernorAlphaContractRaw)
   public getCTokenContract = _.memoize(this.getCTokenContractRaw)
   public getCompoundBridgeContract = _.memoize(this.getCompoundBridgeContractRaw)
   public getSoloContract = _.memoize(this.getSoloContractRaw)
