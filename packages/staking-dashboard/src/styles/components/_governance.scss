@@ -123,6 +123,9 @@
       color: #a9b5c7;
       outline: none;
     }
+    &__button {
+      cursor: pointer;
+    }
   }
   &__table {
     margin-top: 30px;

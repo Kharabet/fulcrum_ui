@@ -18,20 +18,19 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
     }
   ]
 
-  const [inputValue, setInputValue] = useState<string>('')
-
-  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value ? event.target.value : ''
-    setInputValue(value)
-  }
-
   return (
     <React.Fragment>
       <Proposals vm={vm} />
       <div className="panel--white padded-2 margin-bottom-2 governance">
         <div className="governance__search">
-          <input value={inputValue} placeholder="Search" onChange={onChange} />
-          <SearchIcon />
+          <input
+            value={vm.name}
+            placeholder="Search"
+            onChange={(e) => (vm.name = e.target.value)}
+          />
+          <div className="governance__search__button" onClick={vm.search}>
+            <SearchIcon />
+          </div>
         </div>
         <div className="governance__table">
           <div className="thead">

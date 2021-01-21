@@ -1,5 +1,4 @@
 import React from 'react'
-import GovernanceVM from './GovernanceVM'
 
 export interface IGovernanceItemProps {
   description: string
@@ -16,7 +15,7 @@ export default function GovernanceItem(props: IGovernanceItemProps) {
       <div className="trow__right">
         <div className="trow__author">{author}</div>
         <div className="trow__action">
-          <button className="closed">{action}</button>
+          <button className={`${action.toLocaleLowerCase()}`}>{action}</button>
         </div>
       </div>
     </div>
