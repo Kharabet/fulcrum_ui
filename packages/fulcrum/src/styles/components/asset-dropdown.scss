@@ -5,12 +5,15 @@
 }
 .asset-dropdown {
   position: absolute;
-  top: calc(50% + 20px);
+  top: calc(50% + 25px);
   border-radius: 4px;
   background-color: #444e5a;
   box-sizing: border-box;
   width: 100%;
   z-index: 100004;
+  @media screen and (max-width: $mobile-version-width) {
+    top: calc(50% + 20px);
+  }
   &__wrapper {
     width: 100vw;
     height: 100vh;
@@ -34,7 +37,7 @@
     align-items: center;
     box-sizing: border-box;
     width: 100%;
-    padding: 4px;
+    padding: 4px 8px;
     border-radius: 4px;
     text-align: center;
     &:hover {
@@ -47,16 +50,27 @@
         background-color: #586473;
       }
     }
+    @media screen and (max-width: $mobile-version-width) {
+      padding:4px;
+    }
     &__name {
-      font-size: 12px;
+      font-size: 16px;
       font-weight: 600;
       color: #ffffff;
+      @media screen and (max-width: $mobile-version-width) {
+        font-size: 12px;
+      }
     }
     &__image-container {
       margin-right: 7px;
+    
+      @media screen and (max-width: $mobile-version-width) {
+        margin-right: 4px;
+      }
       svg {
         width: 24px;
-        height: 24px;        
+        height: 24px;
+        vertical-align: -3px;
       }
     }
   }
@@ -80,9 +94,9 @@
   svg {
     width: 24px;
     height: 24px;
-    margin-right: 4px;
+    margin-right: 7px;
     @media screen and (max-width: $mobile-version-width) {
-      margin-right: 2px;
+      margin-right: 4px;
     }
     .eth-svg {
       fill: #c8c8c8;

@@ -12,6 +12,10 @@
   .sell & {
     margin-top: 0;
   }
+  .wrapper-loader {
+    display: inline-block;
+    vertical-align: -6px;
+  }
   &__column {
     display: flex;
     flex-direction: column;
@@ -24,7 +28,7 @@
       &:first-child {
         display: none;
       }
-     
+
       &-row {
         width: 50%;
         margin-right: 20px;

@@ -99,10 +99,10 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
             className="tooltip__icon"
             data-multiline="true"
             data-html={true}
-            data-tip="<p>Use CHI token to save on gas fees.
-            Chi will be burned from your wallet, saving you up to 42% on all transaction fees.</p>
-            <a href='#' class='tooltip__button'>Buy CHI</a>
-            <a href='#' class='tooltip__button'>Learn More</a>"
+            data-tip="<p>Use CHI token to save on gas fees. 
+            CHI will be burned from your wallet, saving you up to 50% on all transaction fees.</p>
+            <a href='https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c' class='tooltip__button'>Buy CHI</a>
+            <a href='https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3' class='tooltip__button'>Learn More</a>"
             data-for="chi-estimated"
           />
           <ReactTooltip
@@ -114,7 +114,6 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
           />
         </div>
         <div
-          title={`${props.estimatedFee.toFixed(18)}`}
           className="trade-expected-result__column-value">
           <span className="trade-expected-result__chi">CHI enabled</span>
           <ChiSwitch />

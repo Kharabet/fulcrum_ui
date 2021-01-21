@@ -36,6 +36,15 @@
     transform: translateX(74px);
   }
 }
+@keyframes translateActions {
+  from {
+    transform: translateX(-25px);
+  }
+  to {
+    transform: translateX(374px);
+  }
+}
+
 @keyframes animationProvider {
   0% {
     transform: scale(1);
