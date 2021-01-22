@@ -1,9 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
-// import Web3 from 'web3';
 import { EventEmitter } from 'events'
 
-import Web3 from 'web3'
 import Web3Utils from 'web3-utils'
 
 import constantAddress from '../config/constant.json'
@@ -59,7 +57,6 @@ const isMainnetProd =
   process.env.NODE_ENV !== 'development' &&
   process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
-const web3: Web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
   configAddress = constantAddress.mainnet
