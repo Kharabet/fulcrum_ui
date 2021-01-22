@@ -12,7 +12,8 @@ export interface ITradeTokenGridHeaderProps {
 const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
   const midMarketTooltip = `<p>The price displayed is based on swapping 1 ETH into the selected asset via Kybers swap rate</p><a href='https://developer.kyber.network/docs/Integrations-PriceFeedSecurity/' target="_blank" rel="noopener noreferrer" class='tooltip__link'>Learn More</a>`
   const liqPriceTooltip =
-    "An opened positions liquidation point will vary slightly from the displayed estimate depending on it's collateral ratio and exact entry price."
+    'The liquidation price will vary slight depending on entry price and the value of your positions collateral.'
+  const aprTooltip = 'The % interest paid per year on your position.'
   return (
     <div className="trade-token-grid-header">
       <div className="trade-token-grid-header__col-token-name">
@@ -62,7 +63,11 @@ const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
         </span>
       </div>
       <div className="trade-token-grid-header__col-profit">
-        <span className="trade-token-grid-header__text">Interest APR</span>
+        <span className="trade-token-grid-header__text">
+          Interest APR
+          <IconInfo className="tooltip__icon" data-tip={aprTooltip} data-for="apr-tooltip" />
+          <ReactTooltip id="apr-tooltip" className="tooltip__info" place="top" effect="solid" />
+        </span>
       </div>
     </div>
   )
