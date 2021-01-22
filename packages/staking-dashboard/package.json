@@ -15,7 +15,6 @@
   },
   "main": "src/index.jsx",
   "dependencies": {
-    "3box": "1.21.0",
     "@0x/base-contract": "5.4.0",
     "@0x/utils": "4.5.2",
     "@types/react-dom": "^16.8.2",
