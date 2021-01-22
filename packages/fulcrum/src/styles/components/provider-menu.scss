@@ -1,13 +1,13 @@
 .provider-menu {
-  padding: 40px 60px 40px 60px;
-  background-color: #444e5a;
-  max-width: 630px;
+  padding: 24px 46px 12px 46px;
+  background-color: var(--bg-provider);
+  max-width: 780px;
   box-sizing: border-box;
   &__title {
     font-size: 22px;
     font-weight: 600;
     line-height: 1.5;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     text-align: center;
     color: #a2abb8;
   }
@@ -15,38 +15,71 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #586473;
-    margin-bottom: 20px;
+    border: 1px solid var(--border-provider-item);
+    box-sizing: border-box;
+    border-radius: 16px;
+    padding: 24px 36px;
+    margin-bottom: 35px;
+    &-left {
+      min-width: 85px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      margin-right: 36px;
+    }
     &-logo {
       display: flex;
       align-items: center;
-      margin-right: 15px;
       svg {
-        width: 64px;
-        height: 64px;
+        width: 47px;
+        height: auto;
       }
     }
-    &-text {
-      font-weight: normal;
-      font-size: 16px;
-      line-height: 130%;
-      color: #e9f4ff;
+    &-label {
+      font-size: 14px;
+      color: var(--primary-text);
+      margin: 6px auto;
     }
-    &-switch {
+    &-title {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--chi-token-title);
+      margin-bottom: 8px;
+    }
+    &-description {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--chi-token-description);
+      margin-bottom: 15px;
+    }
+    &-links {
+      display: flex;
+      a {
+        border: 1px solid var(--trade-header-color);
+        color: var(--chi-link-color);
+        text-transform: uppercase;
+        border-radius: 27px;
+        font-size: 12px;
+        font-weight: 800;
+        &:first-child {
+          margin-right: 8px;
+          padding: 7px 23px;
+        }
+        &:last-child {
+          margin-right: 8px;
+          padding: 7px 19px;
+        }
+      }
+    }
+    /*&-switch {
       margin-left: 40px;
-    }
+    }*/
   }
   &__footer {
     color: var(--trade-header-color);
-
-    display: flex;
-    // margin-top: 20px;
-    flex-wrap: wrap;
-    max-width: 280px;
-
-    justify-content: center;
-    margin: 0 auto;
+    font-size: 14px;
+    text-align: center;
     a {
       color: #00c0ab;
       &:hover {
@@ -56,10 +89,9 @@
   }
   &__list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-
-    grid-row-gap: 15px;
-    grid-column-gap: 25px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-row-gap: 16px;
+    grid-column-gap: 10px;
   }
   &__list-item {
     display: flex;
@@ -69,21 +101,19 @@
     cursor: pointer;
     box-sizing: border-box;
     border-radius: 43px;
-    flex-direction: column;
     flex-direction: row;
-    /* width: 50%; */
-    padding: 10px 30px;
+    padding: 12px 24px;
     flex-wrap: wrap;
-    background-color: #3d4651;
-    width: 250px;
+    background-color: var(--bg-provider-item);
+    width: 223px;
 
     &:hover {
       transition: all 0.1s;
-      background-color: #758295;
+      background-color: var(--bg-provider-item-hover);
     }
     &--selected {
-      background-color: #444e5a;
-      border: 1px solid #586473;
+      background-color: transparent;
+      border: 1px solid var(--border-provider-item);
       padding: 8px 30px;
       &:hover {
         background-color: initial;
@@ -95,7 +125,7 @@
           font-weight: 800;
           font-size: 15px;
           line-height: 150%;
-          color: #fff;
+          color: var(--primary-text);
         }
         .address {
           font-size: 13px;
@@ -111,9 +141,9 @@
       }
       &-txt {
         font-weight: normal;
-        font-size: 20px;
-        line-height: 150%;
-        color: #ffffff;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--primary-text);
       }
     }
   }
@@ -121,18 +151,20 @@
     border: none;
     font-weight: 600;
     font-size: 16px;
-    line-height: 150%;
+    line-height: 1.5;
     color: #ffffff;
-
     display: flex;
     align-items: center;
+    justify-content: center;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    background: #586473;
+    background: var(--bg-disconnect-provider);
     border-radius: 43px;
-    text-align: center;
-    padding: 15.5px 50px;
-    margin: 30px auto 10px;
+    margin: 35px auto;
+    padding: 18px 0;
+    width: 223px;
+    outline: none;
+    cursor: pointer;
     &:hover {
       transition: all 0.1s;
       background-color: #758295;

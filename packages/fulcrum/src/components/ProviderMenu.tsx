@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react'
+import React, { Component, useEffect, useState } from 'react'
 import { ProviderType } from '../domain/ProviderType'
 import { ProviderMenuListItem } from './ProviderMenuListItem'
 import { useWeb3React } from '@web3-react/core'
@@ -12,7 +12,6 @@ import Asset from 'bzx-common/src/assets/Asset'
 import { BigNumber } from '@0x/utils'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
-
 export interface IProviderMenuProps {
   providerTypes: ProviderType[]
   isMobileMedia: boolean
@@ -21,6 +20,7 @@ export interface IProviderMenuProps {
 }
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
+  const [isEnabledChi, setChi] = useState(false)
   useEffect(() => {
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
     const switchButton = document.querySelector<HTMLInputElement>(
@@ -28,10 +28,12 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     )
     if (switchButton) {
       if (isGasTokenEnabled) {
+        setChi(true)
         switchButton.setAttribute('data-isgastokenenabled', 'true')
         localStorage.setItem('isGasTokenEnabled', 'true')
         switchButton.checked = true
       } else {
+        setChi(false)
         switchButton.setAttribute('data-isgastokenenabled', 'false')
         localStorage.setItem('isGasTokenEnabled', 'false')
         switchButton.checked = false
@@ -130,15 +132,38 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       <div className="provider-menu__title">Select Wallet Provider</div>
       {account && (
         <div className="provider-menu__gas-token">
-          <div className="provider-menu__gas-token-logo">
-            <ChiTokenLogo />
+          <div className="provider-menu__gas-token-left">
+            <div className="provider-menu__gas-token-logo">
+              <ChiTokenLogo />
+            </div>
+            <div className="provider-menu__gas-token-label">
+              CHI {isEnabledChi ? `Enabled` : `Disabled`}
+            </div>
+            <div className="provider-menu__gas-token-switch">
+              <SwitchButtonInput onSwitch={onChiSwitch} type="gas" />
+            </div>
           </div>
-          <p className="provider-menu__gas-token-text">
-            Use CHI token to save on gas. It would be burned from your wallet on each transaction to
-            save on TX cost.
-          </p>
-          <div className="provider-menu__gas-token-switch">
-            <SwitchButtonInput onSwitch={onChiSwitch} type="gas" />
+          <div className="provider-menu__gas-token-right">
+            <p className="provider-menu__gas-token-title">
+              For a better Fulcrum & Torque experience we suggest enabling CHI token.
+            </p>
+            <p className="provider-menu__gas-token-description">
+              Use CHI token to save on high gas fees. Chi will be burned from your wallet, saving
+              you up to 50% on all transaction fees.
+            </p>
+            <div className="provider-menu__gas-token-links">
+              <a
+                href="https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c"
+                target="_blank"
+                rel="nofollow">
+                Buy chi
+              </a>
+              <a
+                href="https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3"
+                target="_blank">
+                Learn more
+              </a>
+            </div>
           </div>
         </div>
       )}
