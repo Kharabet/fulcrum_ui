@@ -1,6 +1,6 @@
 .extend-loan-form {
-  background-color: #333c46;
-  color: white;
+  background-color: var(--lend-bg-loading);
+  color: var(--primary-text);
   width: 440px;
   padding: 64px 32px 32px 32px;
   font-family: 'Mulish', sans-serif;
@@ -95,7 +95,7 @@
   left: 351px;
   top: 365px;
 
-  background: #444e5a;
+  background: var(--history-row-inner);
   border-radius: 24px;
   color: #33dfcc;
   border: none;

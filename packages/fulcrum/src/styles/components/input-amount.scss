@@ -10,7 +10,7 @@
   }
   &__container {
     display: flex;
-    background: #1e262e;
+    background-color: var(--bg-input-amount);
     width: auto;
     height: 65px;
     position: relative;
@@ -29,7 +29,7 @@
     font-stretch: normal;
     letter-spacing: normal;
     text-align: left;
-    color: #ffffff;
+    color: var(--primary-text);
     background-color: transparent;
 
     &:focus {
