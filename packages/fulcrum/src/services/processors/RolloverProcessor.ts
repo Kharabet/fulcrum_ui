@@ -23,7 +23,7 @@ export class RolloverProcessor {
       'Initializing',
       'Submitting transaction',
       'Updating the blockchain',
-      'Transaction completed'
+      'Transaction completed',
     ])
 
     // Initializing loan
@@ -45,18 +45,15 @@ export class RolloverProcessor {
     try {
       const gasAmount =
         isGasTokenEnabled && chiTokenBalance.gt(0)
-          ? await iBZxContract.rolloverWithGasToken.estimateGasAsync(
-              taskRequest.loanId,
-              account,
-              loanData,
-              {
+          ? await iBZxContract
+              .rolloverWithGasToken(taskRequest.loanId, account, loanData)
+              .estimateGasAsync({
                 from: account,
-                gas: FulcrumProvider.Instance.gasLimit
-              }
-            )
-          : await iBZxContract.rollover.estimateGasAsync(taskRequest.loanId, loanData, {
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
+          : await iBZxContract.rollover(taskRequest.loanId, loanData).estimateGasAsync({
               from: account,
-              gas: FulcrumProvider.Instance.gasLimit
+              gas: FulcrumProvider.Instance.gasLimit,
             })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
@@ -68,20 +65,17 @@ export class RolloverProcessor {
     try {
       txHash =
         isGasTokenEnabled && chiTokenBalance.gt(0)
-          ? await iBZxContract.rolloverWithGasToken.sendTransactionAsync(
-              taskRequest.loanId,
-              account,
-              loanData,
-              {
+          ? await iBZxContract
+              .rolloverWithGasToken(taskRequest.loanId, account, loanData)
+              .sendTransactionAsync({
                 from: account,
                 gas: gasAmountBN.toString(),
-                gasPrice: await FulcrumProvider.Instance.gasPrice()
-              }
-            )
-          : await iBZxContract.rollover.sendTransactionAsync(taskRequest.loanId, loanData, {
+                gasPrice: await FulcrumProvider.Instance.gasPrice(),
+              })
+          : await iBZxContract.rollover(taskRequest.loanId, loanData).sendTransactionAsync({
               from: account,
               gas: gasAmountBN.toString(),
-              gasPrice: await FulcrumProvider.Instance.gasPrice()
+              gasPrice: await FulcrumProvider.Instance.gasPrice(),
             })
 
       task.setTxHash(txHash)

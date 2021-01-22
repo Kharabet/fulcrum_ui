@@ -22,7 +22,7 @@ export class RolloverProcessor {
       'Initializing',
       'Submitting transaction',
       'Updating the blockchain',
-      'Transaction completed'
+      'Transaction completed',
     ])
 
     // Initializing loan
@@ -44,18 +44,15 @@ export class RolloverProcessor {
     try {
       const gasAmount =
         isGasTokenEnabled && chiTokenBalance.gt(0)
-          ? await iBZxContract.rolloverWithGasToken.estimateGasAsync(
-              taskRequest.loanId,
-              account,
-              loanData,
-              {
+          ? await iBZxContract
+              .rolloverWithGasToken(taskRequest.loanId, account, loanData)
+              .estimateGasAsync({
                 from: account,
-                gas: ExplorerProvider.Instance.gasLimit
-              }
-            )
-          : await iBZxContract.rollover.estimateGasAsync(taskRequest.loanId, loanData, {
+                gas: ExplorerProvider.Instance.gasLimit,
+              })
+          : await iBZxContract.rollover(taskRequest.loanId, loanData).estimateGasAsync({
               from: account,
-              gas: ExplorerProvider.Instance.gasLimit
+              gas: ExplorerProvider.Instance.gasLimit,
             })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(ExplorerProvider.Instance.gasBufferCoeff)
@@ -67,20 +64,17 @@ export class RolloverProcessor {
     try {
       txHash =
         isGasTokenEnabled && chiTokenBalance.gt(0)
-          ? await iBZxContract.rolloverWithGasToken.sendTransactionAsync(
-              taskRequest.loanId,
-              account,
-              loanData,
-              {
+          ? await iBZxContract
+              .rolloverWithGasToken(taskRequest.loanId, account, loanData)
+              .sendTransactionAsync({
                 from: account,
                 gas: gasAmountBN.toString(),
-                gasPrice: await ExplorerProvider.Instance.gasPrice()
-              }
-            )
-          : await iBZxContract.rollover.sendTransactionAsync(taskRequest.loanId, loanData, {
+                gasPrice: await ExplorerProvider.Instance.gasPrice(),
+              })
+          : await iBZxContract.rollover(taskRequest.loanId, loanData).sendTransactionAsync({
               from: account,
               gas: gasAmountBN.toString(),
-              gasPrice: await ExplorerProvider.Instance.gasPrice()
+              gasPrice: await ExplorerProvider.Instance.gasPrice(),
             })
 
       task.setTxHash(txHash)

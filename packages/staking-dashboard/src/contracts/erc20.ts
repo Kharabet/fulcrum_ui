@@ -51,16 +51,16 @@ export class erc20Contract extends BaseContract {
         _owner,
         _spender
       ])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('allowance(address,address)')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult)
@@ -79,13 +79,13 @@ export class erc20Contract extends BaseContract {
         _spender,
         _value
       ])
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...txData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults(),
+        
         (self as any).approve.estimateGasAsync.bind(self, _spender, _value)
       )
       const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults)
@@ -101,13 +101,13 @@ export class erc20Contract extends BaseContract {
         _spender,
         _value
       ])
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...txData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults)
       return gas
@@ -131,16 +131,16 @@ export class erc20Contract extends BaseContract {
         _spender,
         _value
       ])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('approve(address,uint256)')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<boolean>(rawCallResult)
@@ -156,16 +156,16 @@ export class erc20Contract extends BaseContract {
     ): Promise<BigNumber> {
       const self = (this as any) as erc20Contract
       const encodedData = self._strictEncodeArguments('balanceOf(address)', [_who])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('balanceOf(address)')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult)
@@ -180,16 +180,16 @@ export class erc20Contract extends BaseContract {
     ): Promise<BigNumber> {
       const self = (this as any) as erc20Contract
       const encodedData = self._strictEncodeArguments('decimals()', [])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('decimals()')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult)
@@ -201,16 +201,16 @@ export class erc20Contract extends BaseContract {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<string> {
       const self = (this as any) as erc20Contract
       const encodedData = self._strictEncodeArguments('name()', [])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('name()')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<string>(rawCallResult)
@@ -222,16 +222,16 @@ export class erc20Contract extends BaseContract {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<string> {
       const self = (this as any) as erc20Contract
       const encodedData = self._strictEncodeArguments('symbol()', [])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('symbol()')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<string>(rawCallResult)
@@ -246,16 +246,16 @@ export class erc20Contract extends BaseContract {
     ): Promise<BigNumber> {
       const self = (this as any) as erc20Contract
       const encodedData = self._strictEncodeArguments('totalSupply()', [])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('totalSupply()')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult)
@@ -271,13 +271,13 @@ export class erc20Contract extends BaseContract {
     ): Promise<string> {
       const self = (this as any) as erc20Contract
       const encodedData = self._strictEncodeArguments('transfer(address,uint256)', [_to, _value])
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...txData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults(),
+        
         (self as any).transfer.estimateGasAsync.bind(self, _to, _value)
       )
       const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults)
@@ -290,13 +290,13 @@ export class erc20Contract extends BaseContract {
     ): Promise<number> {
       const self = (this as any) as erc20Contract
       const encodedData = self._strictEncodeArguments('transfer(address,uint256)', [_to, _value])
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...txData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults)
       return gas
@@ -317,16 +317,16 @@ export class erc20Contract extends BaseContract {
     ): Promise<boolean> {
       const self = (this as any) as erc20Contract
       const encodedData = self._strictEncodeArguments('transfer(address,uint256)', [_to, _value])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('transfer(address,uint256)')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<boolean>(rawCallResult)
@@ -347,13 +347,13 @@ export class erc20Contract extends BaseContract {
         _to,
         _value
       ])
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...txData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults(),
+        
         (self as any).transferFrom.estimateGasAsync.bind(self, _from, _to, _value)
       )
       const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults)
@@ -371,13 +371,13 @@ export class erc20Contract extends BaseContract {
         _to,
         _value
       ])
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...txData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults)
       return gas
@@ -403,16 +403,16 @@ export class erc20Contract extends BaseContract {
         _to,
         _value
       ])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+      const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
           to: self.address,
           ...callData,
           data: encodedData
         },
-        self._web3Wrapper.getContractDefaults()
+        
       )
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
+      BaseContract._throwIfCallResultIsRevertError(rawCallResult)
       const abiEncoder = self._lookupAbiEncoder('transferFrom(address,address,uint256)')
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<boolean>(rawCallResult)

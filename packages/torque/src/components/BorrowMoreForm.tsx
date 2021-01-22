@@ -103,7 +103,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       .times(100)
       .plus(100)
       .lte(this.state.borrowMoreColalterizationMin)
-
+    const TokenIcon = assetDetails.reactLogoSvg
     return (
       <form className="borrow-more-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
@@ -146,7 +146,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
           )}
           <div className="input-container mt-30">
             <div className="input-row">
-              <span className="asset-icon">{assetDetails.reactLogoSvg.render()}</span>
+              <span className="asset-icon"><TokenIcon /></span>
               <input
                 ref={this._setInputRef}
                 className="input-amount"

@@ -8,7 +8,6 @@ import { FulcrumProviderEvents } from '../events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../FulcrumProvider'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 export class UnlendErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
     if (
@@ -37,7 +36,7 @@ export class UnlendErcProcessor {
       'Initializing',
       'Closing loan',
       'Updating the blockchain',
-      'Transaction completed'
+      'Transaction completed',
     ])
 
     // no additional inits or checks
@@ -59,9 +58,9 @@ export class UnlendErcProcessor {
       gasAmountBN = new BigNumber(600000)
     } else {
       // estimating gas amount
-      const gasAmount = await tokenContract.burn.estimateGasAsync(account, amountInBaseUnits, {
+      const gasAmount = await tokenContract.burn(account, amountInBaseUnits).estimateGasAsync({
         from: account,
-        gas: FulcrumProvider.Instance.gasLimit
+        gas: FulcrumProvider.Instance.gasLimit,
       })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
@@ -71,10 +70,10 @@ export class UnlendErcProcessor {
     let txHash: string = ''
     try {
       // Submitting unloan
-      txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, {
+      txHash = await tokenContract.burn(account, amountInBaseUnits).sendTransactionAsync({
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice()
+        gasPrice: await FulcrumProvider.Instance.gasPrice(),
       })
       task.setTxHash(txHash)
     } catch (e) {

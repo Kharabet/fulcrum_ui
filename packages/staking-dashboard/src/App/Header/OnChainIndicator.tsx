@@ -39,13 +39,15 @@ export function OnChainIndicator({ appVM }: { appVM: AppVM }) {
       </button>
     )
   }
-
+  const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
+  if (!ProviderLogoIcon) {
+    return null
+  }
   return (
     <button className="btn--onchain-indicator" onClick={appVM.providerMenu.show}>
       <div className="flex-row-center">
         <div className="on-chain-indicator__svg">
-          {providerTypeDetails.reactLogoSvgShort !== null &&
-            providerTypeDetails.reactLogoSvgShort.render()}
+          {ProviderLogoIcon !== null && <ProviderLogoIcon />}
         </div>
         <div className="margin-left-05 txt-left">
           <div className="on-chain-indicator__description">{providerTypeDetails.displayName}</div>
@@ -69,11 +71,11 @@ export function OnChainIndicator({ appVM }: { appVM: AppVM }) {
               <i>Loading Wallet...</i>
             </div>
           )}
-          {isDisconnecting &&
+          {isDisconnecting && (
             <div>
               <i>Disconnecting...</i>
             </div>
-          }
+          )}
         </div>
       </div>
     </button>

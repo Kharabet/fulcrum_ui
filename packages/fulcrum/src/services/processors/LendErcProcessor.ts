@@ -60,10 +60,10 @@ export class LendErcProcessor {
 
     // Detecting token allowance
     let approvePromise: Promise<string> | null = null
-    const erc20allowance = await tokenErc20Contract.allowance.callAsync(
+    const erc20allowance = await tokenErc20Contract.allowance(
       account,
       tokenContract.address
-    )
+    ).callAsync()
     task.processingStepNext()
 
     let txHash: string = ''
@@ -96,7 +96,7 @@ export class LendErcProcessor {
         gasAmountBN = new BigNumber(600000)
       } else {
         // estimating gas amount
-        const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, {
+        const gasAmount = await tokenContract.mint(account, amountInBaseUnits).estimateGasAsync({
           from: account,
           gas: FulcrumProvider.Instance.gasLimit
         })
@@ -106,7 +106,7 @@ export class LendErcProcessor {
       }
 
       // Submitting loan
-      txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, {
+      txHash = await tokenContract.mint(account, amountInBaseUnits).sendTransactionAsync({
         from: account,
         gas: gasAmountBN.toString(),
         gasPrice: await FulcrumProvider.Instance.gasPrice()

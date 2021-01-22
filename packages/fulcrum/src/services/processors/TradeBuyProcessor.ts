@@ -49,11 +49,10 @@ export class TradeBuyProcessor {
         'Initializing',
         'Submitting trade',
         'Updating the blockchain',
-        'Transaction completed'
+        'Transaction completed',
       ])
 
       assetErc20Address = '0x0000000000000000000000000000000000000000'
-
     } else {
       //Initializing
       task.processingStart([
@@ -63,7 +62,7 @@ export class TradeBuyProcessor {
         'Waiting for token allowance',
         'Submitting trade',
         'Updating the blockchain',
-        'Transaction completed'
+        'Transaction completed',
       ])
 
       assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(taskRequest.depositToken)
@@ -81,7 +80,9 @@ export class TradeBuyProcessor {
       // Detecting token allowance
       task.processingStepNext()
 
-      erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address)
+      erc20allowance = await tokenErc20Contract
+        .allowance(account, tokenContract.address)
+        .callAsync()
 
       // Prompting token allowance
       task.processingStepNext()
@@ -141,35 +142,37 @@ export class TradeBuyProcessor {
     } else {
       const gasAmount =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
-          ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              leverageAmount,
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              account,
-              loanData,
-              {
+          ? await tokenContract
+              .marginTradeWithGasToken(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                leverageAmount,
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                account,
+                loanData
+              )
+              .estimateGasAsync({
                 from: account,
                 value: sendAmountForValue,
-                gas: FulcrumProvider.Instance.gasLimit
-              }
-            )
-          : await tokenContract.marginTrade.estimateGasAsync(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              leverageAmount,
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              loanData,
-              {
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
+          : await tokenContract
+              .marginTrade(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                leverageAmount,
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                loanData
+              )
+              .estimateGasAsync({
                 from: account,
                 value: sendAmountForValue,
-                gas: FulcrumProvider.Instance.gasLimit
-              }
-            )
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(FulcrumProvider.Instance.gasBufferCoeffForTrade)
         .integerValue(BigNumber.ROUND_UP)
@@ -182,37 +185,39 @@ export class TradeBuyProcessor {
       // Submitting trade
       txHash =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
-          ? await tokenContract.marginTradeWithGasToken.sendTransactionAsync(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              leverageAmount,
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              account,
-              loanData,
-              {
+          ? await tokenContract
+              .marginTradeWithGasToken(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                leverageAmount,
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                account,
+                loanData
+              )
+              .sendTransactionAsync({
                 from: account,
                 value: sendAmountForValue,
                 gas: gasAmountBN.toString(),
-                gasPrice: await FulcrumProvider.Instance.gasPrice()
-              }
-            )
-          : await tokenContract.marginTrade.sendTransactionAsync(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              leverageAmount,
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              loanData,
-              {
+                gasPrice: await FulcrumProvider.Instance.gasPrice(),
+              })
+          : await tokenContract
+              .marginTrade(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                leverageAmount,
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                loanData
+              )
+              .sendTransactionAsync({
                 from: account,
                 value: sendAmountForValue,
                 gas: gasAmountBN.toString(),
-                gasPrice: await FulcrumProvider.Instance.gasPrice()
-              }
-            )
+                gasPrice: await FulcrumProvider.Instance.gasPrice(),
+              })
       task.setTxHash(txHash)
     } catch (e) {
       throw e

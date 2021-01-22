@@ -58,16 +58,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('BZRX()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('BZRX()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -88,16 +88,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('allowance(address,address)', [_owner,
         _spender
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('allowance(address,address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -116,13 +116,13 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('approve(address,uint256)', [_spender,
     _value
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).approve.estimateGasAsync.bind(
                     self,
                     _spender,
@@ -141,13 +141,13 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('approve(address,uint256)', [_spender,
     _value
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -173,16 +173,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('approve(address,uint256)', [_spender,
         _value
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('approve(address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean
@@ -201,16 +201,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('balanceOf(address)', [_owner
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('balanceOf(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -231,16 +231,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('balanceOfAt(address,uint256)', [_owner,
         _blockNumber
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('balanceOfAt(address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -255,13 +255,13 @@ export class BZRXVestingTokenContract extends BaseContract {
         ): Promise<string> {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('burn()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).burn.estimateGasAsync.bind(
                     self,
                 ),
@@ -274,13 +274,13 @@ export class BZRXVestingTokenContract extends BaseContract {
         ): Promise<number> {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('burn()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -298,16 +298,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('burn()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('burn()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -322,13 +322,13 @@ export class BZRXVestingTokenContract extends BaseContract {
         ): Promise<string> {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('claim()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).claim.estimateGasAsync.bind(
                     self,
                 ),
@@ -341,13 +341,13 @@ export class BZRXVestingTokenContract extends BaseContract {
         ): Promise<number> {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('claim()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -365,16 +365,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('claim()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('claim()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -393,16 +393,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('claimedBalanceOf(address)', [_owner
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('claimedBalanceOf(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -419,16 +419,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('cliffDuration()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('cliffDuration()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -445,16 +445,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('decimals()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('decimals()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -469,13 +469,13 @@ export class BZRXVestingTokenContract extends BaseContract {
         ): Promise<string> {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('initialize()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).initialize.estimateGasAsync.bind(
                     self,
                 ),
@@ -488,13 +488,13 @@ export class BZRXVestingTokenContract extends BaseContract {
         ): Promise<number> {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('initialize()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -512,16 +512,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('initialize()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('initialize()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -538,16 +538,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('isOwner()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('isOwner()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean
@@ -564,16 +564,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('name()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('name()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -590,16 +590,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('owner()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('owner()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -618,13 +618,13 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('rescue(address,uint256)', [_receiver,
     _amount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).rescue.estimateGasAsync.bind(
                     self,
                     _receiver,
@@ -643,13 +643,13 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('rescue(address,uint256)', [_receiver,
     _amount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -675,16 +675,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('rescue(address,uint256)', [_receiver,
         _amount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('rescue(address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -701,16 +701,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('symbol()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('symbol()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -727,16 +727,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('totalClaimed()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('totalClaimed()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -753,16 +753,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('totalSupply()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('totalSupply()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -781,16 +781,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('totalSupplyAt(uint256)', [_blockNumber
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('totalSupplyAt(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -807,16 +807,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('totalUnclaimed()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('totalUnclaimed()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -833,16 +833,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('totalVested()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('totalVested()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -861,13 +861,13 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('transfer(address,uint256)', [_to,
     _value
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).transfer.estimateGasAsync.bind(
                     self,
                     _to,
@@ -886,13 +886,13 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('transfer(address,uint256)', [_to,
     _value
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -918,16 +918,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('transfer(address,uint256)', [_to,
         _value
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('transfer(address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean
@@ -948,13 +948,13 @@ export class BZRXVestingTokenContract extends BaseContract {
     _to,
     _value
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).transferFrom.estimateGasAsync.bind(
                     self,
                     _from,
@@ -976,13 +976,13 @@ export class BZRXVestingTokenContract extends BaseContract {
     _to,
     _value
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -1012,16 +1012,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         _to,
         _value
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('transferFrom(address,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean
@@ -1038,13 +1038,13 @@ export class BZRXVestingTokenContract extends BaseContract {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).transferOwnership.estimateGasAsync.bind(
                     self,
                     newOwner
@@ -1060,13 +1060,13 @@ export class BZRXVestingTokenContract extends BaseContract {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -1088,16 +1088,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('transferOwnership(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -1116,16 +1116,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('vestedBalanceOf(address)', [_owner
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vestedBalanceOf(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1144,16 +1144,16 @@ export class BZRXVestingTokenContract extends BaseContract {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('vestingBalanceOf(address)', [_owner
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vestingBalanceOf(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1170,16 +1170,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('vestingCliffTimestamp()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vestingCliffTimestamp()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1196,16 +1196,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('vestingDuration()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vestingDuration()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1222,16 +1222,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('vestingEndTimestamp()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vestingEndTimestamp()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1248,16 +1248,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('vestingLastClaimTimestamp()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vestingLastClaimTimestamp()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1274,16 +1274,16 @@ export class BZRXVestingTokenContract extends BaseContract {
         > {
             const self = this as any as BZRXVestingTokenContract;
             const encodedData = self._strictEncodeArguments('vestingStartTimestamp()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vestingStartTimestamp()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber

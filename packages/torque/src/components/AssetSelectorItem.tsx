@@ -108,6 +108,7 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
   }
 
   const asset = AssetsDictionary.assets.get(props.asset) as AssetDetails
+  const TokenIcon = asset.reactLogoSvg
   return (
     <div className="asset-selector-item">
       {isLoadingTransaction && request && (
@@ -141,7 +142,7 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
         </div>
         <div className="asset-selector-footer">
           <div className="asset-selector__title">{props.asset}</div>
-          <div className="asset-selector__icon">{asset.reactLogoSvg.render()}</div>
+          <div className="asset-selector__icon"><TokenIcon /></div>
           <div className="asset-selector__arrow">
             <ArrowRight />
           </div>

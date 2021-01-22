@@ -35,13 +35,13 @@ export class CollateralTokenSelectorItem extends Component<
       this.props.asset === this.props.selectedCollateral
         ? 'collateral-token-selector-item--selected'
         : ''
-
+    const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <div
         className={`collateral-token-selector-item ${selectedStyle}`}
         onClick={this.onTokenClick}>
         <div className="collateral-token-selector-item__image-container">
-          {this.state.assetDetails.reactLogoSvg.render()}
+          <TokenIcon />
         </div>
         <div className="collateral-token-selector-item__description-container">
           <div className="collateral-token-selector-item__name">

@@ -423,14 +423,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
 
     const canSubmit = this.state.inputAmountValue.gt(0)
-
+    const TokenIcon = this.state.assetDetails.reactLogoSvg 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
         <div className="trade-form__left_block">
           <div className="trade-form__info_block">
             <div className="trade-form__info_block__logo">
-              {this.state.assetDetails.reactLogoSvg.render()}
+              <TokenIcon />
               <PositionTypeMarkerAlt value={this.props.positionType} />
             </div>
             <div className="trade-form__asset-stats">

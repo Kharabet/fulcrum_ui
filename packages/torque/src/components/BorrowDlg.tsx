@@ -10,7 +10,7 @@ interface IBorrowDlgState {
   borrowAsset: Asset
 
   executorParams: {
-    resolve: (value?: BorrowRequest) => void
+    resolve: (value?: BorrowRequest | PromiseLike<BorrowRequest>) => void
     reject: (reason?: any) => void
   } | null
 }
@@ -51,6 +51,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
       this.setState({
         ...this.state,
         isOpen: true,
+        //@ts-ignore
         executorParams: { resolve: resolve, reject: reject },
         borrowAsset: borrowAsset
       })

@@ -1,3 +1,4 @@
+import React from 'react'
 export default class AssetDetails {
   public addressErc20: Map<number, string | null> = new Map<number, string>()
   public bgBrightColor: string = '#000000'
@@ -5,13 +6,21 @@ export default class AssetDetails {
   public decimals: number = 18
   public displayName: string = ''
   public logoSvg: any = null
-  public reactLogoSvg: any = null
+  public reactLogoSvg: React.FunctionComponent<
+  React.SVGProps<SVGSVGElement> & {
+    title?: string | undefined
+  }
+>
 
   constructor(
     displayName: string,
     decimals: number,
     logoSvg: any,
-    reactLogoSvg: any,
+    reactLogoSvg: React.FunctionComponent<
+    React.SVGProps<SVGSVGElement> & {
+      title?: string | undefined
+    }
+  >,
     bgBrightColor: string,
     bgLightColor: string,
     addressErc20: Map<number, string | null>

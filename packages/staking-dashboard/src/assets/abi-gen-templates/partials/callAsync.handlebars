@@ -5,16 +5,16 @@ async callAsync(
 ): Promise<{{> return_type outputs=outputs}}> {
     const self = this as any as {{contractName}}Contract;
     const encodedData = self._strictEncodeArguments('{{this.functionSignature}}', [{{> params inputs=inputs}}]);
-    const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+    const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
         {
             to: self.address,
             ...callData,
             data: encodedData,
         },
-        self._web3Wrapper.getContractDefaults(),
+        
     );
     const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-    BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+    BaseContract._throwIfCallResultIsRevertError(rawCallResult);
     const abiEncoder = self._lookupAbiEncoder('{{this.functionSignature}}');
     // tslint:disable boolean-naming
     const result = abiEncoder.strictDecodeReturnValue<{{> return_type outputs=outputs}}>(rawCallResult);

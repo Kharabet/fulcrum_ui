@@ -58,13 +58,13 @@ export class CollateralTokenSelectorToggle extends Component<
     if (this.state.assetDetails === null) {
       return null
     }
-
+    const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <React.Fragment>
         <div
           className={`collateral-token-selector-toggle ${this.state.activeToggle ? `active` : ``}`}>
           <div className="collateral-token-selector-toggle__logo-container">
-            {this.state.assetDetails.reactLogoSvg.render()}
+            <TokenIcon />
           </div>
           <div
             className="collateral-token-selector-toggle__info-container"

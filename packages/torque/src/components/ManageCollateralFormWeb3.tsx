@@ -238,7 +238,7 @@ export class ManageCollateralFormWeb3 extends Component<
     if (this.state.assetDetails === null) {
       return null
     }
-
+    const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
@@ -291,7 +291,7 @@ export class ManageCollateralFormWeb3 extends Component<
 
           <div className="input-container">
             <div className="input-row">
-              <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+              <span className="asset-icon"><TokenIcon /></span>
               {this.state.isLoading ? (
                 <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
               ) : (

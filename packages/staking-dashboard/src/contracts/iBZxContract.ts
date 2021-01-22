@@ -398,16 +398,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('affiliateFeePercent()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('affiliateFeePercent()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -436,13 +436,13 @@ export class iBZxContract extends BaseContract {
     sentValues,
     loanDataBytes
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).borrowOrTradeFromPool.estimateGasAsync.bind(
                     self,
                     loanParamsId,
@@ -476,13 +476,13 @@ export class iBZxContract extends BaseContract {
     sentValues,
     loanDataBytes
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -528,16 +528,16 @@ export class iBZxContract extends BaseContract {
         sentValues,
         loanDataBytes
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('borrowOrTradeFromPool(bytes32,bytes32,bool,uint256,address[4],uint256[5],bytes)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<{loanId: string;principal: BigNumber;collateral: BigNumber}
@@ -558,16 +558,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('borrowerOrders(address,bytes32)', [index_0,
         index_1
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('borrowerOrders(address,bytes32)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
@@ -584,16 +584,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowingFeePercent()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('borrowingFeePercent()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -612,16 +612,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowingFeeTokensHeld(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('borrowingFeeTokensHeld(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -640,16 +640,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('borrowingFeeTokensPaid(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('borrowingFeeTokensPaid(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -666,16 +666,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('bzrxTokenAddress()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('bzrxTokenAddress()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -692,13 +692,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('claimRewards(address)', [receiver
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).claimRewards.estimateGasAsync.bind(
                     self,
                     receiver
@@ -714,13 +714,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('claimRewards(address)', [receiver
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -742,16 +742,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('claimRewards(address)', [receiver
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('claimRewards(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -772,13 +772,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     depositAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).closeWithDeposit.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -800,13 +800,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     depositAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -836,16 +836,16 @@ export class iBZxContract extends BaseContract {
         receiver,
         depositAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('closeWithDeposit(bytes32,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, string]
@@ -868,13 +868,13 @@ export class iBZxContract extends BaseContract {
     gasTokenUser,
     depositAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).closeWithDepositWithGasToken.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -899,13 +899,13 @@ export class iBZxContract extends BaseContract {
     gasTokenUser,
     depositAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -939,16 +939,16 @@ export class iBZxContract extends BaseContract {
         gasTokenUser,
         depositAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('closeWithDepositWithGasToken(bytes32,address,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, string]
@@ -973,13 +973,13 @@ export class iBZxContract extends BaseContract {
     returnTokenIsCollateral,
     loanDataBytes
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).closeWithSwap.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -1007,13 +1007,13 @@ export class iBZxContract extends BaseContract {
     returnTokenIsCollateral,
     loanDataBytes
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -1051,16 +1051,16 @@ export class iBZxContract extends BaseContract {
         returnTokenIsCollateral,
         loanDataBytes
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('closeWithSwap(bytes32,address,uint256,bool,bytes)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, string]
@@ -1087,13 +1087,13 @@ export class iBZxContract extends BaseContract {
     returnTokenIsCollateral,
     index_5
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).closeWithSwapWithGasToken.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -1124,13 +1124,13 @@ export class iBZxContract extends BaseContract {
     returnTokenIsCollateral,
     index_5
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -1172,16 +1172,16 @@ export class iBZxContract extends BaseContract {
         returnTokenIsCollateral,
         index_5
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('closeWithSwapWithGasToken(bytes32,address,address,uint256,bool,bytes)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, string]
@@ -1202,16 +1202,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('delegatedManagers(bytes32,address)', [index_0,
         index_1
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('delegatedManagers(bytes32,address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean
@@ -1230,13 +1230,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('depositCollateral(bytes32,uint256)', [loanId,
     depositAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).depositCollateral.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -1255,13 +1255,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('depositCollateral(bytes32,uint256)', [loanId,
     depositAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -1287,16 +1287,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('depositCollateral(bytes32,uint256)', [loanId,
         depositAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('depositCollateral(bytes32,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -1313,13 +1313,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositProtocolToken(uint256)', [amount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).depositProtocolToken.estimateGasAsync.bind(
                     self,
                     amount
@@ -1335,13 +1335,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositProtocolToken(uint256)', [amount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -1363,16 +1363,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('depositProtocolToken(uint256)', [amount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('depositProtocolToken(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -1389,13 +1389,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('disableLoanParams(bytes32[])', [loanParamsIdList
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).disableLoanParams.estimateGasAsync.bind(
                     self,
                     loanParamsIdList
@@ -1411,13 +1411,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('disableLoanParams(bytes32[])', [loanParamsIdList
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -1439,16 +1439,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('disableLoanParams(bytes32[])', [loanParamsIdList
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('disableLoanParams(bytes32[])');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -1471,13 +1471,13 @@ export class iBZxContract extends BaseContract {
     useCollateral,
     index_3
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).extendLoanDuration.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -1502,13 +1502,13 @@ export class iBZxContract extends BaseContract {
     useCollateral,
     index_3
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -1542,16 +1542,16 @@ export class iBZxContract extends BaseContract {
         useCollateral,
         index_3
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('extendLoanDuration(bytes32,uint256,bool,bytes)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1568,16 +1568,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('feesController()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('feesController()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -1600,16 +1600,16 @@ export class iBZxContract extends BaseContract {
         count,
         unsafeOnly
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getActiveLoans(uint256,uint256,bool)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}>
@@ -1626,16 +1626,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getActiveLoansCount()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getActiveLoansCount()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1662,16 +1662,16 @@ export class iBZxContract extends BaseContract {
         marginAmount,
         isTorqueLoan
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getBorrowAmount(address,address,uint256,uint256,bool)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1692,16 +1692,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('getBorrowAmountByParams(bytes32,uint256)', [loanParamsId,
         collateralTokenAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getBorrowAmountByParams(bytes32,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1730,16 +1730,16 @@ export class iBZxContract extends BaseContract {
         interestRate,
         newPrincipal
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getEstimatedMarginExposure(address,address,uint256,uint256,uint256,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1760,16 +1760,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('getLenderInterestData(address,address)', [lender,
         loanToken
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getLenderInterestData(address,address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
@@ -1788,16 +1788,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLoan(bytes32)', [loanId
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getLoan(bytes32)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}
@@ -1816,16 +1816,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLoanInterestData(bytes32)', [loanId
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getLoanInterestData(bytes32)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[string, BigNumber, BigNumber, BigNumber]
@@ -1844,16 +1844,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getLoanParams(bytes32[])', [loanParamsIdList
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getLoanParams(bytes32[])');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<Array<{id: string;active: boolean;owner: string;loanToken: string;collateralToken: string;minInitialMargin: BigNumber;maintenanceMargin: BigNumber;maxLoanTerm: BigNumber}>
@@ -1876,16 +1876,16 @@ export class iBZxContract extends BaseContract {
         start,
         count
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getLoanParamsList(address,uint256,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string[]
@@ -1906,16 +1906,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('getLoanPoolsList(uint256,uint256)', [start,
         count
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getLoanPoolsList(uint256,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string[]
@@ -1942,16 +1942,16 @@ export class iBZxContract extends BaseContract {
         marginAmount,
         isTorqueLoan
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getRequiredCollateral(address,address,uint256,uint256,bool)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -1972,16 +1972,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('getRequiredCollateralByParams(bytes32,uint256)', [loanParamsId,
         newPrincipal
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getRequiredCollateralByParams(bytes32,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2004,16 +2004,16 @@ export class iBZxContract extends BaseContract {
         destToken,
         sourceTokenAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getSwapExpectedReturn(address,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2032,16 +2032,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('getTarget(string)', [sig
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getTarget(string)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -2062,16 +2062,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('getTotalPrincipal(address,address)', [lender,
         loanToken
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getTotalPrincipal(address,address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2100,16 +2100,16 @@ export class iBZxContract extends BaseContract {
         isLender,
         unsafeOnly
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getUserLoans(address,uint256,uint256,uint8,bool,bool)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<Array<{loanId: string;endTimestamp: BigNumber;loanToken: string;collateralToken: string;principal: BigNumber;collateral: BigNumber;interestOwedPerDay: BigNumber;interestDepositRemaining: BigNumber;startRate: BigNumber;startMargin: BigNumber;maintenanceMargin: BigNumber;currentMargin: BigNumber;maxLoanTerm: BigNumber;maxLiquidatable: BigNumber;maxSeizable: BigNumber;depositValueAsLoanToken: BigNumber;depositValueAsCollateralToken: BigNumber}>
@@ -2130,16 +2130,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('getUserLoansCount(address,bool)', [user,
         isLender
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('getUserLoansCount(address,bool)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2158,13 +2158,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('grantRewards(address[],uint256[])', [users,
     amounts
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).grantRewards.estimateGasAsync.bind(
                     self,
                     users,
@@ -2183,13 +2183,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('grantRewards(address[],uint256[])', [users,
     amounts
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -2215,16 +2215,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('grantRewards(address[],uint256[])', [users,
         amounts
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('grantRewards(address[],uint256[])');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2243,16 +2243,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('isLoanPool(address)', [loanPool
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('isLoanPool(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean
@@ -2269,16 +2269,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('isOwner()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('isOwner()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean
@@ -2299,16 +2299,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('lenderInterest(address,address)', [index_0,
         index_1
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('lenderInterest(address,address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
@@ -2329,16 +2329,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('lenderOrders(address,bytes32)', [index_0,
         index_1
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('lenderOrders(address,bytes32)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
@@ -2355,16 +2355,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('lendingFeePercent()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('lendingFeePercent()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2383,16 +2383,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('lendingFeeTokensHeld(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('lendingFeeTokensHeld(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2411,16 +2411,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('lendingFeeTokensPaid(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('lendingFeeTokensPaid(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2441,13 +2441,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     closeAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).liquidate.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -2469,13 +2469,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     closeAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -2505,16 +2505,16 @@ export class iBZxContract extends BaseContract {
         receiver,
         closeAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('liquidate(bytes32,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, string]
@@ -2537,13 +2537,13 @@ export class iBZxContract extends BaseContract {
     gasTokenUser,
     closeAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).liquidateWithGasToken.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -2568,13 +2568,13 @@ export class iBZxContract extends BaseContract {
     gasTokenUser,
     closeAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -2608,16 +2608,16 @@ export class iBZxContract extends BaseContract {
         gasTokenUser,
         closeAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('liquidateWithGasToken(bytes32,address,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, string]
@@ -2638,16 +2638,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('liquidationIncentivePercent(address,address)', [index_0,
         index_1
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('liquidationIncentivePercent(address,address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2666,16 +2666,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('loanInterest(bytes32)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('loanInterest(bytes32)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, BigNumber]
@@ -2694,16 +2694,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('loanParams(bytes32)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('loanParams(bytes32)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[string, boolean, string, string, string, BigNumber, BigNumber, BigNumber]
@@ -2722,16 +2722,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('loanPoolToUnderlying(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('loanPoolToUnderlying(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -2750,16 +2750,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('loans(bytes32)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('loans(bytes32)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[string, string, string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, string, string, boolean]
@@ -2778,16 +2778,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('logicTargets(bytes4)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('logicTargets(bytes4)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -2804,16 +2804,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('maxDisagreement()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('maxDisagreement()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2830,16 +2830,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('maxSwapSize()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('maxSwapSize()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2856,16 +2856,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('owner()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('owner()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -2882,16 +2882,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('priceFeeds()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('priceFeeds()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -2908,16 +2908,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('protocolTokenHeld()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('protocolTokenHeld()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2934,16 +2934,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('protocolTokenPaid()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('protocolTokenPaid()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -2964,16 +2964,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('queryFees(address[],uint8)', [tokens,
         feeType
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('queryFees(address[],uint8)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber[], BigNumber[]]
@@ -2994,13 +2994,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     withdrawAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).reduceLoanDuration.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -3022,13 +3022,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     withdrawAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3058,16 +3058,16 @@ export class iBZxContract extends BaseContract {
         receiver,
         withdrawAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('reduceLoanDuration(bytes32,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -3084,13 +3084,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('replaceContract(address)', [target
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).replaceContract.estimateGasAsync.bind(
                     self,
                     target
@@ -3106,13 +3106,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('replaceContract(address)', [target
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3134,16 +3134,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('replaceContract(address)', [target
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('replaceContract(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -3162,16 +3162,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('rewardsBalanceOf(address)', [user
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('rewardsBalanceOf(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -3190,13 +3190,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('rollover(bytes32,bytes)', [loanId,
     loanDataBytes
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).rollover.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -3215,13 +3215,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('rollover(bytes32,bytes)', [loanId,
     loanDataBytes
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3247,16 +3247,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('rollover(bytes32,bytes)', [loanId,
         loanDataBytes
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('rollover(bytes32,bytes)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[string, BigNumber]
@@ -3277,13 +3277,13 @@ export class iBZxContract extends BaseContract {
     gasTokenUser,
     index_2
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).rolloverWithGasToken.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -3305,13 +3305,13 @@ export class iBZxContract extends BaseContract {
     gasTokenUser,
     index_2
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3341,16 +3341,16 @@ export class iBZxContract extends BaseContract {
         gasTokenUser,
         index_2
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('rolloverWithGasToken(bytes32,address,bytes)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[string, BigNumber]
@@ -3367,13 +3367,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setAffiliateFeePercent(uint256)', [newValue
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setAffiliateFeePercent.estimateGasAsync.bind(
                     self,
                     newValue
@@ -3389,13 +3389,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setAffiliateFeePercent(uint256)', [newValue
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3417,16 +3417,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setAffiliateFeePercent(uint256)', [newValue
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setAffiliateFeePercent(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -3443,13 +3443,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setBorrowingFeePercent(uint256)', [newValue
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setBorrowingFeePercent.estimateGasAsync.bind(
                     self,
                     newValue
@@ -3465,13 +3465,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setBorrowingFeePercent(uint256)', [newValue
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3493,16 +3493,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setBorrowingFeePercent(uint256)', [newValue
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setBorrowingFeePercent(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -3523,13 +3523,13 @@ export class iBZxContract extends BaseContract {
     delegated,
     toggle
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setDelegatedManager.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -3551,13 +3551,13 @@ export class iBZxContract extends BaseContract {
     delegated,
     toggle
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3587,16 +3587,16 @@ export class iBZxContract extends BaseContract {
         delegated,
         toggle
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setDelegatedManager(bytes32,address,bool)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -3613,13 +3613,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setFeesController(address)', [newController
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setFeesController.estimateGasAsync.bind(
                     self,
                     newController
@@ -3635,13 +3635,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setFeesController(address)', [newController
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3663,16 +3663,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setFeesController(address)', [newController
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setFeesController(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -3689,13 +3689,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLendingFeePercent(uint256)', [newValue
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setLendingFeePercent.estimateGasAsync.bind(
                     self,
                     newValue
@@ -3711,13 +3711,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLendingFeePercent(uint256)', [newValue
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3739,16 +3739,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setLendingFeePercent(uint256)', [newValue
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setLendingFeePercent(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -3769,13 +3769,13 @@ export class iBZxContract extends BaseContract {
     collateralTokens,
     amounts
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setLiquidationIncentivePercent.estimateGasAsync.bind(
                     self,
                     loanTokens,
@@ -3797,13 +3797,13 @@ export class iBZxContract extends BaseContract {
     collateralTokens,
     amounts
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3833,16 +3833,16 @@ export class iBZxContract extends BaseContract {
         collateralTokens,
         amounts
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setLiquidationIncentivePercent(address[],address[],uint256[])');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -3861,13 +3861,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setLoanPool(address[],address[])', [pools,
     assets
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setLoanPool.estimateGasAsync.bind(
                     self,
                     pools,
@@ -3886,13 +3886,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setLoanPool(address[],address[])', [pools,
     assets
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3918,16 +3918,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setLoanPool(address[],address[])', [pools,
         assets
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setLoanPool(address[],address[])');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -3944,13 +3944,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxDisagreement(uint256)', [newAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setMaxDisagreement.estimateGasAsync.bind(
                     self,
                     newAmount
@@ -3966,13 +3966,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxDisagreement(uint256)', [newAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -3994,16 +3994,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxDisagreement(uint256)', [newAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setMaxDisagreement(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -4020,13 +4020,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxSwapSize(uint256)', [newAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setMaxSwapSize.estimateGasAsync.bind(
                     self,
                     newAmount
@@ -4042,13 +4042,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxSwapSize(uint256)', [newAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4070,16 +4070,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setMaxSwapSize(uint256)', [newAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setMaxSwapSize(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -4096,13 +4096,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setPriceFeedContract(address)', [newContract
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setPriceFeedContract.estimateGasAsync.bind(
                     self,
                     newContract
@@ -4118,13 +4118,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setPriceFeedContract(address)', [newContract
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4146,16 +4146,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setPriceFeedContract(address)', [newContract
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setPriceFeedContract(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -4172,13 +4172,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSourceBufferPercent(uint256)', [newAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setSourceBufferPercent.estimateGasAsync.bind(
                     self,
                     newAmount
@@ -4194,13 +4194,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSourceBufferPercent(uint256)', [newAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4222,16 +4222,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSourceBufferPercent(uint256)', [newAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setSourceBufferPercent(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -4250,13 +4250,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setSupportedTokens(address[],bool[])', [addrs,
     toggles
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setSupportedTokens.estimateGasAsync.bind(
                     self,
                     addrs,
@@ -4275,13 +4275,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setSupportedTokens(address[],bool[])', [addrs,
     toggles
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4307,16 +4307,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setSupportedTokens(address[],bool[])', [addrs,
         toggles
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setSupportedTokens(address[],bool[])');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -4333,13 +4333,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSwapsImplContract(address)', [newContract
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setSwapsImplContract.estimateGasAsync.bind(
                     self,
                     newContract
@@ -4355,13 +4355,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSwapsImplContract(address)', [newContract
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4383,16 +4383,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setSwapsImplContract(address)', [newContract
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setSwapsImplContract(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -4411,13 +4411,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setTargets(string[],address[])', [sigsArr,
     targetsArr
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setTargets.estimateGasAsync.bind(
                     self,
                     sigsArr,
@@ -4436,13 +4436,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setTargets(string[],address[])', [sigsArr,
     targetsArr
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4468,16 +4468,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('setTargets(string[],address[])', [sigsArr,
         targetsArr
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setTargets(string[],address[])');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -4494,13 +4494,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTradingFeePercent(uint256)', [newValue
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setTradingFeePercent.estimateGasAsync.bind(
                     self,
                     newValue
@@ -4516,13 +4516,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTradingFeePercent(uint256)', [newValue
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4544,16 +4544,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setTradingFeePercent(uint256)', [newValue
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setTradingFeePercent(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -4570,13 +4570,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setupLoanParams((bytes32,bool,address,address,address,uint256,uint256,uint256)[])', [loanParamsList
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).setupLoanParams.estimateGasAsync.bind(
                     self,
                     loanParamsList
@@ -4592,13 +4592,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setupLoanParams((bytes32,bool,address,address,address,uint256,uint256,uint256)[])', [loanParamsList
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4620,16 +4620,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('setupLoanParams((bytes32,bool,address,address,address,uint256,uint256,uint256)[])', [loanParamsList
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setupLoanParams((bytes32,bool,address,address,address,uint256,uint256,uint256)[])');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string[]
@@ -4646,16 +4646,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('sourceBufferPercent()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('sourceBufferPercent()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -4674,16 +4674,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('supportedTokens(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('supportedTokens(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean
@@ -4712,13 +4712,13 @@ export class iBZxContract extends BaseContract {
     requiredDestTokenAmount,
     swapData
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).swapExternal.estimateGasAsync.bind(
                     self,
                     sourceToken,
@@ -4752,13 +4752,13 @@ export class iBZxContract extends BaseContract {
     requiredDestTokenAmount,
     swapData
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4804,16 +4804,16 @@ export class iBZxContract extends BaseContract {
         requiredDestTokenAmount,
         swapData
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('swapExternal(address,address,address,address,uint256,uint256,bytes)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber]
@@ -4844,13 +4844,13 @@ export class iBZxContract extends BaseContract {
     requiredDestTokenAmount,
     swapData
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).swapExternalWithGasToken.estimateGasAsync.bind(
                     self,
                     sourceToken,
@@ -4887,13 +4887,13 @@ export class iBZxContract extends BaseContract {
     requiredDestTokenAmount,
     swapData
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -4943,16 +4943,16 @@ export class iBZxContract extends BaseContract {
         requiredDestTokenAmount,
         swapData
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('swapExternalWithGasToken(address,address,address,address,address,uint256,uint256,bytes)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber]
@@ -4969,16 +4969,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('swapsImpl()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('swapsImpl()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -4995,16 +4995,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('tradingFeePercent()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('tradingFeePercent()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -5023,16 +5023,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('tradingFeeTokensHeld(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('tradingFeeTokensHeld(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -5051,16 +5051,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('tradingFeeTokensPaid(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('tradingFeeTokensPaid(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -5077,13 +5077,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).transferOwnership.estimateGasAsync.bind(
                     self,
                     newOwner
@@ -5099,13 +5099,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -5127,16 +5127,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('transferOwnership(address)', [newOwner
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('transferOwnership(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -5155,16 +5155,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('underlyingToLoanPool(address)', [index_0
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('underlyingToLoanPool(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -5181,16 +5181,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('vbzrxTokenAddress()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vbzrxTokenAddress()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -5207,16 +5207,16 @@ export class iBZxContract extends BaseContract {
         > {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('wethToken()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('wethToken()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
@@ -5233,13 +5233,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawAccruedInterest(address)', [loanToken
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).withdrawAccruedInterest.estimateGasAsync.bind(
                     self,
                     loanToken
@@ -5255,13 +5255,13 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawAccruedInterest(address)', [loanToken
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -5283,16 +5283,16 @@ export class iBZxContract extends BaseContract {
             const self = this as any as iBZxContract;
             const encodedData = self._strictEncodeArguments('withdrawAccruedInterest(address)', [loanToken
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('withdrawAccruedInterest(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
@@ -5313,13 +5313,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     withdrawAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).withdrawCollateral.estimateGasAsync.bind(
                     self,
                     loanId,
@@ -5341,13 +5341,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     withdrawAmount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -5377,16 +5377,16 @@ export class iBZxContract extends BaseContract {
         receiver,
         withdrawAmount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('withdrawCollateral(bytes32,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
@@ -5407,13 +5407,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     feeType
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).withdrawFees.estimateGasAsync.bind(
                     self,
                     tokens,
@@ -5435,13 +5435,13 @@ export class iBZxContract extends BaseContract {
     receiver,
     feeType
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -5471,16 +5471,16 @@ export class iBZxContract extends BaseContract {
         receiver,
         feeType
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('withdrawFees(address[],address,uint8)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber[]
@@ -5499,13 +5499,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('withdrawProtocolToken(address,uint256)', [receiver,
     amount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
                 (self as any).withdrawProtocolToken.estimateGasAsync.bind(
                     self,
                     receiver,
@@ -5524,13 +5524,13 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('withdrawProtocolToken(address,uint256)', [receiver,
     amount
     ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...txData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
             return gas;
@@ -5556,16 +5556,16 @@ export class iBZxContract extends BaseContract {
             const encodedData = self._strictEncodeArguments('withdrawProtocolToken(address,uint256)', [receiver,
         amount
         ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            const callDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
                 {
                     to: self.address,
                     ...callData,
                     data: encodedData,
                 },
-                self._web3Wrapper.getContractDefaults(),
+                
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            BaseContract._throwIfCallResultIsRevertError(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('withdrawProtocolToken(address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[string, BigNumber]

@@ -127,11 +127,12 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         enabled: false
       }
     }
+    const TokenIcon = asset.reactLogoSvg
     return (
       <Link to={`/stats/${asset.displayName.toLocaleLowerCase()}`} className="asset-selector-item">
         <div className="asset-selector-item-row">
           <span className="asset-selector-icon">
-            {this.props.asset !== Asset.UNKNOWN && asset.reactLogoSvg.render()}
+            {this.props.asset !== Asset.UNKNOWN && <TokenIcon />}
           </span>
           <span className="asset-selector-name">{asset.displayName}</span>
         </div>

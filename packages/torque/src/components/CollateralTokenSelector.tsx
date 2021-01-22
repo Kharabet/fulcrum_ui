@@ -120,6 +120,7 @@ export class CollateralTokenSelector extends Component<
       this.setState({
         ...this.state,
         isOpen: true,
+        // @ts-ignore
         executorParams: { resolve: resolve, reject: reject },
         borrowAsset: borrowAsset,
         collateralAsset: collateralAsset

@@ -53,6 +53,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
       this.setState({
         ...this.state,
         isOpen: true,
+        // @ts-ignore
         executorParams: { resolve: resolve, reject: reject },
         loanOrderState: item
       })

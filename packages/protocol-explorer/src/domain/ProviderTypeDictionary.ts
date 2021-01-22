@@ -65,28 +65,28 @@ export default class ProviderTypeDictionary {
     ProviderType,
     ProviderTypeDetails
   >([
-    [ProviderType.MetaMask, new ProviderTypeDetails('MetaMask', MetamaskLogoShort, injected)],
+    [ProviderType.MetaMask, new ProviderTypeDetails('MetaMask', injected, MetamaskLogoShort)],
     [
       ProviderType.TrustWallet,
-      new ProviderTypeDetails('TrustWallet', TrustWalletLogoShort, injected)
+      new ProviderTypeDetails('TrustWallet', injected, TrustWalletLogoShort)
     ],
-    [ProviderType.Bitski, new ProviderTypeDetails('Bitski', BitskiLogoShort, bitski)],
-    [ProviderType.Fortmatic, new ProviderTypeDetails('Fortmatic', FortmaticLogoShort, fortmatic)],
+    [ProviderType.Bitski, new ProviderTypeDetails('Bitski', bitski, BitskiLogoShort)],
+    [ProviderType.Fortmatic, new ProviderTypeDetails('Fortmatic', fortmatic, FortmaticLogoShort)],
     [
       ProviderType.WalletConnect,
-      new ProviderTypeDetails('WalletConnect', WalletConnectLogoShort, walletconnect)
+      new ProviderTypeDetails('WalletConnect', walletconnect, WalletConnectLogoShort)
     ],
-    [ProviderType.Portis, new ProviderTypeDetails('Portis', PortisLogoShort, portis)],
+    [ProviderType.Portis, new ProviderTypeDetails('Portis', portis, PortisLogoShort)],
     [
       ProviderType.Squarelink,
-      new ProviderTypeDetails('Squarelink', SquarelinkLogoShort, squarelink)
+      new ProviderTypeDetails('Squarelink', squarelink, SquarelinkLogoShort)
     ],
-    [ProviderType.Ledger, new ProviderTypeDetails('Ledger', LedgerLogoShort, ledger)],
-    [ProviderType.Torus, new ProviderTypeDetails('Torus', TorusLogoShort, torus)],
-    [ProviderType.Authereum, new ProviderTypeDetails('Authereum', AuthereumLogoShort, authereum)],
-    [ProviderType.Trezor, new ProviderTypeDetails('Trezor', TrezorLogoShort, trezor)],
-    [ProviderType.WalletLink, new ProviderTypeDetails('Coinbase', WalletLinkLogoShort, walletlink)],
-    [ProviderType.None, new ProviderTypeDetails('None', null, null)]
+    [ProviderType.Ledger, new ProviderTypeDetails('Ledger', ledger, LedgerLogoShort)],
+    [ProviderType.Torus, new ProviderTypeDetails('Torus', torus, TorusLogoShort)],
+    [ProviderType.Authereum, new ProviderTypeDetails('Authereum', authereum, AuthereumLogoShort)],
+    [ProviderType.Trezor, new ProviderTypeDetails('Trezor', trezor, AuthereumLogoShort)],
+    [ProviderType.WalletLink, new ProviderTypeDetails('Coinbase', walletlink, WalletLinkLogoShort)],
+    [ProviderType.None, new ProviderTypeDetails('None', null)]
   ])
 
   public static async getProviderTypeByConnector(value: AbstractConnector): Promise<ProviderType> {

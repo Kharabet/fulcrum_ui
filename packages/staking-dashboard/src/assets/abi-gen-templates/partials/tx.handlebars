@@ -10,13 +10,13 @@ public {{languageSpecificName}} = {
     ): Promise<string> {
         const self = this as any as {{contractName}}Contract;
         const encodedData = self._strictEncodeArguments('{{this.functionSignature}}', [{{> params inputs=inputs}}]);
-        const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
             {
                 to: self.address,
                 ...txData,
                 data: encodedData,
             },
-            self._web3Wrapper.getContractDefaults(),
+            
             (self as any).{{languageSpecificName}}.estimateGasAsync.bind(
                 self,
                 {{> params inputs=inputs}}
@@ -31,13 +31,13 @@ public {{languageSpecificName}} = {
     ): Promise<number> {
         const self = this as any as {{contractName}}Contract;
         const encodedData = self._strictEncodeArguments('{{this.functionSignature}}', [{{> params inputs=inputs}}]);
-        const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
             {
                 to: self.address,
                 ...txData,
                 data: encodedData,
             },
-            self._web3Wrapper.getContractDefaults(),
+            
         );
         const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
         return gas;

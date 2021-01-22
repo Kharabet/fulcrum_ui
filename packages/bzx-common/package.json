@@ -6,13 +6,9 @@
     "author": "",
     "license": "Apache-2.0",
     "dependencies": {
-        "@0x/base-contract": "^5.0.5",
-        "@0x/utils": "^4.3.1"
+        "@0x/abi-gen": "^5.4.17",
+        "@0x/base-contract": "^6.2.16",
+        "@0x/utils": "^6.2.0"
     },
-    "devDependencies": {
-      "@0x/abi-gen": "^2.0.9"
-    },
-    "scripts": {
-    }
-  }
-  
+    "scripts": {}
+}

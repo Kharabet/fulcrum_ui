@@ -23,7 +23,7 @@ export class ExtendLoanProcessor {
         'Initializing',
         'Submitting loan',
         'Updating the blockchain',
-        'Transaction completed'
+        'Transaction completed',
       ])
     } else {
       //Initializing
@@ -34,7 +34,7 @@ export class ExtendLoanProcessor {
         'Waiting for token allowance',
         'Submitting loan',
         'Updating the blockchain',
-        'Transaction completed'
+        'Transaction completed',
       ])
     }
     // Initializing loan
@@ -67,10 +67,12 @@ export class ExtendLoanProcessor {
       }
       // Detecting token allowance
       task.processingStepNext()
-      erc20allowance = await tokenErc20Contract.allowance.callAsync(
-        account,
-        TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
-      )
+      erc20allowance = await tokenErc20Contract
+        .allowance(
+          account,
+          TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
+        )
+        .callAsync()
 
       // Prompting token allowance
       task.processingStepNext()
@@ -99,17 +101,13 @@ export class ExtendLoanProcessor {
     const loanData = '0x'
 
     try {
-      const gasAmount = await bZxContract.extendLoanDuration.estimateGasAsync(
-        taskRequest.loanId,
-        depositAmountInBaseUnits,
-        false,
-        loanData,
-        {
+      const gasAmount = await bZxContract
+        .extendLoanDuration(taskRequest.loanId, depositAmountInBaseUnits, false, loanData)
+        .estimateGasAsync({
           from: account,
           value: isETHBorrowAsset ? depositAmountInBaseUnits : undefined,
-          gas: TorqueProvider.Instance.gasLimit
-        }
-      )
+          gas: TorqueProvider.Instance.gasLimit,
+        })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
@@ -118,18 +116,19 @@ export class ExtendLoanProcessor {
     }
 
     try {
-      txHash = await bZxContract.extendLoanDuration.sendTransactionAsync(
-        taskRequest.loanId, // loanId
-        depositAmountInBaseUnits, // depositAmount
-        false, // useCollateral
-        loanData,
-        {
+      txHash = await bZxContract
+        .extendLoanDuration(
+          taskRequest.loanId, // loanId
+          depositAmountInBaseUnits, // depositAmount
+          false, // useCollateral
+          loanData
+        )
+        .sendTransactionAsync({
           from: account,
           value: isETHBorrowAsset ? depositAmountInBaseUnits : undefined,
           gas: !gasAmountBN.eq(0) ? gasAmountBN.toString() : '3000000',
-          gasPrice: await TorqueProvider.Instance.gasPrice()
-        }
-      )
+          gasPrice: await TorqueProvider.Instance.gasPrice(),
+        })
       task.setTxHash(txHash)
     } catch (e) {
       throw e

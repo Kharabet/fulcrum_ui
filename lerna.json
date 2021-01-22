@@ -1,11 +1,9 @@
 {
   "lerna": "3.14.1",
   "packages": [
-    "packages/alchemy-web3",
     "packages/bzx-common",
     "packages/fulcrum",
     "packages/torque",
-    "packages/web3-react-6",
     "packages/protocol-explorer",
     "packages/stackers-dashboard",
     "packages/web3-react-6/packages/*"

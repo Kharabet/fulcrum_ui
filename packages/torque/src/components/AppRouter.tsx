@@ -14,7 +14,6 @@ import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
 import siteConfig from '../config/SiteConfig.json'
-import { LocationListener } from './LocationListener'
 import { RiskDisclosure } from './RiskDisclosure'
 import Modal from 'react-modal'
 
@@ -132,7 +131,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
             <MaintenancePage />
           ) : (
             <Router history={NavService.Instance.History}>
-              <LocationListener doNetworkConnect={this.doNetworkConnect}>
                 <Switch>
                   <Route exact={true} path="/" render={() => <Redirect to="/borrow" />} />
                   <Route
@@ -186,7 +184,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 ) : (
                   ``
                 )}
-              </LocationListener>
             </Router>
           )}
         </div>

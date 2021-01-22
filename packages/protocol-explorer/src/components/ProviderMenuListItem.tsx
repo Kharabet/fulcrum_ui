@@ -52,7 +52,8 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
     const etherscanURL = ExplorerProvider.Instance.web3ProviderSettings
       ? ExplorerProvider.Instance.web3ProviderSettings.etherscanURL
       : ''
-
+    const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
+    if (!ProviderLogoIcon) {return null}
     return (
       <li
         className={`provider-menu__list-item provider-menu__list-item--selected`}
@@ -74,21 +75,21 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
           )}
         </div>
         <div className="provider-menu__list-item-content-img">
-          {providerTypeDetails.reactreactLogoSvgShort.render()}
+          <ProviderLogoIcon />
         </div>
       </li>
     )
   }
-
+  
+  const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
+  if (!ProviderLogoIcon) {return null}
   return (
     <li className={`provider-menu__list-item `} onClick={onClick}>
       <div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>
       <div className="provider-menu__list-item-content-img">
         {props.isActivating ? (
           <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
-        ) : (
-          providerTypeDetails.reactreactLogoSvgShort.render()
-        )}
+        ) : <ProviderLogoIcon />}
       </div>
     </li>
   )

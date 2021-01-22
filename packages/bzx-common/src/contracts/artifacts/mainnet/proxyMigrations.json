@@ -1,34 +1,38 @@
 {
-  "constant": false,
-  "inputs": [
+  "abi": [
     {
-      "name": "bridge",
-      "type": "address"
-    },
-    {
-      "name": "cdps",
-      "type": "uint256[]"
-    },
-    {
-      "name": "darts",
-      "type": "uint256[]"
-    },
-    {
-      "name": "dinks",
-      "type": "uint256[]"
-    },
-    {
-      "name": "collateralDinks",
-      "type": "uint256[]"
-    },
-    {
-      "name": "borrowAmounts",
-      "type": "uint256[]"
+      "constant": false,
+      "inputs": [
+        {
+          "name": "bridge",
+          "type": "address"
+        },
+        {
+          "name": "cdps",
+          "type": "uint256[]"
+        },
+        {
+          "name": "darts",
+          "type": "uint256[]"
+        },
+        {
+          "name": "dinks",
+          "type": "uint256[]"
+        },
+        {
+          "name": "collateralDinks",
+          "type": "uint256[]"
+        },
+        {
+          "name": "borrowAmounts",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "migrateLoan",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
-  ],
-  "name": "migrateLoan",
-  "outputs": [],
-  "payable": false,
-  "stateMutability": "nonpayable",
-  "type": "function"
+  ]
 }
