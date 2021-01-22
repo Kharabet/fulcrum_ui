@@ -10,8 +10,7 @@ export interface ITradeTokenGridHeaderProps {
 }
 
 const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
-  const midMarketTooltip =
-    'Price feeds are provided securely via Chainlink, trades are executed via Kyber. This can result in minor price variations when opening and closing positions.'
+  const midMarketTooltip = `<p>The price displayed is based on swapping 1 ETH into the selected asset via Kybers swap rate</p><a href='https://developer.kyber.network/docs/Integrations-PriceFeedSecurity/' target="_blank" rel="noopener noreferrer" class='tooltip__link'>Learn More</a>`
   const liqPriceTooltip =
     "An opened positions liquidation point will vary slightly from the displayed estimate depending on it's collateral ratio and exact entry price."
   return (
@@ -31,6 +30,8 @@ const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
           <label className="trade-token-grid-header__text-asset">{props.quoteToken}</label>
           <IconInfo
             className="tooltip__icon"
+            data-multiline="true"
+            data-html={true}
             data-tip={midMarketTooltip}
             data-for="mid-market-price-tooltip"
           />
@@ -39,6 +40,7 @@ const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
             className="tooltip__info"
             place="top"
             effect="solid"
+            delayHide={500}
           />
         </span>
       </div>
