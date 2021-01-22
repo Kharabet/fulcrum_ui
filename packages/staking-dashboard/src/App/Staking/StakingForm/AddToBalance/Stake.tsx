@@ -5,7 +5,7 @@ import StakingFormVM from '../StakingFormVM'
 import InputStake from './InputStake'
 import SpendingAllowance from './SpendingAllowance'
 
-export function AddToBalance({ vm }: { vm: StakingFormVM }) {
+export function Stake({ vm }: { vm: StakingFormVM }) {
   const { wallet } = vm.stakingStore.userBalances
   const { stakingAllowances } = vm.stakingStore
 
@@ -13,7 +13,7 @@ export function AddToBalance({ vm }: { vm: StakingFormVM }) {
     <React.Fragment>
       <SpendingAllowance vm={vm} />
 
-      {stakingAllowances.needApprovalList.length < 4 && (
+      {vm.stakingStore.hasEnoughToStake && (
         <>
           <h3 className="section-header">Add to Staking Balance</h3>
 
@@ -69,4 +69,4 @@ export function AddToBalance({ vm }: { vm: StakingFormVM }) {
   )
 }
 
-export default observer(AddToBalance)
+export default observer(Stake)

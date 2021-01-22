@@ -3,6 +3,7 @@ import errorUtils from 'app-lib/errorUtils'
 import stakingUtils from 'app-lib/stakingUtils'
 import sleep from 'bard-instruments/lib/async/sleep'
 import * as mobx from 'mobx'
+import { stakeableToken } from 'src/domain/stakingTypes'
 import { StakingProvider } from 'src/services/StakingProvider'
 import RootStore from 'src/stores/RootStore'
 import Representatives from './Representatives'
@@ -35,6 +36,18 @@ export default class StakingStore {
   }
 
   /**
+   * Flag to know if the user has at least one token approved and enough of it in the wallet
+   * to stake it.
+   */
+  public get hasEnoughToStake() {
+    return Object.values(stakeableToken).some((token) => {
+      return (
+        !this.stakingAllowances.needApprovals.get(token) && this.userBalances.wallet[token].gt(0.01)
+      )
+    })
+  }
+
+  /**
    * Helper to set values through mobx actions.
    */
   public set(prop: stakingStoreProp, value: any) {
@@ -59,21 +72,16 @@ export default class StakingStore {
     this.stakingAllowances.clearError()
   }
 
-  public async stake(tokenAmounts: {
-    bzrx: BigNumber
-    vbzrx: BigNumber
-    ibzrx: BigNumber
-    bpt: BigNumber
-  }) {
+  public async stake(tokenAmounts: Map<stakeableToken, BigNumber>) {
     try {
-      if (!stakingUtils.verifyStake(this.userBalances.wallet, tokenAmounts)) {
-        throw new Error('Staking amounts are invalid. Maybe trying to stake more than possible.')
-      }
+      // if (!stakingUtils.verifyStake(this.userBalances.wallet, tokenAmounts)) {
+      //   throw new Error('Staking amounts are invalid. Maybe trying to stake more than possible.')
+      // }
       this.assign({ stakingPending: true, stakingError: null })
       const { result } = this.stakingProvider.stake(tokenAmounts)
       await result
-      this.userBalances.staked.add(tokenAmounts)
-      this.userBalances.wallet.substract(tokenAmounts)
+      this.userBalances.staked.add(Object.fromEntries(tokenAmounts))
+      this.userBalances.wallet.substract(Object.fromEntries(tokenAmounts))
     } catch (err) {
       this.set('stakingError', errorUtils.decorateError(err, { title: 'Could not stake' }))
       throw err
@@ -82,20 +90,15 @@ export default class StakingStore {
     }
   }
 
-  public async unstake(tokenAmounts: {
-    bzrx: BigNumber
-    vbzrx: BigNumber
-    ibzrx: BigNumber
-    bpt: BigNumber
-  }) {
+  public async unstake(tokenAmounts: Map<stakeableToken, BigNumber>) {
     try {
-      if (!stakingUtils.verifyStake(this.userBalances.staked, tokenAmounts)) {
-        throw new Error('Staking amounts are invalid. Maybe trying to unstake more than possible.')
-      }
+      // if (!stakingUtils.verifyStake(this.userBalances.staked, tokenAmounts)) {
+      //   throw new Error('Staking amounts are invalid. Maybe trying to unstake more than possible.')
+      // }
       this.assign({ stakingPending: true, stakingError: null })
       await this.stakingProvider.unstakeTokens(tokenAmounts)
-      this.userBalances.wallet.add(tokenAmounts)
-      this.userBalances.staked.substract(tokenAmounts)
+      this.userBalances.wallet.add(Object.fromEntries(tokenAmounts))
+      this.userBalances.staked.substract(Object.fromEntries(tokenAmounts))
     } catch (err) {
       this.set('stakingError', errorUtils.decorateError(err, { title: 'Could not unstake' }))
       throw err
@@ -185,7 +188,7 @@ export default class StakingStore {
       await this.userBalances.getUserBalances()
       await this.stakingAllowances.check()
       await sleep(1000)
-      await this.rewards.getRewards()
+      await this.rewards.getAllRewards()
     } else {
       this.userBalances.clearBalances()
       this.rewards.clearBalances()
@@ -214,8 +217,8 @@ export default class StakingStore {
     this.stakingProvider = stakingProvider
     this.representatives = new Representatives(stakingProvider)
     this.rewards = new Rewards(stakingProvider, this)
-    this.userBalances = new UserBalances(stakingProvider)
-    this.stakingAllowances = new StakingAllowances(stakingProvider, this.userBalances)
+    this.userBalances = new UserBalances(stakingProvider, this.rootStore)
+    this.stakingAllowances = new StakingAllowances(this.userBalances, this.rootStore)
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }
 }

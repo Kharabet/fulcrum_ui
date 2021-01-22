@@ -14,7 +14,7 @@ export function UserBalances({ rootStore }: { rootStore: RootStore }) {
   const { wallet, staked } = stakingStore.userBalances
 
   return (
-    <div className="balance-wrapper padded-2 bg-darken border-rounded-1">
+    <div className="padded-2 bg-darken border-rounded-1">
       {userBalances.pending && (
         <Loader
           className="calculator__balance-loader"

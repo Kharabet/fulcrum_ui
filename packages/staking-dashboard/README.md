@@ -54,23 +54,23 @@ LPT.transferFrom("0x4085e9fb679dd2f60c2e64afe9533107fa1c18f2", myAccount, 345e18
 BZRX.approve(iBZRX, 10*10**50, {"from": myAccount})
 iBZRX.mint(myAccount, 25*10**18, {"from": myAccount})
 ## Spending Approvals
-BZRX.approve(staking, 10*10**50, {"from": myAccount})
-vBZRX.approve(staking, 10*10**50, {"from": myAccount})
-iBZRX.approve(staking, 10*10**50, {"from": myAccount})
-LPT.approve(staking, 10*10**50, {"from": myAccount})
+BZRX.approve(staking, 10*10**50, {"from": accounts[0]})
+vBZRX.approve(staking, 10*10**50, {"from": accounts[0]})
+iBZRX.approve(staking, 10*10**50, {"from": accounts[0]})
+LPT.approve(staking, 10*10**50, {"from": accounts[0]})
 
 # ----------  COMMANDS TO CREATE TEST CASES ----------- #
 
 # --- STAKE ---
 
 # STAKE multiple
-staking.stake([BZRX, vBZRX, iBZRX, LPT], [10e18, 10e18, 10e18, 10e18], {"from": myAccount})
+staking.stake([BZRX, vBZRX, iBZRX, LPT], [10e18, 10e18, 10e18, 10e18], {"from": accounts[0]})
 
 # --- REWARDS ---
 
 # SWEEP FEES (myAccount can claim BZRX / 3CRV)
 staking.setMaxAllowedDisagreement(10e18)
-staking.sweepFees({"from": myAccount})
+staking.sweepFees({"from": accounts[0]})
 
 # REWARDS: generate incentive rewards (VBZRX)
 borrowAmount = 100*10**6
@@ -82,13 +82,13 @@ txBorrow = iUSDC.borrow("", borrowAmount, borrowTime, collateralAmount, collater
 # --- UNSTAKE ---
 
 # UNSTAKE one
-staking.unstake([BZRX], [10e18], {"from": myAccount})
+staking.unstake([BZRX], [10e18], {"from": accounts[0]})
 
 # UNSTAKE multiple
-staking.unstake([BZRX, vBZRX, iBZRX, LPT], [10e18, 10e18, 10e18, 10e18], {"from": myAccount})
+staking.unstake([BZRX, vBZRX, iBZRX, LPT], [10e18, 10e18, 10e18, 10e18], {"from": accounts[0]})
 
 # UNSTAKE all
-staking.exit({"from": myAccount})
+staking.exit({"from": accounts[0]})
 
 # --- DELEGATES ---
 

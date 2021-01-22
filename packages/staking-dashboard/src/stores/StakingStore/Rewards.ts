@@ -74,16 +74,18 @@ export default class Rewards {
     Object.assign(this, props)
   }
 
-  public async getRewards() {
+  public async getAllRewards() {
     this.assign({ error: null, pendingStakingRewards: true })
     try {
       const sp = this.stakingProvider
       this.set('rebateRewards', await sp.getRebateRewards())
-      const rewards = await sp.getUserEarnings()
+      const rewards = await sp.getStakingRewards()
       this.assign(rewards)
+      const vestedBzrx = await this.stakingProvider.getVestedBzrxBalance()
+      this.set('vestedVbzrx', vestedBzrx.div(10 ** 18))
       return rewards
     } catch (err) {
-      const error = errorUtils.decorateError(err, { title: 'Failed to get rewards estimates' })
+      const error = errorUtils.decorateError(err, { title: 'Failed to get rewards balances' })
       this.set('error', error)
     } finally {
       this.set('pendingStakingRewards', false)
@@ -92,13 +94,12 @@ export default class Rewards {
 
   public async claimStakingRewards(shouldRestake: boolean = false) {
     this.assign({ error: null, pendingStakingRewards: true })
-    const claimedAmounts = {bzrx: this.bzrx, stableCoin: this.stableCoin}
+    const claimedAmounts = { bzrx: this.bzrx, stableCoin: this.stableCoin }
     try {
       await this.stakingProvider.claimStakingRewards(shouldRestake)
       this.assign({
         bzrx: new BigNumber(0),
         stableCoin: new BigNumber(0)
-        // TODO: What do we do with vesting ones?
       })
       return claimedAmounts
     } catch (err) {
@@ -120,20 +121,6 @@ export default class Rewards {
       this.set('error', error)
     } finally {
       this.set('pendingRebateRewards', false)
-    }
-  }
-
-  public async getVestedBZRX() {
-    try {
-      const result = await this.stakingProvider.getVestedBzrxBalance()
-      // this.set('vestedVbzrx', )
-    }
-    catch (err) {
-      const error = errorUtils.decorateError(err, { title: 'Failed to get vested BZRX balance' })
-      this.set('error', error)
-    }
-    finally {
-
     }
   }
 

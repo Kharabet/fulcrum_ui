@@ -3,6 +3,7 @@ import RewardsVM from './RewardsVM'
 import AssetBalance from 'shared-components/AssetBalance'
 import { Button, InputBasic } from 'ui-framework'
 import { tokenIcons } from 'app-images'
+import ExternalLink from 'shared-components/ExternalLink'
 
 export default function Rewards({ vm }: { vm: RewardsVM }) {
   const { rootStore } = vm
@@ -34,8 +35,9 @@ export default function Rewards({ vm }: { vm: RewardsVM }) {
 
           <div className="margin-bottom-1 flex-col">
             <p className="margin-top-0">
-              <b>What is 3CRV?</b> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minus
-              est ex dolorum, at rem odio ipsa ratione nam ut nihil.
+              <b>3CRV</b> is an interest earning stablecoin made up of other stablecoins. You can
+              redeem them for USDC, USDT, or DAI on{' '}
+              <ExternalLink href="https://www.curve.fi/">curve.fi</ExternalLink>. Learn more (HERE)
             </p>
             <Button
               isLoading={rewards.pendingStakingRewards}
@@ -82,15 +84,15 @@ export default function Rewards({ vm }: { vm: RewardsVM }) {
           </div>
           <div className="flex-col">
             <p className="margin-top-0">
-              <b>What are time-locked rewards?</b> Lorem ipsum dolor sit amet, consectetur adipisicing
-              elit!
+              <b>When you stake vesting BZRX</b> (vBZRX), your staking rewards are unlocked on the
+              same schedule as the vesting. Learn more (HERE)
             </p>
           </div>
         </div>
       </div>
 
       <div className="panel--white padded-2 margin-bottom-2">
-        <h3 className="section-header">Incentive Rewards</h3>
+        <h3 className="section-header">User Rewards</h3>
         <div className="ui-grid-wmin-260px">
           <div>
             <AssetBalance
@@ -104,7 +106,8 @@ export default function Rewards({ vm }: { vm: RewardsVM }) {
           </div>
           <div className="flex-col">
             <p className="margin-top-0">
-              <b>What are incentive rewards?</b> Rewards for using the platform.
+              <b>When you trade or borrow</b>, half the fees you've paid are returned to you in the
+              form of vBZRX.
             </p>
             <Button
               isLoading={rewards.pendingRebateRewards}
@@ -130,9 +133,7 @@ export default function Rewards({ vm }: { vm: RewardsVM }) {
             />
           </div>
           <div className="flex-col">
-            <p className="margin-top-0">
-              vBZRX tokens turn into BZRX over time.
-            </p>
+            <p className="margin-top-0">vBZRX tokens turn into BZRX over time.</p>
             <Button
               isLoading={rewards.pendingVbzrxClaim}
               className="button blue btn--medium"
