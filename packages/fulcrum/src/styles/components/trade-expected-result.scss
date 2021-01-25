@@ -21,7 +21,7 @@
     flex-direction: column;
     width: calc(50% - 8px);
     padding: 13px;
-    border: 1px solid #586473;
+    border: 1px solid var(--trade-expected-result-border);
     .sell & {
       width: 100%;
       flex-direction: row;
@@ -66,7 +66,7 @@
   }
   &__fee {
     .value {
-      color: #fff;
+      color: var(--trade-form-text);
     }
     .expired & .value {
       color: #939fac;
@@ -86,7 +86,7 @@
   &__chi {
     font-weight: 600;
     font-size: 14px;
-    color: #fff;
+    color: var(--trade-form-text);
     .expired & {
       color: #939fac;
     }
@@ -95,6 +95,7 @@
     width: 16px;
     margin-top: -2px;
     float: right;
+    
   }
   @media screen and (max-width: $mobile-version-width) {
     display: block;

@@ -7,7 +7,7 @@
   position: absolute;
   top: calc(50% + 25px);
   border-radius: 4px;
-  background-color: #444e5a;
+  background-color: var(--asset-dropdown-bg);
   box-sizing: border-box;
   width: 100%;
   z-index: 100004;
@@ -26,7 +26,7 @@
     font-weight: 600;
     line-height: 1.5;
     letter-spacing: 0.05px;
-    color: #ffffff;
+    color:  var(--asset-dropdown-text);
   }
   &__items {
     display: flex;
@@ -42,12 +42,12 @@
     text-align: center;
     &:hover {
       cursor: pointer;
-      background-color: #8b97a9;
+      background-color: var(--asset-dropdown-button-bg-hover);
     }
     &--selected {
-      background-color: #586473;
+      background-color: var(--asset-dropdown-button-bg-hover);
       &:hover {
-        background-color: #586473;
+        background-color: var(--asset-dropdown-button-bg-hover);
       }
     }
     @media screen and (max-width: $mobile-version-width) {
@@ -56,7 +56,7 @@
     &__name {
       font-size: 16px;
       font-weight: 600;
-      color: #ffffff;
+      color: var(--asset-dropdown-text);
       @media screen and (max-width: $mobile-version-width) {
         font-size: 12px;
       }
@@ -82,7 +82,7 @@
   flex-direction: row;
   box-sizing: border-box;
   border-radius: 26px;
-  background-color: #586473;
+  background-color: var(--asset-dropdown-button-bg); 
   width: 112px;
   align-items: center;
   padding: 8px;
@@ -118,19 +118,19 @@
   &.closed {
     &::after {
       top: calc(50% + 2px);
-      border-top: 4px solid #ffffff;
+      border-top: 4px solid var(--asset-dropdown-text);
     }
   }
 
   &.opened {
     &::after {
-      border-bottom: 4px solid #ffffff;
+      border-bottom: 4px solid var(--asset-dropdown-text);
     }
   }
   span {
     font-size: 16px;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--asset-dropdown-text);
     // margin-top: 2px;
     @media screen and (max-width: $mobile-version-width) {
       font-size: 12px;

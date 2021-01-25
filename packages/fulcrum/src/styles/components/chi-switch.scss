@@ -20,7 +20,7 @@
 
       &:checked + .cb-checkmark,
       .cb-checkmark {
-        background-color: #283038;
+        background-color:var(--chi-switch-bg);
         &:before {
           background-color: #00c0ab;
           transform: translateX(0px);
@@ -32,7 +32,7 @@
     }
   }
   .cb-checkmark {
-    background-color: #283038;
+    background-color: var(--chi-switch-bg);
     cursor: pointer;
     position: absolute;
     width: 100%;
