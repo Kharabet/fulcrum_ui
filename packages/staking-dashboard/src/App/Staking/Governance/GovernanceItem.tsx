@@ -1,21 +1,22 @@
 import React from 'react'
+import GovernanceProposal from 'src/domain/GovernanceProposal'
+import hashUtils from 'app-lib/hashUtils'
+
 
 export interface IGovernanceItemProps {
-  description: string
-  author: string
-  action: string
+  proposal: GovernanceProposal
   openProposals: () => void
 }
 
 export default function GovernanceItem(props: IGovernanceItemProps) {
-  const { description, author, action } = props
+  const { title, proposer, state } = props.proposal
   return (
     <div className="trow" onClick={props.openProposals}>
-      <div className="trow__description">{description} </div>
+      <div className="trow__description">{title} </div>
       <div className="trow__right">
-        <div className="trow__author">{author}</div>
+        <div className="trow__author">{hashUtils.shortHash(proposer)}</div>
         <div className="trow__action">
-          <button className={`${action.toLocaleLowerCase()}`}>{action}</button>
+          <button className={`${state.toLocaleLowerCase()}`}>{state}</button>
         </div>
       </div>
     </div>

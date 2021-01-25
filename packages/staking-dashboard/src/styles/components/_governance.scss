@@ -143,18 +143,18 @@
         }
       }
       &__description {
-        font-size: 18px;
+        font-size: 16px;
         line-height: 1.5;
         font-weight: bold;
-
+        margin: 10px;
         color: #276bfb;
       }
       &__author {
         font-size: 16px;
         line-height: 1.6;
         color: #276bfb;
-        margin-right: 54px;
-        width: 105px;
+        margin-right: 20px;
+        width: 110px;
       }
       &__action {
         button {

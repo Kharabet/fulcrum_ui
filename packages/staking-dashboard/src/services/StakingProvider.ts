@@ -1,8 +1,10 @@
 import { BigNumber } from '@0x/utils'
-import { TransactionReceipt, Web3Wrapper } from '@0x/web3-wrapper'
+import { TransactionReceipt, Web3Wrapper, LogEntry } from '@0x/web3-wrapper'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
 import hashUtils from 'app-lib/hashUtils'
+import GovernanceProposal from 'src/domain/GovernanceProposal'
+import ProposalCreated from 'src/domain/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
 import appConfig from '../config/appConfig'
 import Asset from '../domain/Asset'
@@ -16,6 +18,11 @@ import StakingRequest from '../domain/StakingRequest'
 import Web3ConnectionFactory from '../domain/Web3ConnectionFactory'
 import { ContractsSource } from './ContractsSource'
 import ProviderChangedEvent from './events/ProviderChangedEvent'
+import { EventAbi, LogWithDecodedArgs, DecodedLogArgs } from 'ethereum-types'
+import {
+  CompoundGovernorAlphaEventArgs,
+  CompoundGovernorAlphaProposalCreatedEventArgs
+} from '../contracts/CompoundGovernorAlpha'
 
 interface IStakingProviderEvents {
   ProviderAvailable: () => void
@@ -238,6 +245,110 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       }
     }
 
+    return result
+  }
+
+  public async getGovernanceProposals(): Promise<Array<GovernanceProposal>> {
+    let result: Array<GovernanceProposal> = []
+
+    let proposalCreatedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalCreatedEventArgs>
+    > = []
+    let proposalsData = []
+    let proposalsStates: BigNumber[] = []
+
+    const enumerateProposalState = (state: number) => {
+      const proposalStates = [
+        'Pending',
+        'Active',
+        'Canceled',
+        'Defeated',
+        'Succeeded',
+        'Queued',
+        'Expired',
+        'Executed'
+      ]
+      return proposalStates[state]
+    }
+
+    if (!this.web3Wrapper || !this.contractsSource) {
+      throw new Error('getGovernanceProposals: Missing source or web3')
+    }
+    const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
+    const proposalsCount = await governanceContract.proposalCount.callAsync()
+    const events = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: [ProposalCreated.topic0],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+
+    const reverseEvents = events.reverse()
+    for (const i in reverseEvents) {
+      if (!reverseEvents[i]) {
+        continue
+      }
+      const event: LogEntry = reverseEvents[i]
+      this.web3Wrapper.abiDecoder.addABI([
+        {
+          anonymous: false,
+          inputs: [
+            { indexed: false, name: 'id', type: 'uint256' },
+            { indexed: false, name: 'proposer', type: 'address' },
+            { indexed: false, name: 'targets', type: 'address[]' },
+            { indexed: false, name: 'values', type: 'uint256[]' },
+            { indexed: false, name: 'signatures', type: 'string[]' },
+            { indexed: false, name: 'calldatas', type: 'bytes[]' },
+            { indexed: false, name: 'startBlock', type: 'uint256' },
+            { indexed: false, name: 'endBlock', type: 'uint256' },
+            { indexed: false, name: 'description', type: 'string' }
+          ],
+          name: 'ProposalCreated',
+          type: 'event'
+        } as EventAbi
+      ])
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalCreatedEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalCreatedEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+    for (const i of Array.from(Array(parseInt(proposalsCount.toFixed())), (n, i) => i + 1)) {
+      proposalsData.push(await governanceContract.proposals.callAsync(new BigNumber(i)))
+      proposalsStates.push(
+        new BigNumber(await governanceContract.state.callAsync(new BigNumber(i)))
+      )
+    }
+    const remappedProposals = proposalsData.reverse()
+      .map((p: any, i: any) => {
+        const id = p[0].toNumber()
+        const creationEvent = proposalCreatedEvents.find((e) => e.args.id.eq(id))
+        if (creationEvent === undefined) {
+          return null
+        }
+
+        const description = creationEvent.args.description
+        const splittedDescription = description.split(/\n/g)
+        p.title = splittedDescription[0].split('# ')[1] || 'Untitled'
+        splittedDescription.splice(0, 1)
+        p.description = splittedDescription.join('\n') || 'No description.'
+        p.state = enumerateProposalState(proposalsStates[i].toNumber())
+        return new GovernanceProposal(
+          id,
+          p.title,
+          p.description,
+          creationEvent.args.proposer,
+          p[5].div(10 ** 18),
+          p[6].div(10 ** 18),
+          p.state
+        )
+      })
+      .filter((e: any) => e !== null) as Array<GovernanceProposal>
+    result = remappedProposals
+    console.log({ result })
     return result
   }
 

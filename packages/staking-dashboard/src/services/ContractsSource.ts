@@ -3,6 +3,8 @@ import { erc20Contract } from '../contracts/erc20'
 import { iBZxContract } from '../contracts/iBZxContract'
 import { StakingV1Contract } from '../contracts/stakingV1'
 import { BZRXVestingTokenContract } from '../contracts/BZRXVestingToken'
+import { CompoundGovernorAlphaContract } from '../contracts/CompoundGovernorAlpha'
+
 // @ts-ignore
 import erc20Json from '../assets/artifacts/BUILD_APP_NETWORK/erc20.json'
 // @ts-ignore
@@ -11,6 +13,8 @@ import stakingV1Json from '../assets/artifacts/BUILD_APP_NETWORK/stakingV1.json'
 import iBZxJson from '../assets/artifacts/BUILD_APP_NETWORK/iBZx.json'
 // @ts-ignore
 import bzrxVestingJson from '../assets/artifacts/BUILD_APP_NETWORK/BZRXVestingToken.json'
+// @ts-ignore
+import compoundGovernorAlphaJson from '../assets/artifacts/BUILD_APP_NETWORK/CompoundGovernorAlpha.json'
 
 export class ContractsSource {
   private readonly provider: any
@@ -139,6 +143,24 @@ export class ContractsSource {
     return address
   }
 
+  
+  public getCompoundGovernorAlphaAddress(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'
+        break
+      case 3:
+        address = '0xc5bfed3bb38a3c4078d4f130f57ca4c560551d45'
+        break
+      case 42:
+        address = ''
+        break
+    }
+    return address
+  }
+
+
   private async getErc20ContractRaw(addressErc20: string) {
     return new erc20Contract(
       erc20Json.abi,
@@ -170,9 +192,18 @@ export class ContractsSource {
       this.provider
     )
   }
+  
+  private getCompoundGovernorAlphaContractRaw(): CompoundGovernorAlphaContract {
+    return new CompoundGovernorAlphaContract(
+      compoundGovernorAlphaJson.abi,
+      this.getCompoundGovernorAlphaAddress().toLowerCase(),
+      this.provider
+    )
+  }
 
   public getErc20Contract = _.memoize(this.getErc20ContractRaw)
   public getiBZxContract = _.memoize(this.getiBZxContractRaw)
   public getStakingV1Contract = _.memoize(this.getStakingV1ContractRaw)
   public getBzrxVestingContract = _.memoize(this.getBzrxVestingContractRaw)
+  public getCompoundGovernorAlphaContract = _.memoize(this.getCompoundGovernorAlphaContractRaw)
 }

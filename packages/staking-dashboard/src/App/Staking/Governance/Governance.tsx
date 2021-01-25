@@ -5,18 +5,13 @@ import Proposals from './Proposals/Proposals'
 import GovernanceItem from './GovernanceItem'
 
 export default function Governance({ vm }: { vm: GovernanceVM }) {
-  const governanceTable = [
-    {
-      description: 'New Formalized Proposal Flow',
-      author: '0x81eb...9c2d',
-      action: 'Active'
-    },
-    {
-      description: 'Force YAMv2 Mitigation to YAMv3 to Keep Community Consensus United',
-      author: '0x81eb...9c2d',
-      action: 'Closed'
-    }
-  ]
+  const governanceProposals = vm.governanceStore.proposalsList.map((proposal) => (
+    <GovernanceItem
+      key={proposal.id}
+      proposal={proposal}
+      openProposals={vm.proposals.show}
+    />
+  ))
 
   return (
     <React.Fragment>
@@ -40,19 +35,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
               <div className="thead__action">Action</div>
             </div>
           </div>
-          <div className="tbody">
-            {governanceTable.map((item, index) => {
-              return (
-                <GovernanceItem
-                  key={index}
-                  description={item.description}
-                  author={item.author}
-                  action={item.action}
-                  openProposals={vm.proposals.show}
-                />
-              )
-            })}
-          </div>
+          <div className="tbody">{governanceProposals}</div>
         </div>
       </div>
     </React.Fragment>
