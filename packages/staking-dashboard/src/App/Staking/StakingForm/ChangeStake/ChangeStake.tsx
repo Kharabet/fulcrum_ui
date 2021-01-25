@@ -8,12 +8,12 @@ export function ChangeStake({ vm }: { vm: StakingFormVM }) {
 
   return (
     <React.Fragment>
-      <div className="add-to-balance padded-2 bg-content">
+      <div className="padded-2 bg-content">
         <div className="bg-darken padded-2">
           <h3 className="section-header">Add to Staking Balance</h3>
           <div className="flex-row">
-            <h3 style={{position: 'relative', left: '67px'}}>In your wallet</h3>
-            <h3 style={{position: 'absolute', right: '83px'}}>Staked</h3>
+            <h3 style={{ position: 'relative', left: '67px' }}>In your wallet</h3>
+            <h3 style={{ position: 'absolute', right: '83px' }}>Staked</h3>
           </div>
           {wallet.bzrx.gt(0) && (
             <InputStake

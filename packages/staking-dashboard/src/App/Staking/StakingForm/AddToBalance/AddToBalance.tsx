@@ -9,7 +9,7 @@ import SpendingAllowance from './SpendingAllowance'
 export function AddToBalance({ vm }: { vm: StakingFormVM }) {
   return (
     <React.Fragment>
-      <div className="add-to-balance margin-top-2">
+      <div className="margin-top-2">
         <div className="margin-bottom-2">
           {vm.userBalances.wallet.isWorthEnough && (
             <ButtonBasic
@@ -35,9 +35,11 @@ export function AddToBalance({ vm }: { vm: StakingFormVM }) {
 
         <SpendingAllowance vm={vm} />
 
-        <div className="panel--white padded-2">
-          {vm.unstakeSelected ? <Unstake vm={vm} /> : <Stake vm={vm} />}
-        </div>
+        {vm.stakingStore.stakingAllowances.needApprovalList.length < 4 && (
+          <div className="panel--white padded-2">
+            {vm.unstakeSelected ? <Unstake vm={vm} /> : <Stake vm={vm} />}
+          </div>
+        )}
       </div>
     </React.Fragment>
   )

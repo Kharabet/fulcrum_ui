@@ -6,10 +6,10 @@ import { ReactComponent as TokenVBzrx } from 'app-images/token-vbzrx.svg'
 import { InputBasic } from 'ui-framework'
 
 const icons: { [index: string]: React.ReactNode } = {
-  bzrx: <TokenBzrx className="stake__token-logo" />,
-  vbzrx: <TokenVBzrx className="stake__token-logo" />,
-  bpt: <TokenBpt className="stake__token-logo" />,
-  ibzrx: <TokenBpt className="stake__token-logo" />
+  bzrx: <TokenBzrx className="stake-input__token-logo" />,
+  vbzrx: <TokenVBzrx className="stake-input__token-logo" />,
+  bpt: <TokenBpt className="stake-input__token-logo" />,
+  ibzrx: <TokenBpt className="stake-input__token-logo" />
 }
 
 interface IStakeInputProps {
@@ -25,18 +25,23 @@ export function InputStake(props: IStakeInputProps) {
   const total = props.walletBalance.plus(props.stakedBalance)
 
   return (
-    <div className="calc-item">
+    <div className="margin-bottom-2 pos-rel">
       <div className="flex-row">
         <div>
-          <span>{icons[props.id]}</span><span className="label--small">{props.label}</span>
+          <span>{icons[props.id]}</span>
+          <span className="label--small">{props.label}</span>
         </div>
-        <div style={{width: '100%'}}>
-          <span className="margin-right-1 stake__value">{total.minus(props.value).toFixed(2)}</span>
-          <span className="stake__value" style={{position:'absolute', right: 0}}>{props.value}</span>
+        <div style={{ width: '100%' }}>
+          <span className="margin-right-1 stake-input__value">
+            {total.minus(props.value).toFixed(2)}
+          </span>
+          <span className="stake-input__value" style={{ position: 'absolute', right: 0 }}>
+            {props.value}
+          </span>
           {/* <InputBasic
             id={props.id}
             name={props.id}
-            className="add-to-balance__input"
+            className="stake-input__field"
             type="number"
             step="0.01"
             max={props.max.toFixed(2, 1)}
@@ -45,9 +50,10 @@ export function InputStake(props: IStakeInputProps) {
             onChange={props.onChange}
             onChangeEmit="name-value"
           /> */}
-          <div className="add-to-balance__range">
+          <div className="pos-rel">
             <InputBasic
               id={props.id}
+              className="stake-input__slider"
               name={props.id}
               step="0.01"
               type="range"
@@ -57,7 +63,7 @@ export function InputStake(props: IStakeInputProps) {
               onChange={props.onChange}
               onChangeEmit="name-value"
             />
-            <div className="line">
+            <div className="stake-input__line">
               <div />
               <div />
               <div />
