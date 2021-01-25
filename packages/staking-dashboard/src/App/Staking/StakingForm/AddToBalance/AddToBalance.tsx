@@ -4,6 +4,7 @@ import StakingFormVM from '../StakingFormVM'
 import Unstake from './Unstake'
 import Stake from './Stake'
 import { ButtonBasic } from 'ui-framework'
+import SpendingAllowance from './SpendingAllowance'
 
 export function AddToBalance({ vm }: { vm: StakingFormVM }) {
   return (
@@ -31,6 +32,8 @@ export function AddToBalance({ vm }: { vm: StakingFormVM }) {
             </ButtonBasic>
           )}
         </div>
+
+        <SpendingAllowance vm={vm} />
 
         <div className="panel--white padded-2">
           {vm.unstakeSelected ? <Unstake vm={vm} /> : <Stake vm={vm} />}
