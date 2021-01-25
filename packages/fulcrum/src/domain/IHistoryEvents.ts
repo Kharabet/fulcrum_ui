@@ -1,12 +1,15 @@
-import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
-import { EarnRewardEvent } from '../domain/events/EarnRewardEvent'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
-import { PayTradingFeeEvent } from '../domain/events/PayTradingFeeEvent'
-import { TradeEvent } from '../domain/events/TradeEvent'
-import { DepositCollateralEvent } from './events/DepositCollateralEvent'
-import { EarnRewardEventNew } from './events/EarnRewardEventNew'
-import { RolloverEvent } from './events/RolloverEvent'
-import { WithdrawCollateralEvent } from './events/WithdrawCollateralEvent'
+
+import {
+  CloseWithSwapEvent,
+  DepositCollateralEvent,
+  EarnRewardEvent,
+  EarnRewardEventNew,
+  LiquidationEvent,
+  PayTradingFeeEvent,
+  RolloverEvent,
+  TradeEvent,
+  WithdrawCollateralEvent
+} from 'bzx-common/src/domain/events'
 
 export interface IHistoryEvents {
   groupedEvents: Array<

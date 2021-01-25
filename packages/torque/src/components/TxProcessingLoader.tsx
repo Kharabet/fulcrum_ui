@@ -84,7 +84,6 @@ export class TxProcessingLoader extends Component<
     const title = this.getTitle()
     if (this.state.requestTask === undefined || !title) return null
 
-    console.log(this.state.requestTask)
     return (
       <React.Fragment>
         {this.state.requestTask.txHash ? (

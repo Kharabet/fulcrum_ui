@@ -47,10 +47,10 @@ export class UnlendEthProcessor {
       amountInBaseUnits = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS
     }
 
-    console.log(
-      tokenContract.address,
-      await tokenContract.burnToEther.getABIEncodedTransactionData(account, amountInBaseUnits)
-    )
+    // console.log(
+    //   tokenContract.address,
+    //   await tokenContract.burnToEther.getABIEncodedTransactionData(account, amountInBaseUnits)
+    // )
 
     // Waiting for token allowance
     if (skipGas) {

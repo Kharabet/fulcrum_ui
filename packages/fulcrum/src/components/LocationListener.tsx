@@ -30,7 +30,6 @@ export class LocationListener extends Component<ILocationListenerProps> {
         doNetworkConnect()
       }
     }
-    // console.log(`location`, location.pathname);
   }
 
   public render() {

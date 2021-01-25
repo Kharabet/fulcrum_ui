@@ -28,7 +28,6 @@ import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { FulcrumProviderEvents } from './events/FulcrumProviderEvents'
 import { LendTransactionMinedEvent } from './events/LendTransactionMinedEvent'
 import { TasksQueueEvents } from './events/TasksQueueEvents'
-import { TradeTransactionMinedEvent } from './events/TradeTransactionMinedEvent'
 import { TasksQueue } from './TasksQueue'
 
 import TagManager from 'react-gtm-module'
@@ -38,20 +37,33 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 
 import Web3Utils from 'web3-utils'
 
-import siteConfig from './../config/SiteConfig.json'
+import {
+  CloseWithSwapEvent,
+  DepositCollateralEvent,
+  EarnRewardEvent,
+  EarnRewardEventNew,
+  LiquidationEvent,
+  PayTradingFeeEvent,
+  RolloverEvent,
+  TradeEvent,
+  WithdrawCollateralEvent
+} from 'bzx-common/src/domain/events'
+import {
+  getCloseWithSwapHistory,
+  getDepositCollateralHistory,
+  getEarnRewardHistory,
+  getLiquidationHistory,
+  getLogsFromEtherscan,
+  getPayTradingFeeHistory,
+  getRolloverHistory,
+  getTradeHistory,
+  getWithdrawCollateralHistory
+} from 'bzx-common/src/utils'
+
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { TradeEvent } from '../domain/events/TradeEvent'
-import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
-import { EarnRewardEvent } from '../domain/events/EarnRewardEvent'
-import { EarnRewardEventNew, FeeType } from '../domain/events/EarnRewardEventNew'
-import { PayTradingFeeEvent } from '../domain/events/PayTradingFeeEvent'
-import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
-import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
 import { ILoanParams } from '../domain/ILoanParams'
 import { RolloverRequest } from '../domain/RolloverRequest'
-import { RolloverEvent } from '../domain/events/RolloverEvent'
 import { IExtendState } from '../domain/IExtendState'
 import { IExtendEstimate } from '../domain/IExtendEstimate'
 
@@ -80,7 +92,6 @@ const initialNetworkId = getNetworkIdByString(networkName)
 export class FulcrumProvider {
   public static Instance: FulcrumProvider
   public impersonateAddress = ''
-  private readonly impersionateAddress = ''
   public readonly gasLimit = '4500000'
   public static readonly ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -134,7 +145,6 @@ export class FulcrumProvider {
         Asset.YFI,
         Asset.BZRX,
         Asset.MKR,
-        Asset.LEND,
         Asset.KNC,
         Asset.UNI,
         Asset.AAVE,
@@ -189,7 +199,7 @@ export class FulcrumProvider {
     try {
       response = localStorage.getItem(item) || ''
     } catch (e) {
-      // console.log(e);
+      console.error(e)
     }
     return response
   }
@@ -198,7 +208,7 @@ export class FulcrumProvider {
     try {
       localStorage.setItem(item, val)
     } catch (e) {
-      // console.log(e);
+      console.error(e)
     }
   }
 
@@ -250,8 +260,6 @@ export class FulcrumProvider {
       )
       await newContractsSource.Init()
       this.contractsSource = newContractsSource
-      console.log(`contractsource: ${this.contractsSource}`)
-      console.log(`contractsource can write: ${this.contractsSource.canWrite}`)
     } else {
       this.contractsSource = null
     }
@@ -291,7 +299,7 @@ export class FulcrumProvider {
       try {
         this.accounts = [sellectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch (e) {
-        // console.log(e);
+        console.error(e)
         this.accounts = []
       }
       if (this.accounts.length === 0) {
@@ -514,7 +522,6 @@ export class FulcrumProvider {
         amount = new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
         amount = new BigNumber(10 ** 18).multipliedBy(750000);
-      case Asset.LEND:
       case Asset.KNC:
         amount = new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.BAT:
@@ -548,7 +555,7 @@ export class FulcrumProvider {
     asset: Asset,
     amountInBaseUnits: BigNumber
   ): Promise<string> => {
-    const resetRequiredAssets = [Asset.USDT, Asset.KNC, Asset.LEND] // these assets require to set approve to 0 before approve larger amount than the current spend limit
+    const resetRequiredAssets = [Asset.USDT, Asset.KNC] // these assets require to set approve to 0 before approve larger amount than the current spend limit
     let result = ''
     const assetErc20Address = this.getErc20AddressOfAsset(asset)
 
@@ -1495,7 +1502,6 @@ export class FulcrumProvider {
     const account = this.getCurrentAccount()
 
     if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      console.log('iToken ', loanToken)
       const tokenContract = this.contractsSource.getITokenContract(loanToken)
       if (!tokenContract) return result
       const leverageAmount =
@@ -1518,12 +1524,6 @@ export class FulcrumProvider {
       const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18
 
       try {
-        console.log('leverageAmount' + leverageAmount)
-        console.log('loanTokenSent' + loanTokenSent)
-        console.log('collateralTokenSent' + collateralTokenSent)
-        console.log('collateralTokenAddress' + collateralTokenAddress)
-        console.log('iTokenAddress' + tokenContract.address)
-
         const marginDetails = await tokenContract.getEstimatedMarginDetails.callAsync(
           leverageAmount,
           loanTokenSent,
@@ -1742,20 +1742,19 @@ export class FulcrumProvider {
             .div(maxAmountInBaseUnits)
             .lte(0.01)
         ) {
-          console.log('close full amount')
           amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1))
         }
 
-        console.log(
-          iBZxContract.address,
-          await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
-            request.loanId,
-            account,
-            amountInBaseUnits,
-            request.returnTokenIsCollateral, // returnTokenIsCollateral
-            request.loanDataBytes
-          )
-        )
+        // console.log(
+        //   iBZxContract.address,
+        //   await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
+        //     request.loanId,
+        //     account,
+        //     amountInBaseUnits,
+        //     request.returnTokenIsCollateral, // returnTokenIsCollateral
+        //     request.loanDataBytes
+        //   )
+        // )
 
         const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
 
@@ -1787,9 +1786,8 @@ export class FulcrumProvider {
                   }
                 )
         } catch (e) {
-          console.log(e)
+          console.error(e)
         }
-        console.log(result)
       }
     }
     return result
@@ -1894,7 +1892,6 @@ export class FulcrumProvider {
         } as IBorrowedFundsState
       })
       .filter((e: IBorrowedFundsState | undefined) => e)
-    console.log(result)
     return result
   }
 
@@ -2160,7 +2157,7 @@ export class FulcrumProvider {
           .dividedBy(10 ** 18)
           .multipliedBy(swapPriceData[1].dividedBy(10 ** 18)) // swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
-        console.log(e)
+        console.error(e)
         result = new BigNumber(0)
       }
     }
@@ -2173,9 +2170,9 @@ export class FulcrumProvider {
     destAsset: Asset,
     srcAmount?: BigNumber
   ): Promise<BigNumber> {
-    if (!isMainnetProd) {
-      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract
-      return await this.getSwapRate(srcAsset, destAsset)
+    if (networkName !== 'mainnet') {
+      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract 
+      return this.getSwapRate(srcAsset, destAsset)
     }
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
@@ -2212,404 +2209,55 @@ export class FulcrumProvider {
         )
         result = new BigNumber(swapPriceData[0]).dividedBy(10 ** 18)
       } catch (e) {
-        console.log(e)
+        console.error(e)
         result = new BigNumber(0)
       }
     }
     return result
   }
 
-  private getOldRewradEvents = async (
-    bzxContractAddress: string,
-    account: string,
-    etherscanApiKey: string
-  ): Promise<any | undefined> => {
-    const etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            EarnRewardEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            EarnRewardEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-    const earnRewardEventResponse = await fetch(etherscanApiUrl)
-    const earnRewardEventResponseJson = await earnRewardEventResponse.json()
-    const result = earnRewardEventResponseJson.result
-    return result instanceof Array && result.length > 0 ? result : undefined
-  }
-
-  private getNewRewradEvents = async (
-    bzxContractAddress: string,
-    account: string,
-    etherscanApiKey: string
-  ): Promise<any | undefined> => {
-    const etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            EarnRewardEventNew.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            EarnRewardEventNew.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-    const earnRewardEventNewResponse = await fetch(etherscanApiUrl)
-    const earnRewardEventNewResponseJson = await earnRewardEventNewResponse.json()
-    const result = earnRewardEventNewResponseJson.result
-    return result instanceof Array && result.length > 0 ? result : undefined
-  }
-
   public getEarnRewardHistory = async (): Promise<Array<EarnRewardEvent | EarnRewardEventNew>> => {
     let result: Array<EarnRewardEvent | EarnRewardEventNew> = []
     const account = this.getCurrentAccount()
 
-    if (!this.contractsSource) return result
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    if (!account || !bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    const events = await this.getOldRewradEvents(bzxContractAddress, account, etherscanApiKey)
-
-    events &&
-      events.reverse().forEach((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const tokenAddress = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const token = this.contractsSource!.getAssetFromAddress(tokenAddress)
-        if (token === Asset.UNKNOWN) return null
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
-
-        const amount = new BigNumber(parseInt(dataSegments[0], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        result.push(
-          new EarnRewardEvent(userAddress, token, loandId, amount.div(10 ** 18), timeStamp, txHash)
-        )
-      })
-
-    const eventsNew = await this.getNewRewradEvents(bzxContractAddress, account, etherscanApiKey)
-    eventsNew &&
-      eventsNew.forEach((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const loandId = event.topics[2]
-        const feeType = parseInt(event.topics[3], 16)
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
-        const tokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
-        const token = this.contractsSource!.getAssetFromAddress(tokenAddress)
-        if (token === Asset.UNKNOWN) return null
-
-        const amount = new BigNumber(parseInt(dataSegments[1], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        result.push(
-          new EarnRewardEventNew(
-            userAddress,
-            loandId,
-            feeType,
-            token,
-            amount.div(10 ** 18),
-            timeStamp,
-            txHash
-          )
-        )
-      })
-    return result
+    if (!this.contractsSource || !this.web3Wrapper || !account) return result
+    return getEarnRewardHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getPayTradingFeeHistory = async (): Promise<PayTradingFeeEvent[]> => {
     let result: PayTradingFeeEvent[] = []
     const account = this.getCurrentAccount()
 
-    if (!this.contractsSource) return result
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    if (!account || !bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            PayTradingFeeEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            PayTradingFeeEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-    const payTradingFeeEventResponse = await fetch(etherscanApiUrl)
-    const payTradingFeeEventResponseJson = await payTradingFeeEventResponse.json()
-    if (payTradingFeeEventResponseJson.status !== '1') return result
-    const events = payTradingFeeEventResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const tokenAddress = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const token = this.contractsSource!.getAssetFromAddress(tokenAddress)
-        if (token === Asset.UNKNOWN) return null
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return result
-        const decimals = AssetsDictionary.assets.get(token)!.decimals || 18
-        const amount = new BigNumber(parseInt(dataSegments[0], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new PayTradingFeeEvent(
-          userAddress,
-          token,
-          loandId,
-          amount.div(10 ** decimals),
-          timeStamp,
-          txHash
-        )
-      })
-      .filter((e: any) => e)
-    return result
+    if (!this.contractsSource || !this.web3Wrapper || !account) return result
+    return getPayTradingFeeHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = []
     const account = this.getCurrentAccount()
-
-    if (!this.contractsSource) return result
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    if (!account || !bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            TradeEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            TradeEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-    const tradeEventResponse = await fetch(etherscanApiUrl)
-    const tradeEventResponseJson = await tradeEventResponse.json()
-    if (tradeEventResponseJson.status !== '1') return result
-    const events = tradeEventResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return result
-        const collateralTokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
-        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
-        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
-        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
-
-        const positionSize = new BigNumber(parseInt(dataSegments[2], 16))
-        const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16))
-        const interestRate = new BigNumber(parseInt(dataSegments[4], 16))
-        const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000)
-        const entryPrice = new BigNumber(parseInt(dataSegments[6], 16))
-        const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16))
-        const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new TradeEvent(
-          userAddress,
-          lender,
-          loandId,
-          collateralToken,
-          loanToken,
-          positionSize,
-          borrowedAmount,
-          interestRate,
-          settlementDate,
-          entryPrice,
-          entryLeverage,
-          currentLeverage,
-          timeStamp,
-          txHash
-        )
-      })
-      .filter((e: any) => e)
-    return result
+    if (!this.contractsSource || !this.web3Wrapper || !account) return result
+    return getTradeHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
     let result: RolloverEvent[] = []
     const account = this.getCurrentAccount()
-
-    if (!this.contractsSource) return result
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    if (!account || !bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl = `https://${
-      networkName === 'kovan' ? 'api-kovan' : 'api'
-    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-      RolloverEvent.topic0
-    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-
-    const rolloverEventResponse = await fetch(etherscanApiUrl)
-    const rolloverEventResponseJson = await rolloverEventResponse.json()
-    if (rolloverEventResponseJson.status !== '1') return result
-    const events = rolloverEventResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const caller = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return result
-        const lender = dataSegments[0].replace('000000000000000000000000', '0x')
-        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
-        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
-        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
-        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
-
-        const collateralAmountUsed = new BigNumber(parseInt(dataSegments[3], 16))
-        const interestAmountAdded = new BigNumber(parseInt(dataSegments[4], 16))
-        const loanEndTimestamp = new Date(parseInt(dataSegments[5], 16) * 1000)
-        const gasRebate = new BigNumber(parseInt(dataSegments[6], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new RolloverEvent(
-          userAddress,
-          caller,
-          loandId,
-          lender,
-          loanToken,
-          collateralToken,
-          collateralAmountUsed,
-          interestAmountAdded,
-          loanEndTimestamp,
-          gasRebate,
-          timeStamp,
-          txHash
-        )
-      })
-      .filter((e: any) => e)
-    return result
+    if (!this.contractsSource || !this.web3Wrapper || !account) return result
+    return getRolloverHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = []
     const account = this.getCurrentAccount()
-
-    if (!this.contractsSource) return result
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    if (!account || !bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            CloseWithSwapEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            CloseWithSwapEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-    const closeWithSwapResponse = await fetch(etherscanApiUrl)
-    const closeWithSwapResponseJson = await closeWithSwapResponse.json()
-    if (closeWithSwapResponseJson.status !== '1') return result
-    const events = closeWithSwapResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const lender = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const loandId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return result
-        const collateralTokenAddress = dataSegments[0].replace('000000000000000000000000', '0x')
-        const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
-        const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
-        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
-
-        const closer = dataSegments[2].replace('000000000000000000000000', '0x')
-        const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16))
-        const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16))
-        const exitPrice = new BigNumber(parseInt(dataSegments[5], 16))
-        const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new CloseWithSwapEvent(
-          userAddress,
-          collateralToken,
-          loanToken,
-          lender,
-          closer,
-          loandId,
-          positionCloseSize,
-          loanCloseAmount,
-          exitPrice,
-          currentLeverage,
-          timeStamp,
-          txHash
-        )
-      })
-      .filter((e: any) => e)
-    return result
+    if (!this.contractsSource || !this.web3Wrapper || !account) return result
+    return getCloseWithSwapHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = []
     const account = this.getCurrentAccount()
-
-    if (!this.contractsSource) return result
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    if (!account || !bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            LiquidationEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            LiquidationEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-    const liquidationEventResponse = await fetch(etherscanApiUrl)
-    const liquidationEventResponseJson = await liquidationEventResponse.json()
-    if (liquidationEventResponseJson.status !== '1') return result
-    const events = liquidationEventResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const liquidatorAddress = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const loanId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return result
-        const lender = dataSegments[0].replace('000000000000000000000000', '0x')
-
-        const baseTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
-        const quoteTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
-        const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress)
-        const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress)
-        if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return null
-
-        const repayAmount = new BigNumber(parseInt(dataSegments[3], 16))
-        const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16))
-        const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16))
-        const currentMargin = new BigNumber(parseInt(dataSegments[6], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new LiquidationEvent(
-          userAddress,
-          liquidatorAddress,
-          loanId,
-          lender,
-          baseToken,
-          quoteToken,
-          repayAmount,
-          collateralWithdrawAmount,
-          collateralToLoanRate,
-          currentMargin,
-          timeStamp,
-          txHash
-        )
-      })
-      .filter((e: any) => e)
-    return result
+    if (!this.contractsSource || !this.web3Wrapper || !account) return result
+    return getLiquidationHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
@@ -2619,19 +2267,16 @@ export class FulcrumProvider {
     if (!account || !this.contractsSource || !this.web3Wrapper) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
     const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
-    const etherscanApiUrl = `https://${
-      networkName === 'kovan' ? 'api-kovan' : 'api'
-    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${blockNumber -
-      days * blocksPerDay}&toBlock=latest&address=${bzxContractAddress}&topic0=${
-      LiquidationEvent.topic0
-    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-
-    const liquidationEventResponse = await fetch(etherscanApiUrl)
-    const liquidationEventResponseJson = await liquidationEventResponse.json()
-    if (liquidationEventResponseJson.status !== '1') return result
-    const events = liquidationEventResponseJson.result
+    const events =
+      (await getLogsFromEtherscan(
+        (blockNumber - days * blocksPerDay).toString(),
+        'latest',
+        bzxContractAddress,
+        [LiquidationEvent.topic0, `0x000000000000000000000000${account.replace('0x', '')}`],
+        networkName!,
+        configProviders.Etherscan_Api
+      )) || []
     const liquidationEvents = events.filter((event: any) => {
       const data = event.data.replace('0x', '')
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
@@ -2650,97 +2295,15 @@ export class FulcrumProvider {
   public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
     let result: DepositCollateralEvent[] = []
     const account = this.getCurrentAccount()
-
-    if (!this.contractsSource) return result
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    if (!account || !bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            DepositCollateralEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            DepositCollateralEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-    const depositCollateralEventResponse = await fetch(etherscanApiUrl)
-    const depositCollateralEventResponseJson = await depositCollateralEventResponse.json()
-    if (depositCollateralEventResponseJson.status !== '1') return result
-    const events = depositCollateralEventResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const depositTokenAddress = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const depositToken = this.contractsSource!.getAssetFromAddress(depositTokenAddress)
-        if (depositToken === Asset.UNKNOWN) return null
-
-        const loanId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return result
-        const depositAmount = new BigNumber(parseInt(dataSegments[0], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new DepositCollateralEvent(
-          userAddress,
-          depositToken,
-          loanId,
-          depositAmount,
-          timeStamp,
-          txHash
-        )
-      })
-      .filter((e: any) => e)
-    return result
+    if (!this.contractsSource || !this.web3Wrapper || !account) return result
+    return getDepositCollateralHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
     let result: WithdrawCollateralEvent[] = []
     const account = this.getCurrentAccount()
-
-    if (!this.contractsSource) return result
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
-    if (!account || !bzxContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api
-    let etherscanApiUrl =
-      networkName === 'kovan'
-        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            WithdrawCollateralEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${
-            WithdrawCollateralEvent.topic0
-          }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
-    const withdrawCollateralEventResponse = await fetch(etherscanApiUrl)
-    const withdrawCollateralEventResponseJson = await withdrawCollateralEventResponse.json()
-    if (withdrawCollateralEventResponseJson.status !== '1') return result
-    const events = withdrawCollateralEventResponseJson.result
-    result = events
-      .reverse()
-      .map((event: any) => {
-        const userAddress = event.topics[1].replace('0x000000000000000000000000', '0x')
-        const withdrawTokenAddress = event.topics[2].replace('0x000000000000000000000000', '0x')
-        const withdrawToken = this.contractsSource!.getAssetFromAddress(withdrawTokenAddress)
-        if (withdrawToken === Asset.UNKNOWN) return null
-
-        const loanId = event.topics[3]
-        const data = event.data.replace('0x', '')
-        const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return result
-        const withdrawAmount = new BigNumber(parseInt(dataSegments[0], 16))
-        const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000)
-        const txHash = event.transactionHash
-        return new WithdrawCollateralEvent(
-          userAddress,
-          withdrawToken,
-          loanId,
-          withdrawAmount,
-          timeStamp,
-          txHash
-        )
-      })
-      .filter((e: any) => e)
-    return result
+    if (!this.contractsSource || !this.web3Wrapper || !account) return result
+    return getWithdrawCollateralHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
@@ -2927,8 +2490,7 @@ console.log(err, added);
       if (
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
+        console.error(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -2961,8 +2523,7 @@ console.log(err, added);
       if (
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
+        console.error(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -3189,8 +2750,7 @@ console.log(err, added);
       if (
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
+        console.error(e)
       }
       task.processingEnd(false, false, e)
     } finally {
@@ -3221,8 +2781,7 @@ console.log(err, added);
       if (
         !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
       ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
+        console.error(e)
       }
       task.processingEnd(false, false, e)
     } finally {
