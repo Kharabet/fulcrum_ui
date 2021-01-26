@@ -1,9 +1,13 @@
 import React from 'react'
 
-export function ExternalLink (props: any) {
-  const {children, ...otherProps} = props
+export function ExternalLink(props: any) {
+  const { children, showIcon, className, ...otherProps } = props
+  let cssClass = showIcon ? 'link--external' : ''
+  if (props.className) {
+    cssClass += ` ${props.className}`
+  }
   return (
-    <a {...otherProps} target="_blank" rel="noreferrer">
+    <a {...otherProps} className={cssClass} target="_blank" rel="noreferrer">
       {children}
     </a>
   )

@@ -121,4 +121,15 @@ header {
       justify-content: center;
     }
   }
+
+  .header__link {
+    font-size: 26px;
+  }
+}
+
+.header__link {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 18px;
+  color: $green-color;
 }

@@ -1,0 +1,9 @@
+.md-visible {
+  display: none;
+}
+
+@media screen and (min-width: $width-min-md) {
+  .md-visible {
+    display: initial;
+  }
+}
