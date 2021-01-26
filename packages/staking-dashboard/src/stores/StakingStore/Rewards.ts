@@ -111,11 +111,16 @@ export default class Rewards {
     }
   }
 
+  /**
+   * Rebate rewards are half the fees going back to the user in form of vbzrx
+   */
   public async claimRebateRewards() {
     this.assign({ error: null, pendingRebateRewards: true })
     try {
       await this.stakingProvider.claimRebateRewards()
+      const vbzrxAmount = this.rebateRewards
       this.set('rebateRewards', new BigNumber(0))
+      return vbzrxAmount
     } catch (err) {
       const error = errorUtils.decorateError(err, { title: 'Failed to claim rebate rewards' })
       this.set('error', error)
@@ -124,11 +129,16 @@ export default class Rewards {
     }
   }
 
+  /**
+   * Mostly for users who hold vbzrx in their wallet and just want to claim their bzrx
+   */
   public async claimVestedBzrx() {
     this.assign({ error: null, pendingVbzrxClaim: true })
     try {
-      const result = await this.stakingProvider.claimRebateRewards()
-      return result
+      await this.stakingProvider.claimVestedBZRX()
+      const bzrxAmount = this.vestedVbzrx
+      this.set('vestedVbzrx', new BigNumber(0))
+      return bzrxAmount
     } catch (err) {
       const error = errorUtils.decorateError(err, { title: 'Failed to claim vested BZRX' })
       this.set('error', error)
@@ -143,6 +153,7 @@ export default class Rewards {
     this.rebateRewards = new BigNumber(0)
     this.stableCoin = new BigNumber(0)
     this.stableCoinVesting = new BigNumber(0)
+    this.vestedVbzrx = new BigNumber(0)
   }
 
   constructor(stakingProvider: StakingProvider, stakingStore: StakingStore) {

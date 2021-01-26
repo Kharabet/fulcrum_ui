@@ -23,6 +23,7 @@ export default class RewardsVM {
   constructor({ rootStore }: { rootStore: RootStore }) {
     this.rootStore = rootStore
     this.stakingStore = rootStore.stakingStore
+    this.rewards = rootStore.stakingStore.rewards
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }
 }

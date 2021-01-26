@@ -5,6 +5,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import AppVM from '../AppVM'
 import OnChainIndicator from './OnChainIndicator'
+import ExternalLink from 'shared-components/ExternalLink'
 
 export function HeaderDesktop({ appVM }: { appVM: AppVM }) {
   return (
@@ -20,13 +21,9 @@ export function HeaderDesktop({ appVM }: { appVM: AppVM }) {
             </div>
           </Link>
           <div className="flex ai-c header-right">
-            <a
-              href="https://help.bzx.network/en/"
-              className={`item-menu`}
-              target="_blank"
-              rel="noopener noreferrer">
+            <ExternalLink href="https://help.bzx.network/en/" className="item-menu">
               Help Center
-            </a>
+            </ExternalLink>
             <OnChainIndicator appVM={appVM} />
           </div>
         </div>

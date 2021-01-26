@@ -118,12 +118,12 @@ export default class StakingStore {
   }
 
   /**
-   * Updates the user wallet model and sets a new wallet update diff.
+   * Updates the "user wallet update" model and sets a new wallet update diff.
    * (eg: useful to notify wallet change)
    * @param diff Amounts of tokens that are added or removed from the wallet
    */
   public updateUserWallet(diff: ITokenAmounts[]) {
-    const { wallet, staked } = this.userBalances
+    const { wallet, staked } = this.userBalances.getCopy()
     const amounts = diff.reduce(
       (acc, tokenAmount) => {
         const balance = tokenAmount.staked ? staked : wallet
@@ -143,35 +143,41 @@ export default class StakingStore {
     )
     const walletUpdate = new WalletUpdate(amounts)
     this.walletUpdate = walletUpdate
+
+    diff.forEach((tokenDiff) => {
+      const destination = tokenDiff.staked ? this.userBalances.staked : this.userBalances.wallet
+      destination.add({ [tokenDiff.token]: tokenDiff.amount })
+    })
   }
 
   /**
    * Claim staking rewards and update user balances
    */
   public async claimStakingRewards(shouldRestake: boolean = false) {
-    try {
-      const claimed = await this.rewards.claimStakingRewards(shouldRestake)
-      this.updateUserWallet([
-        { token: 'bzrx', amount: claimed.bzrx, staked: shouldRestake },
-        { token: 'crv', amount: claimed.stableCoin, staked: false }
-      ])
-      this.userBalances.wallet.add({ bzrx: claimed.bzrx, crv: claimed.stableCoin })
-      return this.userBalances.getUserBalances()
-    } catch (err) {
-      console.error(err)
-    }
+    const claimed = await this.rewards.claimStakingRewards(shouldRestake)
+    this.updateUserWallet([
+      { token: 'bzrx', amount: claimed.bzrx, staked: shouldRestake },
+      { token: 'crv', amount: claimed.stableCoin, staked: false }
+    ])
   }
 
   /**
    * Claim rebate rewards and update user balances
    */
   public async claimRebateRewards() {
-    try {
-      await this.rewards.claimRebateRewards()
-      return this.userBalances.getUserBalances()
-    } catch (err) {
-      this.set('stakingError', err)
-      console.error(err)
+    const vbzrxAmount = await this.rewards.claimRebateRewards()
+    if (vbzrxAmount) {
+      this.updateUserWallet([{ token: 'vbzrx', amount: vbzrxAmount, staked: false }])
+    }
+  }
+
+  /**
+   * Claim vested BZRX and update user balances
+   */
+  public async claimVestedBzrx() {
+    const bzrxAmount = await this.rewards.claimVestedBzrx()
+    if (bzrxAmount) {
+      this.updateUserWallet([{ token: 'bzrx', amount: bzrxAmount, staked: false }])
     }
   }
 
@@ -187,7 +193,7 @@ export default class StakingStore {
       // })
       await this.userBalances.getUserBalances()
       await this.stakingAllowances.check()
-      await sleep(1000)
+      await sleep(500)
       await this.rewards.getAllRewards()
     } else {
       this.userBalances.clearBalances()
@@ -200,15 +206,6 @@ export default class StakingStore {
     // when user goes to the staking page
     const sp = this.stakingProvider
     sp.on('ProviderChanged', this.syncData)
-
-    // setTimeout(async () => {
-    //   try {
-    //     const result = await this.stakingAllowances.bzrx.check()
-    //     console.log(result.toFixed())
-    //   } catch (err) {
-    //     this.set('stakingError', err)
-    //   }
-    // }, 5000)
   }
 
   constructor(rootStore: RootStore) {

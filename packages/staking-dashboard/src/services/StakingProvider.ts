@@ -866,7 +866,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       task.processingEnd(true, false, null)
     } catch (err) {
       task.processingEnd(false, false, err)
-      console.log('hey')
       throw err
     } finally {
       this.emit('AskToCloseProgressDlg', task)

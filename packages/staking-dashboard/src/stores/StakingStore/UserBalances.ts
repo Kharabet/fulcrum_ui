@@ -8,7 +8,7 @@ import RootStore from '../RootStore'
 type userBalanceProp = 'pending' | 'stakingProvider' | 'error'
 type tokens = 'bpt' | 'bzrx' | 'vbzrx' | 'ibzrx' | 'crv'
 
-class TokenBalances {
+export class TokenBalances {
   [name: string]: any
   public bzrx = new BigNumber(0)
   public ibzrx = new BigNumber(0)
@@ -91,6 +91,16 @@ class TokenBalances {
     this.crv = new BigNumber(0)
   }
 
+  public getCopy() {
+    const balances = new TokenBalances()
+    balances.set('bzrx', new BigNumber(this.bzrx))
+    balances.set('vbzrx', new BigNumber(this.vbzrx))
+    balances.set('ibzrx', new BigNumber(this.ibzrx))
+    balances.set('bpt', new BigNumber(this.bpt))
+    balances.set('crv', new BigNumber(this.crv))
+    return balances
+  }
+
   constructor() {
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }
@@ -162,6 +172,13 @@ export default class UserBalances {
     this.wallet.clearBalances()
     this.staked.clearBalances()
     this.loaded = false
+  }
+
+  public getCopy() {
+    return {
+      wallet: this.wallet.getCopy(),
+      staked: this.staked.getCopy()
+    }
   }
 
   constructor(stakingProvider: StakingProvider, rootStore: RootStore) {
