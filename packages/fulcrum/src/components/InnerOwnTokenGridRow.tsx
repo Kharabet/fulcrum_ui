@@ -53,6 +53,7 @@ interface IInnerOwnTokenGridRowState {
   request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
   valueChange: BigNumber
   resultTx: boolean
+  activeTokenProfit: Asset
 }
 
 export class InnerOwnTokenGridRow extends Component<
@@ -69,7 +70,8 @@ export class InnerOwnTokenGridRow extends Component<
       isLoadingTransaction: false,
       request: undefined,
       resultTx: false,
-      valueChange: new BigNumber(0)
+      valueChange: new BigNumber(0),
+      activeTokenProfit: props.baseToken
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -243,22 +245,24 @@ export class InnerOwnTokenGridRow extends Component<
     ) {
       profitTitle =
         this.props.positionType === PositionType.LONG
-          ? `${this.props.profitCollateralToken.toFixed()} | ${this.props.profitLoanToken.toFixed()}`
-          : `${this.props.profitLoanToken.toFixed()} | ${this.props.profitCollateralToken.toFixed()}`
+          ? this.state.activeTokenProfit === this.props.baseToken
+            ? `${this.props.profitCollateralToken.toFixed()}`
+            : `${this.props.profitLoanToken.toFixed()}`
+          : this.state.activeTokenProfit === this.props.baseToken
+          ? `${this.props.profitLoanToken.toFixed()}`
+          : `${this.props.profitCollateralToken.toFixed()}`
       profitValue =
         this.props.positionType === PositionType.LONG ? (
           <React.Fragment>
-            {this.props.profitCollateralToken.toFixed(2)}&nbsp;
-            <span className="inner-own-token-grid-row__line" />
-            &nbsp;
-            {this.props.profitLoanToken.toFixed(precisionDigits)}
+            {this.state.activeTokenProfit === this.props.baseToken
+              ? this.props.profitCollateralToken.toFixed(2)
+              : this.props.profitLoanToken.toFixed(precisionDigits)}
           </React.Fragment>
         ) : (
           <React.Fragment>
-            {this.props.profitLoanToken.toFixed(2)}&nbsp;
-            <span className="inner-own-token-grid-row__line" />
-            &nbsp;
-            {this.props.profitCollateralToken.toFixed(precisionDigits)}
+            {this.state.activeTokenProfit === this.props.baseToken
+              ? this.props.profitLoanToken.toFixed(2)
+              : this.props.profitCollateralToken.toFixed(precisionDigits)}
           </React.Fragment>
         )
     }
@@ -273,13 +277,7 @@ export class InnerOwnTokenGridRow extends Component<
     }
     if (!this.props.profitCollateralToken || !this.props.profitLoanToken || isRollover) {
       profitTitle = ''
-      profitValue = (
-        <React.Fragment>
-          – &nbsp;
-          <span className="inner-own-token-grid-row__line" />
-          &nbsp; –
-        </React.Fragment>
-      )
+      profitValue = '–'
     }
 
     return (
@@ -399,7 +397,9 @@ export class InnerOwnTokenGridRow extends Component<
               </span>
 
               {!this.state.isLoading ? (
-                <React.Fragment>{this.props.liquidationPrice.toFixed(precisionDigits)}</React.Fragment>
+                <React.Fragment>
+                  {this.props.liquidationPrice.toFixed(precisionDigits)}
+                </React.Fragment>
               ) : (
                 <Preloader width="74px" />
               )}
@@ -412,6 +412,26 @@ export class InnerOwnTokenGridRow extends Component<
                 </label>
               </span>
               {!this.state.isLoading ? profitValue : <Preloader width="74px" />}
+              <div className="inner-own-token-grid-row__col-profit-switch">
+                <label
+                  className={`${
+                    this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''
+                  }`}
+                  onClick={() => {
+                    this.setActiveTokenProfit(this.props.baseToken)
+                  }}>
+                  {this.props.baseToken}
+                </label>
+                <label
+                  className={`${
+                    this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
+                  }`}
+                  onClick={() => {
+                    this.setActiveTokenProfit(this.props.quoteToken)
+                  }}>
+                  {this.props.quoteToken}
+                </label>
+              </div>
             </div>
             <div className="inner-own-token-grid-row__col-action opacityIn rightIn">
               <button
@@ -432,6 +452,10 @@ export class InnerOwnTokenGridRow extends Component<
         )}
       </React.Fragment>
     )
+  }
+
+  public setActiveTokenProfit(asset: Asset) {
+    this.setState({ ...this.state, activeTokenProfit: asset })
   }
 
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {

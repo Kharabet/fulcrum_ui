@@ -94,6 +94,31 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
     position: relative;
     text-align: left;
   }
+  &__col-profit-switch {
+    border-radius: 22px;
+    background-color: var(--primary-bg);
+    position: absolute;
+    display: flex;
+    bottom: 10px;
+    cursor: pointer;
+    label {
+      line-height: 1.5;
+      font-size: 12px;
+      display: inline-block;
+      padding: 3px 6px;
+      color: var(--primary-text);
+      &:first-child {
+        border-radius: 22px 0 0 22px;
+      }
+      &:last-child {
+        border-radius: 0 22px 22px 0;
+      }
+      &.active {
+        background-color: #276bfb;
+        color: #ffffff;
+      }
+    }
+  }
   &__line {
     display: inline-block;
     height: 26px;
@@ -344,6 +369,11 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
         order: 8;
         grid-column-start: 1;
         grid-column-end: 5;
+        position: relative;
+        &-switch {
+          right: 0;
+          bottom: 2px;
+        }
       }
 
       &__col-asset-collateral-small {
