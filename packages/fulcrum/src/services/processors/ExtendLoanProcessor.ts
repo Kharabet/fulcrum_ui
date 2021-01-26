@@ -101,7 +101,7 @@ export class ExtendLoanProcessor {
     let txHash: string = ''
     const loanData = '0x'
 
-    /*try {
+    try {
       const gasAmount = await bZxContract.extendLoanDuration.estimateGasAsync(
         taskRequest.loanId,
         depositAmountInBaseUnits,
@@ -119,7 +119,8 @@ export class ExtendLoanProcessor {
     } catch (e) {
       console.log(e)
       throw e
-    }*/
+    }
+    
     const gasLimit = FulcrumProvider.Instance.gasLimit
     try {
       txHash = await bZxContract.extendLoanDuration.sendTransactionAsync(
@@ -130,7 +131,7 @@ export class ExtendLoanProcessor {
         {
           from: account,
           value: isETHBorrowAsset ? depositAmountInBaseUnits : undefined,
-          gas: gasLimit,
+          gas:  !gasAmountBN.eq(0) ? gasAmountBN.toString() : gasLimit,
           gasPrice: await FulcrumProvider.Instance.gasPrice()
         }
       )
