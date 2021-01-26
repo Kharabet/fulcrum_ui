@@ -7,7 +7,7 @@ export function ExternalLink(props: any) {
     cssClass += ` ${props.className}`
   }
   return (
-    <a {...otherProps} className={cssClass} target="_blank" rel="noreferrer">
+    <a {...otherProps} className={cssClass} target="_blank" rel="noreferrer noopener">
       {children}
     </a>
   )
