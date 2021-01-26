@@ -92,7 +92,7 @@ export function UserBalances({ rootStore }: { rootStore: RootStore }) {
           />
         </div>
       </div>
-      {userBalances.loaded && userBalances.wallet.isEmpty && !userBalances.staked.isEmpty && (
+      {userBalances.loaded && userBalances.wallet.isEmpty && userBalances.staked.isEmpty && (
         <p>
           <i>There are no tokens available to stake in your wallet.</i>
         </p>
