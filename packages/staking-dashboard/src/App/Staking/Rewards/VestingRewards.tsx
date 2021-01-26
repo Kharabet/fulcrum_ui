@@ -30,7 +30,7 @@ export function VestingRewards({ vm }: { vm: RewardsVM }) {
         <div className="flex-col">
           <p className="margin-top-0">
             <b>When you stake vesting BZRX</b> (vBZRX), your staking rewards are unlocked on the
-            same schedule as the vesting.{' '}
+            same schedule as the vesting. Learn more{' '}
             <ExternalLink href="https://bzx.network/blog/staking-bzrx">here</ExternalLink>.
           </p>
         </div>
