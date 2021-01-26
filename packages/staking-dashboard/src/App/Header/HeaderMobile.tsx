@@ -5,6 +5,7 @@ import { ReactComponent as MenuIconOpen } from 'app-images/menu-open.svg'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { Link } from 'react-router-dom'
+import ExternalLink from 'shared-components/ExternalLink'
 import FooterSocial from 'shared-components/FooterSocial'
 import AppVM from '../AppVM'
 import OnChainIndicator from './OnChainIndicator'
@@ -35,13 +36,33 @@ export function HeaderMobile({ appVM }: { appVM: AppVM }) {
             <div className="flex-center">
               <OnChainIndicator appVM={appVM} />
             </div>
-            <div className="header-menu">
+            <div className="header-menu txt-center">
               <Link
                 to="/"
-                className={`item-menu ${window.location.pathname === '/' ? `active` : ``}`}
+                className={`item-menu margin-bottom-1 ${
+                  window.location.pathname === '/' ? `active` : ``
+                }`}
                 onClick={appVM.providerMenu.hide}>
                 Dashboard
               </Link>
+              <ExternalLink
+                className="header__link margin-bottom-1"
+                href="https://app.fulcrum.trade/trade"
+                showIcon={true}>
+                Trade
+              </ExternalLink>
+              <ExternalLink
+                className="header__link margin-bottom-1"
+                href="https://app.fulcrum.trade/lend"
+                showIcon={true}>
+                Lend
+              </ExternalLink>
+              <ExternalLink
+                className="header__link margin-bottom-1"
+                href="https://app.torque.loans"
+                showIcon={true}>
+                Borrow
+              </ExternalLink>
               {/*<Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`}  onClick={this.removeOverflow}>
                   Transactions
                 </Link>*/}

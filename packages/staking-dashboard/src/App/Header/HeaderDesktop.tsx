@@ -20,6 +20,26 @@ export function HeaderDesktop({ appVM }: { appVM: AppVM }) {
               <LogoStaking />
             </div>
           </Link>
+          <div className="flex-row md-visible">
+            <ExternalLink
+              className="header__link margin-right-3"
+              href="https://app.fulcrum.trade/trade"
+              showIcon={true}>
+              Trade
+            </ExternalLink>
+            <ExternalLink
+              className="header__link margin-right-3"
+              href="https://app.fulcrum.trade/lend"
+              showIcon={true}>
+              Lend
+            </ExternalLink>
+            <ExternalLink
+              className="header__link margin-right-3"
+              href="https://app.torque.loans"
+              showIcon={true}>
+              Borrow
+            </ExternalLink>
+          </div>
           <div className="flex ai-c header-right">
             <ExternalLink href="https://help.bzx.network/en/" className="item-menu">
               Help Center
