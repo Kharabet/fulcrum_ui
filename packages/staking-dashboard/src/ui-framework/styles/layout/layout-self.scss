@@ -66,6 +66,10 @@
   margin-left: $spacing-base;
 }
 
+.margin-left-2 {
+  margin-left: 2 * $spacing-base;
+}
+
 .margin-right-1 {
   margin-right: $spacing-base;
 }
@@ -88,6 +92,12 @@
   position: relative;
 }
 
+.center-block {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 // FLEX
 .flex-fill {
   flex-grow: 1;
@@ -97,4 +107,8 @@
 .flex-span-equal {
   flex-grow: 1;
   flex-basis: 0;
+}
+
+.flex-row-end {
+  margin-left: auto;
 }

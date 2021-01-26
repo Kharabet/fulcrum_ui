@@ -10,10 +10,10 @@ export function AddToBalance({ vm }: { vm: StakingFormVM }) {
   return (
     <React.Fragment>
       <div className="margin-top-2">
-        <div className="margin-bottom-2">
+        <div className="margin-bottom-2 margin-left-1">
           {vm.userBalances.wallet.isWorthEnough && (
             <ButtonBasic
-              className={`btn--tab margin-right-2 ${!vm.unstakeSelected ? 'active' : ''}`}
+              className={`btn--tab margin-right-1 ${!vm.unstakeSelected ? 'active' : ''}`}
               onClick={vm.set}
               onClickEmit="name-value"
               name="unstakeSelected"

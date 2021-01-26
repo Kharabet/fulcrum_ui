@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react'
 import React from 'react'
 import AssetBalance from 'shared-components/AssetBalance'
+import ExternalLink from 'shared-components/ExternalLink'
 import RewardsVM from './RewardsVM'
 
 export function VestingRewards({ vm }: { vm: RewardsVM }) {
@@ -29,7 +30,8 @@ export function VestingRewards({ vm }: { vm: RewardsVM }) {
         <div className="flex-col">
           <p className="margin-top-0">
             <b>When you stake vesting BZRX</b> (vBZRX), your staking rewards are unlocked on the
-            same schedule as the vesting. Learn more (HERE)
+            same schedule as the vesting.{' '}
+            <ExternalLink href="https://bzx.network/blog/staking-bzrx">here</ExternalLink>.
           </p>
         </div>
       </div>

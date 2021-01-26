@@ -3,7 +3,7 @@ import * as mobx from 'mobx'
 
 enum breakPoints {
   small = 767,
-  medium = 960
+  medium = 992
 }
 
 /**

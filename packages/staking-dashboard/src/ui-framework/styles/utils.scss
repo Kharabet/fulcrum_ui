@@ -1,9 +1,27 @@
+.sm-visible {
+  display: none;
+}
+
 .md-visible {
   display: none;
+}
+
+@media screen and (min-width: $width-min-sm) {
+  .sm-visible {
+    display: initial;
+  }
+
+  .sm-hidden {
+    display: none;
+  }
 }
 
 @media screen and (min-width: $width-min-md) {
   .md-visible {
     display: initial;
+  }
+
+  .md-hidden {
+    display: none;
   }
 }

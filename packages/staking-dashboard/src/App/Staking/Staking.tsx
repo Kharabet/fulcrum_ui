@@ -7,12 +7,12 @@ import StakingForm from './StakingForm'
 import WalletUpdate from './WalletUpdate'
 
 export function StakingDashboard({ appVM }: { appVM: AppVM }) {
-  const {rewards} = appVM.rootStore.stakingStore
+  const { rewards } = appVM.rootStore.stakingStore
   return (
     <section className="calculator r-padded-h-2">
-      <div className="margin-bottom-2">
+      <div className="margin-bottom-2 margin-left-1">
         <Button
-          className={`btn--tab margin-right-2 ${appVM.section === 'stake' ? 'active' : ''}`}
+          className={`btn--tab margin-right-1 ${appVM.section === 'stake' ? 'active' : ''}`}
           name="section"
           value="stake"
           onClick={appVM.set}
@@ -30,8 +30,8 @@ export function StakingDashboard({ appVM }: { appVM: AppVM }) {
         </Button>
       </div>
       {appVM.section === 'stake' && <StakingForm />}
-      {appVM.section === 'rewards' && <Rewards appVM={appVM}/>}
-      <WalletUpdate appVM={appVM}/>
+      {appVM.section === 'rewards' && <Rewards appVM={appVM} />}
+      <WalletUpdate appVM={appVM} />
     </section>
   )
 }
