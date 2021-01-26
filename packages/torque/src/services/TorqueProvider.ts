@@ -173,7 +173,7 @@ export class TorqueProvider {
     return TorqueProvider.Instance
   }
 
-    public getCurrentAccount(): string | undefined {
+  public getCurrentAccount(): string | undefined {
     return this.impersonateAddress
       ? this.impersonateAddress
       : this.accounts.length > 0 && this.accounts[0]
@@ -183,20 +183,12 @@ export class TorqueProvider {
 
   public static getLocalstorageItem(item: string): string {
     let response = ''
-    try {
-      response = localStorage.getItem(item) || ''
-    } catch (e) {
-      // console.log(e);
-    }
+    response = localStorage.getItem(item) || ''
     return response
   }
 
   public static setLocalstorageItem(item: string, val: string) {
-    try {
-      localStorage.setItem(item, val)
-    } catch (e) {
-      // console.log(e);
-    }
+    localStorage.setItem(item, val)
   }
 
   public async setWeb3Provider(connector: AbstractConnector, account?: string) {
@@ -206,7 +198,7 @@ export class TorqueProvider {
       this.unsupportedNetwork = false
       await Web3ConnectionFactory.setWalletProvider(connector, providerType, account)
     } catch (e) {
-      console.log(e)
+      console.error(e)
       this.isLoading = false
 
       return
@@ -497,7 +489,6 @@ export class TorqueProvider {
     ) {
       return new BigNumber(1)
     }
-    // console.log("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
@@ -514,11 +505,9 @@ export class TorqueProvider {
           srcAssetErc20Address,
           destAssetErc20Address
         )
-        // console.log("swapPriceData- ",swapPriceData[0])
-        // result = swapPriceData[0].multipliedBy(swapPriceData[1]);
         result = swapPriceData[0].dividedBy(10 ** 18)
       } catch (e) {
-        console.log(e)
+        console.error(e)
         result = new BigNumber(0)
       }
     }
@@ -546,7 +535,6 @@ export class TorqueProvider {
         amount = new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
         amount = new BigNumber(10 ** 18).multipliedBy(750000);
-      case Asset.LEND:
       case Asset.KNC:
         amount = new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.BAT:
@@ -580,7 +568,7 @@ export class TorqueProvider {
     asset: Asset,
     amountInBaseUnits: BigNumber
   ): Promise<string> => {
-    const resetRequiredAssets = [Asset.USDT, Asset.KNC, Asset.LEND] // these assets require to set approve to 0 before approve larger amount than the current spend limit
+    const resetRequiredAssets = [Asset.USDT, Asset.KNC] // these assets require to set approve to 0 before approve larger amount than the current spend limit
     let result = ''
     const assetErc20Address = this.getErc20AddressOfAsset(asset)
 
@@ -1384,7 +1372,7 @@ export class TorqueProvider {
             return null
           }
         } catch (e) {
-          console.log(e)
+          console.error(e)
           if (!e.code) {
             alert('Dry run failed')
           }
@@ -1619,7 +1607,6 @@ export class TorqueProvider {
     try {
       const response = await fetch(url)
       const jsonData = await response.json()
-      // console.log(jsonData);
       if (jsonData.average) {
         // ethgasstation values need divide by 10 to get gwei
         const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8)
@@ -1631,7 +1618,6 @@ export class TorqueProvider {
         }
       }
     } catch (error) {
-      // console.log(error);
       result = new BigNumber(1000).multipliedBy(10 ** 9) // error default 60 gwei
     }
 
@@ -1660,7 +1646,6 @@ export class TorqueProvider {
       false,
       false
     )
-    // console.log(loansData);
     const zero = new BigNumber(0)
     const rolloverData = loansData.filter(
       (e) =>
@@ -1707,7 +1692,6 @@ export class TorqueProvider {
           loanData: e
         }
       })
-    console.log(result)
     return result
   }
 
@@ -2261,7 +2245,6 @@ export class TorqueProvider {
       const account = this.getCurrentAccount()
       const bZxContract = await this.contractsSource.getiBZxContract()
       if (account && bZxContract) {
-        // console.log(bZxContract.address, borrowedFundsState.loanId, account);
         result = await bZxContract.withdrawCollateral.callAsync(
           borrowedFundsState.loanId,
           account,
@@ -2274,7 +2257,6 @@ export class TorqueProvider {
         const precision =
           AssetsDictionary.assets.get(borrowedFundsState.collateralAsset)!.decimals || 18
         result = result.dividedBy(10 ** precision)
-        // console.log(result.toString());
       }
     }
     return result
@@ -2537,12 +2519,7 @@ export class TorqueProvider {
 
       task.processingEnd(true, false, null)
     } catch (e) {
-      if (
-        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
-      ) {
-        // tslint:disable-next-line:no-console
-        console.log(e)
-      }
+      console.error(e)
       task.processingEnd(false, false, e)
     } finally {
       this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task)

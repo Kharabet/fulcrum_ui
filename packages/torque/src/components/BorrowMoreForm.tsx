@@ -229,7 +229,6 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             ]
           }
         }
-        // console.log("tagManagerArgs = ", tagManagerArgs)
         TagManager.dataLayer(tagManagerArgs)
       }
 

@@ -89,7 +89,6 @@ export const RolloverRow = (props: IRolloverRowProps) => {
 
     const request = new RolloverRequest(loanId)
 
-    console.log(request)
     changeLoadingTransaction(true, request)
     await ExplorerProvider.Instance.onRolloverConfirmed(request)
   }

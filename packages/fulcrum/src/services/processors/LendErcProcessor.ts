@@ -85,10 +85,10 @@ export class LendErcProcessor {
         skipGas = true
       }
 
-      console.log(
-        tokenContract.address,
-        await tokenContract.mint.getABIEncodedTransactionData(account, amountInBaseUnits)
-      )
+      // console.log(
+      //   tokenContract.address,
+      //   await tokenContract.mint.getABIEncodedTransactionData(account, amountInBaseUnits)
+      // )
 
       // Waiting for token allowance
       if (approvePromise || skipGas) {

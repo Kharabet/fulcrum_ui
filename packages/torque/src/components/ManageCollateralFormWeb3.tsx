@@ -54,8 +54,6 @@ export class ManageCollateralFormWeb3 extends Component<
   constructor(props: IManageCollateralFormWeb3Props, context?: any) {
     super(props, context)
 
-    // console.log(props.loanOrderState);
-
     this.state = {
       minValue: 0,
       maxValue: 0,
@@ -166,8 +164,6 @@ export class ManageCollateralFormWeb3 extends Component<
                 ) {
                   currentCollateralNormalizedBN = new BigNumber(collateralState.minValue)
                 }
-
-                // console.log(currentCollateralNormalizedBN.toString());
 
                 // check balance
                 if (this.props.loanOrderState.collateralAsset === Asset.ETH) {
@@ -342,7 +338,6 @@ export class ManageCollateralFormWeb3 extends Component<
   }
 
   private rxGetEstimate = (selectedValue: number): Observable<ICollateralChangeEstimate> => {
-    // console.log(this.state.loanValue, selectedValue);
 
     let collateralAmount = new BigNumber(0)
     if (this.state.loanValue !== selectedValue && this.props.loanOrderState.loanData) {
@@ -357,7 +352,6 @@ export class ManageCollateralFormWeb3 extends Component<
           .dividedBy(this.state.maxValue - this.state.loanValue)
           .multipliedBy(this.props.loanOrderState.collateralAmount)
       }
-      // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loanOrderState.collateralAmount.toString());
     }
 
     return new Observable<ICollateralChangeEstimate>((observer) => {
@@ -416,7 +410,6 @@ export class ManageCollateralFormWeb3 extends Component<
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    // console.log(this.state.collateralAmount.toString(), new BigNumber(this.state.loanValue).dividedBy(10**18).toString(), new BigNumber(this.state.selectedValue).dividedBy(10**18).toString());
     if (!this.state.didSubmit && this.state.collateralAmount.gt(0)) {
       this.setState({ ...this.state, didSubmit: true })
 

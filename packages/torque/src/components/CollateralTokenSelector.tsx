@@ -41,7 +41,6 @@ export class CollateralTokenSelector extends Component<
         Asset.YFI,
         Asset.BZRX,
         Asset.MKR,
-        // Asset.LEND,
         Asset.KNC,
         Asset.UNI,
         Asset.AAVE,

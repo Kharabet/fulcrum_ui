@@ -94,8 +94,9 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
       setRequest(borrowRequest)
       await TorqueProvider.Instance.onDoBorrow(borrowRequest)
     } catch (error) {
-      // tslint:disable-next-line: no-console
-      if (error.message !== 'Form closed') console.error(error)
+      if (error.message !== 'Form closed') {
+        console.error(error)
+      }
     }
   }
 
