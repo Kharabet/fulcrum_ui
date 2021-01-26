@@ -26,7 +26,7 @@
     font-weight: 600;
     line-height: 1.5;
     letter-spacing: 0.05px;
-    color:  var(--asset-dropdown-text);
+    color: var(--asset-dropdown-text);
   }
   &__items {
     display: flex;
@@ -51,11 +51,11 @@
       }
     }
     @media screen and (max-width: $mobile-version-width) {
-      padding:4px;
+      padding: 4px;
     }
     &__name {
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--asset-dropdown-text);
       @media screen and (max-width: $mobile-version-width) {
         font-size: 12px;
@@ -63,7 +63,7 @@
     }
     &__image-container {
       margin-right: 7px;
-    
+
       @media screen and (max-width: $mobile-version-width) {
         margin-right: 4px;
       }
@@ -82,7 +82,7 @@
   flex-direction: row;
   box-sizing: border-box;
   border-radius: 26px;
-  background-color: var(--asset-dropdown-button-bg); 
+  background-color: #758295;
   width: 112px;
   align-items: center;
   padding: 8px;
@@ -90,6 +90,9 @@
   @media screen and (max-width: $mobile-version-width) {
     width: 86px;
     padding: 4px;
+  }
+  .trade-form & {
+    background-color: var(--asset-dropdown-button-bg);
   }
   svg {
     width: 24px;
@@ -129,9 +132,12 @@
   }
   span {
     font-size: 16px;
-    font-weight: 600;
-    color: var(--asset-dropdown-text);
+    font-weight: 700;
+    color: #ffffff;
     // margin-top: 2px;
+    .trade-form & {
+      color: var(--asset-dropdown-text);
+    }
     @media screen and (max-width: $mobile-version-width) {
       font-size: 12px;
     }

@@ -47,13 +47,16 @@
       height: 16.8px;
       width: 16.8px;
 
-      bottom: 3.5px;
-      right: 3.5px;
+      bottom: 4px;
+      right: 5.5px;
       transition: 0.4s;
       border-radius: 50%;
       transform: translateX(-16.8px);
       z-index: 2;
       background-color: #758295;
+      @media screen and (max-width: $mobile-version-width) {
+        right: 2.5px;        
+      }
     }
   }
 }
