@@ -81,15 +81,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       : undefined
   }
 
-  public preloadContracts(names: Array<'staking' | 'erc20' | 'ibzx'>, erc20Address?: string) {
-    const contracts = {
-      staking: () => this.getStakingContract(),
-      erc20: () =>
-        this.contractsSource && erc20Address && this.contractsSource.getErc20Contract(erc20Address),
-      ibzx: () => false
-    }
-  }
-
   public setWeb3Provider = async (connector: AbstractConnector, account?: string) => {
     this.unsupportedNetwork = false
     this.emit('ProviderIsChanging')

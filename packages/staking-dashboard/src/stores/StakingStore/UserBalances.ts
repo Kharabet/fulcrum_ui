@@ -1,7 +1,6 @@
 // tslint:disable: max-classes-per-file
 import { BigNumber } from '@0x/utils'
 import * as mobx from 'mobx'
-import Asset from 'src/domain/Asset'
 import { StakingProvider } from 'src/services/StakingProvider'
 import RootStore from '../RootStore'
 
