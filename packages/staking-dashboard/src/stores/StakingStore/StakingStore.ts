@@ -1,6 +1,5 @@
 import { BigNumber } from '@0x/utils'
 import errorUtils from 'app-lib/errorUtils'
-import stakingUtils from 'app-lib/stakingUtils'
 import sleep from 'bard-instruments/lib/async/sleep'
 import * as mobx from 'mobx'
 import { stakeableToken } from 'src/domain/stakingTypes'
@@ -74,6 +73,7 @@ export default class StakingStore {
 
   public async stake(tokenAmounts: Map<stakeableToken, BigNumber>) {
     try {
+      // TODO: need to adapt the verifyStake method to spending allowances
       // if (!stakingUtils.verifyStake(this.userBalances.wallet, tokenAmounts)) {
       //   throw new Error('Staking amounts are invalid. Maybe trying to stake more than possible.')
       // }
@@ -92,6 +92,7 @@ export default class StakingStore {
 
   public async unstake(tokenAmounts: Map<stakeableToken, BigNumber>) {
     try {
+      // TODO: need to adapt the verifyStake method to spending allowances
       // if (!stakingUtils.verifyStake(this.userBalances.staked, tokenAmounts)) {
       //   throw new Error('Staking amounts are invalid. Maybe trying to unstake more than possible.')
       // }

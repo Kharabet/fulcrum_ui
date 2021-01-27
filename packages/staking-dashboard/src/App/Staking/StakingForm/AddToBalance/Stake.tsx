@@ -13,7 +13,7 @@ export function Stake({ vm }: { vm: StakingFormVM }) {
   }
 
   return (
-    <React.Fragment>
+    <div className="panel--white padded-2">
       <h3 className="section-header">Add to Staking Balance</h3>
 
       {wallet.bzrx.gte(0.01) && stakingAllowances.bzrx.amount.gte(wallet.bzrx) && (
@@ -62,7 +62,7 @@ export function Stake({ vm }: { vm: StakingFormVM }) {
           Stake
         </Button>
       )}
-    </React.Fragment>
+    </div>
   )
 }
 

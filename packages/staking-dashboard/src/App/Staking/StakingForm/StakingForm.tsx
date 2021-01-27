@@ -16,8 +16,8 @@ export default function StakingForm({ vm }: { vm: StakingFormVM }) {
       <Modal
         isOpen={vm.findRepDialogIsOpen}
         onRequestClose={vm.closeFindRepDialog}
-        className="modal-content-div"
-        overlayClassName="modal-overlay-div"
+        className="modal__content"
+        overlayClassName="modal__overlay"
         ariaHideApp={false}>
         <FindRepresentative vm={vm} />
       </Modal>

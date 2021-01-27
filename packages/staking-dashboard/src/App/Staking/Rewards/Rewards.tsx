@@ -7,11 +7,19 @@ import VestingRewards from './VestingRewards'
 
 export default function Rewards({ vm }: { vm: RewardsVM }) {
   return (
-    <>
-      <StakingRewards vm={vm} />
-      <VestingRewards vm={vm} />
-      <UserRewards vm={vm} />
-      <VestedBZRX vm={vm} />
-    </>
+    <div className="grid--staking">
+      <div className="panel--white padded-2">
+        <StakingRewards vm={vm} />
+      </div>
+      <div className="panel--white padded-2">
+        <VestingRewards vm={vm} />
+      </div>
+      <div className="panel--white padded-2">
+        <UserRewards vm={vm} />
+      </div>
+      <div className="panel--white padded-2">
+        <VestedBZRX vm={vm} />
+      </div>
+    </div>
   )
 }

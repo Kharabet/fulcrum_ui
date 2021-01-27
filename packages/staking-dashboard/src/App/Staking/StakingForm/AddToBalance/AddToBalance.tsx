@@ -33,13 +33,10 @@ export function AddToBalance({ vm }: { vm: StakingFormVM }) {
           )}
         </div>
 
-        <SpendingAllowance vm={vm} />
+        {!vm.unstakeSelected && <SpendingAllowance vm={vm} />}
 
-        {vm.stakingStore.stakingAllowances.needApprovalList.length < 4 && (
-          <div className="panel--white padded-2">
-            {vm.unstakeSelected ? <Unstake vm={vm} /> : <Stake vm={vm} />}
-          </div>
-        )}
+        {vm.stakingStore.stakingAllowances.needApprovalList.length < 4 &&
+          (vm.unstakeSelected ? <Unstake vm={vm} /> : <Stake vm={vm} />)}
       </div>
     </React.Fragment>
   )

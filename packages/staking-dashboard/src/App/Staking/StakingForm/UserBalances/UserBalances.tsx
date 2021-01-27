@@ -11,18 +11,18 @@ export function UserBalances({ rootStore }: { rootStore: RootStore }) {
   const { wallet, staked } = stakingStore.userBalances
 
   return (
-    <div className="panel--white padded-2">
-      {userBalances.pending && (
-        <Loader
-          className="calculator__balance-loader"
-          quantityDots={3}
-          sizeDots="small"
-          title=""
-          isOverlay={false}
-        />
-      )}
-      <div className="ui-grid-wmin-260px">
-        <div>
+    <div>
+      <div className="grid--staking">
+        <div className="panel--white padded-2">
+          {userBalances.pending && (
+            <Loader
+              className="calculator__balance-loader"
+              quantityDots={3}
+              sizeDots="small"
+              title=""
+              isOverlay={false}
+            />
+          )}
           <h3 className="section-header">Wallet Balance</h3>
           <AssetBalance
             className="margin-bottom-2"
@@ -49,14 +49,13 @@ export function UserBalances({ rootStore }: { rootStore: RootStore }) {
           />
 
           <AssetBalance
-            className="margin-bottom-2"
             link={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`}
             tokenLogo={tokenIcons.bpt}
             balance={wallet.bpt}
             name="BPT"
           />
         </div>
-        <div>
+        <div className="panel--white padded-2">
           <h3 className="section-header">Staking Balance</h3>
 
           <AssetBalance
@@ -84,7 +83,6 @@ export function UserBalances({ rootStore }: { rootStore: RootStore }) {
           />
 
           <AssetBalance
-            className="margin-bottom-2"
             link={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`}
             tokenLogo={tokenIcons.bpt}
             balance={staked.bpt}

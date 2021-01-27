@@ -8,7 +8,7 @@ export function Unstake({ vm }: { vm: StakingFormVM }) {
   const { staked } = vm.stakingStore.userBalances
 
   return (
-    <React.Fragment>
+    <div className="panel--white padded-2">
       <h3 className="section-header">Remove from Staking Balance</h3>
       {staked.bzrx.gte(0.01) && (
         <InputStake
@@ -54,7 +54,7 @@ export function Unstake({ vm }: { vm: StakingFormVM }) {
         onClick={vm.unstake}>
         Unstake
       </Button>
-    </React.Fragment>
+    </div>
   )
 }
 

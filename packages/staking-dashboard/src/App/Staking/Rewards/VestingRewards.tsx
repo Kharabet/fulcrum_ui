@@ -8,9 +8,9 @@ export function VestingRewards({ vm }: { vm: RewardsVM }) {
   const { rewards } = vm
 
   return (
-    <div className="panel--white padded-2 margin-bottom-2">
+    <>
       <h3 className="section-header">Time-Locked Rewards</h3>
-      <div className="ui-grid-wmin-260px">
+      <div>
         <div className="margin-bottom-1">
           <AssetBalance
             className="margin-bottom-2"
@@ -28,14 +28,14 @@ export function VestingRewards({ vm }: { vm: RewardsVM }) {
           />
         </div>
         <div className="flex-col">
-          <p className="margin-top-0">
+          <p>
             <b>When you stake vesting BZRX</b> (vBZRX), your staking rewards are unlocked on the
             same schedule as the vesting. Learn more{' '}
             <ExternalLink href="https://bzx.network/blog/staking-bzrx">here</ExternalLink>.
           </p>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
