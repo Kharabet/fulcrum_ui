@@ -45,7 +45,7 @@ export function StakingRewards({ vm }: { vm: RewardsVM }) {
           value={vm.inputRestake}
         />
         <label className="margin-left-1ch label" htmlFor="input-restake">
-          Restake
+          Restake BZRX
         </label>
       </div>
 
