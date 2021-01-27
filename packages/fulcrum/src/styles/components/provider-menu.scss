@@ -67,7 +67,6 @@
           padding: 7px 23px;
         }
         &:last-child {
-          margin-right: 8px;
           padding: 7px 19px;
         }
       }
@@ -211,33 +210,51 @@
 
 @media only screen and (max-width: $breakpoint-mobile-max) {
   .provider-menu {
-    padding: 30px 15px 15px 15px;
+    padding: 15px;
+    &__title {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
 
     &__gas-token {
-      padding-bottom: 10px;
-      margin-bottom: 20px;
+      padding: 16px;
       &-logo {
-        margin-right: 5px;
-        svg {
-          width: 44px;
-          height: 44px;
-        }
+        display: none;
       }
-      &-text {
+      &-label {
         font-weight: normal;
-        font-size: 12px;
+        font-size: 10px;
       }
       &-switch {
         margin-left: 10px;
+      }
+      &-title {
+        display: none;
+      }
+      &-description {
+        font-size: 8px;
+        margin-bottom: 8px;
+      }
+      &-left {
+        margin-right: 0;
+      }
+      &-links {
+        a {
+          &:first-child,
+          &:last-child {
+            font-size: 8px;
+            padding: 6px 8px;
+          }
+        }
       }
     }
     &__list {
       grid-row-gap: 8px;
       grid-column-gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
     }
     &__list-item {
-      width: 100%;
-      min-width: 140px;
+      width: 140px;
       padding: 4px 12px;
       min-height: 43px;
       &--selected {
@@ -262,8 +279,9 @@
     }
     .disconnect {
       font-size: 12px;
-      padding: 10px 30px;
+      padding: 12px 30px;
       margin: 20px auto;
+      max-width: 146px;
     }
   }
 }
