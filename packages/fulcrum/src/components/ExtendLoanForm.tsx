@@ -57,9 +57,9 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
     this.state = {
       minValue: 1,
-      maxValue: 365,
+      maxValue: 28,
       assetDetails: null,
-      selectedValue: 90,
+      selectedValue: 14,
       depositAmount: new BigNumber(0),
       extendManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
@@ -69,7 +69,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       inputAmountText: '',
       maxDepositAmount: new BigNumber(0),
       isLoading: false,
-      buttonValue: 25
+      buttonValue: 14
     }
 
     this._selectedValueUpdate = new Subject()
@@ -142,8 +142,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     }
   }
   public onInsertMaxValue = async (value: number) => {
-    const percent = value / 100
-    const selectedValue = new BigNumber(this.state.maxValue).multipliedBy(percent)
+    const selectedValue = new BigNumber(this.state.maxValue).multipliedBy(value)
     const selectedValueNumber = selectedValue.toNumber()
     this.setState(
       {
@@ -197,6 +196,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               onCollateralChange={this.onCollateralChange}
               withSlider={true}
               readonly
+              maxSliderValue={28}
             />
             {this.state.balanceTooLow ? (
               <React.Fragment>

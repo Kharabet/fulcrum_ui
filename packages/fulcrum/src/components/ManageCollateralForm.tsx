@@ -314,6 +314,7 @@ export default class ManageCollateralForm extends Component<
                   onTradeAmountChange={this.onTradeAmountChange}
                   onCollateralChange={this.onCollateralChange}
                   withSlider={false}
+                  maxSliderValue={100}
                 />
               </div>
             </div>

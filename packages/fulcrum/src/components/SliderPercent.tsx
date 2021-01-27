@@ -1,18 +1,12 @@
-import React, { Component, ChangeEvent } from 'react'
+import React, { Component } from 'react'
 import Slider from 'rc-slider'
-
-import '../styles/components/input-amount.scss'
 
 interface ISliderPercentProps {
   onInsertMaxValue: (value: number) => void
   percentSlider: number
+  maxSliderValue: number
 }
-
-interface ISliderPercentState {
-  selectedPercent: number
-}
-
-export class SliderPercent extends Component<ISliderPercentProps, ISliderPercentState> {
+export class SliderPercent extends Component<ISliderPercentProps> {
   private _input: HTMLInputElement | null = null
 
   constructor(props: ISliderPercentProps) {
@@ -24,23 +18,19 @@ export class SliderPercent extends Component<ISliderPercentProps, ISliderPercent
     }
   }
   public render() {
+    const sliderValue = this.props.percentSlider * this.props.maxSliderValue
     return (
       <React.Fragment>
-        <div className="wrapper-slider-percent">
+        <div className="wrapper-slider-percent green-slider">
           <div className="slider-percent">
             <Slider
-              min={1}
-              max={28}
+              min={0}
+              max={this.props.maxSliderValue}
               step={1}
-              value={this.props.percentSlider}
+              value={sliderValue}
               onChange={this.onChange}
-              onAfterChange={this.onAfterChange}
+              // onAfterChange={this.onAfterChange}
             />
-            <div
-              style={{ left: `${(this.props.percentSlider / 28) * 100}%` }}
-              className="label-percent">
-              {this.props.percentSlider}&nbsp;days
-            </div>
             <div className="dots-percent">
               <div className="dot-percent"></div>
               <div className="dot-percent"></div>
@@ -57,12 +47,9 @@ export class SliderPercent extends Component<ISliderPercentProps, ISliderPercent
     )
   }
   public onChange = (value: number) => {
-    this.props.onInsertMaxValue(value)
-  }
-  public onAfterChange = (value: number) => {
-    this.props.onInsertMaxValue(value)
+    this.props.onInsertMaxValue(value / this.props.maxSliderValue)
   }
   public setMaxPercent = (event: any) => {
-    this.props.onInsertMaxValue(100)
+    this.props.onInsertMaxValue(1)
   }
 }

@@ -60,6 +60,20 @@
     line-height: 1.5;
     margin-bottom: 12px;
   }
+  .input-amount {
+    &__row-container {
+      display: none;
+    }
+    &__container {
+      background-color: var(--input-bg);
+    }
+  }
+  .asset-dropdown-button {
+    background-color: var(--asset-dropdown-button-bg);
+    span {
+      color: var(--asset-dropdown-text);
+    }
+  }
 }
 
 .button-extend {

@@ -256,16 +256,13 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <span className="body-header">Pair</span>
           {`${this.props.baseToken.toUpperCase()}/${this.props.quoteToken.toUpperCase()}`}
         </div>
-        <div className="own-token-grid-row__col-position-type opacityIn">
-          <span className="body-header">Type&nbsp;</span>
-
-          <span className="position-type-marker">{`${this.props.leverage}x ${this.props.positionType}`}</span>
-        </div>
+ 
         <div
           title={this.props.positionValue.toFixed(18)}
           className="own-token-grid-row__col-position  opacityIn">
           <span className="body-header">Position&nbsp;</span>
-          <span className="own-token-grid-row__asset">{this.props.baseToken}</span>
+          <span className="own-token-grid-row__asset">{this.props.baseToken} {`${this.props.leverage}x`}&nbsp; {this.props.positionType}
+             </span>
           <br />
           {this.props.positionValue.toFixed(4)}
         </div>
@@ -364,7 +361,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               'rollover-warning'}`}
             onClick={isRollover ? this.onRolloverClick : this.onSellClick}
             disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
-            {isRollover ? 'Rollover' : TradeType.SELL}
+            {isRollover ? 'Rollover' : 'CLOSE POSITION'}
           </button>
           {remainingDays.lte(6) && (
             <NotificationRollover isRollover={isRollover} countOfDaysToRollover={remainingDays} />

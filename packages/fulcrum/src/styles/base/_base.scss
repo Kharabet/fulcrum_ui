@@ -75,3 +75,28 @@ a {
   color: var(--primary-text);
   padding-bottom: 1.5rem;
 }
+
+.max-percent {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+cursor: pointer;
+  width: 56px;
+  height: 32px;
+  left: 351px;
+  top: 365px;
+
+  background: var(--max-percent-bg);
+  border-radius: 24px;
+  color: var(--max-percent-color);
+  border: none;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+  @media screen and (max-width: $mobile-version-max-width) {
+    font-size: 10px;
+    width: 46px;
+    height: 24px;
+  }
+}
