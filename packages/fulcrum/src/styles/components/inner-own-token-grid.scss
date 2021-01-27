@@ -99,19 +99,19 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
     background-color: var(--primary-bg);
     position: absolute;
     display: flex;
-    bottom: 10px;
+    bottom: 18px;
     cursor: pointer;
     label {
       line-height: 1.5;
-      font-size: 12px;
+      font-size: 9px;
       display: inline-block;
       padding: 3px 6px;
       color: var(--primary-text);
       &:first-child {
-        border-radius: 22px 0 0 22px;
+        border-radius: 18px 0 0 18px;
       }
       &:last-child {
-        border-radius: 0 22px 22px 0;
+        border-radius: 0 18px 18px 0;
       }
       &.active {
         background-color: #276bfb;

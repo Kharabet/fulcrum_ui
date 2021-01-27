@@ -17,9 +17,9 @@ export interface IInnerOwnTokenGridHeaderProps {
 const InnerOwnTokenGridHeader = (props: IInnerOwnTokenGridHeaderProps) => {
   const insertProfitTooltip =
     props.positionType === PositionType.LONG
-      ? `<div class="short-label">Profit in ${props.asset}</div><div>Profit in ${props.quoteToken} *(+/-) Collateral value change of your ETH</div>`
-      : `<div>Profit in ${props.asset} *(+/-) Collateral value change of your ETH</div><div class="short-label">Profit in ${props.quoteToken}</div>`
-  const profitTooltip = `<p class="tooltip__info__profit__title">Profit is displayed in two ways:</p><ul class="tooltip__info__profit__ul"><li>Left value of traded asset</li><li>Right value of total position profit including collateral change </li></ul><p class="ta-c">${props.asset}/${props.quoteToken} pair for example</p><div class="tooltip__info__profit__table">${insertProfitTooltip}</div>`
+      ? `<ul class="tooltip__info__profit__ul"><li>Left: value of traded asset</li><li>Right: value of total position profit including collateral change </li></ul><p class="ta-c">${props.asset}/${props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div class="short-label">Profit in ${props.asset}</div><div>Profit in ${props.quoteToken} + the change of your ${props.asset} collateral</div></div>`
+      : `<ul class="tooltip__info__profit__ul"><li>Left: value of total position profit including collateral change </li><li>Right: value of traded asset</li></ul><p class="ta-c">${props.asset}/${props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div>Profit in ${props.asset} + the change of your ${props.quoteToken} collateral</div><div class="short-label">Profit in ${props.quoteToken}</div></div>`
+  const profitTooltip = `<p class="tooltip__info__profit__title">Profit is displayed in two ways:</p>${insertProfitTooltip}`
 
   return (
     <div className="inner-own-token-grid-header">
