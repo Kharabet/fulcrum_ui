@@ -1310,10 +1310,10 @@ export class FulcrumProvider {
       return new BigNumber(0)
     }
 
-    const slippage = swapPriceOneTokenWorth['expectedRate']
-      .minus(swapPriceTradeAmount['expectedRate'])
+    const slippage = new BigNumber(swapPriceOneTokenWorth['expectedRate'])
+      .minus(new BigNumber(swapPriceTradeAmount['expectedRate']))
       .abs()
-      .div(swapPriceTradeAmount['expectedRate'])
+      .div(new BigNumber(swapPriceTradeAmount['expectedRate']))
       .times(100)
 
     return slippage
