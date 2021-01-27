@@ -2601,6 +2601,72 @@ export class TorqueProvider {
     })
     return (liquidationEvents && liquidationEvents.length) || result
   }
+
+  public async getBorrowEstimatedGas(request: BorrowRequest, isGasTokenEnabled: boolean) {
+    let result = new BigNumber(0)
+    const account = this.getCurrentAccount()
+
+    if (!this.contractsSource || !account || !request.borrowAmount) return result
+
+    const isETHCollateralAsset = TorqueProvider.Instance.isETHAsset(request.collateralAsset)
+    const collateralAssetErc20Address =
+      TorqueProvider.Instance.getErc20AddressOfAsset(request.collateralAsset) || ''
+    const loanPrecision = AssetsDictionary.assets.get(request.borrowAsset)!.decimals || 18
+    const collateralPrecision = AssetsDictionary.assets.get(request.collateralAsset)!.decimals || 18
+    const borrowAmountInBaseUnits = new BigNumber(
+      request.borrowAmount.multipliedBy(10 ** loanPrecision).toFixed(0, 1)
+    )
+    const depositAmountInBaseUnits = new BigNumber(
+      request.depositAmount.multipliedBy(10 ** collateralPrecision).toFixed(0, 1)
+    )
+    let gasAmount = 0
+    const ChiTokenBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+    const iTokenContract = await TorqueProvider.Instance.contractsSource!.getITokenContract(
+      request.borrowAsset
+    )
+
+    if (!iTokenContract) return result
+
+    try {
+      gasAmount =
+        isGasTokenEnabled && ChiTokenBalance.gt(0)
+          ? await iTokenContract.borrowWithGasToken.estimateGasAsync(
+              request.loanId,
+              borrowAmountInBaseUnits,
+              new BigNumber(7884000), // approximately 3 months
+              depositAmountInBaseUnits,
+              isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+              account,
+              account,
+              account,
+              '0x',
+              {
+                from: account,
+                value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
+                gas: TorqueProvider.Instance.gasLimit
+              }
+            )
+          : await iTokenContract.borrow.estimateGasAsync(
+              request.loanId,
+              borrowAmountInBaseUnits,
+              new BigNumber(7884000), // approximately 3 months
+              depositAmountInBaseUnits,
+              isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+              account,
+              account,
+              '0x',
+              {
+                from: account,
+                value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
+                gas: TorqueProvider.Instance.gasLimit
+              }
+            )
+    } catch (e) {}
+
+    return new BigNumber(gasAmount || 0)
+      .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
+      .integerValue(BigNumber.ROUND_UP)
+  }
 }
 
 // tslint:disable-next-line

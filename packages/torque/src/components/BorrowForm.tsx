@@ -41,6 +41,8 @@ interface IBorrowFormState {
   collaterizationPercents: string
   ethBalance: BigNumber
   maxAvailableLiquidity: BigNumber
+  estimatedFee: BigNumber
+  estimatedFeeChi: BigNumber
 }
 
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
@@ -69,6 +71,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       depositAmountValue: '',
       ethBalance: new BigNumber(0),
       maxAvailableLiquidity: new BigNumber(0),
+      estimatedFee: new BigNumber(0),
+      estimatedFeeChi: new BigNumber(0),
       gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false,
       didSubmit: false,
@@ -98,7 +102,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       .subscribe(async (next) => {
         this.setDepositEstimate(next.depositAmount)
         this.changeStateLoading()
-        await this.checkBalanceTooLow()
+        await this.checkBalanceTooLow()        
+        await this.setEstimatedFee()
       })
 
     merge(
@@ -115,6 +120,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         this.setBorrowEstimate(next.borrowAmount)
         this.changeStateLoading()
         await this.checkBalanceTooLow()
+        await this.setEstimatedFee()
       })
   }
 
@@ -153,6 +159,38 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
   private inverseCurve(x: number): number{
     return new BigNumber(Math.log((x-120)/0.30194)/2.30097).dp(2, BigNumber.ROUND_HALF_UP).toNumber()
+  }
+
+  private async setEstimatedFee() {
+    if (this.state.borrowAmount.eq(0))
+      return (
+        this._isMounted &&
+        this.setState({ estimatedFee: new BigNumber(0) })
+      )
+
+    const tradeRequest = new BorrowRequest(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+      this.props.borrowAsset,
+      this.state.borrowAmount,
+      this.state.collateralAsset,
+      this.state.depositAmount
+    )
+
+    const gasPrice = await TorqueProvider.Instance.gasPrice()
+    const rate = await TorqueProvider.Instance.getSwapToUsdRate(Asset.ETH)
+    const estimatedFee = await TorqueProvider.Instance.getBorrowEstimatedGas(
+      tradeRequest,
+      false
+    ).then((result) => {
+      return result
+        .times(gasPrice)
+        .div(10 ** 18)
+        .times(rate)
+    })
+
+    const estimatedFeeChi = estimatedFee.times(0.4)
+
+    this.setState({ estimatedFee, estimatedFeeChi })
   }
 
   public render() {
@@ -253,9 +291,13 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 onAfterChange={this.onChange}
               />
             </React.Fragment>
+          <div title={this.state.estimatedFee.toFixed(18)}>Estimated fee {this.state.estimatedFee.toFixed(2)}</div>
+          <div title={this.state.estimatedFeeChi.toFixed(18)}>Estimated fee Chi {this.state.estimatedFeeChi.toFixed(2)}</div>
+      
           </div>
         </section>
-
+        
+         
         <ChiSwitch />
 
         <section className="dialog-actions">
