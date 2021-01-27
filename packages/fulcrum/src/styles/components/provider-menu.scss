@@ -206,6 +206,9 @@
       }
     }
   }
+  .provider-icon {
+    fill: var(--fill-provider-icon);
+  }
 }
 
 @media only screen and (max-width: $breakpoint-mobile-max) {
