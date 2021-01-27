@@ -31,7 +31,7 @@ export function StakingRewards({ vm }: { vm: RewardsVM }) {
       <p className="margin-bottom-2">
         <b>3CRV</b> is an interest earning stablecoin made up of other stablecoins. You can redeem
         them for USDC, USDT, or DAI on{' '}
-        <ExternalLink href="https://www.curve.fi/">curve.fi</ExternalLink>. Learn more{' '}
+        <ExternalLink href="https://www.curve.fi/3pool/withdraw">curve.fi</ExternalLink>. Learn more{' '}
         <ExternalLink href="https://bzx.network/blog/staking-bzrx">here</ExternalLink>.
       </p>
 
