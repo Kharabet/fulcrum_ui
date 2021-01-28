@@ -24,7 +24,7 @@ export class SliderPercent extends Component<ISliderPercentProps> {
         <div className="wrapper-slider-percent green-slider">
           <div className="slider-percent">
             <Slider
-              min={0}
+              min={1}
               max={this.props.maxSliderValue}
               step={1}
               value={sliderValue}

@@ -69,7 +69,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       inputAmountText: '',
       maxDepositAmount: new BigNumber(0),
       isLoading: false,
-      buttonValue: 14
+      buttonValue: 0.5
     }
 
     this._selectedValueUpdate = new Subject()

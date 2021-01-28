@@ -74,6 +74,17 @@
       color: var(--asset-dropdown-text);
     }
   }
+  .wrapper-slider-percent {
+    .slider-percent {
+      .rc-slider-handle {
+        &:after {
+          content: attr(aria-valuenow) ' days';
+          left: -5px;
+          width: 50px;
+        }
+      }
+    }
+  }
 }
 
 .button-extend {
