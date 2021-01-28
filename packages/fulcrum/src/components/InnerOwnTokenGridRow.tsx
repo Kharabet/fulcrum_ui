@@ -1,6 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import { ReactComponent as OpenManageCollateral } from '../assets/images/openManageCollateral.svg'
+import { ReactComponent as OpenExtendLoan } from '../assets/images/openExtendLoan.svg'
 import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
@@ -300,12 +301,13 @@ export class InnerOwnTokenGridRow extends Component<
               title={this.props.positionValue.toFixed(18)}
               className="inner-own-token-grid-row__col-token-name-full opacityIn">
               <span className="inner-own-token-grid-row__body-header">
-              <label className="text-asset">{this.props.baseToken} {`${this.props.leverage}x`}&nbsp; {this.props.positionType}</label>  
-                
+                <label className="text-asset">
+                  {this.props.baseToken} {`${this.props.leverage}x`}&nbsp; {this.props.positionType}
+                </label>
               </span>
               {this.props.positionValue.toFixed(4)}
             </div>
-         
+
             <div
               title={`${this.props.value.toFixed(18)}`}
               className="inner-own-token-grid-row__col-asset-price">
@@ -353,11 +355,7 @@ export class InnerOwnTokenGridRow extends Component<
                         onClick={this.onManageClick}>
                         <OpenManageCollateral />
                       </div>
-                      <div onClick={this.onExtendLoanClick}>
-                        <OpenManageCollateral />
-                      </div>
                     </span>
-
                     <span
                       className={`inner-own-token-grid-row__col-asset-collateral-small ${
                         this.props.loan.collateralizedPercent.lte(
@@ -369,6 +367,11 @@ export class InnerOwnTokenGridRow extends Component<
                       title={collateralizedPercent.toFixed(18)}>
                       {collateralizedPercent.toFixed(2)}%
                     </span>
+                    <div
+                      onClick={this.onExtendLoanClick}
+                      className="inner-own-token-grid-row__open-extend-loan">
+                      <OpenExtendLoan />
+                    </div>
                   </span>
                 </React.Fragment>
               ) : (
