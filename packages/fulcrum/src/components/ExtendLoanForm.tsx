@@ -184,12 +184,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
           <div className="extend-loan-form__info-extended-by-container mt-70">
             <div className="extend-loan-form__info-extended-by-msg jc-sb mb-8">
               <div className="extend-loan-form__tip">You will send</div>
-              <div className="extend-loan-form__tip collateral">Collateral</div>
             </div>
             <InputAmount
               inputAmountText={this.state.inputAmountText}
               isLoading={this.state.isLoading}
-              selectedAsset={this.props.loan!.collateralAsset}
+              selectedAsset={this.props.loan!.loanAsset}
               buttonValue={this.state.buttonValue}
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
