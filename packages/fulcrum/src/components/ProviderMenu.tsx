@@ -116,6 +116,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       )
       switchButton.setAttribute('data-isgastokenenabled', 'true')
       localStorage.setItem('isGasTokenEnabled', 'true')
+      setChi(true)
     } else {
       await FulcrumProvider.Instance.setApproval(
         '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
@@ -124,6 +125,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       )
       switchButton.setAttribute('data-isgastokenenabled', 'false')
       localStorage.setItem('isGasTokenEnabled', 'false')
+      setChi(false)
     }
   }
   const ChiTokenLogo = AssetsDictionary.assets.get(Asset.CHI)!.reactLogoSvg
