@@ -10,10 +10,9 @@ const OwnTokenGridHeader = () => {
       <div className="own-token-grid-header__col-token-name">
         <span className="own-token-grid-header__text">Pair</span>
       </div>
-      <div className="own-token-grid-header__col-position-type">
+      {/* <div className="own-token-grid-header__col-position-type">
         <span className="own-token-grid-header__text">Type</span>
-      </div>
-
+      </div> */}
       <div className="own-token-grid-header__col-position">
         <span className="own-token-grid-header__text">Position</span>
       </div>

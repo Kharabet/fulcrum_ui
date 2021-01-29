@@ -1268,17 +1268,14 @@ export class FulcrumProvider {
     if (tradedAmountEstimate.eq(0) || srcToken === destToken) {
       return new BigNumber(0)
     }
-    
+
     const srcAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(srcToken)
     const destAssetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(destToken)
 
-    if (!this.contractsSource || !srcAssetErc20Address || !destAssetErc20Address) {
+    if (!srcAssetErc20Address || !destAssetErc20Address) {
       return new BigNumber(0)
     }
-    const kyberContract = await this.contractsSource.getIKyberNetworkProxyContract()
-    if (!kyberContract) {
-      return new BigNumber(0)
-    }
+
     const srcDecimals = AssetsDictionary.assets.get(srcToken)?.decimals || 18
     const amount = tradedAmountEstimate.times(10 ** srcDecimals).dp(0, BigNumber.ROUND_HALF_UP)
     if (amount.lte(10 ** srcDecimals)) {
@@ -1297,24 +1294,26 @@ export class FulcrumProvider {
         .dp(0, BigNumber.ROUND_HALF_UP)
     }
 
-    const swapPriceOneTokenWorth: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
-      srcAssetErc20Address,
-      destAssetErc20Address,
-      srcOneTokenWorthAmount
+    const swapPriceOneTokenWorth = await fetch(
+      `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${srcOneTokenWorthAmount}`
     )
-    const swapPriceTradeAmount: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
-      srcAssetErc20Address,
-      destAssetErc20Address,
-      amount
-    )
+      .then((resp) => resp.json())
+      .catch(console.error)
 
-    if (swapPriceOneTokenWorth[0].isZero() || swapPriceTradeAmount[0].isZero()) {
+    const swapPriceTradeAmount = await fetch(
+      `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${amount}`
+    )
+      .then((resp) => resp.json())
+      .catch(console.error)
+
+    if (!swapPriceOneTokenWorth['expectedRate'] || !swapPriceTradeAmount['expectedRate']) {
       return new BigNumber(0)
     }
-    const slippage = swapPriceOneTokenWorth[0]
-      .minus(swapPriceTradeAmount[0])
+
+    const slippage = new BigNumber(swapPriceOneTokenWorth['expectedRate'])
+      .minus(new BigNumber(swapPriceTradeAmount['expectedRate']))
       .abs()
-      .div(swapPriceTradeAmount[0])
+      .div(new BigNumber(swapPriceTradeAmount['expectedRate']))
       .times(100)
 
     return slippage
@@ -2161,18 +2160,14 @@ export class FulcrumProvider {
     srcAmount?: BigNumber
   ): Promise<BigNumber> {
     if (networkName !== 'mainnet') {
-      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract 
+      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract
       return this.getSwapRate(srcAsset, destAsset)
     }
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
 
-    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-      const kyberContract = await this.contractsSource.getIKyberNetworkProxyContract()
-      if (!kyberContract) {
-        return result
-      }
+    if (srcAssetErc20Address && destAssetErc20Address) {
       const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
       if (!srcAmount) {
         srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
@@ -2192,12 +2187,13 @@ export class FulcrumProvider {
             .dp(0, BigNumber.ROUND_HALF_UP)
         }
 
-        const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
-          srcAssetErc20Address,
-          destAssetErc20Address,
-          srcAmount
+        const swapPriceData = await fetch(
+          `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${srcAmount}`
         )
-        result = new BigNumber(swapPriceData[0]).dividedBy(10 ** 18)
+          .then((resp) => resp.json())
+          .catch(console.error)
+
+        result = new BigNumber(swapPriceData['expectedRate']).dividedBy(10 ** 18)
       } catch (e) {
         console.error(e)
         result = new BigNumber(0)
@@ -2863,6 +2859,122 @@ console.log(err, added);
     } catch (e) {
       reject(e)
     }
+  }
+
+  public async getTradeEstimatedGas(request: TradeRequest, isGasTokenEnabled: boolean) {
+    let result = new BigNumber(0)
+    const account = this.getCurrentAccount()
+    if (!this.contractsSource || !account || !request.amount) return result
+
+    const isLong = request.positionType === PositionType.LONG
+
+    const loanToken = isLong ? request.quoteToken : request.asset
+    const collateralToken = isLong ? request.asset : request.quoteToken
+    const depositToken = request.depositToken
+    const leverageAmount =
+    request.positionType === PositionType.LONG
+      ? new BigNumber(request.leverage - 1).times(10 ** 18)
+      : new BigNumber(request.leverage).times(10 ** 18)
+
+    const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18
+    const amountInBaseUnits = new BigNumber(
+      request.amount.multipliedBy(10 ** decimals).toFixed(0, 1)
+    )
+
+    const loanTokenSent = depositToken === loanToken ? amountInBaseUnits : new BigNumber(0)
+
+    const collateralTokenSent =
+      depositToken === collateralToken ? amountInBaseUnits : new BigNumber(0)
+
+    const collateralTokenAddress =
+    //  collateralToken !== Asset.ETH
+         FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
+        //: FulcrumProvider.ZERO_ADDRESS
+
+    const sendAmountForValue =
+      depositToken === Asset.WETH || depositToken === Asset.ETH
+        ? amountInBaseUnits
+        : new BigNumber(0)
+
+    let gasAmount = Number(FulcrumProvider.Instance.gasLimit)
+    //console.log('loanTokenSent: ' + loanToken + loanTokenSent.toFixed())
+    //console.log('collateralTokenSent: ' + collateralToken + collateralTokenSent.toFixed())
+
+    if (request.tradeType === TradeType.BUY) {
+      const tokenContract = this.contractsSource.getITokenContract(loanToken)
+      if (!tokenContract) return result
+      try {
+        gasAmount =
+          isGasTokenEnabled
+            ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(leverageAmount),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                account,
+                '0x',
+                {
+                  from: account,
+                  value: sendAmountForValue,
+                  gas: FulcrumProvider.Instance.gasLimit
+                }
+              )
+            : await tokenContract.marginTrade.estimateGasAsync(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(leverageAmount),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                '0x',
+                {
+                  from: account,
+                  value: sendAmountForValue,
+                  gas: FulcrumProvider.Instance.gasLimit
+                }
+              )
+      } catch (e) {
+
+      }
+    } 
+    else {
+      const tokenContract = await this.contractsSource.getiBZxContract()
+      if (!tokenContract) return result
+      try {
+        gasAmount =
+          isGasTokenEnabled
+            ? await tokenContract.closeWithSwapWithGasToken.estimateGasAsync(
+                request.loanId,
+                account,
+                account,
+                amountInBaseUnits,
+                
+                request.returnTokenIsCollateral,
+                '0x',
+                {
+                  from: account,
+                  gas: FulcrumProvider.Instance.gasLimit
+                }
+              )
+            : await tokenContract.closeWithSwap.estimateGasAsync(
+                request.loanId,
+                account,
+                amountInBaseUnits,
+                request.returnTokenIsCollateral,
+                '0x',
+                {
+                  from: account,
+                  gas: FulcrumProvider.Instance.gasLimit
+                }
+              )
+      } catch (e) {
+      }
+    }
+    return new BigNumber(gasAmount || 0)
+      .multipliedBy(this.gasBufferCoeffForTrade)
+      .integerValue(BigNumber.ROUND_UP)
   }
 
   public sleep(ms: number) {
