@@ -72,16 +72,16 @@
     input {
       display: none;
       &[data-isgastokenenabled='false'] + .slider {
-        background-color: #586473;
+        background-color: #283038;
         &:before {
           transform: translateX(-19px);
           z-index: 2;
         }
       }
       &[data-isgastokenenabled='true'] + .slider {
-        background-color: #276bfb;
+        background-color: #283038;
         &:before {
-          background-color: #ffffff;
+          background-color: #33dfcc;
           transform: translateX(0px);
         }
       }
