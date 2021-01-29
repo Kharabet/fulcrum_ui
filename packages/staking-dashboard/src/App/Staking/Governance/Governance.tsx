@@ -9,7 +9,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
     <GovernanceItem
       key={proposal.id}
       proposal={proposal}
-      openProposals={vm.proposals.show}
+      openProposals={vm.showProposal}
     />
   ))
 

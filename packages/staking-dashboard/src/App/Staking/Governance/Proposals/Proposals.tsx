@@ -6,7 +6,7 @@ import GovernanceVM from '../GovernanceVM'
 import ProposalHistoryItem from './ProposalHistoryItem'
 
 export function Proposals({ vm }: { vm: GovernanceVM }) {
-  const { proposals } = vm
+  const { proposalPopup, activeProposal } = vm
 
   const history = [
     {
@@ -22,17 +22,19 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
       date: 'December 22nd, 2020'
     }
   ]
-
+  if (activeProposal === undefined) {
+    return null
+  }
   return (
     <Modal
-      isOpen={proposals.visible}
+      isOpen={proposalPopup.visible && activeProposal !== undefined}
       className="modal-content-div"
       overlayClassName="modal-overlay-div"
       ariaHideApp={false}>
       <div className="proposals">
         <div className="proposals-header">
-          <span>Remove automatic COMP claims and COMP speed refresh</span>
-          <div onClick={proposals.hide}>
+          <span>{activeProposal.title}</span>
+          <div onClick={proposalPopup.hide}>
             <CloseIcon className="disclosure__close" />
           </div>
         </div>
@@ -40,42 +42,41 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
           <div className="proposals-votes">
             <div className="proposals-votes__title">Votes</div>
             <div className="proposals-votes__range">
-              <div className="proposals-votes__range-active" style={{ width: '65%' }}></div>
+              <div className="proposals-votes__range-active" style={{ width: '65%' }} />
             </div>
             <div className="proposals-votes__data">
               <div>
                 <label>For:&nbsp;</label>
-                <span className="value">340,345</span>
+                <span className="value">{activeProposal.votesFor.toFixed(0)}</span>
               </div>
               <div>
                 <label>Against:&nbsp;</label>
-                <span className="value">4,465</span>
+                <span className="value">{activeProposal.votesAgainst.toFixed(0)}</span>
               </div>
             </div>
           </div>
           <div className="flex jc-sb">
             <div className="proposals-info">
-              <div className="proposals-info__title">Info</div>
-              <div className="proposals-info__description">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cursus leo, pellentesque
-                sagittis maecenas maecenas ut. Eu interdum urna pulvinar in tincidunt fringilla odio
-                dapibus. Ut orci consectetur justo a morbi molestie sit vitae. Rhoncus lectus neque
-                nibh erat diam consectetur orci morbi nunc. Cursus leo, pellentesque sagittis
-                maecenas maecenas ut.
-              </div>
+              <div className="proposals-info__title">Actions</div>
+              <div className="proposals-info__description">actions</div>
             </div>
             <div className="proposals-history">
               <div className="proposals-history__title">Proposal History</div>
               <ul className="proposals-history__list">
-                {history.map((item, index) => {
-                  return <ProposalHistoryItem key={index} date={item.date} status={item.status} />
+                {activeProposal.history.map((item, index) => {
+                  return <ProposalHistoryItem key={index} {...item} />
                 })}
               </ul>
             </div>
           </div>
+          
+          <div className="proposals-info">
+              <div className="proposals-info__title">Info</div>
+              <div className="proposals-info__description">{activeProposal.description}</div>
+            </div>
         </div>
         <div className="flex jc-fe">
-          <button className="button blue proposals-button" onClick={proposals.hide}>
+          <button className="button blue proposals-button" onClick={proposalPopup.hide}>
             Cancel
           </button>
         </div>

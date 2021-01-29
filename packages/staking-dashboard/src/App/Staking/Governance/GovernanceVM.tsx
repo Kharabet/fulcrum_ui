@@ -1,5 +1,6 @@
 import * as mobx from 'mobx'
 import { ChangeEvent } from 'react'
+import GovernanceProposal from 'src/domain/GovernanceProposal'
 
 import { RootStore, GovernanceStore } from 'src/stores'
 import { DialogVM } from 'ui-framework'
@@ -9,7 +10,13 @@ export default class GovernanceVM {
   public rootStore: RootStore
 
   public governanceStore: GovernanceStore
-  public proposals = new DialogVM()
+  public activeProposal?: GovernanceProposal
+  public proposalPopup = new DialogVM({id: 'proposal-popup'})
+
+  public showProposal = (id: number) => {
+    this.activeProposal = this.governanceStore.proposalsList.find(proposal => proposal.id === id)
+    this.activeProposal && this.proposalPopup.show()
+  }
 
   public search() {}
 
