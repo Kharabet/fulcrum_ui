@@ -115,6 +115,7 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 10% 10% 10% 13% 8%;
       }
       &.active {
         background-color: #276bfb;
+        transition: 0.15s background-color;
         color: #ffffff;
       }
     }

@@ -253,6 +253,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
         }
         &.active {
           background-color: #276bfb;
+          transition: 0.15s background-color;
           color: #ffffff;
         }
       }
