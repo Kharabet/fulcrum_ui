@@ -162,6 +162,10 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     if (this.state.assetDetails === null) {
       return null
     }
+    const estimatedDate = this.props.loan.loanData.endTimestamp
+      .multipliedBy(1000)
+      .plus(this.state.selectedValue * 24 * 60 * 60 * 1000)
+      .toNumber()
     return (
       <form className="extend-loan-form" onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.props.onCancel} />
@@ -172,9 +176,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               Your rollover date will be extended by
             </div>
             <div className="extend-loan-form__info-extended-by-date">
-              {new Date(
-                Date.now() + this.state.selectedValue * 24 * 60 * 60 * 1000
-              ).toLocaleDateString(undefined, {
+              {new Date(estimatedDate).toLocaleDateString(undefined, {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric'
