@@ -161,7 +161,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     this.setLocalstorageItem('providerType', this.providerType)
   }
 
-  public preloadIBZXContract() {
+  public async preloadIBZXContract() {
     if (this.contractsSource) {
       return this.contractsSource.getiBZxContract()
     }
