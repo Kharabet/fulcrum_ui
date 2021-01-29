@@ -97,7 +97,7 @@ export class FulcrumProvider {
 
   // gasBufferCoeff equal 110% gas reserve
   public readonly gasBufferCoeff = new BigNumber('1.06')
-  public readonly gasBufferCoeffForTrade = new BigNumber('1.1')
+  public readonly gasBufferCoeffForTrade = new BigNumber('1.2')
   // 5000ms
   public readonly successDisplayTimeout = 5000
 
