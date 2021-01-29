@@ -4,7 +4,7 @@ import { Button } from 'ui-framework'
 import AppVM from '../AppVM'
 import Rewards from './Rewards'
 import StakingForm from './StakingForm'
-import Governance from './Governance'
+// import Governance from './Governance'
 import WalletUpdate from './WalletUpdate'
 
 export function StakingDashboard({ appVM }: { appVM: AppVM }) {
