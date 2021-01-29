@@ -185,7 +185,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             />
             {this.state.balanceTooLow ? (
               <React.Fragment>
-                <div className="extend-loan-form__insufficient-balance">
+                <div className="extend-loan-form__info-extended-by-msg">
                   Insufficient {this.state.assetDetails.displayName} balance in your wallet!
                 </div>
               </React.Fragment>
@@ -194,7 +194,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         </section>
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">
-            <button type="submit" className={`btn btn-size--small button-extend`}>
+            <button type="submit" className={`btn btn-size--small button-extend`} disabled={this.state.balanceTooLow}>
               Front interest
             </button>
           </div>
@@ -214,13 +214,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     })
   }
 
-  public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    if (this.state.depositAmount.lte(0)) {
-      return
-    }
-
+  private checkBalance = async (): Promise<boolean> => {
     let assetBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.props.loan.loanAsset
     )
@@ -239,14 +233,27 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         balanceTooLow: true
       })
 
-      return
+      return true
     } else {
       this.setState({
         ...this.state,
         balanceTooLow: false
       })
-    }
 
+      return false
+    }
+  }
+
+  public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (this.state.depositAmount.lte(0) || this.state.balanceTooLow) {
+      return
+    }
+    const isEnoughBalance = await this.checkBalance()
+    if (!isEnoughBalance) {
+      return
+    }
     const request = this.props.request
 
     request.depositAmount = new BigNumber(this.state.depositAmount)
@@ -257,6 +264,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const inputAmountText = event.target.value ? event.target.value : ''
+    await this.checkBalance()
     this.setState({
       ...this.state,
       inputAmountText
@@ -268,6 +276,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       this.props.loan.interestOwedPerDay,
       this.state.maxValue
     )
+    await this.checkBalance()
     this.setState({ ...this.state, maxDepositAmount: maxDepositAmount.depositAmount })
   }
 

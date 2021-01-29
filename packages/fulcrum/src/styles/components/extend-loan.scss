@@ -110,6 +110,12 @@
     height: 56px;
     font-size: 16px;
   }
+  
+  &:disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-color);
+    cursor: not-allowed;
+  }
 }
 .max-percent {
   display: flex;
