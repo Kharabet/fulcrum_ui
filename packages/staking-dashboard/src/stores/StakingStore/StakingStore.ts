@@ -108,16 +108,6 @@ export default class StakingStore {
     }
   }
 
-  public async unstakeAll() {
-    this.set('stakingError', null)
-    try {
-      await this.stakingProvider.unstakeAll()
-    } catch (err) {
-      this.set('stakingError', errorUtils.decorateError(err, { title: 'Could not unstake' }))
-      throw err
-    }
-  }
-
   /**
    * Updates the "user wallet update" model and sets a new wallet update diff.
    * (eg: useful to notify wallet change)
