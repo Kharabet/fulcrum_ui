@@ -19,7 +19,7 @@ interface IInputAmountProps {
   withSlider?: boolean
   onInsertMaxValue: (value: number) => void
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void
-  onCollateralChange: (asset: Asset) => void
+  onCollateralChange?: (asset: Asset) => void
   readonly?: boolean
   maxSliderValue: number
 }

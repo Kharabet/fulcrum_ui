@@ -1,8 +1,7 @@
 import { BigNumber } from '@0x/utils'
-import Slider from 'rc-slider'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
-import { merge, Observable, Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
+import { Observable, Subject } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
@@ -38,8 +37,6 @@ interface IExtendLoanFormState {
   extendManagementAddress: string | null
   gasAmountNeeded: BigNumber
   balanceTooLow: boolean
-  didSubmit: boolean
-  interestAmount: number
   inputAmountText: string
   maxDepositAmount: BigNumber
   isLoading: boolean
@@ -49,7 +46,6 @@ interface IExtendLoanFormState {
 export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanFormState> {
   private readonly _inputDecimals = 6
 
-  private readonly _inputChange: Subject<string>
   private readonly _selectedValueUpdate: Subject<number>
 
   constructor(props: IExtendLoanFormProps, context?: any) {
@@ -64,8 +60,6 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       extendManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
       balanceTooLow: false,
-      didSubmit: false,
-      interestAmount: 0,
       inputAmountText: '',
       maxDepositAmount: new BigNumber(0),
       isLoading: false,
@@ -73,16 +67,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     }
 
     this._selectedValueUpdate = new Subject()
-    this._inputChange = new Subject()
-
-    merge(
-      this._inputChange.pipe(
-        distinctUntilChanged(),
-        debounceTime(300),
-        switchMap((value) => this.rxFromInputAmount(value))
-      ),
-      this._selectedValueUpdate.pipe(distinctUntilChanged())
-    )
+    this._selectedValueUpdate
       .pipe(switchMap((value) => this.rxGetEstimate(value)))
       .subscribe((value: IExtendEstimate) => {
         this.setState({
@@ -194,7 +179,6 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               buttonValue={this.state.buttonValue}
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
-              onCollateralChange={this.onCollateralChange}
               withSlider={true}
               readonly
               maxSliderValue={28}
@@ -210,24 +194,14 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         </section>
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">
-            <button
-              type="submit"
-              className={`btn btn-size--small button-extend ${
-                this.state.didSubmit ? `btn-disabled` : ``
-              }`}>
-              {this.state.didSubmit ? 'Submitting...' : 'Front interest'}
+            <button type="submit" className={`btn btn-size--small button-extend`}>
+              Front interest
             </button>
           </div>
         </section>
       </form>
     )
   }
-
-  // private pluralize = (singular: string,
-  //   plural: string, value: number) => {
-  //   const isPlural = value !== 1;
-  //   return isPlural ? plural : singular;
-  // };
 
   private rxGetEstimate = (selectedValue: number): Observable<IExtendEstimate> => {
     return new Observable<IExtendEstimate>((observer) => {
@@ -240,37 +214,6 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     })
   }
 
-  private rxFromInputAmount = (value: string): Observable<number> => {
-    return new Observable<number>((observer) => {
-      let inputAmountText = value
-      const maxDepositAmountText = this.state.maxDepositAmount.toFixed()
-      const maxDepositAmountNumber = Number(maxDepositAmountText)
-
-      if (Number(inputAmountText) > maxDepositAmountNumber) {
-        inputAmountText = this.formatPrecision(this.state.maxDepositAmount)
-      }
-      const depositAmountText = new BigNumber(inputAmountText)
-      const depositAmountNumber = Number(depositAmountText)
-      const selectedValue = Math.round(
-        (depositAmountNumber * this.state.maxValue) / maxDepositAmountNumber
-      )
-      this.setState({ ...this.state, selectedValue })
-      observer.next(selectedValue)
-    })
-  }
-
-  private onChange = (value: number) => {
-    this.setState({
-      ...this.state,
-      selectedValue: value,
-      interestAmount: 0
-    })
-  }
-
-  private onAfterChange = (value: number) => {
-    this._selectedValueUpdate.next(this.state.selectedValue)
-  }
-
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -278,71 +221,45 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       return
     }
 
-    if (!this.state.didSubmit) {
-      this.setState({ ...this.state, didSubmit: true })
-
-      let assetBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
-        this.props.loan.loanAsset
-      )
-      if (this.props.loan.loanAsset === Asset.ETH) {
-        assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTxn)
-          ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTxn)
-          : new BigNumber(0)
-      }
-      const precision = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
-      const amountInBaseUnits = new BigNumber(
-        this.state.depositAmount.multipliedBy(10 ** precision).toFixed(0, 1)
-      )
-      if (assetBalance.lt(amountInBaseUnits)) {
-        this.setState({
-          ...this.state,
-          balanceTooLow: true,
-          didSubmit: false
-        })
-
-        return
-      } else {
-        this.setState({
-          ...this.state,
-          balanceTooLow: false
-        })
-      }
-
-      const request = this.props.request
-
-      request.depositAmount = new BigNumber(this.state.depositAmount)
-
-      this.props.onSubmit(request)
-      this.props.changeLoadingTransaction(true, request, false, false)
+    let assetBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+      this.props.loan.loanAsset
+    )
+    if (this.props.loan.loanAsset === Asset.ETH) {
+      assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTxn)
+        ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTxn)
+        : new BigNumber(0)
     }
+    const precision = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
+    const amountInBaseUnits = new BigNumber(
+      this.state.depositAmount.multipliedBy(10 ** precision).toFixed(0, 1)
+    )
+    if (assetBalance.lt(amountInBaseUnits)) {
+      this.setState({
+        ...this.state,
+        balanceTooLow: true
+      })
+
+      return
+    } else {
+      this.setState({
+        ...this.state,
+        balanceTooLow: false
+      })
+    }
+
+    const request = this.props.request
+
+    request.depositAmount = new BigNumber(this.state.depositAmount)
+
+    this.props.onSubmit(request)
+    this.props.changeLoadingTransaction(true, request, false, false)
   }
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const inputAmountText = event.target.value ? event.target.value : ''
-    if (Number(inputAmountText) === 0) {
-      this.setState({
-        ...this.state,
-        inputAmountText
-      })
-    } else {
-      // setting Text to update display at the same time
-      this.setState(
-        {
-          ...this.state,
-          inputAmountText,
-          interestAmount: 0
-        },
-        () => {
-          this._inputChange.next(inputAmountText)
-        }
-      )
-    }
-  }
-
-  public updateInterestAmount = (interest: number) => {
-    const selectedValue = this.state.maxValue * interest
-    this.setState({ ...this.state, selectedValue: selectedValue, interestAmount: interest }, () => {
-      this._selectedValueUpdate.next(selectedValue)
+    this.setState({
+      ...this.state,
+      inputAmountText
     })
   }
 
@@ -363,5 +280,4 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
     return Number(output.toFixed(x)).toString()
   }
-  public onCollateralChange = (asset: Asset) => {}
 }
