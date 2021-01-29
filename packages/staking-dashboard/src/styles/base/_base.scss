@@ -1,8 +1,8 @@
 * {
   font-family: 'Muli', sans-serif;
   box-sizing: border-box;
-  margin: 0;
 }
+
 body {
   color: #283049;
   background-color: #e9f4ff;
@@ -25,7 +25,7 @@ body {
 
 a {
   text-decoration: none;
-  color: $primary-color;
+  color: $color-blue;
   &:hover {
     color: $primary-color-hover;
   }
@@ -67,29 +67,7 @@ ol {
 .pb-50 {
   padding-bottom: 50px;
 }
-.logo-staking {
-  display: flex;
-  align-items: center;
-  @media screen and(max-width: $width-max-sm) {
-    svg {
-      width: 140px;
-      height: auto;
-    }
-  }
-}
-.logo-sign {
-  display: flex;
-  margin-right: 15px;
-  border-radius: 8px;
-  background: linear-gradient(314.84deg, #003cda 19.25%, #33dfcc 86.5%);
-  @media screen and(max-width: $width-max-sm) {
-    margin-right: 10px;
-    svg {
-      width: 35px;
-      height: auto;
-    }
-  }
-}
+
 .logo-bzx {
   display: flex;
   @media screen and(max-width: $width-max-sm) {

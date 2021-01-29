@@ -1,196 +1,45 @@
 .calculator {
   position: relative;
   margin: auto;
-  max-width: 725px;
-  background-color: #ffffff;
-  border-radius: 8px;
+  max-width: 746px;
+}
 
-  .calculator-row {
-    display: flex;
-    flex-direction: column;
+.calculator__balance-loader {
+  position: absolute;
+  top: 13px;
+  left: 50%;
+}
 
-    &.rewards-container {
-      flex-direction: row;
-      justify-content: flex-start;
+.section-header {
+  margin-bottom: 24px;
+  line-height: 1.5;
+  color: #495460;
+  font-size: 17px;
+  font-weight: bold;
+}
 
-      @media screen and (max-width: $width-max-sm) {
-        flex-direction: column;
-      }
-      button {
-        font-size: 14px;
-        line-height: 150%;
-        padding: 9px 24px;
-        height: initial;
-        min-width: initial;
-      }
-    }
-    justify-content: space-between;
-    &:not(:last-child) {
-      border-bottom: 1px solid #e7ebf0;
-    }
-    @media screen and (max-width: $width-max-sm) {
-      flex-direction: column;
-    }
-    @media screen and (min-width: $width-min-xs) {
-      padding: 24px 32px 20px 32px;
-    }
-    @media screen and (max-width: $width-max-xs) {
-      padding: 30px;
-    }
-    &.balance {
-      flex-wrap: wrap;
-      flex-direction: row;
-      padding: 24px;
-      border-bottom: none;
-      padding-bottom: 16px;
-      .balance-item {
-        width: 100%;
-        @media screen and (min-width: $width-min-xs) {
-          width: 50%;
-        }
-      }
-      .balance-wrapper {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        background: #f5f7f9;
-        border-radius: 4px;
-        padding: 24px 24px 24px 24px;
-      }
-    }
-    .notice {
-      text-align: center;
-      padding: 10px 0px;
-      font-size: 14px;
-    }
-    .warning {
-      font-size: 14px;
-      color: #ff5c5c;
-      // font-weight: 600;
-      position: absolute;
-    }
-    .row-header {
-      font-weight: 800;
-      line-height: 1.5;
-      display: flex;
-      align-items: center;
-      color: #283049;
-      margin-bottom: 24px;
-      margin-left: 15px;
-      @media screen and (min-width: $width-min-xs) {
-        font-size: 16px;
-      }
-      @media screen and (max-width: $width-max-xs) {
-        font-size: 12px;
-      }
-    }
-    .row-container {
-      margin-bottom: 34px;
-    }
-    .row-body {
-      font-weight: 800;
-      line-height: 1;
-      color: #283049;
-      position: relative;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      padding-top: 15px;
-      @media screen and (min-width: $width-min-xs) {
-        font-size: 36px;
-      }
-      @media screen and (max-width: $width-max-xs) {
-        font-size: 26px;
-      }
-      .value {
-        position: relative;
-      }
-      .icon {
-        display: flex;
-        svg {
-          width: 32px;
-          height: auto;
-          margin-right: 14px;
-        }
-      }
-    }
-    .row-token {
-      position: absolute;
-      top: 0;
-      left: 46px;
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1;
-      color: #758295;
-    }
-    .row-footer {
-      font-weight: 600;
-      line-height: 1.5;
-      color: #758295;
-      @media screen and (min-width: $width-min-xs) {
-        font-size: 18px;
-      }
-      @media screen and (max-width: $width-max-xs) {
-        font-size: 16px;
-      }
-    }
-    .reward-item {
-      width: 50%;
-      @media screen and (min-width: $width-min-sm) {
-        padding-bottom: 12px;
-      }
-      @media screen and (max-width: $width-max-xs) {
-        width: 100%;
-        margin-bottom: 25px;
-      }
-      .row-body,
-      .row-footer {
-        color: $green-color;
-      }
-      .row-body {
-        padding-top: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+.label--small {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  color: #758295;
+}
 
-        .currency {
-          font-weight: 600;
-        }
-        .value {
-          position: relative;
-          &:before {
-            position: absolute;
-            content: 'Estimated';
-            color: #758295;
+.token-label {
+  @extend .label--small;
+  position: absolute;
+  top: 0px;
+  left: 46px;
+}
 
-            font-weight: 600;
-            font-size: 12px;
-            line-height: 15px;
-            left: 0;
-            top: -15px;
-          }
-        }
+.stake-input__token-logo {
+  width: 32px;
+  height: 32px;
+}
 
-        button {
-          margin-left: 20px;
-          @media screen and (min-width: $width-min-xs) {
-            margin-bottom: -13px;
-          }
-          @media screen and (max-width: $width-max-xs) {
-            margin-top: 10px;
-            margin-left: 10px;
-          }
-        }
-      }
-    }
-    .reward-content {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-
-      @media screen and (max-width: $width-max-xs) {
-        margin-bottom: 0;
-      }
-    }
-  }
+.stake-input__value {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  color: #283049;
 }

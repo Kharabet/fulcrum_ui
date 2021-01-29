@@ -1,4 +1,4 @@
-export class AssetDetails {
+export default class AssetDetails {
   public displayName: string = ''
   public labelName: string = ''
   public logoSvg: any = null

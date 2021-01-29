@@ -1,7 +1,7 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
-import { ProviderType } from '../../domain/ProviderType'
+import ProviderType from '../../domain/ProviderType'
 
-export class ProviderChangedEvent {
+export default class ProviderChangedEvent {
   public providerType: ProviderType
   public web3: Web3Wrapper | null
 

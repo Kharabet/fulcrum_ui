@@ -251,6 +251,35 @@ $secondary-dark-color: rgba(#333c46, 0.4);
       cursor: not-allowed;
     }
   }
+  &__col-profit {
+    margin-top: 15px;
+    &-switch {
+      border-radius: 22px;
+      background-color: var(--primary-bg);
+      position: absolute;
+      display: flex;
+      bottom: 10px;
+      label {
+        line-height: 1.5;
+        font-size: 9px;
+        display: inline-block;
+        padding: 3px 6px;
+        color: var(--primary-text);
+        cursor: pointer;
+        &:first-child {
+          border-radius: 18px 0 0 18px;
+        }
+        &:last-child {
+          border-radius: 0 18px 18px 0;
+        }
+        &.active {
+          background-color: #276bfb;
+          transition: 0.15s background-color;
+          color: #ffffff;
+        }
+      }
+    }
+  }
 }
 
 @media (max-width: $breakpoint-mobile-max) {

@@ -77,6 +77,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                     isLoadingTransaction={this.props.isLoadingTransaction}
                     changeLoadingTransaction={this.props.changeLoadingTransaction}
                     onTransactionsCompleted={this.props.onTransactionsCompleted}
+                    positionType={row.props.positionType}
                   />
                 </div>
               )

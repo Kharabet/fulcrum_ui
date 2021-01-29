@@ -28,7 +28,6 @@ enum Asset {
   REP = 'REP',
   KNC = 'KNC',
   CHI = 'CHI',
-  LEND = 'LEND',
   BZRX = 'BZRX',
   vBZRX = 'vBZRX',
   YFI = 'YFI',

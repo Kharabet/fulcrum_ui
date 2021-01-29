@@ -142,7 +142,7 @@ footer {
       margin-right: 15px;
     }
     a {
-      color: $green-color;
+      color: darken($green-color, 10%);
       &:not(:last-child) {
         margin-right: 30px;
       }
