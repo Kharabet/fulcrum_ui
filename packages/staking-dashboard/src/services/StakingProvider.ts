@@ -1,8 +1,13 @@
 import { BigNumber } from '@0x/utils'
-import { TransactionReceipt, Web3Wrapper } from '@0x/web3-wrapper'
+import { TransactionReceipt, Web3Wrapper, LogEntry } from '@0x/web3-wrapper'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
 import hashUtils from 'app-lib/hashUtils'
+import GovernanceProposal, {
+  GovernanceProposalHistoryItem,
+  GovernanceProposalStates
+} from 'src/domain/GovernanceProposal'
+import ProposalCreated from 'src/domain/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
 import appConfig from '../config/appConfig'
 import Asset from '../domain/Asset'
@@ -14,6 +19,15 @@ import Web3ConnectionFactory from '../domain/Web3ConnectionFactory'
 import ContractsSource from './ContractsSource'
 import ProviderChangedEvent from './events/ProviderChangedEvent'
 import { stakeableToken } from 'src/domain/stakingTypes'
+import { EventAbi, LogWithDecodedArgs, DecodedLogArgs } from 'ethereum-types'
+import {
+  CompoundGovernorAlphaEventArgs,
+  CompoundGovernorAlphaProposalCanceledEventArgs,
+  CompoundGovernorAlphaProposalCreatedEventArgs,
+  CompoundGovernorAlphaProposalExecutedEventArgs,
+  CompoundGovernorAlphaProposalQueuedEventArgs,
+  CompoundGovernorAlphaVoteCastEventArgs
+} from '../contracts/CompoundGovernorAlpha'
 
 interface IStakingProviderEvents {
   ProviderAvailable: () => void
@@ -215,6 +229,288 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   /**
    * Amount of vBZRX that have vested held in the user wallet
    */
+  public async getGovernanceProposals(): Promise<Array<GovernanceProposal>> {
+    let result: Array<GovernanceProposal> = []
+
+    let proposalCreatedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalCreatedEventArgs>
+    > = []
+    let proposalQueuedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalQueuedEventArgs>
+    > = []
+    let proposalExecutedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalExecutedEventArgs>
+    > = []
+    let proposalCanceledEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalCanceledEventArgs>
+    > = []
+    let proposalVoteCastEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaVoteCastEventArgs>
+    > = []
+    let proposalsData = []
+    let proposalsStates: BigNumber[] = []
+
+    const enumerateProposalState = (state: number) => {
+      const proposalStates = [
+        'Pending',
+        'Active',
+        'Canceled',
+        'Defeated',
+        'Succeeded',
+        'Queued',
+        'Expired',
+        'Executed'
+      ]
+      return proposalStates[state]
+    }
+
+    if (!this.web3Wrapper || !this.contractsSource) {
+      throw new Error('getGovernanceProposals: Missing source or web3')
+    }
+
+    const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
+    this.web3Wrapper.abiDecoder.addABI(governanceContract.abi)
+    const proposalsCount = await governanceContract.proposalCount.callAsync()
+    const quorumVotes = await governanceContract.quorumVotes.callAsync()
+    const votingPeriod = await governanceContract.votingPeriod.callAsync()
+    const currentBlock = await this.web3Wrapper.getBlockNumberAsync()
+
+    const voteCastEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: ['0x877856338e13f63d0c36822ff0ef736b80934cd90574a3a5bc9262c39d217c46'],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in voteCastEvents) {
+      if (!voteCastEvents[i]) {
+        continue
+      }
+      const event: LogEntry = voteCastEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaVoteCastEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalVoteCastEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+
+    const createdEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: [ProposalCreated.topic0],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in createdEvents) {
+      if (!createdEvents[i]) {
+        continue
+      }
+      const event: LogEntry = createdEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalCreatedEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalCreatedEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+
+    const queuedEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: ['0x9a2e42fd6722813d69113e7d0079d3d940171428df7373df9c7f7617cfda2892'],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in queuedEvents) {
+      if (!createdEvents[i]) {
+        continue
+      }
+      const event: LogEntry = queuedEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalQueuedEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalQueuedEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+
+    const executedEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: ['0x712ae1383f79ac853f8d882153778e0260ef8f03b504e2866e0593e04d2b291f'],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in executedEvents) {
+      if (!createdEvents[i]) {
+        continue
+      }
+      const event: LogEntry = executedEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalExecutedEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalExecutedEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+    const canceledEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: ['0x789cf55be980739dad1d0699b93b58e806b51c9d96619bfa8fe0a28abaa7b30c'],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in canceledEvents) {
+      if (!createdEvents[i]) {
+        continue
+      }
+      const event: LogEntry = canceledEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalCanceledEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalCanceledEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+
+    for (const i of Array.from(Array(parseInt(proposalsCount.toFixed())), (n, i) => i + 1)) {
+      proposalsData.push(await governanceContract.proposals.callAsync(new BigNumber(i)))
+      proposalsStates.push(
+        new BigNumber(await governanceContract.state.callAsync(new BigNumber(i)))
+      )
+    }
+    const remappedProposals = []
+    for (const i in proposalsData) {
+      const p = proposalsData[i]
+      const id = p[0].toNumber()
+      const creationEvent = proposalCreatedEvents.find((e) => e.args.id.eq(id))
+      if (creationEvent === undefined) {
+        continue
+      }
+      const queuedEvent = proposalQueuedEvents.find((e) => e.args.id.eq(id))
+      const executedEvent = proposalExecutedEvents.find((e) => e.args.id.eq(id))
+      const canceledEvent = proposalCanceledEvents.find((e) => e.args.id.eq(id))
+      const voteCasts = proposalVoteCastEvents.filter(
+        (e) => e.args.proposalId.eq(id) && e.args.support === true
+      )
+      // let votesAccumulator = new BigNumber(0)
+      // voteCasts.some( vote => {
+      //   votesAccumulator = votesAccumulator.plus(vote.args.votes)
+      //   if (votesAccumulator.gt(quorumVotes)){
+      //     console.log(id, vote.blockNumber!.toFixed())
+      //     return true
+      //   }
+      //   return false
+      // })
+
+      const splittedDescription = creationEvent.args.description.split(/\n/g)
+      const title = splittedDescription[0].split('# ')[1] || 'Untitled'
+      splittedDescription.splice(0, 1)
+      const description = splittedDescription.join('\n') || 'No description.'
+
+      const pendingHistoryItem = {
+        state: GovernanceProposalStates.Pending,
+        blockNumber: p[3].toNumber(),
+        txnHash: creationEvent.transactionHash,
+        date: await this.web3Wrapper!.getBlockTimestampAsync(creationEvent.blockNumber!)
+      } as GovernanceProposalHistoryItem
+      const activeHistoryItem = {
+        state: GovernanceProposalStates.Active,
+        blockNumber: p[3].toNumber(),
+        txnHash: creationEvent.transactionHash,
+        date: await this.web3Wrapper!.getBlockTimestampAsync(creationEvent.blockNumber!)
+      } as GovernanceProposalHistoryItem
+      const voteResultHisoryItem = {
+        state:
+          p[4].lt(currentBlock) && p[2].isZero()
+            ? GovernanceProposalStates.Defeated
+            : GovernanceProposalStates.Succeeded,
+        blockNumber: p[4].toNumber(),
+        date: await this.web3Wrapper!.getBlockTimestampAsync(p[4].toNumber())
+      } as GovernanceProposalHistoryItem
+
+      const queuedHisoryItem =
+        (queuedEvent &&
+          ({
+            state: GovernanceProposalStates.Queued,
+            blockNumber: queuedEvent.blockNumber!,
+            txnHash: queuedEvent.transactionHash,
+            date: await this.web3Wrapper!.getBlockTimestampAsync(queuedEvent.blockNumber!)
+          } as GovernanceProposalHistoryItem)) ||
+        undefined
+
+      const executedHisoryItem =
+        (executedEvent &&
+          ({
+            state: GovernanceProposalStates.Executed,
+            blockNumber: executedEvent.blockNumber!,
+            txnHash: executedEvent.transactionHash,
+            date: await this.web3Wrapper!.getBlockTimestampAsync(executedEvent.blockNumber!)
+          } as GovernanceProposalHistoryItem)) ||
+        undefined
+
+      const expiredHisoryItem =
+        (queuedEvent &&
+          p[2].plus(1209600).lt(currentBlock) &&
+          ({
+            state: GovernanceProposalStates.Expired,
+            blockNumber: p[2].plus(1209600).toNumber(),
+            date: await this.web3Wrapper!.getBlockTimestampAsync(p[2].plus(1209600).toNumber())
+          } as GovernanceProposalHistoryItem)) ||
+        undefined
+
+      const canceledHisoryItem =
+        (canceledEvent &&
+          ({
+            state: GovernanceProposalStates.Canceled,
+            blockNumber: canceledEvent.blockNumber!,
+            txnHash: canceledEvent.transactionHash
+          } as GovernanceProposalHistoryItem)) ||
+        undefined
+
+      const notEmpty = <TValue>(value: TValue | null | undefined): value is TValue => {
+        return value !== null && value !== undefined
+      }
+      const history: Array<GovernanceProposalHistoryItem> = [
+        pendingHistoryItem,
+        activeHistoryItem,
+        voteResultHisoryItem,
+        queuedHisoryItem,
+        executedHisoryItem,
+        expiredHisoryItem,
+        canceledHisoryItem
+      ].filter(notEmpty)
+
+      remappedProposals.push(
+        new GovernanceProposal(
+          id,
+          title,
+          description,
+          creationEvent.args.proposer,
+          p[5].div(10 ** 18),
+          p[6].div(10 ** 18),
+          GovernanceProposalStates[proposalsStates[id - 1].toNumber()],
+          p,
+          creationEvent,
+          queuedEvent,
+          executedEvent,
+          canceledEvent,
+          voteCasts,
+          history
+        )
+      )
+    }
+    result = remappedProposals.reverse()
+    console.log({ result })
+    return result
+  }
+
   public async getVestedBzrxBalance() {
     const account = this.getCurrentAccount()
 

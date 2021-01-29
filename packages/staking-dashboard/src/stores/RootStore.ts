@@ -6,11 +6,13 @@ import UIStore from './UIStore'
 import Web3Connection from './Web3Connection'
 import appConfig from 'src/config/appConfig'
 import errorUtils from 'app-lib/errorUtils'
+import GovernanceStore from './GovernanceStore'
 
 export default class RootStore {
   public stakingStore: StakingStore
   public transactionStore: TransactionStore
   public stakingProvider: StakingProvider
+  public governanceStore: GovernanceStore
   public web3Connection: Web3Connection
   public uiStore: UIStore
   public etherscanURL = appConfig.web3ProviderSettings.etherscanURL
@@ -22,6 +24,14 @@ export default class RootStore {
       return {
         error,
         stackMessages: errorUtils.getErrorStackMessages(error)
+      }
+    }
+
+    const governanceError = this.governanceStore.error
+    if (governanceError) {
+      return {
+        error: governanceError,
+        stackMessages: errorUtils.getErrorStackMessages(governanceError)
       }
     }
     return null
@@ -36,12 +46,14 @@ export default class RootStore {
 
   public clearError () {
     this.stakingStore.clearError()
+    // this.governanceStore.clearError()
   }
 
   public init() {
     this.web3Connection.init()
     this.stakingStore.init()
     this.transactionStore.init()
+    // this.governanceStore.init()
 
     /**
      * Trying to manage errors in a centralized way.
@@ -62,6 +74,7 @@ export default class RootStore {
     this.stakingProvider = stakingProvider
     this.transactionStore = new TransactionStore(this)
     this.stakingStore = new StakingStore(this)
+    this.governanceStore = new GovernanceStore(this)
     this.web3Connection = new Web3Connection(this)
     this.uiStore = new UIStore(this)
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })

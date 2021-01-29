@@ -4,6 +4,8 @@ import { iBZxContract } from '../contracts/iBZxContract'
 import { StakingV1Contract } from '../contracts/stakingV1'
 import { BZRXVestingTokenContract } from '../contracts/BZRXVestingToken'
 import { HelperImplContract } from '../contracts/helper'
+import { CompoundGovernorAlphaContract } from '../contracts/CompoundGovernorAlpha'
+
 // @ts-ignore
 import erc20Json from '../assets/artifacts/BUILD_APP_NETWORK/erc20.json'
 // @ts-ignore
@@ -14,6 +16,8 @@ import iBZxJson from '../assets/artifacts/BUILD_APP_NETWORK/iBZx.json'
 import bzrxVestingJson from '../assets/artifacts/BUILD_APP_NETWORK/BZRXVestingToken.json'
 // @ts-ignore
 import HelperImplJson from '../assets/artifacts/BUILD_APP_NETWORK/HelperImpl.json'
+// @ts-ignore
+import compoundGovernorAlphaJson from '../assets/artifacts/BUILD_APP_NETWORK/CompoundGovernorAlpha.json'
 
 const ibzxAddresses = new Map([
   [1, '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'],
@@ -53,6 +57,24 @@ export default class ContractsSource {
     return address
   }
 
+  
+  public getCompoundGovernorAlphaAddress(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'
+        break
+      case 3:
+        address = '0xc5bfed3bb38a3c4078d4f130f57ca4c560551d45'
+        break
+      case 42:
+        address = ''
+        break
+    }
+    return address
+  }
+
+
   private async getErc20ContractRaw(addressErc20: string) {
     return new erc20Contract(erc20Json.abi, addressErc20.toLowerCase(), this.provider)
   }
@@ -71,6 +93,14 @@ export default class ContractsSource {
     const address = vbzrxAddresses.get(this.networkId) || ''
     return new BZRXVestingTokenContract(bzrxVestingJson.abi, address.toLowerCase(), this.provider)
   }
+  
+  private getCompoundGovernorAlphaContractRaw(): CompoundGovernorAlphaContract {
+    return new CompoundGovernorAlphaContract(
+      compoundGovernorAlphaJson.abi,
+      this.getCompoundGovernorAlphaAddress().toLowerCase(),
+      this.provider
+    )
+  }
 
   public async getHelperContractRaw() {
     const address = helperAddresses.get(this.networkId) || ''
@@ -82,4 +112,5 @@ export default class ContractsSource {
   public getStakingV1Contract = _.memoize(this.getStakingV1ContractRaw)
   public getBzrxVestingContract = _.memoize(this.getBzrxVestingContractRaw)
   public getHelperContract = _.memoize(this.getHelperContractRaw)
+  public getCompoundGovernorAlphaContract = _.memoize(this.getCompoundGovernorAlphaContractRaw)
 }
