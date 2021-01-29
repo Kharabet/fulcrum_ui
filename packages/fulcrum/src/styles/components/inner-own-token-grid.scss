@@ -217,6 +217,9 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 10% 10% 13% 15%;
     .icon-extend-dark {
       fill: var(--lend-bg-hover);
     }
+    @media screen and (max-width: $breakpoint-desktop-max) {
+      right: 18px;
+    }
   }
 
   &__col-action {
