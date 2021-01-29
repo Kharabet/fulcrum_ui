@@ -238,13 +238,13 @@ $secondary-dark-color: rgba(#333c46, 0.4);
       position: absolute;
       display: flex;
       bottom: 10px;
-      cursor: pointer;
       label {
         line-height: 1.5;
         font-size: 9px;
         display: inline-block;
         padding: 3px 6px;
         color: var(--primary-text);
+        cursor: pointer;
         &:first-child {
           border-radius: 18px 0 0 18px;
         }
