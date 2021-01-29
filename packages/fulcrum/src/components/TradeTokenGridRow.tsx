@@ -246,14 +246,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <button
                 className={'' + (this.props.positionType === PositionType.LONG ? 'btn-active' : '')}
                 onClick={() => this.props.changeGridPositionType(PositionType.LONG)}>
-                Long
+                Buy / Long
               </button>
               <button
                 className={
                   '' + (this.props.positionType === PositionType.SHORT ? 'btn-active' : '')
                 }
                 onClick={() => this.props.changeGridPositionType(PositionType.SHORT)}>
-                Short
+                Sell / Short
               </button>
             </div>
           </div>
@@ -267,11 +267,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               </div>
             </div>
           )}
-          {!this.props.isMobileMedia && (
+          {/* {!this.props.isMobileMedia && (
             <div className="trade-token-grid-row__col-position-type">
               <PositionTypeMarker value={this.props.positionType} />
             </div>
-          )}
+          )} */}
           <div className="trade-token-grid-row__col-leverage">
             <div className="leverage-selector__wrapper">
               <LeverageSelector
@@ -340,10 +340,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           </div>
           <div className="trade-token-grid-row__col-action">
             <button
-              className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half"
+              className={`trade-token-grid-row__button ${this.props.positionType === PositionType.LONG ?'':'trade-token-grid-row__button-short'} trade-token-grid-row__button--size-half`}
               disabled={siteConfig.TradeBuyDisabled || this.state.isLoadingTransaction}
               onClick={this.onBuyClick}>
-              {TradeType.BUY}
+               {this.props.positionType === PositionType.LONG ? 'Buy' : 'Sell'} / {this.props.positionType}
             </button>
           </div>
         </div>
