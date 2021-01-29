@@ -27,7 +27,7 @@ const ibzxAddresses = new Map([
 ])
 
 const stakingV1Addresses = new Map([
-  [1, '0xE7eD6747FaC5360f88a2EFC03E00d25789F69291'],
+  [1, '0xe95ebce2b02ee07def5ed6b53289801f7fc137a4'],
   [42, '0xE7eD6747FaC5360f88a2EFC03E00d25789F69291']
 ])
 
