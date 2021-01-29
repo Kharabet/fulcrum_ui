@@ -19,7 +19,7 @@ export function StakingRewards({ vm }: { vm: RewardsVM }) {
       />
 
       <p className="margin-bottom-2">
-        <b>vBZRX tokens vest BZRX overtime</b>. Your available BZRX are listed above.
+        <b>vBZRX tokens in your wallet vest BZRX overtime</b>. Your available BZRX are listed above.
       </p>
 
       <Button
