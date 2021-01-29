@@ -2,8 +2,6 @@ import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import React, { Component } from 'react'
 
-
-
 export interface IAssetDropdownProps {
   assets: Asset[]
   selectedAsset: Asset

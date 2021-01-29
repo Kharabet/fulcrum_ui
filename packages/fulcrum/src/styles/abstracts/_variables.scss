@@ -69,6 +69,21 @@ $breakpoint-mobile-min: 960px;
   --chi-link-color: #444e5a;
   --bg-disconnect-provider: #a9b5c7;
   --fill-provider-icon: #000000;
+  --trade-form-bg: #ffffff;
+  --trade-form-left-bg: #e9f4ff;
+  --trade-form-text: #282f36;
+  --trade-expected-result-border: #A2ABB8;
+  --input-bg: #E9F4FF;
+  --slider-bg: #D6DDE4;
+  --max-percent-bg: #00c0ab;
+  --max-percent-color: #ffffff;
+  --asset-dropdown-bg: #e9f4ff;
+  --asset-dropdown-text: #282f36;
+  --asset-dropdown-button-bg: #ffffff;
+  --asset-dropdown-button-bg-hover: #d1ddea;
+  --chi-switch-bg: #282f36;
+  --dropdown-select-bg: #e9f4ff;
+  --dropdown-select-text: #282f36;
 }
 
 [data-theme='dark'] {
@@ -123,4 +138,19 @@ $breakpoint-mobile-min: 960px;
   --chi-link-color: #ffffff;
   --bg-disconnect-provider: #586473;
   --fill-provider-icon: #ffffff;
+  --trade-form-bg: #333c46;
+  --trade-form-left-bg: #ffffff;
+  --trade-form-text: #ffffff;
+  --trade-expected-result-border: #586473;
+  --input-bg: #1e262e;
+  --slider-bg: #1e262e;
+  --max-percent-bg: #444e5a;
+  --max-percent-color: #00c0ab;
+  --asset-dropdown-bg: #444e5a;
+  --asset-dropdown-text: #ffffff;
+  --asset-dropdown-button-bg: #586473;
+  --asset-dropdown-button-bg-hover: #444e5a;
+  --chi-switch-bg: #283038;
+  --dropdown-select-bg: #758295;
+  --dropdown-select-text: #e9f4ff;
 }
