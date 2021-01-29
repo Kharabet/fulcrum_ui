@@ -175,6 +175,27 @@ $secondary-dark-color: rgba(#333c46, 0.4);
       }
     }
   }
+  &__open-extend-loan {
+    background-color: #ffffff;
+    background-color: var(--bg-icon-collateral);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-left: 10px;
+    position: absolute;
+    top: -2px;
+    right: -50px;
+    cursor: pointer;
+    .icon-extend-light {
+      fill: var(--icon-collateral);
+    }
+    .icon-extend-dark {
+      fill: var(--lend-bg-hover);
+    }
+  }
   &__col-collateral-wrapper {
     display: flex;
     position: relative;
@@ -332,7 +353,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
         grid-column-end: 4;
       }
       &__col-action {
-        order:4;
+        order: 4;
 
         align-self: baseline;
         grid-column-start: 4;
@@ -358,6 +379,12 @@ $secondary-dark-color: rgba(#333c46, 0.4);
         padding: 4px;
         top: 0;
         right: -30px;
+      }
+      &__open-extend-loan {
+        top: 20px;
+        right: -30px;
+        width: 16px;
+        height: 16px;
       }
       &__col-asset-collateral-small {
         text-indent: 10px;

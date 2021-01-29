@@ -1,7 +1,6 @@
 import React, { Component, ChangeEvent } from 'react'
 import { SliderPercent } from './SliderPercent'
 
-
 import Asset from 'bzx-common/src/assets/Asset'
 
 import { TradeType } from '../domain/TradeType'
@@ -20,7 +19,9 @@ interface IInputAmountProps {
   withSlider?: boolean
   onInsertMaxValue: (value: number) => void
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void
-  onCollateralChange: (asset: Asset) => void
+  onCollateralChange?: (asset: Asset) => void
+  readonly?: boolean
+  maxSliderValue: number
 }
 
 interface IInputAmountState {
@@ -65,6 +66,7 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
             className="input-amount__input"
             value={!this.props.isLoading ? this.formatPrecision(this.props.inputAmountText) : ''}
             onChange={this.props.onTradeAmountChange}
+            readOnly={this.props.readonly}
           />
           {this.props.isLoading && (
             <div className="preloader-container">
@@ -117,6 +119,7 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
           <SliderPercent
             onInsertMaxValue={this.props.onInsertMaxValue}
             percentSlider={this.props.buttonValue}
+            maxSliderValue={this.props.maxSliderValue}
           />
         )}
       </div>

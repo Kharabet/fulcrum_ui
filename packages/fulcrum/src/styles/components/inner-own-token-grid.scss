@@ -157,7 +157,7 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 10% 10% 13% 15%;
 
     color: #a2abb8;
     left: 0;
-    top: 100%;
+    bottom: -25px;
     &.positive {
       color: #00c0ab;
     }
@@ -193,7 +193,7 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 10% 10% 13% 15%;
     font-size: 12px;
     font-weight: 600;
     text-indent: 13px;
-    top: 100%;
+    bottom: -25px;
     left: -13px;
     color: #a2abb8;
     &.danger {
@@ -226,6 +226,25 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 10% 10% 13% 15%;
       .icon-collateral-stroke {
         stroke: #ff4f4f;
       }
+    }
+  }
+
+  &__open-extend-loan {
+    position: absolute;
+    right: 9px;
+    cursor: pointer;
+    svg {
+      width: auto;
+      height: auto;
+    }
+    .icon-extend-light {
+      fill: var(--icon-collateral);
+    }
+    .icon-extend-dark {
+      fill: var(--lend-bg-hover);
+    }
+    @media screen and (max-width: $breakpoint-desktop-max) {
+      right: 18px;
     }
   }
 
@@ -389,9 +408,17 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 10% 10% 13% 15%;
       &__col-asset-collateral-small {
         font-size: 10px;
         right: auto;
-        left: 55px;
+        left: 80px;
         width: 102px;
         top: -5px;
+      }
+      &__open-extend-loan {
+        display: flex;
+        top: 4px;
+        right: 4px;
+        svg {
+          width: 18px;
+        }
       }
 
       &_button {

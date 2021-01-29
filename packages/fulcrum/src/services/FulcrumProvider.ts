@@ -13,6 +13,7 @@ import { ICollateralManagementParams } from '../domain/ICollateralManagementPara
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
 import { ProviderType } from '../domain/ProviderType'
 import { RequestStatus } from '../domain/RequestStatus'
@@ -63,6 +64,8 @@ import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ILoanParams } from '../domain/ILoanParams'
 import { RolloverRequest } from '../domain/RolloverRequest'
+import { IExtendState } from '../domain/IExtendState'
+import { IExtendEstimate } from '../domain/IExtendEstimate'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -119,6 +122,7 @@ export class FulcrumProvider {
   public unsupportedNetwork: boolean = false
 
   public readonly lendAssetsShown: Asset[]
+  public readonly gasBufferForTxn = new BigNumber(5 * 10 ** 16) // 0.05 ETH
 
   constructor() {
     // init
@@ -348,6 +352,12 @@ export class FulcrumProvider {
   }
 
   public onManageCollateralConfirmed = async (request: ManageCollateralRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request))
+    }
+  }
+
+  public onExtendLoanConfirmed = async (request: ExtendLoanRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
@@ -2378,6 +2388,10 @@ export class FulcrumProvider {
       await this.processRolloverRequestTask(task, skipGas)
     }
 
+    if (task.request instanceof ExtendLoanRequest) {
+      await this.processExtendLoanRequestTask(task, skipGas)
+    }
+
     return false
   }
 
@@ -2771,6 +2785,38 @@ console.log(err, added);
     }
   }
 
+  private processExtendLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.loanId)
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error('No provider available!')
+      }
+
+      const account = this.getCurrentAccount()
+      if (!account) {
+        throw new Error('Unable to get wallet address!')
+      }
+
+      const taskRequest: ExtendLoanRequest = task.request as ExtendLoanRequest
+
+      const { ExtendLoanProcessor } = await import('./processors/ExtendLoanProcessor')
+      const processor = new ExtendLoanProcessor()
+      await processor.run(task, account, skipGas)
+
+      task.processingEnd(true, false, null)
+    } catch (e) {
+      if (
+        !e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)
+      ) {
+        // tslint:disable-next-line:no-console
+        console.log(e)
+      }
+      task.processingEnd(false, false, e)
+    } finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task)
+    }
+  }
+
   public waitForTransactionMined = async (
     txHash: string,
     request?: LendRequest | TradeRequest | ManageCollateralRequest | RolloverRequest
@@ -2872,9 +2918,9 @@ console.log(err, added);
     const collateralToken = isLong ? request.asset : request.quoteToken
     const depositToken = request.depositToken
     const leverageAmount =
-    request.positionType === PositionType.LONG
-      ? new BigNumber(request.leverage - 1).times(10 ** 18)
-      : new BigNumber(request.leverage).times(10 ** 18)
+      request.positionType === PositionType.LONG
+        ? new BigNumber(request.leverage - 1).times(10 ** 18)
+        : new BigNumber(request.leverage).times(10 ** 18)
 
     const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18
     const amountInBaseUnits = new BigNumber(
@@ -2887,9 +2933,9 @@ console.log(err, added);
       depositToken === collateralToken ? amountInBaseUnits : new BigNumber(0)
 
     const collateralTokenAddress =
-    //  collateralToken !== Asset.ETH
-         FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
-        //: FulcrumProvider.ZERO_ADDRESS
+      //  collateralToken !== Asset.ETH
+      FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
+    //: FulcrumProvider.ZERO_ADDRESS
 
     const sendAmountForValue =
       depositToken === Asset.WETH || depositToken === Asset.ETH
@@ -2904,73 +2950,67 @@ console.log(err, added);
       const tokenContract = this.contractsSource.getITokenContract(loanToken)
       if (!tokenContract) return result
       try {
-        gasAmount =
-          isGasTokenEnabled
-            ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
-                '0x0000000000000000000000000000000000000000000000000000000000000000',
-                new BigNumber(leverageAmount),
-                loanTokenSent,
-                collateralTokenSent,
-                collateralTokenAddress!,
-                account,
-                account,
-                '0x',
-                {
-                  from: account,
-                  value: sendAmountForValue,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-            : await tokenContract.marginTrade.estimateGasAsync(
-                '0x0000000000000000000000000000000000000000000000000000000000000000',
-                new BigNumber(leverageAmount),
-                loanTokenSent,
-                collateralTokenSent,
-                collateralTokenAddress!,
-                account,
-                '0x',
-                {
-                  from: account,
-                  value: sendAmountForValue,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-      } catch (e) {
-
-      }
-    } 
-    else {
+        gasAmount = isGasTokenEnabled
+          ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+              new BigNumber(leverageAmount),
+              loanTokenSent,
+              collateralTokenSent,
+              collateralTokenAddress!,
+              account,
+              account,
+              '0x',
+              {
+                from: account,
+                value: sendAmountForValue,
+                gas: FulcrumProvider.Instance.gasLimit
+              }
+            )
+          : await tokenContract.marginTrade.estimateGasAsync(
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+              new BigNumber(leverageAmount),
+              loanTokenSent,
+              collateralTokenSent,
+              collateralTokenAddress!,
+              account,
+              '0x',
+              {
+                from: account,
+                value: sendAmountForValue,
+                gas: FulcrumProvider.Instance.gasLimit
+              }
+            )
+      } catch (e) {}
+    } else {
       const tokenContract = await this.contractsSource.getiBZxContract()
       if (!tokenContract) return result
       try {
-        gasAmount =
-          isGasTokenEnabled
-            ? await tokenContract.closeWithSwapWithGasToken.estimateGasAsync(
-                request.loanId,
-                account,
-                account,
-                amountInBaseUnits,
-                
-                request.returnTokenIsCollateral,
-                '0x',
-                {
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-            : await tokenContract.closeWithSwap.estimateGasAsync(
-                request.loanId,
-                account,
-                amountInBaseUnits,
-                request.returnTokenIsCollateral,
-                '0x',
-                {
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit
-                }
-              )
-      } catch (e) {
-      }
+        gasAmount = isGasTokenEnabled
+          ? await tokenContract.closeWithSwapWithGasToken.estimateGasAsync(
+              request.loanId,
+              account,
+              account,
+              amountInBaseUnits,
+
+              request.returnTokenIsCollateral,
+              '0x',
+              {
+                from: account,
+                gas: FulcrumProvider.Instance.gasLimit
+              }
+            )
+          : await tokenContract.closeWithSwap.estimateGasAsync(
+              request.loanId,
+              account,
+              amountInBaseUnits,
+              request.returnTokenIsCollateral,
+              '0x',
+              {
+                from: account,
+                gas: FulcrumProvider.Instance.gasLimit
+              }
+            )
+      } catch (e) {}
     }
     return new BigNumber(gasAmount || 0)
       .multipliedBy(this.gasBufferCoeffForTrade)
@@ -2983,6 +3023,28 @@ console.log(err, added);
 
   public isETHAsset = (asset: Asset): boolean => {
     return asset === Asset.ETH // || asset === Asset.WETH;
+  }
+
+  public getLoanExtendParams = async (
+    borrowedFundsState: IBorrowedFundsState
+  ): Promise<IExtendState> => {
+    return { minValue: 1, maxValue: 28, currentValue: 14 }
+  }
+
+  public getLoanExtendManagementAddress = async (
+    borrowedFundsState: IBorrowedFundsState
+  ): Promise<string | null> => {
+    return `extend.${borrowedFundsState.loanAsset.toLowerCase()}.tokenloan.eth`
+  }
+
+  public getLoanExtendGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1000000)
+  }
+  public getLoanExtendEstimate = async (
+    interestOwedPerDay: BigNumber,
+    daysToAdd: number
+  ): Promise<IExtendEstimate> => {
+    return { depositAmount: interestOwedPerDay.multipliedBy(daysToAdd) }
   }
 }
 

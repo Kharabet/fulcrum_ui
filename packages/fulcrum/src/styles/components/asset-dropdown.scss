@@ -82,13 +82,14 @@
   flex-direction: row;
   box-sizing: border-box;
   border-radius: 26px;
-  background-color: #758295;
-  width: 112px;
+
+  background-color: #758295; //background-color: var(--lend-bg-hover);
+  width: 112px; //width: 105px;
   align-items: center;
   padding: 8px;
   position: relative;
   @media screen and (max-width: $mobile-version-width) {
-    width: 86px;
+    width: 86px; //width: 95px;
     padding: 4px;
   }
   .trade-form & {
@@ -132,8 +133,11 @@
   }
   span {
     font-size: 16px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 700; //font-weight: 600;
+    color: var(--primary-text);
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: 0.05em;
     // margin-top: 2px;
     .trade-form & {
       color: var(--asset-dropdown-text);

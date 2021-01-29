@@ -462,10 +462,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                   {`${this.state.interestRate.toFixed(1)}%`} APR
                 </div>
                 <div className="trade-form__info_block__stats__data">
-                <span className="trade-form__info_block__stats__data-type">{this.props.positionType}</span>  
-                {`${this.props.leverage.toString()}x`}   
-                  <PositionTypeMarkerAlt value={this.props.positionType} />     
-                </div>              
+                  <span className="trade-form__info_block__stats__data-type">
+                    {this.props.positionType}
+                  </span>
+                  {`${this.props.leverage.toString()}x`}
+                  <PositionTypeMarkerAlt value={this.props.positionType} />
+                </div>
               </div>
             </div>
           </div>
@@ -486,6 +488,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               onTradeAmountChange={this.onTradeAmountChange}
               onCollateralChange={this.onCollateralChange}
               withSlider
+              maxSliderValue={100}
             />
             {this.props.tradeType === TradeType.SELL && (
               <InputReceive

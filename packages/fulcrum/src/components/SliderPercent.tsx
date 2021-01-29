@@ -4,9 +4,8 @@ import Slider from 'rc-slider'
 interface ISliderPercentProps {
   onInsertMaxValue: (value: number) => void
   percentSlider: number
+  maxSliderValue: number
 }
-
-
 export class SliderPercent extends Component<ISliderPercentProps> {
   private _input: HTMLInputElement | null = null
 
@@ -19,18 +18,18 @@ export class SliderPercent extends Component<ISliderPercentProps> {
     }
   }
   public render() {
-      const sliderValue = this.props.percentSlider * 100
+    const sliderValue = this.props.percentSlider * this.props.maxSliderValue
     return (
       <React.Fragment>
         <div className="wrapper-slider-percent green-slider">
           <div className="slider-percent">
             <Slider
-              min={0}
-              max={100}
+              min={1}
+              max={this.props.maxSliderValue}
               step={1}
               value={sliderValue}
               onChange={this.onChange}
-             // onAfterChange={this.onAfterChange}
+              // onAfterChange={this.onAfterChange}
             />
             <div className="dots-percent">
               <div className="dot-percent"></div>
@@ -48,11 +47,8 @@ export class SliderPercent extends Component<ISliderPercentProps> {
     )
   }
   public onChange = (value: number) => {
-    this.props.onInsertMaxValue(value/100)
+    this.props.onInsertMaxValue(value / this.props.maxSliderValue)
   }
-//   public onAfterChange = (value: number) => {
-//     this.props.onInsertMaxValue(value/100)
-//   }
   public setMaxPercent = (event: any) => {
     this.props.onInsertMaxValue(1)
   }
