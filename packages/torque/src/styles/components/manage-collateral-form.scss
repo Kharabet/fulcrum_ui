@@ -76,4 +76,10 @@
   .mb-20 {
     margin-bottom: 20px;
   }
+  &__liquidation-price {
+    display: flex;
+    justify-content: space-between;
+    color: #758295;
+    margin-bottom: 20px;
+  }
 }

@@ -88,7 +88,6 @@ export class ManageCollateralFormWeb3 extends Component<
       .subscribe((value: ICollateralChangeEstimate) => {
         this.setState({
           ...this.state,
-          liquidationPrice: value.liquidationPrice,
           collateralAmount: value.collateralAmount,
           collateralizedPercent: value.collateralizedPercent,
           inputAmountText: this.formatPrecision(value.collateralAmount.toString())
@@ -211,11 +210,11 @@ export class ManageCollateralFormWeb3 extends Component<
     )
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<IManageCollateralFormWeb3Props>,
     prevState: Readonly<IManageCollateralFormWeb3State>,
     snapshot?: any
-  ): void {
+  ): Promise<void> {
     if (
       prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId ||
       prevState.loanValue !== this.state.loanValue
@@ -231,6 +230,33 @@ export class ManageCollateralFormWeb3 extends Component<
           }
         )
       })
+    }
+    if (prevState.assetDetails !== this.state.assetDetails) {
+      const loanAssetDecimals =
+        AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18
+      const collateralAssetDecimals =
+        AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!.decimals || 18
+      const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
+      const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
+
+      const collateralToUSDCurrentRate = await TorqueProvider.Instance.getSwapToUsdRate(
+        this.props.loanOrderState.loanAsset
+      )
+      // liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
+      const liquidationCollateralToLoanRate = this.props.loanOrderState
+        .loanData!.maintenanceMargin.times(
+          this.props.loanOrderState.loanData!.principal.times(loanAssetPrecision)
+        )
+        .div(10 ** 20)
+        .plus(this.props.loanOrderState.loanData!.principal.times(loanAssetPrecision))
+        .div(this.props.loanOrderState.loanData!.collateral.times(collateralAssetPrecision))
+        .times(10 ** 18)
+
+      const liquidationPrice = liquidationCollateralToLoanRate
+        .div(10 ** 18)
+        .times(collateralToUSDCurrentRate)
+
+      this.setState({ ...this.state, liquidationPrice })
     }
   }
 
@@ -283,6 +309,11 @@ export class ManageCollateralFormWeb3 extends Component<
           <div className="manage-collateral-form__tips">
             <div className="manage-collateral-form__tip">Withdraw</div>
             <div className="manage-collateral-form__tip">Top Up</div>
+          </div>
+
+          <div className="manage-collateral-form__liquidation-price">
+            <span>Liquidation price</span>
+            <span>${this.state.liquidationPrice.toFixed(2)}</span>
           </div>
 
           <div className="manage-collateral-form__info-liquidated-at-msg mb-20">
@@ -338,7 +369,6 @@ export class ManageCollateralFormWeb3 extends Component<
   }
 
   private rxGetEstimate = (selectedValue: number): Observable<ICollateralChangeEstimate> => {
-
     let collateralAmount = new BigNumber(0)
     if (this.state.loanValue !== selectedValue && this.props.loanOrderState.loanData) {
       if (selectedValue < this.state.loanValue) {
