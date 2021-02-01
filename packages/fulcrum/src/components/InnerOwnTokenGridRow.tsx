@@ -474,6 +474,8 @@ export class InnerOwnTokenGridRow extends Component<
       this.props.loan.loanAsset,
       this.props.loan.collateralAsset,
       this.props.loan.collateralAmount,
+      this.props.positionType,
+      //this.
       false
     )
 

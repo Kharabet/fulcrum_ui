@@ -61,6 +61,7 @@ interface IManageCollateralFormState {
 
   didSubmit: boolean
   isLoading: boolean
+  liquidationPrice: BigNumber
 }
 
 export default class ManageCollateralForm extends Component<
@@ -93,7 +94,8 @@ export default class ManageCollateralForm extends Component<
       collateralTooLow: false,
       inputAmountText: '',
       didSubmit: false,
-      isLoading: true
+      isLoading: true,
+      liquidationPrice: new BigNumber(0)
     }
 
     this._inputChange = new Subject()
@@ -256,6 +258,38 @@ export default class ManageCollateralForm extends Component<
     })
   }
 
+  public async componentDidUpdate(
+    prevProps: Readonly<IManageCollateralFormProps>,
+    prevState: Readonly<IManageCollateralFormState>,
+    snapshot?: any
+  ): Promise<void> {
+    if (prevState.assetDetails !== this.state.assetDetails) {
+      if (this.props.loan) {
+        const loanAssetDecimals =
+          AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
+        const collateralAssetDecimals =
+          AssetsDictionary.assets.get(this.props.loan.collateralAsset)!.decimals || 18
+        const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
+        const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
+        const liquidationCollateralToLoanRate = this.props.loan
+          .loanData!.maintenanceMargin.times(
+            this.props.loan.loanData!.principal.times(loanAssetPrecision)
+          )
+          .div(10 ** 20)
+          .plus(this.props.loan.loanData!.principal.times(loanAssetPrecision))
+          .div(this.props.loan.loanData!.collateral.times(collateralAssetPrecision))
+          .times(10 ** 18)
+
+        const liquidationPrice =
+          this.props.request.positionType === PositionType.LONG
+            ? liquidationCollateralToLoanRate.div(10 ** 18)
+            : new BigNumber(10 ** 36).div(liquidationCollateralToLoanRate).div(10 ** 18)
+
+        this.setState({ ...this.state, liquidationPrice })
+      }
+    }
+  }
+
   public render() {
     if (this.state.assetDetails === null) {
       return null
@@ -292,6 +326,10 @@ export default class ManageCollateralForm extends Component<
           <div className="manage-collateral-form__tips">
             <div className="manage-collateral-form__tip">Withdraw</div>
             <div className="manage-collateral-form__tip">Top Up</div>
+          </div>
+          <div className="manage-collateral-form__liquidation-price">
+            <span>Liquidation price</span>
+            <span>${this.state.liquidationPrice.toFixed(2)}</span>
           </div>
           <div className="manage-collateral-form__text">
             You will {this.state.loanValue > this.state.selectedValue ? 'withdraw' : 'top up'}
@@ -336,7 +374,12 @@ export default class ManageCollateralForm extends Component<
   }
 
   private onChange = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value, buttonValue: 0, isLoading: true })
+    this.setState({
+      ...this.state,
+      selectedValue: value,
+      buttonValue: 0,
+      isLoading: true
+    })
   }
 
   private onAfterChange = (value: number) => {

@@ -370,7 +370,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               }}>
               {this.props.quoteToken}
             </label>
-        </div>
+          </div>
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button
@@ -405,6 +405,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.loan.loanAsset,
       this.props.loan.collateralAsset,
       this.props.loan.collateralAmount,
+      this.props.positionType,
       false
     )
 

@@ -231,6 +231,13 @@
       margin-left: 2px;
     }
   }
+  &__liquidation-price {
+    display: flex;
+    justify-content: space-between;
+    color: #a9b5c7;
+    margin-bottom: 23px;
+    font-size: 14px;
+  }
 
   @media screen and (max-width: $mobile-version-max-width) {
     width: 310px;
