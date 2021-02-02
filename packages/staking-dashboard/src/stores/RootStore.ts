@@ -46,14 +46,14 @@ export default class RootStore {
 
   public clearError () {
     this.stakingStore.clearError()
-    // this.governanceStore.clearError()
+    this.governanceStore.clearError()
   }
 
   public init() {
     this.web3Connection.init()
     this.stakingStore.init()
     this.transactionStore.init()
-    // this.governanceStore.init()
+    this.governanceStore.init()
 
     /**
      * Trying to manage errors in a centralized way.

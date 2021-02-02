@@ -255,26 +255,26 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     return result
   }
 
-  public async getGovernanceProposals(): Promise<Array<GovernanceProposal>> {
-    let result: Array<GovernanceProposal> = []
+  public async getGovernanceProposals(): Promise<GovernanceProposal[]> {
+    let result: GovernanceProposal[] = []
 
-    let proposalCreatedEvents: Array<
+    const proposalCreatedEvents: Array<
       LogWithDecodedArgs<CompoundGovernorAlphaProposalCreatedEventArgs>
     > = []
-    let proposalQueuedEvents: Array<
+    const proposalQueuedEvents: Array<
       LogWithDecodedArgs<CompoundGovernorAlphaProposalQueuedEventArgs>
     > = []
-    let proposalExecutedEvents: Array<
+    const proposalExecutedEvents: Array<
       LogWithDecodedArgs<CompoundGovernorAlphaProposalExecutedEventArgs>
     > = []
-    let proposalCanceledEvents: Array<
+    const proposalCanceledEvents: Array<
       LogWithDecodedArgs<CompoundGovernorAlphaProposalCanceledEventArgs>
     > = []
-    let proposalVoteCastEvents: Array<
+    const proposalVoteCastEvents: Array<
       LogWithDecodedArgs<CompoundGovernorAlphaVoteCastEventArgs>
     > = []
-    let proposalsData = []
-    let proposalsStates: BigNumber[] = []
+    const proposalsData = []
+    const proposalsStates: BigNumber[] = []
 
     const enumerateProposalState = (state: number) => {
       const proposalStates = [
@@ -299,7 +299,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const proposalsCount = await governanceContract.proposalCount.callAsync()
     const quorumVotes = await governanceContract.quorumVotes.callAsync()
     const votingPeriod = await governanceContract.votingPeriod.callAsync()
-    const currentBlock = await this.web3Wrapper.getBlockNumberAsync()
+    const currentBlockNumber = await this.web3Wrapper.getBlockNumberAsync()
 
     const voteCastEvents = await this.web3Wrapper.getLogsAsync({
       fromBlock: '0x895440', //9000000
@@ -413,6 +413,9 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
     const remappedProposals = []
     for (const i in proposalsData) {
+      if (!proposalsData[i]) {
+        continue
+      }
       const p = proposalsData[i]
       const id = p[0].toNumber()
       const creationEvent = proposalCreatedEvents.find((e) => e.args.id.eq(id))
@@ -440,54 +443,69 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       splittedDescription.splice(0, 1)
       const description = splittedDescription.join('\n') || 'No description.'
 
-      const pendingHistoryItem = {
-        state: GovernanceProposalStates.Pending,
-        blockNumber: p[3].toNumber(),
-        txnHash: creationEvent.transactionHash,
-        date: await this.web3Wrapper!.getBlockTimestampAsync(creationEvent.blockNumber!)
-      } as GovernanceProposalHistoryItem
-      const activeHistoryItem = {
-        state: GovernanceProposalStates.Active,
-        blockNumber: p[3].toNumber(),
-        txnHash: creationEvent.transactionHash,
-        date: await this.web3Wrapper!.getBlockTimestampAsync(creationEvent.blockNumber!)
-      } as GovernanceProposalHistoryItem
-      const voteResultHisoryItem = {
+      const pendingHistoryItem =
+        (creationEvent.blockNumber &&
+          creationEvent.blockNumber < currentBlockNumber &&
+          ({
+            state: GovernanceProposalStates.Pending,
+            blockNumber: p[3].toNumber(),
+            txnHash: creationEvent.transactionHash,
+            date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
+          } as GovernanceProposalHistoryItem)) ||
+        undefined
+
+      const activeHistoryItem =
+        (creationEvent.blockNumber &&
+          creationEvent.blockNumber < currentBlockNumber &&
+          ({
+            state: GovernanceProposalStates.Active,
+            blockNumber: p[3].toNumber(),
+            txnHash: creationEvent.transactionHash,
+            date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
+          } as GovernanceProposalHistoryItem)) ||
+        undefined
+
+      const voteResultHisoryItem = p[4].lt(currentBlockNumber) && {
         state:
-          p[4].lt(currentBlock) && p[2].isZero()
+          p[4].lt(currentBlockNumber) && p[2].isZero()
             ? GovernanceProposalStates.Defeated
             : GovernanceProposalStates.Succeeded,
         blockNumber: p[4].toNumber(),
-        date: await this.web3Wrapper!.getBlockTimestampAsync(p[4].toNumber())
-      } as GovernanceProposalHistoryItem
+        date: await this.web3Wrapper.getBlockTimestampAsync(p[4].toNumber())
+      } as GovernanceProposalHistoryItem || undefined
 
       const queuedHisoryItem =
         (queuedEvent &&
+          queuedEvent.blockNumber &&
+          queuedEvent.blockNumber < currentBlockNumber &&
           ({
             state: GovernanceProposalStates.Queued,
-            blockNumber: queuedEvent.blockNumber!,
+            blockNumber: queuedEvent.blockNumber,
             txnHash: queuedEvent.transactionHash,
-            date: await this.web3Wrapper!.getBlockTimestampAsync(queuedEvent.blockNumber!)
+            date: await this.web3Wrapper.getBlockTimestampAsync(queuedEvent.blockNumber)
           } as GovernanceProposalHistoryItem)) ||
         undefined
 
       const executedHisoryItem =
         (executedEvent &&
+          executedEvent.blockNumber &&
+          executedEvent.blockNumber < currentBlockNumber &&
           ({
             state: GovernanceProposalStates.Executed,
-            blockNumber: executedEvent.blockNumber!,
+            blockNumber: executedEvent.blockNumber,
             txnHash: executedEvent.transactionHash,
-            date: await this.web3Wrapper!.getBlockTimestampAsync(executedEvent.blockNumber!)
+            date: await this.web3Wrapper.getBlockTimestampAsync(executedEvent.blockNumber)
           } as GovernanceProposalHistoryItem)) ||
         undefined
 
+      // 1209600 is Timelock contract GRACE_PERIOD
       const expiredHisoryItem =
         (queuedEvent &&
-          p[2].plus(1209600).lt(currentBlock) &&
+          p[2].plus(1209600).lt(currentBlockNumber) &&
           ({
             state: GovernanceProposalStates.Expired,
             blockNumber: p[2].plus(1209600).toNumber(),
-            date: await this.web3Wrapper!.getBlockTimestampAsync(p[2].plus(1209600).toNumber())
+            date: await this.web3Wrapper.getBlockTimestampAsync(p[2].plus(1209600).toNumber())
           } as GovernanceProposalHistoryItem)) ||
         undefined
 
@@ -503,7 +521,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       const notEmpty = <TValue>(value: TValue | null | undefined): value is TValue => {
         return value !== null && value !== undefined
       }
-      const history: Array<GovernanceProposalHistoryItem> = [
+      const history: GovernanceProposalHistoryItem[] = [
         pendingHistoryItem,
         activeHistoryItem,
         voteResultHisoryItem,

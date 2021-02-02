@@ -29,18 +29,18 @@ export function StakingDashboard({ appVM }: { appVM: AppVM }) {
           onClickEmit="name-value">
           Rewards
         </Button>
-        {/* <Button
+        <Button
           className={`btn--tab ${appVM.section === 'dao' ? 'active' : ''}`}
           name="section"
           value="dao"
           onClick={appVM.set}
           onClickEmit="name-value">
           Governance
-        </Button> */}
+        </Button>
       </div>
       {appVM.section === 'stake' && <StakingForm />}
       {appVM.section === 'rewards' && <Rewards appVM={appVM} />}
-      {/* {appVM.section === 'dao' && <Governance appVM={appVM} />} */}
+      {appVM.section === 'dao' && <Governance appVM={appVM} />}
       <WalletUpdate appVM={appVM} />
     </section>
   )
