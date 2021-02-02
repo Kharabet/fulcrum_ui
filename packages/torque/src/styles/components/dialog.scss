@@ -4,6 +4,10 @@
   align-items: center;
   width: 100%;
   padding: 38px 48px 0 48px;
+  z-index: 100;
+  .borrow &{
+    position: absolute;
+  }
   &__title {
     font-size: 22px;
     line-height: 1.5;

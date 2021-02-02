@@ -375,6 +375,23 @@ export class TorqueProvider {
     return result
   }
 
+  public async getBalanceOf(asset: Asset): Promise<BigNumber> {
+    let result: BigNumber = new BigNumber(0)
+
+    if (this.contractsSource && this.web3Wrapper) {
+      const assetAddress = this.getErc20AddressOfAsset(asset)
+      if (assetAddress) {
+        const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
+        const iBZxAddress = this.contractsSource.getiBZxAddress()
+        if (tokenContract) {
+          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
+          result = (await tokenContract.balanceOf.callAsync(iBZxAddress)).dividedBy(10 ** precision)
+        }
+      }
+    }
+    return result
+  }
+
   public async getGasTokenAllowance(): Promise<BigNumber> {
     let result = new BigNumber(0)
 

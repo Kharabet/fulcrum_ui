@@ -70,7 +70,7 @@ export class CollateralTokenSelectorToggle extends Component<
             className="collateral-token-selector-toggle__info-container"
             onClick={this.onChangeClick}>
             <div className="collateral-token-selector-toggle__info-title">
-              Collateral {this.props.collateralAsset}
+              {this.props.collateralAsset}
             </div>
             <span className="collateral-token-selector-toggle__arrow">
               <ArrowSelect />
