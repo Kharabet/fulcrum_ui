@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig",
+  "include": [
+    "src",
+    "../common"
+  ],
+  "exclude": [
+      "node_modules",
+      "**/*.spec.ts"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "bzx-common/*": ["../common/*"],
+      "src/*": ["./src/*"],
+      "app-images": ["./src/assets/images"],
+      "app-lib/*": ["./src/lib/*"],
+      "app-services": ["./src/services"],
+      "shared-components/*": ["./src/shared-components/*"],
+      "ui-framework": ["./src/ui-framework"],
+    }
+  }
+}

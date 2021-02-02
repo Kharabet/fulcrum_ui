@@ -7,6 +7,7 @@ import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import '../styles/components/inner-own-token-grid.scss'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
 import { RolloverRequest } from '../domain/RolloverRequest'
+import { PositionType } from 'src/domain/PositionType'
 
 export interface IInnerOwnTokenGridProps {
   isMobileMedia: boolean
@@ -15,9 +16,10 @@ export interface IInnerOwnTokenGridProps {
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
     request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
-  ) => void  
+  ) => void
   onTransactionsCompleted: () => void
   isLoadingTransaction: boolean
+  positionType: PositionType
 }
 
 interface IInnerOwnTokenGridState {}
@@ -44,6 +46,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
               this.props.request.loanId === this.props.ownRowsData[0].loan.loanId
             }
             isLoadingTransaction={this.props.isLoadingTransaction}
+            positionType={this.props.positionType}
           />
         )}
 

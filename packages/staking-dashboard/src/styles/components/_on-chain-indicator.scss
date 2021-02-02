@@ -16,44 +16,25 @@
       border: 1px solid #276bfb;
     }
   }
-  .on-chain-indicator__container {
-    display: flex;
-    flex-wrap: wrap;
-    border: none;
-    outline: none;
-    background-color: transparent;
-    width: 100%;
-    cursor: pointer;
-    .on-chain-indicator__svg {
-      display: flex;
-      padding-left: 15px;
-    }
-    .on-chain-indicator__description {
-      display: flex;
-      flex-direction: column;
-      text-align: left;
-      margin-left: 12px;
-      span {
-        font-size: 13px;
-        color: #495460;
-        font-weight: 800;
-        margin-bottom: 3px;
-      }
-    }
-    .on-chain-indicator__provider-txt {
-      width: 100%;
-      font-size: 13px;
-      font-weight: 200;
-      line-height: 1.8;
-      text-align: center;
-      color: #276bfb;
-    }
-    .on-chain-indicator__wallet-address {
-      width: 100%;
-      color: #758295;
-      font-size: 13px;
-    }
-  }
+}
+
+.on-chain-indicator__svg > svg {
+  height: 28px;
+}
+
+.on-chain-indicator__description {
+  font-size: 15px;
+  color: #495460;
+  font-weight: 800;
+}
+
+.on-chain-indicator__provider-txt {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 200;
+  line-height: 1.8;
+  text-align: center;
+  color: #276bfb;
 }
 
 @media screen and (max-width: $width-max-md) {
@@ -63,15 +44,12 @@
     justify-content: center;
     margin-top: 0;
   }
-  .on-chain-indicator__container {
-    margin: 0;
-    .on-chain-indicator__wallet-address {
-      padding: 0 0.5rem;
-      border-left: solid 0px;
-    }
-    a.on-chain-indicator__wallet-address {
-      padding: 0;
-    }
+  .on-chain-indicator__wallet-address {
+    padding: 0 0.5rem;
+    border-left: solid 0px;
+  }
+  a.on-chain-indicator__wallet-address {
+    padding: 0;
   }
 }
 @media screen and (max-width: $width-max-sm) {

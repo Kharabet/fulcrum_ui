@@ -1,0 +1,142 @@
+// Reset
+button {
+  cursor: pointer;
+  vertical-align: bottom;
+  line-height: 1;
+  font-size: 16px;
+
+  &:focus,
+  &:hover {
+    outline: 0;
+  }
+
+  &.disabled,
+  &[disabled] {
+    cursor: not-allowed;
+
+    &:focus,
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.btn--medium {
+  padding: 0 $spacing-base * 3;
+}
+
+.btn--link {
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+  line-height: 1.15;
+  color: #276bfb;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.btn--tab {
+  display: inline-block;
+  position: relative;
+  border: 0;
+  background: transparent;
+  padding: 14px 16px 14px 16px;
+  height: 44px;
+  vertical-align: baseline;
+  text-decoration: none;
+  color: #283049;
+  font-size: 16px;
+  font-weight: bold;
+
+  &:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    height: 3px;
+    background-color: #dfe6ec;
+    border-radius: 2px;
+  }
+
+  &:focus {
+    outline: 0;
+    box-shadow: none;
+    border: 0;
+  }
+}
+
+.btn--tab.active {
+  &:before {
+    background-color: $color-blue;
+  }
+}
+
+// shows a little dot in the button to bring attention
+.btn__notification-marker {
+  position: absolute;
+  top: 5px;
+  right: 0;
+  border-radius: 50%;
+  background-color: $green-color;
+  padding-top: 2px;
+  width: 16px;
+  height: 16px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.btn--onchain-indicator {
+  // refactor
+  border: 1px solid #b9c7d6;
+  border-radius: 100px;
+  background-color: #fff;
+  cursor: pointer;
+  padding: 0 $spacing-base * 1.5;
+  width: 210px;
+  height: 50px;
+}
+
+.on-chain-indicator__description {
+  text-align: left;
+}
+
+.btn {
+  border: none;
+  outline: none;
+  border-radius: 40px;
+  height: 56px;
+  font-weight: bold;
+  font-size: 16px;
+  position: relative;
+
+  &:disabled,
+  &[disabled] {
+    background: #d9e0e7 !important;
+    color: #ffffff !important;
+    cursor: not-allowed;
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.btn--blue {
+  @extend .btn;
+  background-color: #276bfb;
+  color: #fff;
+
+  &:focus,
+  &:hover {
+    background-color: #5b88ff;
+    color: #fff;
+  }
+}
+
+.btn--invisible {
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+}
