@@ -1,4 +1,3 @@
-
 .st-asset-balance {
   font-weight: 800;
   line-height: 1;
@@ -8,12 +7,7 @@
   flex-wrap: wrap;
   align-items: center;
   padding-top: 15px;
-  @media screen and (min-width: $width-min-xs) {
-    font-size: 36px;
-  }
-  @media screen and (max-width: $width-max-xs) {
-    font-size: 26px;
-  }
+  font-size: 36px;
   .value {
     position: relative;
   }

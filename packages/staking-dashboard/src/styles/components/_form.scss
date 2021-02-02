@@ -1,25 +1,7 @@
 .calculator {
   position: relative;
   margin: auto;
-  max-width: 725px;
-  border-radius: 8px;
-
-  .calculator-row {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    @media screen and (max-width: $width-max-sm) {
-      flex-direction: column;
-    }
-
-    .warning {
-      font-size: 14px;
-      color: #ff5c5c;
-      // font-weight: 600;
-      position: absolute;
-    }
-  }
+  max-width: 746px;
 }
 
 .calculator__balance-loader {
@@ -50,12 +32,12 @@
   left: 46px;
 }
 
-.stake__token-logo {
+.stake-input__token-logo {
   width: 32px;
   height: 32px;
 }
 
-.stake__value {
+.stake-input__value {
   font-size: 36px;
   font-weight: 800;
   line-height: 1;

@@ -1,10 +1,12 @@
 import * as mobx from 'mobx'
-import { StakingProvider } from 'src/services/StakingProvider'
+import RootStore from '../RootStore'
 import SpendingAllowance from './SpendingAllowance'
 import UserBalances from './UserBalances'
+import { stakeableToken } from 'src/domain/stakingTypes'
 
 export default class StakingAllowances {
   [name: string]: any
+  private rootStore: RootStore
   private userBalances: UserBalances
   public bzrx: SpendingAllowance
   public vbzrx: SpendingAllowance
@@ -27,36 +29,38 @@ export default class StakingAllowances {
     })
   }
 
+  /**
+   * TODO: refactor, probably dont need both list as array or map
+   */
+  public get needApprovals(): Map<stakeableToken, SpendingAllowance> {
+    const map = new Map<stakeableToken, SpendingAllowance>()
+    this.needApprovalList.forEach((allowance) => {
+      map.set(allowance.tokenName.toLocaleLowerCase() as stakeableToken, allowance)
+    })
+    return map
+  }
+
   public clearError() {
     this.list.forEach((approval) => (approval.error = null))
   }
 
   public async check() {
-    const { wallet } = this.userBalances
-
-    if (wallet.bzrx.gt(0.01)) {
-      await this.bzrx.check()
-    }
-
-    if (wallet.vbzrx.gt(0.01)) {
-      await this.vbzrx.check()
-    }
-
-    if (wallet.ibzrx.gt(0.01)) {
-      await this.ibzrx.check()
-    }
-
-    if (wallet.bpt.gt(0.01)) {
-      await this.bpt.check()
-    }
+    const { walletAddress } = this.rootStore.web3Connection
+    const sp = this.rootStore.stakingProvider
+    const result = await sp.getStakeableAllowances(walletAddress)
+    this.bzrx.assign({ amount: result.bzrx, checked: true })
+    this.vbzrx.assign({ amount: result.vbzrx, checked: true })
+    this.ibzrx.assign({ amount: result.ibzrx, checked: true })
+    this.bpt.assign({ amount: result.bpt, checked: true })
   }
 
-  constructor(stakingProvider: StakingProvider, userBalances: UserBalances) {
+  constructor(userBalances: UserBalances, rootStore: RootStore) {
     this.userBalances = userBalances
-    this.bzrx = new SpendingAllowance('BZRX', stakingProvider)
-    this.vbzrx = new SpendingAllowance('VBZRX', stakingProvider)
-    this.ibzrx = new SpendingAllowance('IBZRX', stakingProvider)
-    this.bpt = new SpendingAllowance('BPT', stakingProvider)
+    this.rootStore = rootStore
+    this.bzrx = new SpendingAllowance('BZRX', this.rootStore.stakingProvider)
+    this.vbzrx = new SpendingAllowance('VBZRX', this.rootStore.stakingProvider)
+    this.ibzrx = new SpendingAllowance('IBZRX', this.rootStore.stakingProvider)
+    this.bpt = new SpendingAllowance('BPT', this.rootStore.stakingProvider)
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }
 }

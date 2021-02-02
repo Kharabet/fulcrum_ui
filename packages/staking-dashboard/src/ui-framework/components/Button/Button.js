@@ -9,12 +9,6 @@ import ButtonBasic from '../ButtonBasic'
  * @property {boolean} disabledMock
  */
 
-const loaderPlacement = {
-  position: 'absolute',
-  left: '50%',
-  marginLeft: '-20px'
-}
-
 const loader = <Loader quantityDots={3} sizeDots="small" isOverlay={false} title="" />
 const notificationMarker = <div className="btn__notification-marker zoomIn">!</div>
 
@@ -24,7 +18,17 @@ const notificationMarker = <div className="btn__notification-marker zoomIn">!</d
  * * You can pass a isLoading attribute to replace the text by a loader.
  */
 export function Button(props) {
-  const { isLoading, variant, block, className, active, disabled, children, notify, ...otherProps } = props
+  const {
+    isLoading,
+    variant,
+    block,
+    className,
+    active,
+    disabled,
+    children,
+    notify,
+    ...otherProps
+  } = props
 
   const variantClass = variant ? 'btn--' + variant : ''
 
@@ -34,10 +38,7 @@ export function Button(props) {
   isLoading && (cssClasses += ' btn-loading')
 
   return (
-    <ButtonBasic
-      {...otherProps}
-      className={cssClasses}
-      disabled={disabled || isLoading}>
+    <ButtonBasic {...otherProps} className={cssClasses} disabled={disabled || isLoading}>
       {isLoading ? loader : children}
       {notify && notificationMarker}
     </ButtonBasic>
@@ -75,7 +76,7 @@ Button.propTypes = {
   value: PropTypes.any,
   active: PropTypes.bool,
   notify: PropTypes.bool,
-  block: PropTypes.bool.isRequired,
+  block: PropTypes.bool.isRequired
 }
 
 Button.defaultProps = {

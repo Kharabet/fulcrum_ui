@@ -1,13 +1,13 @@
 // tslint:disable: max-classes-per-file
 import { BigNumber } from '@0x/utils'
 import * as mobx from 'mobx'
-import Asset from 'src/domain/Asset'
 import { StakingProvider } from 'src/services/StakingProvider'
+import RootStore from '../RootStore'
 
 type userBalanceProp = 'pending' | 'stakingProvider' | 'error'
 type tokens = 'bpt' | 'bzrx' | 'vbzrx' | 'ibzrx' | 'crv'
 
-class TokenBalances {
+export class TokenBalances {
   [name: string]: any
   public bzrx = new BigNumber(0)
   public ibzrx = new BigNumber(0)
@@ -90,18 +90,29 @@ class TokenBalances {
     this.crv = new BigNumber(0)
   }
 
+  public getCopy() {
+    const balances = new TokenBalances()
+    balances.set('bzrx', new BigNumber(this.bzrx))
+    balances.set('vbzrx', new BigNumber(this.vbzrx))
+    balances.set('ibzrx', new BigNumber(this.ibzrx))
+    balances.set('bpt', new BigNumber(this.bpt))
+    balances.set('crv', new BigNumber(this.crv))
+    return balances
+  }
+
   constructor() {
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }
 }
 
 export default class UserBalances {
-  [name: string]: any
+  public rootStore: RootStore
   public wallet = new TokenBalances()
   public staked = new TokenBalances()
   public pending = false
   public stakingProvider: StakingProvider
   public error: Error | null = null
+  public loaded = false
 
   get total() {
     return {
@@ -119,17 +130,28 @@ export default class UserBalances {
     this[prop] = value
   }
 
+  /**
+   * Helper to assign multiple props values through a mobx action.
+   */
+  public assign(props: { [key: string]: any }) {
+    Object.assign(this, props)
+  }
+
+  /**
+   * Get and store the staking specific tokens the user has in wallet and already staked.
+   */
   public async getUserBalances() {
+    const { walletAddress } = this.rootStore.web3Connection
     try {
       const sp = this.stakingProvider
       this.set('pending', true)
-      this.wallet.set('bzrx', (await sp.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18))
-      this.wallet.set('vbzrx', (await sp.getAssetTokenBalanceOfUser(Asset.VBZRX)).div(10 ** 18))
-      this.wallet.set('ibzrx', (await sp.getAssetTokenBalanceOfUser(Asset.IBZRX)).div(10 ** 18))
-      this.wallet.set('bpt', (await sp.getAssetTokenBalanceOfUser(Asset.BPT)).div(10 ** 18))
-      this.wallet.set('crv', (await sp.getAssetTokenBalanceOfUser(Asset.CRV)).div(10 ** 18))
-      const stakedAmounts = await sp.getStakedBalances()
+      const walletAmounts = await sp.getStakeableBalances(walletAddress)
+      const stakedAmounts = await sp.getStakedBalances(walletAddress)
       mobx.runInAction(() => {
+        this.wallet.bzrx = walletAmounts.bzrx.div(10 ** 18)
+        this.wallet.vbzrx = walletAmounts.vbzrx.div(10 ** 18)
+        this.wallet.ibzrx = walletAmounts.ibzrx.div(10 ** 18)
+        this.wallet.bpt = walletAmounts.bpt.div(10 ** 18)
         this.staked.bzrx = stakedAmounts.bzrx.div(10 ** 18)
         this.staked.vbzrx = stakedAmounts.vbzrx.div(10 ** 18)
         this.staked.ibzrx = stakedAmounts.ibzrx.div(10 ** 18)
@@ -141,17 +163,26 @@ export default class UserBalances {
       this.set('error', err)
       console.error(err)
     } finally {
-      this.set('pending', false)
+      this.assign({ loaded: true, pending: false })
     }
   }
 
   public clearBalances() {
     this.wallet.clearBalances()
     this.staked.clearBalances()
+    this.loaded = false
   }
 
-  constructor(stakingProvider: StakingProvider) {
+  public getCopy() {
+    return {
+      wallet: this.wallet.getCopy(),
+      staked: this.staked.getCopy()
+    }
+  }
+
+  constructor(stakingProvider: StakingProvider, rootStore: RootStore) {
     this.stakingProvider = stakingProvider
+    this.rootStore = rootStore
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }
 }

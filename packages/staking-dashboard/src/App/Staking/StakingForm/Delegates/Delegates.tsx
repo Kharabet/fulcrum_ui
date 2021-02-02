@@ -33,7 +33,7 @@ export function Delegates({ vm }: { vm: StakingFormVM }) {
             Change delegate
           </ButtonBasic>
 
-          <div className="calculator-row">
+          <div>
             <div className="group-buttons">
               <button className="button" onClick={vm.openFindRepDialog}>
                 Search delegates

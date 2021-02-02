@@ -2,6 +2,10 @@
 import * as mobx from 'mobx'
 import RootStore from '../RootStore'
 
+/**
+ * WORK IN PROGRESS This module is meant to help manage all transactions.
+ */
+
 interface ITransactionEvent {
   opId: string
   opType?: 'staking'

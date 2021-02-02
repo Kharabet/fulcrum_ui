@@ -20,7 +20,7 @@ const bptDecimals = isKovan ? 10 ** 6 : 10 ** 18
 
 const web3ProviderSettings = ethereumUtils.getWeb3ProviderSettings(appNetworkId)
 
-const infiniteApproval = new BigNumber(10 ** 50)
+const infiniteApproval = new BigNumber(10 * 10 ** 50)
 
 export default {
   appNetwork,

@@ -31,8 +31,8 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
   return (
     <Modal
       isOpen={proposalPopup.visible && activeProposal !== undefined}
-      className="modal-content-div"
-      overlayClassName="modal-overlay-div"
+      className="modal__content"
+      overlayClassName="modal__overlay"
       ariaHideApp={false}>
       <SimpleBar style={{ maxHeight: '90vh', width: '720px', margin: '10px 0' }}>
         <div className="proposals">

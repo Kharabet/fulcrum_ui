@@ -1,9 +1,10 @@
+import _ from 'lodash'
 import * as mobx from 'mobx'
 import { RootStore } from 'src/stores'
 import { DialogVM } from 'ui-framework'
 import ProviderType from 'src/domain/ProviderType'
 
-type AppVMProps = 'pending'
+type AppVMProps = 'pending' | 'section'
 
 export default class AppVM {
   [name: string]: any
@@ -29,17 +30,28 @@ export default class AppVM {
     Object.assign(this, props)
   }
 
-  public connect (providerType: ProviderType) {
+  public connect(providerType: ProviderType) {
     this.providerMenu.hide()
     this.rootStore.web3Connection.connect(providerType)
   }
 
-  public disconnect () {
+  public disconnect() {
     this.providerMenu.hide()
     this.rootStore.web3Connection.disconnect()
   }
 
+  /**
+   * - Prepare the contract for claiming rewards (optimization because of blocking UI)
+   * - And refresh rewards balances
+   */
+  public async prepareRewardTab() {
+    await this.rootStore.stakingProvider.preloadIBZXContract()
+    this.rootStore.stakingStore.rewards.getAllRewards()
+  }
+
   public init() {
+    const prepareRewardTab = _.throttle(() => this.prepareRewardTab(), 5000)
+
     this.stopAutoSettingBodyOverflow = mobx.reaction(
       () => this.headerMenu.visible || this.providerMenu.visible,
       (menuVisible) => {
@@ -53,12 +65,12 @@ export default class AppVM {
 
     // This is purely to help performance issue when loading contracts
     this.stopPreloadContract = mobx.reaction(
-      () => this.section === 'rewards',
+      () => {
+        return this.section === 'rewards'
+      },
       (shouldPreload) => {
         if (shouldPreload) {
-          setTimeout(() => {
-            this.rootStore.stakingProvider.preloadIBZXContract()
-          }, 1000)
+          prepareRewardTab()
         }
       }
     )
@@ -78,7 +90,7 @@ export default class AppVM {
 
   constructor({ rootStore }: { rootStore: RootStore }) {
     this.rootStore = rootStore
-    this.init()
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
+    this.init()
   }
 }

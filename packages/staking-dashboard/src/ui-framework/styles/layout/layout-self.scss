@@ -15,6 +15,16 @@
   padding-right: 2 * $spacing-base;
 }
 
+.r-padded-h-2 {
+  padding-left: $spacing-base;
+  padding-right: $spacing-base;
+
+  @media screen and (min-width: $width-min-sm) {
+    padding-left: 2 * $spacing-base;
+    padding-right: 2 * $spacing-base;
+  }
+}
+
 .padded-h-4 {
   padding-left: 4 * $spacing-base;
   padding-right: 4 * $spacing-base;
@@ -56,12 +66,20 @@
   margin-left: $spacing-base;
 }
 
+.margin-left-2 {
+  margin-left: 2 * $spacing-base;
+}
+
 .margin-right-1 {
   margin-right: $spacing-base;
 }
 
 .margin-right-2 {
   margin-right: 2 * $spacing-base;
+}
+
+.margin-right-3 {
+  margin-right: 3 * $spacing-base;
 }
 
 .margin-right-1ch {
@@ -74,6 +92,12 @@
   position: relative;
 }
 
+.center-block {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 // FLEX
 .flex-fill {
   flex-grow: 1;
@@ -83,4 +107,8 @@
 .flex-span-equal {
   flex-grow: 1;
   flex-basis: 0;
+}
+
+.flex-row-end {
+  margin-left: auto;
 }

@@ -10,10 +10,10 @@ import WalletUpdate from './WalletUpdate'
 export function StakingDashboard({ appVM }: { appVM: AppVM }) {
   const { rewards } = appVM.rootStore.stakingStore
   return (
-    <section className="calculator padded-h-2">
-      <div className="margin-bottom-2">
+    <section className="calculator r-padded-h-2">
+      <div className="margin-bottom-2 margin-left-1">
         <Button
-          className={`btn--tab margin-right-2 ${appVM.section === 'stake' ? 'active' : ''}`}
+          className={`btn--tab margin-right-1 ${appVM.section === 'stake' ? 'active' : ''}`}
           name="section"
           value="stake"
           onClick={appVM.set}

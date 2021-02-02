@@ -1,5 +1,5 @@
 /**
- * Add extra props to errors that are useful
+ * Add extra props to errors that are useful.
  * @param error
  * @param opts
  */
@@ -14,14 +14,13 @@ function decorateError(error: Error, opts: { title?: string } = {}) {
   return error
 }
 
-
 /**
  * Creates a more human readable error message from the entire stack
  */
-function getErrorStackMessages (error: any, message = ''): string {
+function getErrorStackMessages(error: any, message = ''): string {
   if (error.message) {
-    const stringyfied = /"message":"(.+?)"/gm.exec(error.message)
-    message += stringyfied ? stringyfied[1] : error.message
+    const stringified = /"message":"(.+?)"/gm.exec(error.message)
+    message += stringified ? stringified[1] : error.message
     if (error.code) {
       message += ` (${error.code})`
     }

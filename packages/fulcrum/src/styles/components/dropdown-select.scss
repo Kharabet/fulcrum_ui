@@ -95,7 +95,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  background-color: var(--select-option);
+  background-color: var(--dropdown-select-bg);
   border-radius: 4px;
 
   &__search {
@@ -123,6 +123,7 @@
     position: absolute;
     left: 48px;
     top: 0;
+    color: #fff;
     pointer-events: none;
     line-height: 48px;
     font-size: 14px;
@@ -157,9 +158,9 @@
     font-weight: 600;
     font-size: 16px;
     height: 480px;
-    color: #e9f4ff;
+    color: var(--dropdown-select-text);
     line-height: 25px;
-    padding: 0 70px 48px;
+    padding: 0 30px 48px;
   }
 
   li {

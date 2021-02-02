@@ -2,7 +2,7 @@
   overflow: hidden;
 }
 
-.modal-overlay-div {
+.modal__overlay {
   position: fixed;
   top: 0;
   right: 0;
@@ -21,33 +21,35 @@
       scrollbar-width: none;
     }
   }
-  .modal-content-div {
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    border-radius: 16px;
-    box-shadow: 0 16px 80px 0 rgba(59, 54, 75, 0.2);
-    background-color: #ffffff;
-    &:focus {
-      outline: none;
-    }
-  }
-  .modal-content-div-top {
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    &:focus {
-      outline: none;
-    }
+}
+
+.modal__content {
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  border-radius: 16px;
+  box-shadow: 0 16px 80px 0 rgba(59, 54, 75, 0.2);
+  background-color: #ffffff;
+  &:focus {
+    outline: none;
   }
 }
+.modal__content-top {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  &:focus {
+    outline: none;
+  }
+}
+
 @media screen and (max-width: 991px) {
-  .modal-overlay-div {
-    .modal-content-div {
+  .modal__overlay {
+    .modal__content {
       top: 30px;
       left: 50%;
       width: calc(100% - 30px);

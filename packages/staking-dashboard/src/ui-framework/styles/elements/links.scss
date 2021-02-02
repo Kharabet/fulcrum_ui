@@ -1,0 +1,13 @@
+.link--external {
+  position: relative;
+
+  &::after {
+    content: '';
+    left: -16px;
+    width: 16px;
+    height: 16px;
+    top: -5px;
+    position: absolute;
+    background-image: url(../../../assets/images/external-link.svg);
+  }
+}
