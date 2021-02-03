@@ -4,27 +4,15 @@ import Modal from 'react-modal'
 import { observer } from 'mobx-react'
 import GovernanceVM from '../GovernanceVM'
 import ProposalHistoryItem from './ProposalHistoryItem'
+import ProposalActionItem from './ProposalActionItem'
 
 import SimpleBar from 'simplebar-react'
 import 'simplebar/dist/simplebar.min.css'
 
 export function Proposals({ vm }: { vm: GovernanceVM }) {
   const { proposalPopup, activeProposal } = vm
+  const { etherscanURL } = vm.rootStore
 
-  const history = [
-    {
-      status: 'Created',
-      date: 'December 22nd, 2020'
-    },
-    {
-      status: 'Active',
-      date: 'December 22nd, 2020'
-    },
-    {
-      status: 'Succeeded',
-      date: 'December 22nd, 2020'
-    }
-  ]
   if (activeProposal === undefined) {
     return null
   }
@@ -46,7 +34,15 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
             <div className="proposals-votes">
               <div className="proposals-votes__title">Votes</div>
               <div className="proposals-votes__range">
-                <div className="proposals-votes__range-active" style={{ width: '65%' }} />
+                <div
+                  className="proposals-votes__range-active"
+                  style={{
+                    width: `${activeProposal.votesFor
+                      .div(activeProposal.votesFor.plus(activeProposal.votesAgainst))
+                      .times(100)
+                      .toNumber()}%`
+                  }}
+                />
               </div>
               <div className="proposals-votes__data">
                 <div>
@@ -60,15 +56,19 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
               </div>
             </div>
             <div className="flex jc-sb">
-              <div className="proposals-info">
-                <div className="proposals-info__title">Actions</div>
-                <div className="proposals-info__description">actions</div>
+              <div className="proposals-actions">
+                <div className="proposals-actions__title">Actions</div>
+                <div className="proposals-actions__details">
+                {activeProposal.actions.map((item, index) => {
+                    return <ProposalActionItem key={index} index={index} {...item} />
+                  })}
+                </div>
               </div>
               <div className="proposals-history">
                 <div className="proposals-history__title">Proposal History</div>
                 <ul className="proposals-history__list">
                   {activeProposal.history.map((item, index) => {
-                    return <ProposalHistoryItem key={index} {...item} />
+                    return <ProposalHistoryItem key={index} etherscanURL={etherscanURL} {...item} />
                   })}
                 </ul>
               </div>

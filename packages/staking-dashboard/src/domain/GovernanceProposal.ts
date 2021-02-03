@@ -11,13 +11,21 @@ export enum GovernanceProposalStates {
   Executed
 }
 
-export interface GovernanceProposalHistoryItem {
+export interface IGovernanceProposalHistoryItem {
   state: GovernanceProposalStates
   date: number
   blockNumber: number
   txnHash?: string
-
 }
+
+export interface IGovernanceProposalActionItem {
+  target: string
+  signature: string
+  callData: string
+  value: BigNumber
+  title: string
+}
+
 export default class GovernanceProposal {
   public readonly id: number
   public readonly title: string
@@ -32,7 +40,8 @@ export default class GovernanceProposal {
   public readonly executedEvent: any
   public readonly canceledEvent: any
   public readonly voteCasts: any
-  public readonly history: Array<GovernanceProposalHistoryItem>
+  public readonly history: Array<IGovernanceProposalHistoryItem>
+  public readonly actions: Array<IGovernanceProposalActionItem>
 
   constructor(
     id: number,
@@ -48,7 +57,8 @@ export default class GovernanceProposal {
     executedEvent: any,
     canceledEvent: any,
     voteCasts: any,
-    history: Array<GovernanceProposalHistoryItem>
+    history: Array<IGovernanceProposalHistoryItem>,
+    actions: Array<IGovernanceProposalActionItem>
   ) {
     this.id = id
     this.title = title
@@ -64,5 +74,6 @@ export default class GovernanceProposal {
     this.canceledEvent = canceledEvent
     this.voteCasts = voteCasts
     this.history = history
+    this.actions = actions
   }
 }

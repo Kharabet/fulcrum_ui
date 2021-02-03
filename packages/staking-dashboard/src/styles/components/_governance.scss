@@ -51,11 +51,21 @@
       }
     }
     .proposals-info__title,
-    .proposals-history__title {
+    .proposals-history__title,
+    .proposals-actions__title {
       font-size: 18px;
       line-height: 1.25;
       font-weight: 600;
       margin-bottom: 24px;
+    }
+    .proposals-actions {
+      // width: calc(50% - 12px);
+      width: 60%;
+      &__details {
+        font-size: 14px;
+        line-height: 1.8;
+        font-weight: 600;
+      }
     }
     .proposals-info {
       // width: calc(50% - 12px);
@@ -86,6 +96,14 @@
         &.green {
           color: #00c0ab;
         }
+        .status-name {
+          position: relative;
+          .icon-external {
+            position: absolute;
+            right: -17px;
+            top: -5px;
+          }
+        }
       }
       &__date {
         font-weight: normal;
@@ -94,6 +112,12 @@
         display: flex;
         align-items: center;
         color: #758295;
+      }
+    }
+    .proposals-actions-item {
+      margin-right: 20px;
+      .title {
+        word-break: break-all;
       }
     }
   }
