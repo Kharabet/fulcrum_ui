@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { OnChainIndicator } from '../components/OnChainIndicator'
-import { ProviderType } from '../domain/ProviderType'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { HeaderLogo } from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
@@ -28,15 +27,22 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     }
   }
 
-  private Menu: IHeaderMenuProps = {
+  private MenuDesktop: IHeaderMenuProps = {
     items: [
       { id: 1, title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
       { id: 2, title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
       { id: 3, title: 'Borrow', link: '/borrow', external: false },
-      { id: 4, title: 'Your Loans', link: '/dashboard', external: false },
-      // { id: 3, title: "Refinance", link: "/refinance", external: false },
+      { id: 4, title: 'Stake', link: 'https://staking.bzx.network', external: true }
+    ]
+  }
 
-      { id: 5, title: 'Staking', link: 'https://staking.bzx.network', external: true },
+  private MenuMobile: IHeaderMenuProps = {
+    items: [
+      { id: 1, title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
+      { id: 2, title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
+      { id: 3, title: 'Borrow', link: '/borrow', external: false },
+      { id: 4, title: 'Stake', link: 'https://staking.bzx.network', external: true },
+      { id: 5, title: 'Borrow FAQ', link: 'https://torque.loans/', external: true },
       {
         id: 6,
         title: 'Help Center',
@@ -45,9 +51,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       }
     ]
   }
-
-  /*public componentDidMount(): void {
-  }*/
 
   public componentWillUnmount(): void {
     document.body.style.overflow = ''
@@ -66,9 +69,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           '0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118'
       )
     ) {
-      this.Menu.items.splice(0, 1)
+      this.MenuDesktop.items.splice(0, 1)
     }
-    const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
     return (
       <header className="header">
         <div className="header__row">
@@ -76,23 +78,26 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderLogo />
           </div>
           <div className="header__center">
-            <HeaderMenu items={this.Menu.items} />
+            <HeaderMenu items={this.MenuDesktop.items} />
           </div>
           <div className="header__right">
             <div className="header-menu__item">
               <a
+                href="https://torque.loans/"
+                className="header-menu__item-link c-primary-blue help-center"
+                target="_blank"
+                rel="noopener noreferrer">
+                <span>Borrow FAQ</span>
+              </a>
+              <a
                 href="https://help.bzx.network/en/collections/2008807-torque"
-                className="header-menu__item-link c-primary-blue help-center">
+                className="header-menu__item-link c-primary-blue help-center"
+                target="_blank"
+                rel="noopener noreferrer">
                 <span>Help Center</span>
               </a>
             </div>
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            {/* <div className="theme-switch-wrapper">
-              <label className="theme-switch">
-                <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} />
-                <div className="slider round"></div>
-              </label>
-            </div> */}
           </div>
         </div>
       </header>
@@ -121,15 +126,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <div className={sidebarClass}>
               <div className="header_btn">
                 <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-                {/* <div className="theme-switch-wrapper">
-                <label className="theme-switch" htmlFor="checkbox">
-                  <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} defaultChecked={!localStorage.theme || localStorage.theme === 'dark' ? true : false} />
-                  <div className="slider round"></div>
-                </label>
-              </div> */}
               </div>
               <div className="header_nav_menu">
-                <HeaderMenu items={this.Menu.items} />
+                <HeaderMenu items={this.MenuMobile.items} />
               </div>
               <div className="footer-container">
                 <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
