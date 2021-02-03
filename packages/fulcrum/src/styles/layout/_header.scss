@@ -9,21 +9,31 @@
 
     .header__left {
       display: flex;
-      flex-direction: row;
       justify-content: flex-start;
-      flex: 1;
     }
 
     .header__right {
       display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
+      &__list {
+        display: flex;
+        align-items: center;
+        &-item {
+          font-weight: 600;
+          font-size: 18px;
+          line-height: 1.5;
+          color: #276bfb;
+          flex-grow: 0;
+          padding: 0 12px;
+          &:not(:last-child) {
+            border-right: 1px solid var(--separator-color);
+          }
+        }
+      }
     }
 
     .header__center {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
     }
   }
 

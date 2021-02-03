@@ -41,6 +41,7 @@ import loansWithOldOpenPriceFormat from '../config/loansWithOldOpenPriceFormat'
 import '../styles/pages/_trade-page.scss'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { InfoBlock } from '../components/InfoBlock'
+import { StatsTokenGrid } from '../components/StatsTokenGrid'
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
@@ -326,6 +327,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 updateHistoryRowsData={this.updateHistoryRowsData}
                 changeLoadingTransaction={this.changeLoadingTransaction}
               />
+            )}
+
+            {this.state.activeTokenGridTab === TokenGridTab.Stats && (
+              <StatsTokenGrid isMobileMedia={this.props.isMobileMedia} />
             )}
 
             {this.state.request &&

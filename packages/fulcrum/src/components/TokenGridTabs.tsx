@@ -95,6 +95,13 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               onClick={this.showTradeHistory}>
               {TokenGridTab.History}
             </div>
+            <div
+              className={`tab ${
+                this.props.activeTokenGridTab === TokenGridTab.Stats ? `active` : ``
+              }`}
+              onClick={this.showStats}>
+              {TokenGridTab.Stats}
+            </div>
           </div>
 
           {/* <div className="pro-switch-wrapper">
@@ -127,18 +134,23 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     this.props.onTokenGridTabChange(TokenGridTab.History)
   }
 
+  public showStats = () => {
+    this.props.onTokenGridTabChange(TokenGridTab.Stats)
+  }
+
   private getDropdownProps(): IDropdownSelectProps {
     const dropDownSelectOptions: IDropDownSelectOption[] = []
     this.props.baseTokens.forEach((baseToken) => {
       this.props.quoteTokens.forEach(
         (stablecoin) =>
-          baseToken !== stablecoin && stablecoin !== Asset.WBTC &&
+          baseToken !== stablecoin &&
+          stablecoin !== Asset.WBTC &&
           dropDownSelectOptions.push({
             baseToken: baseToken,
             quoteToken: stablecoin
           })
       )
-      if (baseToken === Asset.ETH){
+      if (baseToken === Asset.ETH) {
         dropDownSelectOptions.push({
           baseToken: baseToken,
           quoteToken: Asset.WBTC
