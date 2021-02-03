@@ -22,7 +22,7 @@ export function StakingDashboard({ appVM }: { appVM: AppVM }) {
         </Button>
         <Button
           notify={rewards.canClaimStakingRewards || rewards.canClaimRebateRewards}
-          className={`btn--tab margin-right-2 ${appVM.section === 'rewards' ? 'active' : ''}`}
+          className={`btn--tab margin-right-1 ${appVM.section === 'rewards' ? 'active' : ''}`}
           name="section"
           value="rewards"
           onClick={appVM.set}

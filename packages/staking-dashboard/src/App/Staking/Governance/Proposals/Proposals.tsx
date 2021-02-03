@@ -1,13 +1,13 @@
+import 'simplebar/dist/simplebar.min.css'
 import { ReactComponent as CloseIcon } from 'app-images/ic__close.svg'
+import Markdown from 'markdown-to-jsx'
+import { observer } from 'mobx-react'
 import React from 'react'
 import Modal from 'react-modal'
-import { observer } from 'mobx-react'
-import GovernanceVM from '../GovernanceVM'
-import ProposalHistoryItem from './ProposalHistoryItem'
-import ProposalActionItem from './ProposalActionItem'
-
 import SimpleBar from 'simplebar-react'
-import 'simplebar/dist/simplebar.min.css'
+import GovernanceVM from '../GovernanceVM'
+import ProposalActionItem from './ProposalActionItem'
+import ProposalHistoryItem from './ProposalHistoryItem'
 
 export function Proposals({ vm }: { vm: GovernanceVM }) {
   const { proposalPopup, activeProposal } = vm
@@ -59,7 +59,7 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
               <div className="proposals-actions">
                 <div className="proposals-actions__title">Actions</div>
                 <div className="proposals-actions__details">
-                {activeProposal.actions.map((item, index) => {
+                  {activeProposal.actions.map((item, index) => {
                     return <ProposalActionItem key={index} index={index} {...item} />
                   })}
                 </div>
@@ -76,7 +76,9 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
 
             <div className="proposals-info">
               <div className="proposals-info__title">Info</div>
-              <div className="proposals-info__description">{activeProposal.description}</div>
+              <div className="proposals-info__description">
+                <Markdown>{activeProposal.description}</Markdown>
+              </div>
             </div>
           </div>
           <div className="flex jc-fe">
