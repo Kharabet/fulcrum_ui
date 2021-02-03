@@ -23,8 +23,8 @@
     padding: 13px;
     border: 1px solid var(--trade-expected-result-border);
     &-row {
-        & +  .trade-expected-result__column-row  {
-          margin-top: 18px;        
+      & + .trade-expected-result__column-row {
+        margin-top: 18px;
       }
     }
 
@@ -38,6 +38,9 @@
       &-row {
         width: 50%;
         margin-right: 20px;
+        & + .trade-expected-result__column-row {
+          margin-top: 0;
+        }
       }
 
       &-title {
@@ -56,7 +59,7 @@
     text-align: left;
     display: flex;
     justify-content: space-between;
-    color: #939fac;   
+    color: #939fac;
   }
 
   .expired & .value {
@@ -64,7 +67,7 @@
   }
 
   .value {
-    color: #1cd8c4;    
+    color: #1cd8c4;
     font-weight: 700;
   }
   &__fee {
@@ -111,10 +114,10 @@
         margin-top: 15px;
       }
       &-row {
-        & +  .trade-expected-result__column-row  {
-          margin-top: 0;        
+        & + .trade-expected-result__column-row {
+          margin-top: 0;
+        }
       }
-    }
     }
     &__column-row {
       width: 50%;
