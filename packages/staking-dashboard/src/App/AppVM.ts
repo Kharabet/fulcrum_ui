@@ -52,8 +52,14 @@ export default class AppVM {
     }
   }
 
+  /**
+   * Load the governance proposal list only if not yet loaded.
+   */
   public async prepareDaoTab() {
-    this.rootStore.governanceStore.getProposals()
+    const { governanceStore } = this.rootStore
+    if (!governanceStore.pending && governanceStore.proposalsList.length === 0) {
+      governanceStore.getProposals()
+    }
   }
 
   public init() {
