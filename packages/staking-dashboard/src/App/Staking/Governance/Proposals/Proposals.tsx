@@ -7,6 +7,7 @@ import React from 'react'
 import GovernanceVM from '../GovernanceVM'
 import ProposalActionItem from './ProposalActionItem'
 import ProposalHistoryItem from './ProposalHistoryItem'
+import { Button } from 'ui-framework'
 
 import defaultAvatar from 'app-images/representative1.png'
 import { ExternalLink } from 'src/shared-components/ExternalLink'
@@ -20,15 +21,22 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
   }
   return (
     <div className="proposals">
-      <div className="proposals-header">
-        <span className="back-to-list" onClick={proposalPopup.hide}>
-          <ArrowLeftIcon />
-        </span>
-        &nbsp;<span>{activeProposal.title}</span>
-      </div>
+      <h2 className="flex-row-center margin-bottom-2">
+        <Button
+          className="proposal__back-btn margin-right-1"
+          variant="blue"
+          onClick={proposalPopup.hide}>
+          <ArrowLeftIcon className="btn__icon" />
+        </Button>
+        {activeProposal.title}
+      </h2>
+
+      <hr className="content-separator margin-v-2" />
+
       <div className="proposals-body">
-        <div className="proposals-base-info">
-          <div className={`proposal__state-label ${activeProposal.state.toLocaleLowerCase()}`}>
+        <div className="proposals-base-info margin-bottom-2 flex-row-center">
+          <div
+            className={`proposal__state-label margin-right-1 ${activeProposal.state.toLocaleLowerCase()}`}>
             {activeProposal.state}
           </div>
           <ExternalLink
@@ -43,7 +51,7 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
           </ExternalLink>
         </div>
         <div className="proposals-votes">
-          <div className="proposals-votes__title">Votes</div>
+          <div className="section-header">Votes</div>
           <div className="proposals-votes__range">
             <div
               className="proposals-votes__range-active"
@@ -66,30 +74,44 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
             </div>
           </div>
         </div>
-        <div className="flex jc-sb">
-          <div className="proposals-actions">
-            <div className="proposals-actions__title">Actions</div>
-            <div className="proposals-actions__details">
-              {activeProposal.actions.map((item, index) => {
-                return <ProposalActionItem key={index} index={index} {...item} />
-              })}
-            </div>
-          </div>
-          <div className="proposals-history">
-            <div className="proposals-history__title">Proposal History</div>
-            <ul className="proposals-history__list">
-              {activeProposal.history.map((item, index) => {
-                return <ProposalHistoryItem key={index} etherscanURL={etherscanURL} {...item} />
-              })}
-            </ul>
-          </div>
-        </div>
+
+        <hr className="content-separator margin-v-2" />
 
         <div className="proposals-info">
-          <div className="proposals-info__title">Info</div>
+          <h3 className="section-header">Info</h3>
           <div className="proposals-info__description">
             <Markdown>{activeProposal.description}</Markdown>
           </div>
+        </div>
+
+        <hr className="content-separator margin-v-2" />
+
+        <h3 className="section-header">Actions</h3>
+        <div className="proposals-actions__details">
+          {activeProposal.actions.map((item, index) => {
+            return <ProposalActionItem key={index} index={index} {...item} />
+          })}
+        </div>
+
+        <hr className="content-separator margin-v-2" />
+
+        <div className="proposals-history">
+          <h3 className="section-header">Proposal History</h3>
+          <table className="table">
+            <thead>
+              <tr>
+                <td className="table__head">
+                  <span className="margin-left-1">Status</span>
+                </td>
+                <td className="table__head">Time</td>
+              </tr>
+            </thead>
+            <tbody>
+              {activeProposal.history.map((item, index) => {
+                return <ProposalHistoryItem key={index} etherscanURL={etherscanURL} {...item} />
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

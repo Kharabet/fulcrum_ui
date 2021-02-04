@@ -1,40 +1,27 @@
-.proposals {
-  .proposals-header {
-    display: flex;
-    font-size: 22px;
-    line-height: 1.5;
-    font-weight: 900;
-    .back-to-list {
-      cursor: pointer;
-      &:hover {
-        opacity: 0.9;
-      }
-    }
+.proposal__back-btn {
+  height: 32px;
+  width: 32px;
+  padding: 6px;
 
-    svg {
-      margin-top: 8px;
-      margin-right: 8px;
-    }
+  .btn__icon {
+    height: 20px;
+    width: 20px;
   }
+}
+
+.proposals {
   .proposals-body {
-    padding: 24px 0;
     .proposals-votes {
-      padding: 32px 0;
-      &__title {
-        font-weight: 600;
-        font-size: 18px;
-        line-height: 1.25;
-      }
       &__range {
         position: relative;
         margin: 16px 0;
-        background: #e9f4ff;
-        height: 4px;
+        background: $color-red-aim;
+        height: 16px;
         width: 100%;
         border-radius: 4px;
         &-active {
           background: #00c0ab;
-          height: 4px;
+          height: 16px;
           border-radius: 4px;
           position: absolute;
         }
@@ -52,19 +39,10 @@
         }
       }
     }
-    .proposals-info__title,
-    .proposals-history__title,
-    .proposals-actions__title {
-      font-size: 18px;
-      line-height: 1.25;
-      font-weight: 600;
-      margin-bottom: 24px;
-    }
     .proposals-actions {
       // width: calc(50% - 12px);
       width: 60%;
       &__details {
-        font-size: 14px;
         line-height: 1.8;
         font-weight: 600;
       }
@@ -72,7 +50,6 @@
     .proposals-info {
       // width: calc(50% - 12px);
       &__description {
-        font-size: 14px;
         line-height: 1.8;
         font-weight: 600;
         img {
@@ -82,23 +59,12 @@
     }
     .proposals-history {
       width: calc(50% - 12px);
-
-      &__li {
-        list-style: none;
-        display: flex;
-        background-color: #f3f9ff;
-        border-radius: 8px;
-        padding: 12px 8px;
-        margin-bottom: 4px;
-        justify-content: space-between;
-      }
       &__status {
         font-weight: 800;
-        font-size: 14px;
         line-height: 1.25;
         display: flex;
         align-items: center;
-        margin-left: 15px;
+        margin-left: $spacing-base;
 
         &.closed,
         &.defeated,
@@ -113,14 +79,6 @@
         &.active {
           color: #276bfb;
         }
-      }
-      &__date {
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 1.25;
-        display: flex;
-        align-items: center;
-        color: #758295;
       }
     }
     .proposals-actions-item {
@@ -167,7 +125,6 @@
   padding: 3px 0;
   border: none;
   border-radius: 18px;
-  font-size: 14px;
   line-height: 1.8;
   font-weight: bold;
   color: #ffffff;
@@ -188,9 +145,6 @@
 }
 
 .proposals-base-info {
-  display: grid;
-  grid-template-columns: 90px 140px;
-  grid-column-gap: 20px;
   .proposals-proposer {
     display: flex;
     padding: 3px 3px;
@@ -200,7 +154,6 @@
     justify-content: space-between;
     align-items: center;
     background-color: #f3f9ff;
-    font-size: 14px;
     line-height: 1.8;
     .avatar {
       height: 25px;

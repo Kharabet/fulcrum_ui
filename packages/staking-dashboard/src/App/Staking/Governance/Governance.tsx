@@ -39,7 +39,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
           <tr>
             <td className="table__head">Description</td>
             <td className="table__head">Author</td>
-            <td className="table__head txt-center">Action</td>
+            <td className="table__head txt-center">Status</td>
           </tr>
         </thead>
         <tbody>

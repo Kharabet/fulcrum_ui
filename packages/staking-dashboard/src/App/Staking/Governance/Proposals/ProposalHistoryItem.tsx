@@ -14,18 +14,20 @@ export function ProposalHistoryItem(props: IProviderMenuListItemProps) {
   const { state, date } = props
   const stateName = GovernanceProposalStates[state]
   return (
-    <li className="proposals-history__li">
-      {props.txnHash ? (
-        <ExternalLink
-          className={`proposals-history__status ${stateName.toLowerCase()}`}
-          showIcon={true}
-          href={`${props.etherscanURL}tx/${props.txnHash}`}>
-          {stateName}
-        </ExternalLink>
-      ) : (
-        <div className={`proposals-history__status ${stateName.toLowerCase()}`}>{stateName}</div>
-      )}
-      <div className="proposals-history__date">
+    <tr>
+      <td>
+        {props.txnHash ? (
+          <ExternalLink
+            className={`proposals-history__status ${stateName.toLowerCase()}`}
+            showIcon={true}
+            href={`${props.etherscanURL}tx/${props.txnHash}`}>
+            {stateName}
+          </ExternalLink>
+        ) : (
+          <div className={`proposals-history__status ${stateName.toLowerCase()}`}>{stateName}</div>
+        )}
+      </td>
+      <td>
         {new Date(date * 1000).toLocaleDateString(undefined, {
           day: 'numeric',
           month: 'short',
@@ -33,8 +35,8 @@ export function ProposalHistoryItem(props: IProviderMenuListItemProps) {
           hour: '2-digit',
           minute: 'numeric'
         })}
-      </div>
-    </li>
+      </td>
+    </tr>
   )
 }
 
