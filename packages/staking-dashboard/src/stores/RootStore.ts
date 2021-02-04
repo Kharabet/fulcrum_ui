@@ -17,7 +17,7 @@ export default class RootStore {
   public uiStore: UIStore
   public etherscanURL = appConfig.web3ProviderSettings.etherscanURL
 
-  public get appError (): {error: any, stackMessages: string} | null {
+  public get appError(): { error: any; stackMessages: string } | null {
     // TODO: fix typescript any
     const error = this.stakingStore.error
     if (error) {
@@ -44,7 +44,7 @@ export default class RootStore {
     Object.assign(this, props)
   }
 
-  public clearError () {
+  public clearError() {
     this.stakingStore.clearError()
     this.governanceStore.clearError()
   }
@@ -53,7 +53,6 @@ export default class RootStore {
     this.web3Connection.init()
     this.stakingStore.init()
     this.transactionStore.init()
-    this.governanceStore.init()
 
     /**
      * Trying to manage errors in a centralized way.

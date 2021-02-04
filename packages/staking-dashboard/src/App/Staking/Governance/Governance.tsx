@@ -3,6 +3,17 @@ import React from 'react'
 import GovernanceItem from './GovernanceItem'
 import GovernanceVM from './GovernanceVM'
 import Proposals from './Proposals/Proposals'
+import { Loader } from 'ui-framework'
+
+const loader = (
+  <Loader
+    title="Loading proposals"
+    className="margin-top-2"
+    quantityDots={3}
+    sizeDots="small"
+    isOverlay={false}
+  />
+)
 
 export default function Governance({ vm }: { vm: GovernanceVM }) {
   const { proposalsList } = vm.governanceStore
@@ -28,7 +39,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
           <tr>
             <td className="table__head">Description</td>
             <td className="table__head">Author</td>
-            <td className="table__head">Action</td>
+            <td className="table__head txt-center">Action</td>
           </tr>
         </thead>
         <tbody>
@@ -37,6 +48,8 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
           ))}
         </tbody>
       </table>
+      {vm.governanceStore.pending && loader}
+      {vm.governanceStore.listFailedToLoad && <p>The list could not be loaded</p>}
     </div>
   )
 }

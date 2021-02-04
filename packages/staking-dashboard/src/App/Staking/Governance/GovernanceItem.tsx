@@ -14,7 +14,7 @@ export function GovernanceItem(props: IGovernanceItemProps) {
       <td>{title} </td>
       <td>{hashUtils.shortHash(proposer.address)}</td>
       <td>
-        <div className={`proposal__state-label ${state.toLocaleLowerCase()}`}>
+        <div className={`proposal__state-label txt-center ${state.toLocaleLowerCase()}`}>
           {state}
         </div>
       </td>
