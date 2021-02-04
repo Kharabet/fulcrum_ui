@@ -4,7 +4,7 @@ import {
   IGovernanceProposalHistoryItem,
   GovernanceProposalStates
 } from 'src/domain/GovernanceProposal'
-import { ReactComponent as ExternalLink } from 'app-images/external-link.svg'
+import ExternalLink from 'shared-components/ExternalLink'
 
 export interface IProviderMenuListItemProps extends IGovernanceProposalHistoryItem {
   etherscanURL: string
@@ -12,24 +12,19 @@ export interface IProviderMenuListItemProps extends IGovernanceProposalHistoryIt
 
 export function ProposalHistoryItem(props: IProviderMenuListItemProps) {
   const { state, date } = props
-  const activeStatus = [
-    GovernanceProposalStates.Succeeded,
-    GovernanceProposalStates.Queued,
-    GovernanceProposalStates.Executed
-  ]
-  const classNameStatus = activeStatus.includes(state) ? 'green' : ''
-  const liHtml = (
+  const stateName = GovernanceProposalStates[state]
+  return (
     <li className="proposals-history__li">
-      <div className={`proposals-history__status ${classNameStatus}`}>
-        <span className='status-name'>
-          {GovernanceProposalStates[state]}
-          {props.txnHash && (
-            <span className="icon-external">
-              <ExternalLink />
-            </span>
-          )}
-        </span>
-      </div>
+      {props.txnHash ? (
+        <ExternalLink
+          className={`proposals-history__status ${stateName.toLowerCase()}`}
+          showIcon={true}
+          href={`${props.etherscanURL}tx/${props.txnHash}`}>
+          {stateName}
+        </ExternalLink>
+      ) : (
+        <div className={`proposals-history__status ${stateName.toLowerCase()}`}>{stateName}</div>
+      )}
       <div className="proposals-history__date">
         {new Date(date * 1000).toLocaleDateString(undefined, {
           day: 'numeric',
@@ -40,13 +35,6 @@ export function ProposalHistoryItem(props: IProviderMenuListItemProps) {
         })}
       </div>
     </li>
-  )
-  return props.txnHash ? (
-    <a href={`${props.etherscanURL}tx/${props.txnHash}`} target="_blank" rel="noopener noreferrer">
-      {liHtml}
-    </a>
-  ) : (
-    liHtml
   )
 }
 

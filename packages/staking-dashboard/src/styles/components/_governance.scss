@@ -88,8 +88,9 @@
         display: flex;
         background-color: #f3f9ff;
         border-radius: 8px;
-        padding: 12px;
+        padding: 12px 8px;
         margin-bottom: 4px;
+        justify-content: space-between;
       }
       &__status {
         font-weight: 800;
@@ -97,17 +98,20 @@
         line-height: 1.25;
         display: flex;
         align-items: center;
-        width: 40%;
-        &.green {
-          color: #00c0ab;
+        margin-left: 15px;
+
+        &.closed,
+        &.defeated,
+        &.expired,
+        &.canceled {
+          color: #8992a4;
         }
-        .status-name {
-          position: relative;
-          .icon-external {
-            position: absolute;
-            right: -17px;
-            top: -5px;
-          }
+        &.pending,
+        &.succeeded,
+        &.queued,
+        &.executed,
+        &.active {
+          color: #276bfb;
         }
       }
       &__date {

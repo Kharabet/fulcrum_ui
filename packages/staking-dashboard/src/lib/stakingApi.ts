@@ -62,7 +62,7 @@ async function getUserFrom3Box(address: string): Promise<{address: string, name:
   // Note: getProfile returns an empty object when profile does not exist
   const profile = await fetch(
     `https://cors-anywhere.herokuapp.com/https://ipfs.3box.io/profile?address=${address}`
-  ).then((resp) => resp.json())
+  ).then((resp) => resp.json()).catch(e => ({name: undefined, image: undefined}))
   const name = profile.name || hashUtils.shortHash(address)
   const imageSrc = profile.image
     ? `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl['/']}`
