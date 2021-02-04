@@ -81,7 +81,7 @@ export default class AppVM {
       (section) => {
         switch (section) {
           case 'rewards':
-            this.prepareRewardTab()
+            prepareRewardTab()
             break
           case 'dao':
             this.prepareDaoTab()
