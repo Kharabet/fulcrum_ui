@@ -3,12 +3,16 @@
   padding: 20px 40px;
   .proposals-header {
     display: flex;
-    justify-content: space-between;
-    span {
-      font-size: 22px;
-      line-height: 1.5;
-      font-weight: 900;
+    font-size: 22px;
+    line-height: 1.5;
+    font-weight: 900;
+    .back-to-list {
+      cursor: pointer;
+      &:hover {
+        opacity: 0.9;
+      }
     }
+
     svg {
       margin-top: 8px;
       margin-right: 8px;
@@ -73,6 +77,9 @@
         font-size: 14px;
         line-height: 1.8;
         font-weight: 600;
+        img {
+          max-width: 100%;
+        }
       }
     }
     .proposals-history {
