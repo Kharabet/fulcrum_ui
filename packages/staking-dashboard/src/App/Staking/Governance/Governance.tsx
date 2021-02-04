@@ -1,34 +1,42 @@
 import { ReactComponent as SearchIcon } from 'app-images/icon-search.svg'
-import React, { ChangeEvent, useState } from 'react'
+import React from 'react'
+import GovernanceItem from './GovernanceItem'
 import GovernanceVM from './GovernanceVM'
 import Proposals from './Proposals/Proposals'
-import GovernanceItem from './GovernanceItem'
 
 export default function Governance({ vm }: { vm: GovernanceVM }) {
-  const governanceProposals = vm.governanceStore.proposalsList.map((proposal) => (
-    <GovernanceItem key={proposal.id} proposal={proposal} openProposals={vm.showProposal} />
-  ))
+  const { proposalsList } = vm.governanceStore
 
-  return vm.proposalPopup.visible ? (
-    <Proposals vm={vm} />
-  ) : (
-    <div className="panel--white padded-2 margin-bottom-2 governance">
-      <div className="governance__search">
+  if (vm.proposalPopup.visible) {
+    return (
+      <div className="panel--white padded-2 margin-bottom-2">
+        <Proposals vm={vm} />
+      </div>
+    )
+  }
+
+  return (
+    <div className="panel--white padded-2 margin-bottom-2">
+      <div className="governance__search margin-bottom-2">
         <input value={vm.name} placeholder="Search" onChange={(e) => (vm.name = e.target.value)} />
         <div className="governance__search__button" onClick={vm.search}>
           <SearchIcon />
         </div>
       </div>
-      <div className="governance__table">
-        <div className="thead">
-          <div className="thead__description">Description</div>
-          <div className="thead__right">
-            <div className="thead__author">Author</div>
-            <div className="thead__action">Action</div>
-          </div>
-        </div>
-        <div className="tbody">{governanceProposals}</div>
-      </div>
+      <table className="table">
+        <thead>
+          <tr>
+            <td className="table__head">Description</td>
+            <td className="table__head">Author</td>
+            <td className="table__head">Action</td>
+          </tr>
+        </thead>
+        <tbody>
+          {proposalsList.map((proposal) => (
+            <GovernanceItem key={proposal.id} proposal={proposal} openProposals={vm.showProposal} />
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
