@@ -695,49 +695,53 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       return []
     }
 
-    const repVotes = await stakingContract.getDelegateVotes.callAsync(
-      new BigNumber(0),
-      new BigNumber(100),
-      {
-        from: account
-      }
-    )
+    // TODO: contrast has changed apparently. Review when we work on delegates.
+    // const repVotes = await stakingContract.getDelegateVotes.callAsync(
+    //   new BigNumber(0),
+    //   new BigNumber(100),
+    //   {
+    //     from: account
+    //   }
+    // )
 
-    return repVotes.map((rep) => ({
-      name: hashUtils.shortHash(rep.user, 6, 4),
-      wallet: rep.user,
-      bzrx: rep.BZRX.div(10 ** 18),
-      bpt: rep.LPToken.div(10 ** 18),
-      ibzrx: rep.iBZRX.div(10 ** 18),
-      vbzrx: rep.vBZRX.div(10 ** 18),
-      totalVotes: rep.totalVotes
-    }))
+    // return repVotes.map((rep) => ({
+    //   name: hashUtils.shortHash(rep.user, 6, 4),
+    //   wallet: rep.user,
+    //   bzrx: rep.BZRX.div(10 ** 18),
+    //   bpt: rep.LPToken.div(10 ** 18),
+    //   ibzrx: rep.iBZRX.div(10 ** 18),
+    //   vbzrx: rep.vBZRX.div(10 ** 18),
+    //   totalVotes: rep.totalVotes
+    // }))
+
+    return []
   }
 
   /**
    * Change the delegate for the current account
    */
   public async changeDelegate(delegateAddress: string) {
-    const account = this.getCurrentAccount()
-    const staking = await this.getStakingContract()
+    // TODO: changeDelegate was removed in the contract, need to add back later
+    // const account = this.getCurrentAccount()
+    // const staking = await this.getStakingContract()
 
-    if (!account || !staking) {
-      throw new Error('Missing account or Staking contract')
-    }
+    // if (!account || !staking) {
+    //   throw new Error('Missing account or Staking contract')
+    // }
 
-    const { gasAmount } = await this.getGasEstimate(() =>
-      staking.changeDelegate.estimateGasAsync(delegateAddress, {
-        from: account
-      })
-    )
+    // const { gasAmount } = await this.getGasEstimate(() =>
+    //   staking.changeDelegate.estimateGasAsync(delegateAddress, {
+    //     from: account
+    //   })
+    // )
 
-    const txHash = await staking.changeDelegate.sendTransactionAsync(delegateAddress, {
-      from: account,
-      gas: gasAmount,
-      gasPrice: await this.gasPrice()
-    })
+    // const txHash = await staking.changeDelegate.sendTransactionAsync(delegateAddress, {
+    //   from: account,
+    //   gas: gasAmount,
+    //   gasPrice: await this.gasPrice()
+    // })
 
-    await this.waitForTransactionMined(txHash)
+    // await this.waitForTransactionMined(txHash)
     return true
   }
 
@@ -948,15 +952,13 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       throw new Error('Missing account or contract')
     }
 
-    const method = shouldRestake ? stakingContract.claimAndRestake : stakingContract.claim
-
     const { gasAmount } = await this.getGasEstimate(() =>
-      method.estimateGasAsync({
+      stakingContract.claim.estimateGasAsync(shouldRestake, {
         from: account
       })
     )
 
-    const txHash = await method.sendTransactionAsync({
+    const txHash = await stakingContract.claim.sendTransactionAsync(shouldRestake, {
       from: account,
       gas: gasAmount,
       gasPrice: await this.gasPrice()

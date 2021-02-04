@@ -9,7 +9,7 @@ import { CompoundGovernorAlphaContract } from '../contracts/CompoundGovernorAlph
 // @ts-ignore
 import erc20Json from '../assets/artifacts/BUILD_APP_NETWORK/erc20.json'
 // @ts-ignore
-import stakingV1Json from '../assets/artifacts/BUILD_APP_NETWORK/stakingV1.json'
+import stakingV1Json from '../assets/artifacts/BUILD_APP_NETWORK/StakingV1.json'
 // @ts-ignore
 import iBZxJson from '../assets/artifacts/BUILD_APP_NETWORK/iBZx.json'
 // @ts-ignore
@@ -49,7 +49,7 @@ export default class ContractsSource {
     this.canWrite = canWrite
   }
 
-  public getStakingV1Address () {
+  public getStakingV1Address() {
     const address = stakingV1Addresses.get(this.networkId)
     if (!address) {
       throw new Error('getStakingV1Address')
@@ -57,7 +57,6 @@ export default class ContractsSource {
     return address
   }
 
-  
   public getCompoundGovernorAlphaAddress(): string {
     let address: string = ''
     switch (this.networkId) {
@@ -73,7 +72,6 @@ export default class ContractsSource {
     }
     return address
   }
-
 
   private async getErc20ContractRaw(addressErc20: string) {
     return new erc20Contract(erc20Json.abi, addressErc20.toLowerCase(), this.provider)
@@ -93,7 +91,7 @@ export default class ContractsSource {
     const address = vbzrxAddresses.get(this.networkId) || ''
     return new BZRXVestingTokenContract(bzrxVestingJson.abi, address.toLowerCase(), this.provider)
   }
-  
+
   private getCompoundGovernorAlphaContractRaw(): CompoundGovernorAlphaContract {
     return new CompoundGovernorAlphaContract(
       compoundGovernorAlphaJson.abi,
