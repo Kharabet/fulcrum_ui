@@ -25,12 +25,16 @@ export interface IGovernanceProposalActionItem {
   value: BigNumber
   title: string
 }
+export interface IGovernanceProposalProposer {
+  address: string
+  name: string
+  imageSrc?: string
+}
 
 export default class GovernanceProposal {
   public readonly id: number
   public readonly title: string
   public readonly description: string
-  public readonly proposer: string
   public readonly state: string
   public readonly votesFor: BigNumber
   public readonly votesAgainst: BigNumber
@@ -42,12 +46,12 @@ export default class GovernanceProposal {
   public readonly voteCasts: any
   public readonly history: Array<IGovernanceProposalHistoryItem>
   public readonly actions: Array<IGovernanceProposalActionItem>
+  public readonly proposer: IGovernanceProposalProposer
 
   constructor(
     id: number,
     title: string,
     description: string,
-    proposer: string,
     votesFor: BigNumber,
     votesAgainst: BigNumber,
     state: string,
@@ -58,7 +62,8 @@ export default class GovernanceProposal {
     canceledEvent: any,
     voteCasts: any,
     history: Array<IGovernanceProposalHistoryItem>,
-    actions: Array<IGovernanceProposalActionItem>
+    actions: Array<IGovernanceProposalActionItem>,
+    proposer: IGovernanceProposalProposer
   ) {
     this.id = id
     this.title = title

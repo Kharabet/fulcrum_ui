@@ -14,9 +14,9 @@ export default function GovernanceItem(props: IGovernanceItemProps) {
     <div className="trow" onClick={() => props.openProposals(id)}>
       <div className="trow__description">{title} </div>
       <div className="trow__right">
-        <div className="trow__author">{hashUtils.shortHash(proposer)}</div>
-        <div className="trow__action">
-          <button className={`${state.toLocaleLowerCase()}`}>{state}</button>
+        <div className="trow__author">{hashUtils.shortHash(proposer.address)}</div>
+        <div className={`proposal__state-label ${state.toLocaleLowerCase()}`}>
+          {state}
         </div>
       </div>
     </div>

@@ -6,7 +6,8 @@ import hashUtils from 'app-lib/hashUtils'
 import GovernanceProposal, {
   IGovernanceProposalActionItem,
   IGovernanceProposalHistoryItem,
-  GovernanceProposalStates
+  GovernanceProposalStates,
+  IGovernanceProposalProposer
 } from 'src/domain/GovernanceProposal'
 import ProposalCreated from 'src/domain/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
@@ -29,7 +30,9 @@ import {
   CompoundGovernorAlphaProposalQueuedEventArgs,
   CompoundGovernorAlphaVoteCastEventArgs
 } from '../contracts/CompoundGovernorAlpha'
+import stakingApi from 'app-lib/stakingApi'
   
+
 // @ts-ignore
 import web3EthAbiUntyped, { AbiCoder } from 'web3-eth-abi'
 // Fix necessary due to wrong type exports in web3-eth-abi
@@ -514,13 +517,12 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         canceledHisoryItem
       ].filter(notEmpty)
       const actions = await this.getProposalActions(new BigNumber(id))
-
+      const proposer = (await stakingApi.getUserFrom3Box(creationEvent.args.proposer)) as IGovernanceProposalProposer
       remappedProposals.push(
         new GovernanceProposal(
           id,
           title,
           description,
-          creationEvent.args.proposer,
           p[5].div(10 ** 18),
           p[6].div(10 ** 18),
           GovernanceProposalStates[proposalsStates[id - 1].toNumber()],
@@ -531,7 +533,8 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
           canceledEvent,
           voteCasts,
           history,
-          actions
+          actions,
+          proposer
         )
       )
     }

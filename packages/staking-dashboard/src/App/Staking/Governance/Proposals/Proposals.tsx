@@ -1,15 +1,15 @@
 import 'simplebar/dist/simplebar.min.css'
-import { ReactComponent as CloseIcon } from 'app-images/ic__close.svg'
 import { ReactComponent as ArrowLeftIcon } from 'app-images/ic_arrow_left.svg'
 
 import Markdown from 'markdown-to-jsx'
 import { observer } from 'mobx-react'
 import React from 'react'
-import Modal from 'react-modal'
-import SimpleBar from 'simplebar-react'
 import GovernanceVM from '../GovernanceVM'
 import ProposalActionItem from './ProposalActionItem'
 import ProposalHistoryItem from './ProposalHistoryItem'
+
+import defaultAvatar from 'app-images/representative1.png'
+import { ExternalLink } from 'src/shared-components/ExternalLink'
 
 export function Proposals({ vm }: { vm: GovernanceVM }) {
   const { proposalPopup, activeProposal } = vm
@@ -27,6 +27,21 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
         &nbsp;<span>{activeProposal.title}</span>
       </div>
       <div className="proposals-body">
+        <div className="proposals-base-info">
+          <div className={`proposal__state-label ${activeProposal.state.toLocaleLowerCase()}`}>
+            {activeProposal.state}
+          </div>
+          <ExternalLink
+            className="proposals-proposer"
+            href={`${etherscanURL}address/${activeProposal.proposer.address}`}>
+            <img
+              className="avatar"
+              src={activeProposal.proposer.imageSrc || defaultAvatar}
+              alt={`${activeProposal.proposer.name}'s avatar`}
+            />
+            <span className="name">{activeProposal.proposer.name}</span>
+          </ExternalLink>
+        </div>
         <div className="proposals-votes">
           <div className="proposals-votes__title">Votes</div>
           <div className="proposals-votes__range">
