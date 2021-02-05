@@ -272,7 +272,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         canceled,
         executed
       })
-      proposalsStates.push(await governanceContract.state.callAsync(new BigNumber(i))
+      proposalsStates.push(new BigNumber(await governanceContract.state.callAsync(new BigNumber(i)))
       )
     }
     const remappedProposals = []
@@ -549,7 +549,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         return null
       }
       const params = paramsMatchArray[1].split(',')
-      const functionName = x.replace(`(${paramsMatchArray[1]})`, '')
+      const functionName = x.replace(`(${paramsMatchArray[1]})`, ',')
 
       const target = targets[i]
       const value = values[i]

@@ -28,12 +28,6 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
 
   return (
     <div className="panel--white padded-2 margin-bottom-2">
-      <div className="governance__search margin-bottom-2">
-        <input value={vm.name} placeholder="Search" onChange={(e) => (vm.name = e.target.value)} />
-        <div className="governance__search__button" onClick={vm.search}>
-          <SearchIcon />
-        </div>
-      </div>
       <table className="table">
         <thead>
           <tr>

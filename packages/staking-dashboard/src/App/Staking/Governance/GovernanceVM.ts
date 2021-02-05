@@ -5,19 +5,16 @@ import { RootStore, GovernanceStore } from 'src/stores'
 import { DialogVM } from 'ui-framework'
 
 export default class GovernanceVM {
-  [name: string]: any
   public rootStore: RootStore
 
   public governanceStore: GovernanceStore
   public activeProposal?: GovernanceProposal
-  public proposalPopup = new DialogVM({id: 'proposal-popup'})
+  public proposalPopup = new DialogVM()
 
   public showProposal = (id: number) => {
     this.activeProposal = this.governanceStore.proposalsList.find(proposal => proposal.id === id)
     this.activeProposal && this.proposalPopup.show()
   }
-
-  public search() {}
 
   constructor({ rootStore }: { rootStore: RootStore }) {
     this.rootStore = rootStore
