@@ -1,37 +1,27 @@
-.proposals {
-  width: 720px;
-  padding: 40px;
-  .proposals-header {
-    display: flex;
-    span {
-      font-size: 22px;
-      line-height: 1.5;
-      font-weight: 900;
-    }
-    svg {
-      margin-top: 8px;
-      margin-right: 8px;
-    }
+.proposal__back-btn {
+  height: 32px;
+  width: 32px;
+  padding: 6px;
+
+  .btn__icon {
+    height: 20px;
+    width: 20px;
   }
+}
+
+.proposals {
   .proposals-body {
-    padding: 24px 0;
     .proposals-votes {
-      padding: 32px 0;
-      &__title {
-        font-weight: 600;
-        font-size: 18px;
-        line-height: 1.25;
-      }
       &__range {
         position: relative;
         margin: 16px 0;
-        background: #e9f4ff;
-        height: 4px;
+        background: $color-red-aim;
+        height: 16px;
         width: 100%;
         border-radius: 4px;
         &-active {
           background: #00c0ab;
-          height: 4px;
+          height: 16px;
           border-radius: 4px;
           position: absolute;
         }
@@ -49,50 +39,52 @@
         }
       }
     }
-    .proposals-info__title,
-    .proposals-history__title {
-      font-size: 18px;
-      line-height: 1.25;
-      font-weight: 600;
-      margin-bottom: 24px;
-    }
-    .proposals-info {
-      width: calc(50% - 12px);
-      &__description {
-        font-size: 14px;
+    .proposals-actions {
+      // width: calc(50% - 12px);
+      width: 60%;
+      &__details {
         line-height: 1.8;
         font-weight: 600;
       }
     }
-    .proposals-history {
-      width: calc(50% - 12px);
-
-      &__li {
-        list-style: none;
-        display: flex;
-        background-color: #f3f9ff;
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 4px;
-      }
-      &__status {
-        font-weight: 800;
-        font-size: 14px;
-        line-height: 1.25;
-        display: flex;
-        align-items: center;
-        width: 40%;
-        &.green {
-          color: #00c0ab;
+    .proposals-info {
+      // width: calc(50% - 12px);
+      &__description {
+        line-height: 1.8;
+        font-weight: 600;
+        img {
+          max-width: 100%;
         }
       }
-      &__date {
-        font-weight: normal;
-        font-size: 14px;
+    }
+    .proposals-history {
+      width: calc(50% - 12px);
+      &__status {
+        font-weight: 800;
         line-height: 1.25;
         display: flex;
         align-items: center;
-        color: #758295;
+        margin-left: $spacing-base;
+
+        &.closed,
+        &.defeated,
+        &.expired,
+        &.canceled {
+          color: #8992a4;
+        }
+        &.pending,
+        &.succeeded,
+        &.queued,
+        &.executed,
+        &.active {
+          color: #276bfb;
+        }
+      }
+    }
+    .proposals-actions-item {
+      margin-right: 20px;
+      .title {
+        word-break: break-all;
       }
     }
   }
@@ -123,83 +115,52 @@
       color: #a9b5c7;
       outline: none;
     }
-    &__button {
-      cursor: pointer;
-    }
   }
-  &__table {
-    margin-top: 30px;
-    .trow {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 25px;
-      border-bottom: 1px solid #cbe2ff;
-      &:hover {
-        background-color: #cbe2ff;
-        cursor: pointer;
-        .trow__description {
-          color: #5b88ff;
-        }
-      }
-      &__description {
-        font-size: 16px;
-        line-height: 1.5;
-        font-weight: bold;
-        margin: 10px;
-        color: #276bfb;
-      }
-      &__author {
-        font-size: 16px;
-        line-height: 1.6;
-        color: #276bfb;
-        margin-right: 20px;
-        width: 110px;
-      }
-      &__action {
-        button {
-          width: 90px;
-          padding: 3px 0;
-          border: none;
-          border-radius: 18px;
-          font-size: 14px;
-          line-height: 1.8;
-          font-weight: bold;
-          color: #ffffff;
+}
 
-          &.closed {
-            background-color: #a9b5c7;
-          }
-          &.active {
-            background-color: #276bfb;
-          }
-        }
-      }
-      &__right {
-        display: flex;
-        align-items: center;
-      }
-    }
+.proposal__state-label {
+  display: flex;
+  justify-content: center;
+  width: 90px;
+  padding: 2px 6px;
+  border: none;
+  border-radius: 18px;
+  line-height: 1.8;
+  font-weight: bold;
+  color: #ffffff;
 
-    .thead {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 2px solid #33dfcc;
-      color: #8992a4;
-      padding: 16px 25px;
-      &__right {
-        display: flex;
-        align-items: center;
-      }
-      &__author {
-        display: flex;
-        align-items: center;
-        margin-right: 54px;
-        width: 105px;
-      }
-      &__action {
-        width: 90px;
-      }
+  &.closed,
+  &.defeated,
+  &.expired,
+  &.canceled {
+    background-color: #8992a4;
+  }
+  &.pending,
+  &.succeeded,
+  &.queued,
+  &.executed,
+  &.active {
+    background-color: #276bfb;
+  }
+}
+.proposal__proposer-address{
+  min-width: 130px;
+}
+
+.proposals-base-info {
+  .proposals-proposer {
+    display: flex;
+    padding: 3px 3px;
+    padding-right: 5px;
+    border: none;
+    border-radius: 18px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f3f9ff;
+    line-height: 1.8;
+    .avatar {
+      height: 25px;
+      margin-right: 10px;
     }
   }
 }

@@ -1,4 +1,5 @@
 import IRep from 'src/domain/IRep'
+import hashUtils from 'app-lib/hashUtils'
 
 /**
  * @param {string} hash address or transaction id
@@ -53,7 +54,25 @@ async function getRepInfo(rep: IRep): Promise<IRep> {
   return { ...rep, name, imageSrc }
 }
 
+/**
+ * Get profile of a representative
+ * @param {string} address user's wallet address
+ */
+async function getUserFrom3Box(address: string): Promise<{address: string, name: string, imageSrc?: string}> {
+  // Note: getProfile returns an empty object when profile does not exist
+  const profile = await fetch(
+    `https://cors-proxy.bzx.network/https://ipfs.3box.io/profile?address=${address}`
+  ).then((resp) => resp.json()).catch(e => ({name: undefined, image: undefined}))
+  const name = profile.name || hashUtils.shortHash(address)
+  const imageSrc = profile.image
+    ? `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl['/']}`
+    : undefined
+
+  return { address, name, imageSrc }
+}
+
 export default {
   getRepInfo,
-  getRepsInfo
+  getRepsInfo,
+  getUserFrom3Box
 }
