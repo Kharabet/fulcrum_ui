@@ -1,13 +1,11 @@
 import { BigNumber } from '@0x/utils'
 
-import { EventAbi, LogWithDecodedArgs, DecodedLogArgs } from 'ethereum-types'
+import { LogWithDecodedArgs } from 'ethereum-types'
 import {
-  CompoundGovernorAlphaEventArgs,
   CompoundGovernorAlphaProposalCanceledEventArgs,
   CompoundGovernorAlphaProposalCreatedEventArgs,
   CompoundGovernorAlphaProposalExecutedEventArgs,
-  CompoundGovernorAlphaProposalQueuedEventArgs,
-  CompoundGovernorAlphaVoteCastEventArgs
+  CompoundGovernorAlphaProposalQueuedEventArgs
 } from '../contracts/CompoundGovernorAlpha'
 export enum GovernanceProposalStates {
   Pending,

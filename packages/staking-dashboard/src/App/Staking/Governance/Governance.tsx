@@ -1,8 +1,7 @@
-import { ReactComponent as SearchIcon } from 'app-images/icon-search.svg'
 import React from 'react'
 import GovernanceItem from './GovernanceItem'
 import GovernanceVM from './GovernanceVM'
-import ProposalDetails from './Proposals'
+import ProposalDetails from './ProposalDetails'
 import { Loader } from 'ui-framework'
 
 const loader = (

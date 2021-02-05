@@ -1,4 +1,3 @@
-import 'simplebar/dist/simplebar.min.css'
 import { ReactComponent as ArrowLeftIcon } from 'app-images/ic_arrow_left.svg'
 
 import Markdown from 'markdown-to-jsx'
