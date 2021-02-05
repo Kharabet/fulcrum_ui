@@ -281,7 +281,10 @@ export default class ManageCollateralForm extends Component<
       const currentCollateralAmount = this.state.collateralAmount.times(
         10 ** collateralAssetDecimals
       )
-      const collateralAmount = this.props.loan.loanData!.collateral.plus(currentCollateralAmount)
+      const collateralAmount =
+        this.state.loanValue > this.state.selectedValue
+          ? this.props.loan.loanData!.collateral.minus(currentCollateralAmount)
+          : this.props.loan.loanData!.collateral.plus(currentCollateralAmount)
 
       const liquidationCollateralToLoanRate = this.props.loan
         .loanData!.maintenanceMargin.times(

@@ -248,9 +248,10 @@ export class ManageCollateralFormWeb3 extends Component<
       this.props.loanOrderState.loanAsset
     )
     const currentCollateralAmount = this.state.collateralAmount.times(10 ** collateralAssetDecimals)
-    const collateralAmount = this.props.loanOrderState.loanData!.collateral.plus(
-      currentCollateralAmount
-    )
+    const collateralAmount =
+      this.state.loanValue > this.state.selectedValue
+        ? this.props.loanOrderState.loanData!.collateral.minus(currentCollateralAmount)
+        : this.props.loanOrderState.loanData!.collateral.plus(currentCollateralAmount)
 
     // liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
     const liquidationCollateralToLoanRate = this.props.loanOrderState
