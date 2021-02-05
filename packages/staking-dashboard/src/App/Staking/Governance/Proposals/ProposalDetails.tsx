@@ -12,7 +12,7 @@ import { Button } from 'ui-framework'
 import defaultAvatar from 'app-images/representative1.png'
 import { ExternalLink } from 'src/shared-components/ExternalLink'
 
-export function Proposals({ vm }: { vm: GovernanceVM }) {
+export function ProposalDetails({ vm }: { vm: GovernanceVM }) {
   const { proposalPopup, activeProposal } = vm
   const { etherscanURL } = vm.rootStore
 
@@ -118,4 +118,4 @@ export function Proposals({ vm }: { vm: GovernanceVM }) {
   )
 }
 
-export default observer(Proposals)
+export default observer(ProposalDetails)

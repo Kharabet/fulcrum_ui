@@ -1,5 +1,4 @@
 import * as mobx from 'mobx'
-import { ChangeEvent } from 'react'
 import GovernanceProposal from 'src/domain/GovernanceProposal'
 
 import { RootStore, GovernanceStore } from 'src/stores'

@@ -12,11 +12,11 @@ export function GovernanceItem(props: IGovernanceItemProps) {
   return (
     <tr className="table__row--link" onClick={() => props.openProposals(id)} role="button">
       <td>{title} </td>
-      <td>{hashUtils.shortHash(proposer.address)}</td>
+      <td className="proposal__proposer-address">{hashUtils.shortHash(proposer.address)}</td>
       <td>
-        <div className={`proposal__state-label txt-center ${state.toLocaleLowerCase()}`}>
+        <span className={`proposal__state-label txt-center ${state.toLocaleLowerCase()}`}>
           {state}
-        </div>
+        </span>
       </td>
     </tr>
   )

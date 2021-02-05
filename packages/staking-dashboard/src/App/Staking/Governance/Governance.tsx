@@ -2,7 +2,7 @@ import { ReactComponent as SearchIcon } from 'app-images/icon-search.svg'
 import React from 'react'
 import GovernanceItem from './GovernanceItem'
 import GovernanceVM from './GovernanceVM'
-import Proposals from './Proposals/Proposals'
+import ProposalDetails from './Proposals'
 import { Loader } from 'ui-framework'
 
 const loader = (
@@ -21,7 +21,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
   if (vm.proposalPopup.visible) {
     return (
       <div className="panel--white padded-2 margin-bottom-2">
-        <Proposals vm={vm} />
+        <ProposalDetails vm={vm} />
       </div>
     )
   }

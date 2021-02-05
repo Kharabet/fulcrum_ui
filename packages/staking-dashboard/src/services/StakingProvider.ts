@@ -7,7 +7,9 @@ import GovernanceProposal, {
   IGovernanceProposalActionItem,
   IGovernanceProposalHistoryItem,
   GovernanceProposalStates,
-  IGovernanceProposalProposer
+  IGovernanceProposalProposer,
+  IGovernanceProposalReturnData,
+  IGovernanceProposalsEvents
 } from 'src/domain/GovernanceProposal'
 import ProposalCreated from 'src/domain/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
@@ -21,17 +23,14 @@ import Web3ConnectionFactory from '../domain/Web3ConnectionFactory'
 import ContractsSource from './ContractsSource'
 import ProviderChangedEvent from './events/ProviderChangedEvent'
 import { stakeableToken } from 'src/domain/stakingTypes'
-import { EventAbi, LogWithDecodedArgs, DecodedLogArgs } from 'ethereum-types'
+import { LogWithDecodedArgs } from 'ethereum-types'
 import {
-  CompoundGovernorAlphaEventArgs,
   CompoundGovernorAlphaProposalCanceledEventArgs,
   CompoundGovernorAlphaProposalCreatedEventArgs,
   CompoundGovernorAlphaProposalExecutedEventArgs,
   CompoundGovernorAlphaProposalQueuedEventArgs,
-  CompoundGovernorAlphaVoteCastEventArgs
 } from '../contracts/CompoundGovernorAlpha'
 import stakingApi from 'app-lib/stakingApi'
-  
 
 // @ts-ignore
 import web3EthAbiUntyped, { AbiCoder } from 'web3-eth-abi'
@@ -235,75 +234,113 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     return this.waitForTransactionMined(txHash)
   }
 
-  /**
-   * Amount of vBZRX that have vested held in the user wallet
-   */
   public async getGovernanceProposals(): Promise<GovernanceProposal[]> {
     let result: GovernanceProposal[] = []
 
-    const proposalCreatedEvents: Array<
-      LogWithDecodedArgs<CompoundGovernorAlphaProposalCreatedEventArgs>
-    > = []
-    const proposalQueuedEvents: Array<
-      LogWithDecodedArgs<CompoundGovernorAlphaProposalQueuedEventArgs>
-    > = []
-    const proposalExecutedEvents: Array<
-      LogWithDecodedArgs<CompoundGovernorAlphaProposalExecutedEventArgs>
-    > = []
-    const proposalCanceledEvents: Array<
-      LogWithDecodedArgs<CompoundGovernorAlphaProposalCanceledEventArgs>
-    > = []
-    const proposalVoteCastEvents: Array<
-      LogWithDecodedArgs<CompoundGovernorAlphaVoteCastEventArgs>
-    > = []
-    const proposalsData = []
+    const proposalsData: IGovernanceProposalReturnData[] = []
     const proposalsStates: BigNumber[] = []
-
-    const enumerateProposalState = (state: number) => {
-      const proposalStates = [
-        'Pending',
-        'Active',
-        'Canceled',
-        'Defeated',
-        'Succeeded',
-        'Queued',
-        'Expired',
-        'Executed'
-      ]
-      return proposalStates[state]
-    }
 
     if (!this.web3Wrapper || !this.contractsSource) {
       throw new Error('getGovernanceProposals: Missing source or web3')
     }
 
-    const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
-    this.web3Wrapper.abiDecoder.addABI(governanceContract.abi)
-    const proposalsCount = await governanceContract.proposalCount.callAsync()
-    const quorumVotes = await governanceContract.quorumVotes.callAsync()
-    const votingPeriod = await governanceContract.votingPeriod.callAsync()
-    const currentBlockNumber = await this.web3Wrapper.getBlockNumberAsync()
+    const proposalsEvents: IGovernanceProposalsEvents = await this.getProposalsEvents()
 
-    const voteCastEvents = await this.web3Wrapper.getLogsAsync({
-      fromBlock: '0x895440', //9000000
-      toBlock: 'latest',
-      topics: ['0x877856338e13f63d0c36822ff0ef736b80934cd90574a3a5bc9262c39d217c46'],
-      address: this.contractsSource.getCompoundGovernorAlphaAddress()
-    })
-    for (const i in voteCastEvents) {
-      if (!voteCastEvents[i]) {
+    const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
+    const proposalsCount = await governanceContract.proposalCount.callAsync()
+
+    for (const i of Array.from(Array(proposalsCount.toNumber()), (n, i) => i + 1)) {
+      const [
+        id,
+        propsoer,
+        eta,
+        startBlock,
+        endBlock,
+        forVotes,
+        againstVotes,
+        canceled,
+        executed
+      ] = await governanceContract.proposals.callAsync(new BigNumber(i))
+      proposalsData.push({
+        id,
+        propsoer,
+        eta,
+        startBlock,
+        endBlock,
+        forVotes,
+        againstVotes,
+        canceled,
+        executed
+      })
+      proposalsStates.push(await governanceContract.state.callAsync(new BigNumber(i))
+      )
+    }
+    const remappedProposals = []
+    for (const i in proposalsData) {
+      if (!proposalsData[i]) {
         continue
       }
-      const event: LogEntry = voteCastEvents[i]
-      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
-        CompoundGovernorAlphaVoteCastEventArgs
-      >(event)
-      if ('args' in decodedData) {
-        proposalVoteCastEvents.push(decodedData)
-      } else {
-        console.warn({ decodedData })
+      const proposalData = proposalsData[i]
+      const id = proposalData.id.toNumber()
+      const creationEvent = proposalsEvents.proposalsCreatedEvents.find((e) => e.args.id.eq(id))
+      if (creationEvent === undefined) {
+        continue
       }
+
+      const splittedDescription = creationEvent.args.description.split(/\n/g)
+      const title = splittedDescription[0].split('# ')[1] || 'Untitled'
+      splittedDescription.splice(0, 1)
+      const description = splittedDescription.join('\n') || 'No description.'
+
+      const proposalHistory: IGovernanceProposalHistoryItem[] = await this.getProposalHistory(
+        proposalData,
+        proposalsEvents
+      )
+
+      const actions: IGovernanceProposalActionItem[] = await this.getProposalActions(new BigNumber(id))
+      const proposer: IGovernanceProposalProposer = await stakingApi.getUserFrom3Box(
+        creationEvent.args.proposer
+      )
+
+      remappedProposals.push(
+        new GovernanceProposal(
+          id,
+          title,
+          description,
+          proposalData.forVotes.div(10 ** 18),
+          proposalData.againstVotes.div(10 ** 18),
+          GovernanceProposalStates[proposalsStates[id - 1].toNumber()],
+          proposalHistory,
+          actions,
+          proposer
+        )
+      )
     }
+    result = remappedProposals.reverse()
+    console.log({ result })
+    return result
+  }
+
+  public async getProposalsEvents(): Promise<IGovernanceProposalsEvents> {
+    const proposalsCreatedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalCreatedEventArgs>
+    > = []
+    const proposalsQueuedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalQueuedEventArgs>
+    > = []
+    const proposalsExecutedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalExecutedEventArgs>
+    > = []
+    const proposalsCanceledEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalCanceledEventArgs>
+    > = []
+
+    if (!this.web3Wrapper || !this.contractsSource) {
+      throw new Error('getProposalsEvents: Missing source or web3')
+    }
+    const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
+
+    this.web3Wrapper.abiDecoder.addABI(governanceContract.abi)
 
     const createdEvents = await this.web3Wrapper.getLogsAsync({
       fromBlock: '0x895440', //9000000
@@ -320,7 +357,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         CompoundGovernorAlphaProposalCreatedEventArgs
       >(event)
       if ('args' in decodedData) {
-        proposalCreatedEvents.push(decodedData)
+        proposalsCreatedEvents.push(decodedData)
       } else {
         console.warn({ decodedData })
       }
@@ -341,7 +378,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         CompoundGovernorAlphaProposalQueuedEventArgs
       >(event)
       if ('args' in decodedData) {
-        proposalQueuedEvents.push(decodedData)
+        proposalsQueuedEvents.push(decodedData)
       } else {
         console.warn({ decodedData })
       }
@@ -362,7 +399,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         CompoundGovernorAlphaProposalExecutedEventArgs
       >(event)
       if ('args' in decodedData) {
-        proposalExecutedEvents.push(decodedData)
+        proposalsExecutedEvents.push(decodedData)
       } else {
         console.warn({ decodedData })
       }
@@ -382,165 +419,117 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         CompoundGovernorAlphaProposalCanceledEventArgs
       >(event)
       if ('args' in decodedData) {
-        proposalCanceledEvents.push(decodedData)
+        proposalsCanceledEvents.push(decodedData)
       } else {
         console.warn({ decodedData })
       }
     }
-
-    for (const i of Array.from(Array(parseInt("5")), (n, i) => i + 1)) {
-      proposalsData.push(await governanceContract.proposals.callAsync(new BigNumber(i)))
-      proposalsStates.push(
-        new BigNumber(await governanceContract.state.callAsync(new BigNumber(i)))
-      )
+    return {
+      proposalsCreatedEvents,
+      proposalsQueuedEvents,
+      proposalsExecutedEvents,
+      proposalsCanceledEvents
     }
-    const remappedProposals = []
-    for (const i in proposalsData) {
-      if (!proposalsData[i]) {
-        continue
-      }
-      const p = proposalsData[i]
-      const id = p[0].toNumber()
-      const creationEvent = proposalCreatedEvents.find((e) => e.args.id.eq(id))
-      if (creationEvent === undefined) {
-        continue
-      }
-      const queuedEvent = proposalQueuedEvents.find((e) => e.args.id.eq(id))
-      const executedEvent = proposalExecutedEvents.find((e) => e.args.id.eq(id))
-      const canceledEvent = proposalCanceledEvents.find((e) => e.args.id.eq(id))
-      const voteCasts = proposalVoteCastEvents.filter(
-        (e) => e.args.proposalId.eq(id) && e.args.support === true
-      )
-      // let votesAccumulator = new BigNumber(0)
-      // voteCasts.some( vote => {
-      //   votesAccumulator = votesAccumulator.plus(vote.args.votes)
-      //   if (votesAccumulator.gt(quorumVotes)){
-      //     console.log(id, vote.blockNumber!.toFixed())
-      //     return true
-      //   }
-      //   return false
-      // })
+  }
 
-      const splittedDescription = creationEvent.args.description.split(/\n/g)
-      const title = splittedDescription[0].split('# ')[1] || 'Untitled'
-      splittedDescription.splice(0, 1)
-      const description = splittedDescription.join('\n') || 'No description.'
+  public async getProposalHistory(
+    proposalData: IGovernanceProposalReturnData,
+    proposalsEvents: IGovernanceProposalsEvents
+  ): Promise<IGovernanceProposalHistoryItem[]> {
+    const history: IGovernanceProposalHistoryItem[] = []
 
-      const pendingHistoryItem =
-        (creationEvent.blockNumber &&
-          creationEvent.blockNumber < currentBlockNumber &&
-          ({
-            state: GovernanceProposalStates.Pending,
-            blockNumber: p[3].toNumber(),
-            txnHash: creationEvent.transactionHash,
-            date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
-          } as IGovernanceProposalHistoryItem)) ||
-        undefined
+    if (!this.web3Wrapper || !this.contractsSource) {
+      throw new Error('getGovernanceProposals: Missing source or web3')
+    }
 
-      const activeHistoryItem =
-        (creationEvent.blockNumber &&
-          creationEvent.blockNumber < currentBlockNumber &&
-          ({
-            state: GovernanceProposalStates.Active,
-            blockNumber: p[3].toNumber(),
-            txnHash: creationEvent.transactionHash,
-            date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
-          } as IGovernanceProposalHistoryItem)) ||
-        undefined
+    const currentBlockNumber = await this.web3Wrapper.getBlockNumberAsync()
 
-      const voteResultHisoryItem =
-        (p[4].lt(currentBlockNumber) &&
-          ({
-            state:
-              p[4].lt(currentBlockNumber) && p[2].isZero()
-                ? GovernanceProposalStates.Defeated
-                : GovernanceProposalStates.Succeeded,
-            blockNumber: p[4].toNumber(),
-            date: await this.web3Wrapper.getBlockTimestampAsync(p[4].toNumber())
-          } as IGovernanceProposalHistoryItem)) ||
-        undefined
+    const creationEvent = proposalsEvents.proposalsCreatedEvents.find((e) =>
+      e.args.id.eq(proposalData.id)
+    )
+    if (creationEvent === undefined) {
+      return history
+    }
+    const queuedEvent = proposalsEvents.proposalsQueuedEvents.find((e) =>
+      e.args.id.eq(proposalData.id)
+    )
+    const executedEvent = proposalsEvents.proposalsExecutedEvents.find((e) =>
+      e.args.id.eq(proposalData.id)
+    )
+    const canceledEvent = proposalsEvents.proposalsCanceledEvents.find((e) =>
+      e.args.id.eq(proposalData.id)
+    )
 
-      const queuedHisoryItem =
-        (queuedEvent &&
-          queuedEvent.blockNumber &&
-          queuedEvent.blockNumber < currentBlockNumber &&
-          ({
-            state: GovernanceProposalStates.Queued,
-            blockNumber: queuedEvent.blockNumber,
-            txnHash: queuedEvent.transactionHash,
-            date: await this.web3Wrapper.getBlockTimestampAsync(queuedEvent.blockNumber)
-          } as IGovernanceProposalHistoryItem)) ||
-        undefined
+    creationEvent.blockNumber &&
+      creationEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Pending,
+        blockNumber: proposalData.startBlock.toNumber(),
+        txnHash: creationEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
+      })
 
-      const executedHisoryItem =
-        (executedEvent &&
-          executedEvent.blockNumber &&
-          executedEvent.blockNumber < currentBlockNumber &&
-          ({
-            state: GovernanceProposalStates.Executed,
-            blockNumber: executedEvent.blockNumber,
-            txnHash: executedEvent.transactionHash,
-            date: await this.web3Wrapper.getBlockTimestampAsync(executedEvent.blockNumber)
-          } as IGovernanceProposalHistoryItem)) ||
-        undefined
+    creationEvent.blockNumber &&
+      creationEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Active,
+        blockNumber: proposalData.startBlock.toNumber(),
+        txnHash: creationEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
+      })
 
-      // 1209600 is Timelock contract GRACE_PERIOD
-      const expiredHisoryItem =
-        (queuedEvent &&
-          p[2].plus(1209600).lt(currentBlockNumber) &&
-          ({
-            state: GovernanceProposalStates.Expired,
-            blockNumber: p[2].plus(1209600).toNumber(),
-            date: await this.web3Wrapper.getBlockTimestampAsync(p[2].plus(1209600).toNumber())
-          } as IGovernanceProposalHistoryItem)) ||
-        undefined
+    proposalData.endBlock.lt(currentBlockNumber) &&
+      history.push({
+        state:
+          proposalData.endBlock.lt(currentBlockNumber) && proposalData.eta.isZero()
+            ? GovernanceProposalStates.Defeated
+            : GovernanceProposalStates.Succeeded,
+        blockNumber: proposalData.endBlock.toNumber(),
+        date: await this.web3Wrapper.getBlockTimestampAsync(proposalData.endBlock.toNumber())
+      })
 
-      const canceledHisoryItem =
-        (canceledEvent &&
-          ({
-            state: GovernanceProposalStates.Canceled,
-            blockNumber: canceledEvent.blockNumber!,
-            txnHash: canceledEvent.transactionHash
-          } as IGovernanceProposalHistoryItem)) ||
-        undefined
+    queuedEvent &&
+      queuedEvent.blockNumber &&
+      queuedEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Queued,
+        blockNumber: queuedEvent.blockNumber,
+        txnHash: queuedEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(queuedEvent.blockNumber)
+      })
 
-      const notEmpty = <TValue>(value: TValue | null | undefined): value is TValue => {
-        return value !== null && value !== undefined
-      }
-      const history: IGovernanceProposalHistoryItem[] = [
-        pendingHistoryItem,
-        activeHistoryItem,
-        voteResultHisoryItem,
-        queuedHisoryItem,
-        executedHisoryItem,
-        expiredHisoryItem,
-        canceledHisoryItem
-      ].filter(notEmpty)
-      const actions = await this.getProposalActions(new BigNumber(id))
-      const proposer = (await stakingApi.getUserFrom3Box(creationEvent.args.proposer)) as IGovernanceProposalProposer
-      remappedProposals.push(
-        new GovernanceProposal(
-          id,
-          title,
-          description,
-          p[5].div(10 ** 18),
-          p[6].div(10 ** 18),
-          GovernanceProposalStates[proposalsStates[id - 1].toNumber()],
-          p,
-          creationEvent,
-          queuedEvent,
-          executedEvent,
-          canceledEvent,
-          voteCasts,
-          history,
-          actions,
-          proposer
+    executedEvent &&
+      executedEvent.blockNumber &&
+      executedEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Executed,
+        blockNumber: executedEvent.blockNumber,
+        txnHash: executedEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(executedEvent.blockNumber)
+      })
+
+    // 1209600 is Timelock contract GRACE_PERIOD
+    queuedEvent &&
+      proposalData.eta.plus(1209600).lt(currentBlockNumber) &&
+      history.push({
+        state: GovernanceProposalStates.Expired,
+        blockNumber: proposalData.eta.plus(1209600).toNumber(),
+        date: await this.web3Wrapper.getBlockTimestampAsync(
+          proposalData.eta.plus(1209600).toNumber()
         )
-      )
-    }
-    result = remappedProposals.reverse()
-    console.log({ result })
-    return result
+      })
+
+    canceledEvent &&
+      canceledEvent.blockNumber &&
+      canceledEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Canceled,
+        blockNumber: canceledEvent.blockNumber,
+        txnHash: canceledEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(canceledEvent.blockNumber)
+      })
+
+    return history
   }
 
   public async getProposalActions(id: BigNumber): Promise<IGovernanceProposalActionItem[]> {
@@ -560,7 +549,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         return null
       }
       const params = paramsMatchArray[1].split(',')
-      const functionName = x.replace(`(${paramsMatchArray[1]})`, "")
+      const functionName = x.replace(`(${paramsMatchArray[1]})`, '')
 
       const target = targets[i]
       const value = values[i]
