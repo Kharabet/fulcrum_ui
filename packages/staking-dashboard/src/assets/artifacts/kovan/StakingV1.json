@@ -595,20 +595,11 @@
       "constant": false,
       "inputs": [
         {
-          "internalType": "address",
-          "name": "delegateToSet",
-          "type": "address"
+          "internalType": "bool",
+          "name": "restake",
+          "type": "bool"
         }
       ],
-      "name": "changeDelegate",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
       "name": "claim",
       "outputs": [
         {
@@ -629,13 +620,8 @@
     {
       "constant": false,
       "inputs": [],
-      "name": "claimAndRestake",
+      "name": "claim3Crv",
       "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "bzrxRewardsEarned",
-          "type": "uint256"
-        },
         {
           "internalType": "uint256",
           "name": "stableCoinRewardsEarned",
@@ -649,36 +635,11 @@
     {
       "constant": false,
       "inputs": [],
-      "name": "claimAndRestakeWithUpdate",
+      "name": "claimBzrx",
       "outputs": [
         {
           "internalType": "uint256",
           "name": "bzrxRewardsEarned",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "stableCoinRewardsEarned",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "claimWithUpdate",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "bzrxRewardsEarned",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "stableCoinRewardsEarned",
           "type": "uint256"
         }
       ],
@@ -858,53 +819,8 @@
     },
     {
       "constant": false,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "earnedWithUpdate",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
       "inputs": [],
       "name": "exit",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "exitWithUpdate",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
@@ -919,64 +835,6 @@
           "internalType": "address",
           "name": "",
           "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "start",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "count",
-          "type": "uint256"
-        }
-      ],
-      "name": "getDelegateVotes",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "user",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "BZRX",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "vBZRX",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "iBZRX",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "LPToken",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "totalVotes",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct StakingConstants.DelegatedTokens[]",
-          "name": "delegateArr",
-          "type": "tuple[]"
         }
       ],
       "payable": false,
@@ -1100,27 +958,6 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "lastClaimTime",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
       "inputs": [],
       "name": "lastRewardsAddTime",
       "outputs": [
@@ -1137,7 +974,22 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "maxAllowedDisagreement",
+      "name": "maxCurveDisagreement",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "maxUniswapDisagreement",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1162,15 +1014,6 @@
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "pause",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -1247,11 +1090,26 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_maxAllowedDisagreement",
+          "name": "_maxCurveDisagreement",
           "type": "uint256"
         }
       ],
-      "name": "setMaxAllowedDisagreement",
+      "name": "setMaxCurveDisagreement",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_maxUniswapDisagreement",
+          "type": "uint256"
+        }
+      ],
+      "name": "setMaxUniswapDisagreement",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
@@ -1282,21 +1140,6 @@
         }
       ],
       "name": "setRewardPercent",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "contract IERC20",
-          "name": "asset",
-          "type": "address"
-        }
-      ],
-      "name": "setUniswapApproval",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
@@ -1494,6 +1337,21 @@
       "type": "function"
     },
     {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "_isPaused",
+          "type": "bool"
+        }
+      ],
+      "name": "togglePause",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "constant": true,
       "inputs": [
         {
@@ -1539,15 +1397,6 @@
         }
       ],
       "name": "transferOwnership",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "unPause",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
@@ -1611,6 +1460,37 @@
         {
           "internalType": "uint256",
           "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenBalance",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "lastUpdate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "vestingEndTime",
+          "type": "uint256"
+        }
+      ],
+      "name": "vestedBalanceForAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "vested",
           "type": "uint256"
         }
       ],
