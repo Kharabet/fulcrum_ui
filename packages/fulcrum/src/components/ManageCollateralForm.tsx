@@ -120,6 +120,7 @@ export default class ManageCollateralForm extends Component<
         )
       )
       .subscribe((next) => {
+        this.getLiquidationPrice()
         this.setState({
           ...this.state,
           collateralAmount: next!.collateralAmount,
@@ -264,29 +265,39 @@ export default class ManageCollateralForm extends Component<
     snapshot?: any
   ): Promise<void> {
     if (prevState.assetDetails !== this.state.assetDetails) {
-      if (this.props.loan) {
-        const loanAssetDecimals =
-          AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
-        const collateralAssetDecimals =
-          AssetsDictionary.assets.get(this.props.loan.collateralAsset)!.decimals || 18
-        const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-        const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
-        const liquidationCollateralToLoanRate = this.props.loan
-          .loanData!.maintenanceMargin.times(
-            this.props.loan.loanData!.principal.times(loanAssetPrecision)
-          )
-          .div(10 ** 20)
-          .plus(this.props.loan.loanData!.principal.times(loanAssetPrecision))
-          .div(this.props.loan.loanData!.collateral.times(collateralAssetPrecision))
-          .times(10 ** 18)
+      this.getLiquidationPrice()
+    }
+  }
 
-        const liquidationPrice =
-          this.props.request.positionType === PositionType.LONG
-            ? liquidationCollateralToLoanRate.div(10 ** 18)
-            : new BigNumber(10 ** 36).div(liquidationCollateralToLoanRate).div(10 ** 18)
+  public getLiquidationPrice = () => {
+    if (this.props.loan) {
+      const loanAssetDecimals =
+        AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
+      const collateralAssetDecimals =
+        AssetsDictionary.assets.get(this.props.loan.collateralAsset)!.decimals || 18
+      const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
+      const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
 
-        this.setState({ ...this.state, liquidationPrice })
-      }
+      const currentCollateralAmount = this.state.collateralAmount.times(
+        10 ** collateralAssetDecimals
+      )
+      const collateralAmount = this.props.loan.loanData!.collateral.plus(currentCollateralAmount)
+
+      const liquidationCollateralToLoanRate = this.props.loan
+        .loanData!.maintenanceMargin.times(
+          this.props.loan.loanData!.principal.times(loanAssetPrecision)
+        )
+        .div(10 ** 20)
+        .plus(this.props.loan.loanData!.principal.times(loanAssetPrecision))
+        .div(collateralAmount.times(collateralAssetPrecision))
+        .times(10 ** 18)
+
+      const liquidationPrice =
+        this.props.request.positionType === PositionType.LONG
+          ? liquidationCollateralToLoanRate.div(10 ** 18)
+          : new BigNumber(10 ** 36).div(liquidationCollateralToLoanRate).div(10 ** 18)
+
+      this.setState({ ...this.state, liquidationPrice })
     }
   }
 
