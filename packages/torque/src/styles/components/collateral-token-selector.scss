@@ -17,7 +17,6 @@
     box-shadow: 0px 8px 30px rgba(95, 109, 130, 0.3);
   }
   &__items {
-    
     .simplebar-track.simplebar-vertical {
       top: 10px;
       height: calc(100% - 20px);
@@ -53,12 +52,16 @@
   }
 }
 @media screen and (max-width: $mobile-version-max-width) {
- 
+  .collateral-token-selector {
+    &__container {
+      top: 50px;
+    }
+  }
   .collateral-token-selector-item {
     padding: 6px 4px;
     &__image-container {
       svg {
-        width: 30px;
+        width: 20px;
       }
     }
   }

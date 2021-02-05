@@ -5,16 +5,15 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import Slider from 'rc-slider'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
-import ReactTooltip from 'react-tooltip'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, switchMap } from 'rxjs/operators'
-import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { IBorrowEstimate } from '../domain/IBorrowEstimate'
 import { IDepositEstimate } from '../domain/IDepositEstimate'
 import { TorqueProvider } from '../services/TorqueProvider'
-import { ChiSwitch } from './ChiSwitch'
 import { CollateralTokenSelectorToggle } from './CollateralTokenSelectorToggle'
+
+import ExpectedResult from './ExpectedResult'
 import { Loader } from './Loader'
 
 const isMainnet = process.env.NODE_ENV && process.env.REACT_APP_ETH_NETWORK === 'mainnet'
@@ -35,6 +34,7 @@ interface IBorrowFormState {
   depositAmountValue: string
   gasAmountNeeded: BigNumber
   balanceTooLow: boolean
+  balanceValue: string
   didSubmit: boolean
   isLoading: boolean
   isEdit: boolean
@@ -46,8 +46,8 @@ interface IBorrowFormState {
   ethBalance: BigNumber
   maxAvailableLiquidity: BigNumber
   estimatedFee: BigNumber
-  estimatedFeeChi: BigNumber
   assetDetails: AssetDetails | null
+  liquidationPrice: BigNumber
 }
 
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
@@ -75,9 +75,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       depositAmount: new BigNumber(0),
       depositAmountValue: '',
       ethBalance: new BigNumber(0),
+      balanceValue: '',
       maxAvailableLiquidity: new BigNumber(0),
       estimatedFee: new BigNumber(0),
-      estimatedFeeChi: new BigNumber(0),
       gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false,
       didSubmit: false,
@@ -88,12 +88,16 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       maxBorrow: new BigNumber(0),
       sliderValue: 0,
       collaterizationPercents: '',
-      assetDetails: assetDetails || null
+      assetDetails: assetDetails || null,
+      liquidationPrice: new BigNumber(0)
     }
 
     this._initDefaults = new Subject<null>()
     this._initDefaults.pipe(debounceTime(50)).subscribe(async () => {
       await this.setInputDefaults()
+      await this.setMaxBorrow()
+      await this.setEstimatedFee()
+      this.changeStateLoading()
     })
 
     this._borrowAmountChange = new Subject<string>()
@@ -107,37 +111,27 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         switchMap((value) => this.rxGetDepositEstimate(value))
       )
       .subscribe(async (next) => {
-        this.setDepositEstimate(next.depositAmount)
-        this.changeStateLoading()
-        await this.checkBalanceTooLow()
+        this.setDepositEstimate(next.depositAmount)        
         await this.setEstimatedFee()
+        await this.checkBalanceTooLow()        
+        this.changeStateLoading()
       })
 
-    this._collateralChange
-      .pipe(
-        debounceTime(500),
-        switchMap((value) => this.rxConvertToBigNumber(this.state.depositAmountValue))
-      )
-      .pipe(switchMap((value) => this.rxGetBorrowEstimate(value)))
-      .subscribe(async (next) => {
-        this.setBorrowEstimate(next.borrowAmount)
-        this.changeStateLoading()
-        await this.setMaxBorrow()
-        await this.checkBalanceTooLow()
-        await this.setEstimatedFee()
-      })
-
-    this._depositAmountChange
-      .pipe(
+    merge(
+      this._depositAmountChange.pipe(
         debounceTime(100),
         switchMap((value) => this.rxConvertToBigNumber(value))
+      ),
+      this._collateralChange.pipe(
+        switchMap((value) => this.rxConvertToBigNumber(this.state.depositAmountValue))
       )
+    )
       .pipe(switchMap((value) => this.rxGetBorrowEstimate(value)))
       .subscribe(async (next) => {
-        this.setBorrowEstimate(next.borrowAmount)
-        this.changeStateLoading()
-        await this.checkBalanceTooLow()
+        this.setBorrowEstimate(next.borrowAmount)        
         await this.setEstimatedFee()
+        await this.checkBalanceTooLow()
+        this.changeStateLoading()
       })
   }
 
@@ -150,21 +144,44 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     const maxAvailableLiquidity = await TorqueProvider.Instance.getAvailableLiquidaity(
       this.props.borrowAsset
     )
+
+    const maintenanceMargin = await TorqueProvider.Instance.getMaintenanceMargin(
+      this.props.borrowAsset,
+      this.state.collateralAsset
+    )
+
     const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
       this.props.borrowAsset,
       this.state.collateralAsset
     )
-    const sliderValue: BigNumber = minInitialMargin.plus(30)
 
-    this.setState({
-      isLoading: false,
-      maxAvailableLiquidity,
-      ethBalance,
-      minValue: minInitialMargin.plus(0.3019),
-      sliderValue: this.inverseCurve(sliderValue),
-      collaterizationPercents: this.formatPrecision(sliderValue)
-    })
-    await this.setMaxBorrow()
+    const collateralToPrincipalRate = await TorqueProvider.Instance.getKyberSwapRate(
+      this.props.borrowAsset,
+      this.state.collateralAsset
+    )
+
+    const initialMargin = minInitialMargin.plus(30)
+
+    const liquidationPrice = maintenanceMargin
+      .times(collateralToPrincipalRate.times(10 ** 18))
+      .div(10 ** 20)
+      .plus(collateralToPrincipalRate.times(10 ** 18))
+      .div(new BigNumber(10 ** 20).plus(initialMargin).div(10 ** 20))
+      .div(10 ** 18)
+
+    this.setState(
+      {
+        isLoading: false,
+        maxAvailableLiquidity,
+        ethBalance,
+        liquidationPrice,
+        minValue: minInitialMargin.plus(0.3019),
+        collaterizationPercents: this.formatPrecision(initialMargin)
+      },
+      () => {
+        this.setState({ sliderValue: this.inverseCurve(initialMargin) })
+      }
+    )
   }
 
   public async componentDidMount() {
@@ -174,11 +191,13 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   // custom logarithmic-like scale for slider
   // based on https://codesandbox.io/s/qxm182k0mw
   private sliderCurve(x: number): BigNumber {
-    return new BigNumber(0.30194 * Math.exp(2.30097 * x) + 120).dp(2, BigNumber.ROUND_HALF_UP)
+    const min = this.state.minValue.toNumber() - 0.3019
+    return new BigNumber(0.30194 * Math.exp(2.30097 * x) + min).dp(2, BigNumber.ROUND_HALF_UP)
   }
 
   private inverseCurve(x: BigNumber): number {
-    return new BigNumber(Math.log((Number(x) - 120) / 0.30194) / 2.30097)
+    const min = this.state.minValue.toNumber() - 0.3019
+    return new BigNumber(Math.log((Number(x) - min) / 0.30194) / 2.30097)
       .dp(2, BigNumber.ROUND_HALF_UP)
       .toNumber()
   }
@@ -208,9 +227,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         .times(rate)
     })
 
-    const estimatedFeeChi = estimatedFee.times(0.4)
-
-    this.setState({ estimatedFee, estimatedFeeChi })
+    this.setState({ estimatedFee })
   }
 
   public formatLiquidity(value: BigNumber): string {
@@ -234,6 +251,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       return null
     }
 
+    const minSliderValue = -this.inverseCurve(this.state.maxValue)
+    const maxSliderValue = -this.inverseCurve(this.state.minValue)
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(TorqueProvider.Instance.gasBufferForTxn)
         ? 'Insufficient funds for gas'
@@ -264,59 +283,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               </div>
             </div>
           </div>
-
-          <div className="borrow-form__fee_block">
-            <div className="borrow-form__column-title">
-              Fees (Overestimated)
-              <IconInfo
-                className="tooltip__icon"
-                data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
-                data-for="fee-estimated"
-              />
-              <ReactTooltip
-                id="fee-estimated"
-                className="tooltip__info"
-                place="top"
-                effect="solid"
-              />
-            </div>
-            <div
-              title={`${this.state.estimatedFee.toFixed(18)}`}
-              className="borrow-form__column-value">
-              <span className="borrow-form__fee" title={this.state.estimatedFee.toFixed()}>
-                ~$<span className="value">{this.state.estimatedFee.toFixed(2)}</span>
-              </span>
-            </div>
-            <div className="borrow-form__column-title">
-              <span>
-                Save&nbsp;
-                <span className="value" title={this.state.estimatedFeeChi.toFixed()}>
-                  {this.formatPrecision(this.state.estimatedFeeChi)}$
-                </span>
-                &nbsp; <br />
-                with CHI
-              </span>
-
-              <IconInfo
-                className="tooltip__icon"
-                data-multiline="true"
-                data-html={true}
-                data-tip="<p>Use CHI token to save on gas fees. 
-            CHI will be burned from your wallet, saving you up to 50% on all transaction fees.</p>
-            <a href='https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c' class='tooltip__button'>Buy CHI</a>
-            <a href='https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3' class='tooltip__button'>Learn More</a>"
-                data-for="chi-estimated"
-              />
-              <ReactTooltip
-                id="chi-estimated"
-                className="tooltip__info"
-                place="top"
-                delayHide={500}
-                effect="solid"
-              />
-            </div>
-            <span className="borrow-form__chi">CHI Enabled</span> <ChiSwitch noLabel={true} />
-          </div>
         </section>
 
         <section className="borrow-form__content">
@@ -339,7 +305,17 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           </div>
           <div className="borrow-form__row-container">
             <div>How much would you like to deposit?</div>
-            <div className="borrow-form__label-collateral">Collateral</div>
+            <div>
+              Balance&nbsp;
+              {this.state.balanceValue && (
+                <span>
+                  <span className="borrow-form__label-balance">
+                    {this.state.balanceValue}&nbsp;
+                  </span>
+                  {this.state.collateralAsset}
+                </span>
+              )}
+            </div>
           </div>
           <div className="borrow-form__input-container">
             <input
@@ -361,73 +337,38 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             </span>
           </div>
 
-          <div className="borrow-form__edit-collateral-by-container">
-            <div className="edit-input-wrapper">
-              <span>Collateralized</span>
-              <div className="edit-input-container">
-                {this.state.collaterizationPercents === '' ? (
-                  <div className="loader-container">
-                    <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
-                  </div>
-                ) : (
-                  <React.Fragment>
-                    <div className="edit-input-collateral">
-                      <input
-                        type="number"
-                        step="any"
-                        placeholder={`Enter`}
-                        value={this.state.collaterizationPercents}
-                        className="input-collateral"
-                        onChange={this.onCollateralAmountChange}
-                      />
-                    </div>
-                  </React.Fragment>
-                )}
-              </div>
+          <div className="borrow-form__info-by-amount">
+            <div className="borrow-form__insufficient-balance borrow-form__error">
+              {this.state.isLoading ? (
+                <Loader quantityDots={3} sizeDots="small" title="" isOverlay={false} />
+              ) : (
+                amountMsg
+              )}
             </div>
           </div>
-          {/* <span className="borrow-form__label-safe">Safe</span>
-            <React.Fragment>
-              <Slider
-                step={
-                  (this.inverseCurve(this.state.maxValue) -
-                    this.inverseCurve(this.state.minValue)) /
-                  100
-                }
-                max={-this.inverseCurve(this.state.minValue)}
-                min={-this.inverseCurve(this.state.maxValue)}
-                value={-this.state.collaterizationValue}
-                onChange={this.onChange}
-                onAfterChange={this.onChange}
-              />
-            </React.Fragment> */}
-          <div className="borrow-form__row-container">
-            <span className="borrow-form__label-safe">Safer</span>
-            <span className="borrow-form__label-safe">Riskier</span>
-          </div>
 
-          <React.Fragment>
+          <div className="borrow-form__slider">
+            <div className="borrow-form__row-container">
+              <span className="borrow-form__label
+              -safe">Safer</span>
+              <span className="borrow-form__label-safe">Riskier</span>
+            </div>
             <Slider
-              step={
-                (this.inverseCurve(this.state.maxValue) - this.inverseCurve(this.state.minValue)) /
-                100
-              }
-              max={-this.inverseCurve(this.state.minValue)}
-              min={-this.inverseCurve(this.state.maxValue)}
+              step={(maxSliderValue - minSliderValue) / 100}
+              min={minSliderValue}
+              max={maxSliderValue}
               value={-this.state.sliderValue}
               onChange={this.onChange}
               onAfterChange={this.onChange}
             />
-          </React.Fragment>
+          </div>
 
-          {!this.state.isLoading && amountMsg !== undefined && (
-            <div className="borrow-form__info-by-amount">
-              <div className="borrow-form__insufficient-balance borrow-form__error">
-                {amountMsg}
-              </div>
-            </div>
-          )}
-
+          <ExpectedResult
+            collaterizationPercents={this.state.collaterizationPercents}
+            liquidationPrice={this.state.liquidationPrice}
+            estimatedFee={this.state.estimatedFee}
+            quoteToken={this.state.collateralAsset}
+          />
           <div className="dialog-actions">
             <div className="borrow-form__actions-container">
               <button
@@ -439,7 +380,13 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                   !Number(this.state.depositAmountValue)
                 }
                 type="submit">
-                {this.state.didSubmit ? 'Submitting...' : 'Borrow'}
+                {this.state.didSubmit
+                  ? 'Submitting...'
+                  : `Borrow${
+                      this.state.borrowAmount.eq(0)
+                        ? ''
+                        : ` ${this.state.borrowAmount.toFixed(2)} ${this.props.borrowAsset}`
+                    }`}
               </button>
             </div>
           </div>
@@ -532,14 +479,17 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   private onChangeCollateralAsset = async (asset: Asset) => {
-    this.setState(
-      {
-        collateralAsset: asset
-      },
-      () => {
-        this._collateralChange.next()
-      }
-    )
+    this.state.collateralAsset !== asset &&
+      this.setState(
+        {
+          collateralAsset: asset
+        },
+        async () => {
+          await this.setInputDefaults()
+          this._collateralChange.next()
+          await this.setMaxBorrow()
+        }
+      )
   }
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -560,7 +510,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     )
   }
 
-  public onMaxClick = () => {
+  public onMaxClick = async () => {
     const borrowAmountValue = this.state.maxBorrow.dp(5, BigNumber.ROUND_CEIL).toString()
 
     this.setState(
@@ -596,8 +546,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     const depositAmountValue = depositAmount.dp(5, BigNumber.ROUND_CEIL).toString()
     this.setState({
       depositAmount: depositAmount,
-      depositAmountValue: depositAmountValue,
-      isLoading: false
+      depositAmountValue: depositAmountValue
     })
   }
 
@@ -615,35 +564,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   public changeStateLoading = () => {
     if (this.state.depositAmount) this.setState({ isLoading: false })
-  }
-
-  public onCollateralAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputCollateralText = event.target.value ? event.target.value : ''
-    const inputCollateralValue = new BigNumber(inputCollateralText)
-
-    if (parseFloat(inputCollateralText) < 0) return
-
-    const collateralText = inputCollateralText
-    let collaterizationPercents = inputCollateralValue
-
-    if (inputCollateralValue.lt(this.state.minValue)) collaterizationPercents = this.state.minValue
-    else if (inputCollateralValue.gt(this.state.maxValue)) {
-      collaterizationPercents = this.state.maxValue
-    }
-
-    this.setState(
-      {
-        collaterizationPercents: collateralText,
-        sliderValue: this.inverseCurve(collaterizationPercents)
-      },
-      () => {
-        this._collateralChange.next()
-      }
-    )
-  }
-
-  public editCollateralInput = () => {
-    this.setState({ isEdit: true })
   }
 
   private onChange = async (value: number) => {
@@ -691,6 +611,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         ).then(async (borrowEstimate) => {
           this.setState({
             isLoading: true,
+            balanceValue: this.formatPrecision(depositAmount),
             maxBorrow: borrowEstimate.borrowAmount.eq(0)
               ? this.state.maxAvailableLiquidity.dp(5, BigNumber.ROUND_DOWN)
               : borrowEstimate.borrowAmount.dp(5, BigNumber.ROUND_DOWN)
