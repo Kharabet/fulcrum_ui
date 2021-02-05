@@ -232,32 +232,41 @@ export class ManageCollateralFormWeb3 extends Component<
       })
     }
     if (prevState.assetDetails !== this.state.assetDetails) {
-      const loanAssetDecimals =
-        AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18
-      const collateralAssetDecimals =
-        AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!.decimals || 18
-      const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
-      const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
-
-      const collateralToUSDCurrentRate = await TorqueProvider.Instance.getSwapToUsdRate(
-        this.props.loanOrderState.loanAsset
-      )
-      // liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
-      const liquidationCollateralToLoanRate = this.props.loanOrderState
-        .loanData!.maintenanceMargin.times(
-          this.props.loanOrderState.loanData!.principal.times(loanAssetPrecision)
-        )
-        .div(10 ** 20)
-        .plus(this.props.loanOrderState.loanData!.principal.times(loanAssetPrecision))
-        .div(this.props.loanOrderState.loanData!.collateral.times(collateralAssetPrecision))
-        .times(10 ** 18)
-
-      const liquidationPrice = liquidationCollateralToLoanRate
-        .div(10 ** 18)
-        .times(collateralToUSDCurrentRate)
-
-      this.setState({ ...this.state, liquidationPrice })
+      this.getLiquidationPrice()
     }
+  }
+
+  public getLiquidationPrice = async () => {
+    const loanAssetDecimals =
+      AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18
+    const collateralAssetDecimals =
+      AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!.decimals || 18
+    const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
+    const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
+
+    const collateralToUSDCurrentRate = await TorqueProvider.Instance.getSwapToUsdRate(
+      this.props.loanOrderState.loanAsset
+    )
+    const currentCollateralAmount = this.state.collateralAmount.times(10 ** collateralAssetDecimals)
+    const collateralAmount = this.props.loanOrderState.loanData!.collateral.plus(
+      currentCollateralAmount
+    )
+
+    // liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
+    const liquidationCollateralToLoanRate = this.props.loanOrderState
+      .loanData!.maintenanceMargin.times(
+        this.props.loanOrderState.loanData!.principal.times(loanAssetPrecision)
+      )
+      .div(10 ** 20)
+      .plus(this.props.loanOrderState.loanData!.principal.times(loanAssetPrecision))
+      .div(collateralAmount.times(collateralAssetPrecision))
+      .times(10 ** 18)
+
+    const liquidationPrice = liquidationCollateralToLoanRate
+      .div(10 ** 18)
+      .times(collateralToUSDCurrentRate)
+
+    this.setState({ ...this.state, liquidationPrice })
   }
 
   public render() {
@@ -390,6 +399,7 @@ export class ManageCollateralFormWeb3 extends Component<
         collateralAmount,
         selectedValue < this.state.loanValue
       ).then((value) => {
+        this.getLiquidationPrice()
         observer.next(value)
         this.changeStateLoading()
       })
