@@ -111,9 +111,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         switchMap((value) => this.rxGetDepositEstimate(value))
       )
       .subscribe(async (next) => {
-        this.setDepositEstimate(next.depositAmount)        
+        this.setDepositEstimate(next.depositAmount)
         await this.setEstimatedFee()
-        await this.checkBalanceTooLow()        
+        await this.checkBalanceTooLow()
         this.changeStateLoading()
       })
 
@@ -128,7 +128,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     )
       .pipe(switchMap((value) => this.rxGetBorrowEstimate(value)))
       .subscribe(async (next) => {
-        this.setBorrowEstimate(next.borrowAmount)        
+        this.setBorrowEstimate(next.borrowAmount)
         await this.setEstimatedFee()
         await this.checkBalanceTooLow()
         this.changeStateLoading()
@@ -176,7 +176,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         ethBalance,
         liquidationPrice,
         minValue: minInitialMargin.plus(0.3019),
-        collaterizationPercents: this.formatPrecision(initialMargin)
+        collaterizationPercents: initialMargin.toFixed(0)
       },
       () => {
         this.setState({ sliderValue: this.inverseCurve(initialMargin) })
@@ -251,6 +251,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       return null
     }
 
+    const loanStatus = this.state.borrowAmount.eq(0)?'':this.state.minValue.plus(10).gt(this.state.collaterizationPercents)?"risky":"safe"
+     
     const minSliderValue = -this.inverseCurve(this.state.maxValue)
     const maxSliderValue = -this.inverseCurve(this.state.minValue)
     const amountMsg =
@@ -349,8 +351,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
           <div className="borrow-form__slider">
             <div className="borrow-form__row-container">
-              <span className="borrow-form__label
-              -safe">Safer</span>
+              <span className="borrow-form__label-safe">Safer</span>
               <span className="borrow-form__label-safe">Riskier</span>
             </div>
             <Slider
@@ -368,6 +369,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             liquidationPrice={this.state.liquidationPrice}
             estimatedFee={this.state.estimatedFee}
             quoteToken={this.state.collateralAsset}
+            loanStatus={loanStatus}
           />
           <div className="dialog-actions">
             <div className="borrow-form__actions-container">
@@ -516,7 +518,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this.setState(
       {
         sliderValue: this.inverseCurve(this.state.minValue),
-        collaterizationPercents: this.formatPrecision(this.state.minValue),
+        collaterizationPercents: this.state.minValue.toFixed(0),
         borrowAmount: this.state.maxBorrow,
         borrowAmountValue
       },
@@ -553,7 +555,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private setBorrowEstimate = (borrowAmount: BigNumber) => {
     const borrowAmountValue = borrowAmount.dp(5, BigNumber.ROUND_CEIL).toString()
 
-    const collaterizationPercents = this.formatPrecision(this.sliderCurve(this.state.sliderValue))
+    const collaterizationPercents = this.sliderCurve(this.state.sliderValue).toFixed(0)
 
     this.setState({
       borrowAmount,
@@ -571,7 +573,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this.setState(
       {
         sliderValue,
-        collaterizationPercents: this.formatPrecision(this.sliderCurve(sliderValue))
+        collaterizationPercents: this.sliderCurve(sliderValue).toFixed(0)
       },
       () => this._collateralChange.next()
     )

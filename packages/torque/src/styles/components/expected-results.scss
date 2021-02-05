@@ -34,12 +34,14 @@
   .value {
     color: #283049;
     font-weight: 400;
-  }
-  &__fee {
-    .value {
-      color: #283049;
+    // &.safe {
+    //   color: #1cd8c4;
+    // }
+    &.risky {
+      color: #fe7272;
     }
   }
+  
   &__column-title {
     margin-bottom: 2px;
     font-weight: 600;
@@ -137,7 +139,7 @@
     margin-bottom: 0;
     &__column {
       padding: 0px 15px;
-      & + .expected-result__column{
+      & + .expected-result__column {
         width: calc(50% + 4px);
       }
     }

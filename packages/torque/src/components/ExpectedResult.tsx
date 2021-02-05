@@ -10,6 +10,7 @@ export interface IExpectedResultProps {
   liquidationPrice: BigNumber
   estimatedFee: BigNumber
   quoteToken: Asset
+  loanStatus: string
 }
 
 function ExpectedResult(props: IExpectedResultProps) {
@@ -30,11 +31,14 @@ function ExpectedResult(props: IExpectedResultProps) {
     <div className="expected-result">
       <div className="expected-result__column">
         <div className="expected-result__column-row">
-          <div className="expected-result__column-title">Collateralised</div>
+          <div className="expected-result__column-title">Collateralized</div>
 
           <div className="expected-result__column-value">
             <div>
-              <span className="value">{props.collaterizationPercents}</span>%
+              <span className={`value ${props.loanStatus}`}>
+                {props.collaterizationPercents}
+              </span>
+              %
             </div>
           </div>
         </div>
@@ -44,7 +48,9 @@ function ExpectedResult(props: IExpectedResultProps) {
             title={`${props.liquidationPrice.toFixed(18)}`}
             className="expected-result__column-value">
             <div>
-              <span className="value">{props.liquidationPrice.toFixed(precisionDigits)}</span>
+              <span className={`value ${props.loanStatus}`}>
+                {props.liquidationPrice.toFixed(precisionDigits)}
+              </span>
               &nbsp;{props.quoteToken}
             </div>
           </div>
@@ -54,7 +60,7 @@ function ExpectedResult(props: IExpectedResultProps) {
       <div className="expected-result__column">
         <div className="expected-result__column-row">
           <div className="expected-result__column-title">
-            Fees (Overestimated)
+            Gas Fees
             <IconInfo
               className="tooltip__icon"
               data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
@@ -69,7 +75,7 @@ function ExpectedResult(props: IExpectedResultProps) {
               <span className="expected-result__fee">-</span>
             ) : (
               <span className="expected-result__fee" title={props.estimatedFee.toFixed()}>
-                ~$<span className="value">{props.estimatedFee.toFixed(2)}</span>
+                ~$<span className="value">{formatPrecision(props.estimatedFee)}</span>
               </span>
             )}
           </div>
@@ -87,8 +93,8 @@ function ExpectedResult(props: IExpectedResultProps) {
               data-html={true}
               data-tip="<p>Use CHI token to save on gas fees. 
             CHI will be burned from your wallet, saving you up to 50% on all transaction fees.</p>
-            <a href='https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c' class='tooltip__button'>Buy CHI</a>
-            <a href='https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3' class='tooltip__button'>Learn More</a>"
+            <a href='https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c' class='tooltip__button' target='blank'>Buy CHI</a>
+            <a href='https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3' class='tooltip__button' target='blank'>Learn More</a>"
               data-for="chi-estimated"
             />
             <ReactTooltip
