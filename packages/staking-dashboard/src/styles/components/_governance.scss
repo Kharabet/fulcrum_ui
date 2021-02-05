@@ -143,7 +143,7 @@
     background-color: #276bfb;
   }
 }
-.proposal__proposer-address{
+.proposal__proposer-address {
   min-width: 130px;
 }
 
@@ -162,5 +162,53 @@
       height: 25px;
       margin-right: 10px;
     }
+  }
+}
+
+@media screen and(max-width: $width-max-sm) {
+  .governance__proposals-table {
+    thead {
+      display: none;
+    }
+    tr {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      border-top: 1px solid #ededed;
+      padding: 12px 6px;
+      &:first-child{
+        border-top: none 
+      }
+      td:first-child {
+        margin-bottom: 20px;
+        border-top: none;
+        width: 100%;
+      }
+      td:nth-child(2),
+      td:nth-child(3) {
+        display: flex;
+        align-items: center;
+        border-top: none;
+        position: relative;
+        padding-left: 0;
+        padding-right: 0;
+        &:before {
+          content: '';
+          position: absolute;
+          top: -12px;
+          font-size: 14px;
+        }
+      }
+
+      td:nth-child(2):before {
+        content: 'author:';
+      }
+      td:nth-child(3):before {
+        content: 'status:';
+      }
+    }
+  }
+  .proposals .proposals-body .proposals-history{
+    width: auto;
   }
 }

@@ -27,7 +27,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
 
   return (
     <div className="panel--white padded-2 margin-bottom-2">
-      <table className="table">
+      <table className="governance__proposals-table table">
         <thead>
           <tr>
             <td className="table__head">Description</td>
