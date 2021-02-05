@@ -182,7 +182,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.getTokenRowsData()
     await this.getInnerOwnRowsData()
     await this.setRecentLiquidationsNumber()
-    await this.fetchPositionsRecursive(10)
+    await this.fetchPositionsRecursive(3)
     setTimeout(() => {
       this.forceUpdate() // solves bug with positions not appearing on the first render.
     }, 5000)
