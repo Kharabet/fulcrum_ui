@@ -26,7 +26,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
   }
 
   return (
-    <div className="panel--white padded-2 margin-bottom-2">
+    <div className="panel--white r-padded-1 margin-bottom-2">
       <table className="governance__proposals-table table">
         <thead>
           <tr>
@@ -37,7 +37,7 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
         </thead>
         <tbody>
           {proposalsList.map((proposal) => (
-            <GovernanceItem key={proposal.id} proposal={proposal} openProposals={vm.showProposal} />
+            <GovernanceItem key={proposal.id} proposal={proposal} vm={vm} openProposals={vm.showProposal} />
           ))}
         </tbody>
       </table>
