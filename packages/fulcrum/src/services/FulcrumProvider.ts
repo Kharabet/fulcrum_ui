@@ -355,6 +355,9 @@ export class FulcrumProvider {
 
   public getLendTokenInterestRate = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.contractsSource) {
       const assetContract = this.contractsSource.getITokenContract(asset)
       if (assetContract) {
@@ -592,8 +595,10 @@ export class FulcrumProvider {
   }
 
   public getReserveDetails = async (assets: Asset[]): Promise<ReserveDetails[]> => {
-    let result: ReserveDetails[] = []
-
+    const result: ReserveDetails[] = []
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.contractsSource) {
       const addressLookup = await this.contractsSource.getITokenAddressesAndReduce(assets)
       assets = addressLookup[0]
@@ -721,6 +726,9 @@ export class FulcrumProvider {
 
   public getBorrowInterestRate = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.contractsSource) {
       const assetContract = this.contractsSource.getITokenContract(asset)
       if (assetContract) {
@@ -799,7 +807,9 @@ export class FulcrumProvider {
   public getLendProfit = async (asset: Asset): Promise<[BigNumber, BigNumber]> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
     let result: [BigNumber, BigNumber] = [new BigNumber(0), new BigNumber(0)]
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     const account = this.getCurrentAccount()
 
     if (account && this.web3Wrapper && this.contractsSource) {
@@ -879,7 +889,9 @@ export class FulcrumProvider {
     loan?: IBorrowedFundsState
   ): Promise<BigNumber> => {
     let result = new BigNumber(0)
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
         const loanToken = positionType === PositionType.LONG ? quoteToken : baseToken
@@ -1069,7 +1081,9 @@ export class FulcrumProvider {
 
   public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0)
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.contractsSource) {
       const assetContract = this.contractsSource.getITokenContract(request.asset)
       if (assetContract) {
@@ -1142,7 +1156,9 @@ export class FulcrumProvider {
     borrowedFundsState: IBorrowedFundsState
   ): Promise<BigNumber> => {
     let result = new BigNumber(0)
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const account = this.getCurrentAccount()
       const bZxContract = await this.contractsSource.getiBZxContract()
@@ -1261,7 +1277,7 @@ export class FulcrumProvider {
     destToken: Asset,
     tradedAmountEstimate: BigNumber
   ): Promise<BigNumber> => {
-    if (tradedAmountEstimate.eq(0) || srcToken === destToken) {
+    if (tradedAmountEstimate.eq(0) || srcToken === destToken || this.unsupportedNetwork) {
       return new BigNumber(0)
     }
 
@@ -1472,6 +1488,9 @@ export class FulcrumProvider {
       exposureValue: new BigNumber(0),
       interestRate: new BigNumber(0),
     }
+    if (this.unsupportedNetwork){
+      return result
+    }
 
     const isLong = request.positionType === PositionType.LONG
 
@@ -1641,7 +1660,9 @@ export class FulcrumProvider {
 
   public async getGasTokenAllowance(): Promise<BigNumber> {
     let result = new BigNumber(0)
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const account = this.getCurrentAccount()
 
@@ -1664,7 +1685,9 @@ export class FulcrumProvider {
 
   public async getITokenAssetBalanceOfUser(asset: Asset): Promise<BigNumber> {
     let result = new BigNumber(0)
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const account = this.getCurrentAccount()
 
@@ -1685,7 +1708,9 @@ export class FulcrumProvider {
 
   public async getLoanCloseAmount(request: TradeRequest): Promise<[BigNumber, BigNumber, string]> {
     let result: [BigNumber, BigNumber, string] = [new BigNumber(0), new BigNumber(0), '']
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const account = this.getCurrentAccount()
       const iBZxContract = await this.contractsSource.getiBZxContract()
@@ -1790,7 +1815,7 @@ export class FulcrumProvider {
     asset: Asset,
     collateralAsset: Asset
   ): Promise<ILoanParams | null> => {
-    if (!this.contractsSource) {
+    if (!this.contractsSource || this.unsupportedNetwork) {
       return null
     }
     const iToken = this.contractsSource.getITokenContract(asset)
@@ -1820,7 +1845,9 @@ export class FulcrumProvider {
 
   public async getUserMarginTradeLoans(): Promise<IBorrowedFundsState[]> {
     let result: IBorrowedFundsState[] = []
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (!this.contractsSource) return result
 
     const iBZxContract = await this.contractsSource.getiBZxContract()
@@ -1885,7 +1912,9 @@ export class FulcrumProvider {
       loans: [],
       allUsersLoansCount: 0,
     }
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (!this.contractsSource) return result
 
     const iBZxContract = await this.contractsSource.getiBZxContract()
@@ -2007,7 +2036,9 @@ export class FulcrumProvider {
 
   private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
     let result = new BigNumber(0)
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.web3Wrapper && this.contractsSource) {
       if (!account && this.contractsSource.canWrite) {
         account = this.getCurrentAccount()
@@ -2059,7 +2090,9 @@ export class FulcrumProvider {
     usdToken: Asset
   ): Promise<[BigNumber[], BigNumber[], BigNumber[]]> {
     let result: [BigNumber[], BigNumber[], BigNumber[]] = [[], [], []]
-
+    if (this.unsupportedNetwork){
+      return result
+    }
     if (this.contractsSource) {
       const oracleAddress = this.contractsSource.getOracleAddress()
       const usdTokenAddress = this.getErc20AddressOfAsset(usdToken)!
@@ -2117,6 +2150,9 @@ export class FulcrumProvider {
       return new BigNumber(1)
     }
     let result: BigNumber = new BigNumber(0)
+    if (this.unsupportedNetwork){
+      return result
+    }
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
 
@@ -2157,6 +2193,9 @@ export class FulcrumProvider {
       return this.getSwapRate(srcAsset, destAsset)
     }
     let result: BigNumber = new BigNumber(0)
+    if (this.unsupportedNetwork){
+      return result
+    }
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
 

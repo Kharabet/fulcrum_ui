@@ -9,6 +9,9 @@ import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc2
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
+    if (FulcrumProvider.Instance.unsupportedNetwork) {
+      throw new Error('You are connected to the wrong network!')
+    }
     if (
       !(
         FulcrumProvider.Instance.contractsSource &&

@@ -12,6 +12,9 @@ import { TradeType } from '../../domain/TradeType'
 
 export class TradeSellProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
+    if (FulcrumProvider.Instance.unsupportedNetwork) {
+      throw new Error('You are connected to the wrong network!')
+    }
     if (
       !(
         FulcrumProvider.Instance.contractsSource &&
