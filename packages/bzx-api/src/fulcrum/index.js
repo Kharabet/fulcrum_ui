@@ -1,5 +1,6 @@
 import { iTokens } from '../config/iTokens'
 import { pTokens } from '../config/pTokens'
+import erc20Tokens from '../config/erc20Tokens'
 
 import BigNumber from 'bignumber.js'
 import {
@@ -12,6 +13,11 @@ import { erc20Json } from '../contracts/erc20Contract'
 import { iTokenJson } from '../contracts/iTokenContract'
 import { pTokenJson } from '../contracts/pTokenContract'
 import { mainnetAddress as iBZxAddress, iBZxJson } from '../contracts/iBZxContract'
+import {
+  mainnetAddress as bzrxVestingTokenAddress,
+  bzrxVestingJson
+} from '../contracts/BZRXVestingTokenContract'
+import { mainnetAddress as stakingV1Address, stakingV1Json } from '../contracts/StakingV1Contract'
 import config from '../config.json'
 import { pTokenPricesModel, pTokenPriceModel } from '../models/pTokenPrices'
 import { iTokenPricesModel, iTokenPriceModel } from '../models/iTokenPrices'
@@ -327,19 +333,18 @@ export default class Fulcrum {
       this.logger.info('No loan-params in db!')
       await this.updateLoanParams()
     }
-    return (
-      lastLoanParams.loanParams.map((params) => {
-        console.log(params)
-        return {
-          loanId: params.loanId,
-          principal: params.principal,
-          collateral: params.collateral,
-          platform: params.platform,
-          initialMargin: params.initialMargin,
-          maintenanceMargin: params.maintenanceMargin,
-          liquidationPenalty: params.liquidationPenalty
-        }
-      }))
+    return lastLoanParams.loanParams.map((params) => {
+      console.log(params)
+      return {
+        loanId: params.loanId,
+        principal: params.principal,
+        collateral: params.collateral,
+        platform: params.platform,
+        initialMargin: params.initialMargin,
+        maintenanceMargin: params.maintenanceMargin,
+        liquidationPenalty: params.liquidationPenalty
+      }
+    })
   }
 
   async updateLoanParams() {
@@ -679,6 +684,9 @@ export default class Fulcrum {
     const bzrxUsdPrice = new BigNumber(
       swapRates[iTokens.map((x) => x.name).indexOf('bzrx')]
     ).dividedBy(10 ** 18)
+    const ethUsdPrice = new BigNumber(
+      swapRates[iTokens.map((x) => x.name).indexOf('eth')]
+    ).dividedBy(10 ** 18)
     const monthlyReward = new BigNumber(10300000).times(bzrxUsdPrice)
 
     if (reserveData && reserveData.totalAssetSupply.length > 0) {
@@ -710,13 +718,13 @@ export default class Fulcrum {
           marketLiquidity = marketLiquidity.times(precision)
           vaultBalance = vaultBalance.times(precision)
 
-          if (token.name === 'bzrx') {
-            const vbzrxLockedAmount = await this.getErc20BalanceOfUser(
-              '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F',
-              '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'
-            )
-            vaultBalance = vaultBalance.plus(vbzrxLockedAmount.times(precision))
-          }
+          // if (token.name === 'bzrx') {
+          //   const vbzrxLockedAmount = await this.getErc20BalanceOfUser(
+          //     '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F',
+          //     '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'
+          //   )
+          //   vaultBalance = vaultBalance.plus(vbzrxLockedAmount.times(precision))
+          // }
 
           if (swapRates[i]) {
             usdSupply = totalAssetSupply.times(swapRates[i]).dividedBy(10 ** 18)
@@ -791,6 +799,69 @@ export default class Fulcrum {
             ? '0'
             : yieldYearlyPercents.toFixed()
       })
+
+      try {
+        const bzrxVestingTokenContract = new this.web3.eth.Contract(
+          bzrxVestingJson.abi,
+          bzrxVestingTokenAddress
+        )
+
+        const vbzrxAddress = erc20Tokens.vbzrx.erc20Address
+        const bzrxAddress = erc20Tokens.bzrx.erc20Address
+        const bptAddress = erc20Tokens.bpt.erc20Address
+        const wethAddress = erc20Tokens.weth.erc20Address
+        const crvAddress = erc20Tokens.crv.erc20Address
+
+        const bptErc20Contract = new this.web3.eth.Contract(erc20Json.abi, bzrxVestingTokenAddress)
+
+        const vbzrxTotalVested = await bzrxVestingTokenContract.methods.totalVested().call()
+        const vbzrxTotalSupply = await bzrxVestingTokenContract.methods.totalSupply().call()
+        const vbzrxWorthPart = new BigNumber(1).minus(
+          new BigNumber(vbzrxTotalVested).div(vbzrxTotalSupply)
+        )
+
+        const vbzrxProtocolLockedAmountUsd = (
+          await this.getErc20BalanceOfUser(vbzrxAddress, iBZxAddress)
+        )
+          .times(vbzrxWorthPart)
+          .times(bzrxUsdPrice)
+
+        const vbzrxStakedLockedAmountUsd = (
+          await this.getErc20BalanceOfUser(vbzrxAddress, stakingV1Address)
+        )
+          .times(vbzrxWorthPart)
+          .times(bzrxUsdPrice)
+        const bzrxStakedLockedAmountUsd = (
+          await this.getErc20BalanceOfUser(bzrxAddress, stakingV1Address)
+        ).times(bzrxUsdPrice)
+
+        const bptBalanceOfStaking = await this.getErc20BalanceOfUser(bptAddress, stakingV1Address)
+        const bptTotalSupply = await bptErc20Contract.methods.totalSupply().call()
+
+        const bzrxBalanceOfBpt = await this.getErc20BalanceOfUser(bzrxAddress, bptAddress)
+
+        const wethBalanceOfBpt = await this.getErc20BalanceOfUser(wethAddress, bptAddress)
+        // share of bpt pool liquidity that locked in staking contract
+        const bptStakedLockedAmountUsd = bzrxBalanceOfBpt
+          .times(bzrxUsdPrice)
+          .plus(wethBalanceOfBpt.times(ethUsdPrice))
+          .times(bptBalanceOfStaking)
+          .div(bptTotalSupply)
+
+        const crvStakedLockedAmountUsd = await this.getErc20BalanceOfUser(
+          crvAddress,
+          stakingV1Address
+        )
+
+        usdTotalLockedAll = usdTotalLockedAll
+          .plus(vbzrxProtocolLockedAmountUsd)
+          .plus(vbzrxStakedLockedAmountUsd)
+          .plus(bzrxStakedLockedAmountUsd)
+          .plus(bptStakedLockedAmountUsd)
+          .plus(crvStakedLockedAmountUsd)
+      } catch (e) {
+        this.logger.error(e)
+      }
 
       stats.allTokensStats = new allTokensStatsModel({
         token: 'all',
