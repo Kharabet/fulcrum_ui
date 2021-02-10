@@ -613,6 +613,8 @@ export class FulcrumProvider {
       const helperContract = await this.contractsSource.getDAppHelperContract()
       if (tokens && helperContract) {
         let swapRates
+        let bzrxPrice = new BigNumber(0)
+        let ethPrice = new BigNumber(0)
         try {
           swapRates = (await this.getSwapToUsdRateBatch(assets, Asset.DAI))[0]
         } catch (e) {
@@ -657,15 +659,13 @@ export class FulcrumProvider {
             //liquidityReserved = liquidityReserved.times(precision);
             vaultBalance = vaultBalance.times(precision)
 
-            if (asset === Asset.BZRX) {
-              const vbzrxLockedAmount = await this.getErc20BalanceOfUser(
-                '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F',
-                '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'
-              )
-              vaultBalance = vaultBalance.plus(vbzrxLockedAmount.times(precision))
-            }
-
             if (swapRates && swapRates[i]) {
+              if (asset === Asset.BZRX) {
+                bzrxPrice = swapRates[i].dividedBy(10 ** 18)
+              }
+              if (asset === Asset.ETH) {
+                ethPrice = swapRates[i].dividedBy(10 ** 18)
+              }
               usdSupply = totalAssetSupply!.times(swapRates[i]).dividedBy(10 ** 18)
               usdSupplyAll = usdSupplyAll.plus(usdSupply)
 
@@ -701,7 +701,77 @@ export class FulcrumProvider {
               )
             )
           }
+          
+          try {
+            const bzrxVestingTokenContract = await this.contractsSource.getBzrxVestingContract()
+            const vbzrxAddress = AssetsDictionary.assets
+              .get(Asset.vBZRX)!
+              .addressErc20.get(this.web3ProviderSettings.networkId)!
+            const bzrxAddress = AssetsDictionary.assets
+              .get(Asset.BZRX)!
+              .addressErc20.get(this.web3ProviderSettings.networkId)!
+            const bptAddress = AssetsDictionary.assets
+              .get(Asset.BPT)!
+              .addressErc20.get(this.web3ProviderSettings.networkId)!
+            const wethAddress = AssetsDictionary.assets
+              .get(Asset.WETH)!
+              .addressErc20.get(this.web3ProviderSettings.networkId)!
+            const crvAddress = AssetsDictionary.assets
+              .get(Asset.CRV)!
+              .addressErc20.get(this.web3ProviderSettings.networkId)!
+            const ibzxAddress = this.contractsSource.getiBZxAddress()
+            const stakingV1Address = this.contractsSource.getStakingV1Address()
+            const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
 
+            const vbzrxTotalVested = await bzrxVestingTokenContract.totalVested.callAsync()
+            const vbzrxTotalSupply = await bzrxVestingTokenContract.totalSupply.callAsync()
+            const vbzrxWorthPart = new BigNumber(1).minus(vbzrxTotalVested.div(vbzrxTotalSupply))
+
+            const vbzrxProtocolLockedAmountUsd = (
+              await this.getErc20BalanceOfUser(vbzrxAddress, ibzxAddress)
+            )
+              .times(vbzrxWorthPart)
+              .times(bzrxPrice)
+
+            const vbzrxStakedLockedAmountUsd = (
+              await this.getErc20BalanceOfUser(vbzrxAddress, stakingV1Address)
+            )
+              .times(vbzrxWorthPart)
+              .times(bzrxPrice)
+            const bzrxStakedLockedAmountUsd = (
+              await this.getErc20BalanceOfUser(bzrxAddress, stakingV1Address)
+            ).times(bzrxPrice)
+
+            const bptBalanceOfStaking = await this.getErc20BalanceOfUser(
+              bptAddress,
+              stakingV1Address
+            )
+            const bptTotalSupply = await bptErc20Contract.totalSupply.callAsync()
+
+            const bzrxBalanceOfBpt = await this.getErc20BalanceOfUser(bzrxAddress, bptAddress)
+
+            const wethBalanceOfBpt = await this.getErc20BalanceOfUser(wethAddress, bptAddress)
+            // share of bpt pool liquidity that locked in staking contract
+            const bptStakedLockedAmountUsd = bzrxBalanceOfBpt
+              .times(bzrxPrice)
+              .plus(wethBalanceOfBpt.times(ethPrice))
+              .times(bptBalanceOfStaking)
+              .div(bptTotalSupply)
+
+            const crvStakedLockedAmountUsd = await this.getErc20BalanceOfUser(
+              crvAddress,
+              stakingV1Address
+            )
+
+            usdTotalLockedAll = usdTotalLockedAll
+              .plus(vbzrxProtocolLockedAmountUsd)
+              .plus(vbzrxStakedLockedAmountUsd)
+              .plus(bzrxStakedLockedAmountUsd)
+              .plus(bptStakedLockedAmountUsd)
+              .plus(crvStakedLockedAmountUsd)
+          } catch (e) {
+            console.error(e)
+          }
           result.push(
             new ReserveDetails(
               Asset.UNKNOWN,
