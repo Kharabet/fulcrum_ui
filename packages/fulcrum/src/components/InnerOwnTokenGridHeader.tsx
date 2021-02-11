@@ -1,17 +1,26 @@
 import React from 'react'
 import ReactTooltip from 'react-tooltip'
 import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import '../styles/components/tooltip.scss'
+import { PositionType } from '../domain/PositionType'
 
 export interface IInnerOwnTokenGridHeaderProps {
   asset?: Asset
   quoteToken?: Asset
   loader: boolean
   isLoadingTransaction: boolean
+  positionType: PositionType
 }
 
 const InnerOwnTokenGridHeader = (props: IInnerOwnTokenGridHeaderProps) => {
+  const insertProfitTooltip =
+    props.positionType === PositionType.LONG
+      ? `<ul class="tooltip__info__profit__ul"><li>Left: value of traded asset</li><li>Right: value of total position profit including collateral change </li></ul><p class="ta-c">${props.asset}/${props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div class="short-label">Profit in ${props.asset}</div><div>Profit in ${props.quoteToken} + the change of your ${props.asset} collateral</div></div>`
+      : `<ul class="tooltip__info__profit__ul"><li>Left: value of total position profit including collateral change </li><li>Right: value of traded asset</li></ul><p class="ta-c">${props.asset}/${props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div>Profit in ${props.asset} + the change of your ${props.quoteToken} collateral</div><div class="short-label">Profit in ${props.quoteToken}</div></div>`
+  const profitTooltip = `<p class="tooltip__info__profit__title">Profit is displayed in two ways:</p>${insertProfitTooltip}`
+
   return (
     <div className="inner-own-token-grid-header">
       <div
@@ -19,15 +28,10 @@ const InnerOwnTokenGridHeader = (props: IInnerOwnTokenGridHeaderProps) => {
           props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`
         }`}>
         <span className="inner-own-token-grid-header__text">
-          Position <label className="text-asset">{props.asset}</label>
+         
         </span>
       </div>
-      <div
-        className={`inner-own-token-grid-header__col-asset-type ${
-          props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`
-        }`}>
-        <span className="inner-own-token-grid-header__text">Type</span>
-      </div>
+  
       <div
         className={`inner-own-token-grid-header__col-asset-price ${
           props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`
@@ -65,16 +69,20 @@ const InnerOwnTokenGridHeader = (props: IInnerOwnTokenGridHeaderProps) => {
           props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`
         }`}>
         <span className="inner-own-token-grid-header__text">
-          Profit{' '}
-          <label className="text-asset">
-            {props.asset} | {props.quoteToken}
-          </label>
+          Profit
           <IconInfo
             className="tooltip__icon"
-            data-tip="Profit is shown in two values, the left is asset amount, the right is in stablecoin value."
+            data-tip={profitTooltip}
+            data-multiline="true"
+            data-html={true}
             data-for="profit-tooltip"
           />
-          <ReactTooltip id="profit-tooltip" className="tooltip__info" place="top" effect="solid" />
+          <ReactTooltip
+            id="profit-tooltip"
+            className="tooltip__info tooltip__info__profit"
+            place="top"
+            effect="solid"
+          />
         </span>
       </div>
     </div>

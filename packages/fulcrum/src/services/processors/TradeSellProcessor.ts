@@ -4,8 +4,10 @@ import { TradeRequest } from '../../domain/TradeRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
 
 import { PositionType } from '../../domain/PositionType'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
-import { Asset } from '../../domain/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { TradeType } from '../../domain/TradeType'
 
 export class TradeSellProcessor {
@@ -61,7 +63,6 @@ export class TradeSellProcessor {
         .div(maxAmountInBaseUnits)
         .lte(0.05)
     ) {
-      console.log('close full amount')
       amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1))
     }
 
@@ -120,13 +121,11 @@ export class TradeSellProcessor {
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeffForTrade)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
         // throw e;
       }
     }
 
     try {
-      console.log('amountInBaseUnits ' + amountInBaseUnits)
       // Closing trade
       const txHash =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
@@ -158,8 +157,7 @@ export class TradeSellProcessor {
 
       task.setTxHash(txHash)
     } catch (e) {
-      console.log(e)
-      // throw e;
+      throw e;
     }
 
     task.processingStepNext()

@@ -1,6 +1,7 @@
 import { BigNumber } from '@0x/utils'
-import { iTokenContract } from '../../contracts/iTokenContract'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTokenContract'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { LendRequest } from '../../domain/LendRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { FulcrumProviderEvents } from '../events/FulcrumProviderEvents'
@@ -39,10 +40,10 @@ export class LendEthProcessor {
 
     let gasAmountBN
 
-    console.log(
-      tokenContract.address,
-      await tokenContract.mintWithEther.getABIEncodedTransactionData(account)
-    )
+    // console.log(
+    //   tokenContract.address,
+    //   await tokenContract.mintWithEther.getABIEncodedTransactionData(account)
+    // )
 
     // Waiting for token allowance
     if (skipGas) {

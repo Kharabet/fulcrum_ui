@@ -4,15 +4,17 @@ import { StatsChart } from '../components/StatsChart'
 import { TxGrid } from '../components/TxGrid'
 import { Header } from '../layout/Header'
 import { RouteComponentProps } from 'react-router'
-import { Asset } from '../domain/Asset'
-import { LiquidationEvent } from '../domain/LiquidationEvent'
-import { BigNumber } from '@0x/utils'
-import { TradeEvent } from '../domain/TradeEvent'
-import { CloseWithSwapEvent } from '../domain/CloseWithSwapEvent'
-import { CloseWithDepositEvent } from '../domain/CloseWithDepositEvent'
-import { BurnEvent } from '../domain/BurnEvent'
-import { MintEvent } from '../domain/MintEvent'
-import { BorrowEvent } from '../domain/BorrowEvent'
+import Asset from 'bzx-common/src/assets/Asset'
+import {
+  BorrowEvent,
+  BurnEvent,
+  CloseWithDepositEvent,
+  CloseWithSwapEvent,
+  LiquidationEvent,
+  MintEvent,
+  RolloverEvent,
+  TradeEvent
+} from 'bzx-common/src/domain/events'
 import { ITxRowProps } from '../components/TxRow'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
@@ -101,6 +103,11 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
         (e: TradeEvent) => e.loanToken === this.state.asset
       )
     )
+    const rolloverEvents = ExplorerProvider.Instance.getGridItems(
+      (await ExplorerProvider.Instance.getRolloverHistory()).filter(
+        (e: RolloverEvent) => e.loanToken === this.state.asset
+      )
+    )
     const closeEvents = ExplorerProvider.Instance.getGridItems(
       (await ExplorerProvider.Instance.getCloseWithSwapHistory()).filter(
         (e: CloseWithSwapEvent) => e.loanToken === this.state.asset
@@ -125,6 +132,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     const events: ITxRowProps[] = liquidationEvents
       .concat(closeEvents)
       .concat(tradeEvents)
+      .concat(rolloverEvents)
       .concat(closeWithDepositEvents)
       .concat(borrowEvents)
       .concat(mintEvents)

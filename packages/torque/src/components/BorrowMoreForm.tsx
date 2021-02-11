@@ -3,7 +3,7 @@ import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { Subject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { TorqueProvider } from '../services/TorqueProvider'
@@ -229,7 +229,6 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             ]
           }
         }
-        // console.log("tagManagerArgs = ", tagManagerArgs)
         TagManager.dataLayer(tagManagerArgs)
       }
 

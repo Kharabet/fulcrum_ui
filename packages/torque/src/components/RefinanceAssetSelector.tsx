@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { IRefinanceLoan, RefinanceData } from '../domain/RefinanceData'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
@@ -102,14 +102,9 @@ export class RefinanceAssetSelector extends Component<
     // const refinanceCompoundData = await TorqueProvider.Instance.checkSoloMargin();
     const loans = await TorqueProvider.Instance.getCompoundLoans() // TODO
 
-    if (loans.length) {
-      console.log('compound', loans[0].balance.toString(10))
-    }
     ;(await this._isMounted) && this.setState({ ...this.state, refinanceCompoundData: loans })
 
     const sololoans = await TorqueProvider.Instance.getSoloLoans() // TODO
-
-    console.log('sololoans = ', sololoans)
 
     const refinanceData = loans.concat(sololoans)
     return refinanceData

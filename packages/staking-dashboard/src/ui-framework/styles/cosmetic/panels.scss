@@ -1,0 +1,7 @@
+
+.panel--white {
+  @include border-rounded-1;
+  @include shadow-1;
+  background-color: #fff;
+  position: relative;
+}

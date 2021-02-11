@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from './Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export interface IActiveLoanData {
   loanId: string
@@ -7,6 +7,7 @@ export interface IActiveLoanData {
   collateralAsset: Asset
   amountOwedUsd: BigNumber
   maxLiquidatable: BigNumber
+  maxLiquidatableUsd: BigNumber
   maxSeizable: BigNumber
   loanData: {
     loanId: string

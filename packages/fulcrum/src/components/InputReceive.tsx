@@ -1,6 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { AssetDropdown } from './AssetDropdown'
 
 interface IInputReceiveProps {
@@ -20,7 +21,7 @@ export default class InputReceive extends Component<IInputReceiveProps, IInputRe
   public render() {
     return (
       <React.Fragment>
-        <div className="input-receive__title">You will receive</div>
+        <div className="input-receive__title">You will Receive</div>
         <div className="input-receive__container">
           <div title={this.props.receiveAmout.toFixed(18)} className="input-receive__input">
             {Number(this.props.receiveAmout.toFixed(5))}

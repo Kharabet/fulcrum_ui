@@ -1,0 +1,50 @@
+// TEXT
+.txt-center {
+  text-align: center;
+}
+
+.txt-right {
+  text-align: right;
+}
+
+.txt-left {
+  text-align: left;
+}
+
+// FLEX
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-row-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-col-end {
+  margin-top: auto;
+}
+
+// GRID
+.ui-grid {
+  display: grid;
+  grid-gap: $spacing-base;
+}
+
+.ui-grid-wmin-260px {
+  @extend .ui-grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}

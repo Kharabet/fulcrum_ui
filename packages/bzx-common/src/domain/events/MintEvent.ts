@@ -1,0 +1,32 @@
+import { BigNumber } from '@0x/utils'
+import Asset from 'bzx-common/src/assets/Asset'
+
+export default class MintEvent {
+  public static topic0: string =
+    '0xb4c03061fb5b7fed76389d5af8f2e0ddb09f8c70d1333abbb62582835e10accb'
+  public readonly minter: string //indexed
+  public readonly tokenAmount: BigNumber
+  public readonly assetAmount: BigNumber
+  public readonly price: BigNumber
+  public readonly blockNumber: BigNumber
+  public readonly txHash: string
+  public readonly asset: Asset
+
+  constructor(
+    minter: string,
+    tokenAmount: BigNumber,
+    assetAmount: BigNumber,
+    price: BigNumber,
+    blockNumber: BigNumber,
+    txHash: string,
+    asset: Asset
+  ) {
+    this.minter = minter
+    this.tokenAmount = tokenAmount
+    this.assetAmount = assetAmount
+    this.price = price
+    this.blockNumber = blockNumber
+    this.txHash = txHash
+    this.asset = asset
+  }
+}

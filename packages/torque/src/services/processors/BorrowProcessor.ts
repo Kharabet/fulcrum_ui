@@ -1,11 +1,11 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from '../../domain/Asset'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { BorrowRequest } from '../../domain/BorrowRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { TorqueProvider } from '../TorqueProvider'
 import { BorrowRequestAwaiting } from '../../domain/BorrowRequestAwaiting'
-import { erc20Contract } from '../../contracts/erc20'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 
 export class BorrowProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -38,7 +38,7 @@ export class BorrowProcessor {
       ])
     }
     // Initializing loan
-    const iTokenContract = await TorqueProvider.Instance.contractsSource.getiTokenContract(
+    const iTokenContract = await TorqueProvider.Instance.contractsSource.getITokenContract(
       taskRequest.borrowAsset
     )
     const collateralAssetErc20Address =
@@ -109,7 +109,6 @@ export class BorrowProcessor {
     const ChiTokenBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
 
     try {
-      console.log(TorqueProvider.Instance.gasLimit)
       const gasAmount =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
           ? await iTokenContract.borrowWithGasToken.estimateGasAsync(
@@ -146,38 +145,36 @@ export class BorrowProcessor {
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
-      console.log(gasAmountBN)
     } catch (e) {
-      console.log(e)
       // throw e;
     }
 
-    console.log(
-      iTokenContract.address,
-      isGasTokenEnabled && ChiTokenBalance.gt(0)
-        ? iTokenContract.borrowWithGasToken.getABIEncodedTransactionData(
-            taskRequest.loanId,
-            borrowAmountInBaseUnits, // borrowAmount
-            new BigNumber(7884000), // initialLoanDuration (approximately 3 months)
-            depositAmountInBaseUnits, // collateralTokenSent
-            isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address, // collateralToken
+    // console.log(
+    //   iTokenContract.address,
+    //   isGasTokenEnabled && ChiTokenBalance.gt(0)
+    //     ? iTokenContract.borrowWithGasToken.getABIEncodedTransactionData(
+    //         taskRequest.loanId,
+    //         borrowAmountInBaseUnits, // borrowAmount
+    //         new BigNumber(7884000), // initialLoanDuration (approximately 3 months)
+    //         depositAmountInBaseUnits, // collateralTokenSent
+    //         isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address, // collateralToken
 
-            account, // borrower
-            account, // borrower
-            account, // gasTokenUser
-            '0x'
-          )
-        : iTokenContract.borrow.getABIEncodedTransactionData(
-            taskRequest.loanId,
-            borrowAmountInBaseUnits, // borrowAmount
-            new BigNumber(7884000), // initialLoanDuration (approximately 3 months)
-            depositAmountInBaseUnits, // collateralTokenSent
-            isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address, // collateralToken
-            account, // borrower
-            account, // receiver
-            '0x'
-          )
-    )
+    //         account, // borrower
+    //         account, // borrower
+    //         account, // gasTokenUser
+    //         '0x'
+    //       )
+    //     : iTokenContract.borrow.getABIEncodedTransactionData(
+    //         taskRequest.loanId,
+    //         borrowAmountInBaseUnits, // borrowAmount
+    //         new BigNumber(7884000), // initialLoanDuration (approximately 3 months)
+    //         depositAmountInBaseUnits, // collateralTokenSent
+    //         isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address, // collateralToken
+    //         account, // borrower
+    //         account, // receiver
+    //         '0x'
+    //       )
+    // )
 
     try {
       txHash =
@@ -218,7 +215,6 @@ export class BorrowProcessor {
             )
       task.setTxHash(txHash)
     } catch (e) {
-      console.log(e)
       throw e
     }
 

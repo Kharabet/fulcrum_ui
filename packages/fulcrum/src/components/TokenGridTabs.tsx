@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { TokenGridTab } from '../domain/TokenGridTab'
 import { IMarketPair } from '../pages/TradePage'
 import '../styles/components/token-grid-tabs.scss'
@@ -131,12 +132,18 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     this.props.baseTokens.forEach((baseToken) => {
       this.props.quoteTokens.forEach(
         (stablecoin) =>
-          baseToken !== stablecoin &&
+          baseToken !== stablecoin && stablecoin !== Asset.WBTC &&
           dropDownSelectOptions.push({
             baseToken: baseToken,
             quoteToken: stablecoin
           })
       )
+      if (baseToken === Asset.ETH){
+        dropDownSelectOptions.push({
+          baseToken: baseToken,
+          quoteToken: Asset.WBTC
+        })
+      }
     })
 
     const activeDropDownOption = dropDownSelectOptions.find(

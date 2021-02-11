@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
-import { erc20Contract } from '../../contracts/erc20'
-import { Asset } from '../../domain/Asset'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
+import Asset from 'bzx-common/src/assets/Asset'
 import { LiquidationRequest } from '../../domain/LiquidationRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { ExplorerProvider } from '../ExplorerProvider'
@@ -120,8 +120,7 @@ export class LiquidationProcessor {
         .multipliedBy(ExplorerProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
     } catch (e) {
-      console.log(e)
-      throw e
+      // throw e
     }
 
     try {
@@ -153,7 +152,6 @@ export class LiquidationProcessor {
 
       task.setTxHash(txHash)
     } catch (e) {
-      console.log(e)
       throw e
     }
 

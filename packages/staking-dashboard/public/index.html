@@ -7,25 +7,31 @@
     <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon_32x32.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#ffffff" />
-
-    <title>bZx Stakers Dashboard - Stake, Unstake and Claim Rewards</title>
-    <meta name="description" content="Stakers Dashboard is the dApp for BZRX holders where they can stake, unstake and claim rewards.">
-
-    <meta property="og:title" content="BZRX Stakers Dashboard - Stake, Unstake and Claim Rewards" />
+    <title>bZx Staking Dashboard - Stake, Unstake and Claim Rewards</title>
+    <meta
+      name="description"
+      content="Staking Dashboard is the dApp for BZRX holders where they can stake, unstake and claim rewards."
+    />
+    <meta property="og:title" content="bZx Staking Dashboard - Stake, Unstake and Claim Rewards" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://staking.bzx.network" />
-    <meta property="og:description" content="Stakers Dashboard is the dApp for BZRX holders where they can stake, unstake and claim rewards." />
+    <meta
+      property="og:description"
+      content="Staking Dashboard is the dApp for BZRX holders where they can stake, unstake and claim rewards."
+    />
     <meta property="og:image" content="https://staking.bzx.network/stake_og_image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@bzxHQ">
-    <meta name="twitter:creator" content="@bzxHQ">
-    <meta name="twitter:title" content="BZRX Stakers Dashboard - Stake, Unstake and Claim Rewar">
-    <meta name="twitter:description" content="Stakers Dashboard is the dApp for BZRX holders where they can stake, unstake and claim rewards.">
-    <meta name="twitter:image" content="https://staking.bzx.network/stake_og_image.png">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@bzxHQ" />
+    <meta name="twitter:creator" content="@bzxHQ" />
+    <meta name="twitter:title" content="bZx Staking Dashboard - Stake, Unstake and Claim Rewards" />
+    <meta
+      name="twitter:description"
+      content="Staking Dashboard is the dApp for BZRX holders where they can stake, unstake and claim rewards."
+    />
+    <meta name="twitter:image" content="https://staking.bzx.network/stake_og_image.png" />
     <meta name="google-site-verification" content="AXyxl_bCEO1Mppcqir3ieuZZdbevGXwlpqPFm7jiclw" />
-
 
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -47,18 +53,39 @@
         display: none !important;
       }
     </style>
+    <style>
+      body {
+        background-color: #e9f4ff;
+        background-image: url(/bg-before.svg), url(/bg-after.svg);
+        background-position: 0 0, 100% 0;
+        background-repeat: no-repeat;
+      }
+      .initial-loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+    </style>
     <script type="text/javascript">
       if (self === top) {
-        var acj = document.getElementById("acj");
-        acj.parentNode.removeChild(acj);
+        var acj = document.getElementById('acj')
+        acj.parentNode.removeChild(acj)
       } else {
-        top.location = self.location;
+        top.location = self.location
       }
     </script>
-
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="root">
+      <div class="initial-loader">
+        <img src="%PUBLIC_URL%/logo-staking.svg" alt="BZX Staking Dashboard" />
+        <p><i>Loading...</i></p>
+      </div>
+    </div>
   </body>
 </html>

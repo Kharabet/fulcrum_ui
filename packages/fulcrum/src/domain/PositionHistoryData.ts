@@ -1,8 +1,12 @@
 import { BigNumber } from '@0x/utils'
-import { PayTradingFeeEvent } from './events/PayTradingFeeEvent'
-import { EarnRewardEvent } from './events/EarnRewardEvent'
-import { Asset } from '../domain/Asset'
-import { EarnRewardEventNew } from './events/EarnRewardEventNew'
+
+import {
+  EarnRewardEvent,
+  EarnRewardEventNew,
+  PayTradingFeeEvent,
+} from 'bzx-common/src/domain/events'
+import Asset from 'bzx-common/src/assets/Asset'
+
 
 export class PositionHistoryData {
   public readonly loanId: string

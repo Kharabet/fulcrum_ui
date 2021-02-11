@@ -2,9 +2,9 @@ import { BigNumber } from '@0x/utils'
 import { RequestTask } from '../../domain/RequestTask'
 import { TorqueProvider } from '../TorqueProvider'
 import { RefinanceMakerRequest } from '../../domain/RefinanceMakerRequest'
-import { cdpManagerContract } from '../../contracts/cdpManager'
-import { dsProxyJsonContract } from '../../contracts/dsProxyJson'
-import { makerBridgeContract } from '../../contracts/makerBridge'
+import { cdpManagerContract } from 'bzx-common/src/contracts/typescript-wrappers/cdpManager'
+import { dsProxyJsonContract } from 'bzx-common/src/contracts/typescript-wrappers/dsProxyJson'
+import { makerBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/makerBridge'
 import Web3 from 'web3'
 
 // export class RefinanceMakerProcessor {

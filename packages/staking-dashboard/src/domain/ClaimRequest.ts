@@ -1,4 +1,4 @@
-export class ClaimRequest {
+export default class ClaimRequest {
   public id: number
   public name: string
   constructor() {

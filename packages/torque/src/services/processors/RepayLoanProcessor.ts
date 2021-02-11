@@ -1,10 +1,10 @@
 import { BigNumber } from '@0x/utils'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { RepayLoanRequest } from '../../domain/RepayLoanRequest'
 import { RequestTask } from '../../domain/RequestTask'
 import { TorqueProvider } from '../TorqueProvider'
-import { erc20Contract } from '../../contracts/erc20'
-import { Asset } from '../../domain/Asset'
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export class RepayLoanProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -70,7 +70,7 @@ export class RepayLoanProcessor {
         task.processingStepNext()
         erc20allowance = await tokenErc20Contract.allowance.callAsync(
           account,
-          TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase()
+          TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
         )
 
         // Prompting token allowance
@@ -79,7 +79,7 @@ export class RepayLoanProcessor {
         // Waiting for token allowance
         task.processingStepNext()
         if (closeAmountInBaseUnits.gt(erc20allowance)) {
-          const spender = TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase()
+          const spender = TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
           const approveHash = await TorqueProvider.Instance.setApproval(
             spender,
             taskRequest.borrowAsset,
@@ -103,7 +103,6 @@ export class RepayLoanProcessor {
 
       let gasAmountBN = new BigNumber(0)
       try {
-        // console.log(bZxContract.address);
         const gasAmount =
           isGasTokenEnabled && ChiTokenBalance.gt(0)
             ? await bZxContract.closeWithDepositWithGasToken.estimateGasAsync(
@@ -131,8 +130,7 @@ export class RepayLoanProcessor {
           .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
       } catch (e) {
-        console.log(e)
-        throw e
+        // throw e
       }
 
       //Submitting loan
@@ -167,7 +165,6 @@ export class RepayLoanProcessor {
               )
         task.setTxHash(txHash)
       } catch (e) {
-        console.log(e)
         throw e
       }
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import SimpleBar from 'simplebar-react'
 import 'simplebar/dist/simplebar.min.css'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { CollateralTokenSelectorItem } from './CollateralTokenSelectorItem'
 
 interface ICollateralTokenSelectorProps {
@@ -41,7 +41,6 @@ export class CollateralTokenSelector extends Component<
         Asset.YFI,
         Asset.BZRX,
         Asset.MKR,
-        // Asset.LEND,
         Asset.KNC,
         Asset.UNI,
         Asset.AAVE,

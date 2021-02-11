@@ -3,9 +3,11 @@ import { RequestTask } from '../../domain/RequestTask'
 import { TradeRequest } from '../../domain/TradeRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
 import { PositionType } from '../../domain/PositionType'
-import { Asset } from '../../domain/Asset'
-import { AssetsDictionary } from '../../domain/AssetsDictionary'
-import { erc20Contract } from '../../contracts/erc20'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
+import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 
 export class TradeBuyProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -125,15 +127,6 @@ export class TradeBuyProcessor {
         ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
         : FulcrumProvider.ZERO_ADDRESS
     const loanData = '0x'
-
-    //console.log("depositAmount: " + amountInBaseUnits.toFixed());
-    console.log('leverageAmount: ' + leverageAmount.toFixed())
-    console.log('loanTokenSent: ' + loanTokenSent.toFixed())
-    console.log('collateralTokenSent: ' + collateralTokenSent.toFixed())
-    //console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
-    console.log('collateral token: ' + collateralToken + ' address: ' + collateralTokenAddress!)
-    console.log('trader: ' + account)
-    console.log('loan data: ' + loanData)
 
     const sendAmountForValue =
       taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH

@@ -1,0 +1,113 @@
+$table-odd-color: $color-gray-light;
+$table-even-color: #fff;
+$table-row-highlighted: $color-gray-light;
+
+.table,
+.table-fixed,
+.table-narrow {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-transform: uppercase;
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+
+  > tbody > {
+    tr > td {
+      border-top: 1px solid #ededed;
+    }
+
+    tr.table__row--highlighted {
+      color: $color-gray-light;
+      font-weight: bold;
+    }
+  }
+}
+
+.table,
+.table-fixed {
+  th {
+    padding: 8px;
+
+    &:first-child {
+      padding: 8px 8px 8px 0;
+    }
+
+    &:last-child {
+      padding: 8px 0 8px 8px;
+    }
+  }
+
+  > tbody > {
+    tr > td {
+      padding: 8px;
+    }
+
+    tr > td:first-child {
+      padding: 8px 8px 8px 0;
+    }
+
+    tr > td:last-child {
+      padding: 8px 0 8px 8px;
+    }
+  }
+}
+
+.table-fixed {
+  table-layout: fixed;
+}
+
+.tbody-space-top-1::before {
+  content: '';
+  display: table-row;
+  height: 16px;
+}
+
+.table__head {
+  background-color: $color-content-bg;
+  color: $color-gray-dark;
+  border-bottom: 2px solid #33dfcc;
+  font-size: 0.9em;
+  font-weight: bold;
+  min-height: 32px;
+  padding: 8px;
+  position: -webkit-sticky;
+  position: sticky;
+  text-transform: uppercase;
+  top: 0;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  z-index: 1; // prevent content in the table to go above it on scroll.
+
+  &:first-child {
+    padding: 8px 8px 8px 0;
+  }
+
+  &:last-child {
+    padding: 8px 0 8px 8px;
+  }
+}
+
+.table__head--narrow {
+  @extend .table__head;
+
+  padding-left: 2px;
+  padding-right: 2px;
+
+  &:first-child {
+    padding-left: 0;
+  }
+
+  &:last-child {
+    padding-right: 0;
+  }
+}
+
+.table__row--link {
+  cursor: pointer;
+  &:hover {
+    background-color: $color-gray-light;
+  }
+}

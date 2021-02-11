@@ -6,12 +6,12 @@ import { ExtendLoanDlg } from '../components/ExtendLoanDlg'
 import { Loader } from '../components/Loader'
 import { ManageCollateralDlg } from '../components/ManageCollateralDlg'
 import { RepayLoanDlg } from '../components/RepayLoanDlg'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { BorrowRequestAwaiting } from '../domain/BorrowRequestAwaiting'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ProviderType } from '../domain/ProviderType'
 import { RolloverRequest } from '../domain/RolloverRequest'
-import { Footer } from '../layout/Footer'
+import Footer from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
@@ -107,7 +107,6 @@ export class DashboardPage extends PureComponent<
     let itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting> = []
 
     items = await TorqueProvider.Instance.getLoansList()
-    console.log(items)
     itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList()
     ;(await this._isMounted) &&
       this.setState({
@@ -232,7 +231,9 @@ export class DashboardPage extends PureComponent<
       const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item)
       // await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
     } catch (error) {
-      if (error.message !== 'Form closed') console.error(error)
+      if (error.message !== 'Form closed') {
+        console.error(error)
+      }
     }
   }
 }

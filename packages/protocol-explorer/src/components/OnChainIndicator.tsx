@@ -151,11 +151,11 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
         </React.Fragment>
       )
     } else {
-      if (providerTypeDetails !== null && providerTypeDetails.reactLogoSvgShort !== null) {
+      if (providerTypeDetails !== null && providerTypeDetails.reactreactLogoSvgShort !== null) {
         return (
           <React.Fragment>
             <div className="on-chain-indicator__svg">
-              {providerTypeDetails.reactLogoSvgShort.render()}
+              {providerTypeDetails.reactreactLogoSvgShort.render()}
             </div>
             <div className="on-chain-indicator__description">
               <span>{providerTypeDetails.displayName}</span>

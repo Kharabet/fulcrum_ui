@@ -1,21 +1,16 @@
 import { EventEmitter } from 'events'
-import { RequestStatus } from './RequestStatus'
-import { StakingProviderEvents } from '../services/events/StakingProviderEvents'
-import { StakingRequest } from './StakingRequest'
-import { ConvertRequest } from './ConvertRequest'
-import { ClaimRequest } from './ClaimRequest'
-import { ClaimReabteRewardsRequest } from './ClaimReabteRewardsRequest'
-import { BecomeRepresentativeRequest } from './BecomeRepresentativeRequest'
+import ClaimRebateRewardsRequest from './ClaimRebateRewardsRequest'
+import ClaimRequest from './ClaimRequest'
+import RequestStatus from './RequestStatus'
+import StakingRequest from './StakingRequest'
 
-export class RequestTask {
+export default class RequestTask {
   private eventEmitter: EventEmitter | null = null
 
   public readonly request:
     | StakingRequest
-    | ConvertRequest
     | ClaimRequest
-    | ClaimReabteRewardsRequest
-    | BecomeRepresentativeRequest
+    | ClaimRebateRewardsRequest
   public status: RequestStatus
   public steps: string[]
   public stepCurrent: number
@@ -25,10 +20,8 @@ export class RequestTask {
   constructor(
     request:
       | StakingRequest
-      | ConvertRequest
       | ClaimRequest
-      | ClaimReabteRewardsRequest
-      | BecomeRepresentativeRequest
+      | ClaimRebateRewardsRequest
   ) {
     this.request = request
     this.status = RequestStatus.AWAITING
@@ -46,7 +39,7 @@ export class RequestTask {
     this.txHash = txHash
 
     if (this.eventEmitter) {
-      this.eventEmitter.emit(StakingProviderEvents.TaskChanged)
+      this.eventEmitter.emit('TaskChanged', this)
     }
   }
 
@@ -59,7 +52,7 @@ export class RequestTask {
     this.stepCurrent = 1
 
     if (this.eventEmitter) {
-      this.eventEmitter.emit(StakingProviderEvents.TaskChanged)
+      this.eventEmitter.emit('TaskChanged', this)
     }
   }
 
@@ -67,7 +60,7 @@ export class RequestTask {
     this.stepCurrent++
 
     if (this.eventEmitter) {
-      this.eventEmitter.emit(StakingProviderEvents.TaskChanged)
+      this.eventEmitter.emit('TaskChanged', this)
     }
   }
 
@@ -80,7 +73,7 @@ export class RequestTask {
       : RequestStatus.FAILED
 
     if (this.eventEmitter) {
-      this.eventEmitter.emit(StakingProviderEvents.TaskChanged)
+      this.eventEmitter.emit('TaskChanged', this)
     }
   }
 }

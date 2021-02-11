@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { Asset } from '../../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { RequestTask } from '../../domain/RequestTask'
 import { RolloverRequest } from '../../domain/RolloverRequest'
 
@@ -61,8 +61,7 @@ export class RolloverProcessor {
         .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
     } catch (e) {
-      console.log(e)
-      throw e
+      // throw e
     }
 
     try {
@@ -86,7 +85,6 @@ export class RolloverProcessor {
 
       task.setTxHash(txHash)
     } catch (e) {
-      console.log(e)
       throw e
     }
 

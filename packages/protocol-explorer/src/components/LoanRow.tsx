@@ -1,8 +1,8 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
@@ -58,7 +58,7 @@ export const LoanRow = (props: ILoanRowProps) => {
         ExplorerProviderEvents.AskToCloseProgressDlg,
         onAskToCloseProgressDlg
       )
-    }
+      }
   })
 
   const onLiquidateClick = async () => {
@@ -130,10 +130,10 @@ export const LoanRow = (props: ILoanRowProps) => {
             <CopyToClipboard>{props.loanId}</CopyToClipboard>
           </div>
           <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">
-            {loanToken.logoSvg.render()} {props.payOffAmount.toFixed(3)}
+            {loanToken.reactLogoSvg.render()} {props.payOffAmount.toFixed(3)}
           </div>
           <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">
-            {collateralToken.logoSvg.render()}
+            {collateralToken.reactLogoSvg.render()}
             {props.seizeAmount.toFixed(3)}
           </div>
           <div className="table-row-loan__action">

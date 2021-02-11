@@ -1,7 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
 import { Loader } from '../components/Loader'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
 import { TorqueProvider } from '../services/TorqueProvider'
 import AssetSelectorItem from './AssetSelectorItem'
 import { BorrowDlg } from './BorrowDlg'
@@ -35,7 +35,6 @@ const AssetSelector = (props: IAssetSelectorProps) => {
       Asset.YFI,
       // Asset.BZRX,
       Asset.MKR,
-      // Asset.LEND,
       Asset.KNC,
       Asset.UNI,
       Asset.AAVE,
@@ -76,11 +75,6 @@ const AssetSelector = (props: IAssetSelectorProps) => {
         ? new BigNumber(interestRates![asset.toLowerCase()]['borrowApr']).times(100)
         : new BigNumber(0)
 
-    const yieldApr =
-      interestRates && interestRates![asset.toLowerCase()]
-        ? new BigNumber(interestRates![asset.toLowerCase()]['yieldFarmingAPR']).times(100)
-        : new BigNumber(0)
-
     const liquidity =
       liquidities && liquidities![asset.toLowerCase()]
         ? new BigNumber(liquidities![asset.toLowerCase()])
@@ -90,7 +84,6 @@ const AssetSelector = (props: IAssetSelectorProps) => {
       <AssetSelectorItem
         key={asset}
         interestRate={interestRate}
-        yieldApr={yieldApr}
         liquidity={liquidity}
         asset={asset}
         {...props}

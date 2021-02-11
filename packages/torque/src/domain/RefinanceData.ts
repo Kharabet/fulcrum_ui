@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
-import { CTokenContract } from '../contracts/CToken'
-import { Asset } from './Asset'
+import { CTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/CToken'
+import Asset from 'bzx-common/src/assets/Asset'
 
 export interface RefinanceData {
   collateralType: string

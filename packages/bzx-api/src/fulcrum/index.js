@@ -1,5 +1,6 @@
 import { iTokens } from '../config/iTokens'
 import { pTokens } from '../config/pTokens'
+import erc20Tokens from '../config/erc20Tokens'
 
 import BigNumber from 'bignumber.js'
 import {
@@ -12,6 +13,12 @@ import { erc20Json } from '../contracts/erc20Contract'
 import { iTokenJson } from '../contracts/iTokenContract'
 import { pTokenJson } from '../contracts/pTokenContract'
 import { mainnetAddress as iBZxAddress, iBZxJson } from '../contracts/iBZxContract'
+import {
+  mainnetAddress as bzrxVestingTokenAddress,
+  bzrxVestingJson
+} from '../contracts/BZRXVestingTokenContract'
+import { mainnetAddress as stakingV1Address, stakingV1Json } from '../contracts/StakingV1Contract'
+import { mainnetAddress as threePoolAddress, threePoolJson } from '../contracts/ThreePoolContract'
 import config from '../config.json'
 import { pTokenPricesModel, pTokenPriceModel } from '../models/pTokenPrices'
 import { iTokenPricesModel, iTokenPriceModel } from '../models/iTokenPrices'
@@ -327,7 +334,18 @@ export default class Fulcrum {
       this.logger.info('No loan-params in db!')
       await this.updateLoanParams()
     }
-    return lastLoanParams.loanParams
+    return lastLoanParams.loanParams.map((params) => {
+      console.log(params)
+      return {
+        loanId: params.loanId,
+        principal: params.principal,
+        collateral: params.collateral,
+        platform: params.platform,
+        initialMargin: params.initialMargin,
+        maintenanceMargin: params.maintenanceMargin,
+        liquidationPenalty: params.liquidationPenalty
+      }
+    })
   }
 
   async updateLoanParams() {
@@ -667,7 +685,23 @@ export default class Fulcrum {
     const bzrxUsdPrice = new BigNumber(
       swapRates[iTokens.map((x) => x.name).indexOf('bzrx')]
     ).dividedBy(10 ** 18)
+    const ethUsdPrice = new BigNumber(
+      swapRates[iTokens.map((x) => x.name).indexOf('eth')]
+    ).dividedBy(10 ** 18)
     const monthlyReward = new BigNumber(10300000).times(bzrxUsdPrice)
+
+    // 3CRV swap contract
+    const threePoolContract = new this.web3.eth.Contract(threePoolJson.abi, threePoolAddress)
+
+    const crvAddress = erc20Tokens.crv.erc20Address
+
+    const crvErc20Contract = new this.web3.eth.Contract(erc20Json.abi, crvAddress)
+
+    const crvStakedLockedAmount = await crvErc20Contract.methods.balanceOf(stakingV1Address).call()
+    const crvTotalSupply = await crvErc20Contract.methods.totalSupply().call()
+
+    // get a share of 3CRV tokens in staking contract compare to all exisiting 3CRV tokens
+    const shareOfCrvLockedInStaking = new BigNumber(crvStakedLockedAmount).div(crvTotalSupply)
 
     if (reserveData && reserveData.totalAssetSupply.length > 0) {
       await Promise.all(
@@ -699,11 +733,108 @@ export default class Fulcrum {
           vaultBalance = vaultBalance.times(precision)
 
           if (token.name === 'bzrx') {
-            const vbzrxLockedAmount = await this.getErc20BalanceOfUser(
-              '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F',
-              '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'
+            const bzrxVestingTokenContract = new this.web3.eth.Contract(
+              bzrxVestingJson.abi,
+              bzrxVestingTokenAddress
             )
-            vaultBalance = vaultBalance.plus(vbzrxLockedAmount.times(precision))
+
+            const vbzrxAddress = erc20Tokens.vbzrx.erc20Address
+            const bzrxAddress = erc20Tokens.bzrx.erc20Address
+            const bptAddress = erc20Tokens.bpt.erc20Address
+
+            const bptErc20Contract = new this.web3.eth.Contract(
+              erc20Json.abi,
+              bzrxVestingTokenAddress
+            )
+
+            const vbzrxTotalVested = await bzrxVestingTokenContract.methods.totalVested().call()
+            const vbzrxTotalSupply = await bzrxVestingTokenContract.methods.totalSupply().call()
+
+            // how much vBZRX tokens already vested. This gives coefficient for vBZRX token price from BZRX price
+            const vbzrxWorthPart = new BigNumber(1).minus(
+              new BigNumber(vbzrxTotalVested).div(vbzrxTotalSupply)
+            )
+
+            const vbzrxProtocolLockedAmount = (
+              await this.getErc20BalanceOfUser(vbzrxAddress, iBZxAddress)
+            ).times(vbzrxWorthPart)
+
+            const vbzrxStakedLockedAmount = (
+              await this.getErc20BalanceOfUser(vbzrxAddress, stakingV1Address)
+            ).times(vbzrxWorthPart)
+            const bzrxStakedLockedAmount = await this.getErc20BalanceOfUser(
+              bzrxAddress,
+              stakingV1Address
+            )
+
+            const bptBalanceOfStaking = await this.getErc20BalanceOfUser(
+              bptAddress,
+              stakingV1Address
+            )
+            const bptTotalSupply = await bptErc20Contract.methods.totalSupply().call()
+
+            const bzrxBalanceOfBpt = await this.getErc20BalanceOfUser(bzrxAddress, bptAddress)
+            // share of bzrx liquidity that belongs to staking contract from all bzrx tokens in pool
+            const bzrxShareOfBptStakedLockedAmount = bzrxBalanceOfBpt
+              .div(bptTotalSupply)
+              .times(bptBalanceOfStaking)
+
+            vaultBalance = vaultBalance
+              .plus(vbzrxProtocolLockedAmount)
+              .plus(vbzrxStakedLockedAmount)
+              .plus(bzrxStakedLockedAmount)
+              .plus(bzrxShareOfBptStakedLockedAmount)
+          }
+          if (token.name === 'eth') {
+            const bptAddress = erc20Tokens.bpt.erc20Address
+            const wethAddress = erc20Tokens.weth.erc20Address
+
+            const bptErc20Contract = new this.web3.eth.Contract(erc20Json.abi, bptAddress)
+
+            const bptBalanceOfStaking = await this.getErc20BalanceOfUser(
+              bptAddress,
+              stakingV1Address
+            )
+            const bptTotalSupply = await bptErc20Contract.methods.totalSupply().call()
+            const wethBalanceOfBpt = await this.getErc20BalanceOfUser(wethAddress, bptAddress)
+
+            // share of weth liquidity that belongs to staking contract from all weth tokens in pool
+            const wethShareOfBptStakedLockedAmount = wethBalanceOfBpt
+              .times(bptBalanceOfStaking)
+              .div(bptTotalSupply)
+
+            vaultBalance = vaultBalance.plus(wethShareOfBptStakedLockedAmount)
+          }
+
+          if (token.name === 'dai') {
+            // underlying DAI in 3CRV
+            const underlyingDaiInCRV = await threePoolContract.methods
+              .balances(new BigNumber(0))
+              .call()
+            const shareOfDaiInStakedCrv = new BigNumber(underlyingDaiInCRV)
+              .times(precision)
+              .times(shareOfCrvLockedInStaking)
+            vaultBalance = vaultBalance.plus(shareOfDaiInStakedCrv)
+          }
+          if (token.name === 'usdc') {
+            // underlying USDC in 3CRV
+            const underlyingUsdcInCRV = await threePoolContract.methods
+              .balances(new BigNumber(1))
+              .call()
+            const shareOfUsdcInStakedCrv = new BigNumber(underlyingUsdcInCRV)
+              .times(precision)
+              .times(shareOfCrvLockedInStaking)
+            vaultBalance = vaultBalance.plus(shareOfUsdcInStakedCrv)
+          }
+          if (token.name === 'usdt') {
+            // underlying USDT in 3CRV
+            const underlyingUsdtInCRV = await threePoolContract.methods
+              .balances(new BigNumber(2))
+              .call()
+            const shareOfUsdtInStakedCrv = new BigNumber(underlyingUsdtInCRV)
+              .times(precision)
+              .times(shareOfCrvLockedInStaking)
+            vaultBalance = vaultBalance.plus(shareOfUsdtInStakedCrv)
           }
 
           if (swapRates[i]) {

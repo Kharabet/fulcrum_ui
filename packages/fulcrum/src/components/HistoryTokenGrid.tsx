@@ -1,10 +1,17 @@
 import React, { Component } from 'react'
 
 import { BigNumber } from '@0x/utils'
-import { Asset } from '../domain/Asset'
-import { CloseWithSwapEvent } from '../domain/events/CloseWithSwapEvent'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
-import { TradeEvent } from '../domain/events/TradeEvent'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import {
+  CloseWithSwapEvent,
+  DepositCollateralEvent,
+  LiquidationEvent,
+  RolloverEvent,
+  TradeEvent,
+  WithdrawCollateralEvent
+} from 'bzx-common/src/domain/events'
+
 import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { PositionEventsGroup } from '../domain/PositionEventsGroup'
 import { PositionHistoryData } from '../domain/PositionHistoryData'
@@ -16,9 +23,8 @@ import { HistoryTokenGridHeader } from './HistoryTokenGridHeader'
 import { HistoryTokenGridRow, IHistoryTokenGridRowProps } from './HistoryTokenGridRow'
 
 import { ReactComponent as Placeholder } from '../assets/images/history_placeholder.svg'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
-import { DepositCollateralEvent } from '../domain/events/DepositCollateralEvent'
-import { WithdrawCollateralEvent } from '../domain/events/WithdrawCollateralEvent'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
@@ -26,7 +32,6 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import '../styles/components/history-token-grid.scss'
-import { RolloverEvent } from '../domain/events/RolloverEvent'
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean
@@ -78,8 +83,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   public async componentDidMount() {
-    if (!this.props.historyRowsData.length) {  
-      await this.getHistoryRowsData(this.state)
+    if (!this.props.historyRowsData.length) {
+      await this.getHistoryRowsData()
     } else {
       this.setState({ ...this.state, isLoading: true })
       const historyEvents = this.props.historyEvents
@@ -104,9 +109,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     prevProps: IHistoryTokenGridProps,
     prevState: IHistoryTokenGridState
   ) {
-    
     if (prevProps.historyEvents !== this.props.historyEvents) {
-      await this.getHistoryRowsData(this.state)
+      await this.getHistoryRowsData()
     }
     if (prevState.numberPagination !== this.state.numberPagination) {
       const historyEvents = this.props.historyEvents
@@ -155,10 +159,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       )
     }
 
-    const startIndex = this.quantityVisibleRow * this.state.numberPagination
-    const endIndex = this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow
     const historyRows = this.state.historyRowsData.map((e, i) => {
-      e.isHidden = i >= startIndex && i < endIndex ? false : true
+      // e.isHidden = i >= startIndex && i < endIndex ? false : true
       return <HistoryTokenGridRow key={i} {...e} />
     })
     return (
@@ -187,19 +189,22 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     )
   }
 
-  public getHistoryRowsData = async (state: IHistoryTokenGridState) => {
+  public getHistoryRowsData = async () => {
     this.setState({ ...this.state, isLoading: true })
-    const dateWhenPricePrecisionWasChanged = new Date(
-      process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? 1605557075000 : 1603991752000
-    ) // approx date when price feed precision update was deployed https://github.com/bZxNetwork/contractsV2/commit/5fb683dd52dc4b2f82f17b01d7b7d52e2b146e4a
+    // https://etherscan.io/tx/0x4c4e621687b18ffd9a7884f58ed8e656cec0fc06e6a6563b63fe5f0c46e0292a
+    const blockNumberWhenPricePrecisionWasChanged = 11270966
     const historyRowsData: IHistoryTokenGridRowProps[] = []
     const historyEvents = this.props.historyEvents
     if (!historyEvents) return
-    const loanIds = Object.keys(historyEvents.groupedEvents)
+
+    const startIndex = this.quantityVisibleRow * this.state.numberPagination
+    const endIndex = this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow
+
+    const loanIds = Object.keys(historyEvents.groupedEvents).slice(startIndex, endIndex)
     for (const loanId of loanIds) {
       // @ts-ignore
-      const events = historyEvents.groupedEvents[loanId].sort(
-        (a: any, b: any) => a.timeStamp.getTime() - b.timeStamp.getTime()
+      const events = historyEvents.groupedEvents[loanId].sort((a: any, b: any) =>
+        a.blockNumber.minus(b.blockNumber).toNumber()
       )
       const tradeEvent = events[0] as TradeEvent
 
@@ -232,13 +237,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
       const openPrice =
         positionType === PositionType.LONG
-          ? tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
+          ? tradeEvent.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
             ? new BigNumber(10 ** 36)
                 .div(tradeEvent.entryPrice)
                 .div(10 ** 18)
                 .times(10 ** (collateralAssetDecimalsFirstEvent - loanAssetDecimalsFirstEvent))
             : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
-          : tradeEvent.timeStamp > dateWhenPricePrecisionWasChanged
+          : tradeEvent.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
           ? tradeEvent.entryPrice
               .div(10 ** 18)
               .times(10 ** (loanAssetDecimalsFirstEvent - collateralAssetDecimalsFirstEvent))
@@ -256,14 +261,24 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         let tradePrice = new BigNumber(0)
         let value = new BigNumber(0)
         let profit: BigNumber | string = '-'
-        const timeStamp = event.timeStamp
+        let timeStamp: Date
+        try {
+          timeStamp = new Date(
+            (await FulcrumProvider.Instance.web3Wrapper!.getBlockTimestampAsync(
+              event.blockNumber.toNumber()
+            )) * 1000
+          )
+        } catch (e) {
+          console.error(e)
+          continue
+        }
         const txHash = event.txHash
-        const payTradingFeeEvent = historyEvents.payTradingFeeEvents.find(
-          (e) => e.timeStamp.getTime() === timeStamp.getTime()
+        const payTradingFeeEvent = historyEvents.payTradingFeeEvents.find((e) =>
+          e.blockNumber.eq(event.blockNumber)
         )
 
-        const earnRewardEvent = historyEvents.earnRewardEvents.find(
-          (e) => e.timeStamp.getTime() === timeStamp.getTime()
+        const earnRewardEvent = historyEvents.earnRewardEvents.find((e) =>
+          e.blockNumber.eq(event.blockNumber)
         )
         if (event instanceof TradeEvent) {
           const action = 'Opened'
@@ -273,22 +288,20 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           if (positionType === PositionType.LONG) {
             positionValue = event.positionSize.div(10 ** collateralAssetDecimals)
-            tradePrice =
-              event.timeStamp > dateWhenPricePrecisionWasChanged
-                ? new BigNumber(10 ** 36)
-                    .div(event.entryPrice)
-                    .div(10 ** 18)
-                    .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
-                : new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18)
+            tradePrice = event.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
+              ? new BigNumber(10 ** 36)
+                  .div(event.entryPrice)
+                  .div(10 ** 18)
+                  .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+              : new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18)
             value = positionValue.times(tradePrice)
           } else {
             positionValue = event.borrowedAmount.div(10 ** loanAssetDecimals)
-            tradePrice =
-              event.timeStamp > dateWhenPricePrecisionWasChanged
-                ? event.entryPrice
-                    .div(10 ** 18)
-                    .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
-                : event.entryPrice.div(10 ** 18)
+            tradePrice = event.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
+              ? event.entryPrice
+                  .div(10 ** 18)
+                  .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
+              : event.entryPrice.div(10 ** 18)
             value = positionValue.times(tradePrice)
           }
 
@@ -315,23 +328,21 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           if (positionType === PositionType.LONG) {
             positionValue = event.positionCloseSize.div(10 ** collateralAssetDecimals)
-            tradePrice =
-              event.timeStamp > dateWhenPricePrecisionWasChanged
-                ? new BigNumber(10 ** 36)
-                    .div(event.exitPrice)
-                    .div(10 ** 18)
-                    .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
-                : new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18)
+            tradePrice = event.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
+              ? new BigNumber(10 ** 36)
+                  .div(event.exitPrice)
+                  .div(10 ** 18)
+                  .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+              : new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18)
             value = positionValue.times(tradePrice)
             profit = tradePrice.minus(openPrice).times(positionValue)
           } else {
             positionValue = event.loanCloseAmount.div(10 ** loanAssetDecimals)
-            tradePrice =
-              event.timeStamp > dateWhenPricePrecisionWasChanged
-                ? event.exitPrice
-                    .div(10 ** 18)
-                    .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
-                : event.exitPrice.div(10 ** 18)
+            tradePrice = event.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
+              ? event.exitPrice
+                  .div(10 ** 18)
+                  .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
+              : event.exitPrice.div(10 ** 18)
             value = positionValue.times(tradePrice)
             profit = openPrice.minus(tradePrice).times(positionValue)
           }
@@ -402,9 +413,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.depositAmount.div(10 ** depositTokenDecimals)
             tradePrice = new BigNumber(0)
           } else {
-            const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
-            const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
-            tradePrice = new BigNumber(swapRateQuoteToken).div(swapRateBaseToken)
+            tradePrice = new BigNumber(0)
             positionValue = event.depositAmount.div(10 ** depositTokenDecimals).times(tradePrice)
           }
 
@@ -432,9 +441,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.withdrawAmount.div(10 ** withdrawTokenDecimals)
             tradePrice = new BigNumber(0)
           } else {
-            const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp)
-            const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp)
-            tradePrice = new BigNumber(swapRateQuoteToken).div(swapRateBaseToken)
+            tradePrice = new BigNumber(0)
             positionValue = event.withdrawAmount.div(10 ** withdrawTokenDecimals).times(tradePrice)
           }
 
@@ -455,9 +462,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           )
         } else if (event instanceof RolloverEvent) {
           const action = 'Rollovered'
-          const loanTokenDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18
-          const collateralTokenDecimals =
-            AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18
 
           tradePrice = new BigNumber(0)
 
@@ -483,7 +487,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       historyRowsData.push({
         eventsGroup: positionEventsGroup,
         stablecoins: this.props.stablecoins,
-        isHidden: true
+        isHidden: false,
+        getAssetUSDRate: this.getAssetUSDRate
       })
     }
     const quantityEvents = Object.keys(historyEvents.groupedEvents).length
@@ -502,28 +507,36 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     this.props.updateHistoryRowsData(historyRowsData)
   }
 
-  public getAssetUSDRate = async (asset: Asset, date: Date) => {
+  public getAssetUSDRate = async (asset: Asset, date: Date): Promise<BigNumber> => {
     const token = asset === Asset.WETH || asset === Asset.fWETH ? Asset.ETH : asset
-
+    if (this.props.stablecoins.includes(asset)) {
+      return new BigNumber(1)
+    }
     const swapToUsdHistoryRateRequest = await fetch(
       `https://api.bzx.network/v1/asset-history-price?asset=${token.toLowerCase()}&date=${date.getTime()}`
     )
     const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
-    return swapToUsdHistoryRateResponse.swapToUSDPrice
+    return new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice)
   }
   public nextPagination = () => {
     if (this.state.numberPagination !== this.state.quantityGrids && !this.state.isLastRow) {
-      this.setState({ ...this.state, numberPagination: this.state.numberPagination + 1 })
+      this.setState(
+        { ...this.state, numberPagination: this.state.numberPagination + 1 },
+        this.getHistoryRowsData
+      )
     }
   }
 
   public prevPagination = () => {
     if (this.state.numberPagination !== 0) {
-      this.setState({
-        ...this.state,
-        numberPagination: this.state.numberPagination - 1,
-        isLastRow: false
-      })
+      this.setState(
+        {
+          ...this.state,
+          numberPagination: this.state.numberPagination - 1,
+          isLastRow: false
+        },
+        this.getHistoryRowsData
+      )
     }
   }
 }

@@ -1,5 +1,6 @@
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import { Asset } from './Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+
 import { PositionType } from './PositionType'
 
 export class TradeTokenKey {
@@ -28,9 +29,10 @@ export class TradeTokenKey {
     this.isTokenized = isTokenized
     this.version = version ? version : 2
 
-    this.erc20Address = FulcrumProvider.Instance.contractsSource
-      ? FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(this) || ''
-      : ''
+    this.erc20Address = ''
+    // this.erc20Address = FulcrumProvider.Instance.contractsSource
+    //   ? FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(this) || ''
+    //   : ''
   }
 
   public static empty(): TradeTokenKey {
@@ -39,9 +41,10 @@ export class TradeTokenKey {
 
   public setVersion(version: number) {
     this.version = version
-    this.erc20Address = FulcrumProvider.Instance.contractsSource
-      ? FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(this) || ''
-      : ''
+    this.erc20Address = ''
+    // this.erc20Address = FulcrumProvider.Instance.contractsSource
+    //   ? FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(this) || ''
+    //   : ''
   }
 
   public toString(): string {

@@ -3,9 +3,12 @@ import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
@@ -370,12 +373,6 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                   onAssetChange={this.onChangeUseWrapped}
                   assets={[Asset.WETH, Asset.ETH]}
                 />
-              ) : this.props.asset === Asset.DAI ? (
-                <AssetDropdown
-                  selectedAsset={this.state.useWrappedDai ? Asset.CHAI : Asset.DAI}
-                  onAssetChange={this.onChangeUseWrappedDai}
-                  assets={[Asset.DAI, Asset.CHAI]}
-                />
               ) : (
                 <AssetDropdown selectedAsset={this.props.asset} assets={[this.props.asset]} />
               )}
@@ -590,8 +587,6 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     } else {
       assetOrWrapped = this.props.asset
     }
-
-    // console.log(`send amount`,sendAmount.toString());
 
     if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
       // indicates a 100% burn

@@ -1,21 +1,21 @@
 @import '../abstracts/variables';
 
-$width-col-token-date: 12%;
+$width-col-token-date: 8%;
 $width-col-token-asset: 11%;
 $width-col-asset-unit: 14%;
-$width-col-type: 12%;
+$width-col-type: 9%;
 $width-col-liquidation-price: 10%;
-$width-col-position-value: 10%;
-$width-col-profit: 6%;
-$width-col-result: 10%;
+$width-col-position-value: 12%;
+$width-col-profit: 12%;
+$width-col-result: 7%;
 $width-col-result-inner: 22%;
 $width-col-position: 10%;
-$width-col-asset-price: 11%;
-$width-col-fee-reward: 18%;
+$width-col-asset-price: 12%;
+$width-col-fee-reward: 17%;
 
-$width-col-position-desktop: 11%;
-$width-col-asset-price-desktop: 12%;
-$width-col-fee-reward-desktop: 16%;
+$width-col-position-desktop: 12%;
+$width-col-asset-price-desktop: 13%;
+$width-col-fee-reward-desktop: 15%;
 
 .history-token-grid {
   @media screen and (max-width: $breakpoint-mobile-max) {
@@ -79,6 +79,11 @@ $width-col-fee-reward-desktop: 16%;
       }
       &-position-value {
         width: $width-col-position-value;
+        align-items: center;
+        svg{
+          width: 20px;
+          height: 20px;
+        }
       }
       &-liquidation-price {
         width: $width-col-liquidation-price;
@@ -88,21 +93,41 @@ $width-col-fee-reward-desktop: 16%;
       }
       &-profit {
         width: $width-col-profit;
+        align-items: center;
+        svg{
+          width: 20px;
+          height: 20px;
+        }
       }
       &-position {
         width: $width-col-position;
+        align-items: center;
+        svg{
+          width: 20px;
+          height: 20px;
+        }
         @media (min-width: $breakpoint-desktop-min) {
           width: $width-col-position-desktop;
         }
       }
       &-asset-price {
         width: $width-col-asset-price;
+        align-items: center;
+        svg{
+          width: 20px;
+          height: 20px;
+        }
         @media (min-width: $breakpoint-desktop-min) {
           width: $width-col-asset-price-desktop;
         }
       }
       &-fee-reward {
         width: $width-col-fee-reward;
+        align-items: center;
+        svg{
+          width: 20px;
+          height: 20px;
+        }
         @media (min-width: $breakpoint-desktop-min) {
           width: $width-col-fee-reward-desktop;
         }
@@ -187,8 +212,7 @@ $width-col-fee-reward-desktop: 16%;
       }
       &-fee-reward {
         @media (min-width: $breakpoint-mobile-min) {
-          justify-content: flex-end;
-          padding-right: 50px;
+          
         }
       }
       &-profit {

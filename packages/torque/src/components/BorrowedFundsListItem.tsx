@@ -2,9 +2,9 @@ import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import ReactTooltip from 'react-tooltip'
 import { ReactComponent as IconInfo } from '../assets/images/ic_info.svg'
-import { Asset } from '../domain/Asset'
-import { AssetDetails } from '../domain/AssetDetails'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
@@ -236,7 +236,9 @@ export class BorrowedFundsListItem extends Component<
             </div>
           </div>
           <div className="borrowed-funds-list-item__header-asset">
-            <div title={borrowedFundsItem.loanId} className="borrowed-funds-list-item__header-asset-img">
+            <div
+              title={borrowedFundsItem.loanId}
+              className="borrowed-funds-list-item__header-asset-img">
               <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
             </div>
             <div className="borrowed-funds-list-item__header-asset-name">
@@ -363,8 +365,9 @@ export class BorrowedFundsListItem extends Component<
       this.setState({ ...this.state, request: manageCollateralRequest })
       await TorqueProvider.Instance.onDoManageCollateral(manageCollateralRequest)
     } catch (error) {
-      // tslint:disable-next-line: no-console
-      if (error.message !== 'Form closed') console.error(error)
+      if (error.message !== 'Form closed') {
+        console.error(error)
+      }
     }
     // this.props.onManageCollateral({ ...this.props.item });
   }
@@ -379,8 +382,9 @@ export class BorrowedFundsListItem extends Component<
       this.setState({ ...this.state, request: repayLoanRequest })
       await TorqueProvider.Instance.onDoRepayLoan(repayLoanRequest)
     } catch (error) {
-      // tslint:disable-next-line: no-console
-      if (error.message !== 'Form closed') console.error(error)
+      if (error.message !== 'Form closed') {
+        console.error(error)
+      }
     }
     // this.props.onRepayLoan({ ...this.props.item });
   }
@@ -395,8 +399,9 @@ export class BorrowedFundsListItem extends Component<
       this.setState({ ...this.state, request: extendLoanRequest })
       await TorqueProvider.Instance.onDoExtendLoan(extendLoanRequest)
     } catch (error) {
-      // tslint:disable-next-line: no-console
-      if (error.message !== 'Form closed') console.error(error)
+      if (error.message !== 'Form closed') {
+        console.error(error)
+      }
     }
     // this.props.onExtendLoan({ ...this.props.item });
   }
@@ -417,8 +422,9 @@ export class BorrowedFundsListItem extends Component<
       this.setState({ ...this.state, request: borroweMoreRequest })
       await TorqueProvider.Instance.onDoBorrow(borroweMoreRequest)
     } catch (error) {
-      // tslint:disable-next-line: no-console
-      if (error.message !== 'Form closed') console.error(error)
+      if (error.message !== 'Form closed') {
+        console.error(error)
+      }
     }
   }
 }

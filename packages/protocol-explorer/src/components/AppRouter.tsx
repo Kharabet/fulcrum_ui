@@ -74,7 +74,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public getLibrary = async (provider: any, connector: any): Promise<any> => {
-    // console.log(provider)
     // handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)
     if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated)) {
@@ -136,12 +135,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     doNetworkConnect={this.doNetworkConnect}
                   />
                 </Route>
-                <Route path="/loan-params">
+                {/* <Route path="/loan-params">
                   <LoanParamsPage
                     isMobileMedia={this.state.isMobileMedia}
                     doNetworkConnect={this.doNetworkConnect}
                   />
-                </Route>
+                </Route> */}
               </Switch>
             </Router>
             <Footer />
@@ -165,7 +164,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public async onConnectorUpdated(update: ConnectorUpdate) {
-    // console.log('onConnectorUpdated')
     ExplorerProvider.Instance.eventEmitter.emit(ExplorerProviderEvents.ProviderIsChanging)
 
     await Web3ConnectionFactory.updateConnector(update)

@@ -1,12 +1,13 @@
 import React from 'react'
 import { ReactComponent as IconArrow } from '../assets/images/icon-tx-arrow.svg'
 import { BigNumber } from '@0x/utils'
-import { Asset } from '../domain/Asset'
+import Asset from 'bzx-common/src/assets/Asset'
+import { ExplorerProvider } from '../services/ExplorerProvider'
 
 export interface ITxRowProps {
   hash: string
   etherscanTxUrl: string
-  age: Date
+  blockNumber: BigNumber
   account: string
   etherscanAddressUrl: string
   quantity: BigNumber
@@ -15,7 +16,18 @@ export interface ITxRowProps {
 }
 
 export const TxRow = (props: ITxRowProps) => {
-  const timeSince = (date: Date) => {
+  const [age, setAge] = React.useState<string>('...')
+  React.useEffect(() => {
+    timeSince(props.blockNumber).then(setAge)
+  }, [])
+  React.useEffect(() => {
+    timeSince(props.blockNumber).then(setAge)
+  }, [props.hash])
+  const timeSince = async (blockNumber: BigNumber) => {
+    const blockTimestamp = await ExplorerProvider.Instance.web3Wrapper!.getBlockTimestampAsync(
+      blockNumber.toNumber()
+    )
+    const date = new Date(blockTimestamp * 1000)
     var seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
 
     var interval = Math.floor(seconds / 31536000)
@@ -54,7 +66,7 @@ export const TxRow = (props: ITxRowProps) => {
           className="table-row-tx__hash">
           {getShortHash(props.hash, 12)}
         </a>
-        <div className="table-row-tx__age">{timeSince(props.age)} ago</div>
+        <div className="table-row-tx__age">{age} ago</div>
         <a
           href={props.etherscanAddressUrl}
           target="_blank"

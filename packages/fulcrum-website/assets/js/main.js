@@ -121,6 +121,7 @@ window.addEventListener('load', function() {
   for (var i = 0; i < url.length; i++) {
     if (url[i].getAttribute('href') == window.location.pathname) url[i].classList.add('active-url')
   }
+  updateAppLink()
 })
 
 function formatUsdPrice(value) {
@@ -133,4 +134,17 @@ function numberWithCommas(x) {
 
 function getFontSize(el) {
   return window.getComputedStyle(el, null).getPropertyValue('font-size')
+}
+
+function updateAppLink() {
+  const pathname = window.location.pathname
+  if (pathname === '/lending') {
+    const appLinksNode = document.querySelectorAll('.app-link')
+    if (appLinksNode) {
+      const appLinks = [].slice.call(appLinksNode)
+      appLinks.forEach((item) => {
+        item.setAttribute('href', 'https://app.fulcrum.trade/lend')
+      })
+    }
+  }
 }

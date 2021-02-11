@@ -5,25 +5,27 @@ import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 
 function ImpersonateInput() {
-  const onSubmit = () => {
-      const input = document.getElementById("impersonate-address") as HTMLInputElement
-      const inputValue = input.value || ''
-      if (inputValue === '' || (inputValue && Web3Utils.isAddress(inputValue))){
-        FulcrumProvider.Instance.impersonateAddress = inputValue
-        FulcrumProvider.Instance.eventEmitter.emit(
-            FulcrumProviderEvents.ProviderChanged,
-            new ProviderChangedEvent(
-              FulcrumProvider.Instance.providerType,
-              FulcrumProvider.Instance.web3Wrapper
-            )
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget as HTMLFormElement
+    const input = form.querySelector("#impersonate-address") as HTMLInputElement
+    const inputValue = input.value || ''
+    if (inputValue === '' || (inputValue && Web3Utils.isAddress(inputValue))){
+      FulcrumProvider.Instance.impersonateAddress = inputValue
+      FulcrumProvider.Instance.eventEmitter.emit(
+          FulcrumProviderEvents.ProviderChanged,
+          new ProviderChangedEvent(
+            FulcrumProvider.Instance.providerType,
+            FulcrumProvider.Instance.web3Wrapper
           )
-      }
-  }
+        )
+    }
+}
   return (
-    <div className="impersonate-container">
+    <form className="impersonate-container" onSubmit={onSubmit}>
       <input type="text" id="impersonate-address"/>
-      <button onClick={onSubmit}>Submit</button>
-    </div>
+      <button type="submit">Submit</button>
+    </form>
   )
 }
 

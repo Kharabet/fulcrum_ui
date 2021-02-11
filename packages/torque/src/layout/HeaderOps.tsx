@@ -4,14 +4,10 @@ import { ProviderType } from '../domain/ProviderType'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { HeaderLogo } from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
-import { HeaderMenuToggle } from './HeaderMenuToggle'
-import { InfoBlock } from '../components/InfoBlock'
-import { FooterMenu } from './FooterMenu'
-import { FooterVersion } from './FooterVersion'
 
 import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
 import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
-import { Footer } from './Footer'
+import Footer from './Footer'
 
 import siteConfig from '../config/SiteConfig.json'
 export interface IHeaderOpsProps {
@@ -34,14 +30,15 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
   private Menu: IHeaderMenuProps = {
     items: [
-      { id: 1, title: 'Borrow', link: '/borrow', external: false },
-      { id: 2, title: 'Your Loans', link: '/dashboard', external: false },
+      { id: 1, title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
+      { id: 2, title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
+      { id: 3, title: 'Borrow', link: '/borrow', external: false },
+      { id: 4, title: 'Your Loans', link: '/dashboard', external: false },
       // { id: 3, title: "Refinance", link: "/refinance", external: false },
 
-      { id: 3, title: 'Staking', link: 'https://staking.bzx.network', external: true },
-      { id: 4, title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
+      { id: 5, title: 'Staking', link: 'https://staking.bzx.network', external: true },
       {
-        id: 5,
+        id: 6,
         title: 'Help Center',
         link: 'https://help.bzx.network/en/collections/2008807-torque',
         external: true
@@ -98,17 +95,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div> */}
           </div>
         </div>
-
-        {
-          <InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-            Earn farming rewards! When trading or borrowing you are earning vBZRX while your
-            position is open. Rewards are deposited weekly in your{' '}
-            <a href="https://staking.bzx.network" className="regular-link" target="blank">
-              staking dashboard
-            </a>
-            .
-          </InfoBlock>
-        }
       </header>
     )
   }
@@ -151,14 +137,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
           ) : null}
         </header>
-        <InfoBlock localstorageItemProp="torque-page-info" isAccept={true}>
-          Earn farming rewards! When trading or borrowing you are earning vBZRX while your position
-          is open. Rewards are deposited weekly in your{' '}
-          <a href="https://staking.bzx.network" className="regular-link" target="blank">
-            staking dashboard
-          </a>
-          .
-        </InfoBlock>
       </React.Fragment>
     )
   }

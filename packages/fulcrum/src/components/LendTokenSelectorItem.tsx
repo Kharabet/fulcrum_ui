@@ -1,7 +1,9 @@
 import { BigNumber } from '@0x/utils'
 import React, { useEffect, useState } from 'react'
-import { Asset } from '../domain/Asset'
-import { AssetsDictionary } from '../domain/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { RequestStatus } from '../domain/RequestStatus'
@@ -116,8 +118,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
       <div className="token-selector-item__actions">
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-full"
-          onClick={onLendClick}
-          disabled={props.asset === Asset.SAI || props.asset === Asset.LEND}>
+          onClick={onLendClick}>
           Lend
         </button>
       </div>
@@ -125,8 +126,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
       <div className="token-selector-item__actions">
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-half"
-          onClick={onLendClick}
-          disabled={props.asset === Asset.SAI || props.asset === Asset.LEND}>
+          onClick={onLendClick}>
           Lend
         </button>
         <button
