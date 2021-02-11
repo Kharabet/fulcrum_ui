@@ -613,11 +613,30 @@ export class FulcrumProvider {
       const helperContract = await this.contractsSource.getDAppHelperContract()
       if (tokens && helperContract) {
         let swapRates
+        let bzrxPrice = new BigNumber(0)
+        let ethPrice = new BigNumber(0)
         try {
           swapRates = (await this.getSwapToUsdRateBatch(assets, Asset.DAI))[0]
         } catch (e) {
           //console.log(e);
         }
+
+        // 3CRV swap contract
+        const threePoolContract = await this.contractsSource.getThreePoolContract()
+
+        const crvAddress = AssetsDictionary.assets
+          .get(Asset.CRV)!
+          .addressErc20.get(this.web3ProviderSettings.networkId)!
+
+        const crvErc20Contract = await this.contractsSource.getErc20Contract(crvAddress)
+
+        const stakingV1Address = this.contractsSource.getStakingV1Address()
+
+        const crvStakedLockedAmount = await crvErc20Contract.balanceOf.callAsync(stakingV1Address)
+        const crvTotalSupply = await crvErc20Contract.totalSupply.callAsync()
+
+        // get a share of 3CRV tokens in staking contract compare to all exisiting 3CRV tokens
+        const shareOfCrvLockedInStaking = crvStakedLockedAmount.div(crvTotalSupply)
 
         //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
 
@@ -657,15 +676,100 @@ export class FulcrumProvider {
             //liquidityReserved = liquidityReserved.times(precision);
             vaultBalance = vaultBalance.times(precision)
 
-            if (asset === Asset.BZRX) {
-              const vbzrxLockedAmount = await this.getErc20BalanceOfUser(
-                '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F',
-                '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'
-              )
-              vaultBalance = vaultBalance.plus(vbzrxLockedAmount.times(precision))
-            }
-
             if (swapRates && swapRates[i]) {
+              if (asset === Asset.BZRX) {
+                const bzrxVestingTokenContract = await this.contractsSource.getBzrxVestingContract()
+                const ibzxAddress = this.contractsSource.getiBZxAddress()
+
+                const vbzrxAddress = AssetsDictionary.assets
+                  .get(Asset.vBZRX)!
+                  .addressErc20.get(this.web3ProviderSettings.networkId)!
+                const bzrxAddress = AssetsDictionary.assets
+                  .get(Asset.BZRX)!
+                  .addressErc20.get(this.web3ProviderSettings.networkId)!
+                const bptAddress = AssetsDictionary.assets
+                  .get(Asset.BPT)!
+                  .addressErc20.get(this.web3ProviderSettings.networkId)!
+                const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
+
+                const vbzrxTotalVested = await bzrxVestingTokenContract.totalVested.callAsync()
+                const vbzrxTotalSupply = await bzrxVestingTokenContract.totalSupply.callAsync()
+                // how much vBZRX tokens already vested. This gives coefficient for vBZRX token price from BZRX price
+                const vbzrxWorthPart = new BigNumber(1).minus(
+                  vbzrxTotalVested.div(vbzrxTotalSupply)
+                )
+                // vBZRX locked in bZx protocol
+                const vbzrxProtocolLockedAmount = (
+                  await this.getErc20BalanceOfUser(vbzrxAddress, ibzxAddress)
+                ).times(vbzrxWorthPart)
+
+                // vBZRX locked in Staking protocol
+                const vbzrxStakedLockedAmount = (
+                  await this.getErc20BalanceOfUser(vbzrxAddress, stakingV1Address)
+                ).times(vbzrxWorthPart)
+                const bzrxStakedLockedAmount = await this.getErc20BalanceOfUser(
+                  bzrxAddress,
+                  stakingV1Address
+                )
+
+                const bptBalanceOfStaking = await this.getErc20BalanceOfUser(
+                  bptAddress,
+                  stakingV1Address
+                )
+                const bptTotalSupply = await bptErc20Contract.totalSupply.callAsync()
+
+                const bzrxBalanceOfBpt = await this.getErc20BalanceOfUser(bzrxAddress, bptAddress)
+                // share of bzrx liquidity that belongs to staking contract from all bzrx tokens in pool 
+                const bzrxShareOfBptStakedLockedAmount = bzrxBalanceOfBpt
+                .div(bptTotalSupply)
+                .times(bptBalanceOfStaking)
+
+                vaultBalance = vaultBalance
+                  .plus(vbzrxProtocolLockedAmount)
+                  .plus(vbzrxStakedLockedAmount)
+                  .plus(bzrxStakedLockedAmount)
+                  .plus(bzrxShareOfBptStakedLockedAmount)
+              }
+              if (asset === Asset.ETH) {
+                const bptAddress = AssetsDictionary.assets
+                  .get(Asset.BPT)!
+                  .addressErc20.get(this.web3ProviderSettings.networkId)!
+                const wethAddress = AssetsDictionary.assets
+                  .get(Asset.WETH)!
+                  .addressErc20.get(this.web3ProviderSettings.networkId)!
+                const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
+
+                const bptBalanceOfStaking = await this.getErc20BalanceOfUser(
+                  bptAddress,
+                  stakingV1Address
+                )
+                const bptTotalSupply = await bptErc20Contract.totalSupply.callAsync()
+                const wethBalanceOfBpt = await this.getErc20BalanceOfUser(wethAddress, bptAddress)
+                
+                // share of weth liquidity that belongs to staking contract from all weth tokens in pool 
+                const wethShareOfBptStakedLockedAmount = wethBalanceOfBpt
+                  .times(bptBalanceOfStaking)
+                  .div(bptTotalSupply)
+                vaultBalance = vaultBalance.plus(wethShareOfBptStakedLockedAmount)
+              }
+              if (asset == Asset.DAI ){
+                // underlying DAI in 3CRV
+                const underlyingDaiInCRV = await threePoolContract.balances.callAsync(new BigNumber(0))
+                const shareOfDaiInStakedCrv = underlyingDaiInCRV.times(precision).times(shareOfCrvLockedInStaking)
+                vaultBalance = vaultBalance.plus(shareOfDaiInStakedCrv)
+              }
+              if (asset == Asset.USDC ){
+                // underlying USDC in 3CRV
+                const underlyingUsdcInCRV = await threePoolContract.balances.callAsync(new BigNumber(1))
+                const shareOfUsdcInStakedCrv = underlyingUsdcInCRV.times(precision).times(shareOfCrvLockedInStaking)
+                vaultBalance = vaultBalance.plus(shareOfUsdcInStakedCrv)
+              }
+              if (asset == Asset.USDT ){
+                // underlying USDT in 3CRV
+                const underlyingUsdtInCRV = await threePoolContract.balances.callAsync(new BigNumber(2))
+                const shareOfUsdtInStakedCrv = underlyingUsdtInCRV.times(precision).times(shareOfCrvLockedInStaking)
+                vaultBalance = vaultBalance.plus(shareOfUsdtInStakedCrv)
+              }
               usdSupply = totalAssetSupply!.times(swapRates[i]).dividedBy(10 ** 18)
               usdSupplyAll = usdSupplyAll.plus(usdSupply)
 
@@ -701,7 +805,6 @@ export class FulcrumProvider {
               )
             )
           }
-
           result.push(
             new ReserveDetails(
               Asset.UNKNOWN,
