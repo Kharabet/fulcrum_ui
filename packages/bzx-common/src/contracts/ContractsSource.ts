@@ -23,6 +23,7 @@ import { SoloBridgeContract } from './typescript-wrappers/SoloBridge'
 import { vatContract } from './typescript-wrappers/vat'
 import { IKyberNetworkProxyContract } from './typescript-wrappers/IKyberNetworkProxy'
 import { BZRXVestingTokenContract } from './typescript-wrappers/BZRXVestingToken'
+import { ThreePoolContract } from './typescript-wrappers/ThreePool'
 
 const getNetworkNameById = (networkId: number): string => {
   let networkName
@@ -89,6 +90,7 @@ export default class ContractsSource {
   public saiToDAIBridgeJson: any
   public instaRegistryJson: any
   public bzrxVestingJson: any
+  public threePoolJson: any
 
   public networkId: number
   public canWrite: boolean
@@ -129,6 +131,7 @@ export default class ContractsSource {
     this.saiToDAIBridgeJson = await import(`./artifacts/${networkName}/saiToDAIBridge.json`)
     this.instaRegistryJson = await import(`./artifacts/${networkName}/instaRegistry.json`)
     this.bzrxVestingJson = await import(`./artifacts/${networkName}/BZRXVestingToken.json`)
+    this.threePoolJson = await import(`./artifacts/${networkName}/threePool.json`)
 
     ContractsSource.iTokenList = (await import(`./artifacts/${networkName}/iTokenList.js`)).iTokenList
 
@@ -281,6 +284,26 @@ export default class ContractsSource {
         break
       case 42:
         address = '0xc153eeAD19e0DBbDb3462Dcc2B703cC6D738A37c'
+        break
+    }
+
+    return address
+  }
+
+  private getThreePoolContractAddress(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7'
+        break
+      case 3:
+        address = ''
+        break
+      case 4:
+        address = ''
+        break
+      case 42:
+        address = ''
         break
     }
 
@@ -566,6 +589,10 @@ export default class ContractsSource {
   private async getBzrxVestingContractRaw() {
     return new BZRXVestingTokenContract(this.bzrxVestingJson.abi, this.getBzrxVestingTokenAddress().toLowerCase(), this.provider)
   }
+ 
+  private async getThreePoolContractRaw() {
+    return new ThreePoolContract(this.threePoolJson.abi, this.getThreePoolContractAddress().toLowerCase(), this.provider)
+  }
 
   private static getAssetFromIlkRaw(ilk: string): Asset {
     const hex = ilk.toString() // force conversion
@@ -605,4 +632,5 @@ export default class ContractsSource {
   public getSoloMarket = _.memoize(ContractsSource.getSoloMarketRaw)
   public getAssetFromIlk = _.memoize(ContractsSource.getAssetFromIlkRaw)
   public getBzrxVestingContract = _.memoize(this.getBzrxVestingContractRaw)
+  public getThreePoolContract = _.memoize(this.getThreePoolContractRaw)
 }
