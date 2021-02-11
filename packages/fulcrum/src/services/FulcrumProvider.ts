@@ -747,10 +747,10 @@ export class FulcrumProvider {
                 const wethBalanceOfBpt = await this.getErc20BalanceOfUser(wethAddress, bptAddress)
                 
                 // share of weth liquidity that belongs to staking contract from all weth tokens in pool 
-                const wethShareOfBptStakedLockedAmountUsd = wethBalanceOfBpt
+                const wethShareOfBptStakedLockedAmount = wethBalanceOfBpt
                   .times(bptBalanceOfStaking)
                   .div(bptTotalSupply)
-                vaultBalance = vaultBalance.plus(wethShareOfBptStakedLockedAmountUsd)
+                vaultBalance = vaultBalance.plus(wethShareOfBptStakedLockedAmount)
               }
               if (asset == Asset.DAI ){
                 // underlying DAI in 3CRV
