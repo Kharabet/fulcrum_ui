@@ -28,7 +28,6 @@ enum Asset {
   REP = 'REP',
   KNC = 'KNC',
   CHI = 'CHI',
-  LEND = 'LEND',
   BZRX = 'BZRX',
   vBZRX = 'vBZRX',
   YFI = 'YFI',
@@ -36,6 +35,8 @@ enum Asset {
   AAVE = 'AAVE',
   LRC = 'LRC',
   COMP = 'COMP',
+  BPT = 'BPT',
+  CRV = 'CRV',
   UNKNOWN = 'UNKNOWN'
 }
 export default Asset

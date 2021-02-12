@@ -1,15 +1,14 @@
-import { Asset } from './Asset'
-import { AssetDetails } from './AssetDetails'
+import { ReactComponent as ETHLogo } from 'app-images/ic_token_eth.svg'
+import { ReactComponent as BPT } from 'app-images/token-bpt.svg'
+import { ReactComponent as BZRX } from 'app-images/token-bzrx.svg'
+import { ReactComponent as vBZRX } from 'app-images/token-vbzrx.svg'
+import Asset from './Asset'
+import AssetDetails from './AssetDetails'
 
-import { ReactComponent as BZRX } from '../assets/images/token-bzrx.svg'
-import { ReactComponent as vBZRX } from '../assets/images/token-vbzrx.svg'
-import { ReactComponent as BPT } from '../assets/images/token-bpt.svg'
-import { ReactComponent as ETHLogo } from '../assets/images/ic_token_eth.svg'
-
-export class AssetsDictionary {
+export default class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
     [
-      Asset.BZRXv1,
+      Asset.BZRXV1,
       new AssetDetails(
         'BZRXv1',
         'bZx Protocol Token v1 (BZRXv1)',
@@ -35,7 +34,7 @@ export class AssetsDictionary {
       )
     ],
     [
-      Asset.vBZRX,
+      Asset.VBZRX,
       new AssetDetails(
         'vBZRX',
         'bZx Vesting Token (vBZRX)',
@@ -57,6 +56,32 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0xe26A220a341EAca116bDa64cF9D5638A935ae629'],
           [42, '0x4c4462c6bca4c92bf41c40f9a4047f35fd296996']
+        ])
+      )
+    ],
+    [
+      Asset.CRV,
+      new AssetDetails(
+        'CRV',
+        '3 Curve token',
+        '',
+        18,
+        new Map<number, string | null>([
+          [1, '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'],
+          [42, '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490']
+        ])
+      )
+    ],
+    [
+      Asset.IBZRX,
+      new AssetDetails(
+        'iBZRX',
+        'iBZRX',
+        BZRX,
+        18,
+        new Map<number, string | null>([
+          [1, '0x18240BD9C07fA6156Ce3F3f61921cC82b2619157'],
+          [42, '0x18240BD9C07fA6156Ce3F3f61921cC82b2619157']
         ])
       )
     ],
@@ -252,4 +277,11 @@ export class AssetsDictionary {
       )
     ]
   ])
+
+  /**
+   * Get the asset with a simple string without the need to import asset enum
+   */
+  public static getAsset(token: keyof typeof Asset) {
+    return AssetsDictionary.assets.get(token as Asset)
+  }
 }

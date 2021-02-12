@@ -92,7 +92,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public getLibrary = async (provider: any, connector: any): Promise<any> => {
-    console.log(provider)
     //handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)
     if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated))
@@ -207,7 +206,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public async onConnectorUpdated(update: ConnectorUpdate) {
-    console.log('onConnectorUpdated')
     await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging)
 
     await Web3ConnectionFactory.updateConnector(update)

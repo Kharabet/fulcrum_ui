@@ -1,4 +1,4 @@
-export enum ProviderType {
+enum ProviderType {
   Alchemy = 'Alchemy',
   MetaMask = 'MetaMask',
   TrustWallet = 'TrustWallet',
@@ -14,3 +14,5 @@ export enum ProviderType {
   Trezor = 'Trezor',
   None = 'None'
 }
+
+export default ProviderType

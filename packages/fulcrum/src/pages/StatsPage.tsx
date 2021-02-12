@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { StatsTokenGrid } from '../components/StatsTokenGrid'
-import { InfoBlock } from '../components/InfoBlock'
 
 import '../styles/pages/_stats-page.scss'
 

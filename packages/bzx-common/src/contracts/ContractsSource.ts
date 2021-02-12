@@ -21,6 +21,9 @@ import { saiToDAIBridgeContract } from './typescript-wrappers/saiToDaiBridge'
 import { SoloContract } from './typescript-wrappers/solo'
 import { SoloBridgeContract } from './typescript-wrappers/SoloBridge'
 import { vatContract } from './typescript-wrappers/vat'
+import { IKyberNetworkProxyContract } from './typescript-wrappers/IKyberNetworkProxy'
+import { BZRXVestingTokenContract } from './typescript-wrappers/BZRXVestingToken'
+import { ThreePoolContract } from './typescript-wrappers/ThreePool'
 
 const getNetworkNameById = (networkId: number): string => {
   let networkName
@@ -68,6 +71,7 @@ export default class ContractsSource {
   private iTokenJson: any
   private oracleJson: any
   private DAppHelperJson: any
+  private IKyberNetworkProxyJson: any
   private iBZxJson: any
 
   private cdpsJson: any
@@ -85,6 +89,8 @@ export default class ContractsSource {
   private proxyMigrationsJson: any
   public saiToDAIBridgeJson: any
   public instaRegistryJson: any
+  public bzrxVestingJson: any
+  public threePoolJson: any
 
   public networkId: number
   public canWrite: boolean
@@ -104,6 +110,7 @@ export default class ContractsSource {
     this.iTokenJson = await import(`./artifacts/${networkName}/iToken.json`)
     this.oracleJson = await import(`./artifacts/${networkName}/oracle.json`)
     this.DAppHelperJson = await import(`./artifacts/${networkName}/DAppHelper.json`)
+    this.IKyberNetworkProxyJson = await import(`./artifacts/${networkName}/IKyberNetworkProxy.json`)
     this.iBZxJson = await import(`./artifacts/${networkName}/iBZx.json`)
 
     this.cdpsJson = await import(`./artifacts/${networkName}/GetCdps.json`)
@@ -123,6 +130,8 @@ export default class ContractsSource {
     this.dsProxyIsAllowJson = await import(`./artifacts/${networkName}/dsProxyIsAllow.json`)
     this.saiToDAIBridgeJson = await import(`./artifacts/${networkName}/saiToDAIBridge.json`)
     this.instaRegistryJson = await import(`./artifacts/${networkName}/instaRegistry.json`)
+    this.bzrxVestingJson = await import(`./artifacts/${networkName}/BZRXVestingToken.json`)
+    this.threePoolJson = await import(`./artifacts/${networkName}/threePool.json`)
 
     ContractsSource.iTokenList = (await import(`./artifacts/${networkName}/iTokenList.js`)).iTokenList
 
@@ -156,6 +165,45 @@ export default class ContractsSource {
         break
       case 42:
         address = '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a'
+        break
+    }
+
+    return address
+  }
+
+  public getStakingV1Address(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0xe95ebce2b02ee07def5ed6b53289801f7fc137a4'
+        break
+      case 3:
+        address = ''
+        break
+      case 4:
+        address = ''
+        break
+      case 42:
+        address = '0xE7eD6747FaC5360f88a2EFC03E00d25789F69291'
+        break
+    }
+
+    return address
+  }
+  public getBzrxVestingTokenAddress(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F'
+        break
+      case 3:
+        address = ''
+        break
+      case 4:
+        address = ''
+        break
+      case 42:
+        address = '0x6F8304039f34fd6A6acDd511988DCf5f62128a32'
         break
     }
 
@@ -221,6 +269,46 @@ export default class ContractsSource {
 
     return address
   }
+  
+  private getIKyberNetworkProxyContractAddress(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0x9AAb3f75489902f3a48495025729a0AF77d4b11e'
+        break
+      case 3:
+        address = '0xd719c34261e099Fdb33030ac8909d5788D3039C4'
+        break
+      case 4:
+        address = '0x0d5371e5EE23dec7DF251A8957279629aa79E9C5'
+        break
+      case 42:
+        address = '0xc153eeAD19e0DBbDb3462Dcc2B703cC6D738A37c'
+        break
+    }
+
+    return address
+  }
+
+  private getThreePoolContractAddress(): string {
+    let address: string = ''
+    switch (this.networkId) {
+      case 1:
+        address = '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7'
+        break
+      case 3:
+        address = ''
+        break
+      case 4:
+        address = ''
+        break
+      case 42:
+        address = ''
+        break
+    }
+
+    return address
+  }
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init()
@@ -256,6 +344,14 @@ export default class ContractsSource {
     return new DAppHelperContract(
       this.DAppHelperJson.abi,
       this.getDAppHelperAddress().toLowerCase(),
+      this.provider
+    )
+  }
+  private async getIKyberNetworkProxyContractRaw(): Promise<IKyberNetworkProxyContract> {
+    await this.Init()
+    return new IKyberNetworkProxyContract(
+      this.IKyberNetworkProxyJson.abi,
+      this.getIKyberNetworkProxyContractAddress().toLowerCase(),
       this.provider
     )
   }
@@ -489,6 +585,14 @@ export default class ContractsSource {
   private async getProxyMigrationJSON() {
     return this.proxyMigrationsJson
   }
+  
+  private async getBzrxVestingContractRaw() {
+    return new BZRXVestingTokenContract(this.bzrxVestingJson.abi, this.getBzrxVestingTokenAddress().toLowerCase(), this.provider)
+  }
+ 
+  private async getThreePoolContractRaw() {
+    return new ThreePoolContract(this.threePoolJson.abi, this.getThreePoolContractAddress().toLowerCase(), this.provider)
+  }
 
   private static getAssetFromIlkRaw(ilk: string): Asset {
     const hex = ilk.toString() // force conversion
@@ -505,6 +609,7 @@ export default class ContractsSource {
   public getITokenContract = _.memoize(this.getITokenContractRaw)
   public getOracleContract = _.memoize(this.getOracleContractRaw)
   public getDAppHelperContract = _.memoize(this.getDAppHelperContractRaw)
+  public getIKyberNetworkProxyContract = _.memoize(this.getIKyberNetworkProxyContractRaw)
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw)
   public getiBZxContract = _.memoize(this.getiBZxContractRaw)
   public getAddressFromAsset = _.memoize(this.getAddressFromAssetRaw)
@@ -526,4 +631,6 @@ export default class ContractsSource {
   public getSoloBridgeContract = _.memoize(this.getSoloBridgeContractRaw)
   public getSoloMarket = _.memoize(ContractsSource.getSoloMarketRaw)
   public getAssetFromIlk = _.memoize(ContractsSource.getAssetFromIlkRaw)
+  public getBzrxVestingContract = _.memoize(this.getBzrxVestingContractRaw)
+  public getThreePoolContract = _.memoize(this.getThreePoolContractRaw)
 }

@@ -1,7 +1,7 @@
 import React, { PureComponent, RefObject } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { RefinanceAssetSelector } from '../components/RefinanceAssetSelector'
-import { Footer } from '../layout/Footer'
+import Footer from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
 import { Loader } from '../components/Loader'
 

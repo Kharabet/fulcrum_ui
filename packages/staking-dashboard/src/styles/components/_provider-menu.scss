@@ -50,12 +50,19 @@
     background: #f5f7f9;
     width: 240px;
     height: 65px;
+    border: 0;
 
     color: #758295;
     &:hover {
       transition: all 0.1s;
       background: #5b88ff;
       color: #fff;
+    }
+    &[disabled],
+    &[disabled]:hover {
+      color: #758295;
+      background: #f5f7f9;
+      cursor: not-allowed;
     }
     &--selected {
       background-color: #fff;

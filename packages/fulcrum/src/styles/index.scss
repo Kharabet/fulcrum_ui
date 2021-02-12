@@ -1,5 +1,3 @@
-@import '~react-tippy/dist/tippy.css';
-
 @import 'abstracts/functions';
 @import 'abstracts/mixins';
 @import 'abstracts/variables';
@@ -25,6 +23,8 @@
 @import 'components/trade-tx-animation';
 @import 'components/manage-token-grid.scss';
 @import 'components/rollover-note.scss';
+@import 'components/slider.scss';
+@import 'components/extend-loan.scss';
 
 @import 'layout/footer';
 @import 'layout/header';

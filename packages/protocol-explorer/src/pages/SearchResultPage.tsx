@@ -1,64 +1,14 @@
 import React, { Component } from 'react'
 import { Header } from '../layout/Header'
-import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
-import { LiquidationEvent } from '../domain/LiquidationEvent'
-import { BigNumber } from '@0x/utils'
 import { ITxRowProps } from '../components/TxRow'
-import configProviders from '../config/providers.json'
 import { TxGrid } from '../components/TxGrid'
-import { LoanGrid } from '../components/LoanGrid'
-import Asset from 'bzx-common/src/assets/Asset'
-import { Bar } from 'react-chartjs-2'
 import { Search } from '../components/Search'
-import { UnhealthyChart } from '../components/UnhealthyChart'
 import { RouteComponentProps } from 'react-router'
-import { TradeEvent } from '../domain/TradeEvent'
-import { CloseWithSwapEvent } from '../domain/CloseWithSwapEvent'
-import { CloseWithDepositEvent } from '../domain/CloseWithDepositEvent'
-import { BorrowEvent } from '../domain/BorrowEvent'
-import { BurnEvent } from '../domain/BurnEvent'
-import { MintEvent } from '../domain/MintEvent'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
-
-const getWeb3ProviderSettings = (networkId: number): string => {
-  let etherscanURL = ''
-  switch (networkId) {
-    case 1:
-      etherscanURL = 'https://etherscan.io/'
-      break
-    case 3:
-      etherscanURL = 'https://ropsten.etherscan.io/'
-      break
-    case 4:
-      etherscanURL = 'https://rinkeby.etherscan.io/'
-      break
-    case 42:
-      etherscanURL = 'https://kovan.etherscan.io/'
-      break
-    default:
-      etherscanURL = ''
-      break
-  }
-  return etherscanURL
-}
-
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1
-    case 'ropsten':
-      return 3
-    case 'rinkeby':
-      return 4
-    case 'kovan':
-      return 42
-    default:
-      return 0
-  }
-}
-const networkName = process.env.REACT_APP_ETH_NETWORK
-const initialNetworkId = getNetworkIdByString(networkName)
+import { Loader } from '../components/Loader'
+import { NavService } from '../services/NavService'
+import { ProviderType } from '../domain/ProviderType'
 
 interface MatchParams {
   filter: string
@@ -74,6 +24,7 @@ interface ISearchResultPageState {
   filter: string
   filteredEvents: ITxRowProps[]
   showSearchResult: boolean
+  isLoading: boolean
 }
 export class SearchResultPage extends Component<ISearchResultPageProps, ISearchResultPageState> {
   constructor(props: any) {
@@ -82,6 +33,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       events: [],
       filteredEvents: [],
       showSearchResult: false,
+      isLoading: false,
       filter: this.props.match.params.filter.toLowerCase()
     }
     this._isMounted = false
@@ -118,11 +70,19 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   }
 
   derivedUpdate = async () => {
+    if (ExplorerProvider.Instance.providerType === ProviderType.None) {
+      this.setState({ filter: '' })
+      return
+    }
+    this.setState({ isLoading: true })
     const liquidationEvents = ExplorerProvider.Instance.getGridItems(
       await ExplorerProvider.Instance.getLiquidationHistory()
     )
     const tradeEvents = ExplorerProvider.Instance.getGridItems(
       await ExplorerProvider.Instance.getTradeHistory()
+    )
+    const rolloverEvents = ExplorerProvider.Instance.getGridItems(
+      await ExplorerProvider.Instance.getRolloverHistory()
     )
     const closeEvents = ExplorerProvider.Instance.getGridItems(
       await ExplorerProvider.Instance.getCloseWithSwapHistory()
@@ -138,11 +98,13 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       .concat(tradeEvents)
       .concat(closeWithDepositEvents)
       .concat(borrowEvents)
+      .concat(rolloverEvents)
 
     this._isMounted &&
       this.setState({
         ...this.state,
-        events
+        events,
+        isLoading: false
       })
     this.onSearch(this.state.filter)
   }
@@ -163,8 +125,12 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       return
     }
     const filteredEvents = this.state.events.filter(
-      (e) => e.hash === filter || e.account === filter
+      (e) =>
+        e.hash.toLowerCase() === filter.toLowerCase() ||
+        e.account.toLowerCase() === filter.toLowerCase()
     )
+    NavService.Instance.History.push(`/search/${filter}`)
+
     this._isMounted &&
       this.setState({
         ...this.state,
@@ -175,6 +141,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   }
 
   public render() {
+    const isWalletConnected = ExplorerProvider.Instance.providerType !== ProviderType.None
     return (
       <React.Fragment>
         <Header
@@ -182,17 +149,28 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
           doNetworkConnect={this.props.doNetworkConnect}
         />
         <section className="search-container pt-45">
-          <Search onSearch={this.onSearch} initialFilter={this.state.filter} />
+          <Search onSearch={this.onSearch.bind(this)} initialFilter={this.state.filter} />
         </section>
-        <section className="pt-90">
-          <div className="container">
-            <h1>Result:</h1>
-            <TxGrid
-              events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents}
-              quantityTx={25}
-            />
-          </div>
-        </section>
+        {isWalletConnected && (
+          <section className="pt-90">
+            <div className="container">
+              <h1 className="pb-45">Result:</h1>
+
+              {this.state.isLoading ? (
+                <div className="pt-45 pb-45">
+                  <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+                </div>
+              ) : (
+                <TxGrid
+                  events={
+                    !this.state.showSearchResult ? this.state.events : this.state.filteredEvents
+                  }
+                  quantityTx={25}
+                />
+              )}
+            </div>
+          </section>
+        )}
       </React.Fragment>
     )
   }

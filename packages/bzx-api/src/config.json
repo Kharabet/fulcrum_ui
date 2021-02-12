@@ -4,5 +4,5 @@
   "corsHeaders": ["Link"],
   "cache_ttl_sec": 900,
   "cache_params_ttl_day": 1,
-  "web3_provider_url": "https://eth-mainnet.alchemyapi.io/v2/DXcS3vM0PJ320XCinLat00Y_UXJNwL_n"
+  "web3_provider_url": "https://eth-mainnet.alchemyapi.io/v2/ifuo2lV1cQiJIHHwyvYzZPN8mSyFbqlS"
 }

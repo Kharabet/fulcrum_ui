@@ -10,18 +10,16 @@ export interface ITradeTokenGridHeaderProps {
 }
 
 const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
-  const midMarketTooltip =
-    'Price feeds are provided securely via Chainlink, trades are executed via Kyber. This can result in minor price variations when opening and closing positions.'
+  const midMarketTooltip = `<p>The price displayed is based on swapping 1 ETH into the selected asset via Kybers swap rate</p><a href='https://developer.kyber.network/docs/Integrations-PriceFeedSecurity/' target="_blank" rel="noopener noreferrer" class='tooltip__link'>(Learn More)</a>`
   const liqPriceTooltip =
-    "An opened positions liquidation point will vary slightly from the displayed estimate depending on it's collateral ratio and exact entry price."
+    'The liquidation price will vary slight depending on entry price and the value of your positions collateral.'
+  const aprTooltip = 'The % interest paid per year on your position.'
   return (
     <div className="trade-token-grid-header">
       <div className="trade-token-grid-header__col-token-name">
         <span className="trade-token-grid-header__text">Asset</span>
       </div>
-      <div className="trade-token-grid-header__col-position-type">
-        <span className="trade-token-grid-header__text">&nbsp;</span>
-      </div>
+      
       <div className="trade-token-grid-header__col-leverage">
         <span className="trade-token-grid-header__text">Leverage</span>
       </div>
@@ -31,6 +29,8 @@ const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
           <label className="trade-token-grid-header__text-asset">{props.quoteToken}</label>
           <IconInfo
             className="tooltip__icon"
+            data-multiline="true"
+            data-html={true}
             data-tip={midMarketTooltip}
             data-for="mid-market-price-tooltip"
           />
@@ -39,6 +39,7 @@ const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
             className="tooltip__info"
             place="top"
             effect="solid"
+            delayHide={500}
           />
         </span>
       </div>
@@ -60,7 +61,11 @@ const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
         </span>
       </div>
       <div className="trade-token-grid-header__col-profit">
-        <span className="trade-token-grid-header__text">Est. Yield, vBZRX</span>
+        <span className="trade-token-grid-header__text">
+          Interest APR
+          <IconInfo className="tooltip__icon" data-tip={aprTooltip} data-for="apr-tooltip" />
+          <ReactTooltip id="apr-tooltip" className="tooltip__info" place="top" effect="solid" />
+        </span>
       </div>
     </div>
   )

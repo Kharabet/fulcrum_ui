@@ -1,19 +1,23 @@
-export enum Asset {
-  BZRXv1 = 'BZRXv1',
-  BZRX = 'BZRX',
-  vBZRX = 'vBZRX',
+enum Asset {
   BPT = 'BPT',
-  ETH = 'ETH',
-  WETH = 'WETH',
+  BZRX = 'BZRX',
+  BZRXV1 = 'BZRXV1',
+  CRV = 'CRV',
   DAI = 'DAI',
+  ETH = 'ETH',
+  IBZRX = 'IBZRX',
+  KNC = 'KNC',
+  LINK = 'LINK',
+  MKR = 'MKR',
+  REP = 'REP',
+  SUSD = 'SUSD',
   USDC = 'USDC',
   USDT = 'USDT',
-  SUSD = 'SUSD',
+  VBZRX = 'VBZRX',
   WBTC = 'WBTC',
-  LINK = 'LINK',
+  WETH = 'WETH',
   ZRX = 'ZRX',
-  REP = 'REP',
-  KNC = 'KNC',
-  MKR = 'MKR',
   UNKNOWN = 'UNKNOWN'
 }
+
+export default Asset

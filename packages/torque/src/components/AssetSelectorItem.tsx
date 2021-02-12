@@ -18,7 +18,6 @@ import { TxProcessingLoader } from './TxProcessingLoader'
 export interface IAssetSelectorItemProps {
   asset: Asset
   interestRate: BigNumber
-  yieldApr: BigNumber
   liquidity: BigNumber
   borrowDlgRef: React.RefObject<BorrowDlg>
   doNetworkConnect: () => void
@@ -95,8 +94,9 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
       setRequest(borrowRequest)
       await TorqueProvider.Instance.onDoBorrow(borrowRequest)
     } catch (error) {
-      // tslint:disable-next-line: no-console
-      if (error.message !== 'Form closed') console.error(error)
+      if (error.message !== 'Form closed') {
+        console.error(error)
+      }
     }
   }
 
@@ -121,21 +121,16 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
       <div className="asset-selector-item-content" onClick={onClick}>
         <div className="asset-selector-body">
           <div className="asset-selector-row">
-            <div className="asset-selector__apr">Est. Yield, vBZRX</div>
-            <div title={props.yieldApr.toFixed(18)} className="asset-selector__interest-rate">
+            <div className="asset-selector__interest-rate">
               <span className="asset-selector__interest-rate-value">
-                {props.yieldApr.toFixed(0)}
+                {props.interestRate.gt(0) ? `${props.interestRate.toFixed(2)}` : `0`}
               </span>
               %
             </div>
           </div>
           <div className="asset-selector-row">
             <div className="asset-selector__apr">APR</div>
-            <div className="asset-selector__fixed">
-              FIXED
-              {props.interestRate.gt(0) ? ` ${props.interestRate.toFixed(2)}` : ` 0`}
-              <span>%</span>
-            </div>
+            <div className="asset-selector__fixed">FIXED</div>
           </div>
           <div className="asset-selector-row">
             <div className="asset-selector__apr">Liquidity</div>

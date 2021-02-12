@@ -6,7 +6,7 @@
     &:not(:last-child) {
       margin-bottom: 20px;
     }
-    &:last-child{
+    &:last-child {
       @media screen and (min-width: $breakpoint-mobile-min) and (max-width: $breakpoint-desktop-max) {
         .trade-token-grid-row__col-price {
           margin-left: 40px;
@@ -21,7 +21,7 @@
     @media screen and (min-width: $breakpoint-mobile-min) {
       display: grid;
       column-gap: 35px;
-      grid-template-columns: 5% 5% 24% 14% 13% 10% 9%;
+      grid-template-columns: 5% 27% 14% 13% 7% 13%;
     }
     @media screen and (max-width: $breakpoint-mobile-max) {
       display: flex;
@@ -41,29 +41,17 @@
       // }
 
       @media screen and (max-width: $breakpoint-mobile-max) {
-        width: calc(100% / 2);
+        width: calc(100% / 3);
       }
     }
-    // &__col-liquidation {
-    //   @media screen and (min-width: $breakpoint-mobile-min) {
-    //     justify-content: flex-end;
-    //   }
-    // }
-     &__col-profit {
       
-      @media screen and (max-width: $breakpoint-mobile-max) {
-        position: relative;
-        width: 50%;
-        margin-left: 50%;
       }
-    }
-  }
   .trade-token-grid-header {
     font-size: 12px;
     font-weight: 600;
     color: var(--trade-header-color);
-    &__text-asset{
-      color:var(--primary-text);
+    &__text-asset {
+      color: var(--primary-text);
     }
     @media screen and (min-width: $breakpoint-desktop-min) {
       padding: 20px 40px 15px 40px;
@@ -112,7 +100,7 @@
         width: 50%;
       }
     }
-   
+
     &__col-position-type {
       display: flex;
     }
@@ -132,7 +120,7 @@
       }
     }
 
-    &__buy-button {
+    &__button {
       border: 0;
       display: flex;
       align-items: center;
@@ -145,10 +133,11 @@
       border-radius: 43px;
       background-color: #00c0ab;
       outline: none;
+
+      font-size: 14px;
+      width: 154px;
       @media screen and(min-width: $breakpoint-mobile-min) {
-        width: 95px;
         height: 44px;
-        font-size: 16px;
       }
       @media screen and(max-width: $breakpoint-mobile-max) {
         padding: 6px 20px;
@@ -156,6 +145,12 @@
       }
       &:hover {
         background-color: #33dfcc;
+      }
+      &-short {
+        background-color: #ff4f4f;
+        &:hover {
+          background-color: #fe7272;
+        }
       }
       &:not(:disabled) {
         cursor: pointer;
@@ -165,22 +160,8 @@
         color: var(--disabled-color);
         cursor: not-allowed;
       }
-     
     }
-  
-   
-    &__yield {
-      position: absolute;
-      font-size: 12px;
-      font-weight: 600;
-      text-indent: 7px;
-      top: 30px;
-      color: #a2abb8;
-      span {
-        color: #00c0ab;
       }
-    }
-  }
 
   .fw-sign {
     font-weight: 400;
@@ -245,10 +226,6 @@
         color: #a2abb8;
         margin-top: 20px;
       }
-       &__yield {
-         font-size: 10px;
-         top: 36px;
        }
     }
-  }
 }

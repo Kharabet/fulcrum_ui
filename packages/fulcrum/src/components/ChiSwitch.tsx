@@ -32,9 +32,7 @@ export const ChiSwitch = () => {
 
   return (
     <div className="chi-switch">
-      <CheckBox checked={isGasTokenEnabled} onChange={onChange}>
-        Use CHI token
-      </CheckBox>
-    </div>
+    <CheckBox checked={isGasTokenEnabled} onChange={onChange}/>
+  </div>
   )
 }

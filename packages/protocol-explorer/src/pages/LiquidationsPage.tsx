@@ -9,7 +9,7 @@ import { TxGrid } from '../components/TxGrid'
 import { ITxRowProps } from '../components/TxRow'
 import { UnhealthyChart } from '../components/UnhealthyChart'
 import Asset from 'bzx-common/src/assets/Asset'
-import { LiquidationEvent } from '../domain/LiquidationEvent'
+import { LiquidationEvent } from 'bzx-common/src/domain/events'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { Header } from '../layout/Header'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
@@ -67,7 +67,6 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         Asset.YFI,
         Asset.BZRX,
         Asset.MKR,
-        Asset.LEND,
         Asset.KNC,
         Asset.UNI,
         Asset.AAVE,
@@ -118,7 +117,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const eventsWithDay = events.map(
       (e: { event: LiquidationEvent; repayAmountUsd: BigNumber }) => ({
         ...e,
-        day: Math.floor(e.event.timeStamp.getTime() / (1000 * 60 * 60 * 24))
+        day: Math.floor(e.event.timeStamp!.getTime() / (1000 * 60 * 60 * 24))
       })
     )
     const eventsWithDayByDay = groupBy(eventsWithDay, 'day')
@@ -204,12 +203,12 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       event: LiquidationEvent
       repayAmountUsd: BigNumber
     }> = []
-    const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory()
+    const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistoryWithTimestamps()
     const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, true)
     const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 500, false)
     const rolloversData = await ExplorerProvider.Instance.getRollovers(0, 500)
     const unhealthyLoansUsd = unhealthyLoansData.reduce(
-      (a, b) => a.plus(b.amountOwedUsd),
+      (a, b) => a.plus(b.maxLiquidatableUsd),
       new BigNumber(0)
     )
     const healthyLoansUsd = healthyLoansData.reduce(
@@ -217,7 +216,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       new BigNumber(0)
     )
     const liqudiations30d = liquidationEvents.filter(
-      (e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30)
+      (e: LiquidationEvent) =>
+        e.timeStamp!.getTime() > new Date().setDate(new Date().getDate() - 30)
     )
     const transactionsCount30d = liqudiations30d.length
 
@@ -244,7 +244,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
           const swapToUsdHistoryRateRequest = await fetch(
             `https://api.bzx.network/v1/asset-history-price?asset=${
               e.loanToken === Asset.fWETH ? 'eth' : e.loanToken.toLowerCase()
-            }&date=${e.timeStamp.getTime()}`
+            }&date=${e.timeStamp!.getTime()}`
           )
           const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data
           if (!swapToUsdHistoryRateResponse) continue
@@ -458,11 +458,13 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                       <div className="flex jc-c labels-container">
                         {this.assetsShown.map((e: Asset) => {
                           const assetDetails = AssetsDictionary.assets.get(e)
-                          return assetDetails && (
-                            <div key={assetDetails.bgBrightColor} className="label-chart">
-                              <span style={{ backgroundColor: assetDetails.bgBrightColor }} />
-                              {e}
-                            </div>
+                          return (
+                            assetDetails && (
+                              <div key={assetDetails.bgBrightColor} className="label-chart">
+                                <span style={{ backgroundColor: assetDetails.bgBrightColor }} />
+                                {e}
+                              </div>
+                            )
                           )
                         })}
                       </div>

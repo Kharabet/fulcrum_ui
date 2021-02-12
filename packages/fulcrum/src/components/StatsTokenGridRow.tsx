@@ -12,7 +12,6 @@ import { FulcrumProvider } from '../services/FulcrumProvider'
 
 export interface IStatsTokenGridRowProps {
   reserveDetails: ReserveDetails
-  yieldApr: BigNumber
 }
 
 interface IStatsTokenGridRowState {
@@ -139,17 +138,15 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
     let customBorrowText
     if (
       details.borrowInterestRate &&
-      this.props.yieldApr.gt(0) &&
       this.props.reserveDetails.asset! !== Asset.ETHv1
     ) {
       customBorrowTitle = `${details.borrowInterestRate.toFixed(
         18
-      )}% / ${this.props.yieldApr.toFixed(18)}%`
+      )}%`
       customBorrowText = (
         <React.Fragment>
           <span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>
-          %&nbsp;/&nbsp;
-          <span className="fw-800 color-primary">{this.props.yieldApr.toFixed(0)}</span>%
+          %
         </React.Fragment>
       )
     } else {

@@ -118,8 +118,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
       <div className="token-selector-item__actions">
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-full"
-          onClick={onLendClick}
-          disabled={props.asset === Asset.SAI || props.asset === Asset.LEND}>
+          onClick={onLendClick}>
           Lend
         </button>
       </div>
@@ -127,8 +126,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
       <div className="token-selector-item__actions">
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-half"
-          onClick={onLendClick}
-          disabled={props.asset === Asset.SAI || props.asset === Asset.LEND}>
+          onClick={onLendClick}>
           Lend
         </button>
         <button

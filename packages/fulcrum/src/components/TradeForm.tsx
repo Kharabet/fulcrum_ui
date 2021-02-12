@@ -4,7 +4,6 @@ import TagManager from 'react-gtm-module'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
-import { ReactComponent as QuestionIcon } from '../assets/images/ic__question_mark.svg'
 import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
@@ -19,12 +18,7 @@ import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
-import ReactTooltip from 'react-tooltip'
-import { ReactComponent as SlippageDown } from '../assets/images/ic__slippage_down.svg'
-import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
 import '../styles/components/trade-form.scss'
-import { ChiSwitch } from './ChiSwitch'
-import { CollapsibleContainer } from './CollapsibleContainer'
 import { InputAmount } from './InputAmount'
 import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
@@ -48,7 +42,6 @@ interface ITradeAmountChangeEvent {
   inputAmountValue: BigNumber
   tradeAmountValue: BigNumber
   maxTradeValue: BigNumber
-
   exposureValue: BigNumber
 }
 
@@ -89,6 +82,8 @@ interface ITradeFormState {
   ethBalance: BigNumber
   depositTokenBalance: BigNumber
   collateralToPrincipalRate: BigNumber
+  estimatedFee: BigNumber
+  estimatedFeeChi: BigNumber
 
   baseToQuoteTokenRate: BigNumber
   returnedAsset: Asset
@@ -128,11 +123,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       ethBalance: new BigNumber(0),
       collateralToPrincipalRate: new BigNumber(0),
       depositTokenBalance: new BigNumber(0),
+      estimatedFee: new BigNumber(0),
+      estimatedFeeChi: new BigNumber(0),
       maybeNeedsApproval: false,
       liquidationPrice: liquidationPrice,
       exposureValue: exposureValue,
       isLoading: true,
       isExposureLoading: true,
+
       baseToQuoteTokenRate: new BigNumber(0),
       returnedAsset: props.baseToken,
       returnedAmount: new BigNumber(0),
@@ -157,10 +155,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value))
         )
       )
-      .subscribe((next) => {
+      .subscribe(async (next) => {
         if (next) {
           this._isMounted &&
             this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false })
+          await this.setEstimatedFee()
         } else {
           this._isMounted &&
             this.setState({
@@ -183,7 +182,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.baseToken)
-    const baseToQuoteTokenRate = await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(
       this.props.tradeType,
       this.props.baseToken,
@@ -211,8 +209,18 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     const collateralToPrincipalRate =
       this.props.positionType === PositionType.LONG
-        ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
-        : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken)
+        ? await FulcrumProvider.Instance.getKyberSwapRate(
+            this.props.baseToken,
+            this.props.quoteToken
+          )
+        : await FulcrumProvider.Instance.getKyberSwapRate(
+            this.props.quoteToken,
+            this.props.baseToken
+          )
+    const baseToQuoteTokenRate =
+      this.props.positionType === PositionType.LONG
+        ? collateralToPrincipalRate
+        : new BigNumber(1).div(collateralToPrincipalRate)
 
     const initialMargin =
       this.props.positionType === PositionType.LONG
@@ -262,10 +270,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.setState({
         ...this.state,
         assetDetails: assetDetails || null,
-        // inputAmountText: limitedAmount.inputAmountText,// "",
-        // inputAmountValue: limitedAmount.inputAmountValue,// new BigNumber(0),
-        // tradeAmountValue: limitedAmount.tradeAmountValue,// new BigNumber(0),
-        // maxTradeValue: limitedAmount.maxTradeValue,
         maxTradeValue,
         interestRate: interestRate,
         liquidationPrice: liquidationPrice,
@@ -304,11 +308,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.props.leverage
       }x-${this.props.positionType.toLocaleLowerCase()}-${this.props.baseToken}/`
     )
-    if (this.props.tradeType === TradeType.BUY) {
-      await this.onInsertMaxValue(1)
-    } else {
-      this.rxFromCurrentAmount('0')
-    }
+    await this.onInsertMaxValue(1)
+
     this._timer = window.setTimeout(() => this.setState({ isExpired: true }), this._staleDataDelay)
   }
 
@@ -336,6 +337,41 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this._isMounted && this.setState({ depositTokenBalance })
   }
 
+  private async setEstimatedFee() {
+    if (this.state.tradeAmountValue.eq(0))
+      return (
+        this._isMounted &&
+        this.setState({ estimatedFee: new BigNumber(0), estimatedFeeChi: new BigNumber(0) })
+      )
+
+    const tradeRequest = new TradeRequest(
+      this.props.loan?.loanId ||
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      this.props.tradeType,
+      this.props.baseToken,
+      this.props.quoteToken,
+      this.state.depositToken,
+      this.props.positionType,
+      this.props.leverage,
+      this.state.tradeAmountValue,
+      this.state.returnTokenIsCollateral
+    )
+    const gasPrice = await FulcrumProvider.Instance.gasPrice()
+    const rate = await FulcrumProvider.Instance.getSwapToUsdRate(Asset.ETH)
+    const estimatedFee = await FulcrumProvider.Instance.getTradeEstimatedGas(
+      tradeRequest,
+      false
+    ).then((result) => {
+      return result
+        .times(gasPrice)
+        .div(10 ** 18)
+        .times(rate)
+    })
+
+    const estimatedFeeChi = estimatedFee.times(0.4)
+
+    this._isMounted && this.setState({ estimatedFee, estimatedFeeChi })
+  }
   public async componentDidUpdate(
     prevProps: Readonly<ITradeFormProps>,
     prevState: Readonly<ITradeFormState>,
@@ -370,7 +406,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
 
     const submitClassName =
-      this.props.tradeType === TradeType.BUY
+      this.props.tradeType === TradeType.BUY && this.props.positionType === PositionType.LONG
         ? 'trade-form__submit-button--buy'
         : 'trade-form__submit-button--sell'
 
@@ -383,23 +419,17 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           ? 'Insufficient funds for gas'
           : this.state.depositTokenBalance && this.state.depositTokenBalance.eq(0)
           ? 'Your wallet is empty'
-          : this.state.slippageRate.gt(0)
-          ? `Slippage:`
           : undefined
-      if (this.props.positionType === PositionType.SHORT) {
-        submitButtonText = `SHORT`
-      } else {
-        submitButtonText = `LEVERAGE`
-      }
+      submitButtonText = `${this.props.positionType === PositionType.LONG ? 'Buy' : 'Sell'} / ${
+        this.props.positionType
+      }`
     } else {
       amountMsg =
         this.state.ethBalance &&
         this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
           ? 'Insufficient funds for gas'
-          : this.state.slippageRate.gt(0)
-          ? `Slippage:`
           : undefined
-      submitButtonText = `CLOSE`
+      submitButtonText = `CLOSE POSITION`
     }
     if (this.state.isExpired) {
       amountMsg = 'Price has changed'
@@ -422,7 +452,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           <div className="trade-form__info_block">
             <div className="trade-form__info_block__logo">
               {this.state.assetDetails.reactLogoSvg.render()}
-              <PositionTypeMarkerAlt value={this.props.positionType} />
             </div>
             <div className="trade-form__asset-stats">
               <div className="trade-form__info_block__asset">
@@ -432,7 +461,13 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 <div className="trade-form__info_block__stats__data">
                   {`${this.state.interestRate.toFixed(1)}%`} APR
                 </div>
-                <div className="trade-form__info_block__stats__data">{`${this.props.leverage.toString()}x`}</div>
+                <div className="trade-form__info_block__stats__data">
+                  <span className="trade-form__info_block__stats__data-type">
+                    {this.props.positionType}
+                  </span>
+                  {`${this.props.leverage.toString()}x`}
+                  <PositionTypeMarkerAlt value={this.props.positionType} />
+                </div>
               </div>
             </div>
           </div>
@@ -442,32 +477,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             this.props.tradeType === TradeType.BUY ? 'buy' : 'sell'
           }${this.state.isExpired ? ' expired' : ''}`}>
           <div className="trade-form__form-values-container">
-            {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
-              <TradeExpectedResult
-                entryPrice={this.state.baseToQuoteTokenRate}
-                liquidationPrice={this.state.liquidationPrice}
-                quoteToken={this.props.quoteToken}
-              />
-            ) : null}
-
-            {!this.state.isLoading && amountMsg !== undefined && (
-              <div className="trade-form__kv-container">
-                {amountMsg.includes('Slippage:') ? (
-                  <div
-                    title={`${this.state.slippageRate.toFixed()}%`}
-                    className={`trade-form__label slippage ${this.state.slippageRate.gte(0.01) &&
-                      'danger'}`}>
-                    {amountMsg}
-                    <span className="trade-form__slippage-amount">
-                      &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}
-                      {this.state.slippageRate.gte(0.01) && <SlippageDown />}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="trade-form__label danger">{amountMsg}</div>
-                )}
-              </div>
-            )}
             <InputAmount
               inputAmountText={this.state.inputAmountText}
               selectorAssets={[this.props.baseToken, this.props.quoteToken]}
@@ -478,6 +487,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
               onCollateralChange={this.onCollateralChange}
+              withSlider
+              maxSliderValue={100}
             />
             {this.props.tradeType === TradeType.SELL && (
               <InputReceive
@@ -491,31 +502,33 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               />
             )}
 
-            {this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
-              <TradeExpectedResult
-                entryPrice={this.state.baseToQuoteTokenRate}
-                liquidationPrice={this.state.liquidationPrice}
-                quoteToken={this.props.quoteToken}
-              />
-            ) : null}
-          </div>
-          <div className="trade-form__row-container">
-            <ChiSwitch />
-            <div className="gas-limits-container">
-              Gas limits are overestimated
-              <IconInfo
-                className="tooltip__icon"
-                data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
-                data-for="gas-limits-tooltip"
-              />
-              <ReactTooltip
-                id="gas-limits-tooltip"
-                className="tooltip__info"
-                place="top"
-                effect="solid"
-              />
+            <div className="trade-form__row-container">
+              <div className="trade-form__slippage">
+                Slippage:
+                <span
+                  className={`trade-form__slippage-value${
+                    this.state.slippageRate.gte(0.02) ? ' danger' : ''
+                  }`}
+                  title={this.state.slippageRate.toFixed()}>
+                  {this.state.slippageRate.toFixed(2)}%
+                </span>
+              </div>
             </div>
+
+            <TradeExpectedResult
+              entryPrice={this.state.baseToQuoteTokenRate}
+              liquidationPrice={this.state.liquidationPrice}
+              estimatedFee={this.state.estimatedFee}
+              quoteToken={this.props.quoteToken}
+            />
           </div>
+
+          {!this.state.isLoading && (
+            <div className="trade-form__kv-container">
+              <div className="trade-form__label">{amountMsg}</div>
+            </div>
+          )}
+
           <div className="trade-form__actions-container">
             {this.state.isExpired ? (
               <button onClick={this.onUpdateClick} className={`trade-form__submit-button update`}>
@@ -532,43 +545,13 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 disabled={!canSubmit}
                 className={`trade-form__submit-button ${submitClassName}`}>
                 {this.state.isExposureLoading || this.state.isLoading ? (
-                  <Preloader width="75px" />
+                  <Preloader width="100%" />
                 ) : (
                   submitButtonText
                 )}
               </button>
             )}
           </div>
-          {this.props.tradeType === TradeType.BUY ? (
-            <div className="trade-how-it-works-container">
-              <CollapsibleContainer
-                titleOpen="What is this?"
-                titleClose="What is this?"
-                isTransparent={false}>
-                <div className="trade-form__how-it-works">
-                  <div className="hiw-icon">
-                    <QuestionIcon />
-                  </div>
-                  <div className="hiw-content">
-                    You are opening {this.props.leverage}x {this.props.positionType}{' '}
-                    {this.state.assetDetails.displayName} position. This will borrow{' '}
-                    {this.props.positionType === PositionType.LONG
-                      ? this.props.quoteToken
-                      : this.state.assetDetails.displayName}{' '}
-                    from a Fulcrum lending pool and that{' '}
-                    {this.props.positionType === PositionType.LONG
-                      ? this.props.quoteToken
-                      : this.state.assetDetails.displayName}{' '}
-                    is swapped into{' '}
-                    {this.props.positionType === PositionType.LONG
-                      ? this.state.assetDetails.displayName
-                      : this.props.quoteToken}{' '}
-                    using an on-chain DEX.
-                  </div>
-                </div>
-              </CollapsibleContainer>
-            </div>
-          ) : null}
         </div>
       </form>
     )
@@ -584,7 +567,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         {
           ...this.state,
           inputAmountText: amountText,
-          buttonValue: 0,
+          buttonValue: Number(new BigNumber(amountText).div(this.state.maxTradeValue)),
           tradeAmountValue: new BigNumber(amountText)
         },
         () => {
