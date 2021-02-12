@@ -25,6 +25,8 @@ import { iTokenPricesModel, iTokenPriceModel } from '../models/iTokenPrices'
 import { statsModel, tokenStatsModel, allTokensStatsModel } from '../models/stats'
 import { loanParamsListModel, loanParamsModel } from '../models/loanParams'
 
+import StakeUnstakeEvents from '../stake-unstake-events.json'
+
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
 
 export default class Fulcrum {
@@ -581,6 +583,45 @@ export default class Fulcrum {
       })
     })
     return result
+  }
+
+  async updateHistoryTVL() {
+    const dbStatsDocuments = await statsModel.find(
+      {
+       
+      },
+      { date: 1, allTokensStats: 1, tokensStats: 1 }
+    )
+    .sort({ date: 1 })
+    const events = StakeUnstakeEvents.query_result.data.rows
+    const stakeTopic1 = 'c5017594d2723c038bb216e5bcef3ac65910ade839c0e63253bf5b59efbf0fd7'
+    const unStakeTopic1 = '2cbcd809a4c90d11f8d12c4b6d09986b255ae1e68f54f076c145fbb2185904e1'
+    const vbzrxAddress = '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F'.toLowerCase()
+    const bzrxAddress = '0x56d811088235F11C8920698a204A5010a788f4b3'.toLowerCase()
+    const result = []
+    dbStatsDocuments.forEach((document, index, documents) => {
+      const bzrxAndVbzrxEventsBeforeTheDate = events.filter(
+        (e) =>
+          (e.token.toLowerCase() === vbzrxAddress || e.token.toLowerCase() === bzrxAddress) &&
+          new Date(e.block_time) < new Date(document.date)
+      )
+      if (bzrxAndVbzrxEventsBeforeTheDate.length === 0 || new Date(document.date) >= new Date("2021-02-11T16:19:15.110+00:00")) {
+        return document
+      }
+      const bzrxAndVbzrxLockedInStaking = bzrxAndVbzrxEventsBeforeTheDate.reduce(
+        (a, b) => (b.topic1 === stakeTopic1 ? a.plus(b.amount) : a.minus(b.amount)),
+        new BigNumber(0)
+      )
+      const bzrxStats = document.tokensStats.find((e) => e.token === 'bzrx')
+      if (!bzrxStats){ return document}
+      bzrxStats.lockedAssets = bzrxAndVbzrxLockedInStaking.div(10 ** 18).plus(bzrxStats.lockedAssets).toFixed() 
+      const bzrxAndVbzrxLockedInStakingUsd = bzrxAndVbzrxLockedInStaking.div(10 ** 18).times(bzrxStats.swapToUSDPrice)
+      bzrxStats.usdTotalLocked = new BigNumber(bzrxStats.lockedAssets).times(bzrxStats.swapToUSDPrice).toFixed()
+      document.allTokensStats.usdTotalLocked = new BigNumber(document.allTokensStats.usdTotalLocked).plus(bzrxAndVbzrxLockedInStakingUsd).toFixed() 
+      document.save()
+      return document
+    })
+    console.log({dbStatsDocuments})
   }
 
   async getAssetStatsHistory(asset, startDate, endDate, estimatedPointsNumber, metrics) {
