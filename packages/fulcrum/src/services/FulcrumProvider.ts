@@ -677,7 +677,7 @@ export class FulcrumProvider {
             vaultBalance = vaultBalance.times(precision)
 
             if (swapRates && swapRates[i]) {
-              if (asset === Asset.BZRX) {
+            if (asset === Asset.BZRX) {
                 const bzrxVestingTokenContract = await this.contractsSource.getBzrxVestingContract()
                 const ibzxAddress = this.contractsSource.getiBZxAddress()
 
@@ -697,7 +697,7 @@ export class FulcrumProvider {
                 // how much vBZRX tokens already vested. This gives coefficient for vBZRX token price from BZRX price
                 const vbzrxWorthPart = new BigNumber(1).minus(
                   vbzrxTotalVested.div(vbzrxTotalSupply)
-                )
+              )
                 // vBZRX locked in bZx protocol
                 const vbzrxProtocolLockedAmount = (
                   await this.getErc20BalanceOfUser(vbzrxAddress, ibzxAddress)
@@ -729,7 +729,7 @@ export class FulcrumProvider {
                   .plus(vbzrxStakedLockedAmount)
                   .plus(bzrxStakedLockedAmount)
                   .plus(bzrxShareOfBptStakedLockedAmount)
-              }
+            }
               if (asset === Asset.ETH) {
                 const bptAddress = AssetsDictionary.assets
                   .get(Asset.BPT)!
@@ -2196,15 +2196,15 @@ export class FulcrumProvider {
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (
-      asset === Asset.SAI ||
-      asset === Asset.DAI ||
-      asset === Asset.USDC ||
-      asset === Asset.SUSD ||
-      asset === Asset.USDT
-    ) {
-      return new BigNumber(1)
-    }
+    // if (
+    //   asset === Asset.SAI ||
+    //   asset === Asset.DAI ||
+    //   asset === Asset.USDC ||
+    //   asset === Asset.SUSD ||
+    //   asset === Asset.USDT
+    // ) {
+    //   return new BigNumber(1)
+    // }
 
     /*const swapRates = await this.getSwapToUsdRateBatch(
       [asset],
@@ -2229,13 +2229,13 @@ export class FulcrumProvider {
 
   // Returns swap rate from Chainlink Oracle
   public async getSwapRate(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
-    if (
-      srcAsset === destAsset ||
-      (srcAsset === Asset.USDC && destAsset === Asset.DAI) ||
-      (srcAsset === Asset.DAI && destAsset === Asset.USDC)
-    ) {
-      return new BigNumber(1)
-    }
+    // if (
+    //   srcAsset === destAsset ||
+    //   (srcAsset === Asset.USDC && destAsset === Asset.DAI) ||
+    //   (srcAsset === Asset.DAI && destAsset === Asset.USDC)
+    // ) {
+    //   return new BigNumber(1)
+    // }
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
@@ -2275,7 +2275,7 @@ export class FulcrumProvider {
     if (networkName !== 'mainnet') {
       // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract
       return this.getSwapRate(srcAsset, destAsset)
-    }
+  }
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
@@ -2286,7 +2286,7 @@ export class FulcrumProvider {
         srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
-      }
+  }
       try {
         const oneEthWorthTokenAmount = await fetch(
           `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`

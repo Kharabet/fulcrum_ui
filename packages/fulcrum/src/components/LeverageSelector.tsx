@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 import '../styles/components/leverage-selector.scss'
 
 export interface ILeverageSelectorProps {
@@ -19,6 +18,10 @@ export class LeverageSelector extends Component<ILeverageSelectorProps> {
     for (let i = this.props.minValue; i <= this.props.maxValue; i++) {
       values.push(i)
     }
+    if (this.props.asset === Asset.DAI) {
+      values.push(10)
+      values.push(15)
+    }
 
     const selectorItems = values.map((e, index) => {
       const isDisabled = false
@@ -33,7 +36,7 @@ export class LeverageSelector extends Component<ILeverageSelectorProps> {
           data-index={index}
           onClick={!isDisabled ? (event) => this.onSelectorItemClick(event, e) : undefined}
           title={isDisabled ? `Disabled` : `${e}x`}>
-          {`${e}x`}
+          <span>{`${e}x`}</span>
         </li>
       )
     })
@@ -44,7 +47,9 @@ export class LeverageSelector extends Component<ILeverageSelectorProps> {
           className="active-selector leverage-selector__item leverage-selector__item--selected"
           style={{
             left: `calc(((100% - 4px) / ${values.length} * ${activeIndex}) + 2px)`
-          }}>{`${this.props.value}x`}</li>
+          }}>
+          <span>{`${this.props.value}x`}</span>
+        </li>
         {selectorItems}
       </ul>
     )
@@ -65,7 +70,7 @@ export class LeverageSelector extends Component<ILeverageSelectorProps> {
       .closest('.leverage-selector')!
       .querySelector('.active-selector') as HTMLElement
     activeSelector.style.setProperty('left', `calc(((100% - 4px) / ${items} * ${index}) + 2px)`)
-    activeSelector.textContent = `${value}x`
+    activeSelector.innerHTML = `<span>${value}x</span>`
 
     if (this.props.onChange) {
       this.props.onChange(value)

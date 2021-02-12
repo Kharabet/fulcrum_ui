@@ -100,7 +100,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     } else {
       this.baseTokens = [
         Asset.ETH,
+        Asset.DAI,
         Asset.WBTC,
+        Asset.BZRX,
         Asset.LINK,
         Asset.MKR,
         Asset.YFI,
@@ -110,7 +112,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.LRC,
         Asset.COMP
       ]
-      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.WBTC]
+      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.BZRX, Asset.WBTC]
     }
     this.stablecoins = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.SUSD]
     const activePair = window.localStorage.getItem('activePair') || undefined
@@ -602,7 +604,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     const quoteAsset = positionType === PositionType.LONG ? loan.loanAsset : loan.collateralAsset
 
-    let leverage = new BigNumber(10 ** 38).div(loan.loanData.startMargin.times(10 ** 18))
+    let leverage = new BigNumber(10 ** 38)
+      .div(loan.loanData.startMargin.times(10 ** 18))
+      .dp(0, BigNumber.ROUND_HALF_UP)
     if (positionType === PositionType.LONG) leverage = leverage.plus(1)
 
     let positionValue = new BigNumber(0)
