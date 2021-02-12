@@ -38,37 +38,36 @@ brownie console --network mainnet-fork
 You can copy paste the following up until `"Commands to create test cases"` into the brownie console. The rest of the commands to execute depend on what you want to test.
 
 ```py
-# ACCOUNT: change "myAccount" to your wallet eg: Metamask)
-myAccount="0x9B5dFE7965C4A30eAB764ff7abf81b3fa96847Fe"
-
 # CONTRACTS SETUP
 exec(open("./scripts/staking-fork.py").read())
+
+# ACCOUNT: change "myAccount" to your wallet eg: Metamask)
+myAccount="0x9B5dFE7965C4A30eAB764ff7abf81b3fa96847Fe"
 
 # TEST ACCOUNT SETUP (sends token + approvals)
 accounts[0].transfer(myAccount, 10e18)
 BZRX.transfer(myAccount, 123e18, {"from": BZRX.address})
 vBZRX.transfer(myAccount, 234e18, {"from": vBZRX.address})
-## Note: LPT "stolen" from a whale, change address if needed
-LPT.transferFrom("0x4085e9fb679dd2f60c2e64afe9533107fa1c18f2", myAccount, 345e18, {"from": "0x4085e9fb679dd2f60c2e64afe9533107fa1c18f2"})
+## Note: BPT "stolen" from a whale, change address if needed
+BPT.transferFrom("0xe95ebce2b02ee07def5ed6b53289801f7fc137a4", myAccount, 345e18, {"from": "0xe95ebce2b02ee07def5ed6b53289801f7fc137a4"})
 BZRX.approve(iBZRX, 10*10**50, {"from": myAccount})
 iBZRX.mint(myAccount, 25*10**18, {"from": myAccount})
 ## Spending Approvals
 BZRX.approve(staking, 10*10**50, {"from": myAccount})
 vBZRX.approve(staking, 10*10**50, {"from": myAccount})
 iBZRX.approve(staking, 10*10**50, {"from": myAccount})
-LPT.approve(staking, 10*10**50, {"from": myAccount})
+BPT.approve(staking, 10*10**50, {"from": myAccount})
 
 # ----------  COMMANDS TO CREATE TEST CASES ----------- #
 
 # --- STAKE ---
 
 # STAKE multiple
-staking.stake([BZRX, vBZRX, iBZRX, LPT], [10e18, 10e18, 10e18, 10e18], {"from": myAccount})
+staking.stake([BZRX, vBZRX, iBZRX, BPT], [10e18, 10e18, 10e18, 10e18], {"from": myAccount})
 
 # --- REWARDS ---
 
 # SWEEP FEES (myAccount can claim BZRX / 3CRV)
-staking.setMaxAllowedDisagreement(10e18)
 staking.sweepFees({"from": myAccount})
 
 # REWARDS: generate incentive rewards (VBZRX)
@@ -84,7 +83,7 @@ txBorrow = iUSDC.borrow("", borrowAmount, borrowTime, collateralAmount, collater
 staking.unstake([BZRX], [10e18], {"from": accounts[0]})
 
 # UNSTAKE multiple
-staking.unstake([BZRX, vBZRX, iBZRX, LPT], [10e18, 10e18, 10e18, 10e18], {"from": myAccount})
+staking.unstake([BZRX, vBZRX, iBZRX, BPT], [10e18, 10e18, 10e18, 10e18], {"from": myAccount})
 
 # UNSTAKE all
 staking.exit({"from": myAccount})

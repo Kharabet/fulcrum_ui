@@ -16,7 +16,7 @@ module.exports = {
 
         const newIncludePaths = [
           // relative path to my yarn workspace library
-          path.resolve(__dirname, '../common')
+          path.resolve(__dirname, '../bzx-common')
         ]
         if (tsxRule) {
           if (Array.isArray(tsxRule.include)) {
@@ -29,9 +29,12 @@ module.exports = {
       return webpackConfig
     },
     plugins: [
-      new webpack.NormalModuleReplacementPlugin(/(.*)BUILD_APP_NETWORK(\.*)/, function (resource) {
-        resource.request = resource.request.replace(/BUILD_APP_NETWORK/, process.env.REACT_APP_ETH_NETWORK)
-      }),
+      new webpack.NormalModuleReplacementPlugin(/(.*)BUILD_APP_NETWORK(\.*)/, function(resource) {
+        resource.request = resource.request.replace(
+          /BUILD_APP_NETWORK/,
+          process.env.REACT_APP_ETH_NETWORK
+        )
+      })
     ]
   },
   babel: {
@@ -40,8 +43,8 @@ module.exports = {
         'module-resolver',
         {
           alias: {
-            'src': './src',
-            'bzx-common': '../common',
+            src: './src',
+            'bzx-common': '../bzx-common',
             'app-images': './src/assets/images',
             'app-lib': './src/lib',
             'app-services': './src/services',

@@ -2,7 +2,6 @@ import { BigNumber } from '@0x/utils'
 import { TransactionReceipt, Web3Wrapper, LogEntry } from '@0x/web3-wrapper'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
-import hashUtils from 'app-lib/hashUtils'
 import GovernanceProposal, {
   IGovernanceProposalActionItem,
   IGovernanceProposalHistoryItem,
@@ -20,7 +19,7 @@ import ProviderType from '../domain/ProviderType'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import RequestTask from '../domain/RequestTask'
 import Web3ConnectionFactory from '../domain/Web3ConnectionFactory'
-import ContractsSource from './ContractsSource'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import ProviderChangedEvent from './events/ProviderChangedEvent'
 import { stakeableToken } from 'src/domain/stakingTypes'
 import { LogWithDecodedArgs } from 'ethereum-types'
@@ -28,7 +27,7 @@ import {
   CompoundGovernorAlphaProposalCanceledEventArgs,
   CompoundGovernorAlphaProposalCreatedEventArgs,
   CompoundGovernorAlphaProposalExecutedEventArgs,
-  CompoundGovernorAlphaProposalQueuedEventArgs,
+  CompoundGovernorAlphaProposalQueuedEventArgs
 } from '../contracts/CompoundGovernorAlpha'
 import stakingApi from 'app-lib/stakingApi'
 
@@ -272,7 +271,8 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         canceled,
         executed
       })
-      proposalsStates.push(new BigNumber(await governanceContract.state.callAsync(new BigNumber(i)))
+      proposalsStates.push(
+        new BigNumber(await governanceContract.state.callAsync(new BigNumber(i)))
       )
     }
     const remappedProposals = []
@@ -297,7 +297,9 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         proposalsEvents
       )
 
-      const actions: IGovernanceProposalActionItem[] = await this.getProposalActions(new BigNumber(id))
+      const actions: IGovernanceProposalActionItem[] = await this.getProposalActions(
+        new BigNumber(id)
+      )
       const proposer: IGovernanceProposalProposer = await stakingApi.getUserFrom3Box(
         creationEvent.args.proposer
       )
