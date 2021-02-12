@@ -14,8 +14,9 @@
   &__column {
     display: flex;
     flex-direction: column;
-    width: calc(50% - 8px);
+    width: calc(50%);
     padding: 0 10px;
+   
     &-row {
       & + .expected-result__column-row {
         margin-top: 18px;
@@ -41,7 +42,7 @@
       color: #fe7272;
     }
   }
-  
+
   &__column-title {
     margin-bottom: 2px;
     font-weight: 600;
@@ -53,12 +54,40 @@
       color: #1cd8c4;
     }
   }
+  .liquidation-price{
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+  }
   &__chi {
     font-weight: 600;
     font-size: 14px;
     color: #283049;
   }
+  &__liquidation-price-switch {
+    border-radius: 22px;
+    label {
+      line-height: 1.5;
+      vertical-align: 5px;
+      font-size: 9px;
+      display: inline-block;
+      padding: 3px 6px;
+      cursor: pointer;
 
+      background-color: #f3f9ff;
+      &:first-child {
+        border-radius: 18px 0 0 18px;
+      }
+      &:last-child {
+        border-radius: 0 18px 18px 0;
+      }
+      &.active {
+        background-color: #276bfb;
+        transition: 0.15s background-color;
+        color: #ffffff;
+      }
+    }
+  }
   .chi-switch {
     display: inline-block;
     margin-top: 5px;
@@ -134,13 +163,13 @@
     float: right;
   }
   @media screen and (max-width: $mobile-version-max-width) {
-    //display: block;
     margin-top: 30px;
     margin-bottom: 0;
     &__column {
-      padding: 0px 15px;
+      padding: 0px 10px;
+      width: calc(50% + 4px);
       & + .expected-result__column {
-        width: calc(50% + 4px);
+        width: calc(50% - 8px);
       }
     }
     &__column-row {
@@ -149,7 +178,7 @@
       }
     }
     &__column-value {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
     }
 
@@ -163,7 +192,9 @@
         transform: translateX(-13.5px);
       }
     }
-
+    &__liquidation-price-switch {
+      margin-right: -10px;
+    }
     .value {
       font-weight: 800;
     }
@@ -177,8 +208,7 @@
       }
     }
     &__chi {
-      font-size: 12px;
-
+      font-size: 13px;
       font-weight: 600;
     }
     .tooltip__icon {

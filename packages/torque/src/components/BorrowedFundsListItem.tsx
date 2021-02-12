@@ -22,6 +22,7 @@ import { ManageCollateralDlg } from './ManageCollateralDlg'
 import { Rail } from './Rail'
 import { RepayLoanDlg } from './RepayLoanDlg'
 import { TxProcessingLoader } from './TxProcessingLoader'
+import { LiquidationDropdown } from './LiquidationDropdown'
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState
@@ -46,6 +47,7 @@ interface IBorrowedFundsListItemState {
     | BorrowRequest
     | RolloverRequest
     | undefined
+  activeTokenLiquidation?: Asset
 }
 
 const isMainnetProd =
@@ -68,7 +70,8 @@ export class BorrowedFundsListItem extends Component<
       isLoadingTransaction: false,
       isInProgress: props.item.isInProgress,
       isEmpty: false,
-      request: undefined
+      request: undefined,
+      activeTokenLiquidation: this.props.item.loanAsset
     }
     TorqueProvider.Instance.eventEmitter.on(
       TorqueProviderEvents.AskToOpenProgressDlg,
@@ -153,23 +156,46 @@ export class BorrowedFundsListItem extends Component<
     )
 
     // liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
-    const liquidationCollateralToLoanRate = this.props.item
+    // const liquidationCollateralToLoanRate = this.props.item
+    //   .loanData!.maintenanceMargin.times(
+    //     this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)
+    //   )
+    //   .div(10 ** 20)
+    //   .plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision))
+    //   .div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision))
+    //   .times(10 ** 18)
+
+    const liquidationPrice = this.props.item
       .loanData!.maintenanceMargin.times(
-        this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)
+        this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision)
       )
       .div(10 ** 20)
-      .plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision))
-      .div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision))
-      .times(10 ** 18)
-    const liquidationPrice = liquidationCollateralToLoanRate
-      .div(10 ** 18)
-      .times(collateralToUSDCurrentRate)
+      .plus(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision))
+      .div(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision))
+      .div(this.props.item.collateralizedPercent.plus(1))
+
+
+    const activeTokenLiquidation = liquidationPrice.lt(1)
+      ? this.props.item.collateralAsset
+      : this.props.item.loanAsset
+
     this.setState({
       ...this.state,
       assetDetails: assetDetails,
       interestRate: this.props.item.interestRate,
-      liquidationPrice
+      liquidationPrice,
+      activeTokenLiquidation
     })
+  }
+
+  public formatPrecision(output: BigNumber): string {
+    const outputNumber = Number(output)
+    const n = Math.log(outputNumber) / Math.LN10
+    let x = 3 - n
+    if (x < 0) x = 0
+    if (x > 6) x = 6
+    const result = Number(outputNumber.toFixed(x)).toString()
+    return result
   }
 
   public render() {
@@ -191,7 +217,7 @@ export class BorrowedFundsListItem extends Component<
     // 115%
     const sliderMin = loanData.maintenanceMargin.div(10 ** 18).toNumber()
     // 300%
-    const sliderMax = sliderMin + 185
+    const sliderMax = 3000
     const isUnhealthyLoan = this.state.borrowedFundsItem.collateralizedPercent
       .times(100)
       .plus(100)
@@ -211,6 +237,11 @@ export class BorrowedFundsListItem extends Component<
     }
 
     if (this.state.isEmpty) return null
+
+    const liquidationPrice =
+      this.state.activeTokenLiquidation === this.props.item.loanAsset
+        ? this.state.liquidationPrice
+        : new BigNumber(1).div(this.state.liquidationPrice)
 
     return (
       <div className={`borrowed-funds-list-item`}>
@@ -288,16 +319,22 @@ export class BorrowedFundsListItem extends Component<
               borrowedFundsItem.collateralAsset
             }`}
             className="borrowed-funds-list-item__body-collateralized-value">
-            <span className="value">{borrowedFundsItem.collateralAmount.toFixed(4)}</span>&nbsp;
+            Collateral:&nbsp;<span className="value">{borrowedFundsItem.collateralAmount.toFixed(4)}</span>&nbsp;
             {borrowedFundsItem.collateralAsset === Asset.WETH
               ? Asset.ETH
               : borrowedFundsItem.collateralAsset}
           </div>
           <div
-            title={`$${this.state.liquidationPrice.toFixed()}`}
+            title={`${liquidationPrice.toFixed()}`}
             className="borrowed-funds-list-item__body-collateralized-value">
-            Liq. Price:&nbsp;$
-            <span className="value">{this.state.liquidationPrice.toFixed(2)}</span>
+            Liq. Price:&nbsp;
+            <span className="value">{this.formatPrecision(liquidationPrice)}</span>
+            <LiquidationDropdown
+              selectedAsset={this.state.activeTokenLiquidation!}
+              loanAsset={this.props.item.loanAsset}
+              collateralAsset={this.props.item.collateralAsset}
+              onAssetChange={(activeTokenLiquidation) => this.setState({ activeTokenLiquidation })}
+            />
           </div>
         </div>
         {this.state.isInProgress ? (

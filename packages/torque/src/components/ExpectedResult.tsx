@@ -1,31 +1,52 @@
 import { BigNumber } from '@0x/utils'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Asset from 'bzx-common/src/assets/Asset'
 import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
 import ReactTooltip from 'react-tooltip'
 import { ChiSwitch } from './ChiSwitch'
+import { LiquidationDropdown } from './LiquidationDropdown'
 
 export interface IExpectedResultProps {
   collaterizationPercents: string
   liquidationPrice: BigNumber
   estimatedFee: BigNumber
-  quoteToken: Asset
+  collateralToken: Asset
+  loanToken: Asset
   loanStatus: string
 }
 
 function ExpectedResult(props: IExpectedResultProps) {
-  const precisionDigits = props.quoteToken === Asset.WBTC ? 4 : 2
   const estimatedFeeChi = props.estimatedFee.times(0.4)
+  const [activeTokenLiquidation, setActiveTokenLiquidation] = useState(props.loanToken)
+  const [isLiquidationPriceLoaded, setLiquidationPriceLoaded] = useState(false)
+
+  useEffect(() => {
+    if (!props.liquidationPrice.eq(0) && !isLiquidationPriceLoaded) {
+      setActiveTokenLiquidation(
+        props.liquidationPrice.lt(1) ? props.collateralToken : props.loanToken
+      )
+      setLiquidationPriceLoaded(true)
+    }
+  }, [props.liquidationPrice])
+
+  useEffect(() => {
+    setLiquidationPriceLoaded(false)
+  }, [props.collateralToken])
 
   function formatPrecision(output: BigNumber): string {
     const outputNumber = Number(output)
     const n = Math.log(outputNumber) / Math.LN10
-    let x = 2 - n
+    let x = 3 - n
     if (x < 0) x = 0
-    if (x > 5) x = 5
+    if (x > 6) x = 6
     const result = Number(outputNumber.toFixed(x)).toString()
     return result
   }
+
+  const liquidationPrice =
+    activeTokenLiquidation === props.loanToken
+      ? props.liquidationPrice
+      : new BigNumber(1).div(props.liquidationPrice)
 
   return (
     <div className="expected-result">
@@ -35,28 +56,33 @@ function ExpectedResult(props: IExpectedResultProps) {
 
           <div className="expected-result__column-value">
             <div>
-              <span className={`value ${props.loanStatus}`}>
-                {props.collaterizationPercents}
-              </span>
-              %
+              <span className={`value ${props.loanStatus}`}>{props.collaterizationPercents}</span>%
             </div>
           </div>
         </div>
         <div className="expected-result__column-row">
-          <div className="expected-result__column-title">Liquidation Price</div>
-          <div
-            title={`${props.liquidationPrice.toFixed(18)}`}
-            className="expected-result__column-value">
+          <div className="expected-result__column-title liquidation-price">
+            Liq. Price
+            <LiquidationDropdown
+              selectedAsset={activeTokenLiquidation}
+              onAssetChange={(asset) => setActiveTokenLiquidation(asset)}
+              loanAsset={props.loanToken}
+              collateralAsset={props.collateralToken}
+            />
+          </div>
+          <div title={`${liquidationPrice.toFixed(18)}`} className="expected-result__column-value">
             <div>
-              <span className={`value ${props.loanStatus}`}>
-                {props.liquidationPrice.toFixed(precisionDigits)}
-              </span>
-              &nbsp;{props.quoteToken}
+              {isLiquidationPriceLoaded ? (
+                <span className={`value ${props.loanStatus}`}>
+                  {formatPrecision(liquidationPrice)}
+                </span>
+              ) : (
+                <span className={`value`}>-</span>
+              )}
             </div>
           </div>
         </div>
       </div>
-
       <div className="expected-result__column">
         <div className="expected-result__column-row">
           <div className="expected-result__column-title">
@@ -75,7 +101,7 @@ function ExpectedResult(props: IExpectedResultProps) {
               <span className="expected-result__fee">-</span>
             ) : (
               <span className="expected-result__fee" title={props.estimatedFee.toFixed()}>
-                ~$<span className="value">{formatPrecision(props.estimatedFee)}</span>
+                ~$<span className="value">{props.estimatedFee.toFixed(0)}</span>
               </span>
             )}
           </div>
@@ -84,7 +110,7 @@ function ExpectedResult(props: IExpectedResultProps) {
           <div className="expected-result__column-title">
             Save&nbsp;
             <span className="value" title={estimatedFeeChi.toFixed()}>
-              {props.estimatedFee.eq(0) ? '' : `${formatPrecision(estimatedFeeChi)}$ `}
+              {props.estimatedFee.eq(0) ? '' : `${estimatedFeeChi.toFixed(0)} `}
             </span>
             with CHI
             <IconInfo

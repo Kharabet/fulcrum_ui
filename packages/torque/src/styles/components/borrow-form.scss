@@ -24,7 +24,7 @@
       transform: translate(-50%, 0);
     }
   }
- 
+
   &__info_block {
     width: 100%;
     &__logo {
@@ -157,7 +157,8 @@
     &[type='number'] {
       -moz-appearance: textfield;
     }
-    &:hover {
+    &:hover,
+    &:focus {
       background-color: transparent;
       color: #283049;
     }
@@ -432,6 +433,12 @@
       height: 24px;
       margin-top: -9px;
       vertical-align: -2px;
+    }
+    .liquidation-dropdown-button__arrow {
+      margin-left: 3px;
+      svg {
+        width: 16px;
+      }
     }
   }
 }
