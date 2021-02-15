@@ -2988,6 +2988,34 @@ export class StakingV1Contract extends BaseContract {
             return result;
         },
     };
+    public vestingLastSync = {
+        async callAsync(
+            index_0: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('vestingLastSync(address)', [index_0
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('vestingLastSync(address)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
     constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
         super('StakingV1', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
         classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);

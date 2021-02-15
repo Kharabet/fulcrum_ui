@@ -38,8 +38,8 @@ brownie console --network mainnet-fork
 You can copy paste the following up until `"Commands to create test cases"` into the brownie console. The rest of the commands to execute depend on what you want to test.
 
 ```py
-# CONTRACTS SETUP
-exec(open("./scripts/staking-fork.py").read())
+# FORK SETUP
+exec(open("./scripts/set-env.py").read())
 
 # ACCOUNT: change "myAccount" to your wallet eg: Metamask)
 myAccount="0x9B5dFE7965C4A30eAB764ff7abf81b3fa96847Fe"
@@ -96,6 +96,11 @@ for i in range(10):
     BZRX.approve(staking, 500e18, {'from': accounts[i]})
     staking.stake([BZRX], [BZRX.balanceOf(accounts[i])], {'from': accounts[i]})
 
+
+# --- Move the blockchain in time for vbzrx ---
+# 1720792801 is when vbzrx have all vested
+chain.sleep(1720792801 - chain.time())
+chain.mine()
 ```
 
 ## Other

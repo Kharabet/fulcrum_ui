@@ -17,6 +17,7 @@ type rewardsProp =
   | 'stableCoinVesting'
   | 'stakingProvider'
   | 'vestedVbzrx'
+  | 'vestedBzrxInRewards'
 
 export default class Rewards {
   /**
@@ -27,6 +28,11 @@ export default class Rewards {
    * BZRX pending to received from staked vbzrx
    */
   public bzrxVesting = new BigNumber(0)
+  /**
+   * The part of bzrx staking rewards that is not really staking rewards but instead
+   * comes from the staked vbzrx that have vested.
+   */
+  public vestedBzrxInRewards = new BigNumber(0)
   public error: Error | null = null
   public pendingRebateRewards = false
   public pendingStakingRewards = false
@@ -83,9 +89,15 @@ export default class Rewards {
       this.assign(rewards)
       const vestedBzrx = await this.stakingProvider.getVestedBzrxBalance()
       this.set('vestedVbzrx', vestedBzrx.div(10 ** 18))
+      const vestedBzrxInRewards = await sp.getVestedVbzrxInRewards(
+        this.stakingStore.userBalances.staked.vbzrx
+      )
+      this.set('vestedBzrxInRewards', vestedBzrxInRewards)
       return rewards
     } catch (err) {
-      const error = errorUtils.decorateError(err, { title: 'Failed to get rewards balances' })
+      const error = errorUtils.decorateError(err, {
+        title: 'Failed to get rewards balances'
+      })
       this.set('error', error)
     } finally {
       this.set('pendingStakingRewards', false)
