@@ -2,7 +2,6 @@ import { BigNumber } from '@0x/utils'
 import { TransactionReceipt, Web3Wrapper, LogEntry } from '@0x/web3-wrapper'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
-import hashUtils from 'app-lib/hashUtils'
 import GovernanceProposal, {
   IGovernanceProposalActionItem,
   IGovernanceProposalHistoryItem,
@@ -20,7 +19,7 @@ import ProviderType from '../domain/ProviderType'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import RequestTask from '../domain/RequestTask'
 import Web3ConnectionFactory from '../domain/Web3ConnectionFactory'
-import ContractsSource from './ContractsSource'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import ProviderChangedEvent from './events/ProviderChangedEvent'
 import { stakeableToken } from 'src/domain/stakingTypes'
 import { LogWithDecodedArgs } from 'ethereum-types'
@@ -28,8 +27,9 @@ import {
   CompoundGovernorAlphaProposalCanceledEventArgs,
   CompoundGovernorAlphaProposalCreatedEventArgs,
   CompoundGovernorAlphaProposalExecutedEventArgs,
-  CompoundGovernorAlphaProposalQueuedEventArgs,
+  CompoundGovernorAlphaProposalQueuedEventArgs
 } from '../contracts/CompoundGovernorAlpha'
+import ethGasStation from 'app-lib/apis/ethGasStation'
 import stakingApi from 'app-lib/stakingApi'
 
 // @ts-ignore
@@ -272,7 +272,8 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         canceled,
         executed
       })
-      proposalsStates.push(new BigNumber(await governanceContract.state.callAsync(new BigNumber(i)))
+      proposalsStates.push(
+        new BigNumber(await governanceContract.state.callAsync(new BigNumber(i)))
       )
     }
     const remappedProposals = []
@@ -297,7 +298,9 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         proposalsEvents
       )
 
-      const actions: IGovernanceProposalActionItem[] = await this.getProposalActions(new BigNumber(id))
+      const actions: IGovernanceProposalActionItem[] = await this.getProposalActions(
+        new BigNumber(id)
+      )
       const proposer: IGovernanceProposalProposer = await stakingApi.getUserFrom3Box(
         creationEvent.args.proposer
       )
@@ -601,7 +604,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const txHash = await vbzrxContract.claim.sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await this.gasPrice()
+      gasPrice: await ethGasStation.getGasPrice()
     })
 
     await this.waitForTransactionMined(txHash)
@@ -643,36 +646,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
     const [bzrx, ibzrx, vbzrx, bpt] = await stakingContract.balanceOfByAssets.callAsync(address)
     return { bzrx, ibzrx, vbzrx, bpt }
-  }
-
-  public gasPrice = async (): Promise<BigNumber> => {
-    let result = new BigNumber(500).multipliedBy(10 ** 9) // upper limit 120 gwei
-    const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
-
-    const url = `https://ethgasstation.info/json/ethgasAPI.json`
-    try {
-      const response = await fetch(url)
-      const jsonData = await response.json()
-      if (jsonData.average) {
-        // ethgasstation values need divide by 10 to get gwei
-        const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8)
-        const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10 ** 8)
-        if (gasPriceAvg.lt(result)) {
-          result = gasPriceAvg
-        } else if (gasPriceSafeLow.lt(result)) {
-          result = gasPriceSafeLow
-        }
-      }
-    } catch (error) {
-      // console.log(error);
-      result = new BigNumber(60).multipliedBy(10 ** 9) // error default 60 gwei
-    }
-
-    if (result.lt(lowerLimit)) {
-      result = lowerLimit
-    }
-
-    return result
   }
 
   /**
@@ -805,6 +778,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   /**
    * User gets 4 types of rewards (earnings)
    * [bzrx, stableCoin, bzrxVesting, stableCoinVesting]
+   * NOTE: bzrx amount is actually the sum of "real" staking rewards + vested staked vbzrx
    */
   public getStakingRewards = async (): Promise<{
     bzrx: BigNumber
@@ -830,6 +804,41 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       bzrxVesting: result[2].div(10 ** 18),
       stableCoinVesting: result[3].div(10 ** 18)
     }
+  }
+
+  /**
+   * Part of the staking rewards that are actually vested BZRX coming from staked vbzrx
+   */
+  public async getVestedVbzrxInRewards(vbzrxStaked: BigNumber) {
+    const account = this.getCurrentAccount()
+    const stakingContract = await this.getStakingContract()
+
+    if (!account || !stakingContract) {
+      throw new Error('missing staking contract')
+    }
+
+    const vestingLastSyncTime = await stakingContract.vestingLastSync.callAsync(account, {
+      from: account
+    })
+
+    let now = new BigNumber(Date.now()).div(1000).dp(0)
+
+    if (this.web3Wrapper && process.env.NODE_ENV !== 'production') {
+      /**
+       * Note: When we test on a fork and move the time of the chain with chain.sleep()
+       * The time in the browser is out of sync with the chain, so we fetch the last block time
+       */
+      const lastBlock = await this.web3Wrapper.getBlockNumberAsync()
+      const lastBlockTime = await this.web3Wrapper.getBlockTimestampAsync(lastBlock)
+      now = new BigNumber(lastBlockTime)
+    }
+
+    const vestedBzrxInRewards = now
+      .minus(vestingLastSyncTime)
+      .div(appConfig.vestingDurationAfterCliff)
+      .times(vbzrxStaked)
+
+    return vestedBzrxInRewards
   }
 
   /**
@@ -952,7 +961,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const txHash = await stakingContract.stake.sendTransactionAsync(addresses, amounts, {
       from: account,
       gas: gasAmount,
-      gasPrice: await this.gasPrice()
+      gasPrice: await ethGasStation.getGasPrice()
     })
 
     if (opId) {
@@ -995,7 +1004,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const txHash = await stakingContract.unstake.sendTransactionAsync(addresses, amounts, {
       from: account,
       gas: gasAmount,
-      gasPrice: await this.gasPrice()
+      gasPrice: await ethGasStation.getGasPrice()
     })
 
     await this.waitForTransactionMined(txHash)
@@ -1018,7 +1027,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const txHash = await stakingContract.claim.sendTransactionAsync(shouldRestake, {
       from: account,
       gas: gasAmount,
-      gasPrice: await this.gasPrice()
+      gasPrice: await ethGasStation.getGasPrice()
     })
 
     await this.waitForTransactionMined(txHash)
@@ -1044,7 +1053,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const txHash = await bZxContract.claimRewards.sendTransactionAsync(account, {
       from: account,
       gas: gasAmount,
-      gasPrice: await this.gasPrice()
+      gasPrice: await ethGasStation.getGasPrice()
     })
 
     await this.waitForTransactionMined(txHash)

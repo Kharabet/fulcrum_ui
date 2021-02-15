@@ -4,6 +4,7 @@ import AssetBalance from 'shared-components/AssetBalance'
 import ExternalLink from 'shared-components/ExternalLink'
 import { Button, InputBasic } from 'ui-framework'
 import RewardsVM from './RewardsVM'
+import numberUtils from 'app-lib/numberUtils'
 
 export function StakingRewards({ vm }: { vm: RewardsVM }) {
   const { rewards } = vm
@@ -27,6 +28,18 @@ export function StakingRewards({ vm }: { vm: RewardsVM }) {
         id="crv"
         name="3CRV (USD)"
       />
+
+      {rewards.bzrx.gt(0.01) && (
+        <p>
+          <b>BZRX</b> rewards include{' '}
+          <b className="txt-positive">{numberUtils.format(rewards.vestedBzrxInRewards)}</b>{' '}
+          <i>vested BZRX</i> from your staked vBZRX and{' '}
+          <b className="txt-positive">
+            {numberUtils.format(rewards.bzrx.minus(rewards.vestedBzrxInRewards))}
+          </b>{' '}
+          BZRX of <i>actual staking rewards</i>.
+        </p>
+      )}
 
       <p className="margin-bottom-2">
         <b>3CRV</b> is an interest earning stablecoin made up of other stablecoins. You can redeem
