@@ -67,6 +67,21 @@ export default class Rewards {
   }
 
   /**
+   * BZRX rewards include vbzrx staked that have vested + actual rewards.
+   * This is the actual staking reward part.
+   * Note: under certain circumstances, the vestedBzrxInRewards may be bigger
+   * than the total rewards. If that happens we prevent having a negative value
+   * and set it to 0.
+   */
+  get actualBzrxStakingRewards() {
+    const amount = this.bzrx.minus(this.vestedBzrxInRewards)
+    if (amount.isNegative()) {
+      return new BigNumber(0)
+    }
+    return amount
+  }
+
+  /**
    * Helper to set the value of one prop through a mobx action.
    */
   public set(prop: rewardsProp, value: any) {

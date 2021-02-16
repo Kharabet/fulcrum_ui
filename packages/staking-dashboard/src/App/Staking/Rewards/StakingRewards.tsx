@@ -34,9 +34,7 @@ export function StakingRewards({ vm }: { vm: RewardsVM }) {
           <b>BZRX</b> rewards include{' '}
           <b className="txt-positive">{numberUtils.format(rewards.vestedBzrxInRewards)}</b>{' '}
           <i>vested BZRX</i> from your staked vBZRX and{' '}
-          <b className="txt-positive">
-            {numberUtils.format(rewards.bzrx.minus(rewards.vestedBzrxInRewards))}
-          </b>{' '}
+          <b className="txt-positive">{numberUtils.format(rewards.actualBzrxStakingRewards)}</b>{' '}
           BZRX of <i>actual staking rewards</i>.
         </p>
       )}
