@@ -23,6 +23,15 @@ The following must be done in the contract repo folder.
 - The local fork will be available on `localhost:8545`
 - Provider, like Metamask should be pointed to `localhost:8545`
 
+**Metamask example**
+
+Go to Settings -> networks -> add network
+
+- Network name: **Localhost 8545**
+- RPC url: **http://localhost:8545**
+- Chain ID: **1**
+- Currency Symbol: **ETH**
+
 ### Commands and scripts
 
 Run from the **contract repo folder**.

@@ -813,25 +813,19 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const account = this.getCurrentAccount()
     const stakingContract = await this.getStakingContract()
 
-    if (!account || !stakingContract) {
-      throw new Error('missing staking contract')
+    if (!account || !stakingContract || !this.web3Wrapper) {
+      throw new Error('Missing staking contract, account or web3Wrapper')
     }
 
     const vestingLastSyncTime = await stakingContract.vestingLastSync.callAsync(account, {
       from: account
     })
 
-    let now = new BigNumber(Date.now()).div(1000).dp(0)
-
-    if (this.web3Wrapper && process.env.NODE_ENV !== 'production') {
-      /**
-       * Note: When we test on a fork and move the time of the chain with chain.sleep()
-       * The time in the browser is out of sync with the chain, so we fetch the last block time
-       */
-      const lastBlock = await this.web3Wrapper.getBlockNumberAsync()
-      const lastBlockTime = await this.web3Wrapper.getBlockTimestampAsync(lastBlock)
-      now = new BigNumber(lastBlockTime)
-    }
+    /**
+     * Note: it is better to use the blockchain time than the user browser local time
+     */
+    const lastBlockTime = await this.web3Wrapper.getBlockTimestampAsync('latest')
+    const now = new BigNumber(lastBlockTime)
 
     const vestedBzrxInRewards = now
       .minus(vestingLastSyncTime)
