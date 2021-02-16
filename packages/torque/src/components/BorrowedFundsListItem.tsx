@@ -157,23 +157,15 @@ export class BorrowedFundsListItem extends Component<
     const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
 
     // liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
-    // const liquidationCollateralToLoanRate = this.props.item
-    //   .loanData!.maintenanceMargin.times(
-    //     this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)
-    //   )
-    //   .div(10 ** 20)
-    //   .plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision))
-    //   .div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision))
-    //   .times(10 ** 18)
-
     const liquidationCollateralToLoanRate = this.props.item
       .loanData!.maintenanceMargin.times(
-        this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision)
+        this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision)
       )
       .div(10 ** 20)
-      .plus(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision))
-      .div(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision))
+      .plus(this.state.borrowedFundsItem.loanData!.principal.times(loanAssetPrecision))
+      .div(this.state.borrowedFundsItem.loanData!.collateral.times(collateralAssetPrecision))
       .times(10 ** 18)
+
     const liquidationPrice = liquidationCollateralToLoanRate.div(10 ** 18)
 
     const activeTokenLiquidation = liquidationPrice.lt(1)

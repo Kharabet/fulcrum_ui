@@ -121,16 +121,20 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         switchMap((value) => this.rxConvertToBigNumber(value))
       ),
       this._collateralChange.pipe(
+        debounceTime(100),
         switchMap((value) => this.rxConvertToBigNumber(this.state.depositAmountValue))
       )
     )
       .pipe(switchMap((value) => this.rxGetBorrowEstimate(value)))
       .subscribe(async (next) => {
+        this.setState({ isLoading: true })
         this.setBorrowEstimate(next.borrowAmount)
         await this.setEstimatedFee()
         await this.setLiquidationPrice()
         await this.checkBalanceTooLow()
         this.changeStateLoading()
+
+        this.setState({ isLoading: false })
       })
   }
 
@@ -214,34 +218,32 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public setLiquidationPrice = async () => {
+    this.setState({ isLoading: true })
     const maintenanceMargin = await TorqueProvider.Instance.getMaintenanceMargin(
       this.props.borrowAsset,
       this.state.collateralAsset
     )
 
-    const initialMargin = this.state.minValue.minus(0.3019).plus(30)
-    const collaterizationPercents = new BigNumber(
-      this.state.collaterizationPercents || initialMargin
-    )
-      .div(100)
-      .div(initialMargin.div(this.state.minValue))
+    const loanTokenDecimals = AssetsDictionary.assets.get(this.props.borrowAsset)?.decimals || 18
+    const collateralTokenDecimals =
+      AssetsDictionary.assets.get(this.state.collateralAsset)?.decimals || 18
 
-    const collateralToPrincipalRate = await TorqueProvider.Instance.getKyberSwapRate(
-      this.props.borrowAsset,
-      this.state.collateralAsset
-    )
-
+    const loanAssetPrecision = new BigNumber(10 ** (18 - loanTokenDecimals))
+    const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralTokenDecimals))
     const liquidationCollateralToLoanRate = maintenanceMargin
-      .times(collateralToPrincipalRate.times(10 ** 18))
+      .times(this.state.borrowAmount.times(10 ** loanTokenDecimals).times(loanAssetPrecision))
       .div(10 ** 20)
-      .plus(collateralToPrincipalRate.times(10 ** 18))
-      //.div(new BigNumber(10 ** 20).plus(collaterizationPercents.times(10 ** 18)).div(10 ** 20))
-      .div(10 ** 18)
+      .plus(this.state.borrowAmount.times(10 ** loanTokenDecimals).times(loanAssetPrecision))
+      .div(
+        this.state.depositAmount
+          .times(10 ** collateralTokenDecimals)
+          .times(collateralAssetPrecision)
+      )
+      .times(10 ** 18)
+      
+    const liquidationPrice = liquidationCollateralToLoanRate.div(10 ** 18)
 
-    const liquidationPrice = liquidationCollateralToLoanRate.times(collaterizationPercents)
-    //const liquidationPrice =liquidationCollateralToLoanRate
-
-    this.setState({ liquidationPrice })
+    this.setState({ liquidationPrice, isLoading: false })
   }
 
   public formatLiquidity(value: BigNumber): string {
@@ -277,7 +279,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       this.state.ethBalance && this.state.ethBalance.lte(TorqueProvider.Instance.gasBufferForTxn)
         ? 'Insufficient funds for gas'
         : this.state.borrowAmount.gt(this.state.maxAvailableLiquidity) ||
-          (this.state.borrowAmount.eq(0) && this.state.depositAmount.gt(0))
+          (this.state.isLoading && this.state.borrowAmount.eq(0) && this.state.depositAmount.gt(0))
         ? 'There is insufficient liquidity available for this loan'
         : this.state.balanceTooLow
         ? `Insufficient ${this.state.collateralAsset} balance in your wallet!`
@@ -398,6 +400,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               <button
                 className={`btn btn-size--small`}
                 disabled={
+                  this.state.isLoading ||
                   this.state.didSubmit ||
                   this.state.balanceTooLow ||
                   amountMsg !== undefined ||

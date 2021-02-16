@@ -17,20 +17,21 @@ export interface IExpectedResultProps {
 
 function ExpectedResult(props: IExpectedResultProps) {
   const estimatedFeeChi = props.estimatedFee.times(0.4)
-  const [activeTokenLiquidation, setActiveTokenLiquidation] = useState(props.loanToken)
+  const [activeTokenLiquidation, setActiveTokenLiquidation] = useState(props.collateralToken)
   const [isLiquidationPriceLoaded, setLiquidationPriceLoaded] = useState(false)
 
   useEffect(() => {
     if (!props.liquidationPrice.eq(0) && !isLiquidationPriceLoaded) {
-      setActiveTokenLiquidation(
-        props.liquidationPrice.lt(1) ? props.collateralToken : props.loanToken
-      )
+      // setActiveTokenLiquidation(
+      //   props.liquidationPrice.lt(1) ? props.collateralToken : props.loanToken
+      // )
       setLiquidationPriceLoaded(true)
     }
   }, [props.liquidationPrice])
 
   useEffect(() => {
     setLiquidationPriceLoaded(false)
+    setActiveTokenLiquidation(props.collateralToken)
   }, [props.collateralToken])
 
   function formatPrecision(output: BigNumber): string {
@@ -44,7 +45,7 @@ function ExpectedResult(props: IExpectedResultProps) {
   }
 
   const liquidationPrice =
-    activeTokenLiquidation === props.loanToken
+    activeTokenLiquidation === props.collateralToken
       ? props.liquidationPrice
       : new BigNumber(1).div(props.liquidationPrice)
 
@@ -72,7 +73,7 @@ function ExpectedResult(props: IExpectedResultProps) {
           </div>
           <div title={`${liquidationPrice.toFixed(18)}`} className="expected-result__column-value">
             <div>
-              {isLiquidationPriceLoaded ? (
+              {isLiquidationPriceLoaded && !props.liquidationPrice.isNaN() ? (
                 <span className={`value ${props.loanStatus}`}>
                   {formatPrecision(liquidationPrice)}
                 </span>
