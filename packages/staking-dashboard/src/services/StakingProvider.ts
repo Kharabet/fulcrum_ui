@@ -28,7 +28,7 @@ import {
   CompoundGovernorAlphaProposalCreatedEventArgs,
   CompoundGovernorAlphaProposalExecutedEventArgs,
   CompoundGovernorAlphaProposalQueuedEventArgs
-} from '../contracts/CompoundGovernorAlpha'
+} from 'bzx-common/src/contracts/typescript-wrappers/CompoundGovernorAlpha'
 import ethGasStation from 'app-lib/apis/ethGasStation'
 import stakingApi from 'app-lib/stakingApi'
 
