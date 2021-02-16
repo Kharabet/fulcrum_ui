@@ -50,7 +50,20 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
           </div>
         </div>
         <div className="trade-expected-result__column-row">
-          <div className="trade-expected-result__column-title">Liquidation Price</div>
+          <div className="trade-expected-result__column-title">
+            Liquidation Price
+            <IconInfo
+              className="tooltip__icon"
+              data-tip="The liquidation price will vary slightly depending on entry price and the value of your positions collateral."
+              data-for="liquidation-price"
+            />
+            <ReactTooltip
+              id="liquidation-price"
+              className="tooltip__info"
+              place="top"
+              effect="solid"
+            />
+          </div>
           <div
             title={`${props.liquidationPrice.toFixed(18)}`}
             className="trade-expected-result__column-value">
@@ -69,57 +82,60 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
       </div>
 
       <div className="trade-expected-result__column">
-      <div className="trade-expected-result__column-row">
-        <div className="trade-expected-result__column-title">
-          Fees (Overestimated)
-          <IconInfo
-            className="tooltip__icon"
-            data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
-            data-for="fee-estimated"
-          />
-          <ReactTooltip id="fee-estimated" className="tooltip__info" place="top" effect="solid" />
-        </div>
-        <div
-          title={`${props.estimatedFee.toFixed(18)}`}
-          className="trade-expected-result__column-value">
-          {props.estimatedFee.eq(0) ? (
-            <Preloader width="55px" />
-          ) : (
-            <span className="trade-expected-result__fee" title={props.estimatedFee.toFixed()}>
-              ~$<span className="value">{props.estimatedFee.toFixed(2)}</span>
-            </span>
-          )}
-        </div>
+        <div className="trade-expected-result__column-row">
+          <div className="trade-expected-result__column-title">
+            Fees (Overestimated)
+            <IconInfo
+              className="tooltip__icon"
+              data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
+              data-for="fee-estimated"
+            />
+            <ReactTooltip id="fee-estimated" className="tooltip__info" place="top" effect="solid" />
+          </div>
+          <div
+            title={`${props.estimatedFee.toFixed(18)}`}
+            className="trade-expected-result__column-value">
+            {props.estimatedFee.eq(0) ? (
+              <Preloader width="55px" />
+            ) : (
+              <span className="trade-expected-result__fee" title={props.estimatedFee.toFixed()}>
+                ~$<span className="value">{formatPrecision(props.estimatedFee)}</span>
+              </span>
+            )}
+          </div>
         </div>
         <div className="trade-expected-result__column-row">
-        <div className="trade-expected-result__column-title">
-          Save <span className="value" title={estimatedFeeChi.toFixed()}>{formatPrecision(estimatedFeeChi)}$</span> <br/>
-          with CHI
-          <IconInfo
-            className="tooltip__icon"
-            data-multiline="true"
-            data-html={true}
-            data-tip="<p>Use CHI token to save on gas fees. 
+          <div className="trade-expected-result__column-title">
+            Save{' '}
+            <span className="value" title={estimatedFeeChi.toFixed()}>
+              {formatPrecision(estimatedFeeChi)}$
+            </span>{' '}
+            <br />
+            with CHI
+            <IconInfo
+              className="tooltip__icon"
+              data-multiline="true"
+              data-html={true}
+              data-tip="<p>Use CHI token to save on gas fees. 
             CHI will be burned from your wallet, saving you up to 50% on all transaction fees.</p>
-            <a href='https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c' class='tooltip__button'>Buy CHI</a>
-            <a href='https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3' class='tooltip__button'>Learn More</a>"
-            data-for="chi-estimated"
-          />
-          <ReactTooltip
-            id="chi-estimated"
-            className="tooltip__info"
-            place="top"
-            delayHide={500}
-            effect="solid"
-          />
-        </div>
-        <div
-          className="trade-expected-result__column-value">
-          <span className="trade-expected-result__chi">CHI enabled</span>
-          <ChiSwitch />
+            <a href='https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c' class='tooltip__button'  target='blank' rel='noopener noreferrer'>Buy CHI</a>
+            <a href='https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3' class='tooltip__button'  target='blank' rel='noopener noreferrer'>Learn More</a>"
+              data-for="chi-estimated"
+            />
+            <ReactTooltip
+              id="chi-estimated"
+              className="tooltip__info"
+              place="top"
+              delayHide={500}
+              effect="solid"
+            />
+          </div>
+          <div className="trade-expected-result__column-value">
+            <span className="trade-expected-result__chi">CHI enabled</span>
+            <ChiSwitch />
+          </div>
         </div>
       </div>
-    </div>
     </div>
   )
 }

@@ -40,6 +40,8 @@ export interface IHistoryTokenGridProps {
   stablecoins: Asset[]
   baseTokens: Asset[]
   quoteTokens: Asset[]
+
+  onStartTrading: () => void
   updateHistoryRowsData: (data: IHistoryTokenGridRowProps[]) => void
   changeLoadingTransaction: (
     isLoadingTransaction: boolean,
@@ -151,9 +153,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           <div>
             <Placeholder />
             <p>No trading history</p>
-            <a href="/trade" className="manage-token-grid__link-button">
+            <button className="manage-token-grid__link-button" onClick={this.props.onStartTrading}>
               Start Trading
-            </a>
+            </button>
           </div>
         </div>
       )

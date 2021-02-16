@@ -313,7 +313,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             {this.state.activeTokenGridTab === TokenGridTab.Open && (
               <OwnTokenGrid
                 ownRowsData={this.state.ownRowsData}
-                isMobileMedia={this.props.isMobileMedia}
+                isMobileMedia={this.props.isMobileMedia}                
+                onStartTrading={()=>this.onTokenGridTabChange(TokenGridTab.Chart)}
               />
             )}
 
@@ -327,6 +328,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 quoteTokens={this.quoteTokens}
                 updateHistoryRowsData={this.updateHistoryRowsData}
                 changeLoadingTransaction={this.changeLoadingTransaction}
+                onStartTrading={()=>this.onTokenGridTabChange(TokenGridTab.Chart)}
               />
             )}
 
