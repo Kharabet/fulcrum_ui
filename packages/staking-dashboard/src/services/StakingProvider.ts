@@ -15,9 +15,8 @@ import { TypedEmitter } from 'tiny-typed-emitter'
 import appConfig from '../config/appConfig'
 import Asset from '../domain/Asset'
 import AssetsDictionary from '../domain/AssetsDictionary'
-import ProviderType from '../domain/ProviderType'
+import ProviderType from 'bzx-common/src/domain/ProviderType'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
-import RequestTask from '../domain/RequestTask'
 import Web3ConnectionFactory from '../domain/Web3ConnectionFactory'
 import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import ProviderChangedEvent from './events/ProviderChangedEvent'
@@ -41,7 +40,6 @@ interface IStakingProviderEvents {
   ProviderAvailable: () => void
   ProviderChanged: (event: ProviderChangedEvent) => void
   ProviderIsChanging: () => void
-  TaskChanged: (task: RequestTask) => void
   TaskUpdate: (event: {
     opId: string
     opType?: 'staking'
@@ -50,8 +48,6 @@ interface IStakingProviderEvents {
     time?: number
   }) => void
   TransactionMined: () => void
-  AskToOpenProgressDlg: (task: RequestTask) => void
-  AskToCloseProgressDlg: (task: RequestTask) => void
 }
 
 export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
@@ -70,7 +66,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   public accounts: string[] = []
   public unsupportedNetwork: boolean = false
   public impersonateAddress = ''
-  private requestTask: RequestTask | undefined
 
   public readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
 
@@ -1055,10 +1050,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
   public sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
-  }
-
-  public getRequestTask() {
-    return this.requestTask
   }
 }
 

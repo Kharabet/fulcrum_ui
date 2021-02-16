@@ -2,7 +2,7 @@ import _ from 'lodash'
 import * as mobx from 'mobx'
 import { RootStore } from 'src/stores'
 import { DialogVM } from 'ui-framework'
-import ProviderType from 'src/domain/ProviderType'
+import ProviderType from 'bzx-common/src/domain/ProviderType'
 
 type AppVMProps = 'pending' | 'section'
 
