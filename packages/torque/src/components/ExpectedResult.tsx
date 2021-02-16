@@ -73,7 +73,7 @@ function ExpectedResult(props: IExpectedResultProps) {
           </div>
           <div title={`${liquidationPrice.toFixed(18)}`} className="expected-result__column-value">
             <div>
-              {isLiquidationPriceLoaded && !props.liquidationPrice.isNaN() ? (
+              {isLiquidationPriceLoaded && !props.liquidationPrice.isNaN() && props.liquidationPrice.isFinite() ? (
                 <span className={`value ${props.loanStatus}`}>
                   {formatPrecision(liquidationPrice)}
                 </span>

@@ -109,10 +109,14 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         switchMap((value) => this.rxGetDepositEstimate(value))
       )
       .subscribe(async (next) => {
+        // if (next.depositAmount.eq(0)) {return}
+        this.setState({ isLoading: true })
         this.setDepositEstimate(next.depositAmount)
         await this.setEstimatedFee()
+        await this.setLiquidationPrice()
         await this.checkBalanceTooLow()
         this.changeStateLoading()
+        this.setState({ isLoading: false })
       })
 
     merge(
@@ -127,8 +131,12 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     )
       .pipe(switchMap((value) => this.rxGetBorrowEstimate(value)))
       .subscribe(async (next) => {
+        if (next.borrowAmount.eq(0)) {
+          // otherwise collaterization percent will be NaN
+          return
+        }
         this.setState({ isLoading: true })
-        this.setBorrowEstimate(next.borrowAmount)
+        await this.setBorrowEstimate(next.borrowAmount)
         await this.setEstimatedFee()
         await this.setLiquidationPrice()
         await this.checkBalanceTooLow()
@@ -144,7 +152,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   private async setInputDefaults() {
     const ethBalance = await TorqueProvider.Instance.getEthBalance()
-    const maxAvailableLiquidity = await TorqueProvider.Instance.getAvailableLiquidaity(
+    const maxAvailableLiquidity = await TorqueProvider.Instance.getAvailableLiquidity(
       this.props.borrowAsset
     )
 
@@ -160,7 +168,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this.setState(
       {
         isLoading: false,
-        maxAvailableLiquidity,
+        maxAvailableLiquidity: maxAvailableLiquidity.times(0.95),
         ethBalance,
         minValue: minInitialMargin.plus(0.3019),
         collaterizationPercents: initialMargin.toFixed(0)
@@ -240,7 +248,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           .times(collateralAssetPrecision)
       )
       .times(10 ** 18)
-      
+
     const liquidationPrice = liquidationCollateralToLoanRate.div(10 ** 18)
 
     this.setState({ liquidationPrice, isLoading: false })
@@ -278,7 +286,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(TorqueProvider.Instance.gasBufferForTxn)
         ? 'Insufficient funds for gas'
-        : this.state.borrowAmount.gt(this.state.maxAvailableLiquidity) ||
+        : new BigNumber(this.state.borrowAmountValue).gt(this.state.maxAvailableLiquidity) ||
+          this.state.borrowAmount.gt(this.state.maxAvailableLiquidity) ||
           (this.state.isLoading && this.state.borrowAmount.eq(0) && this.state.depositAmount.gt(0))
         ? 'There is insufficient liquidity available for this loan'
         : this.state.balanceTooLow
@@ -546,6 +555,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
     this.setState(
       {
+        isLoading: true,
         sliderValue: this.inverseCurve(this.state.minValue),
         collaterizationPercents: this.state.minValue.toFixed(0),
         depositAmount: this.state.balanceValue,
@@ -585,17 +595,14 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     })
   }
 
-  private setBorrowEstimate = (borrowAmount: BigNumber) => {
+  private setBorrowEstimate = async (borrowAmount: BigNumber) => {
     const precisionDigits = TorqueProvider.Instance.isStableAsset(this.props.borrowAsset) ? 2 : 5
 
     const borrowAmountValue = borrowAmount.dp(precisionDigits, BigNumber.ROUND_CEIL).toString()
-
-    const collaterizationPercents = this.sliderCurve(this.state.sliderValue).toFixed(0)
-
+    this._borrowAmountChange.next(borrowAmountValue)
     this.setState({
       borrowAmount,
-      borrowAmountValue,
-      collaterizationPercents
+      borrowAmountValue
     })
   }
 
@@ -616,7 +623,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   public onChangeDeposit = async (event: ChangeEvent<HTMLInputElement>) => {
     const depositAmountValue = event.target.value ? event.target.value : ''
-
+    if (parseFloat(depositAmountValue) < 0) {
+      return
+    }
     this.setState(
       {
         depositAmount: new BigNumber(depositAmountValue),
@@ -639,10 +648,13 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         const decimals = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18
 
         const depositAmount = balance.dividedBy(10 ** decimals)
-
+        const depositAmountValue = depositAmount.toFixed()
+        this._depositAmountChange.next(depositAmountValue)
         this.setState({
           isLoading: true,
-          balanceValue: depositAmount
+          balanceValue: depositAmount,
+          depositAmountValue,
+          depositAmount
         })
       }
     )

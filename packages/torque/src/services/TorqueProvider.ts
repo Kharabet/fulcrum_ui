@@ -457,6 +457,12 @@ export class TorqueProvider {
       const iBZxContract = await this.contractsSource.getiBZxContract()
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || ''
       if (depositAmount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
+        const collateralToLoanRate = await this.getSwapRate(collateralAsset, borrowAsset)
+        const liquidity = await this.getAvailableLiquidity(borrowAsset)
+        if (depositAmount.times(collateralToLoanRate).gte(liquidity)){
+          result.borrowAmount = liquidity.times(0.8)
+          return result
+        }
         const loanPrecision = AssetsDictionary.assets.get(borrowAsset)!.decimals || 18
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
 
@@ -2300,7 +2306,7 @@ export class TorqueProvider {
     return result
   }
 
-  public getAvailableLiquidaity = async (asset: Asset): Promise<BigNumber> => {
+  public getAvailableLiquidity = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
     if (this.contractsSource && this.web3Wrapper) {

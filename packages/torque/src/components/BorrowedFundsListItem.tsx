@@ -71,7 +71,7 @@ export class BorrowedFundsListItem extends Component<
       isInProgress: props.item.isInProgress,
       isEmpty: false,
       request: undefined,
-      activeTokenLiquidation: this.props.item.loanAsset
+      activeTokenLiquidation: this.props.item.collateralAsset
     }
     TorqueProvider.Instance.eventEmitter.on(
       TorqueProviderEvents.AskToOpenProgressDlg,
@@ -168,16 +168,11 @@ export class BorrowedFundsListItem extends Component<
 
     const liquidationPrice = liquidationCollateralToLoanRate.div(10 ** 18)
 
-    const activeTokenLiquidation = liquidationPrice.lt(1)
-      ? this.props.item.collateralAsset
-      : this.props.item.loanAsset
-
     this.setState({
       ...this.state,
       assetDetails: assetDetails,
       interestRate: this.props.item.interestRate,
-      liquidationPrice,
-      activeTokenLiquidation
+      liquidationPrice
     })
   }
 
@@ -231,10 +226,7 @@ export class BorrowedFundsListItem extends Component<
 
     if (this.state.isEmpty) return null
 
-    const liquidationPrice =
-      this.state.activeTokenLiquidation === this.props.item.loanAsset
-        ? this.state.liquidationPrice
-        : new BigNumber(1).div(this.state.liquidationPrice)
+    const liquidationPrice = this.state.liquidationPrice
 
     return (
       <div className={`borrowed-funds-list-item`}>
