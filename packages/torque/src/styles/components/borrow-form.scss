@@ -148,7 +148,9 @@
     color: #283049;
     font-weight: 800;
     line-height: 64px;
-
+    &::placeholder {
+      font-size: 30px;
+    }
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;

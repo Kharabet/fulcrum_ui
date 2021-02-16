@@ -14,7 +14,10 @@ export interface ILiquidationDropdownState {
   isOpened: boolean
 }
 
-export class LiquidationDropdown extends Component<ILiquidationDropdownProps, ILiquidationDropdownState> {
+export class LiquidationDropdown extends Component<
+  ILiquidationDropdownProps,
+  ILiquidationDropdownState
+> {
   constructor(props: ILiquidationDropdownProps) {
     super(props)
 
@@ -57,24 +60,24 @@ export class LiquidationDropdown extends Component<ILiquidationDropdownProps, IL
 
     return (
       <React.Fragment>
-      
         <div className="liquidation-dropdown-container">
-        {this.state.isOpened ? (
-          <div className="liquidation-dropdown__wrapper" onClick={this.onClose} />
-        ) : null}
+          {this.state.isOpened ? (
+            <div className="liquidation-dropdown__wrapper" onClick={this.onClose} />
+          ) : null}
           <div className="liquidation-dropdown-container">
             <div
               className={`liquidation-dropdown-button ${this.state.isOpened ? 'opened' : 'closed'}`}
-              onClick={this.onOpenClick}>
+              onClick={() => this.onSelect(unselectedAsset)}>
               <span>
                 {this.props.selectedAsset}/{unselectedAsset}
               </span>
-              <span className="liquidation-dropdown-button__arrow">
-                <IconSwitch 
-                 data-tip="Click to toggle quote currency. Liq is the price at which your position is liquidated."
-                 data-for="covert"/>
-                <ReactTooltip id="covert" className="tooltip__info" place="top" effect="solid" />
+              <span
+                className="liquidation-dropdown-button__arrow"
+                data-tip="Click to toggle quote currency. Liq is the price at which your position is liquidated."
+                data-for="convert">
+                <IconSwitch />
               </span>
+              <ReactTooltip id="convert" className="tooltip__info" place="top" effect="solid" />
             </div>
             {this.state.isOpened ? (
               <React.Fragment>

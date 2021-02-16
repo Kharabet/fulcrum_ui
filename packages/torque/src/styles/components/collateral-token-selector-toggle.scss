@@ -1,12 +1,13 @@
 .collateral-token-selector-toggle {
   display: flex;
   font-weight: 600;
-  background-color: #E7EBF0;
+  background-color: #e7ebf0;
   border-radius: 8px;
   padding: 8px;
   position: relative;
   height: 40px;
   margin-right: 12px;
+  width: 135px;
   &.active {
     background-color: #ffffff;
     border-color: #5b88ff;
@@ -45,34 +46,41 @@
   }
 
   &__info-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 15px;
     color: $color-gray-darker;
-    margin-right: 10px;
+    span {
+      font-size: 14px;
+      font-weight: 800;
+    }
   }
 }
 @media screen and (max-width: $mobile-version-max-width) {
   .collateral-token-selector-toggle {
     height: 32px;
     font-size: 10px;
+    width: 110px;
     &__logo-container {
       margin-right: 4px;
       svg {
         width: 20px;
       }
     }
-    &__info-title{
-      margin-right: 5px;
+    &__info-title {
+      font-size: 11px;
+      line-height: 13px;
+      span {
+        font-size: 12px;
+      }
     }
-    &__info-container{
+    &__info-container {
       padding-right: 5px;
     }
-    &__arrow{
+    &__arrow {
       svg {
         width: 8px;
       }
     }
- 
   }
 }

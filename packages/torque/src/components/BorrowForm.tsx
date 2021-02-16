@@ -34,13 +34,12 @@ interface IBorrowFormState {
   depositAmountValue: string
   gasAmountNeeded: BigNumber
   balanceTooLow: boolean
-  balanceValue: string
+  balanceValue: BigNumber
   didSubmit: boolean
   isLoading: boolean
   isEdit: boolean
   minValue: BigNumber
   maxValue: BigNumber
-  maxBorrow: BigNumber
   sliderValue: number
   collaterizationPercents: string
   ethBalance: BigNumber
@@ -75,7 +74,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       depositAmount: new BigNumber(0),
       depositAmountValue: '',
       ethBalance: new BigNumber(0),
-      balanceValue: '',
+      balanceValue: new BigNumber(0),
       maxAvailableLiquidity: new BigNumber(0),
       estimatedFee: new BigNumber(0),
       gasAmountNeeded: new BigNumber(3000000),
@@ -85,7 +84,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       isEdit: false,
       minValue: new BigNumber(120.3019),
       maxValue: new BigNumber(3000),
-      maxBorrow: new BigNumber(0),
       sliderValue: 0,
       collaterizationPercents: '',
       assetDetails: assetDetails || null,
@@ -130,6 +128,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       .subscribe(async (next) => {
         this.setBorrowEstimate(next.borrowAmount)
         await this.setEstimatedFee()
+        await this.setLiquidationPrice()
         await this.checkBalanceTooLow()
         this.changeStateLoading()
       })
@@ -221,18 +220,26 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     )
 
     const initialMargin = this.state.minValue.minus(0.3019).plus(30)
+    const collaterizationPercents = new BigNumber(
+      this.state.collaterizationPercents || initialMargin
+    )
+      .div(100)
+      .div(initialMargin.div(this.state.minValue))
 
     const collateralToPrincipalRate = await TorqueProvider.Instance.getKyberSwapRate(
       this.props.borrowAsset,
       this.state.collateralAsset
     )
 
-    const liquidationPrice = maintenanceMargin
+    const liquidationCollateralToLoanRate = maintenanceMargin
       .times(collateralToPrincipalRate.times(10 ** 18))
       .div(10 ** 20)
       .plus(collateralToPrincipalRate.times(10 ** 18))
-      .div(new BigNumber(10 ** 20).plus(initialMargin).div(10 ** 20))
+      //.div(new BigNumber(10 ** 20).plus(collaterizationPercents.times(10 ** 18)).div(10 ** 20))
       .div(10 ** 18)
+
+    const liquidationPrice = liquidationCollateralToLoanRate.times(collaterizationPercents)
+    //const liquidationPrice =liquidationCollateralToLoanRate
 
     this.setState({ liquidationPrice })
   }
@@ -320,10 +327,13 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             <div>How much would you like to deposit?</div>
             <div>
               Balance&nbsp;
-              {this.state.balanceValue && (
-                <span onClick={this.onMaxClick} style={{ cursor: 'pointer' }}>
+              {this.state.balanceValue.gt(0) && (
+                <span
+                  title={this.state.balanceValue.toFixed()}
+                  onClick={this.onMaxClick}
+                  style={{ cursor: 'pointer' }}>
                   <span className="borrow-form__label-balance">
-                    {this.state.balanceValue}&nbsp;
+                    {this.formatPrecision(this.state.balanceValue)}&nbsp;
                   </span>
                   {this.state.collateralAsset}
                 </span>
@@ -527,7 +537,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   public onMaxClick = async () => {
     const precisionDigits = TorqueProvider.Instance.isStableAsset(this.props.borrowAsset) ? 2 : 5
 
-    const borrowAmountValue = this.state.maxBorrow
+    const depositAmountValue = this.state.balanceValue
       .dp(precisionDigits, BigNumber.ROUND_CEIL)
       .toString()
 
@@ -535,11 +545,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       {
         sliderValue: this.inverseCurve(this.state.minValue),
         collaterizationPercents: this.state.minValue.toFixed(0),
-        borrowAmount: this.state.maxBorrow,
-        borrowAmountValue
+        depositAmount: this.state.balanceValue,
+        depositAmountValue
       },
       () => {
-        this._borrowAmountChange.next(this.state.borrowAmountValue)
+        this._depositAmountChange.next(depositAmountValue)
       }
     )
   }
@@ -626,22 +636,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         const decimals = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18
 
         const depositAmount = balance.dividedBy(10 ** decimals)
-        const precisionDigits = TorqueProvider.Instance.isStableAsset(this.props.borrowAsset)
-          ? 2
-          : 5
-        await TorqueProvider.Instance.getBorrowAmountEstimate(
-          this.props.borrowAsset,
-          this.state.collateralAsset,
-          depositAmount,
-          this.state.minValue
-        ).then(async (borrowEstimate) => {
-          this.setState({
-            isLoading: true,
-            balanceValue: this.formatPrecision(depositAmount),
-            maxBorrow: borrowEstimate.borrowAmount.eq(0)
-              ? this.state.maxAvailableLiquidity.dp(precisionDigits, BigNumber.ROUND_DOWN)
-              : borrowEstimate.borrowAmount.dp(precisionDigits, BigNumber.ROUND_DOWN)
-          })
+
+        this.setState({
+          isLoading: true,
+          balanceValue: depositAmount
         })
       }
     )

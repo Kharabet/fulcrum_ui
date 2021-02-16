@@ -86,13 +86,7 @@ function ExpectedResult(props: IExpectedResultProps) {
       <div className="expected-result__column">
         <div className="expected-result__column-row">
           <div className="expected-result__column-title">
-            Gas Fees
-            <IconInfo
-              className="tooltip__icon"
-              data-tip="Please note our system overestimates gas limits to ensure transactions are processed. They will rarely exceed 90% of the stated cost."
-              data-for="fee-estimated"
-            />
-            <ReactTooltip id="fee-estimated" className="tooltip__info" place="top" effect="solid" />
+            Gas Fees         
           </div>
           <div
             title={`${props.estimatedFee.toFixed(18)}`}
@@ -110,7 +104,7 @@ function ExpectedResult(props: IExpectedResultProps) {
           <div className="expected-result__column-title">
             Save&nbsp;
             <span className="value" title={estimatedFeeChi.toFixed()}>
-              {props.estimatedFee.eq(0) ? '' : `${estimatedFeeChi.toFixed(0)} `}
+              {props.estimatedFee.eq(0) ? '' : `$${estimatedFeeChi.toFixed(0)} `}
             </span>
             with CHI
             <IconInfo
