@@ -79,7 +79,12 @@
   &__liquidation-price {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     color: #758295;
     margin-bottom: 20px;
+    &-container {
+      display: flex;
+      align-items: center;
+    }
   }
 }
