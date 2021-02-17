@@ -80,7 +80,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false,
       didSubmit: false,
-      isLoading: true,
+      isLoading: false,
       isEdit: false,
       minValue: new BigNumber(120.3019),
       maxValue: new BigNumber(3000),
@@ -95,7 +95,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       await this.setInputDefaults()
       await this.setMaxBorrow()
       await this.setEstimatedFee()
-      this.changeStateLoading()
     })
 
     this._borrowAmountChange = new Subject<string>()
@@ -115,7 +114,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         await this.setEstimatedFee()
         await this.setLiquidationPrice()
         await this.checkBalanceTooLow()
-        this.changeStateLoading()
         this.setState({ isLoading: false })
       })
 
@@ -143,7 +141,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         await this.setEstimatedFee()
         await this.setLiquidationPrice()
         await this.checkBalanceTooLow()
-        this.changeStateLoading()
 
         this.setState({ isLoading: false })
       })
@@ -165,7 +162,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
     this.setState(
       {
-        isLoading: false,
         maxAvailableLiquidity: this.props.liquidity.times(0.95),
         ethBalance,
         minValue: minInitialMargin.plus(0.3019),
@@ -182,6 +178,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public async componentDidMount() {
+    this.setState({isLoading: true})
     this._initDefaults.next()
   }
 
@@ -641,7 +638,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this.setState(
       {
         depositAmount: new BigNumber(depositAmountValue),
-        depositAmountValue: depositAmountValue
+        depositAmountValue: depositAmountValue,
+        isLoading: true
       },
       () => {
         this._depositAmountChange.next(depositAmountValue)
@@ -663,6 +661,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         const depositAmount = balance.dividedBy(10 ** decimals)
         const depositAmountValue = depositAmount.toFixed()
         if (balance.gt(0)) {
+          this.setState({isLoading: true})
           this._depositAmountChange.next(depositAmountValue)
         }
         this.setState({
