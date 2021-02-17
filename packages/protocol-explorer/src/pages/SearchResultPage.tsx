@@ -1,22 +1,19 @@
 import React, { Component } from 'react'
-import { Header } from '../layout/Header'
 import { ITxRowProps } from '../components/TxRow'
 import { TxGrid } from '../components/TxGrid'
 import { Search } from '../components/Search'
-import { RouteComponentProps } from 'react-router'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { Loader } from '../components/Loader'
 import { NavService } from '../services/NavService'
 import { ProviderType } from '../domain/ProviderType'
+import { Tab } from 'src/domain/Tab'
 
-interface MatchParams {
-  filter: string
-}
-
-interface ISearchResultPageProps extends RouteComponentProps<MatchParams> {
+interface ISearchResultPageProps {
   doNetworkConnect: () => void
   isMobileMedia: boolean
+  activeTab: Tab
+  setActiveTab: (tab: Tab) => void
 }
 
 interface ISearchResultPageState {
@@ -34,7 +31,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       filteredEvents: [],
       showSearchResult: false,
       isLoading: false,
-      filter: this.props.match.params.filter.toLowerCase()
+      filter: props.match.params.filter.toLowerCase()
     }
     this._isMounted = false
     ExplorerProvider.Instance.eventEmitter.on(
@@ -144,10 +141,6 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
     const isWalletConnected = ExplorerProvider.Instance.providerType !== ProviderType.None
     return (
       <React.Fragment>
-        <Header
-          isMobileMedia={this.props.isMobileMedia}
-          doNetworkConnect={this.props.doNetworkConnect}
-        />
         <section className="search-container pt-45">
           <Search onSearch={this.onSearch.bind(this)} initialFilter={this.state.filter} />
         </section>

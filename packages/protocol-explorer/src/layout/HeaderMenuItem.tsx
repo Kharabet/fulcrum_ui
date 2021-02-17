@@ -13,21 +13,11 @@ export const HeaderMenuItem = (props: IHeaderMenuItemProps) => {
   return (
     <React.Fragment>
       {props.external ? (
-        <a
-          href={props.link}
-          className={`item-menu ${window.location.pathname === props.link ? `active` : ``}`}
-          target="_blank">
-          {props.title !== 'Help Center' ? (
-            <span className="icon-external">
-              <ExternalLink />
-            </span>
-          ) : null}
+        <a href={props.link} className={`item-menu`} target="_blank" rel="noopener noreferrer">
           <span>{props.title}</span>
         </a>
       ) : (
-        <Link
-          to={props.link}
-          className={`item-menu ${window.location.pathname === props.link ? `active` : ``}`}>
+        <Link to={props.link} className={`item-menu`}>
           {props.title}
         </Link>
       )}
