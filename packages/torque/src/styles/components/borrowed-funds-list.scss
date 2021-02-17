@@ -142,6 +142,7 @@
           }
         }
         &-value {
+          display: flex;
           font-weight: 600;
           font-size: 20px;
           line-height: 150%;
@@ -258,6 +259,13 @@
     align-self: center;
     margin: 10px 10px 0px 0px;
   }
+  .liquidation-dropdown-container {
+    margin-left: 3px;
+  }
+  .liquidation-dropdown-button span,
+  .liquidation-dropdown-item__name {
+    font-size: 14px;
+  }
   @media screen and (min-width: $breakpoint-mobile-min) {
     .borrowed-funds-list-item {
       &:nth-child(odd) {
@@ -276,6 +284,9 @@
     .borrowed-funds-list-item {
       place-self: center;
       padding: 20px 25px;
+      &__body-collateralized-value {
+        font-size: 17px;
+      }
     }
   }
 }
