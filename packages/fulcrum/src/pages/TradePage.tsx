@@ -86,7 +86,7 @@ interface ITradePageState {
 }
 
 const TRADE_PAIRS: { baseToken: Asset; quoteToken: Asset }[] =
-  (process.env.REACT_APP_ETH_NETWORK === 'kovan' && [
+  (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && [
     { baseToken: Asset.ETH, quoteToken: Asset.DAI },
     { baseToken: Asset.ETH, quoteToken: Asset.USDC },
     { baseToken: Asset.ETH, quoteToken: Asset.USDT },
