@@ -9,10 +9,13 @@ import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
 import Footer from './Footer'
 
 import siteConfig from '../config/SiteConfig.json'
+import { Tab } from '../domain/Tab'
+
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void
   isRiskDisclosureModalOpen: () => void
   isMobileMedia: boolean
+  setActiveTab: (tab: Tab) => void
 }
 
 interface IHeaderOpsState {
@@ -75,7 +78,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       <header className="header">
         <div className="header__row">
           <div className="header__left">
-            <HeaderLogo />
+            <HeaderLogo setActiveTab={this.props.setActiveTab} />
           </div>
           <div className="header__center">
             <HeaderMenu items={this.MenuDesktop.items} />
@@ -112,7 +115,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         <header className="header">
           <div className="header__row">
             <div className="header__left">
-              <HeaderLogo />
+              <HeaderLogo setActiveTab={this.props.setActiveTab} />
             </div>
             <div className="header_icon" onClick={this.onMenuToggle}>
               {!this.state.isMenuOpen ? (

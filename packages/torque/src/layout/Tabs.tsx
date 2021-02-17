@@ -1,5 +1,6 @@
 import React from 'react'
 import { Tab } from '../domain/Tab'
+import { NavService } from '../services/NavService'
 
 interface ITabsProps {
   activeTab: Tab
@@ -12,6 +13,7 @@ const Tabs = (props: ITabsProps) => {
       <div
         className={`tabs__item ${props.activeTab === Tab.Borrow ? 'active' : ''} `}
         onClick={() => {
+          NavService.Instance.History.push('/')
           props.setActiveTab(Tab.Borrow)
         }}>
         Borrow
@@ -19,6 +21,7 @@ const Tabs = (props: ITabsProps) => {
       <div
         className={`tabs__item ${props.activeTab === Tab.Loans ? 'active' : ''} `}
         onClick={() => {
+          NavService.Instance.History.push('/dashboard')
           props.setActiveTab(Tab.Loans)
         }}>
         Your loans

@@ -44,6 +44,7 @@ export default class TabContainer extends PureComponent<
           isMobileMedia={this.props.isMobileMedia}
           doNetworkConnect={this.props.doNetworkConnect}
           isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}
+          setActiveTab={this.setActiveTab}
         />
         <main>
           <Tabs activeTab={this.state.activeTab} setActiveTab={this.setActiveTab} />

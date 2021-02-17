@@ -31,11 +31,11 @@ export class RefinancePage extends PureComponent<
     return (
       <React.Fragment>
         <div className="refinance-page">
-          <HeaderOps
+          {/*<HeaderOps
             isMobileMedia={this.props.isMobileMedia}
             doNetworkConnect={this.props.doNetworkConnect}
             isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}
-          />
+          />*/}
 
           <main>
             {this.state.isShowLoader ? (

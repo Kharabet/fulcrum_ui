@@ -136,7 +136,29 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 <Switch>
                   <Route
                     exact={true}
-                    path={['/', '/borrow', '/dashboard']}
+                    path={'/'}
+                    render={(props) => (
+                      <TabContainer
+                        {...props}
+                        isMobileMedia={this.state.isMobileMedia}
+                        doNetworkConnect={this.doNetworkConnect}
+                        isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
+                      />
+                    )}
+                  />
+                  <Route
+                    path={'/borrow'}
+                    render={(props) => (
+                      <TabContainer
+                        {...props}
+                        isMobileMedia={this.state.isMobileMedia}
+                        doNetworkConnect={this.doNetworkConnect}
+                        isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
+                      />
+                    )}
+                  />
+                  <Route
+                    path={'/dashboard'}
                     render={(props) => (
                       <TabContainer
                         {...props}
