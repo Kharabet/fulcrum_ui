@@ -85,6 +85,55 @@ interface ITradePageState {
   isSupportNetwork: boolean
 }
 
+const TRADE_PAIRS: { baseToken: Asset; quoteToken: Asset }[] =
+  (process.env.REACT_APP_ETH_NETWORK === 'kovan' && [
+    { baseToken: Asset.ETH, quoteToken: Asset.DAI },
+    { baseToken: Asset.ETH, quoteToken: Asset.USDC },
+    { baseToken: Asset.ETH, quoteToken: Asset.USDT },
+    { baseToken: Asset.ETH, quoteToken: Asset.WBTC },
+    { baseToken: Asset.ETH, quoteToken: Asset.BZRX },
+    { baseToken: Asset.WBTC, quoteToken: Asset.DAI },
+    { baseToken: Asset.WBTC, quoteToken: Asset.USDC },
+    { baseToken: Asset.WBTC, quoteToken: Asset.USDT },
+    { baseToken: Asset.WBTC, quoteToken: Asset.BZRX },
+    { baseToken: Asset.BZRX, quoteToken: Asset.DAI },
+    { baseToken: Asset.BZRX, quoteToken: Asset.USDC },
+    { baseToken: Asset.BZRX, quoteToken: Asset.USDT },
+    { baseToken: Asset.LINK, quoteToken: Asset.DAI },
+    { baseToken: Asset.LINK, quoteToken: Asset.USDC },
+    { baseToken: Asset.LINK, quoteToken: Asset.USDT },
+    { baseToken: Asset.LINK, quoteToken: Asset.BZRX },
+    { baseToken: Asset.MKR, quoteToken: Asset.DAI },
+    { baseToken: Asset.MKR, quoteToken: Asset.USDC },
+    { baseToken: Asset.MKR, quoteToken: Asset.USDT },
+    { baseToken: Asset.MKR, quoteToken: Asset.BZRX },
+    { baseToken: Asset.YFI, quoteToken: Asset.DAI },
+    { baseToken: Asset.YFI, quoteToken: Asset.USDC },
+    { baseToken: Asset.YFI, quoteToken: Asset.USDT },
+    { baseToken: Asset.YFI, quoteToken: Asset.BZRX },
+    { baseToken: Asset.KNC, quoteToken: Asset.DAI },
+    { baseToken: Asset.KNC, quoteToken: Asset.USDC },
+    { baseToken: Asset.KNC, quoteToken: Asset.USDT },
+    { baseToken: Asset.KNC, quoteToken: Asset.BZRX },
+    { baseToken: Asset.UNI, quoteToken: Asset.DAI },
+    { baseToken: Asset.UNI, quoteToken: Asset.USDC },
+    { baseToken: Asset.UNI, quoteToken: Asset.USDT },
+    { baseToken: Asset.UNI, quoteToken: Asset.BZRX },
+    { baseToken: Asset.AAVE, quoteToken: Asset.DAI },
+    { baseToken: Asset.AAVE, quoteToken: Asset.USDC },
+    { baseToken: Asset.AAVE, quoteToken: Asset.USDT },
+    { baseToken: Asset.AAVE, quoteToken: Asset.BZRX },
+    { baseToken: Asset.LRC, quoteToken: Asset.DAI },
+    { baseToken: Asset.LRC, quoteToken: Asset.USDC },
+    { baseToken: Asset.LRC, quoteToken: Asset.USDT },
+    { baseToken: Asset.LRC, quoteToken: Asset.BZRX },
+    { baseToken: Asset.COMP, quoteToken: Asset.DAI },
+    { baseToken: Asset.COMP, quoteToken: Asset.USDC },
+    { baseToken: Asset.COMP, quoteToken: Asset.USDT },
+    { baseToken: Asset.COMP, quoteToken: Asset.BZRX }
+  ]) ||
+  []
+
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   private _isMounted: boolean = false
   private readonly daysNumberForLoanActionNotification = 2
@@ -590,16 +639,32 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ? collateralToPrincipalRate
       : await FulcrumProvider.Instance.getKyberSwapRate(loan.collateralAsset, loan.loanAsset)
 
-    const isLoanTokenOnlyInQuoteTokens =
-      !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
-    const isCollateralTokenNotInQuoteTokens =
-      this.baseTokens.includes(loan.collateralAsset) &&
-      !this.quoteTokens.includes(loan.collateralAsset)
-    const positionType =
-      isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
-        ? PositionType.LONG
-        : PositionType.SHORT
+    let positionType
 
+    if (TRADE_PAIRS) {
+      const possiblePairs = TRADE_PAIRS.filter(
+        (p) =>
+          (p.baseToken === loan.loanAsset && p.quoteToken === loan.collateralAsset) ||
+          (p.baseToken === loan.collateralAsset && p.quoteToken === loan.loanAsset)
+      )
+      if (possiblePairs.length > 1) {
+        console.error(
+          "The position fits to more than one pair. Couldn't treat it exactly as LONG/SHORT"
+        )
+      }
+      positionType =
+        possiblePairs[0].baseToken === loan.collateralAsset ? PositionType.LONG : PositionType.SHORT
+    } else {
+      const isLoanTokenOnlyInQuoteTokens =
+        !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
+      const isCollateralTokenNotInQuoteTokens =
+        this.baseTokens.includes(loan.collateralAsset) &&
+        !this.quoteTokens.includes(loan.collateralAsset)
+      positionType =
+        isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
+          ? PositionType.LONG
+          : PositionType.SHORT
+    }
     const baseAsset = positionType === PositionType.LONG ? loan.collateralAsset : loan.loanAsset
 
     const quoteAsset = positionType === PositionType.LONG ? loan.loanAsset : loan.collateralAsset
