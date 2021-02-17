@@ -114,8 +114,8 @@ function ExpectedResult(props: IExpectedResultProps) {
               data-html={true}
               data-tip="<p>Use CHI token to save on gas fees. 
             CHI will be burned from your wallet, saving you up to 50% on all transaction fees.</p>
-            <a href='https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c' class='tooltip__button' target='blank'>Buy CHI</a>
-            <a href='https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3' class='tooltip__button' target='blank'>Learn More</a>"
+            <a href='https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c' class='tooltip__button' target='_blank' rel='noopener noreferrer'>Buy CHI</a>
+            <a href='https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3' class='tooltip__button' target='_blank' rel='noopener noreferrer'>Learn More</a>"
               data-for="chi-estimated"
             />
             <ReactTooltip

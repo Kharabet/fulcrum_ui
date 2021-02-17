@@ -164,12 +164,13 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
               <a
                 href="https://app.uniswap.org/#/swap?inputCurrency=0x0000000000004946c0e9f43f4dee607b0ef1fa1c"
                 target="_blank"
-                rel="nofollow">
+                rel="noopener noreferrer">
                 Buy chi
               </a>
               <a
                 href="https://1inch-exchange.medium.com/everything-you-wanted-to-know-about-chi-gastoken-a1ba0ea55bf3"
-                target="_blank">
+                target="_blank"
+                rel="noopener noreferrer">
                 Learn more
               </a>
             </div>

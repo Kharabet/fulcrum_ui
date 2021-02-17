@@ -450,7 +450,7 @@ export class TorqueProvider {
     depositAmount: BigNumber,
     collaterizationPercent: BigNumber
   ): Promise<IBorrowEstimate> => {
-    const result = { borrowAmount: new BigNumber(0), gasEstimate: new BigNumber(0) }
+    const result = { borrowAmount: new BigNumber(0), gasEstimate: new BigNumber(0), exceedsLiquidity: false }
 
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getITokenContract(borrowAsset)
@@ -461,6 +461,7 @@ export class TorqueProvider {
         const liquidity = await this.getAvailableLiquidity(borrowAsset)
         if (depositAmount.times(collateralToLoanRate).gte(liquidity)){
           result.borrowAmount = liquidity.times(0.8)
+          result.exceedsLiquidity = true
           return result
         }
         const loanPrecision = AssetsDictionary.assets.get(borrowAsset)!.decimals || 18
