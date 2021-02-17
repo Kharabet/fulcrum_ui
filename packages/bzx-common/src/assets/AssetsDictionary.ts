@@ -410,6 +410,36 @@ export default class AssetsDictionary {
           [42, '']
         ])
       )
-    ]
+    ],
+    [
+      Asset.BPT,
+      new AssetDetails(
+        'BPT',
+        18,
+        null,
+        null,
+        '',
+        '',
+        new Map<number, string | null>([
+          [1, '0xe26A220a341EAca116bDa64cF9D5638A935ae629'],
+          [42, '0x4c4462c6bca4c92bf41c40f9a4047f35fd296996']
+        ])
+      )
+    ],
+    [
+      Asset.CRV,
+      new AssetDetails(
+        'CRV',
+        18,
+        null,
+        null,
+        '',
+        '',
+        new Map<number, string | null>([
+          [1, '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'],
+          [42, '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490']
+        ])
+      )
+    ],
   ])
 }

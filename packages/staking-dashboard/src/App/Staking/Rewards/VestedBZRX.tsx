@@ -9,7 +9,7 @@ export function StakingRewards({ vm }: { vm: RewardsVM }) {
 
   return (
     <div className="flex-col">
-      <h3 className="section-header">Vested BZRX</h3>
+      <h3 className="section-header">Vested BZRX in Your Wallet</h3>
       <AssetBalance
         variant="green"
         className="margin-bottom-2"
@@ -19,7 +19,7 @@ export function StakingRewards({ vm }: { vm: RewardsVM }) {
       />
 
       <p className="margin-bottom-2">
-        <b>vBZRX tokens in your wallet vest BZRX overtime</b>. Your available BZRX are listed above.
+        <b>vBZRX tokens in your wallet</b> vest BZRX overtime. Your available BZRX are listed above.
       </p>
 
       <Button

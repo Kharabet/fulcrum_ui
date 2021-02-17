@@ -33,7 +33,7 @@ const AssetSelector = (props: IAssetSelectorProps) => {
       Asset.WBTC,
       Asset.LINK,
       Asset.YFI,
-      // Asset.BZRX,
+      Asset.BZRX,
       Asset.MKR,
       Asset.KNC,
       Asset.UNI,

@@ -17,9 +17,6 @@
     box-shadow: 0px 8px 30px rgba(95, 109, 130, 0.3);
   }
   &__items {
-    .simplebar-content-wrapper {
-      padding: 15px 0;
-    }
     .simplebar-track.simplebar-vertical {
       top: 10px;
       height: calc(100% - 20px);
@@ -32,7 +29,7 @@
   flex-wrap: wrap;
   display: flex;
   align-items: center;
-  padding: 8px 4px;
+  padding: 8px;
   cursor: pointer;
   &:hover {
     background-color: #5b88ff;
@@ -44,7 +41,7 @@
     justify-content: center;
     svg {
       margin-right: 8px;
-      width: 40px;
+      width: 28px;
       height: auto;
     }
   }
@@ -56,17 +53,15 @@
 }
 @media screen and (max-width: $mobile-version-max-width) {
   .collateral-token-selector {
-    &__items {
-      .simplebar-content-wrapper {
-        padding: 10px 0;
-      }
+    &__container {
+      top: 50px;
     }
   }
   .collateral-token-selector-item {
     padding: 6px 4px;
     &__image-container {
       svg {
-        width: 30px;
+        width: 20px;
       }
     }
   }

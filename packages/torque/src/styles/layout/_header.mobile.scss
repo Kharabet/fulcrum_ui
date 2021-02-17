@@ -27,7 +27,7 @@
 
     .header_btn {
       margin-bottom: 40px;
-      margin-top: 60px;
+      margin-top: 60px;      
     }
 
     .sidebar_h {
@@ -69,5 +69,11 @@
         opacity: 1;
       }
     }
+  }
+}
+@media only screen and (max-width: $breakpoint-mobile-max) and (max-height: 736px) {
+  .header .header_btn{
+    margin-top: 10px;
+    margin-bottom: 20px;
   }
 }

@@ -35,6 +35,8 @@ enum Asset {
   AAVE = 'AAVE',
   LRC = 'LRC',
   COMP = 'COMP',
+  BPT = 'BPT',
+  CRV = 'CRV',
   UNKNOWN = 'UNKNOWN'
 }
 export default Asset

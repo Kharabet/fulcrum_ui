@@ -45,8 +45,21 @@ export default class AppVM {
    * - And refresh rewards balances
    */
   public async prepareRewardTab() {
-    await this.rootStore.stakingProvider.preloadIBZXContract()
-    this.rootStore.stakingStore.rewards.getAllRewards()
+    const { stakingProvider, web3Connection, stakingStore } = this.rootStore
+    await stakingProvider.preloadIBZXContract()
+    if (web3Connection.isConnected) {
+      stakingStore.rewards.getAllRewards()
+    }
+  }
+
+  /**
+   * Load the governance proposal list only if not yet loaded.
+   */
+  public async prepareDaoTab() {
+    const { governanceStore } = this.rootStore
+    if (!governanceStore.pending && governanceStore.proposalsList.length === 0) {
+      governanceStore.getProposals()
+    }
   }
 
   public init() {
@@ -63,14 +76,15 @@ export default class AppVM {
       }
     )
 
-    // This is purely to help performance issue when loading contracts
-    this.stopPreloadContract = mobx.reaction(
-      () => {
-        return this.section === 'rewards'
-      },
-      (shouldPreload) => {
-        if (shouldPreload) {
-          prepareRewardTab()
+    this.stopPreloadTab = mobx.reaction(
+      () => this.section,
+      (section) => {
+        switch (section) {
+          case 'rewards':
+            prepareRewardTab()
+            break
+          case 'dao':
+            this.prepareDaoTab()
         }
       }
     )
@@ -83,8 +97,8 @@ export default class AppVM {
     if (this.stopAutoSettingBodyOverflow) {
       this.stopAutoSettingBodyOverflow()
     }
-    if (this.stopPreloadContract) {
-      this.stopPreloadContract()
+    if (this.stopPreloadTab) {
+      this.stopPreloadTab()
     }
   }
 
