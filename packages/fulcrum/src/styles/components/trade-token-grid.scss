@@ -21,7 +21,7 @@
     @media screen and (min-width: $breakpoint-mobile-min) {
       display: grid;
       column-gap: 35px;
-      grid-template-columns: 5% 27% 14% 13% 7% 13%;
+      grid-template-columns: 5% 27% 13% 13% 8% 13%;
     }
     @media screen and (max-width: $breakpoint-mobile-max) {
       display: flex;
