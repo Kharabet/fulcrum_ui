@@ -92,6 +92,8 @@ const TRADE_PAIRS: { baseToken: Asset; quoteToken: Asset }[] =
     { baseToken: Asset.ETH, quoteToken: Asset.USDT },
     { baseToken: Asset.ETH, quoteToken: Asset.WBTC },
     { baseToken: Asset.ETH, quoteToken: Asset.BZRX },
+    { baseToken: Asset.DAI, quoteToken: Asset.USDC },
+    { baseToken: Asset.DAI, quoteToken: Asset.USDT },
     { baseToken: Asset.WBTC, quoteToken: Asset.DAI },
     { baseToken: Asset.WBTC, quoteToken: Asset.USDC },
     { baseToken: Asset.WBTC, quoteToken: Asset.USDT },
@@ -312,6 +314,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               </InfoBlock>
             )}
             <TokenGridTabs
+              tradePairs={TRADE_PAIRS}
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
               selectedMarket={this.state.selectedMarket}
@@ -640,13 +643,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       : await FulcrumProvider.Instance.getKyberSwapRate(loan.collateralAsset, loan.loanAsset)
 
     let positionType
-
-    if (TRADE_PAIRS) {
-      const possiblePairs = TRADE_PAIRS.filter(
-        (p) =>
-          (p.baseToken === loan.loanAsset && p.quoteToken === loan.collateralAsset) ||
-          (p.baseToken === loan.collateralAsset && p.quoteToken === loan.loanAsset)
-      )
+    const possiblePairs = TRADE_PAIRS.filter(
+      (p) =>
+        (p.baseToken === loan.loanAsset && p.quoteToken === loan.collateralAsset) ||
+        (p.baseToken === loan.collateralAsset && p.quoteToken === loan.loanAsset)
+    )
+    if (TRADE_PAIRS.length > 0 && possiblePairs && possiblePairs.length > 0) {
       if (possiblePairs.length > 1) {
         console.error(
           "The position fits to more than one pair. Couldn't treat it exactly as LONG/SHORT"
