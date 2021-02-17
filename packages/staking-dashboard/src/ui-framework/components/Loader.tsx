@@ -36,6 +36,7 @@ export default class Loader extends PureComponent<ILoaderProps> {
           {this.props.isOverlay ? <div className="loader-wrapper" /> : null}
           <div className={`${this.props.isOverlay ? `loader-overlay` : ``}`}>
             <div className={`loader-content loader-content-${this.props.sizeDots}`}>
+              <div className="loader-dots">{this.renderDots()}</div>
               {this.props.title.length !== 0 ? (
                 <p
                   className={`loader-text loader-text-${this.props.sizeDots} ${
@@ -44,7 +45,6 @@ export default class Loader extends PureComponent<ILoaderProps> {
                   {this.props.title}
                 </p>
               ) : null}
-              <div className="loader-dots">{this.renderDots()}</div>
             </div>
           </div>
         </div>
