@@ -19,6 +19,7 @@ export function ProposalHistoryItem(props: IProviderMenuListItemProps) {
         {props.txnHash ? (
           <ExternalLink
             className={`proposals-history__status ${stateName.toLowerCase()}`}
+            targetBlank={true}
             showIcon={true}
             href={`${props.etherscanURL}tx/${props.txnHash}`}>
             {stateName}

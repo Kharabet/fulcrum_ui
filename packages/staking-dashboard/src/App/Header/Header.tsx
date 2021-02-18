@@ -27,20 +27,17 @@ export function Header({ appVM }: { appVM: AppVM }) {
           <div className="flex-row md-visible">
             <ExternalLink
               className="header__link margin-right-3"
-              href="https://app.fulcrum.trade/trade"
-              showIcon={true}>
+              href="https://app.fulcrum.trade/trade">
               Trade
             </ExternalLink>
             <ExternalLink
               className="header__link margin-right-3"
-              href="https://app.fulcrum.trade/lend"
-              showIcon={true}>
+              href="https://app.fulcrum.trade/lend">
               Lend
             </ExternalLink>
             <ExternalLink
               className="header__link margin-right-3"
-              href="https://app.torque.loans"
-              showIcon={true}>
+              href="https://app.torque.loans">
               Borrow
             </ExternalLink>
             <ExternalLink className="header__link active">Stake</ExternalLink>
