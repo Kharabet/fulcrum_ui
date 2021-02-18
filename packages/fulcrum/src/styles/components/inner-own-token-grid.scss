@@ -58,7 +58,7 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
       position: relative;
       > span {
         position: absolute;
-        
+
         width: max-content;
       }
     }
@@ -98,29 +98,37 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
     position: relative;
     text-align: left;
   }
-  &__col-profit-switch {
-    border-radius: 22px;
-    background-color: var(--primary-bg);
-    position: absolute;
-    display: flex;
-    bottom: 18px;
-    label {
-      line-height: 1.5;
-      font-size: 9px;
-      display: inline-block;
-      padding: 3px 6px;
-      color: var(--primary-text);
-      cursor: pointer;
-      &:first-child {
-        border-radius: 18px 0 0 18px;
-      }
-      &:last-child {
-        border-radius: 0 18px 18px 0;
-      }
-      &.active {
-        background-color: #276bfb;
-        transition: 0.15s background-color;
-        color: #ffffff;
+  &__col-profit {
+    .positive {
+      color: #00c0ab;
+    }
+    .negative {
+      color: #ff4f4f;
+    }
+    &-switch {
+      border-radius: 22px;
+      background-color: var(--primary-bg);
+      position: absolute;
+      display: flex;
+      bottom: 18px;
+      label {
+        line-height: 1.5;
+        font-size: 9px;
+        display: inline-block;
+        padding: 3px 6px;
+        color: var(--primary-text);
+        cursor: pointer;
+        &:first-child {
+          border-radius: 18px 0 0 18px;
+        }
+        &:last-child {
+          border-radius: 0 18px 18px 0;
+        }
+        &.active {
+          background-color: #276bfb;
+          transition: 0.15s background-color;
+          color: #ffffff;
+        }
       }
     }
   }

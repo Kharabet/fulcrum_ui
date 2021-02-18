@@ -250,6 +250,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         ? `<ul class="tooltip__info__profit__ul"><li>Left: value of traded asset</li><li>Right: value of total position profit including collateral change </li></ul><p class="ta-c">${this.props.baseToken}/${this.props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div class="short-label">Profit in ${this.props.baseToken}</div><div>Profit in ${this.props.quoteToken} + the change of your ${this.props.baseToken} collateral</div></div>`
         : `<ul class="tooltip__info__profit__ul"><li>Left: value of total position profit including collateral change </li><li>Right: value of traded asset</li></ul><p class="ta-c">${this.props.baseToken}/${this.props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div>Profit in ${this.props.baseToken} + the change of your ${this.props.quoteToken} collateral</div><div class="short-label">Profit in ${this.props.quoteToken}</div></div>`
     const profitTooltip = `<p class="tooltip__info__profit__title">Profit is displayed in two ways:</p>${insertProfitTooltip}`
+    const profitClass =
+      Number(profitTitle) < 0 ? 'negative' : Number(profitTitle) > 0 ? 'positive' : ''
 
     return this.state.isLoadingTransaction && this.state.request ? (
       <React.Fragment>
@@ -393,25 +395,38 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               effect="solid"
             />
           </span>
-          {!this.state.isLoading ? profitValue : <Preloader width="74px" />}
-          <div className="own-token-grid-row__col-profit-switch">
-            <label
-              className={`${this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''}`}
-              onClick={() => {
-                this.setActiveTokenProfit(this.props.baseToken)
-              }}>
-              {this.props.baseToken}
-            </label>
-            <label
-              className={`${
-                this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
-              }`}
-              onClick={() => {
-                this.setActiveTokenProfit(this.props.quoteToken)
-              }}>
-              {this.props.quoteToken}
-            </label>
-          </div>
+          {!this.state.isLoading ? (
+            <span className={profitClass}>
+              {profitClass === 'positive' ? '+' : ''}
+              {profitValue}
+              {Number(profitTitle) ? (
+                <div className="own-token-grid-row__col-profit-switch">
+                  <label
+                    className={`${
+                      this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''
+                    }`}
+                    onClick={() => {
+                      this.setActiveTokenProfit(this.props.baseToken)
+                    }}>
+                    {this.props.baseToken}
+                  </label>
+                  <label
+                    className={`${
+                      this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
+                    }`}
+                    onClick={() => {
+                      this.setActiveTokenProfit(this.props.quoteToken)
+                    }}>
+                    {this.props.quoteToken}
+                  </label>
+                </div>
+              ) : (
+                ''
+              )}
+            </span>
+          ) : (
+            <Preloader width="74px" />
+          )}
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button

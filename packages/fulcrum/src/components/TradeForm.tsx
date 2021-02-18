@@ -459,7 +459,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               </div>
               <div className="trade-form__info_block__stats">
                 <div className="trade-form__info_block__stats__data">
-                  <strong>{`${this.state.interestRate.toFixed(1)}%`}</strong> APR FIXED
+                  <strong>{`${this.state.interestRate.toFixed(1)}%`}</strong> APR
                 </div>
                 <div className="trade-form__info_block__stats__data">
                   <span className="trade-form__info_block__stats__data-type">
