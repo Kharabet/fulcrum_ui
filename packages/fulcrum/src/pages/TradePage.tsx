@@ -14,11 +14,12 @@ import { TokenGridTabs } from '../components/TokenGridTabs'
 import { TradeTokenGrid } from '../components/TradeTokenGrid'
 import { ITradeTokenGridRowProps } from '../components/TradeTokenGridRow'
 import { TVChartContainer } from '../components/TVChartContainer'
+import { ExtendLoanForm } from '../components/ExtendLoanForm'
 
 import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
+import { TRADE_PAIRS } from '../config/appConfig'
 import {
   CloseWithSwapEvent,
   DepositCollateralEvent,
@@ -31,6 +32,7 @@ import {
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { IHistoryEvents } from '../domain/IHistoryEvents'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
 import { TokenGridTab } from '../domain/TokenGridTab'
 import { TradeRequest } from '../domain/TradeRequest'
@@ -39,9 +41,11 @@ import loansWithOldOpenPriceFormat from '../config/loansWithOldOpenPriceFormat'
 import '../styles/pages/_trade-page.scss'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { InfoBlock } from '../components/InfoBlock'
+import { StatsTokenGrid } from '../components/StatsTokenGrid'
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
+//const ExtendLoanForm = React.lazy(() => import('../components/ExtendLoanForm'))
 
 export interface ITradePageProps {
   doNetworkConnect: () => void
@@ -64,6 +68,7 @@ interface ITradePageState {
   loanId?: string
   loans: IBorrowedFundsState[] | undefined
   isManageCollateralModalOpen: boolean
+  isExtendLoanModalOpen: boolean
 
   openedPositionsCount: number
   tokenRowsData: ITradeTokenGridRowProps[]
@@ -73,13 +78,14 @@ interface ITradePageState {
   historyRowsData: IHistoryTokenGridRowProps[]
   tradeRequestId: number
   isLoadingTransaction: boolean
-  request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
+  request: TradeRequest | ManageCollateralRequest | RolloverRequest | ExtendLoanRequest | undefined
   isTxCompleted: boolean
   activePositionType: PositionType
 
   recentLiquidationsNumber: number
   isSupportNetwork: boolean
 }
+
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   private _isMounted: boolean = false
@@ -96,7 +102,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     } else {
       this.baseTokens = [
         Asset.ETH,
+        Asset.DAI,
         Asset.WBTC,
+        Asset.BZRX,
         Asset.LINK,
         Asset.MKR,
         Asset.YFI,
@@ -106,7 +114,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.LRC,
         Asset.COMP
       ]
-      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.WBTC]
+      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.BZRX, Asset.WBTC]
     }
     this.stablecoins = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.SUSD]
     const activePair = window.localStorage.getItem('activePair') || undefined
@@ -124,6 +132,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       isManageCollateralModalOpen: false,
+      isExtendLoanModalOpen: false,
       openedPositionsCount: 0,
       tokenRowsData: [],
       innerOwnRowsData: [],
@@ -177,7 +186,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.getTokenRowsData()
     await this.getInnerOwnRowsData()
     await this.setRecentLiquidationsNumber()
-    await this.fetchPositionsRecursive(10)
+    await this.fetchPositionsRecursive(3)
     setTimeout(() => {
       this.forceUpdate() // solves bug with positions not appearing on the first render.
     }, 5000)
@@ -256,6 +265,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               </InfoBlock>
             )}
             <TokenGridTabs
+              tradePairs={TRADE_PAIRS}
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
               selectedMarket={this.state.selectedMarket}
@@ -307,6 +317,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               <OwnTokenGrid
                 ownRowsData={this.state.ownRowsData}
                 isMobileMedia={this.props.isMobileMedia}
+                onStartTrading={() => this.onTokenGridTabChange(TokenGridTab.Chart)}
               />
             )}
 
@@ -320,7 +331,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 quoteTokens={this.quoteTokens}
                 updateHistoryRowsData={this.updateHistoryRowsData}
                 changeLoadingTransaction={this.changeLoadingTransaction}
+                onStartTrading={() => this.onTokenGridTabChange(TokenGridTab.Chart)}
               />
+            )}
+
+            {this.state.activeTokenGridTab === TokenGridTab.Stats && (
+              <StatsTokenGrid isMobileMedia={this.props.isMobileMedia} />
             )}
 
             {this.state.request &&
@@ -358,6 +374,23 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                   onSubmit={this.onManageCollateralConfirmed}
                   onCancel={this.onManageCollateralRequestClose}
                   isOpenModal={this.state.isManageCollateralModalOpen}
+                  isMobileMedia={this.props.isMobileMedia}
+                  changeLoadingTransaction={this.changeLoadingTransaction}
+                />
+              </Modal>
+            )}
+            {this.state.request !== undefined && loan !== undefined && (
+              <Modal
+                isOpen={this.state.isExtendLoanModalOpen}
+                onRequestClose={this.onExtendLoanRequestClose}
+                className="modal-content-div"
+                overlayClassName="modal-overlay-div">
+                <ExtendLoanForm
+                  loan={loan}
+                  request={this.state.request as ExtendLoanRequest}
+                  onSubmit={this.onExtendLoanConfirmed}
+                  onCancel={this.onExtendLoanRequestClose}
+                  isOpenModal={this.state.isExtendLoanModalOpen}
                   isMobileMedia={this.props.isMobileMedia}
                   changeLoadingTransaction={this.changeLoadingTransaction}
                 />
@@ -450,6 +483,46 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       })
   }
 
+  public onExtendLoanRequested = async (request: ExtendLoanRequest) => {
+    if (
+      !FulcrumProvider.Instance.contractsSource ||
+      !FulcrumProvider.Instance.contractsSource.canWrite
+    ) {
+      this.props.doNetworkConnect()
+      return
+    }
+
+    if (request) {
+      // if (this.state.activeTokenGridTab === TokenGridTab.Open) {
+      //   await this.onTabSelect(request.asset, request.collateralAsset)
+      // }
+      ;(await this._isMounted) &&
+        this.setState({
+          ...this.state,
+          isExtendLoanModalOpen: true,
+          loanId: request.loanId,
+          request
+        })
+    }
+  }
+
+  public onExtendLoanRequestClose = async () => {
+    ;(await this._isMounted) &&
+      this.setState({
+        ...this.state,
+        isExtendLoanModalOpen: false
+      })
+  }
+  public onExtendLoanConfirmed = async (request: ExtendLoanRequest) => {
+    request.id = this.state.tradeRequestId
+    FulcrumProvider.Instance.onExtendLoanConfirmed(request)
+    this.setState({
+      ...this.state,
+      isExtendLoanModalOpen: false,
+      request
+    })
+  }
+
   public onTradeRequested = async (request: TradeRequest) => {
     if (
       !FulcrumProvider.Instance.contractsSource ||
@@ -526,21 +599,38 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ? collateralToPrincipalRate
       : await FulcrumProvider.Instance.getKyberSwapRate(loan.collateralAsset, loan.loanAsset)
 
-    const isLoanTokenOnlyInQuoteTokens =
-      !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
-    const isCollateralTokenNotInQuoteTokens =
-      this.baseTokens.includes(loan.collateralAsset) &&
-      !this.quoteTokens.includes(loan.collateralAsset)
-    const positionType =
-      isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
-        ? PositionType.LONG
-        : PositionType.SHORT
-
+    let positionType
+    const possiblePairs = TRADE_PAIRS.filter(
+      (p) =>
+        (p.baseToken === loan.loanAsset && p.quoteToken === loan.collateralAsset) ||
+        (p.baseToken === loan.collateralAsset && p.quoteToken === loan.loanAsset)
+    )
+    if (TRADE_PAIRS.length > 0 && possiblePairs && possiblePairs.length > 0) {
+      if (possiblePairs.length > 1) {
+        console.error(
+          "The position fits to more than one pair. Couldn't treat it exactly as LONG/SHORT"
+        )
+      }
+      positionType =
+        possiblePairs[0].baseToken === loan.collateralAsset ? PositionType.LONG : PositionType.SHORT
+    } else {
+      const isLoanTokenOnlyInQuoteTokens =
+        !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
+      const isCollateralTokenNotInQuoteTokens =
+        this.baseTokens.includes(loan.collateralAsset) &&
+        !this.quoteTokens.includes(loan.collateralAsset)
+      positionType =
+        isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
+          ? PositionType.LONG
+          : PositionType.SHORT
+    }
     const baseAsset = positionType === PositionType.LONG ? loan.collateralAsset : loan.loanAsset
 
     const quoteAsset = positionType === PositionType.LONG ? loan.loanAsset : loan.collateralAsset
 
-    let leverage = new BigNumber(10 ** 38).div(loan.loanData.startMargin.times(10 ** 18))
+    let leverage = new BigNumber(10 ** 38)
+      .div(loan.loanData.startMargin.times(10 ** 18))
+      .dp(0, BigNumber.ROUND_HALF_UP)
     if (positionType === PositionType.LONG) leverage = leverage.plus(1)
 
     let positionValue = new BigNumber(0)
@@ -748,6 +838,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maintenanceMargin: maintenanceMargin.div(10 ** 20),
       onTrade: this.onTradeRequested,
       onManageCollateralOpen: this.onManageCollateralRequested,
+      onExtendLoanOpen: this.onExtendLoanRequested,
       onRolloverConfirmed: this.onRolloverConfirmed,
       changeLoadingTransaction: this.changeLoadingTransaction,
       onTransactionsCompleted: this.onTransactionsCompleted,
@@ -913,7 +1004,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
     const historyEvents = { groupedEvents, earnRewardEvents, payTradingFeeEvents }
     ;(await this._isMounted) &&
-      this.setState({ ...this.state, historyRowsData: [], historyEvents: historyEvents })
+      this.setState({
+        ...this.state,
+        historyRowsData: [],
+        historyEvents: historyEvents
+      })
   }
 
   public getTokenRowsData = async () => {
@@ -959,7 +1054,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public changeLoadingTransaction = async (
     isLoadingTransaction: boolean,
-    request: TradeRequest | ManageCollateralRequest | RolloverRequest | undefined
+    request: TradeRequest | ManageCollateralRequest | RolloverRequest | RolloverRequest | undefined
   ) => {
     ;(await this._isMounted) &&
       this.setState({

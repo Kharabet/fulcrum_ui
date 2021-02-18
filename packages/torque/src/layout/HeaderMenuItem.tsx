@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-import { NavLink } from 'react-router-dom'
-import { ReactComponent as ExternalLink } from '../assets/images/external-link.svg'
 
 export interface IHeaderMenuItemProps {
-  id: number
   title: string
   link: string
   external: boolean
+  newTab?: boolean
 }
 
 export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
@@ -14,27 +12,23 @@ export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
     return (
       <div className="header-menu__item">
         {this.props.external ? (
-          <a
-            href={this.props.link}
-            className={`header-menu__item-link ${
-              this.props.title === 'Help Center' ? 'c-primary-blue help-center' : 'c-green'
-            }`}
-            target="_blank">
-            {this.props.title !== 'Help Center' ? (
-              <span className="icon-external">
-                <ExternalLink />
-              </span>
-            ) : null}
-            <span>{this.props.title}</span>
-          </a>
+          this.props.newTab ? (
+            <a
+              href={this.props.link}
+              className={`header-menu__item-link c-green`}
+              target="_blank"
+              rel="noopener noreferrer">
+              <span>{this.props.title}</span>
+            </a>
+          ) : (
+            <a href={this.props.link} className={`header-menu__item-link c-green`}>
+              <span>{this.props.title}</span>
+            </a>
+          )
         ) : (
-          <NavLink
-            to={this.props.link}
-            className="header-menu__item-link c-green"
-            exact={true}
-            activeClassName="header-menu__item-link--active">
-            <span>{this.props.title}</span>
-          </NavLink>
+          <span className="header-menu__item-link header-menu__item-link--active c-green">
+            {this.props.title}
+          </span>
         )}
       </div>
     )

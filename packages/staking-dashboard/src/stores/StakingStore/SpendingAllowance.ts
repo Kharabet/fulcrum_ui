@@ -1,4 +1,5 @@
 import { BigNumber } from '@0x/utils'
+import errorUtils from 'app-lib/errorUtils'
 import * as mobx from 'mobx'
 import Asset from 'src/domain/Asset'
 import { StakingProvider } from 'src/services/StakingProvider'
@@ -27,6 +28,9 @@ export default class SpendingAllowance {
     Object.assign(this, props)
   }
 
+  /**
+   * Get the current amount of spending allowance for the token
+   */
   public async check() {
     try {
       this.assign({ pending: true, error: null })
@@ -34,7 +38,7 @@ export default class SpendingAllowance {
       this.assign({ amount, checked: true })
       return amount
     } catch (err) {
-      err.title = `Could not check allowance [${this.tokenName}]`
+      errorUtils.decorateError(err, { title: `Could not check allowance [${this.tokenName}]` })
       this.set('error', err)
     } finally {
       this.set('pending', false)
@@ -48,7 +52,7 @@ export default class SpendingAllowance {
       this.amount = amount
       return this.amount
     } catch (err) {
-      err.title = `Could not update allowance [${this.tokenName}]`
+      errorUtils.decorateError(err, { title: `Could not update allowance [${this.tokenName}]` })
       this.set('error', err)
     } finally {
       this.set('pending', false)

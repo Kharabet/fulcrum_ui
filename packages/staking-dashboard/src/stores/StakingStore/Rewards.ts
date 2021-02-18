@@ -17,6 +17,7 @@ type rewardsProp =
   | 'stableCoinVesting'
   | 'stakingProvider'
   | 'vestedVbzrx'
+  | 'vestedBzrxInRewards'
 
 export default class Rewards {
   /**
@@ -27,6 +28,11 @@ export default class Rewards {
    * BZRX pending to received from staked vbzrx
    */
   public bzrxVesting = new BigNumber(0)
+  /**
+   * The part of bzrx staking rewards that is not really staking rewards but instead
+   * comes from the staked vbzrx that have vested.
+   */
+  public vestedBzrxInRewards = new BigNumber(0)
   public error: Error | null = null
   public pendingRebateRewards = false
   public pendingStakingRewards = false
@@ -61,6 +67,21 @@ export default class Rewards {
   }
 
   /**
+   * BZRX rewards include vbzrx staked that have vested + actual rewards.
+   * This is the actual staking reward part.
+   * Note: under certain circumstances, the vestedBzrxInRewards may be bigger
+   * than the total rewards. If that happens we prevent having a negative value
+   * and set it to 0.
+   */
+  get actualBzrxStakingRewards() {
+    const amount = this.bzrx.minus(this.vestedBzrxInRewards)
+    if (amount.isNegative()) {
+      return new BigNumber(0)
+    }
+    return amount
+  }
+
+  /**
    * Helper to set the value of one prop through a mobx action.
    */
   public set(prop: rewardsProp, value: any) {
@@ -74,16 +95,24 @@ export default class Rewards {
     Object.assign(this, props)
   }
 
-  public async getRewards() {
+  public async getAllRewards() {
     this.assign({ error: null, pendingStakingRewards: true })
     try {
       const sp = this.stakingProvider
       this.set('rebateRewards', await sp.getRebateRewards())
-      const rewards = await sp.getUserEarnings()
+      const rewards = await sp.getStakingRewards()
       this.assign(rewards)
+      const vestedBzrx = await this.stakingProvider.getVestedBzrxBalance()
+      this.set('vestedVbzrx', vestedBzrx.div(10 ** 18))
+      const vestedBzrxInRewards = await sp.getVestedVbzrxInRewards(
+        this.stakingStore.userBalances.staked.vbzrx
+      )
+      this.set('vestedBzrxInRewards', vestedBzrxInRewards)
       return rewards
     } catch (err) {
-      const error = errorUtils.decorateError(err, { title: 'Failed to get rewards estimates' })
+      const error = errorUtils.decorateError(err, {
+        title: 'Failed to get rewards balances'
+      })
       this.set('error', error)
     } finally {
       this.set('pendingStakingRewards', false)
@@ -92,13 +121,12 @@ export default class Rewards {
 
   public async claimStakingRewards(shouldRestake: boolean = false) {
     this.assign({ error: null, pendingStakingRewards: true })
-    const claimedAmounts = {bzrx: this.bzrx, stableCoin: this.stableCoin}
+    const claimedAmounts = { bzrx: this.bzrx, stableCoin: this.stableCoin }
     try {
       await this.stakingProvider.claimStakingRewards(shouldRestake)
       this.assign({
         bzrx: new BigNumber(0),
         stableCoin: new BigNumber(0)
-        // TODO: What do we do with vesting ones?
       })
       return claimedAmounts
     } catch (err) {
@@ -110,11 +138,16 @@ export default class Rewards {
     }
   }
 
+  /**
+   * Rebate rewards are half the fees going back to the user in form of vbzrx
+   */
   public async claimRebateRewards() {
     this.assign({ error: null, pendingRebateRewards: true })
     try {
       await this.stakingProvider.claimRebateRewards()
+      const vbzrxAmount = this.rebateRewards
       this.set('rebateRewards', new BigNumber(0))
+      return vbzrxAmount
     } catch (err) {
       const error = errorUtils.decorateError(err, { title: 'Failed to claim rebate rewards' })
       this.set('error', error)
@@ -123,25 +156,16 @@ export default class Rewards {
     }
   }
 
-  public async getVestedBZRX() {
-    try {
-      const result = await this.stakingProvider.getVestedBzrxBalance()
-      // this.set('vestedVbzrx', )
-    }
-    catch (err) {
-      const error = errorUtils.decorateError(err, { title: 'Failed to get vested BZRX balance' })
-      this.set('error', error)
-    }
-    finally {
-
-    }
-  }
-
+  /**
+   * Mostly for users who hold vbzrx in their wallet and just want to claim their bzrx
+   */
   public async claimVestedBzrx() {
     this.assign({ error: null, pendingVbzrxClaim: true })
     try {
-      const result = await this.stakingProvider.claimRebateRewards()
-      return result
+      await this.stakingProvider.claimVestedBZRX()
+      const bzrxAmount = this.vestedVbzrx
+      this.set('vestedVbzrx', new BigNumber(0))
+      return bzrxAmount
     } catch (err) {
       const error = errorUtils.decorateError(err, { title: 'Failed to claim vested BZRX' })
       this.set('error', error)
@@ -156,6 +180,7 @@ export default class Rewards {
     this.rebateRewards = new BigNumber(0)
     this.stableCoin = new BigNumber(0)
     this.stableCoinVesting = new BigNumber(0)
+    this.vestedVbzrx = new BigNumber(0)
   }
 
   constructor(stakingProvider: StakingProvider, stakingStore: StakingStore) {

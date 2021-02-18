@@ -4,8 +4,13 @@ import Asset from 'bzx-common/src/assets/Asset'
 import { TorqueProvider } from '../services/TorqueProvider'
 import '../styles/components/chi-switch.scss'
 import { CheckBox } from './CheckBox'
+import { propTypes } from 'qrcode.react'
 
-export const ChiSwitch = () => {
+export interface IChiSwithProps {
+  noLabel?: boolean
+}
+
+export const ChiSwitch = (props: IChiSwithProps) => {
   const [isGasTokenEnabled, setChecked] = useState(
     localStorage.getItem('isGasTokenEnabled') === 'true'
   )
@@ -32,7 +37,7 @@ export const ChiSwitch = () => {
   return (
     <div className="chi-switch">
       <CheckBox checked={isGasTokenEnabled} onChange={onChange}>
-        Use CHI token
+        {props.noLabel ? '':'Use CHI token'}
       </CheckBox>
     </div>
   )

@@ -4,9 +4,10 @@ import sleep from 'bard-instruments/lib/async/sleep'
 import * as mobx from 'mobx'
 import appConfig from 'src/config/appConfig'
 import RequestTask from 'src/domain/RequestTask'
-import { DialogVM } from 'ui-framework'
+import { stakeableToken } from 'src/domain/stakingTypes'
 import { RootStore, StakingStore } from 'src/stores'
 import UserBalances from 'src/stores/StakingStore/UserBalances'
+import { DialogVM } from 'ui-framework'
 
 type StakingFormVMProp =
   | 'bzrxInput'
@@ -34,18 +35,20 @@ export default class StakingFormVM {
   public spendingAllowanceDetails = new DialogVM({ id: 'spendingAllowanceDetails' })
   public unstakeSelected = false
 
-  get inputsAsBN() {
+  get inputsAsBN(): Record<stakeableToken, BigNumber> {
     return {
       bzrx: new BigNumber(this.bzrxInput),
       vbzrx: new BigNumber(this.vbzrxInput),
-      bpt: new BigNumber(this.bptInput),
-      ibzrx: new BigNumber(this.ibzrxInput)
+      ibzrx: new BigNumber(this.ibzrxInput),
+      bpt: new BigNumber(this.bptInput)
     }
   }
 
   get canStake() {
-    const { wallet } = this.stakingStore.userBalances
-    return stakingUtils.verifyStake(wallet, this.inputsAsBN)
+    // TODO : redo check. Had to disable because of spending approval changes.
+    return true
+    // const { wallet } = this.stakingStore.userBalances
+    // return stakingUtils.verifyStake(wallet, this.inputsAsBN)
   }
 
   get canUnstake() {
@@ -135,59 +138,50 @@ export default class StakingFormVM {
     this.closeFindRepDialog()
   }
 
-  public setSpendingAllowance(name: 'bzrx' | 'vbzrx' | 'ibzrx' | 'bpt') {
-    const SpendingAllowance = this.stakingStore.stakingAllowances[name]
-    return SpendingAllowance.update(appConfig.infiniteApproval)
+  public setSpendingAllowance(name: stakeableToken) {
+    const spendingAllowance = this.stakingStore.stakingAllowances[name]
+    return spendingAllowance.update(appConfig.infiniteApproval)
   }
 
+  /**
+   * Stake
+   * Uses some heuristic: we are assuming that the user wants to use the full amounts
+   * by comparing rounded values of staked and inputs
+   */
   public stake() {
+    const { stakingAllowances } = this.stakingStore
     const { wallet } = this.userBalances
-    // Some heuristic: we are assuming that the user wants to use the full amounts
-    // by comparing rounded values of wallet and inputs
-    const amounts = {
-      bpt:
-        this.inputsAsBN.bpt.toFixed(2, 1) === wallet.bpt.toFixed(2, 1)
-          ? wallet.bpt
-          : this.inputsAsBN.bpt,
-      bzrx:
-        this.inputsAsBN.bzrx.toFixed(2, 1) === wallet.bzrx.toFixed(2, 1)
-          ? wallet.bzrx
-          : this.inputsAsBN.bzrx,
-      ibzrx:
-        this.inputsAsBN.ibzrx.toFixed(2, 1) === wallet.ibzrx.toFixed(2, 1)
-          ? wallet.ibzrx
-          : this.inputsAsBN.ibzrx,
-      vbzrx:
-        this.inputsAsBN.vbzrx.toFixed(2, 1) === wallet.vbzrx.toFixed(2, 1)
-          ? wallet.vbzrx
-          : this.inputsAsBN.vbzrx
-    }
-    return this.stakingStore.stake(amounts)
+    const tokenAmounts = new Map<stakeableToken, BigNumber>()
+    Object.values(stakeableToken).forEach((token) => {
+      const inputValue = this.inputsAsBN[token]
+      if (!stakingAllowances.needApprovals.get(token) && inputValue.gt(0)) {
+        const amount =
+          inputValue.toFixed(2, 1) === wallet[token].toFixed(2, 1) ? wallet[token] : inputValue
+        tokenAmounts.set(token, amount)
+      }
+    })
+    return this.stakingStore.stake(tokenAmounts)
   }
 
+  /**
+   * Unstake
+   * Users some heuristic: we are assuming that the user wants to use the full amounts
+   * by comparing rounded values of staked and inputs
+   */
   public unstake() {
     const { staked } = this.userBalances
-    // Some heuristic: we are assuming that the user wants to use the full amounts
-    // by comparing rounded values of staked and inputs
-    const amounts = {
-      bpt:
-        this.inputsAsBN.bpt.toFixed(2, 1) === staked.bpt.toFixed(2, 1)
-          ? staked.bpt
-          : this.inputsAsBN.bpt,
-      bzrx:
-        this.inputsAsBN.bzrx.toFixed(2, 1) === staked.bzrx.toFixed(2, 1)
-          ? staked.bzrx
-          : this.inputsAsBN.bzrx,
-      ibzrx:
-        this.inputsAsBN.ibzrx.toFixed(2, 1) === staked.ibzrx.toFixed(2, 1)
-          ? staked.ibzrx
-          : this.inputsAsBN.ibzrx,
-      vbzrx:
-        this.inputsAsBN.vbzrx.toFixed(2, 1) === staked.vbzrx.toFixed(2, 1)
-          ? staked.vbzrx
-          : this.inputsAsBN.vbzrx
-    }
-    return this.stakingStore.unstake(amounts)
+    const tokenAmounts = new Map<stakeableToken, BigNumber>()
+
+    Object.values(stakeableToken).forEach((token) => {
+      const inputValue = this.inputsAsBN[token]
+      if (inputValue.gt(0)) {
+        const amount =
+          inputValue.toFixed(2, 1) === staked[token].toFixed(2, 1) ? staked[token] : inputValue
+        tokenAmounts.set(token, amount)
+      }
+    })
+
+    return this.stakingStore.unstake(tokenAmounts)
   }
 
   public showTransactionAnim(task: RequestTask) {
@@ -204,10 +198,6 @@ export default class StakingFormVM {
   }
 
   private init() {
-    const sp = this.rootStore.stakingProvider
-    sp.on('AskToOpenProgressDlg', this.showTransactionAnim)
-    sp.on('AskToCloseProgressDlg', this.hideTransactionAnim)
-
     const { wallet, staked } = this.userBalances
     this.unstakeSelected = !wallet.isWorthEnough && staked.isWorthEnough
     const balance = this.unstakeSelected ? staked : wallet
@@ -219,7 +209,6 @@ export default class StakingFormVM {
 
     this.stopInputSync = mobx.reaction(
       () => {
-        const { wallet, staked } = this.stakingStore.userBalances
         const unstakeSelected = !staked.isWorthEnough
           ? false
           : !wallet.isWorthEnough
@@ -246,9 +235,6 @@ export default class StakingFormVM {
   }
 
   public destroyVM() {
-    const sp = this.rootStore.stakingProvider
-    sp.off('AskToOpenProgressDlg', this.showTransactionAnim)
-    sp.off('AskToCloseProgressDlg', this.hideTransactionAnim)
     this.stopInputSync()
     this.stopDelegateSync()
   }

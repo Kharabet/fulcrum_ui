@@ -1,8 +1,13 @@
 @import '../abstracts/variables';
-
 @media screen and (max-width: $breakpoint-laptop-max) {
   .trade-page {
     padding: 0;
+    .stats-grid {
+      padding: 0 15px;
+      &__title {
+        padding: 0 15px;
+      }
+    }
   }
 }
 @media only screen and (max-width: $mobile-version-width-sm) {

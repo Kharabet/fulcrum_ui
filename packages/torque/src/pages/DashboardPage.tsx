@@ -1,29 +1,19 @@
 import React, { PureComponent, RefObject } from 'react'
-import { RouteComponentProps } from 'react-router'
 import { BorrowedFundsList } from '../components/BorrowedFundsList'
 import { BorrowMoreDlg } from '../components/BorrowMoreDlg'
 import { ExtendLoanDlg } from '../components/ExtendLoanDlg'
 import { Loader } from '../components/Loader'
 import { ManageCollateralDlg } from '../components/ManageCollateralDlg'
 import { RepayLoanDlg } from '../components/RepayLoanDlg'
-import Asset from 'bzx-common/src/assets/Asset'
 import { BorrowRequestAwaiting } from '../domain/BorrowRequestAwaiting'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ProviderType } from '../domain/ProviderType'
-import { RolloverRequest } from '../domain/RolloverRequest'
-import Footer from '../layout/Footer'
-import { HeaderOps } from '../layout/HeaderOps'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { InfoBlock } from '../components/InfoBlock'
 
-export interface IDashboardPageRouteParams {
-  walletAddress: string | undefined
-}
-
 export interface IDashboardPageParams {
   doNetworkConnect: () => void
-  isRiskDisclosureModalOpen: () => void
   isMobileMedia: boolean
 }
 
@@ -34,10 +24,7 @@ interface IDashboardPageState {
   recentLiquidationsNumber: number
 }
 
-export class DashboardPage extends PureComponent<
-  IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>,
-  IDashboardPageState
-> {
+export class DashboardPage extends PureComponent<IDashboardPageParams, IDashboardPageState> {
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>
   private repayLoanDlgRef: RefObject<RepayLoanDlg>
   private extendLoanDlgRef: RefObject<ExtendLoanDlg>
@@ -158,82 +145,56 @@ export class DashboardPage extends PureComponent<
         <RepayLoanDlg ref={this.repayLoanDlgRef} />
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
         <BorrowMoreDlg ref={this.borrowMoreDlgRef} />
-        <div className="dashboard-page">
-          <HeaderOps
-            isMobileMedia={this.props.isMobileMedia}
-            doNetworkConnect={this.props.doNetworkConnect}
-            isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}
-          />
-          <main>
-            {this.state.recentLiquidationsNumber > 0 && (
-              <InfoBlock localstorageItemProp="past-liquidations-info">
-                {this.state.recentLiquidationsNumber === 1
-                  ? 'One'
-                  : this.state.recentLiquidationsNumber}
-                &nbsp;of your loans&nbsp;
-                {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated during
-                the past {this.daysNumberForLoanActionNotification} days. For more information visit
-                your&nbsp;
-                <a
-                  href="https://explorer.bzx.network/liquidations"
-                  className="regular-link"
-                  target="_blank"
-                  rel="noopener noreferrer">
-                  Liquidations
-                </a>
-                .
-              </InfoBlock>
-            )}
-            {!TorqueProvider.Instance.unsupportedNetwork ? (
-              <React.Fragment>
-                <div className="page-header">
-                  <h1>Your Loans</h1>
-                  {/* <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p> */}
-                  {this.state.isDataLoading ||
-                    (TorqueProvider.Instance.isLoading && (
-                      <Loader
-                        quantityDots={5}
-                        sizeDots={'large'}
-                        title={'Loading'}
-                        isOverlay={false}
-                      />
-                    ))}
-                </div>
-                <BorrowedFundsList
-                  items={this.state.items}
-                  itemsAwaiting={this.state.itemsAwaiting}
-                  manageCollateralDlgRef={this.manageCollateralDlgRef}
-                  repayLoanDlgRef={this.repayLoanDlgRef}
-                  extendLoanDlgRef={this.extendLoanDlgRef}
-                  borrowMoreDlgRef={this.borrowMoreDlgRef}
-                  isLoading={this.state.isDataLoading}
-                />
-              </React.Fragment>
-            ) : (
-              <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-                <div style={{ cursor: `pointer` }}>You are connected to the wrong network.</div>
+        <div>
+          {this.state.recentLiquidationsNumber > 0 && (
+            <InfoBlock localstorageItemProp="past-liquidations-info">
+              {this.state.recentLiquidationsNumber === 1
+                ? 'One'
+                : this.state.recentLiquidationsNumber}
+              &nbsp;of your loans&nbsp;
+              {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated during
+              the past {this.daysNumberForLoanActionNotification} days. For more information visit
+              your&nbsp;
+              <a
+                href="https://explorer.bzx.network/liquidations"
+                className="regular-link"
+                target="_blank"
+                rel="noopener noreferrer">
+                Liquidations
+              </a>
+              .
+            </InfoBlock>
+          )}
+          {!TorqueProvider.Instance.unsupportedNetwork ? (
+            <React.Fragment>
+              <div>
+                {this.state.isDataLoading ||
+                  (TorqueProvider.Instance.isLoading && (
+                    <Loader
+                      quantityDots={5}
+                      sizeDots={'large'}
+                      title={'Loading'}
+                      isOverlay={false}
+                    />
+                  ))}
               </div>
-            )}
-          </main>
-          <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+              <BorrowedFundsList
+                items={this.state.items}
+                itemsAwaiting={this.state.itemsAwaiting}
+                manageCollateralDlgRef={this.manageCollateralDlgRef}
+                repayLoanDlgRef={this.repayLoanDlgRef}
+                extendLoanDlgRef={this.extendLoanDlgRef}
+                borrowMoreDlgRef={this.borrowMoreDlgRef}
+                isLoading={this.state.isDataLoading}
+              />
+            </React.Fragment>
+          ) : (
+            <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+              <div style={{ cursor: `pointer` }}>You are connected to the wrong network.</div>
+            </div>
+          )}
         </div>
       </React.Fragment>
     )
-  }
-  private onRollover = async (request: RolloverRequest) => {
-    await TorqueProvider.Instance.onDoRollover(request)
-  }
-
-  private onBorrowMore = async (item: IBorrowedFundsState) => {
-    if (!this.borrowMoreDlgRef.current) return
-
-    try {
-      const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item)
-      // await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
-    } catch (error) {
-      if (error.message !== 'Form closed') {
-        console.error(error)
-      }
-    }
   }
 }

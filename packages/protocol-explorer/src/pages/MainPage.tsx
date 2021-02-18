@@ -6,10 +6,13 @@ import { ReactComponent as Arrow } from '../assets/images/icon-arrow.svg'
 import { GroupButton } from '../components/GroupButton'
 import { Header } from '../layout/Header'
 import { NavService } from '../services/NavService'
+import { Tab } from '../domain/Tab'
 
 interface IMainPageProps {
   doNetworkConnect: () => void
   isMobileMedia: boolean
+  activeTab: Tab
+  setActiveTab: (tab: Tab) => void
 }
 interface IMainPageState {
   periodChart: number
@@ -70,10 +73,6 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     return (
       <React.Fragment>
         <section className="bg-gradient">
-          <Header
-            isMobileMedia={this.props.isMobileMedia}
-            doNetworkConnect={this.props.doNetworkConnect}
-          />
           <div className="container">
             <div className="flex fw-w jc-sb">
               <div className="flex fd-c w-md-100">

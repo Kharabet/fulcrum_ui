@@ -1,9 +1,10 @@
+import _ from 'lodash'
 import * as mobx from 'mobx'
 import { RootStore } from 'src/stores'
 import { DialogVM } from 'ui-framework'
 import ProviderType from 'src/domain/ProviderType'
 
-type AppVMProps = 'pending'
+type AppVMProps = 'pending' | 'section'
 
 export default class AppVM {
   [name: string]: any
@@ -29,17 +30,41 @@ export default class AppVM {
     Object.assign(this, props)
   }
 
-  public connect (providerType: ProviderType) {
+  public connect(providerType: ProviderType) {
     this.providerMenu.hide()
     this.rootStore.web3Connection.connect(providerType)
   }
 
-  public disconnect () {
+  public disconnect() {
     this.providerMenu.hide()
     this.rootStore.web3Connection.disconnect()
   }
 
+  /**
+   * - Prepare the contract for claiming rewards (optimization because of blocking UI)
+   * - And refresh rewards balances
+   */
+  public async prepareRewardTab() {
+    const { stakingProvider, web3Connection, stakingStore } = this.rootStore
+    await stakingProvider.preloadIBZXContract()
+    if (web3Connection.isConnected) {
+      stakingStore.rewards.getAllRewards()
+    }
+  }
+
+  /**
+   * Load the governance proposal list only if not yet loaded.
+   */
+  public async prepareDaoTab() {
+    const { governanceStore } = this.rootStore
+    if (!governanceStore.pending && governanceStore.proposalsList.length === 0) {
+      governanceStore.getProposals()
+    }
+  }
+
   public init() {
+    const prepareRewardTab = _.throttle(() => this.prepareRewardTab(), 5000)
+
     this.stopAutoSettingBodyOverflow = mobx.reaction(
       () => this.headerMenu.visible || this.providerMenu.visible,
       (menuVisible) => {
@@ -51,14 +76,15 @@ export default class AppVM {
       }
     )
 
-    // This is purely to help performance issue when loading contracts
-    this.stopPreloadContract = mobx.reaction(
-      () => this.section === 'rewards',
-      (shouldPreload) => {
-        if (shouldPreload) {
-          setTimeout(() => {
-            this.rootStore.stakingProvider.preloadIBZXContract()
-          }, 1000)
+    this.stopPreloadTab = mobx.reaction(
+      () => this.section,
+      (section) => {
+        switch (section) {
+          case 'rewards':
+            prepareRewardTab()
+            break
+          case 'dao':
+            this.prepareDaoTab()
         }
       }
     )
@@ -71,14 +97,14 @@ export default class AppVM {
     if (this.stopAutoSettingBodyOverflow) {
       this.stopAutoSettingBodyOverflow()
     }
-    if (this.stopPreloadContract) {
-      this.stopPreloadContract()
+    if (this.stopPreloadTab) {
+      this.stopPreloadTab()
     }
   }
 
   constructor({ rootStore }: { rootStore: RootStore }) {
     this.rootStore = rootStore
-    this.init()
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
+    this.init()
   }
 }

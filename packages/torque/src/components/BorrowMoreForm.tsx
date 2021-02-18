@@ -89,8 +89,8 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
     // 115%
     const sliderMin = loan.loanData!.maintenanceMargin.div(10 ** 18).toNumber()
-    // 300%
-    const sliderMax = sliderMin + 185
+    // 3000%
+    const sliderMax = 3000
 
     let sliderValue = loan.collateralizedPercent.multipliedBy(100).toNumber()
     if (sliderValue > sliderMax) {
@@ -137,7 +137,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             </div>
           </div>
 
-          <Rail sliderValue={sliderValue} sliderMax={sliderMax} />
+          <Rail sliderValue={sliderValue} sliderMin={sliderMin} sliderMax={sliderMax} />
           {collateralizationTooLow && (
             <div className="borrow-more-loan-form__insufficient-balance borrow-more-loan-form__error">
               A minimum of {this.state.borrowMoreColalterizationMin.toFixed(2)}% collaterilization

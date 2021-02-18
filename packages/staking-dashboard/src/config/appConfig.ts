@@ -20,7 +20,13 @@ const bptDecimals = isKovan ? 10 ** 6 : 10 ** 18
 
 const web3ProviderSettings = ethereumUtils.getWeb3ProviderSettings(appNetworkId)
 
-const infiniteApproval = new BigNumber(10 ** 50)
+const infiniteApproval = new BigNumber(10 * 10 ** 50)
+
+/**
+ * Amount of time that needs to have passed for all vbzrx to have vested (after cliff)
+ * @see https://github.com/bZxNetwork/contractsV2/blob/2ee66ab40eff103441cad040452f6ed06f197520/contracts/staking/StakingConstants.sol#L33
+ */
+const vestingDurationAfterCliff = 110376000
 
 export default {
   appNetwork,
@@ -29,5 +35,6 @@ export default {
   infiniteApproval,
   isKovan,
   isMainnetProd,
+  vestingDurationAfterCliff,
   web3ProviderSettings
 }

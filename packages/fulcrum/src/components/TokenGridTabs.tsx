@@ -8,6 +8,7 @@ import { DropdownSelect, IDropDownSelectOption, IDropdownSelectProps } from './D
 import { OpenPositionsButton } from './OpenPositionsButton'
 
 export interface ITokenGridTabsProps {
+  tradePairs: { baseToken: Asset; quoteToken: Asset }[]
   selectedMarket: IMarketPair
   isMobile: boolean
   baseTokens: Asset[]
@@ -95,6 +96,13 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               onClick={this.showTradeHistory}>
               {TokenGridTab.History}
             </div>
+            <div
+              className={`tab ${
+                this.props.activeTokenGridTab === TokenGridTab.Stats ? `active` : ``
+              }`}
+              onClick={this.showStats}>
+              {TokenGridTab.Stats}
+            </div>
           </div>
 
           {/* <div className="pro-switch-wrapper">
@@ -127,24 +135,44 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     this.props.onTokenGridTabChange(TokenGridTab.History)
   }
 
+  public showStats = () => {
+    this.props.onTokenGridTabChange(TokenGridTab.Stats)
+  }
+
   private getDropdownProps(): IDropdownSelectProps {
-    const dropDownSelectOptions: IDropDownSelectOption[] = []
-    this.props.baseTokens.forEach((baseToken) => {
-      this.props.quoteTokens.forEach(
-        (stablecoin) =>
-          baseToken !== stablecoin && stablecoin !== Asset.WBTC &&
+    let dropDownSelectOptions: IDropDownSelectOption[] = []
+    if (this.props.tradePairs.length > 0) {
+      dropDownSelectOptions = this.props.tradePairs
+    } else {
+      this.props.baseTokens.forEach((baseToken) => {
+        if (baseToken === Asset.DAI) {
           dropDownSelectOptions.push({
             baseToken: baseToken,
-            quoteToken: stablecoin
+            quoteToken: Asset.USDC
           })
-      )
-      if (baseToken === Asset.ETH){
-        dropDownSelectOptions.push({
-          baseToken: baseToken,
-          quoteToken: Asset.WBTC
-        })
-      }
-    })
+          dropDownSelectOptions.push({
+            baseToken: baseToken,
+            quoteToken: Asset.USDT
+          })
+          return
+        }
+        this.props.quoteTokens.forEach(
+          (stablecoin) =>
+            baseToken !== stablecoin &&
+            stablecoin !== Asset.WBTC &&
+            dropDownSelectOptions.push({
+              baseToken: baseToken,
+              quoteToken: stablecoin
+            })
+        )
+        if (baseToken === Asset.ETH) {
+          dropDownSelectOptions.push({
+            baseToken: baseToken,
+            quoteToken: Asset.WBTC
+          })
+        }
+      })
+    }
 
     const activeDropDownOption = dropDownSelectOptions.find(
       (option) =>

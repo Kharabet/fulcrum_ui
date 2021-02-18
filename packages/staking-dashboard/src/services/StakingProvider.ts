@@ -1,21 +1,41 @@
 import { BigNumber } from '@0x/utils'
-import { TransactionReceipt, Web3Wrapper } from '@0x/web3-wrapper'
+import { TransactionReceipt, Web3Wrapper, LogEntry } from '@0x/web3-wrapper'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
-import hashUtils from 'app-lib/hashUtils'
+import GovernanceProposal, {
+  IGovernanceProposalActionItem,
+  IGovernanceProposalHistoryItem,
+  GovernanceProposalStates,
+  IGovernanceProposalProposer,
+  IGovernanceProposalReturnData,
+  IGovernanceProposalsEvents
+} from 'src/domain/GovernanceProposal'
+import ProposalCreated from 'src/domain/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
 import appConfig from '../config/appConfig'
 import Asset from '../domain/Asset'
 import AssetsDictionary from '../domain/AssetsDictionary'
-import ClaimRebateRewardsRequest from '../domain/ClaimRebateRewardsRequest'
-import ClaimRequest from '../domain/ClaimRequest'
 import ProviderType from '../domain/ProviderType'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import RequestTask from '../domain/RequestTask'
-import StakingRequest from '../domain/StakingRequest'
 import Web3ConnectionFactory from '../domain/Web3ConnectionFactory'
-import { ContractsSource } from './ContractsSource'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import ProviderChangedEvent from './events/ProviderChangedEvent'
+import { stakeableToken } from 'src/domain/stakingTypes'
+import { LogWithDecodedArgs } from 'ethereum-types'
+import {
+  CompoundGovernorAlphaProposalCanceledEventArgs,
+  CompoundGovernorAlphaProposalCreatedEventArgs,
+  CompoundGovernorAlphaProposalExecutedEventArgs,
+  CompoundGovernorAlphaProposalQueuedEventArgs
+} from '../contracts/CompoundGovernorAlpha'
+import ethGasStation from 'app-lib/apis/ethGasStation'
+import stakingApi from 'app-lib/stakingApi'
+
+// @ts-ignore
+import web3EthAbiUntyped, { AbiCoder } from 'web3-eth-abi'
+// Fix necessary due to wrong type exports in web3-eth-abi
+const web3EthAbi: AbiCoder = web3EthAbiUntyped as any
 
 interface IStakingProviderEvents {
   ProviderAvailable: () => void
@@ -78,15 +98,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       : this.accounts.length > 0 && this.accounts[0]
       ? this.accounts[0].toLowerCase()
       : undefined
-  }
-
-  public preloadContracts(names: Array<'staking' | 'erc20' | 'ibzx'>, erc20Address?: string) {
-    const contracts = {
-      staking: () => this.getStakingContract(),
-      erc20: () =>
-        this.contractsSource && erc20Address && this.contractsSource.getErc20Contract(erc20Address),
-      ibzx: () => false
-    }
   }
 
   public setWeb3Provider = async (connector: AbstractConnector, account?: string) => {
@@ -158,14 +169,10 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     this.setLocalstorageItem('providerType', this.providerType)
   }
 
-  public preloadIBZXContract() {
+  public async preloadIBZXContract() {
     if (this.contractsSource) {
       return this.contractsSource.getiBZxContract()
     }
-  }
-
-  public deactivate = async () => {
-    await this.setReadonlyWeb3Provider()
   }
 
   public getErc20AddressOfAsset(asset: keyof typeof Asset): string | null {
@@ -176,6 +183,10 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     return null
   }
 
+  /**
+   * Helper to know the spending allowance of a contract for a particular token
+   * The account checked is the current active one
+   */
   public async checkErc20Allowance(asset: keyof typeof Asset, contractAddress: string) {
     const erc20Address = this.getErc20AddressOfAsset(asset)
     const account = this.getCurrentAccount()
@@ -185,7 +196,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
 
     const erc20Contract = await this.contractsSource.getErc20Contract(erc20Address)
-    const result = await erc20Contract.allowance.callAsync(account, contractAddress)
+    const result = await erc20Contract.allowance(account, contractAddress).callAsync()
 
     return result
   }
@@ -216,28 +227,345 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const erc20Contract = await this.contractsSource.getErc20Contract(erc20Address)
     const stakingAddress = this.contractsSource.getStakingV1Address()
 
-    const txHash = await erc20Contract.approve.sendTransactionAsync(stakingAddress, amount, {
+    const txHash = await erc20Contract.approve(stakingAddress, amount).sendTransactionAsync({
       from: account
     })
 
     return this.waitForTransactionMined(txHash)
   }
 
-  public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0)
-    if (asset === Asset.UNKNOWN) {
-      // always 0
-      result = new BigNumber(0)
-    } else {
-      // get erc20 token balance
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
-      const assetErc20Address = this.getErc20AddressOfAsset(asset)
-      if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address)
-        result = result.multipliedBy(10 ** (18 - precision))
+  public async getGovernanceProposals(): Promise<GovernanceProposal[]> {
+    let result: GovernanceProposal[] = []
+
+    const proposalsData: IGovernanceProposalReturnData[] = []
+    const proposalsStates: BigNumber[] = []
+
+    if (!this.web3Wrapper || !this.contractsSource) {
+      throw new Error('getGovernanceProposals: Missing source or web3')
+    }
+
+    const proposalsEvents: IGovernanceProposalsEvents = await this.getProposalsEvents()
+
+    const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
+    const proposalsCount = await governanceContract.proposalCount().callAsync()
+
+    for (const i of Array.from(Array(proposalsCount.toNumber()), (n, i) => i + 1)) {
+      const [
+        id,
+        propsoer,
+        eta,
+        startBlock,
+        endBlock,
+        forVotes,
+        againstVotes,
+        canceled,
+        executed
+      ] = await governanceContract.proposals(new BigNumber(i)).callAsync()
+      proposalsData.push({
+        id,
+        propsoer,
+        eta,
+        startBlock,
+        endBlock,
+        forVotes,
+        againstVotes,
+        canceled,
+        executed
+      })
+      proposalsStates.push(
+        new BigNumber(await governanceContract.state(new BigNumber(i)).callAsync())
+      )
+    }
+    const remappedProposals = []
+    for (const i in proposalsData) {
+      if (!proposalsData[i]) {
+        continue
+      }
+      const proposalData = proposalsData[i]
+      const id = proposalData.id.toNumber()
+      const creationEvent = proposalsEvents.proposalsCreatedEvents.find((e) => e.args.id.eq(id))
+      if (creationEvent === undefined) {
+        continue
+      }
+
+      const splittedDescription = creationEvent.args.description.split(/\n/g)
+      const title = splittedDescription[0].split('# ')[1] || 'Untitled'
+      splittedDescription.splice(0, 1)
+      const description = splittedDescription.join('\n') || 'No description.'
+
+      const proposalHistory: IGovernanceProposalHistoryItem[] = await this.getProposalHistory(
+        proposalData,
+        proposalsEvents
+      )
+
+      const actions: IGovernanceProposalActionItem[] = await this.getProposalActions(
+        new BigNumber(id)
+      )
+      const proposer: IGovernanceProposalProposer = await stakingApi.getUserFrom3Box(
+        creationEvent.args.proposer
+      )
+
+      remappedProposals.push(
+        new GovernanceProposal(
+          id,
+          title,
+          description,
+          proposalData.forVotes.div(10 ** 18),
+          proposalData.againstVotes.div(10 ** 18),
+          GovernanceProposalStates[proposalsStates[id - 1].toNumber()],
+          proposalHistory,
+          actions,
+          proposer
+        )
+      )
+    }
+    result = remappedProposals.reverse()
+    console.log({ result })
+    return result
+  }
+
+  public async getProposalsEvents(): Promise<IGovernanceProposalsEvents> {
+    const proposalsCreatedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalCreatedEventArgs>
+    > = []
+    const proposalsQueuedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalQueuedEventArgs>
+    > = []
+    const proposalsExecutedEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalExecutedEventArgs>
+    > = []
+    const proposalsCanceledEvents: Array<
+      LogWithDecodedArgs<CompoundGovernorAlphaProposalCanceledEventArgs>
+    > = []
+
+    if (!this.web3Wrapper || !this.contractsSource) {
+      throw new Error('getProposalsEvents: Missing source or web3')
+    }
+    const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
+
+    this.web3Wrapper.abiDecoder.addABI(governanceContract.abi)
+
+    const createdEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: [ProposalCreated.topic0],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in createdEvents) {
+      if (!createdEvents[i]) {
+        continue
+      }
+      const event: LogEntry = createdEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalCreatedEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalsCreatedEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
       }
     }
 
+    const queuedEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: ['0x9a2e42fd6722813d69113e7d0079d3d940171428df7373df9c7f7617cfda2892'],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in queuedEvents) {
+      if (!createdEvents[i]) {
+        continue
+      }
+      const event: LogEntry = queuedEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalQueuedEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalsQueuedEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+
+    const executedEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: ['0x712ae1383f79ac853f8d882153778e0260ef8f03b504e2866e0593e04d2b291f'],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in executedEvents) {
+      if (!createdEvents[i]) {
+        continue
+      }
+      const event: LogEntry = executedEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalExecutedEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalsExecutedEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+    const canceledEvents = await this.web3Wrapper.getLogsAsync({
+      fromBlock: '0x895440', //9000000
+      toBlock: 'latest',
+      topics: ['0x789cf55be980739dad1d0699b93b58e806b51c9d96619bfa8fe0a28abaa7b30c'],
+      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+    })
+    for (const i in canceledEvents) {
+      if (!createdEvents[i]) {
+        continue
+      }
+      const event: LogEntry = canceledEvents[i]
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
+        CompoundGovernorAlphaProposalCanceledEventArgs
+      >(event)
+      if ('args' in decodedData) {
+        proposalsCanceledEvents.push(decodedData)
+      } else {
+        console.warn({ decodedData })
+      }
+    }
+    return {
+      proposalsCreatedEvents,
+      proposalsQueuedEvents,
+      proposalsExecutedEvents,
+      proposalsCanceledEvents
+    }
+  }
+
+  public async getProposalHistory(
+    proposalData: IGovernanceProposalReturnData,
+    proposalsEvents: IGovernanceProposalsEvents
+  ): Promise<IGovernanceProposalHistoryItem[]> {
+    const history: IGovernanceProposalHistoryItem[] = []
+
+    if (!this.web3Wrapper || !this.contractsSource) {
+      throw new Error('getGovernanceProposals: Missing source or web3')
+    }
+
+    const currentBlockNumber = await this.web3Wrapper.getBlockNumberAsync()
+
+    const creationEvent = proposalsEvents.proposalsCreatedEvents.find((e) =>
+      e.args.id.eq(proposalData.id)
+    )
+    if (creationEvent === undefined) {
+      return history
+    }
+    const queuedEvent = proposalsEvents.proposalsQueuedEvents.find((e) =>
+      e.args.id.eq(proposalData.id)
+    )
+    const executedEvent = proposalsEvents.proposalsExecutedEvents.find((e) =>
+      e.args.id.eq(proposalData.id)
+    )
+    const canceledEvent = proposalsEvents.proposalsCanceledEvents.find((e) =>
+      e.args.id.eq(proposalData.id)
+    )
+
+    creationEvent.blockNumber &&
+      creationEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Pending,
+        blockNumber: proposalData.startBlock.toNumber(),
+        txnHash: creationEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
+      })
+
+    creationEvent.blockNumber &&
+      creationEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Active,
+        blockNumber: proposalData.startBlock.toNumber(),
+        txnHash: creationEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
+      })
+
+    proposalData.endBlock.lt(currentBlockNumber) &&
+      history.push({
+        state:
+          proposalData.endBlock.lt(currentBlockNumber) && proposalData.eta.isZero()
+            ? GovernanceProposalStates.Defeated
+            : GovernanceProposalStates.Succeeded,
+        blockNumber: proposalData.endBlock.toNumber(),
+        date: await this.web3Wrapper.getBlockTimestampAsync(proposalData.endBlock.toNumber())
+      })
+
+    queuedEvent &&
+      queuedEvent.blockNumber &&
+      queuedEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Queued,
+        blockNumber: queuedEvent.blockNumber,
+        txnHash: queuedEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(queuedEvent.blockNumber)
+      })
+
+    executedEvent &&
+      executedEvent.blockNumber &&
+      executedEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Executed,
+        blockNumber: executedEvent.blockNumber,
+        txnHash: executedEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(executedEvent.blockNumber)
+      })
+
+    // 1209600 is Timelock contract GRACE_PERIOD
+    queuedEvent &&
+      proposalData.eta.plus(1209600).lt(currentBlockNumber) &&
+      history.push({
+        state: GovernanceProposalStates.Expired,
+        blockNumber: proposalData.eta.plus(1209600).toNumber(),
+        date: await this.web3Wrapper.getBlockTimestampAsync(
+          proposalData.eta.plus(1209600).toNumber()
+        )
+      })
+
+    canceledEvent &&
+      canceledEvent.blockNumber &&
+      canceledEvent.blockNumber < currentBlockNumber &&
+      history.push({
+        state: GovernanceProposalStates.Canceled,
+        blockNumber: canceledEvent.blockNumber,
+        txnHash: canceledEvent.transactionHash,
+        date: await this.web3Wrapper.getBlockTimestampAsync(canceledEvent.blockNumber)
+      })
+
+    return history
+  }
+
+  public async getProposalActions(id: BigNumber): Promise<IGovernanceProposalActionItem[]> {
+    const result: IGovernanceProposalActionItem[] = []
+
+    if (!this.web3Wrapper || !this.contractsSource) {
+      throw new Error('getGovernanceProposals: Missing source or web3')
+    }
+
+    const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
+    const [targets, values, signatures, callDatas] = await governanceContract.getActions(id).callAsync()
+    signatures.forEach((x, i) => {
+      const paramsMatchArray = x.match(/.*\((.*)\)/)
+      if (!paramsMatchArray || !paramsMatchArray[1]) {
+        return null
+      }
+      const params = paramsMatchArray[1].split(',')
+      const functionName = x.replace(`(${paramsMatchArray[1]})`, ',')
+
+      const target = targets[i]
+      const value = values[i]
+      const signature = x
+      const callData = callDatas[i]
+      const decodedParams = web3EthAbi.decodeParameters(params, callData)
+      const title = `${target}.${functionName}(${Object.values(decodedParams).join('')})`
+      result.push({
+        target,
+        value,
+        signature,
+        callData,
+        title
+      } as IGovernanceProposalActionItem)
+    })
     return result
   }
 
@@ -250,7 +578,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     const vbzrxContract = await this.contractsSource.getBzrxVestingContract()
 
-    return vbzrxContract.vestedBalanceOf.callAsync(account)
+    return vbzrxContract.vestedBalanceOf(account).callAsync()
   }
 
   /**
@@ -266,24 +594,18 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const vbzrxContract = await this.contractsSource.getBzrxVestingContract()
 
     const { gasAmount } = await this.getGasEstimate(() =>
-      vbzrxContract.claim.estimateGasAsync({
+      vbzrxContract.claim().estimateGasAsync({
         from: account
       })
     )
 
-    const txHash = await vbzrxContract.claim.sendTransactionAsync({
+    const txHash = await vbzrxContract.claim().sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await this.gasPrice()
+      gasPrice: await ethGasStation.getGasPrice()
     })
 
     await this.waitForTransactionMined(txHash)
-  }
-
-  public async getSpendingAllowances() {
-    if (!this.contractsSource) {
-      throw new Error('Missing contract source')
-    }
   }
 
   /**
@@ -310,10 +632,9 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    * The amounts are in base units so they must be divided by 10 ** decimals
    * @param address the wallet of the user
    */
-  public async getStakedBalances(address?: string) {
+  public async getStakedBalances(address: string) {
     const stakingContract = await this.getStakingContract()
-    const account = address || this.getCurrentAccount()
-    if (!stakingContract || !account) {
+    if (!stakingContract) {
       return {
         bzrx: new BigNumber(0),
         vbzrx: new BigNumber(0),
@@ -321,110 +642,67 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         bpt: new BigNumber(0)
       }
     }
-    const [bzrx, ibzrx, vbzrx, bpt] = await stakingContract.balanceOfByAssets.callAsync(account)
+    const [bzrx, ibzrx, vbzrx, bpt] = await stakingContract.balanceOfByAssets(address).callAsync()
     return { bzrx, ibzrx, vbzrx, bpt }
   }
 
-  private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
-    let result = new BigNumber(0)
+  /**
+   * Get addresses of the stakeable tokens.
+   * Throws an error if there is a missing address
+   */
+  public getStakeableAddresses() {
+    if (!this.contractsSource) {
+      throw new Error('Missing contract sources')
+    }
+    const bzrx = this.getErc20AddressOfAsset(Asset.BZRX)
+    const vbzrx = this.getErc20AddressOfAsset(Asset.VBZRX)
+    const ibzrx = this.getErc20AddressOfAsset(Asset.IBZRX)
+    const bpt = this.getErc20AddressOfAsset(Asset.BPT)
 
-    if (this.web3Wrapper && this.contractsSource) {
-      if (!account && this.contractsSource.canWrite) {
-        account = this.getCurrentAccount()
-      }
-
-      if (account) {
-        const tokenContract = await this.contractsSource.getErc20Contract(addressErc20)
-        if (tokenContract) {
-          result = await tokenContract.balanceOf.callAsync(account)
-        }
-      }
+    if (!bzrx || !vbzrx || !ibzrx || !bpt) {
+      throw new Error('Missing stakeable token address')
     }
 
-    return result
+    return { bzrx, vbzrx, ibzrx, bpt }
   }
 
-  public gasPrice = async (): Promise<BigNumber> => {
-    let result = new BigNumber(500).multipliedBy(10 ** 9) // upper limit 120 gwei
-    const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
-
-    const url = `https://ethgasstation.info/json/ethgasAPI.json`
-    try {
-      const response = await fetch(url)
-      const jsonData = await response.json()
-      // console.log(jsonData);
-      if (jsonData.average) {
-        // ethgasstation values need divide by 10 to get gwei
-        const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8)
-        const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10 ** 8)
-        if (gasPriceAvg.lt(result)) {
-          result = gasPriceAvg
-        } else if (gasPriceSafeLow.lt(result)) {
-          result = gasPriceSafeLow
-        }
-      }
-    } catch (error) {
-      // console.log(error);
-      result = new BigNumber(60).multipliedBy(10 ** 9) // error default 60 gwei
+  /**
+   * Get the staking specific tokens balances from a user wallet
+   * @param userAddress user wallet
+   */
+  public async getStakeableBalances(userAddress: string) {
+    if (!this.contractsSource) {
+      throw new Error('Missing contract sources')
     }
+    const helper = await this.contractsSource.getHelperContract()
+    const addresses = this.getStakeableAddresses()
+    const [bzrx, vbzrx, ibzrx, bpt] = await helper.balanceOf(
+      [addresses.bzrx, addresses.vbzrx, addresses.ibzrx, addresses.bpt],
+      userAddress
+    ).callAsync()
 
-    if (result.lt(lowerLimit)) {
-      result = lowerLimit
-    }
-
-    return result
+    return { bzrx, vbzrx, ibzrx, bpt }
   }
 
-  public getLargeApprovalAmount = (
-    asset: Asset,
-    neededAmount: BigNumber = new BigNumber(0)
-  ): BigNumber => {
-    let amount = new BigNumber(0)
+  /**
+   * Get the spending allowance for each stakeable asset for a user wallet
+   * @param userAddress user wallet
+   */
 
-    switch (asset) {
-      case Asset.BZRX:
-      case Asset.BZRXV1:
-      case Asset.BPT:
-        return new BigNumber(10 ** 18).multipliedBy(25000000)
-      case Asset.ETH:
-      case Asset.WETH:
-        amount = new BigNumber(10 ** 18).multipliedBy(1500)
-        break
-      case Asset.WBTC:
-        amount = new BigNumber(10 ** 8).multipliedBy(25)
-        break
-      case Asset.LINK:
-        amount = new BigNumber(10 ** 18).multipliedBy(60000)
-        break
-      case Asset.ZRX:
-        amount = new BigNumber(10 ** 18).multipliedBy(750000)
-        break
-      case Asset.KNC:
-        amount = new BigNumber(10 ** 18).multipliedBy(550000)
-        break
-      case Asset.DAI:
-      case Asset.SUSD:
-        amount = new BigNumber(10 ** 18).multipliedBy(375000)
-        break
-      case Asset.USDC:
-      case Asset.USDT:
-        amount = new BigNumber(10 ** 6).multipliedBy(375000)
-        break
-      case Asset.REP:
-        amount = new BigNumber(10 ** 18).multipliedBy(15000)
-        break
-      case Asset.MKR:
-        amount = new BigNumber(10 ** 18).multipliedBy(1250)
-        break
-      default:
-        break
+  public async getStakeableAllowances(userAddress: string) {
+    if (!this.contractsSource) {
+      throw new Error('Missing contract sources')
     }
+    const helper = await this.contractsSource.getHelperContract()
+    const addresses = this.getStakeableAddresses()
+    const stakingAddress = this.contractsSource.getStakingV1Address()
+    const [bzrx, vbzrx, ibzrx, bpt] = await helper.allowance(
+      [addresses.bzrx, addresses.vbzrx, addresses.ibzrx, addresses.bpt],
+      userAddress,
+      stakingAddress
+    ).callAsync()
 
-    if (amount.eq(0)) {
-      throw new Error('Invalid approval asset!')
-    }
-
-    return amount.gt(neededAmount) ? amount : neededAmount
+    return { bzrx, vbzrx, ibzrx, bpt }
   }
 
   public getRepresentatives = async (): Promise<
@@ -445,56 +723,62 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       return []
     }
 
-    const repVotes = await stakingContract.getDelegateVotes.callAsync(
-      new BigNumber(0),
-      new BigNumber(100),
-      {
-        from: account
-      }
-    )
+    // TODO: contrast has changed apparently. Review when we work on delegates.
+    // const repVotes = await stakingContract.getDelegateVotes.callAsync(
+    //   new BigNumber(0),
+    //   new BigNumber(100),
+    //   {
+    //     from: account
+    //   }
+    // )
 
-    return repVotes.map((rep) => ({
-      name: hashUtils.shortHash(rep.user, 6, 4),
-      wallet: rep.user,
-      bzrx: rep.BZRX.div(10 ** 18),
-      bpt: rep.LPToken.div(10 ** 18),
-      ibzrx: rep.iBZRX.div(10 ** 18),
-      vbzrx: rep.vBZRX.div(10 ** 18),
-      totalVotes: rep.totalVotes
-    }))
+    // return repVotes.map((rep) => ({
+    //   name: hashUtils.shortHash(rep.user, 6, 4),
+    //   wallet: rep.user,
+    //   bzrx: rep.BZRX.div(10 ** 18),
+    //   bpt: rep.LPToken.div(10 ** 18),
+    //   ibzrx: rep.iBZRX.div(10 ** 18),
+    //   vbzrx: rep.vBZRX.div(10 ** 18),
+    //   totalVotes: rep.totalVotes
+    // }))
+
+    return []
   }
 
   /**
    * Change the delegate for the current account
    */
   public async changeDelegate(delegateAddress: string) {
-    const account = this.getCurrentAccount()
-    const staking = await this.getStakingContract()
+    // TODO: changeDelegate was removed in the contract, need to add back later
+    // const account = this.getCurrentAccount()
+    // const staking = await this.getStakingContract()
 
-    if (!account || !staking) {
-      throw new Error('Missing account or Staking contract')
-    }
+    // if (!account || !staking) {
+    //   throw new Error('Missing account or Staking contract')
+    // }
 
-    const { gasAmount } = await this.getGasEstimate(() =>
-      staking.changeDelegate.estimateGasAsync(delegateAddress, {
-        from: account
-      })
-    )
+    // const { gasAmount } = await this.getGasEstimate(() =>
+    //   staking.changeDelegate.estimateGasAsync(delegateAddress, {
+    //     from: account
+    //   })
+    // )
 
-    const txHash = await staking.changeDelegate.sendTransactionAsync(delegateAddress, {
-      from: account,
-      gas: gasAmount,
-      gasPrice: await this.gasPrice()
-    })
+    // const txHash = await staking.changeDelegate.sendTransactionAsync(delegateAddress, {
+    //   from: account,
+    //   gas: gasAmount,
+    //   gasPrice: await this.gasPrice()
+    // })
 
-    await this.waitForTransactionMined(txHash)
+    // await this.waitForTransactionMined(txHash)
     return true
   }
 
   /**
    * User gets 4 types of rewards (earnings)
+   * [bzrx, stableCoin, bzrxVesting, stableCoinVesting]
+   * NOTE: bzrx amount is actually the sum of "real" staking rewards + vested staked vbzrx
    */
-  public getUserEarnings = async (): Promise<{
+  public getStakingRewards = async (): Promise<{
     bzrx: BigNumber
     stableCoin: BigNumber
     bzrxVesting: BigNumber
@@ -504,29 +788,49 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const stakingContract = await this.getStakingContract()
 
     if (!account || !stakingContract) {
-      return {
-        bzrx: new BigNumber(0),
-        stableCoin: new BigNumber(0),
-        bzrxVesting: new BigNumber(0),
-        stableCoinVesting: new BigNumber(0)
-      }
+      throw new Error('missing account / staking contract')
     }
 
-    const [
-      bzrx,
-      stableCoin,
-      bzrxVesting,
-      stableCoinVesting
-    ] = await stakingContract.earned.callAsync(account, {
+    // [bzrx, stableCoin, bzrxVesting, stableCoinVesting]
+    const result = await stakingContract.earned(account).callAsync({
       from: account
     })
 
     return {
-      bzrx: bzrx.div(10 ** 18),
-      stableCoin: stableCoin.div(10 ** 18),
-      bzrxVesting: bzrxVesting.div(10 ** 18),
-      stableCoinVesting: stableCoinVesting.div(10 ** 18)
+      bzrx: result[0].div(10 ** 18),
+      stableCoin: result[1].div(10 ** 18),
+      bzrxVesting: result[2].div(10 ** 18),
+      stableCoinVesting: result[3].div(10 ** 18)
     }
+  }
+
+  /**
+   * Part of the staking rewards that are actually vested BZRX coming from staked vbzrx
+   */
+  public async getVestedVbzrxInRewards(vbzrxStaked: BigNumber) {
+    const account = this.getCurrentAccount()
+    const stakingContract = await this.getStakingContract()
+
+    if (!account || !stakingContract || !this.web3Wrapper) {
+      throw new Error('Missing staking contract, account or web3Wrapper')
+    }
+
+    const vestingLastSyncTime = await stakingContract.vestingLastSync(account).callAsync({
+      from: account
+    })
+
+    /**
+     * Note: it is better to use the blockchain time than the user browser local time
+     */
+    const lastBlockTime = await this.web3Wrapper.getBlockTimestampAsync('latest')
+    const now = new BigNumber(lastBlockTime)
+
+    const vestedBzrxInRewards = now
+      .minus(vestingLastSyncTime)
+      .div(appConfig.vestingDurationAfterCliff)
+      .times(vbzrxStaked)
+
+    return vestedBzrxInRewards
   }
 
   /**
@@ -555,64 +859,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   }
 
   /**
-   * Unstake a single token
-   * @param token token to unstake
-   * @param amount unstake 10 tokens = new BigNumber(10)
-   */
-  public async unstakeOne(token: 'BZRX' | 'VBZRX' | 'IBZRX' | 'BPT', amount: BigNumber) {
-    const account = this.getCurrentAccount()
-    const stakingContract = await this.getStakingContract()
-    if (!account || !stakingContract) {
-      throw new Error('Account or staking contract unavailable')
-    }
-
-    const tokenAddress = this.getErc20AddressOfAsset(token)
-    if (!tokenAddress) {
-      throw new Error('ERC20 Token address not found')
-    }
-
-    const { gasAmount } = await this.getGasEstimate(() =>
-      stakingContract.unstake.estimateGasAsync([tokenAddress], [amount.times(10 ** 18)], {
-        from: account
-      })
-    )
-
-    const txHash = await stakingContract.unstake.sendTransactionAsync(
-      [tokenAddress],
-      [amount.times(10 ** 18)],
-      {
-        from: account,
-        gas: gasAmount,
-        gasPrice: await this.gasPrice()
-      }
-    )
-
-    await this.waitForTransactionMined(txHash)
-  }
-
-  public async unstakeAll() {
-    const account = this.getCurrentAccount()
-    const stakingContract = await this.getStakingContract()
-    if (!account || !stakingContract) {
-      throw new Error('Account or staking contract unavailable')
-    }
-
-    const { gasAmount } = await this.getGasEstimate(() =>
-      stakingContract.exit.estimateGasAsync({
-        from: account
-      })
-    )
-
-    const txHash = await stakingContract.exit.sendTransactionAsync({
-      from: account,
-      gas: gasAmount,
-      gasPrice: await this.gasPrice()
-    })
-
-    await this.waitForTransactionMined(txHash)
-  }
-
-  /**
    * Returns delegate for current account
    */
   public getDelegateAddress = async (): Promise<string> => {
@@ -623,7 +869,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       throw new Error('Missing contract or account')
     }
 
-    return staking.delegate.callAsync(account, {
+    return staking.delegate(account).callAsync({
       from: account
     })
   }
@@ -636,7 +882,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
 
     const bZxContract = await this.contractsSource.getiBZxContract()
-    const vbzrxAmount = await bZxContract.rewardsBalanceOf.callAsync(account, {
+    const vbzrxAmount = await bZxContract.rewardsBalanceOf(account).callAsync({
       from: account
     })
 
@@ -663,76 +909,52 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     return this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper)
   }
 
-  public onRequestConfirmed = async (request: StakingRequest | ClaimRequest) => {
-    return this.processRequestTask(new RequestTask(request))
-  }
-
-  public stake = (tokens: {
-    bzrx: BigNumber
-    vbzrx: BigNumber
-    ibzrx: BigNumber
-    bpt: BigNumber
-  }) => {
+  public stake = (tokenAmounts: Map<stakeableToken, BigNumber>) => {
     const opId = (Math.random() + 1).toString()
-    this.emit('TaskUpdate', { opId, opType: 'staking', type: 'created', value: Date.now() })
-    return { opId, type: 'staking', result: this._stake(tokens, opId) }
+    this.emit('TaskUpdate', {
+      opId,
+      opType: 'staking',
+      type: 'created',
+      value: Date.now()
+    })
+    return { opId, type: 'staking', result: this._stake(tokenAmounts, opId) }
   }
 
   /**
    * Send stake request.
    * Amounts should be in decimal base.
    * eg: if user wants to unstake 10 BZRX then bzrx argument should be new BigNumber(10)
-   * @param tokens amount of bzrx, vbzrx, ibzrx and bpt to stake
+   * @param tokenAmounts amount of bzrx, vbzrx, ibzrx and bpt to stake
    */
-  public _stake = async (
-    tokens: {
-      bzrx: BigNumber
-      vbzrx: BigNumber
-      ibzrx: BigNumber
-      bpt: BigNumber
-    },
-    opId?: string
-  ) => {
+  public _stake = async (tokenAmounts: Map<stakeableToken, BigNumber>, opId?: string) => {
     const account = this.getCurrentAccount()
     const stakingContract = await this.getStakingContract()
+    const stakeableAddresses = this.getStakeableAddresses()
 
     if (!account || !stakingContract) {
       throw new Error('Missing account of stakingContract')
     }
 
-    const bzrxErc20Address = this.getErc20AddressOfAsset(Asset.BZRX)
-    const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.VBZRX)
-    const ibzrxErc20Address = this.getErc20AddressOfAsset(Asset.IBZRX)
-    const bptErc20Address = this.getErc20AddressOfAsset(Asset.BPT)
-
-    if (!bzrxErc20Address || !vbzrxErc20Address || !ibzrxErc20Address || !bptErc20Address) {
-      throw new Error('No ERC20 contract available!')
-    }
-
-    const bzrx = tokens.bzrx.times(10 ** 18)
-    const vbzrx = tokens.vbzrx.times(10 ** 18)
-    const ibzrx = tokens.ibzrx.times(10 ** 18)
-    const bpt = tokens.bpt.times(10 ** 18)
+    const { addresses, amounts } = Array.from(tokenAmounts).reduce(
+      (acc, [token, amount]) => {
+        acc.amounts.push(amount.times(10 ** 18))
+        acc.addresses.push(stakeableAddresses[token])
+        return acc
+      },
+      { addresses: [] as string[], amounts: [] as BigNumber[] }
+    )
 
     const { gasAmount } = await this.getGasEstimate(() =>
-      stakingContract.stake.estimateGasAsync(
-        [bzrxErc20Address, vbzrxErc20Address, ibzrxErc20Address, bptErc20Address],
-        [bzrx, vbzrx, ibzrx, bpt],
-        {
-          from: account
-        }
-      )
+      stakingContract.stake(addresses, amounts).estimateGasAsync({
+        from: account
+      })
     )
 
-    const txHash = await stakingContract.stake.sendTransactionAsync(
-      [bzrxErc20Address, vbzrxErc20Address, ibzrxErc20Address, bptErc20Address],
-      [bzrx, vbzrx, ibzrx, bpt],
-      {
-        from: account,
-        gas: gasAmount,
-        gasPrice: await this.gasPrice()
-      }
-    )
+    const txHash = await stakingContract.stake(addresses, amounts).sendTransactionAsync({
+      from: account,
+      gas: gasAmount,
+      gasPrice: await ethGasStation.getGasPrice()
+    })
 
     if (opId) {
       this.emit('TaskUpdate', { opId: opId, type: 'txhash', value: txHash })
@@ -747,52 +969,35 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    * eg: if user wants to unstake 10 BZRX then bzrx argument should be new BigNumber(10)
    * @param tokens amount of bzrx, vbzrx and bpt to stake
    */
-  public unstakeTokens = async (tokens: {
-    bzrx: BigNumber
-    vbzrx: BigNumber
-    ibzrx: BigNumber
-    bpt: BigNumber
-  }) => {
+  public unstakeTokens = async (tokenAmounts: Map<stakeableToken, BigNumber>) => {
     const account = this.getCurrentAccount()
     const stakingContract = await this.getStakingContract()
+    const stakeableAddresses = this.getStakeableAddresses()
 
     if (!account || !stakingContract) {
       throw new Error('Missing account of stakingContract')
     }
 
-    const bzrxErc20Address = this.getErc20AddressOfAsset(Asset.BZRX)
-    const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.VBZRX)
-    const ibzrxErc20Address = this.getErc20AddressOfAsset(Asset.IBZRX)
-    const bptErc20Address = this.getErc20AddressOfAsset(Asset.BPT)
-
-    if (!bzrxErc20Address || !vbzrxErc20Address || !ibzrxErc20Address || !bptErc20Address) {
-      throw new Error('No ERC20 contract available!')
-    }
-
-    const bzrx = tokens.bzrx.times(10 ** 18)
-    const vbzrx = tokens.vbzrx.times(10 ** 18)
-    const ibzrx = tokens.ibzrx.times(10 ** 18)
-    const bpt = tokens.bpt.times(10 ** 18)
+    const { addresses, amounts } = Array.from(tokenAmounts).reduce(
+      (acc, [token, amount]) => {
+        acc.amounts.push(amount.times(10 ** 18))
+        acc.addresses.push(stakeableAddresses[token])
+        return acc
+      },
+      { addresses: [] as string[], amounts: [] as BigNumber[] }
+    )
 
     const { gasAmount } = await this.getGasEstimate(() =>
-      stakingContract.unstake.estimateGasAsync(
-        [bzrxErc20Address, vbzrxErc20Address, ibzrxErc20Address, bptErc20Address],
-        [bzrx, vbzrx, ibzrx, bpt],
-        {
-          from: account
-        }
-      )
+      stakingContract.unstake(addresses, amounts).estimateGasAsync({
+        from: account
+      })
     )
 
-    const txHash = await stakingContract.unstake.sendTransactionAsync(
-      [bzrxErc20Address, vbzrxErc20Address, ibzrxErc20Address, bptErc20Address],
-      [bzrx, vbzrx, ibzrx, bpt],
-      {
-        from: account,
-        gas: gasAmount,
-        gasPrice: await this.gasPrice()
-      }
-    )
+    const txHash = await stakingContract.unstake(addresses, amounts).sendTransactionAsync({
+      from: account,
+      gas: gasAmount,
+      gasPrice: await ethGasStation.getGasPrice()
+    })
 
     await this.waitForTransactionMined(txHash)
   }
@@ -802,24 +1007,19 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const stakingContract = await this.getStakingContract()
 
     if (!account || !stakingContract) {
-      return {
-        bzrx: new BigNumber(0),
-        stableCoin: new BigNumber(0)
-      }
+      throw new Error('Missing account or contract')
     }
 
-    const method = shouldRestake ? stakingContract.claimAndRestake : stakingContract.claim
-
     const { gasAmount } = await this.getGasEstimate(() =>
-      method.estimateGasAsync({
+      stakingContract.claim(shouldRestake).estimateGasAsync({
         from: account
       })
     )
 
-    const txHash = await method.sendTransactionAsync({
+    const txHash = await stakingContract.claim(shouldRestake).sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await this.gasPrice()
+      gasPrice: await ethGasStation.getGasPrice()
     })
 
     await this.waitForTransactionMined(txHash)
@@ -837,174 +1037,18 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
 
     const { gasAmount } = await this.getGasEstimate(() =>
-      bZxContract.claimRewards.estimateGasAsync(account, {
+      bZxContract.claimRewards(account).estimateGasAsync({
         from: account
       })
     )
 
-    const txHash = await bZxContract.claimRewards.sendTransactionAsync(account, {
+    const txHash = await bZxContract.claimRewards(account).sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await this.gasPrice()
+      gasPrice: await ethGasStation.getGasPrice()
     })
 
     await this.waitForTransactionMined(txHash)
-  }
-
-  private processClaimRebateRewardsRequestTask = async (task: RequestTask, account: string) => {
-    const bZxContract = await this.contractsSource!.getiBZxContract()
-    if (!bZxContract) throw new Error('No ERC20 contract available!')
-    // Submitting loan
-    task.processingStepNext()
-    let gasAmountBN
-    let gasAmount
-    let txHash = ''
-    try {
-      gasAmount = await bZxContract.claimRewards.estimateGasAsync(account, {
-        from: account,
-        gas: this.gasLimit
-      })
-      gasAmountBN = new BigNumber(gasAmount)
-        .multipliedBy(this.gasBufferCoeff)
-        .integerValue(BigNumber.ROUND_UP)
-    } catch (e) {
-      console.error(e)
-      throw e
-    }
-
-    try {
-      txHash = await bZxContract.claimRewards.sendTransactionAsync(account, {
-        from: account,
-        gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-        gasPrice: await this.gasPrice()
-      })
-
-      task.setTxHash(txHash)
-    } catch (e) {
-      console.error(e)
-      throw e
-    }
-    return txHash
-  }
-
-  public processRequestTask = async (task: RequestTask) => {
-    try {
-      this.requestTask = task
-      task.setEventEmitter(this)
-      this.emit('AskToOpenProgressDlg', task)
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error('No provider available!')
-      }
-
-      const account = this.getCurrentAccount()
-
-      if (!account) {
-        throw new Error('Unable to get wallet address!')
-      }
-
-      const taskRequest = task.request
-
-      task.processingStart([
-        'Initializing',
-        'Submitting ' + taskRequest.name,
-        'Updating the blockchain',
-        'Transaction completed'
-      ])
-
-      let txHash
-      switch (taskRequest.constructor) {
-        case StakingRequest:
-          txHash = await this.processStakingRequestTask(task, account)
-          break
-        case ClaimRebateRewardsRequest:
-          txHash = await this.processClaimRebateRewardsRequestTask(task, account)
-          break
-        default:
-          throw new Error('Unknown request!')
-      }
-
-      task.processingStepNext()
-      const txReceipt = await this.waitForTransactionMined(txHash)
-      if (!txReceipt.status) {
-        throw new Error('Reverted by EVM')
-      }
-
-      task.processingStepNext()
-      await this.sleep(this.successDisplayTimeout)
-      task.processingEnd(true, false, null)
-    } catch (err) {
-      task.processingEnd(false, false, err)
-      console.log('hey')
-      throw err
-    } finally {
-      this.emit('AskToCloseProgressDlg', task)
-    }
-    return false
-  }
-
-  private processStakingRequestTask = async (task: RequestTask, account: string) => {
-    const taskRequest = task.request as StakingRequest
-    const { amounts } = taskRequest
-
-    const stakingContract = await this.contractsSource!.getStakingV1Contract()
-
-    if (!stakingContract) {
-      throw new Error('No staking contract available!')
-    }
-
-    const bzrxErc20Address = this.getErc20AddressOfAsset(Asset.BZRX)
-    const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.VBZRX)
-    const ibzrxErc20Address = this.getErc20AddressOfAsset(Asset.IBZRX)
-    const bptErc20Address = this.getErc20AddressOfAsset(Asset.BPT)
-
-    if (!bzrxErc20Address || !vbzrxErc20Address || !ibzrxErc20Address || !bptErc20Address) {
-      throw new Error('No ERC20 contract available!')
-    }
-
-    // const encodedInput = stakingContract.stake.getABIEncodedTransactionData(
-    //   [bzrxErc20Address, vbzrxErc20Address, ibzrxErc20Address, bptErc20Address],
-    //   [amounts.bzrx, amounts.vbzrx, amounts.ibzrx, amounts.bpt]
-    // )
-    // console.log(encodedInput)
-
-    task.processingStepNext()
-    let gasAmountBN
-    let gasAmount
-    let txHash = ''
-    try {
-      gasAmount = await stakingContract.stake.estimateGasAsync(
-        [bzrxErc20Address, vbzrxErc20Address, ibzrxErc20Address, bptErc20Address],
-        [amounts.bzrx, amounts.vbzrx, amounts.ibzrx, amounts.bpt],
-        {
-          from: account,
-          gas: this.gasLimit
-        }
-      )
-      gasAmountBN = new BigNumber(gasAmount)
-        .multipliedBy(this.gasBufferCoeff)
-        .integerValue(BigNumber.ROUND_UP)
-    } catch (err) {
-      console.error(err)
-      throw err
-    }
-
-    try {
-      txHash = await stakingContract.stake.sendTransactionAsync(
-        [bzrxErc20Address, vbzrxErc20Address, ibzrxErc20Address, bptErc20Address],
-        [amounts.bzrx, amounts.vbzrx, amounts.ibzrx, amounts.bpt],
-        {
-          from: account,
-          gas: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-          gasPrice: await this.gasPrice()
-        }
-      )
-
-      task.setTxHash(txHash)
-    } catch (err) {
-      console.log(err)
-      throw err
-    }
-    return txHash
   }
 
   public sleep(ms: number) {

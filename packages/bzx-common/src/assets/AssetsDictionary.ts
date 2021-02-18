@@ -1,4 +1,4 @@
-import  Asset  from './Asset'
+import Asset from './Asset'
 import AssetDetails from './AssetDetails'
 
 import aave_logo, { ReactComponent as AAVELogo } from './images/ic_token_aave.svg'
@@ -24,6 +24,9 @@ import weth_logo, { ReactComponent as WETHLogo } from './images/ic_token_weth.sv
 import yfi_logo, { ReactComponent as YFILogo } from './images/ic_token_yfi.svg'
 import zrx_logo, { ReactComponent as ZRXLogo } from './images/ic_token_zrx.svg'
 import vbzrx_logo, { ReactComponent as vBZRXLogo } from './images/ic_token_vbzrx.svg'
+import ibzrx_logo, { ReactComponent as iBZRXLogo } from './images/ic_token_ibzrx.svg'
+import bpt_logo, { ReactComponent as BPTLogo } from './images/ic_token_bpt.svg'
+import crv_logo, { ReactComponent as CRVLogo } from './images/ic_token_crv.svg'
 
 export default class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
@@ -38,9 +41,9 @@ export default class AssetsDictionary {
         '',
         new Map<number, string | null>([
           [1, '0x0000000000004946c0e9f43f4dee607b0ef1fa1c'],
-          [42, '0x0000000000004946c0e9f43f4dee607b0ef1fa1c']
+          [42, '0x0000000000004946c0e9f43f4dee607b0ef1fa1c'],
         ])
-      )
+      ),
     ],
     [
       Asset.BAT,
@@ -54,9 +57,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x0d8775f648430679a709e98d2b0cb6250d2887ef'],
           [3, '0xdb0040451f373949a4be60dcd7b6b8d6e42658b6'],
-          [42, '0xac091ccf1b0c601182f3ccf3eb20f291aba39029']
+          [42, '0xac091ccf1b0c601182f3ccf3eb20f291aba39029'],
         ])
-      )
+      ),
     ],
     [
       Asset.WBTC,
@@ -70,9 +73,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'],
           [3, '0x95cc8d8f29d0f7fcc425e8708893e759d1599c97'], // using ENG token instead
-          [42, '0x5ae55494ccda82f1f7c653bc2b6ebb4ad3c77dac']
+          [42, '0x5ae55494ccda82f1f7c653bc2b6ebb4ad3c77dac'],
         ])
-      )
+      ),
     ],
     [
       Asset.LINK,
@@ -86,9 +89,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x514910771af9ca656af840dff83e8264ecf986ca'],
           [3, ''],
-          [42, '0xfb9325e5f4fc9629525427a1c92c0f4d723500cf']
+          [42, '0xfb9325e5f4fc9629525427a1c92c0f4d723500cf'],
         ])
-      )
+      ),
     ],
     [
       Asset.USDT,
@@ -102,9 +105,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0xdac17f958d2ee523a2206206994597c13d831ec7'],
           [3, ''],
-          [42, '0x4c4462c6bca4c92bf41c40f9a4047f35fd296996']
+          [42, '0x4c4462c6bca4c92bf41c40f9a4047f35fd296996'],
         ])
-      )
+      ),
     ],
     [
       Asset.SAI,
@@ -118,9 +121,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359'],
           [3, '0xad6d458402f60fd3bd25163575031acdce07538d'],
-          [42, '0xc4375b7de8af5a38a93548eb8453a498222c4ff2']
+          [42, '0xc4375b7de8af5a38a93548eb8453a498222c4ff2'],
         ])
-      )
+      ),
     ],
     [
       Asset.DAI,
@@ -135,9 +138,9 @@ export default class AssetsDictionary {
           [1, '0x6b175474e89094c44da98b954eedeac495271d0f'],
           [3, '0xf80a32a835f79d7787e8a8ee5721d0feafd78108'],
           [4, '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'],
-          [42, '0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8']
+          [42, '0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8'],
         ])
-      )
+      ),
     ],
     [
       Asset.CHAI,
@@ -152,9 +155,9 @@ export default class AssetsDictionary {
           [1, '0x06af07097c9eeb7fd685c692751d5c66db49c215'],
           [3, ''],
           [4, ''],
-          [42, '0x71dd45d9579a499b58aa85f50e5e3b241ca2d10d']
+          [42, '0x71dd45d9579a499b58aa85f50e5e3b241ca2d10d'],
         ])
-      )
+      ),
     ],
     [
       Asset.USDC,
@@ -168,9 +171,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'],
           [3, '0x95cc8d8f29d0f7fcc425e8708893e759d1599c97'], // using eng
-          [42, '0xb443f30cdd6076b1a5269dbc08b774f222d4db4e']
+          [42, '0xb443f30cdd6076b1a5269dbc08b774f222d4db4e'],
         ])
-      )
+      ),
     ],
     [
       Asset.SUSD,
@@ -184,9 +187,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x57ab1ec28d129707052df4df418d58a2d46d5f51'],
           [3, ''],
-          [42, '0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62']
+          [42, '0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62'],
         ])
-      )
+      ),
     ],
     [
       Asset.ETH,
@@ -201,9 +204,9 @@ export default class AssetsDictionary {
           [1, '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'],
           [3, '0xc778417e063141139fce010982780140aa0cd5ab'],
           [4, '0xc778417e063141139fce010982780140aa0cd5ab'],
-          [42, '0xd0a1e359811322d97991e03f863a0c30c2cf029c']
+          [42, '0xd0a1e359811322d97991e03f863a0c30c2cf029c'],
         ])
-      )
+      ),
     ],
     [
       Asset.WETH,
@@ -218,9 +221,9 @@ export default class AssetsDictionary {
           [1, '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'],
           [3, '0xc778417e063141139fce010982780140aa0cd5ab'],
           [4, '0xc778417e063141139fce010982780140aa0cd5ab'],
-          [42, '0xd0a1e359811322d97991e03f863a0c30c2cf029c']
+          [42, '0xd0a1e359811322d97991e03f863a0c30c2cf029c'],
         ])
-      )
+      ),
     ],
     [
       Asset.fWETH,
@@ -232,7 +235,7 @@ export default class AssetsDictionary {
         '#FFFFFF',
         '#B0B0B0',
         new Map<number, string | null>([[42, '0xfbe16ba4e8029b759d3c5ef8844124893f3ae470']])
-      )
+      ),
     ],
     [
       Asset.KNC,
@@ -246,9 +249,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0xdd974d5c2e2928dea5f71b9825b8b646686bd200'],
           [3, '0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6'],
-          [42, '0x02357164ba33f299f7654cbb29da29db38ae1f44']
+          [42, '0x02357164ba33f299f7654cbb29da29db38ae1f44'],
         ])
-      )
+      ),
     ],
     [
       Asset.MKR,
@@ -262,9 +265,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2'],
           [3, '0x4bfba4a8f28755cb2061c413459ee562c6b9c51b'], // using omg token instead
-          [42, '0x4893919982648ffefe4324538d54402387c20198']
+          [42, '0x4893919982648ffefe4324538d54402387c20198'],
         ])
-      )
+      ),
     ],
     [
       Asset.REP,
@@ -279,9 +282,9 @@ export default class AssetsDictionary {
           [1, '0x1985365e9f78359a9b6ad760e32412f4a445e862'],
           [3, '0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6'], // using snt token instead
           [4, '0x6e894660985207feb7cf89faf048998c71e8ee89'],
-          [42, '0x39ac2818e08d285abe548f77a0819651b8b5d213']
+          [42, '0x39ac2818e08d285abe548f77a0819651b8b5d213'],
         ])
-      )
+      ),
     ],
     [
       Asset.ZRX,
@@ -295,9 +298,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0xe41d2489571d322189246dafa5ebde1f4699f498'],
           [3, '0xb4f7332ed719eb4839f091eddb2a3ba309739521'], // using link token instead
-          [42, '0x629b28c5aa5c953df2511d2e48d316a07eafb3e3']
+          [42, '0x629b28c5aa5c953df2511d2e48d316a07eafb3e3'],
         ])
-      )
+      ),
     ],
 
     [
@@ -312,9 +315,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x56d811088235F11C8920698a204A5010a788f4b3'],
           [3, ''],
-          [42, '']
+          [42, ''],
         ])
-      )
+      ),
     ],
     [
       Asset.vBZRX,
@@ -327,9 +330,9 @@ export default class AssetsDictionary {
         '#D8D3FF',
         new Map<number, string | null>([
           [1, '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F'],
-          [42, '0x6F8304039f34fd6A6acDd511988DCf5f62128a32']
+          [42, '0x6F8304039f34fd6A6acDd511988DCf5f62128a32'],
         ])
-      )
+      ),
     ],
     [
       Asset.YFI,
@@ -343,9 +346,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e'],
           [3, ''],
-          [42, '']
+          [42, ''],
         ])
-      )
+      ),
     ],
     [
       Asset.AAVE,
@@ -359,9 +362,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'],
           [3, ''],
-          [42, '']
+          [42, ''],
         ])
-      )
+      ),
     ],
     [
       Asset.UNI,
@@ -375,9 +378,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'],
           [3, ''],
-          [42, '']
+          [42, ''],
         ])
-      )
+      ),
     ],
     [
       Asset.LRC,
@@ -391,9 +394,9 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd'],
           [3, ''],
-          [42, '']
+          [42, ''],
         ])
-      )
+      ),
     ],
     [
       Asset.COMP,
@@ -407,9 +410,39 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0xc00e94cb662c3520282e6f5717214004a7f26888'],
           [3, ''],
-          [42, '']
+          [42, ''],
         ])
-      )
-    ]
+      ),
+    ],
+    [
+      Asset.BPT,
+      new AssetDetails(
+        'BPT',
+        18,
+        bpt_logo,
+        BPTLogo,
+        '',
+        '',
+        new Map<number, string | null>([
+          [1, '0xe26A220a341EAca116bDa64cF9D5638A935ae629'],
+          [42, '0x4c4462c6bca4c92bf41c40f9a4047f35fd296996'],
+        ])
+      ),
+    ],
+    [
+      Asset.CRV,
+      new AssetDetails(
+        'CRV',
+        18,
+        crv_logo,
+        CRVLogo,
+        '',
+        '',
+        new Map<number, string | null>([
+          [1, '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'],
+          [42, '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'],
+        ])
+      ),
+    ],
   ])
 }

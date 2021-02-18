@@ -16,8 +16,8 @@ export function ProviderMenu({ appVM }: { appVM: AppVM }) {
     <Modal
       isOpen={providerMenu.visible}
       onRequestClose={providerMenu.hide}
-      className="modal-content-div"
-      overlayClassName="modal-overlay-div"
+      className="modal__content"
+      overlayClassName="modal__overlay"
       ariaHideApp={false}>
       <div className="provider-menu">
         <div className="provider-menu__title">

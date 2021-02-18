@@ -11,7 +11,6 @@ import { UnhealthyChart } from '../components/UnhealthyChart'
 import Asset from 'bzx-common/src/assets/Asset'
 import { LiquidationEvent } from 'bzx-common/src/domain/events'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
-import { Header } from '../layout/Header'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { NavService } from '../services/NavService'
@@ -23,10 +22,13 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { RolloversGrid } from '../components/RolloversGrid'
 import { IRolloverRowProps } from '../components/RolloverRow'
 import { IRolloverData } from '../domain/IRolloverData'
+import { Tab } from '../domain/Tab'
 
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void
   isMobileMedia: boolean
+  activeTab: Tab
+  setActiveTab: (tab: Tab) => void
 }
 
 interface ILiquidationsPageState {
@@ -403,10 +405,6 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
     return (
       <React.Fragment>
-        <Header
-          isMobileMedia={this.props.isMobileMedia}
-          doNetworkConnect={this.props.doNetworkConnect}
-        />
         <main className="flex fd-c ac-c jc-c">
           {!ExplorerProvider.Instance.unsupportedNetwork ? (
             <React.Fragment>

@@ -8,24 +8,20 @@ import '../styles/components/own-token-grid.scss'
 
 export interface IOwnTokenGridProps {
   isMobileMedia: boolean
+  onStartTrading: () => void
   ownRowsData: IOwnTokenGridRowProps[] | undefined
 }
 
 export class OwnTokenGrid extends Component<IOwnTokenGridProps> {
   constructor(props: IOwnTokenGridProps) {
-    super(props)   
+    super(props)
   }
 
   public render() {
-    if (this.props.ownRowsData===undefined) {
-        return (
-          <PreloaderChart
-            quantityDots={4}
-            sizeDots={'middle'}
-            title={'Loading'}
-            isOverlay={false}
-          />
-        )
+    if (this.props.ownRowsData === undefined) {
+      return (
+        <PreloaderChart quantityDots={4} sizeDots={'middle'} title={'Loading'} isOverlay={false} />
+      )
     }
 
     if (!this.props.ownRowsData.length) {
@@ -34,9 +30,11 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps> {
           <div>
             <Placeholder />
             <p>No open positions</p>
-            <a href="/trade" className="manage-token-grid__link-button">
+            <button
+              className="button manage-token-grid__link-button"
+              onClick={this.props.onStartTrading}>
               Start Trading
-            </a>
+            </button>
           </div>
         </div>
       )

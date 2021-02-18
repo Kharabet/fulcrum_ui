@@ -375,6 +375,25 @@ export class TorqueProvider {
     return result
   }
 
+  public async getBalanceOf(asset: Asset): Promise<BigNumber> {
+    let result: BigNumber = new BigNumber(0)
+
+    if (this.contractsSource && this.web3Wrapper) {
+      const assetAddress = this.getErc20AddressOfAsset(asset)
+      if (assetAddress) {
+        const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
+        const iBZxAddress = this.contractsSource.getiBZxAddress()
+        if (tokenContract) {
+          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
+          result = (await tokenContract.balanceOf(iBZxAddress).callAsync()).dividedBy(
+            10 ** precision
+          )
+        }
+      }
+    }
+    return result
+  }
+
   public async getGasTokenAllowance(): Promise<BigNumber> {
     let result = new BigNumber(0)
 
@@ -434,13 +453,24 @@ export class TorqueProvider {
     depositAmount: BigNumber,
     collaterizationPercent: BigNumber
   ): Promise<IBorrowEstimate> => {
-    const result = { borrowAmount: new BigNumber(0), gasEstimate: new BigNumber(0) }
+    const result = {
+      borrowAmount: new BigNumber(0),
+      gasEstimate: new BigNumber(0),
+      exceedsLiquidity: false,
+    }
 
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getITokenContract(borrowAsset)
       const iBZxContract = await this.contractsSource.getiBZxContract()
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || ''
       if (depositAmount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
+        const collateralToLoanRate = await this.getSwapRate(collateralAsset, borrowAsset)
+        const liquidity = await this.getAvailableLiquidity(borrowAsset)
+        if (depositAmount.times(collateralToLoanRate).gte(liquidity)) {
+          result.borrowAmount = liquidity.times(0.8)
+          result.exceedsLiquidity = true
+          return result
+        }
         const loanPrecision = AssetsDictionary.assets.get(borrowAsset)!.decimals || 18
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
 
@@ -636,7 +666,7 @@ export class TorqueProvider {
     return result
   }
 
-  private getMaintenanceMargin = async (
+  public getMaintenanceMargin = async (
     asset: Asset,
     collateralAsset: Asset
   ): Promise<BigNumber> => {
@@ -1301,9 +1331,9 @@ export class TorqueProvider {
           try {
             // if proxy use then use this function for cdpAllow
             const txHash = await proxy
-              .execute(proxyActionsAddress, allowData,refRequest.isInstaProxy)
+              .execute(proxyActionsAddress, allowData, refRequest.isInstaProxy)
               .sendTransactionAsync({
-                from: refRequest.accountAddress
+                from: refRequest.accountAddress,
               })
             const receipt = await this.waitForTransactionMined(txHash)
             if (receipt != null) {
@@ -2252,7 +2282,7 @@ export class TorqueProvider {
     return result
   }
 
-  public getAvailableLiquidaity = async (asset: Asset): Promise<BigNumber> => {
+  public getAvailableLiquidity = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
     if (this.contractsSource && this.web3Wrapper) {
@@ -2530,6 +2560,67 @@ export class TorqueProvider {
     }
   }
 
+  private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
+    switch (asset) {
+      case Asset.WBTC:
+        return new BigNumber(10 ** 6)
+      case Asset.USDC:
+      case Asset.USDT:
+        return new BigNumber(10 ** 4)
+      default:
+        return new BigNumber(10 ** 16)
+    }
+  }
+
+  // Returns swap rate from Kyber
+  public async getKyberSwapRate(
+    srcAsset: Asset,
+    destAsset: Asset,
+    srcAmount?: BigNumber
+  ): Promise<BigNumber> {
+    if (networkName !== 'mainnet') {
+      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract
+      return this.getSwapRate(srcAsset, destAsset)
+    }
+    let result: BigNumber = new BigNumber(0)
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
+
+    if (srcAssetErc20Address && destAssetErc20Address) {
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
+      if (!srcAmount) {
+        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
+      } else {
+        srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
+      }
+      try {
+        const oneEthWorthTokenAmount = await fetch(
+          `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`
+        )
+          .then((resp) => resp.json())
+          .then((resp) => 1 / resp.data[0].src_qty[0])
+          .catch(console.error)
+        if (oneEthWorthTokenAmount) {
+          srcAmount = new BigNumber(oneEthWorthTokenAmount)
+            .times(10 ** srcAssetDecimals)
+            .dp(0, BigNumber.ROUND_HALF_UP)
+        }
+
+        const swapPriceData = await fetch(
+          `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${srcAmount}`
+        )
+          .then((resp) => resp.json())
+          .catch(console.error)
+
+        result = new BigNumber(swapPriceData['expectedRate']).dividedBy(10 ** 18)
+      } catch (e) {
+        console.error(e)
+        result = new BigNumber(0)
+      }
+    }
+    return result
+  }
+
   public sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
@@ -2570,6 +2661,74 @@ export class TorqueProvider {
       return true
     })
     return (liquidationEvents && liquidationEvents.length) || result
+  }
+
+  public async getBorrowEstimatedGas(request: BorrowRequest, isGasTokenEnabled: boolean) {
+    let result = new BigNumber(0)
+    const account = this.getCurrentAccount()
+
+    if (!this.contractsSource || !account || !request.borrowAmount) return result
+
+    const isETHCollateralAsset = TorqueProvider.Instance.isETHAsset(request.collateralAsset)
+    const collateralAssetErc20Address =
+      TorqueProvider.Instance.getErc20AddressOfAsset(request.collateralAsset) || ''
+    const loanPrecision = AssetsDictionary.assets.get(request.borrowAsset)!.decimals || 18
+    const collateralPrecision = AssetsDictionary.assets.get(request.collateralAsset)!.decimals || 18
+    const borrowAmountInBaseUnits = new BigNumber(
+      request.borrowAmount.multipliedBy(10 ** loanPrecision).toFixed(0, 1)
+    )
+    const depositAmountInBaseUnits = new BigNumber(
+      request.depositAmount.multipliedBy(10 ** collateralPrecision).toFixed(0, 1)
+    )
+    let gasAmount = 0
+    const ChiTokenBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+    const iTokenContract = TorqueProvider.Instance.contractsSource!.getITokenContract(
+      request.borrowAsset
+    )
+
+    if (!iTokenContract) return result
+
+    try {
+      gasAmount =
+        isGasTokenEnabled && ChiTokenBalance.gt(0)
+          ? await iTokenContract
+              .borrowWithGasToken(
+                request.loanId,
+                borrowAmountInBaseUnits,
+                new BigNumber(7884000), // approximately 3 months
+                depositAmountInBaseUnits,
+                isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+                account,
+                account,
+                account,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
+                gas: TorqueProvider.Instance.gasLimit,
+              })
+          : await iTokenContract
+              .borrow(
+                request.loanId,
+                borrowAmountInBaseUnits,
+                new BigNumber(7884000), // approximately 3 months
+                depositAmountInBaseUnits,
+                isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+                account,
+                account,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
+                gas: TorqueProvider.Instance.gasLimit,
+              })
+    } catch (e) {}
+
+    return new BigNumber(gasAmount || 0)
+      .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
+      .integerValue(BigNumber.ROUND_UP)
   }
 }
 

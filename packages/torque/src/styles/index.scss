@@ -34,6 +34,10 @@
 @import 'components/progress-fragment';
 @import 'components/confirm';
 @import 'components/tooltip';
+@import 'components/tabs';
+@import 'components/expected-results';
+@import 'components/liquidation-dropdown';
+@import 'components/rail';
 
 @import 'layout/footer';
 @import 'layout/header';
@@ -43,7 +47,5 @@
 @import 'layout/header-menu.mobile';
 @import 'layout/page-layout';
 
-@import 'pages/borrow-page';
-@import 'pages/refinance-page';
-@import 'pages/dashboard-page';
+@import 'pages/page';
 @import 'pages/maintenance-page';

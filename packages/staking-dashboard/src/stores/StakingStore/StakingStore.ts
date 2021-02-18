@@ -1,8 +1,8 @@
 import { BigNumber } from '@0x/utils'
 import errorUtils from 'app-lib/errorUtils'
-import stakingUtils from 'app-lib/stakingUtils'
 import sleep from 'bard-instruments/lib/async/sleep'
 import * as mobx from 'mobx'
+import { stakeableToken } from 'src/domain/stakingTypes'
 import { StakingProvider } from 'src/services/StakingProvider'
 import RootStore from 'src/stores/RootStore'
 import Representatives from './Representatives'
@@ -35,6 +35,18 @@ export default class StakingStore {
   }
 
   /**
+   * Flag to know if the user has at least one token approved and enough of it in the wallet
+   * to stake it.
+   */
+  public get hasEnoughToStake() {
+    return Object.values(stakeableToken).some((token) => {
+      return (
+        !this.stakingAllowances.needApprovals.get(token) && this.userBalances.wallet[token].gt(0.01)
+      )
+    })
+  }
+
+  /**
    * Helper to set values through mobx actions.
    */
   public set(prop: stakingStoreProp, value: any) {
@@ -59,21 +71,17 @@ export default class StakingStore {
     this.stakingAllowances.clearError()
   }
 
-  public async stake(tokenAmounts: {
-    bzrx: BigNumber
-    vbzrx: BigNumber
-    ibzrx: BigNumber
-    bpt: BigNumber
-  }) {
+  public async stake(tokenAmounts: Map<stakeableToken, BigNumber>) {
     try {
-      if (!stakingUtils.verifyStake(this.userBalances.wallet, tokenAmounts)) {
-        throw new Error('Staking amounts are invalid. Maybe trying to stake more than possible.')
-      }
+      // TODO: need to adapt the verifyStake method to spending allowances
+      // if (!stakingUtils.verifyStake(this.userBalances.wallet, tokenAmounts)) {
+      //   throw new Error('Staking amounts are invalid. Maybe trying to stake more than possible.')
+      // }
       this.assign({ stakingPending: true, stakingError: null })
       const { result } = this.stakingProvider.stake(tokenAmounts)
       await result
-      this.userBalances.staked.add(tokenAmounts)
-      this.userBalances.wallet.substract(tokenAmounts)
+      this.userBalances.staked.add(Object.fromEntries(tokenAmounts))
+      this.userBalances.wallet.substract(Object.fromEntries(tokenAmounts))
     } catch (err) {
       this.set('stakingError', errorUtils.decorateError(err, { title: 'Could not stake' }))
       throw err
@@ -82,20 +90,16 @@ export default class StakingStore {
     }
   }
 
-  public async unstake(tokenAmounts: {
-    bzrx: BigNumber
-    vbzrx: BigNumber
-    ibzrx: BigNumber
-    bpt: BigNumber
-  }) {
+  public async unstake(tokenAmounts: Map<stakeableToken, BigNumber>) {
     try {
-      if (!stakingUtils.verifyStake(this.userBalances.staked, tokenAmounts)) {
-        throw new Error('Staking amounts are invalid. Maybe trying to unstake more than possible.')
-      }
+      // TODO: need to adapt the verifyStake method to spending allowances
+      // if (!stakingUtils.verifyStake(this.userBalances.staked, tokenAmounts)) {
+      //   throw new Error('Staking amounts are invalid. Maybe trying to unstake more than possible.')
+      // }
       this.assign({ stakingPending: true, stakingError: null })
       await this.stakingProvider.unstakeTokens(tokenAmounts)
-      this.userBalances.wallet.add(tokenAmounts)
-      this.userBalances.staked.substract(tokenAmounts)
+      this.userBalances.wallet.add(Object.fromEntries(tokenAmounts))
+      this.userBalances.staked.substract(Object.fromEntries(tokenAmounts))
     } catch (err) {
       this.set('stakingError', errorUtils.decorateError(err, { title: 'Could not unstake' }))
       throw err
@@ -104,23 +108,13 @@ export default class StakingStore {
     }
   }
 
-  public async unstakeAll() {
-    this.set('stakingError', null)
-    try {
-      await this.stakingProvider.unstakeAll()
-    } catch (err) {
-      this.set('stakingError', errorUtils.decorateError(err, { title: 'Could not unstake' }))
-      throw err
-    }
-  }
-
   /**
-   * Updates the user wallet model and sets a new wallet update diff.
+   * Updates the "user wallet update" model and sets a new wallet update diff.
    * (eg: useful to notify wallet change)
    * @param diff Amounts of tokens that are added or removed from the wallet
    */
   public updateUserWallet(diff: ITokenAmounts[]) {
-    const { wallet, staked } = this.userBalances
+    const { wallet, staked } = this.userBalances.getCopy()
     const amounts = diff.reduce(
       (acc, tokenAmount) => {
         const balance = tokenAmount.staked ? staked : wallet
@@ -140,35 +134,41 @@ export default class StakingStore {
     )
     const walletUpdate = new WalletUpdate(amounts)
     this.walletUpdate = walletUpdate
+
+    diff.forEach((tokenDiff) => {
+      const destination = tokenDiff.staked ? this.userBalances.staked : this.userBalances.wallet
+      destination.add({ [tokenDiff.token]: tokenDiff.amount })
+    })
   }
 
   /**
    * Claim staking rewards and update user balances
    */
   public async claimStakingRewards(shouldRestake: boolean = false) {
-    try {
-      const claimed = await this.rewards.claimStakingRewards(shouldRestake)
-      this.updateUserWallet([
-        { token: 'bzrx', amount: claimed.bzrx, staked: shouldRestake },
-        { token: 'crv', amount: claimed.stableCoin, staked: false }
-      ])
-      this.userBalances.wallet.add({ bzrx: claimed.bzrx, crv: claimed.stableCoin })
-      return this.userBalances.getUserBalances()
-    } catch (err) {
-      console.error(err)
-    }
+    const claimed = await this.rewards.claimStakingRewards(shouldRestake)
+    this.updateUserWallet([
+      { token: 'bzrx', amount: claimed.bzrx, staked: shouldRestake },
+      { token: 'crv', amount: claimed.stableCoin, staked: false }
+    ])
   }
 
   /**
    * Claim rebate rewards and update user balances
    */
   public async claimRebateRewards() {
-    try {
-      await this.rewards.claimRebateRewards()
-      return this.userBalances.getUserBalances()
-    } catch (err) {
-      this.set('stakingError', err)
-      console.error(err)
+    const vbzrxAmount = await this.rewards.claimRebateRewards()
+    if (vbzrxAmount) {
+      this.updateUserWallet([{ token: 'vbzrx', amount: vbzrxAmount, staked: false }])
+    }
+  }
+
+  /**
+   * Claim vested BZRX and update user balances
+   */
+  public async claimVestedBzrx() {
+    const bzrxAmount = await this.rewards.claimVestedBzrx()
+    if (bzrxAmount) {
+      this.updateUserWallet([{ token: 'bzrx', amount: bzrxAmount, staked: false }])
     }
   }
 
@@ -184,8 +184,8 @@ export default class StakingStore {
       // })
       await this.userBalances.getUserBalances()
       await this.stakingAllowances.check()
-      await sleep(1000)
-      await this.rewards.getRewards()
+      await sleep(500)
+      await this.rewards.getAllRewards()
     } else {
       this.userBalances.clearBalances()
       this.rewards.clearBalances()
@@ -197,15 +197,6 @@ export default class StakingStore {
     // when user goes to the staking page
     const sp = this.stakingProvider
     sp.on('ProviderChanged', this.syncData)
-
-    // setTimeout(async () => {
-    //   try {
-    //     const result = await this.stakingAllowances.bzrx.check()
-    //     console.log(result.toFixed())
-    //   } catch (err) {
-    //     this.set('stakingError', err)
-    //   }
-    // }, 5000)
   }
 
   constructor(rootStore: RootStore) {
@@ -214,8 +205,8 @@ export default class StakingStore {
     this.stakingProvider = stakingProvider
     this.representatives = new Representatives(stakingProvider)
     this.rewards = new Rewards(stakingProvider, this)
-    this.userBalances = new UserBalances(stakingProvider)
-    this.stakingAllowances = new StakingAllowances(stakingProvider, this.userBalances)
+    this.userBalances = new UserBalances(stakingProvider, this.rootStore)
+    this.stakingAllowances = new StakingAllowances(this.userBalances, this.rootStore)
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }
 }

@@ -13,6 +13,11 @@ export default class WalletUpdate {
   public to: ITokenAmounts[] = []
   public diffs: ITokenAmounts[] = []
 
+  /**
+   * When this is called, this will trigger a reaction
+   * Note that it might be refactored into a VM or something because it's a bit "magical"
+   * This is used so that the UI can show a transition from one amount to another
+   */
   public switchAmounts() {
     const _from = this.from
     this.from = this.to

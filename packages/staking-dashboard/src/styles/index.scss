@@ -15,12 +15,15 @@
 @import 'components/loader';
 @import 'components/add-to-balance';
 @import 'components/representative';
+@import 'components/governance';
 
 @import 'layout/footer';
 
 @import 'layout/header';
 @import '../shared-components/AppError.scss';
 @import '../shared-components/AssetBalance.scss';
+
+@import '../App/Staking/Staking.scss';
 
 .st-side-dialog {
   position: fixed;

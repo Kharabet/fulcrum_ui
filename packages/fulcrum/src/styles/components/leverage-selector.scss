@@ -10,7 +10,7 @@
   vertical-align: middle;
   padding: 2px;
   @media screen and (min-width: $breakpoint-mobile-min) {
-    margin-left: -15px;
+    margin-left: -2px;
   }
   border-radius: 100px;
   display: flex;
@@ -23,6 +23,7 @@
     background-color: #276bfb;
     color: #ffffff;
     transition: all 0.2s ease-in-out;
+    z-index: 10;
   }
 
   @media only screen and (max-width: $mobile-version-max-width) {
@@ -38,7 +39,9 @@
 }
 
 .leverage-selector__item {
-  display: inline-block;
+  position: relative;
+  display: flex;
+  align-items: center;
   vertical-align: top;
 
   line-height: initial;
@@ -59,7 +62,8 @@
   font-style: normal;
   font-weight: 800;
   font-size: 16px;
-
+  width: 50px;
+  height: 50px;
   padding: 13px 15px;
   &:hover:not(&--selected) {
     cursor: pointer;
@@ -74,6 +78,13 @@
       color: #ffffff;
     }
   }
+  span{
+    position: absolute;
+    content: "";
+    left: 50%;
+    transform: translateX(-50%);
+
+  }
 
   @media only screen and (max-width: $mobile-version-max-width) {
     padding: 6px 8.5px;
@@ -81,5 +92,7 @@
     font-weight: 800;
     font-size: 12px;
     line-height: 150%;
+    width: 30px;
+    height: 30px;
   }
 }

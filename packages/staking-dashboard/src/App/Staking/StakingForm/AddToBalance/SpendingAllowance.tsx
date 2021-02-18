@@ -12,11 +12,12 @@ export function SpendingAllowance({ vm }: { vm: StakingFormVM }) {
   }
 
   return (
-    <div className="margin-bottom-2">
+    <div className="margin-bottom-2 panel--white padded-2">
       <h3 className="section-header">Spending Approval</h3>
       <p className="margin-bottom-2">
         <span className="margin-right-1ch">
-          Please approve the following tokens before they can be staked.
+          Please approve all the tokens you are planning to stake, in order to save on transaction
+          fees.
         </span>
         <Button className="btn--link" onClick={vm.spendingAllowanceDetails.toggle}>
           <i>Details</i>
@@ -28,6 +29,10 @@ export function SpendingAllowance({ vm }: { vm: StakingFormVM }) {
           <p>
             When staking, your tokens are moved from your wallet to the BZX staking contract. In
             order to do so, you need to approve a transaction that will allow it.
+          </p>
+          <p>
+            While you can stake multiple tokens at the same time, spending approvals are done for
+            each token separately.
           </p>
         </div>
       )}

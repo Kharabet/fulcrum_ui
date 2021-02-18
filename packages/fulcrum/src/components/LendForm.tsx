@@ -371,12 +371,6 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                   onAssetChange={this.onChangeUseWrapped}
                   assets={[Asset.WETH, Asset.ETH]}
                 />
-              ) : this.props.asset === Asset.DAI ? (
-                <AssetDropdown
-                  selectedAsset={this.state.useWrappedDai ? Asset.CHAI : Asset.DAI}
-                  onAssetChange={this.onChangeUseWrappedDai}
-                  assets={[Asset.DAI, Asset.CHAI]}
-                />
               ) : (
                 <AssetDropdown selectedAsset={this.props.asset} assets={[this.props.asset]} />
               )}
@@ -591,7 +585,6 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     } else {
       assetOrWrapped = this.props.asset
     }
-
 
     if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
       // indicates a 100% burn

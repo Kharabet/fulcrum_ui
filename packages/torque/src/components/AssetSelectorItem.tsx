@@ -90,7 +90,7 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
       return
     }
     try {
-      const borrowRequest = await props.borrowDlgRef.current.getValue(props.asset)
+      const borrowRequest = await props.borrowDlgRef.current.getValue(props.asset, props.interestRate, props.liquidity)
       setRequest(borrowRequest)
       await TorqueProvider.Instance.onDoBorrow(borrowRequest)
     } catch (error) {

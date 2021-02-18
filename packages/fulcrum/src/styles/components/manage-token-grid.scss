@@ -27,6 +27,9 @@
     background: #276bfb;
     border-radius: 43px;
     padding: 15px 30px;
+    border: 0;
+    cursor: pointer;
+    outline: none;
     &:hover {
       background: #5b88ff;
     }
