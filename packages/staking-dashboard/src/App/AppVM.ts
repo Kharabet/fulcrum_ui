@@ -7,7 +7,6 @@ import ProviderType from 'bzx-common/src/domain/ProviderType'
 type AppVMProps = 'pending' | 'section'
 
 export default class AppVM {
-  [name: string]: any
   public rootStore: RootStore
   public pending = false
   public headerMenu = new DialogVM()
@@ -15,6 +14,7 @@ export default class AppVM {
   public section: 'dao' | 'stake' | 'rewards' = 'stake'
   private stopAutoHidingProviderMenu: mobx.IReactionDisposer | null = null
   private stopAutoSettingBodyOverflow: mobx.IReactionDisposer | null = null
+  private stopPreloadTab: mobx.IReactionDisposer | null = null
 
   /**
    * Helper to set values through mobx actions.
