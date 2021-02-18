@@ -20,7 +20,10 @@ import { Preloader } from './Preloader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 import { NotificationRollover } from './NotificationRollover'
 import { RolloverRequest } from '../domain/RolloverRequest'
+import ReactTooltip from 'react-tooltip'
+import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
 
+import '../styles/components/tooltip.scss'
 export interface IOwnTokenGridRowProps {
   loan: IBorrowedFundsState
   baseToken: Asset
@@ -31,6 +34,7 @@ export interface IOwnTokenGridRowProps {
   value: BigNumber
   collateral: BigNumber
   openPrice: BigNumber
+  currentPrice: BigNumber
   liquidationPrice: BigNumber
   profitCollateralToken?: BigNumber
   profitLoanToken?: BigNumber
@@ -241,6 +245,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       profitTitle = ''
       profitValue = '–'
     }
+    const insertProfitTooltip =
+      this.props.positionType === PositionType.LONG
+        ? `<ul class="tooltip__info__profit__ul"><li>Left: value of traded asset</li><li>Right: value of total position profit including collateral change </li></ul><p class="ta-c">${this.props.baseToken}/${this.props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div class="short-label">Profit in ${this.props.baseToken}</div><div>Profit in ${this.props.quoteToken} + the change of your ${this.props.baseToken} collateral</div></div>`
+        : `<ul class="tooltip__info__profit__ul"><li>Left: value of total position profit including collateral change </li><li>Right: value of traded asset</li></ul><p class="ta-c">${this.props.baseToken}/${this.props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div>Profit in ${this.props.baseToken} + the change of your ${this.props.quoteToken} collateral</div><div class="short-label">Profit in ${this.props.quoteToken}</div></div>`
+    const profitTooltip = `<p class="tooltip__info__profit__title">Profit is displayed in two ways:</p>${insertProfitTooltip}`
 
     return this.state.isLoadingTransaction && this.state.request ? (
       <React.Fragment>
@@ -274,6 +283,18 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <br />
           {!this.state.isLoading ? (
             <React.Fragment>{this.props.openPrice.toFixed(precisionDigits)}</React.Fragment>
+          ) : (
+            <Preloader width="74px" />
+          )}
+        </div>
+        <div
+          title={this.props.currentPrice.toFixed(18)}
+          className="own-token-grid-row__col-current-price  opacityIn">
+          <span className="body-header">Current Price&nbsp;</span>
+          <span className="own-token-grid-row__asset">{this.props.quoteToken}</span>
+          <br />
+          {!this.state.isLoading ? (
+            <React.Fragment>{this.props.currentPrice.toFixed(precisionDigits)}</React.Fragment>
           ) : (
             <Preloader width="74px" />
           )}
@@ -338,7 +359,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         <div
           title={this.props.value.toFixed(18)}
           className="own-token-grid-row__col-position-value opacityIn">
-          <span className="body-header">Value&nbsp;</span>
+          <span className="body-header">Position Value&nbsp;</span>
           <span className="own-token-grid-row__asset">{this.props.quoteToken}</span>
           <br />
           {!this.state.isLoading ? (
@@ -352,6 +373,22 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           )}
         </div>
         <div title={profitTitle} className="own-token-grid-row__col-profit opacityIn">
+          <span className="body-header">
+            Profit&nbsp;
+            <IconInfo
+              className="tooltip__icon"
+              data-tip={profitTooltip}
+              data-multiline="true"
+              data-html={true}
+              data-for="profit-tooltip"
+            />
+            <ReactTooltip
+              id="profit-tooltip"
+              className="tooltip__info tooltip__info__profit"
+              place="right"
+              effect="solid"
+            />
+          </span>
           {!this.state.isLoading ? profitValue : <Preloader width="74px" />}
           <div className="own-token-grid-row__col-profit-switch">
             <label
@@ -370,7 +407,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               }}>
               {this.props.quoteToken}
             </label>
-        </div>
+          </div>
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button

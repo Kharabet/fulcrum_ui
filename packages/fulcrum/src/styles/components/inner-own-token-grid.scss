@@ -228,6 +228,9 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
         stroke: #ff4f4f;
       }
     }
+    @media screen and (max-width: $breakpoint-desktop-max) {
+      right: -39px;
+    }
   }
 
   &__open-extend-loan {
@@ -245,7 +248,8 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
       fill: var(--lend-bg-hover);
     }
     @media screen and (max-width: $breakpoint-desktop-max) {
-      right: 18px;
+      right: 14px;
+      top: 29px;
     }
   }
 
@@ -398,10 +402,10 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
       &__col-profit {
         order: 8;
         grid-column-start: 1;
-        grid-column-end: 5;
+        grid-column-end: 4;
         position: relative;
         &-switch {
-          right: 0;
+          left: 80px;
           bottom: 2px;
         }
       }

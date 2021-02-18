@@ -108,7 +108,7 @@ function TradeExpectedResult(props: ITradeExpectedResultProps) {
           <div className="trade-expected-result__column-title">
             Save{' '}
             <span className="value" title={estimatedFeeChi.toFixed()}>
-              {formatPrecision(estimatedFeeChi)}$
+              ${formatPrecision(estimatedFeeChi)}
             </span>{' '}
             <br />
             with CHI
