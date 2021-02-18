@@ -5,14 +5,14 @@ export interface IHeaderMenuProps {}
 export class HeaderMenu extends Component<IHeaderMenuProps> {
   public render() {
     const itemsMenu = [
-      { id: 1, title: 'Stats', link: '/', external: false },
-      { id: 2, title: 'Liquidations', link: '/liquidations', external: false },
-      // { id: 3, title: 'Loan Params', link: '/loan-params', external: false },
-      // { id: 3, title: 'Staking', link: 'https://staking.bzx.network', external: true },
-      { id: 4, title: 'Blog', link: 'https://bzx.network/blog/', external: true }
+      { title: 'Trade', link: 'https://app.fulcrum.trade/trade', newTab: false },
+      { title: 'Lend', link: 'https://app.fulcrum.trade/lend', newTab: false },
+
+      { title: 'Borrow', link: 'https://app.torque.loans/borrow', newTab: false },
+      { title: 'Stake', link: 'https://staking.bzx.network', newTab: true }
     ]
-    const menuItems = itemsMenu.map((e: IHeaderMenuItemProps) => (
-      <HeaderMenuItem key={e.id} {...e} />
+    const menuItems = itemsMenu.map((e: IHeaderMenuItemProps, index: number) => (
+      <HeaderMenuItem key={index} {...e} />
     ))
     return <div className="header-menu">{menuItems}</div>
   }

@@ -40,7 +40,8 @@ export function ProposalDetails({ vm }: { vm: GovernanceVM }) {
           </div>
           <ExternalLink
             className="proposals-proposer"
-            href={`${etherscanURL}address/${activeProposal.proposer.address}`}>
+            href={`${etherscanURL}address/${activeProposal.proposer.address}`}
+            targetBlank={true}>
             <img
               className="avatar"
               src={activeProposal.proposer.imageSrc || defaultAvatar}

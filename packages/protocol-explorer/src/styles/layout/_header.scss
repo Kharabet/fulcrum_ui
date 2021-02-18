@@ -1,6 +1,6 @@
 header {
   @media screen and (min-width: $width-min-md) {
-    padding: 60px 0 75px 0;
+    padding: 60px 0 25px 0;
   }
   @media screen and (max-width: $width-max-md) {
     padding: 30px 0 35px 0;
@@ -21,14 +21,13 @@ header {
       overflow-y: auto;
     }
   }
-  a {
-    &.logo {
-      display: flex;
-      align-items: center;
-      z-index: 2;
-      @media screen and (max-width: $width-max-md) {
-        margin-left: 15px;
-      }
+  .logo {
+    display: flex;
+    align-items: center;
+    z-index: 2;
+    cursor: pointer;
+    @media screen and (max-width: $width-max-md) {
+      margin-left: 15px;
     }
   }
   .footer-social {
@@ -58,11 +57,6 @@ header {
   }
 }
 .header-menu {
-  @media screen and(min-width: $width-min-md) {
-    position: absolute;
-    left: 0;
-    right: 60px;
-  }
   @media screen and(max-width: $width-max-md) {
     display: flex;
     flex-direction: column;

@@ -17,7 +17,6 @@ interface ILoanParamsPageProps {
 }
 
 const LoanParamsPage = (props: ILoanParamsPageProps) => {
- 
   const [data, setData] = useState<IParamRowProps[]>([])
   const [activePlatform, setActivePlatform] = useState<Platform>(Platform.Fulcrum)
   const [filteredData, setFilteredData] = useState<IParamRowProps[]>([])
@@ -80,7 +79,6 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
 
   return (
     <React.Fragment>
-      <Header isMobileMedia={props.isMobileMedia} doNetworkConnect={props.doNetworkConnect} />
       <main className="flex fd-c ac-c jc-c">
         {!ExplorerProvider.Instance.unsupportedNetwork ? (
           <React.Fragment>

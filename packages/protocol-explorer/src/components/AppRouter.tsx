@@ -1,14 +1,7 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import React, { Component } from 'react'
 import { Route, Router, Switch } from 'react-router-dom'
-import configProviders from '../config/providers.json'
 import { ProviderType } from '../domain/ProviderType'
-import { Footer } from '../layout/Footer'
-import { LiquidationsPage } from '../pages/LiquidationsPage'
-import LoanParamsPage from '../pages/LoanParamsPage'
-import { MainPage } from '../pages/MainPage'
-import { SearchResultPage } from '../pages/SearchResultPage'
-import { StatsPage } from '../pages/StatsPage'
 import { NavService } from '../services/NavService'
 
 import Modal from 'react-modal'
@@ -23,6 +16,8 @@ import { errors } from 'ethers'
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
 import { ProviderMenu } from './ProviderMenu'
+import { Tab } from '../domain/Tab'
+import TabContainer from './TabContainer'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -35,6 +30,7 @@ interface IAppRouterState {
   isLoading: boolean
   web3: Web3Wrapper | null
   isMobileMedia: boolean
+  activeTab: Tab
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -47,7 +43,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       selectedProviderType: ExplorerProvider.Instance.providerType,
       web3: ExplorerProvider.Instance.web3Wrapper,
-      isMobileMedia: window.innerWidth <= 991
+      isMobileMedia: window.innerWidth <= 991,
+      activeTab: Tab.Stats
     }
 
     ExplorerProvider.Instance.eventEmitter.on(
@@ -82,6 +79,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
     return Web3ConnectionFactory.currentWeb3Engine
   }
 
+  public setActiveTab = (tab: Tab) => {
+    this.setState({ ...this.state, activeTab: tab })
+  }
+
   public render() {
     return (
       <Web3ReactProvider getLibrary={this.getLibrary}>
@@ -103,47 +104,70 @@ export class AppRouter extends Component<any, IAppRouterState> {
           <div className="flex fd-c ac-c w-100">
             <Router history={NavService.Instance.History}>
               <Switch>
-                <Route exact={true} path="/">
-                  <MainPage
-                    isMobileMedia={this.state.isMobileMedia}
-                    doNetworkConnect={this.doNetworkConnect}
-                  />
-                </Route>
                 <Route
-                  path="/stats/:token"
+                  exact={true}
+                  path={'/'}
                   render={(props) => (
-                    <StatsPage
+                    <TabContainer
                       {...props}
                       isMobileMedia={this.state.isMobileMedia}
                       doNetworkConnect={this.doNetworkConnect}
+                      activeTab={this.state.activeTab}
+                      setActiveTab={this.setActiveTab}
                     />
                   )}
                 />
                 <Route
-                  path="/search/:filter"
+                  path={'/liquidations'}
                   render={(props) => (
-                    <SearchResultPage
+                    <TabContainer
                       {...props}
                       isMobileMedia={this.state.isMobileMedia}
                       doNetworkConnect={this.doNetworkConnect}
+                      activeTab={this.state.activeTab}
+                      setActiveTab={this.setActiveTab}
                     />
                   )}
                 />
-                <Route path="/liquidations">
-                  <LiquidationsPage
-                    isMobileMedia={this.state.isMobileMedia}
-                    doNetworkConnect={this.doNetworkConnect}
-                  />
-                </Route>
-                {/* <Route path="/loan-params">
-                  <LoanParamsPage
-                    isMobileMedia={this.state.isMobileMedia}
-                    doNetworkConnect={this.doNetworkConnect}
-                  />
-                </Route> */}
+                <Route
+                  path={'/stats'}
+                  render={(props) => (
+                    <TabContainer
+                      {...props}
+                      isMobileMedia={this.state.isMobileMedia}
+                      doNetworkConnect={this.doNetworkConnect}
+                      activeTab={this.state.activeTab}
+                      setActiveTab={this.setActiveTab}
+                    />
+                  )}
+                />
+                <Route
+                  path={'/search/:filter'}
+                  render={(props) => (
+                    <TabContainer
+                      {...props}
+                      isMobileMedia={this.state.isMobileMedia}
+                      doNetworkConnect={this.doNetworkConnect}
+                      activeTab={Tab.Unknown}
+                      setActiveTab={this.setActiveTab}
+                    />
+                  )}
+                />
+                <Route
+                  exact={true}
+                  path={'/stats/:token'}
+                  render={(props) => (
+                    <TabContainer
+                      {...props}
+                      isMobileMedia={this.state.isMobileMedia}
+                      doNetworkConnect={this.doNetworkConnect}
+                      activeTab={Tab.Unknown}
+                      setActiveTab={this.setActiveTab}
+                    />
+                  )}
+                />
               </Switch>
             </Router>
-            <Footer />
           </div>
         </div>
       </Web3ReactProvider>

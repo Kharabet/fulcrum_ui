@@ -96,6 +96,13 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               onClick={this.showTradeHistory}>
               {TokenGridTab.History}
             </div>
+            <div
+              className={`tab ${
+                this.props.activeTokenGridTab === TokenGridTab.Stats ? `active` : ``
+              }`}
+              onClick={this.showStats}>
+              {TokenGridTab.Stats}
+            </div>
           </div>
 
           {/* <div className="pro-switch-wrapper">
@@ -126,6 +133,10 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
   public showTradeHistory = () => {
     this.props.onTokenGridTabChange(TokenGridTab.History)
+  }
+
+  public showStats = () => {
+    this.props.onTokenGridTabChange(TokenGridTab.Stats)
   }
 
   private getDropdownProps(): IDropdownSelectProps {

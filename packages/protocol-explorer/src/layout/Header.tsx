@@ -2,15 +2,19 @@ import React, { Component } from 'react'
 import { ReactComponent as LogoExplorer } from '../assets/images/logo-explorer.svg'
 import { ReactComponent as LogoSign } from '../assets/images/logo-sign.svg'
 import { HeaderMenu } from './HeaderMenu'
-import { Link } from 'react-router-dom'
 import { OnChainIndicator } from '../components/OnChainIndicator'
 import { FooterSocial } from '../layout/FooterSocial'
 import { ReactComponent as MenuIconClose } from '../assets/images/menu-close.svg'
 import { ReactComponent as MenuIconOpen } from '../assets/images/menu-open.svg'
+import { NavService } from '../services/NavService'
+import { Tab } from '../domain/Tab'
+import Tabs from '../components/Tabs'
 
 interface IHeaderProps {
   doNetworkConnect: () => void
   isMobileMedia: boolean
+  activeTab: Tab
+  setActiveTab: (tab: Tab) => void
 }
 interface IHeaderState {
   isMenuOpen: boolean
@@ -41,12 +45,12 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
       <header>
         <div className="container container-md">
           <div className="flex jc-sb ai-c ta-c relative">
-            <Link to="/" className="logo">
+            <div className="logo" onClick={this.onClickLogo}>
               <div className="wrapper-logo-sign">
                 <LogoSign />
               </div>
               <LogoExplorer />
-            </Link>
+            </div>
             <HeaderMenu />
             <div className="flex ai-c header-right">
               <a
@@ -60,50 +64,58 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
             </div>
           </div>
         </div>
+        <Tabs activeTab={this.props.activeTab} setActiveTab={this.props.setActiveTab} />
       </header>
     )
   }
 
   private renderMobile = () => {
     return (
-      <header className={`${this.state.isMenuOpen ? `open-menu` : ``}`}>
-        <div className="flex fd-c h-100">
-          <div className="flex jc-sb ai-c w-100 px-15">
-            <Link to="/" className="logo">
-              <div className="wrapper-logo-sign">
-                <LogoSign />
+      <React.Fragment>
+        <header className={`${this.state.isMenuOpen ? `open-menu` : ``}`}>
+          <div className="flex fd-c h-100">
+            <div className="flex jc-sb ai-c w-100 px-15">
+              <div className="logo" onClick={this.onClickLogo}>
+                <div className="wrapper-logo-sign">
+                  <LogoSign />
+                </div>
+                <LogoExplorer />
               </div>
-              <LogoExplorer />
-            </Link>
-            <div className="header_icon" onClick={this.onMenuToggle}>
-              {!this.state.isMenuOpen ? (
-                <MenuIconOpen className="header__menu" />
-              ) : (
-                <MenuIconClose className="header__menu" />
-              )}
-            </div>
-          </div>
-          <div className={`mobile-menu ${this.state.isMenuOpen ? `shown` : `hidden`}`}>
-            <div className="w-100">
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-              <HeaderMenu />
-              <div className="header-menu">
-                <a
-                  href="https://help.bzx.network/en/"
-                  className={`item-menu c-blue`}
-                  target="_blank">
-                  Help Center
-                </a>
+              <div className="header_icon" onClick={this.onMenuToggle}>
+                {!this.state.isMenuOpen ? (
+                  <MenuIconOpen className="header__menu" />
+                ) : (
+                  <MenuIconClose className="header__menu" />
+                )}
               </div>
             </div>
+            <div className={`mobile-menu ${this.state.isMenuOpen ? `shown` : `hidden`}`}>
+              <div className="w-100">
+                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+                <HeaderMenu />
+                <div className="header-menu">
+                  <a
+                    href="https://help.bzx.network/en/"
+                    className={`item-menu c-blue`}
+                    target="_blank">
+                    Help Center
+                  </a>
+                </div>
+              </div>
 
-            <FooterSocial isShowSocial={!this.state.isMenuOpen} />
+              <FooterSocial isShowSocial={!this.state.isMenuOpen} />
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+        <Tabs activeTab={this.props.activeTab} setActiveTab={this.props.setActiveTab} />
+      </React.Fragment>
     )
   }
 
+  public onClickLogo = () => {
+    NavService.Instance.History.push(`/`)
+    this.props.setActiveTab(Tab.Stats)
+  }
   private onMenuToggle = () => {
     this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen })
   }
