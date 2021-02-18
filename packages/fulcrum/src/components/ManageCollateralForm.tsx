@@ -17,12 +17,13 @@ import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { InputAmount } from './InputAmount'
 import { TradeType } from '../domain/TradeType'
+import { LiquidationDropdown } from './LiquidationDropdown'
 
 import '../styles/components/manage-collateral-form.scss'
 import { PositionType } from '../domain/PositionType'
 
 export interface IManageCollateralFormProps {
-  loan?: IBorrowedFundsState
+  loan: IBorrowedFundsState
 
   request: ManageCollateralRequest
   onSubmit: (request: ManageCollateralRequest) => void
@@ -62,6 +63,7 @@ interface IManageCollateralFormState {
   didSubmit: boolean
   isLoading: boolean
   liquidationPrice: BigNumber
+  activeTokenLiquidation: Asset
 }
 
 export default class ManageCollateralForm extends Component<
@@ -95,7 +97,8 @@ export default class ManageCollateralForm extends Component<
       inputAmountText: '',
       didSubmit: false,
       isLoading: true,
-      liquidationPrice: new BigNumber(0)
+      liquidationPrice: new BigNumber(0),
+      activeTokenLiquidation: this.props.loan.collateralAsset
     }
 
     this._inputChange = new Subject()
@@ -128,7 +131,7 @@ export default class ManageCollateralForm extends Component<
           collateralTooLow: next!.collateralizedPercent.lt(
             this.props.loan!.loanData!.maintenanceMargin.div(10 ** 18).plus(10) || 25
           ),
-          inputAmountText: this.formatPrecision(next!.collateralAmount.toString())
+          inputAmountText: this.formatPrecision(next!.collateralAmount.toString(), true)
         })
       })
   }
@@ -315,6 +318,10 @@ export default class ManageCollateralForm extends Component<
         : this.state.balanceTooLow
         ? 'Your wallet is empty'
         : ''
+    const liquidationPrice =
+      this.state.activeTokenLiquidation === this.props.loan.collateralAsset
+        ? this.state.liquidationPrice
+        : new BigNumber(1).div(this.state.liquidationPrice)
 
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
@@ -342,8 +349,18 @@ export default class ManageCollateralForm extends Component<
             <div className="manage-collateral-form__tip">Top Up</div>
           </div>
           <div className="manage-collateral-form__liquidation-price">
-            <span>Liquidation price</span>
-            <span>${this.state.liquidationPrice.toFixed(2)}</span>
+            <span>{this.props.isMobileMedia ? 'Liq.' : 'Liquidation'} price</span>
+            <div className="manage-collateral-form__liquidation-price-container">
+              <span>{this.formatPrecision(liquidationPrice.toFixed(), false)}</span>
+              <LiquidationDropdown
+                selectedAsset={this.state.activeTokenLiquidation}
+                loanAsset={this.props.loan.loanAsset}
+                collateralAsset={this.props.loan.collateralAsset}
+                onAssetChange={(activeTokenLiquidation) =>
+                  this.setState({ activeTokenLiquidation })
+                }
+              />
+            </div>
           </div>
           <div className="manage-collateral-form__text">
             You will {this.state.loanValue > this.state.selectedValue ? 'withdraw' : 'top up'}
@@ -571,7 +588,7 @@ export default class ManageCollateralForm extends Component<
     }
   }
 
-  public formatPrecision(outputText: string): string {
+  public formatPrecision(outputText: string, isNecessarySign: boolean): string {
     const output = Number(outputText)
     let sign = ''
     if (this.state.loanValue > this.state.selectedValue) sign = '-'
@@ -579,8 +596,7 @@ export default class ManageCollateralForm extends Component<
     let x = 4 - n
     if (x < 0) x = 0
     if (x > 5) x = 5
-    var m = Math.pow(10, x)
-    let result = new Number(Math.floor(output * m) / m).toString()
-    return result != '0' ? sign + result : result
+    let result = new Number(output.toFixed(x)).toString()
+    return isNecessarySign && result != '0' ? sign + result : result
   }
 }
