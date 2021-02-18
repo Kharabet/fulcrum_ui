@@ -13,6 +13,9 @@
     color: #276bfb;
     text-align: center;
     cursor: pointer;
+    &:hover {
+      opacity: 0.85;
+    }
     &.active {
       color: #283049;
       position: relative;
