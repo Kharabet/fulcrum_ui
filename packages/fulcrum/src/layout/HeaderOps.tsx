@@ -86,11 +86,11 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   private renderDesktop = () => {
     const menu: IHeaderMenuProps = {
       items: [
-        { id: 0, title: 'Trade', link: '/trade', external: false },
-        { id: 1, title: 'Lend', link: '/lend', external: false },
+        { title: 'Trade', link: '/trade', external: false },
+        { title: 'Lend', link: '/lend', external: false },
 
-        { id: 2, title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
-        { id: 3, title: 'Stake', link: 'https://staking.bzx.network', external: true }
+        { title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
+        { title: 'Stake', link: 'https://staking.bzx.network', external: true, newTab: true }
       ],
       onMenuToggle: this.onMenuToggle
     }
@@ -136,12 +136,16 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   private renderMobile = () => {
     const menu: IHeaderMenuProps = {
       items: [
-        { id: 0, title: 'Trade', link: '/trade', external: false },
-        { id: 1, title: 'Lend', link: '/lend', external: false },
-        { id: 2, title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
-        { id: 3, title: 'Stake', link: 'https://staking.bzx.network', external: true },
+        { title: 'Trade', link: '/trade', external: false },
+        { title: 'Lend', link: '/lend', external: false },
+        { title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
         {
-          id: 4,
+          title: 'Stake',
+          link: 'https://staking.bzx.network',
+          external: true,
+          newTab: true
+        },
+        {
           title: `${this.props.headerClass === 'trade' ? 'Trade FAQ' : 'Lend FAQ'}`,
           link: `${
             this.props.headerClass === 'trade'
@@ -151,7 +155,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           external: true
         },
         {
-          id: 5,
           title: 'Help Center',
           link: 'https://bzx.network/faq-fulcrum.html',
           external: true

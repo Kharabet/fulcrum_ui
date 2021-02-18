@@ -32,22 +32,21 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
   private MenuDesktop: IHeaderMenuProps = {
     items: [
-      { id: 1, title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
-      { id: 2, title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
-      { id: 3, title: 'Borrow', link: '/borrow', external: false },
-      { id: 4, title: 'Stake', link: 'https://staking.bzx.network', external: true }
+      { title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
+      { title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
+      { title: 'Borrow', link: '/borrow', external: false },
+      { title: 'Stake', link: 'https://staking.bzx.network', external: true, newTab: true }
     ]
   }
 
   private MenuMobile: IHeaderMenuProps = {
     items: [
-      { id: 1, title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
-      { id: 2, title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
-      { id: 3, title: 'Borrow', link: '/borrow', external: false },
-      { id: 4, title: 'Stake', link: 'https://staking.bzx.network', external: true },
-      { id: 5, title: 'Borrow FAQ', link: 'https://torque.loans/', external: true },
+      { title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
+      { title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
+      { title: 'Borrow', link: '/borrow', external: false },
+      { title: 'Stake', link: 'https://staking.bzx.network', external: true, newTab: true },
+      { title: 'Borrow FAQ', link: 'https://torque.loans/', external: true },
       {
-        id: 6,
         title: 'Help Center',
         link: 'https://help.bzx.network/en/collections/2008807-torque',
         external: true

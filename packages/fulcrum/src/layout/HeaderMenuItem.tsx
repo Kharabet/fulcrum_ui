@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
 
 export interface IHeaderMenuItemProps {
-  id: number
   title: string
   link: string
   external: boolean
+  newTab?: boolean
 }
 
 export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
@@ -13,9 +13,19 @@ export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
     return (
       <div className="header-menu__item">
         {this.props.external ? (
-          <a href={this.props.link} className={`header-menu__item-link`} target="_blank">
-            <span>{this.props.title}</span>
-          </a>
+          this.props.newTab ? (
+            <a
+              href={this.props.link}
+              className={`header-menu__item-link`}
+              target="_blank"
+              rel="noopener noreferrer">
+              <span>{this.props.title}</span>
+            </a>
+          ) : (
+            <a href={this.props.link} className={`header-menu__item-link`}>
+              <span>{this.props.title}</span>
+            </a>
+          )
         ) : (
           <NavLink
             to={this.props.link}
