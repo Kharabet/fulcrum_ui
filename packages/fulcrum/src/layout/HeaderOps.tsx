@@ -89,7 +89,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 0, title: 'Trade', link: '/trade', external: false },
         { id: 1, title: 'Lend', link: '/lend', external: false },
 
-        { id: 2, title: 'Borrow', link: 'https://torque.loans', external: true },
+        { id: 2, title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
         { id: 3, title: 'Stake', link: 'https://staking.bzx.network', external: true }
       ],
       onMenuToggle: this.onMenuToggle
@@ -138,7 +138,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       items: [
         { id: 0, title: 'Trade', link: '/trade', external: false },
         { id: 1, title: 'Lend', link: '/lend', external: false },
-        { id: 2, title: 'Borrow', link: 'https://torque.loans', external: true },
+        { id: 2, title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
         { id: 3, title: 'Stake', link: 'https://staking.bzx.network', external: true },
         {
           id: 4,
