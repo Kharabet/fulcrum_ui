@@ -15,7 +15,7 @@ export function GovernanceItem(props: IGovernanceItemProps) {
   return (
     <tr className="table__row--link" onClick={() => props.openProposals(id)} role="button">
       <td>{title} </td>
-      {!props.vm.media.smScreen && (
+      {!props.vm.rootStore.uiStore.media.smScreen && (
         <td className="proposal__proposer-address">{hashUtils.shortHash(proposer.address)}</td>
       )}
       <td>

@@ -2,7 +2,6 @@ import * as mobx from 'mobx'
 import GovernanceProposal from 'src/domain/GovernanceProposal'
 
 import { RootStore, GovernanceStore } from 'src/stores'
-import MediaQuery from 'src/stores/UIStore/MediaQuery'
 import { DialogVM } from 'ui-framework'
 
 export default class GovernanceVM {
@@ -11,7 +10,6 @@ export default class GovernanceVM {
   public governanceStore: GovernanceStore
   public activeProposal?: GovernanceProposal
   public proposalPopup = new DialogVM()
-  public media = new MediaQuery()
 
   public showProposal = (id: number) => {
     this.activeProposal = this.governanceStore.proposalsList.find(proposal => proposal.id === id)
@@ -21,7 +19,6 @@ export default class GovernanceVM {
   constructor({ rootStore }: { rootStore: RootStore }) {
     this.rootStore = rootStore
     this.governanceStore = rootStore.governanceStore
-    this.media = rootStore.uiStore.media
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }
 }
