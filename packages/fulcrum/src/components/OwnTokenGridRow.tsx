@@ -286,7 +286,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <br />
 
           {!this.state.isLoading ? (
-            <React.Fragment>{this.props.liquidationPrice.toFixed(precisionDigits)}</React.Fragment>
+            this.props.liquidationPrice.isNaN() || !this.props.liquidationPrice.isFinite() ? (
+              '-'
+            ) : (
+              this.props.liquidationPrice.toFixed(precisionDigits)
+            )
           ) : (
             <Preloader width="74px" />
           )}
@@ -370,7 +374,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               }}>
               {this.props.quoteToken}
             </label>
-        </div>
+          </div>
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button

@@ -1,0 +1,15 @@
+.rail {
+  background-color: #ffffff;
+  height: 15px;
+  border-radius: 10px;
+  &__outer {
+    height: 100%;
+    border-radius: 10px;
+  }
+  &__inner {
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    background-image: linear-gradient(-90deg, #ff4f4f 0%, #f0e93f 28.84%, #33dfcc 101.16%);
+  }
+}

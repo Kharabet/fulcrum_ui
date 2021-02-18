@@ -7,7 +7,7 @@ $font-size-button: 14px;
 $width-button: 154px;
 $height-button: 44px;
 $padding: 22px 30px 35px 30px;
-$grid-template-columns: 9% calc(12% - 35px) 10% 10% 10% 13% 15%;
+$grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
 .inner-own-token-grid-header,
 .inner-own-token-grid-row {
   .text-asset {
@@ -58,6 +58,7 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 10% 10% 13% 15%;
       position: relative;
       > span {
         position: absolute;
+        
         width: max-content;
       }
     }

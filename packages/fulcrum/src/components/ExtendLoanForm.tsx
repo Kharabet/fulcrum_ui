@@ -79,6 +79,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   }
 
   public async componentDidMount() {
+    await this.checkBalance()
     await FulcrumProvider.Instance.getLoanExtendParams(this.props.loan).then(
       async (collateralState) => {
         await FulcrumProvider.Instance.getLoanExtendManagementAddress(this.props.loan).then(
@@ -215,15 +216,16 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   }
 
   private checkBalance = async (): Promise<boolean> => {
-    let assetBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+    const precision = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
+
+    let assetBalance = (await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.props.loan.loanAsset
-    )
+    ))
     if (this.props.loan.loanAsset === Asset.ETH) {
       assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTxn)
         ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTxn)
         : new BigNumber(0)
     }
-    const precision = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
     const amountInBaseUnits = new BigNumber(
       this.state.depositAmount.multipliedBy(10 ** precision).toFixed(0, 1)
     )
@@ -233,14 +235,14 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         balanceTooLow: true
       })
 
-      return true
+      return false
     } else {
       this.setState({
         ...this.state,
         balanceTooLow: false
       })
 
-      return false
+      return true
     }
   }
 

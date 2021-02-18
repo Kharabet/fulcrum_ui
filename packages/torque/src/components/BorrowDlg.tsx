@@ -1,3 +1,4 @@
+import { BigNumber } from '@0x/utils'
 import React, { Component } from 'react'
 import ReactModal from 'react-modal'
 import Asset from 'bzx-common/src/assets/Asset'
@@ -8,9 +9,11 @@ import { DialogHeader } from './DialogHeader'
 interface IBorrowDlgState {
   isOpen: boolean
   borrowAsset: Asset
+  interestRate: BigNumber
+  liquidity: BigNumber
 
   executorParams: {
-    resolve: (value?: BorrowRequest) => void
+    resolve: (value: BorrowRequest) => void
     reject: (reason?: any) => void
   } | null
 }
@@ -19,7 +22,13 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context)
 
-    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, executorParams: null }
+    this.state = {
+      isOpen: false,
+      borrowAsset: Asset.UNKNOWN,
+      executorParams: null,
+      interestRate: new BigNumber(0),
+      liquidity: new BigNumber(0)
+    }
   }
 
   public render() {
@@ -27,14 +36,16 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
       <ReactModal
         isOpen={this.state.isOpen}
         className="modal-content-div"
-        overlayClassName="modal-overlay-div"
+        overlayClassName="modal-overlay-div borrow"
         onRequestClose={this.hide}>
         <DialogHeader
-          title={`Borrow how much ${this.state.borrowAsset}?`}
+          title={``}
           onDecline={this.onFormDecline}
         />
         <BorrowForm
           borrowAsset={this.state.borrowAsset}
+          interestRate={this.state.interestRate}
+          liquidity={this.state.liquidity}
           onSubmit={this.onFormSubmit}
           onDecline={this.onFormDecline}
         />
@@ -42,17 +53,22 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
     )
   }
 
-  public getValue = async (borrowAsset: Asset): Promise<BorrowRequest> => {
+  public getValue = async (
+    borrowAsset: Asset,
+    interestRate: BigNumber,
+    liquidity: BigNumber
+  ): Promise<BorrowRequest> => {
     if (this.state.isOpen) {
       return new Promise<BorrowRequest>((resolve, reject) => reject())
     }
 
     return new Promise<BorrowRequest>((resolve, reject) => {
       this.setState({
-        ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        borrowAsset: borrowAsset
+        borrowAsset,
+        liquidity,
+        interestRate
       })
     })
   }

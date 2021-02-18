@@ -731,13 +731,13 @@ export class StakingV1Contract extends BaseContract {
             return result;
         },
     };
-    public changeDelegate = {
+    public claim = {
         async sendTransactionAsync(
-            delegateToSet: string,
+            restake: boolean,
             txData: Partial<TxData> = {},
         ): Promise<string> {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('changeDelegate(address)', [delegateToSet
+            const encodedData = self._strictEncodeArguments('claim(bool)', [restake
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -746,20 +746,20 @@ export class StakingV1Contract extends BaseContract {
                     data: encodedData,
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).changeDelegate.estimateGasAsync.bind(
+                (self as any).claim.estimateGasAsync.bind(
                     self,
-                    delegateToSet
+                    restake
                 ),
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
         },
         async estimateGasAsync(
-            delegateToSet: string,
+            restake: boolean,
             txData: Partial<TxData> = {},
         ): Promise<number> {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('changeDelegate(address)', [delegateToSet
+            const encodedData = self._strictEncodeArguments('claim(bool)', [restake
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -773,21 +773,21 @@ export class StakingV1Contract extends BaseContract {
             return gas;
         },
         getABIEncodedTransactionData(
-            delegateToSet: string,
+            restake: boolean,
         ): string {
             const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('changeDelegate(address)', [delegateToSet
+            const abiEncodedTransactionData = self._strictEncodeArguments('claim(bool)', [restake
     ]);
             return abiEncodedTransactionData;
         },
         async callAsync(
-            delegateToSet: string,
+            restake: boolean,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<void
+        ): Promise<[BigNumber, BigNumber]
         > {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('changeDelegate(address)', [delegateToSet
+            const encodedData = self._strictEncodeArguments('claim(bool)', [restake
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -799,20 +799,20 @@ export class StakingV1Contract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('changeDelegate(address)');
+            const abiEncoder = self._lookupAbiEncoder('claim(bool)');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<void
+            const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber]
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
         },
     };
-    public claim = {
+    public claim3Crv = {
         async sendTransactionAsync(
             txData: Partial<TxData> = {},
         ): Promise<string> {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claim()', []);
+            const encodedData = self._strictEncodeArguments('claim3Crv()', []);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -820,7 +820,7 @@ export class StakingV1Contract extends BaseContract {
                     data: encodedData,
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).claim.estimateGasAsync.bind(
+                (self as any).claim3Crv.estimateGasAsync.bind(
                     self,
                 ),
             );
@@ -831,7 +831,7 @@ export class StakingV1Contract extends BaseContract {
             txData: Partial<TxData> = {},
         ): Promise<number> {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claim()', []);
+            const encodedData = self._strictEncodeArguments('claim3Crv()', []);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -846,16 +846,16 @@ export class StakingV1Contract extends BaseContract {
         getABIEncodedTransactionData(
         ): string {
             const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('claim()', []);
+            const abiEncodedTransactionData = self._strictEncodeArguments('claim3Crv()', []);
             return abiEncodedTransactionData;
         },
         async callAsync(
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<[BigNumber, BigNumber]
+        ): Promise<BigNumber
         > {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claim()', []);
+            const encodedData = self._strictEncodeArguments('claim3Crv()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -866,20 +866,20 @@ export class StakingV1Contract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('claim()');
+            const abiEncoder = self._lookupAbiEncoder('claim3Crv()');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber]
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
         },
     };
-    public claimAndRestake = {
+    public claimBzrx = {
         async sendTransactionAsync(
             txData: Partial<TxData> = {},
         ): Promise<string> {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimAndRestake()', []);
+            const encodedData = self._strictEncodeArguments('claimBzrx()', []);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -887,7 +887,7 @@ export class StakingV1Contract extends BaseContract {
                     data: encodedData,
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).claimAndRestake.estimateGasAsync.bind(
+                (self as any).claimBzrx.estimateGasAsync.bind(
                     self,
                 ),
             );
@@ -898,7 +898,7 @@ export class StakingV1Contract extends BaseContract {
             txData: Partial<TxData> = {},
         ): Promise<number> {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimAndRestake()', []);
+            const encodedData = self._strictEncodeArguments('claimBzrx()', []);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -913,16 +913,16 @@ export class StakingV1Contract extends BaseContract {
         getABIEncodedTransactionData(
         ): string {
             const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('claimAndRestake()', []);
+            const abiEncodedTransactionData = self._strictEncodeArguments('claimBzrx()', []);
             return abiEncodedTransactionData;
         },
         async callAsync(
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<[BigNumber, BigNumber]
+        ): Promise<BigNumber
         > {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimAndRestake()', []);
+            const encodedData = self._strictEncodeArguments('claimBzrx()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -933,143 +933,9 @@ export class StakingV1Contract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('claimAndRestake()');
+            const abiEncoder = self._lookupAbiEncoder('claimBzrx()');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber]
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
-    public claimAndRestakeWithUpdate = {
-        async sendTransactionAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<string> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimAndRestakeWithUpdate()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-                (self as any).claimAndRestakeWithUpdate.estimateGasAsync.bind(
-                    self,
-                ),
-            );
-            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            return txHash;
-        },
-        async estimateGasAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<number> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimAndRestakeWithUpdate()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            return gas;
-        },
-        getABIEncodedTransactionData(
-        ): string {
-            const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('claimAndRestakeWithUpdate()', []);
-            return abiEncodedTransactionData;
-        },
-        async callAsync(
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<[BigNumber, BigNumber]
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimAndRestakeWithUpdate()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('claimAndRestakeWithUpdate()');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber]
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
-    public claimWithUpdate = {
-        async sendTransactionAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<string> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimWithUpdate()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-                (self as any).claimWithUpdate.estimateGasAsync.bind(
-                    self,
-                ),
-            );
-            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            return txHash;
-        },
-        async estimateGasAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<number> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimWithUpdate()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            return gas;
-        },
-        getABIEncodedTransactionData(
-        ): string {
-            const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('claimWithUpdate()', []);
-            return abiEncodedTransactionData;
-        },
-        async callAsync(
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<[BigNumber, BigNumber]
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('claimWithUpdate()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('claimWithUpdate()');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber]
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
@@ -1295,82 +1161,6 @@ export class StakingV1Contract extends BaseContract {
             return result;
         },
     };
-    public earnedWithUpdate = {
-        async sendTransactionAsync(
-            account: string,
-            txData: Partial<TxData> = {},
-        ): Promise<string> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('earnedWithUpdate(address)', [account
-    ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-                (self as any).earnedWithUpdate.estimateGasAsync.bind(
-                    self,
-                    account
-                ),
-            );
-            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            return txHash;
-        },
-        async estimateGasAsync(
-            account: string,
-            txData: Partial<TxData> = {},
-        ): Promise<number> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('earnedWithUpdate(address)', [account
-    ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            return gas;
-        },
-        getABIEncodedTransactionData(
-            account: string,
-        ): string {
-            const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('earnedWithUpdate(address)', [account
-    ]);
-            return abiEncodedTransactionData;
-        },
-        async callAsync(
-            account: string,
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<[BigNumber, BigNumber, BigNumber, BigNumber]
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('earnedWithUpdate(address)', [account
-        ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('earnedWithUpdate(address)');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, BigNumber, BigNumber]
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
     public exit = {
         async sendTransactionAsync(
             txData: Partial<TxData> = {},
@@ -1438,73 +1228,6 @@ export class StakingV1Contract extends BaseContract {
             return result;
         },
     };
-    public exitWithUpdate = {
-        async sendTransactionAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<string> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('exitWithUpdate()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-                (self as any).exitWithUpdate.estimateGasAsync.bind(
-                    self,
-                ),
-            );
-            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            return txHash;
-        },
-        async estimateGasAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<number> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('exitWithUpdate()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            return gas;
-        },
-        getABIEncodedTransactionData(
-        ): string {
-            const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('exitWithUpdate()', []);
-            return abiEncodedTransactionData;
-        },
-        async callAsync(
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<void
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('exitWithUpdate()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('exitWithUpdate()');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<void
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
     public fundsWallet = {
         async callAsync(
             callData: Partial<CallData> = {},
@@ -1526,36 +1249,6 @@ export class StakingV1Contract extends BaseContract {
             const abiEncoder = self._lookupAbiEncoder('fundsWallet()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
-    public getDelegateVotes = {
-        async callAsync(
-            start: BigNumber,
-            count: BigNumber,
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<Array<{user: string;BZRX: BigNumber;vBZRX: BigNumber;iBZRX: BigNumber;LPToken: BigNumber;totalVotes: BigNumber}>
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('getDelegateVotes(uint256,uint256)', [start,
-        count
-        ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('getDelegateVotes(uint256,uint256)');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<Array<{user: string;BZRX: BigNumber;vBZRX: BigNumber;iBZRX: BigNumber;LPToken: BigNumber;totalVotes: BigNumber}>
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
@@ -1743,34 +1436,6 @@ export class StakingV1Contract extends BaseContract {
             return result;
         },
     };
-    public lastClaimTime = {
-        async callAsync(
-            index_0: string,
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<BigNumber
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('lastClaimTime(address)', [index_0
-        ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('lastClaimTime(address)');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<BigNumber
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
     public lastRewardsAddTime = {
         async callAsync(
             callData: Partial<CallData> = {},
@@ -1797,14 +1462,14 @@ export class StakingV1Contract extends BaseContract {
             return result;
         },
     };
-    public maxAllowedDisagreement = {
+    public maxCurveDisagreement = {
         async callAsync(
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('maxAllowedDisagreement()', []);
+            const encodedData = self._strictEncodeArguments('maxCurveDisagreement()', []);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -1815,7 +1480,33 @@ export class StakingV1Contract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('maxAllowedDisagreement()');
+            const abiEncoder = self._lookupAbiEncoder('maxCurveDisagreement()');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public maxUniswapDisagreement = {
+        async callAsync(
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('maxUniswapDisagreement()', []);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('maxUniswapDisagreement()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
         >(rawCallResult);
@@ -1844,73 +1535,6 @@ export class StakingV1Contract extends BaseContract {
             const abiEncoder = self._lookupAbiEncoder('owner()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
-    public pause = {
-        async sendTransactionAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<string> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('pause()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-                (self as any).pause.estimateGasAsync.bind(
-                    self,
-                ),
-            );
-            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            return txHash;
-        },
-        async estimateGasAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<number> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('pause()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            return gas;
-        },
-        getABIEncodedTransactionData(
-        ): string {
-            const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('pause()', []);
-            return abiEncodedTransactionData;
-        },
-        async callAsync(
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<void
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('pause()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('pause()');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<void
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
@@ -2237,13 +1861,13 @@ export class StakingV1Contract extends BaseContract {
             return result;
         },
     };
-    public setMaxAllowedDisagreement = {
+    public setMaxCurveDisagreement = {
         async sendTransactionAsync(
-            _maxAllowedDisagreement: BigNumber,
+            _maxCurveDisagreement: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<string> {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('setMaxAllowedDisagreement(uint256)', [_maxAllowedDisagreement
+            const encodedData = self._strictEncodeArguments('setMaxCurveDisagreement(uint256)', [_maxCurveDisagreement
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2252,20 +1876,20 @@ export class StakingV1Contract extends BaseContract {
                     data: encodedData,
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).setMaxAllowedDisagreement.estimateGasAsync.bind(
+                (self as any).setMaxCurveDisagreement.estimateGasAsync.bind(
                     self,
-                    _maxAllowedDisagreement
+                    _maxCurveDisagreement
                 ),
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
         },
         async estimateGasAsync(
-            _maxAllowedDisagreement: BigNumber,
+            _maxCurveDisagreement: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('setMaxAllowedDisagreement(uint256)', [_maxAllowedDisagreement
+            const encodedData = self._strictEncodeArguments('setMaxCurveDisagreement(uint256)', [_maxCurveDisagreement
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2279,21 +1903,21 @@ export class StakingV1Contract extends BaseContract {
             return gas;
         },
         getABIEncodedTransactionData(
-            _maxAllowedDisagreement: BigNumber,
+            _maxCurveDisagreement: BigNumber,
         ): string {
             const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('setMaxAllowedDisagreement(uint256)', [_maxAllowedDisagreement
+            const abiEncodedTransactionData = self._strictEncodeArguments('setMaxCurveDisagreement(uint256)', [_maxCurveDisagreement
     ]);
             return abiEncodedTransactionData;
         },
         async callAsync(
-            _maxAllowedDisagreement: BigNumber,
+            _maxCurveDisagreement: BigNumber,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
             const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('setMaxAllowedDisagreement(uint256)', [_maxAllowedDisagreement
+            const encodedData = self._strictEncodeArguments('setMaxCurveDisagreement(uint256)', [_maxCurveDisagreement
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -2305,7 +1929,83 @@ export class StakingV1Contract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('setMaxAllowedDisagreement(uint256)');
+            const abiEncoder = self._lookupAbiEncoder('setMaxCurveDisagreement(uint256)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<void
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public setMaxUniswapDisagreement = {
+        async sendTransactionAsync(
+            _maxUniswapDisagreement: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('setMaxUniswapDisagreement(uint256)', [_maxUniswapDisagreement
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).setMaxUniswapDisagreement.estimateGasAsync.bind(
+                    self,
+                    _maxUniswapDisagreement
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            _maxUniswapDisagreement: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('setMaxUniswapDisagreement(uint256)', [_maxUniswapDisagreement
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            _maxUniswapDisagreement: BigNumber,
+        ): string {
+            const self = this as any as StakingV1Contract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('setMaxUniswapDisagreement(uint256)', [_maxUniswapDisagreement
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            _maxUniswapDisagreement: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<void
+        > {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('setMaxUniswapDisagreement(uint256)', [_maxUniswapDisagreement
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('setMaxUniswapDisagreement(uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
         >(rawCallResult);
@@ -2458,82 +2158,6 @@ export class StakingV1Contract extends BaseContract {
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setRewardPercent(uint256)');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<void
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
-    public setUniswapApproval = {
-        async sendTransactionAsync(
-            asset: string,
-            txData: Partial<TxData> = {},
-        ): Promise<string> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('setUniswapApproval(address)', [asset
-    ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-                (self as any).setUniswapApproval.estimateGasAsync.bind(
-                    self,
-                    asset
-                ),
-            );
-            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            return txHash;
-        },
-        async estimateGasAsync(
-            asset: string,
-            txData: Partial<TxData> = {},
-        ): Promise<number> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('setUniswapApproval(address)', [asset
-    ]);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            return gas;
-        },
-        getABIEncodedTransactionData(
-            asset: string,
-        ): string {
-            const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('setUniswapApproval(address)', [asset
-    ]);
-            return abiEncodedTransactionData;
-        },
-        async callAsync(
-            asset: string,
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<void
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('setUniswapApproval(address)', [asset
-        ]);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('setUniswapApproval(address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
         >(rawCallResult);
@@ -2937,6 +2561,82 @@ export class StakingV1Contract extends BaseContract {
             return result;
         },
     };
+    public togglePause = {
+        async sendTransactionAsync(
+            _isPaused: boolean,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('togglePause(bool)', [_isPaused
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).togglePause.estimateGasAsync.bind(
+                    self,
+                    _isPaused
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            _isPaused: boolean,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('togglePause(bool)', [_isPaused
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            _isPaused: boolean,
+        ): string {
+            const self = this as any as StakingV1Contract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('togglePause(bool)', [_isPaused
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            _isPaused: boolean,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<void
+        > {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('togglePause(bool)', [_isPaused
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('togglePause(bool)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<void
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
     public totalSupplyByAsset = {
         async callAsync(
             token: string,
@@ -3060,73 +2760,6 @@ export class StakingV1Contract extends BaseContract {
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('transferOwnership(address)');
-            // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<void
-        >(rawCallResult);
-            // tslint:enable boolean-naming
-            return result;
-        },
-    };
-    public unPause = {
-        async sendTransactionAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<string> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('unPause()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-                (self as any).unPause.estimateGasAsync.bind(
-                    self,
-                ),
-            );
-            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            return txHash;
-        },
-        async estimateGasAsync(
-            txData: Partial<TxData> = {},
-        ): Promise<number> {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('unPause()', []);
-            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...txData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            return gas;
-        },
-        getABIEncodedTransactionData(
-        ): string {
-            const self = this as any as StakingV1Contract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('unPause()', []);
-            return abiEncodedTransactionData;
-        },
-        async callAsync(
-            callData: Partial<CallData> = {},
-            defaultBlock?: BlockParam,
-        ): Promise<void
-        > {
-            const self = this as any as StakingV1Contract;
-            const encodedData = self._strictEncodeArguments('unPause()', []);
-            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-                {
-                    to: self.address,
-                    ...callData,
-                    data: encodedData,
-                },
-                self._web3Wrapper.getContractDefaults(),
-            );
-            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('unPause()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
         >(rawCallResult);
@@ -3290,6 +2923,38 @@ export class StakingV1Contract extends BaseContract {
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('vBZRXWeightStored()');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public vestedBalanceForAmount = {
+        async callAsync(
+            tokenBalance: BigNumber,
+            lastUpdate: BigNumber,
+            vestingEndTime: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as StakingV1Contract;
+            const encodedData = self._strictEncodeArguments('vestedBalanceForAmount(uint256,uint256,uint256)', [tokenBalance,
+        lastUpdate,
+        vestingEndTime
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('vestedBalanceForAmount(uint256,uint256,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber
         >(rawCallResult);

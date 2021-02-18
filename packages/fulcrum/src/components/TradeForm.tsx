@@ -506,8 +506,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               <div className="trade-form__slippage">
                 Slippage:
                 <span
-                  className={`trade-form__slippage-value${
-                    this.state.slippageRate.gte(0.02) ? ' danger' : ''
+                  className={`trade-form__slippage-value ${
+                    this.state.slippageRate.gte(0.01) && this.state.slippageRate.lte(1) ? 'green':
+                    this.state.slippageRate.gt(1) && this.state.slippageRate.lte(2) ? 'yellow' :
+                    this.state.slippageRate.gt(2) ? 'danger' : ''
                   }`}
                   title={this.state.slippageRate.toFixed()}>
                   {this.state.slippageRate.toFixed(2)}%

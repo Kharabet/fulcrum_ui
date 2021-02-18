@@ -19,7 +19,7 @@ import { ExtendLoanForm } from '../components/ExtendLoanForm'
 import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
+import { TRADE_PAIRS } from '../config/appConfig'
 import {
   CloseWithSwapEvent,
   DepositCollateralEvent,
@@ -86,6 +86,7 @@ interface ITradePageState {
   isSupportNetwork: boolean
 }
 
+
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   private _isMounted: boolean = false
   private readonly daysNumberForLoanActionNotification = 2
@@ -101,7 +102,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     } else {
       this.baseTokens = [
         Asset.ETH,
+        Asset.DAI,
         Asset.WBTC,
+        Asset.BZRX,
         Asset.LINK,
         Asset.MKR,
         Asset.YFI,
@@ -111,7 +114,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.LRC,
         Asset.COMP
       ]
-      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.WBTC]
+      this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.BZRX, Asset.WBTC]
     }
     this.stablecoins = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.SUSD]
     const activePair = window.localStorage.getItem('activePair') || undefined
@@ -183,7 +186,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.getTokenRowsData()
     await this.getInnerOwnRowsData()
     await this.setRecentLiquidationsNumber()
-    await this.fetchPositionsRecursive(10)
+    await this.fetchPositionsRecursive(3)
     setTimeout(() => {
       this.forceUpdate() // solves bug with positions not appearing on the first render.
     }, 5000)
@@ -262,6 +265,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               </InfoBlock>
             )}
             <TokenGridTabs
+              tradePairs={TRADE_PAIRS}
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
               selectedMarket={this.state.selectedMarket}
@@ -313,6 +317,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               <OwnTokenGrid
                 ownRowsData={this.state.ownRowsData}
                 isMobileMedia={this.props.isMobileMedia}
+                onStartTrading={() => this.onTokenGridTabChange(TokenGridTab.Chart)}
               />
             )}
 
@@ -326,6 +331,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 quoteTokens={this.quoteTokens}
                 updateHistoryRowsData={this.updateHistoryRowsData}
                 changeLoadingTransaction={this.changeLoadingTransaction}
+                onStartTrading={() => this.onTokenGridTabChange(TokenGridTab.Chart)}
               />
             )}
 
@@ -593,21 +599,38 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ? collateralToPrincipalRate
       : await FulcrumProvider.Instance.getKyberSwapRate(loan.collateralAsset, loan.loanAsset)
 
-    const isLoanTokenOnlyInQuoteTokens =
-      !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
-    const isCollateralTokenNotInQuoteTokens =
-      this.baseTokens.includes(loan.collateralAsset) &&
-      !this.quoteTokens.includes(loan.collateralAsset)
-    const positionType =
-      isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
-        ? PositionType.LONG
-        : PositionType.SHORT
-
+    let positionType
+    const possiblePairs = TRADE_PAIRS.filter(
+      (p) =>
+        (p.baseToken === loan.loanAsset && p.quoteToken === loan.collateralAsset) ||
+        (p.baseToken === loan.collateralAsset && p.quoteToken === loan.loanAsset)
+    )
+    if (TRADE_PAIRS.length > 0 && possiblePairs && possiblePairs.length > 0) {
+      if (possiblePairs.length > 1) {
+        console.error(
+          "The position fits to more than one pair. Couldn't treat it exactly as LONG/SHORT"
+        )
+      }
+      positionType =
+        possiblePairs[0].baseToken === loan.collateralAsset ? PositionType.LONG : PositionType.SHORT
+    } else {
+      const isLoanTokenOnlyInQuoteTokens =
+        !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
+      const isCollateralTokenNotInQuoteTokens =
+        this.baseTokens.includes(loan.collateralAsset) &&
+        !this.quoteTokens.includes(loan.collateralAsset)
+      positionType =
+        isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
+          ? PositionType.LONG
+          : PositionType.SHORT
+    }
     const baseAsset = positionType === PositionType.LONG ? loan.collateralAsset : loan.loanAsset
 
     const quoteAsset = positionType === PositionType.LONG ? loan.loanAsset : loan.collateralAsset
 
-    let leverage = new BigNumber(10 ** 38).div(loan.loanData.startMargin.times(10 ** 18))
+    let leverage = new BigNumber(10 ** 38)
+      .div(loan.loanData.startMargin.times(10 ** 18))
+      .dp(0, BigNumber.ROUND_HALF_UP)
     if (positionType === PositionType.LONG) leverage = leverage.plus(1)
 
     let positionValue = new BigNumber(0)

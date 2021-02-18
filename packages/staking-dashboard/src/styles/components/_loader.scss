@@ -32,22 +32,18 @@
     z-index: 10001;
   }
   .loader-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
     z-index: 10003;
     .loader-text {
-      font-weight: 900;
-      color: #283049;
+      font-weight: bold;
+      color: $color-gray-dark;
       margin-bottom: 0;
       text-align: center;
+      font-style: italic;
       &.warning {
         color: #ff5c5c;
       }
       &-small {
-        font-size: 12px;
+        font-size: 15px;
         margin-bottom: 10px;
       }
       &-middle {
