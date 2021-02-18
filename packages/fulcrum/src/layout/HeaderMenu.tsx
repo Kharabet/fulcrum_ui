@@ -8,8 +8,8 @@ export interface IHeaderMenuProps {
 
 export class HeaderMenu extends Component<IHeaderMenuProps> {
   public render() {
-    const menuItems = this.props.items.map((e: IHeaderMenuItemProps) => (
-      <HeaderMenuItem key={e.id} {...e} />
+    const menuItems = this.props.items.map((e: IHeaderMenuItemProps, index: number) => (
+      <HeaderMenuItem key={index} {...e} />
     ))
 
     return (

@@ -86,49 +86,75 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   private renderDesktop = () => {
     const menu: IHeaderMenuProps = {
       items: [
-        { id: 0, title: 'Lend', link: '/lend', external: false },
-        { id: 1, title: 'Trade', link: '/trade', external: false },
-        { id: 2, title: 'Borrow', link: 'https://torque.loans', external: true },
-        { id: 3, title: 'Staking', link: 'https://staking.bzx.network', external: true },
-        { id: 4, title: 'Stats', link: '/stats', external: false },
-        {
-          id: 5,
-          title: 'Help Center',
-          link: 'https://bzx.network/faq-fulcrum.html',
-          external: true
-        }
+        { title: 'Trade', link: '/trade', external: false },
+        { title: 'Lend', link: '/lend', external: false },
+
+        { title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
+        { title: 'Stake', link: 'https://staking.bzx.network', external: true, newTab: true }
       ],
       onMenuToggle: this.onMenuToggle
     }
 
     return (
-        <header className={`header ${this.props.headerClass}`}>
-          <div className="header__row">
-            <div className="header__left">
-              <HeaderLogo />
-            </div>
-            <div className="header__center">
-              <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
-            </div>
-            <div className="header__right">
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-              <SwitchButtonInput onSwitch={this.onSwitchTheme} type="theme" />
-            </div>
+      <header className={`header ${this.props.headerClass}`}>
+        <div className="header__row">
+          <div className="header__left">
+            <HeaderLogo />
           </div>
-        </header>
+          <div className="header__center">
+            <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
+          </div>
+          <div className="header__right">
+            <div className="header__right__list">
+              <a
+                className="header__right__list-item"
+                href={`${
+                  this.props.headerClass === 'trade'
+                    ? 'https://fulcrum.trade/'
+                    : 'https://fulcrum.trade/lending'
+                }`}
+                target="_blank"
+                rel="noopener noreferrer">
+                {this.props.headerClass === 'trade' ? 'Trade FAQ' : 'Lend FAQ'}
+              </a>
+              <a
+                className="header__right__list-item"
+                href="https://bzx.network/faq-fulcrum.html"
+                target="_blank"
+                rel="noopener noreferrer">
+                Help Center
+              </a>
+            </div>
+            <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            <SwitchButtonInput onSwitch={this.onSwitchTheme} type="theme" />
+          </div>
+        </div>
+      </header>
     )
   }
 
   private renderMobile = () => {
     const menu: IHeaderMenuProps = {
       items: [
-        { id: 0, title: 'Lend', link: '/lend', external: false },
-        { id: 1, title: 'Trade', link: '/trade', external: false },
-        { id: 2, title: 'Borrow', link: 'https://torque.loans', external: true },
-        { id: 3, title: 'Staking', link: 'https://staking.bzx.network', external: true },
-        { id: 4, title: 'Stats', link: '/stats', external: false },
+        { title: 'Trade', link: '/trade', external: false },
+        { title: 'Lend', link: '/lend', external: false },
+        { title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
         {
-          id: 5,
+          title: 'Stake',
+          link: 'https://staking.bzx.network',
+          external: true,
+          newTab: true
+        },
+        {
+          title: `${this.props.headerClass === 'trade' ? 'Trade FAQ' : 'Lend FAQ'}`,
+          link: `${
+            this.props.headerClass === 'trade'
+              ? 'https://fulcrum.trade/'
+              : 'https://fulcrum.trade/lending'
+          }`,
+          external: true
+        },
+        {
           title: 'Help Center',
           link: 'https://bzx.network/faq-fulcrum.html',
           external: true
@@ -140,46 +166,46 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
 
     return (
-        <header className={`header ${this.props.headerClass}`}>
-          <div className="header__row">
-            <div className="header__left">
-              <HeaderLogo />
+      <header className={`header ${this.props.headerClass}`}>
+        <div className="header__row">
+          <div className="header__left">
+            <HeaderLogo />
+          </div>
+          <div className="header_icon" onClick={this.onMenuToggle}>
+            {!this.state.isMenuOpen ? (
+              <MenuIconOpen className="header__menu" />
+            ) : (
+              <MenuIconClose className="header__menu" />
+            )}
+          </div>
+        </div>
+        {this.state.isMenuOpen ? (
+          <div className={sidebarClass}>
+            <div className="header_btn">
+              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              <div className="theme-switch-wrapper">
+                <label className="theme-switch" htmlFor="checkbox">
+                  <input
+                    type="checkbox"
+                    id="checkbox"
+                    onChange={this.onSwitchTheme}
+                    defaultChecked={
+                      !localStorage.theme || localStorage.theme === 'dark' ? true : false
+                    }
+                  />
+                  <div className="slider round"></div>
+                </label>
+              </div>
             </div>
-            <div className="header_icon" onClick={this.onMenuToggle}>
-              {!this.state.isMenuOpen ? (
-                <MenuIconOpen className="header__menu" />
-              ) : (
-                <MenuIconClose className="header__menu" />
-              )}
+            <div className="header_nav_menu">
+              <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
+            </div>
+            <div className="footer-container">
+              <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
             </div>
           </div>
-          {this.state.isMenuOpen ? (
-            <div className={sidebarClass}>
-              <div className="header_btn">
-                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-                <div className="theme-switch-wrapper">
-                  <label className="theme-switch" htmlFor="checkbox">
-                    <input
-                      type="checkbox"
-                      id="checkbox"
-                      onChange={this.onSwitchTheme}
-                      defaultChecked={
-                        !localStorage.theme || localStorage.theme === 'dark' ? true : false
-                      }
-                    />
-                    <div className="slider round"></div>
-                  </label>
-                </div>
-              </div>
-              <div className="header_nav_menu">
-                <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
-              </div>
-              <div className="footer-container">
-                <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-              </div>
-            </div>
-          ) : null}
-        </header>
+        ) : null}
+      </header>
     )
   }
 

@@ -21,7 +21,7 @@
   @media screen and (min-width: $breakpoint-desktop-min) {
     margin-right: 75px;
     &:last-child {
-      margin-right: 135px;
+      margin-right: 0;
     }
   }
   @media screen and (max-width: $breakpoint-desktop-max) {
@@ -42,17 +42,12 @@
     margin-left: auto;
     margin-right: auto;
     display: block;
-    .icon-external {
-      position: absolute;
-      top: -6px;
-      left: -16px;
-    }
-    &:hover .icon-external svg path {
-      stroke: #33dfcc;
+    color: #00c0ab;
+    &:hover {
+      color: #33dfcc;
     }
 
     &.header-menu__item-link--active {
-      color: var(--primary-text);
       &:before {
         content: '';
         position: absolute;

@@ -87,7 +87,11 @@ a {
     width: 100%;
   }
 }
-
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 .pages-container {
   min-height: 100vh;
   overflow-x: hidden;

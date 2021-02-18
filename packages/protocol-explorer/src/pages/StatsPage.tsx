@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 import { Search } from '../components/Search'
 import { StatsChart } from '../components/StatsChart'
 import { TxGrid } from '../components/TxGrid'
-import { Header } from '../layout/Header'
-import { RouteComponentProps } from 'react-router'
 import Asset from 'bzx-common/src/assets/Asset'
 import {
   BorrowEvent,
@@ -20,14 +18,13 @@ import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { NavService } from '../services/NavService'
 import { Loader } from '../components/Loader'
+import { Tab } from '../domain/Tab'
 
-interface MatchParams {
-  token: string
-}
-
-interface IStatsPageProps extends RouteComponentProps<MatchParams> {
+interface IStatsPageProps {
   doNetworkConnect: () => void
   isMobileMedia: boolean
+  activeTab: Tab
+  setActiveTab: (tab: Tab) => void
 }
 
 interface IStatsPageState {
@@ -43,9 +40,9 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     super(props)
     this.state = {
       asset:
-        this.props.match.params.token.toUpperCase() === 'FWETH'
+        props.match.params.token.toUpperCase() === 'FWETH'
           ? Asset.fWETH
-          : (this.props.match.params.token.toUpperCase() as Asset),
+          : (props.match.params.token.toUpperCase() as Asset),
       events: [],
       isDataLoading: true
     }
@@ -180,10 +177,6 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   public render() {
     return (
       <React.Fragment>
-        <Header
-          isMobileMedia={this.props.isMobileMedia}
-          doNetworkConnect={this.props.doNetworkConnect}
-        />
         <main className="flex fd-c ac-c jc-c">
           {this.state.isDataLoading ? (
             <section className="pt-90 pb-45">

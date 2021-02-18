@@ -1,0 +1,33 @@
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+  &__item {
+    display: flex;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    padding: 8px 18px;
+    color: #276bfb;
+    text-align: center;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.85;
+    }
+    &.active {
+      color: #283049;
+      position: relative;
+      &:before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 3px;
+        background: #276bfb;
+        border-radius: 3px 3px 0 0;
+        bottom: 0;
+      }
+    }
+  }
+}

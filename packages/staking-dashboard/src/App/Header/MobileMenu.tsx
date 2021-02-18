@@ -25,21 +25,19 @@ export function MobileMenu({ appVM }: { appVM: AppVM }) {
           <div className="margin-bottom-2">
             <ExternalLink
               className="header__link"
-              href="https://app.fulcrum.trade/trade"
-              showIcon={true}>
+              href="https://app.fulcrum.trade/trade">
               Trade
             </ExternalLink>
           </div>
           <div className="margin-bottom-2">
             <ExternalLink
               className="header__link"
-              href="https://app.fulcrum.trade/lend"
-              showIcon={true}>
+              href="https://app.fulcrum.trade/lend">
               Lend
             </ExternalLink>
           </div>
           <div className="margin-bottom-2">
-            <ExternalLink className="header__link" href="https://app.torque.loans" showIcon={true}>
+            <ExternalLink className="header__link" href="https://app.torque.loans" >
               Borrow
             </ExternalLink>
           </div>
