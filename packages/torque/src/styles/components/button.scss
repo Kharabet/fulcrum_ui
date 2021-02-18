@@ -1,6 +1,6 @@
 .btn {
   font-family: 'Muli', sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1.4;
   font-weight: 800;
   text-align: center;
@@ -9,14 +9,14 @@
   cursor: pointer;
   outline: none;
   color: #ffffff;
-  background-color: #276bfb;
+  background-color: $color-green;
 
   &:hover {
-    background-color: $color-blue--hover;
+    background-color: $color-green--hover;
   }
 
   &:active {
-    background-color: $color-blue--pressed;
+    background-color: $color-green--pressed;
   }
   &.btn-light {
     color: #276bfb;
@@ -29,33 +29,33 @@
   }
   &[disabled] {
     opacity: 0.4;
-    background-color: $color-blue !important;
+    background-color: $color-green !important;
     cursor: not-allowed;
     &:hover {
-      background-color: $color-blue !important;
+      background-color: $color-green !important;
     }
 
     &:active {
-      background-color: $color-blue !important;
+      background-color: $color-green !important;
     }
   }
 }
 
 .btn-size--small {
-  padding: 20px 46px;
+  padding: 22px 46px;
 }
 
 .btn-disabled,
 :disabled {
   opacity: 0.4;
-  background-color: $color-blue !important;
+  background-color: $color-green !important;
 
   &:hover {
-    background-color: $color-blue !important;
+    background-color: $color-green !important;
   }
 
   &:active {
-    background-color: $color-blue !important;
+    background-color: $color-green !important;
   }
 }
 @media screen and(max-width: $mobile-version-max-width) {

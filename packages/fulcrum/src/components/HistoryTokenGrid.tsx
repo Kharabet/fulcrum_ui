@@ -32,6 +32,7 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import '../styles/components/history-token-grid.scss'
+import { TRADE_PAIRS } from '../config/appConfig'
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean
@@ -210,17 +211,36 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       )
       const tradeEvent = events[0] as TradeEvent
 
-      const isLoanTokenOnlyInQuoteTokens =
-        !this.props.baseTokens.includes(tradeEvent.loanToken) &&
-        this.props.quoteTokens.includes(tradeEvent.loanToken)
-      const isCollateralTokenNotInQuoteTokens =
-        this.props.baseTokens.includes(tradeEvent.collateralToken) &&
-        !this.props.quoteTokens.includes(tradeEvent.collateralToken)
+      let positionType
+      const possiblePairs = TRADE_PAIRS.filter(
+        (p) =>
+          (p.baseToken === tradeEvent.loanToken && p.quoteToken === tradeEvent.collateralToken) ||
+          (p.baseToken === tradeEvent.collateralToken && p.quoteToken === tradeEvent.loanToken)
+      )
+      if (TRADE_PAIRS.length > 0 && possiblePairs && possiblePairs.length > 0) {
+        if (possiblePairs.length > 1) {
+          console.error(
+            "The position fits to more than one pair. Couldn't treat it exactly as LONG/SHORT"
+          )
+        }
+        positionType =
+          possiblePairs[0].baseToken === tradeEvent.collateralToken
+            ? PositionType.LONG
+            : PositionType.SHORT
+      } else {
+        const isLoanTokenOnlyInQuoteTokens =
+          !this.props.baseTokens.includes(tradeEvent.loanToken) &&
+          this.props.quoteTokens.includes(tradeEvent.loanToken)
+        const isCollateralTokenNotInQuoteTokens =
+          this.props.baseTokens.includes(tradeEvent.collateralToken) &&
+          !this.props.quoteTokens.includes(tradeEvent.collateralToken)
 
-      const positionType =
-        isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
-          ? PositionType.LONG
-          : PositionType.SHORT
+        positionType =
+          isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
+            ? PositionType.LONG
+            : PositionType.SHORT
+      }
+
       const baseAsset =
         positionType === PositionType.LONG ? tradeEvent.collateralToken : tradeEvent.loanToken
 

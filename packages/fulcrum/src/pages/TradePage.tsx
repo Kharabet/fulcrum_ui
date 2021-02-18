@@ -19,7 +19,7 @@ import { ExtendLoanForm } from '../components/ExtendLoanForm'
 import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
+import { TRADE_PAIRS } from '../config/appConfig'
 import {
   CloseWithSwapEvent,
   DepositCollateralEvent,
@@ -84,6 +84,7 @@ interface ITradePageState {
   recentLiquidationsNumber: number
   isSupportNetwork: boolean
 }
+
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   private _isMounted: boolean = false
@@ -263,6 +264,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               </InfoBlock>
             )}
             <TokenGridTabs
+              tradePairs={TRADE_PAIRS}
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
               selectedMarket={this.state.selectedMarket}
@@ -593,16 +595,31 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ? collateralToPrincipalRate
       : await FulcrumProvider.Instance.getKyberSwapRate(loan.collateralAsset, loan.loanAsset)
 
-    const isLoanTokenOnlyInQuoteTokens =
-      !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
-    const isCollateralTokenNotInQuoteTokens =
-      this.baseTokens.includes(loan.collateralAsset) &&
-      !this.quoteTokens.includes(loan.collateralAsset)
-    const positionType =
-      isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
-        ? PositionType.LONG
-        : PositionType.SHORT
-
+    let positionType
+    const possiblePairs = TRADE_PAIRS.filter(
+      (p) =>
+        (p.baseToken === loan.loanAsset && p.quoteToken === loan.collateralAsset) ||
+        (p.baseToken === loan.collateralAsset && p.quoteToken === loan.loanAsset)
+    )
+    if (TRADE_PAIRS.length > 0 && possiblePairs && possiblePairs.length > 0) {
+      if (possiblePairs.length > 1) {
+        console.error(
+          "The position fits to more than one pair. Couldn't treat it exactly as LONG/SHORT"
+        )
+      }
+      positionType =
+        possiblePairs[0].baseToken === loan.collateralAsset ? PositionType.LONG : PositionType.SHORT
+    } else {
+      const isLoanTokenOnlyInQuoteTokens =
+        !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
+      const isCollateralTokenNotInQuoteTokens =
+        this.baseTokens.includes(loan.collateralAsset) &&
+        !this.quoteTokens.includes(loan.collateralAsset)
+      positionType =
+        isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
+          ? PositionType.LONG
+          : PositionType.SHORT
+    }
     const baseAsset = positionType === PositionType.LONG ? loan.collateralAsset : loan.loanAsset
 
     const quoteAsset = positionType === PositionType.LONG ? loan.loanAsset : loan.collateralAsset
