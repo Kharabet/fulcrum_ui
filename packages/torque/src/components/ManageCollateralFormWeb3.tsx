@@ -411,8 +411,8 @@ export class ManageCollateralFormWeb3 extends Component<
         collateralAmount,
         selectedValue < this.state.loanValue
       ).then((value) => {
-        this.getLiquidationPrice()
         observer.next(value)
+        this.getLiquidationPrice()
         this.changeStateLoading()
       })
     })
