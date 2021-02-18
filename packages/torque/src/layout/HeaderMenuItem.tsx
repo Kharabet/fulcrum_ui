@@ -14,7 +14,11 @@ export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
     return (
       <div className="header-menu__item">
         {this.props.external ? (
-          <a href={this.props.link} className={`header-menu__item-link c-green`}>
+          <a
+            href={this.props.link}
+            className={`header-menu__item-link c-green`}
+            target="_blank"
+            rel="noopener noreferrer">
             <span>{this.props.title}</span>
           </a>
         ) : (
