@@ -7,7 +7,7 @@ $font-size-button: 14px;
 $width-button: 154px;
 $height-button: 44px;
 $padding: 22px 30px 35px 30px;
-$grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
+$grid-template-columns: 9% calc(13% - 35px) 10% 12.5% 12.5% 8% 13%;
 .inner-own-token-grid-header,
 .inner-own-token-grid-row {
   .text-asset {
@@ -17,7 +17,6 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
 .inner-own-token-grid-header {
   display: grid;
   grid-template-columns: $grid-template-columns;
-  column-gap: 35px;
   justify-content: space-between;
   padding: 17px 30px 0px 30px;
   margin-bottom: -32px;
@@ -58,7 +57,7 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
       position: relative;
       > span {
         position: absolute;
-        
+
         width: max-content;
       }
     }
@@ -75,7 +74,6 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
 
   z-index: 1;
   justify-content: space-between;
-  column-gap: 35px;
   align-items: center;
   background-color: var(--secondary-row);
   padding: $padding;
@@ -98,29 +96,37 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
     position: relative;
     text-align: left;
   }
-  &__col-profit-switch {
-    border-radius: 22px;
-    background-color: var(--primary-bg);
-    position: absolute;
-    display: flex;
-    bottom: 18px;
-    label {
-      line-height: 1.5;
-      font-size: 9px;
-      display: inline-block;
-      padding: 3px 6px;
-      color: var(--primary-text);
-      cursor: pointer;
-      &:first-child {
-        border-radius: 18px 0 0 18px;
-      }
-      &:last-child {
-        border-radius: 0 18px 18px 0;
-      }
-      &.active {
-        background-color: #276bfb;
-        transition: 0.15s background-color;
-        color: #ffffff;
+  &__col-profit {
+    .positive {
+      color: #00c0ab;
+    }
+    .negative {
+      color: #ff4f4f;
+    }
+    &-switch {
+      border-radius: 22px;
+      background-color: var(--primary-bg);
+      position: absolute;
+      display: flex;
+      bottom: 18px;
+      label {
+        line-height: 1.5;
+        font-size: 9px;
+        display: inline-block;
+        padding: 3px 6px;
+        color: var(--primary-text);
+        cursor: pointer;
+        &:first-child {
+          border-radius: 18px 0 0 18px;
+        }
+        &:last-child {
+          border-radius: 0 18px 18px 0;
+        }
+        &.active {
+          background-color: #276bfb;
+          transition: 0.15s background-color;
+          color: #ffffff;
+        }
       }
     }
   }
@@ -228,6 +234,9 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
         stroke: #ff4f4f;
       }
     }
+    @media screen and (max-width: $breakpoint-desktop-max) {
+      right: -39px;
+    }
   }
 
   &__open-extend-loan {
@@ -245,7 +254,8 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
       fill: var(--lend-bg-hover);
     }
     @media screen and (max-width: $breakpoint-desktop-max) {
-      right: 18px;
+      right: 14px;
+      top: 29px;
     }
   }
 
@@ -319,7 +329,6 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
       align-items: baseline;
       padding: 18px 15px 13px;
       row-gap: 12px;
-      column-gap: 0;
       font-size: 18px;
       .value-currency {
         text-align: left;
@@ -398,10 +407,10 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
       &__col-profit {
         order: 8;
         grid-column-start: 1;
-        grid-column-end: 5;
+        grid-column-end: 4;
         position: relative;
         &-switch {
-          right: 0;
+          left: 80px;
           bottom: 2px;
         }
       }
