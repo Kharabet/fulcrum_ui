@@ -231,6 +231,27 @@
       margin-left: 2px;
     }
   }
+  &__liquidation-price {
+    display: flex;
+    justify-content: space-between;
+    color: #a9b5c7;
+    margin-bottom: 23px;
+    font-size: 14px;
+    &-container {
+      display: flex;
+      .liquidation-dropdown-container {
+        margin-left: 4px;
+        .liquidation-dropdown-button {
+          display: flex;
+          &__arrow {
+            display: flex;
+            margin-left: 4px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
 
   @media screen and (max-width: $mobile-version-max-width) {
     width: 310px;

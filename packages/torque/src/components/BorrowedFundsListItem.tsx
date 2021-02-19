@@ -123,6 +123,7 @@ export class BorrowedFundsListItem extends Component<
       return
     }
     await this.updateData()
+    await this.derivedUpdate()
     this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
   }
 

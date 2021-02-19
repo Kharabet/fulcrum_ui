@@ -27,10 +27,8 @@ export default class TabContainer extends PureComponent<
       activeTab: Tab.Borrow
     }
   }
-  public setActiveTab = (tab: Tab) => {
-    this.setState({ ...this.state, activeTab: tab })
+  public setActiveTab = (tab: Tab) => {    this.setState({ activeTab: tab })
   }
-
   public componentDidMount(): void {
     if (this.props.location.pathname === '/dashboard') {
       this.setActiveTab(Tab.Loans)
@@ -49,7 +47,9 @@ export default class TabContainer extends PureComponent<
         <main>
           <Tabs activeTab={this.state.activeTab} setActiveTab={this.setActiveTab} />
           <React.Fragment>
-            {this.state.activeTab === Tab.Borrow && <BorrowPage {...this.props} />}
+            {this.state.activeTab === Tab.Borrow && (
+              <BorrowPage setLoansActiveTab={() => this.setActiveTab(Tab.Loans)} {...this.props} />
+            )}
             {this.state.activeTab === Tab.Loans && <DashboardPage {...this.props} />}
           </React.Fragment>
         </main>

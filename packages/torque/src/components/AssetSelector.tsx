@@ -9,6 +9,7 @@ import { BorrowDlg } from './BorrowDlg'
 export interface IAssetSelectorProps {
   borrowDlgRef: React.RefObject<BorrowDlg>
   doNetworkConnect: () => void
+  setLoansActiveTab: () => void
 }
 
 const AssetSelector = (props: IAssetSelectorProps) => {

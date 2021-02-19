@@ -178,7 +178,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public async componentDidMount() {
-    this.setState({isLoading: true})
+    this.setState({ isLoading: true })
     this._initDefaults.next()
   }
 
@@ -554,7 +554,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public onMaxClick = async () => {
-    const precisionDigits = TorqueProvider.Instance.isStableAsset(this.props.borrowAsset) ? 2 : 5
+    const precisionDigits = TorqueProvider.Instance.isStableAsset(this.state.collateralAsset) ? 2 : 5
     if (this.state.balanceValue.eq(0)) {
       return
     }
@@ -659,9 +659,15 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         const decimals = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18
 
         const depositAmount = balance.dividedBy(10 ** decimals)
-        const depositAmountValue = depositAmount.toFixed()
+        const precisionDigits = TorqueProvider.Instance.isStableAsset(this.state.collateralAsset)
+          ? 2
+          : 5
+        const depositAmountValue = depositAmount
+          .dp(precisionDigits, BigNumber.ROUND_CEIL)
+          .toString()
+
         if (balance.gt(0)) {
-          this.setState({isLoading: true})
+          this.setState({ isLoading: true })
           this._depositAmountChange.next(depositAmountValue)
         }
         this.setState({

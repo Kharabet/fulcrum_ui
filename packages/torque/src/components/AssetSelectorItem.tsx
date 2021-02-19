@@ -21,6 +21,7 @@ export interface IAssetSelectorItemProps {
   liquidity: BigNumber
   borrowDlgRef: React.RefObject<BorrowDlg>
   doNetworkConnect: () => void
+  setLoansActiveTab: ()=> void
 }
 
 const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
@@ -46,6 +47,7 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
       setLoadingTransaction(false)
       setRequest(undefined)
       NavService.Instance.History.push('/dashboard')
+      props.setLoansActiveTab()
     }
     TorqueProvider.Instance.eventEmitter.on(
       TorqueProviderEvents.AskToOpenProgressDlg,
