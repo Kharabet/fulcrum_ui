@@ -7,7 +7,7 @@ $font-size-button: 14px;
 $width-button: 154px;
 $height-button: 44px;
 $padding: 22px 30px 35px 30px;
-$grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
+$grid-template-columns: 9% calc(13% - 35px) 10% 12.5% 12.5% 8% 13%;
 .inner-own-token-grid-header,
 .inner-own-token-grid-row {
   .text-asset {
@@ -17,7 +17,6 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
 .inner-own-token-grid-header {
   display: grid;
   grid-template-columns: $grid-template-columns;
-  column-gap: 35px;
   justify-content: space-between;
   padding: 17px 30px 0px 30px;
   margin-bottom: -32px;
@@ -75,7 +74,6 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
 
   z-index: 1;
   justify-content: space-between;
-  column-gap: 35px;
   align-items: center;
   background-color: var(--secondary-row);
   padding: $padding;
@@ -331,7 +329,6 @@ $grid-template-columns: 9% calc(12% - 35px) 10% 13% 13% 8% 13%;
       align-items: baseline;
       padding: 18px 15px 13px;
       row-gap: 12px;
-      column-gap: 0;
       font-size: 18px;
       .value-currency {
         text-align: left;
