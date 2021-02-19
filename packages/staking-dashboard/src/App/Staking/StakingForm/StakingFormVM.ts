@@ -1,9 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import stakingUtils from 'app-lib/stakingUtils'
-import sleep from 'bard-instruments/lib/async/sleep'
 import * as mobx from 'mobx'
 import appConfig from 'src/config/appConfig'
-import RequestTask from 'src/domain/RequestTask'
 import { stakeableToken } from 'src/domain/stakingTypes'
 import { RootStore, StakingStore } from 'src/stores'
 import UserBalances from 'src/stores/StakingStore/UserBalances'
@@ -15,7 +13,6 @@ type StakingFormVMProp =
   | 'bptInput'
   | 'ibzrxInput'
   | 'selectedRepAddress'
-  | 'transactionIsRunning'
   | 'unstakeSelected'
 
 export default class StakingFormVM {
@@ -30,7 +27,6 @@ export default class StakingFormVM {
   public selectedRepAddress = ''
   public findRepDialogIsOpen = false
   public repSearchInput = ''
-  public transactionIsRunning = false
   public changeDelegateDialog = new DialogVM({ id: 'changeDelegateDialog' })
   public spendingAllowanceDetails = new DialogVM({ id: 'spendingAllowanceDetails' })
   public unstakeSelected = false
@@ -182,15 +178,6 @@ export default class StakingFormVM {
     })
 
     return this.stakingStore.unstake(tokenAmounts)
-  }
-
-  public showTransactionAnim(task: RequestTask) {
-    this.transactionIsRunning = true
-  }
-
-  public async hideTransactionAnim(task: RequestTask) {
-    await sleep(1500)
-    this.set('transactionIsRunning', false)
   }
 
   public async changeDelegate() {

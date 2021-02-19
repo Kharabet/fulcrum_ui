@@ -11,9 +11,10 @@ export function StakingDashboard({ appVM }: { appVM: AppVM }) {
   const { rewards } = appVM.rootStore.stakingStore
   return (
     <section className="calculator r-padded-h-2">
-      <div className="margin-bottom-2 flex jc-c">
+      <div className="margin-bottom-2 flex-center">
         <Button
-          className={`btn--tab margin-right-1 ${appVM.section === 'stake' ? 'active' : ''}`}
+          className="staking__tab margin-right-1"
+          active={appVM.section === 'stake'}
           name="section"
           value="stake"
           onClick={appVM.set}
@@ -22,7 +23,8 @@ export function StakingDashboard({ appVM }: { appVM: AppVM }) {
         </Button>
         <Button
           notify={rewards.canClaimStakingRewards || rewards.canClaimRebateRewards}
-          className={`btn--tab margin-right-1 ${appVM.section === 'rewards' ? 'active' : ''}`}
+          className="staking__tab"
+          active={appVM.section === 'rewards'}
           name="section"
           value="rewards"
           onClick={appVM.set}
@@ -30,7 +32,8 @@ export function StakingDashboard({ appVM }: { appVM: AppVM }) {
           Rewards
         </Button>
         {/* <Button
-          className={`btn--tab ${appVM.section === 'dao' ? 'active' : ''}`}
+          className="staking__tab"
+          active={appVM.section === 'dao'}
           name="section"
           value="dao"
           onClick={appVM.set}

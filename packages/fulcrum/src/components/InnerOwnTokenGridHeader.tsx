@@ -37,7 +37,7 @@ const InnerOwnTokenGridHeader = (props: IInnerOwnTokenGridHeaderProps) => {
           props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`
         }`}>
         <span className="inner-own-token-grid-header__text">
-          Value <label className="text-asset">{props.quoteToken}</label>
+          Position Value <label className="text-asset">{props.quoteToken}</label>
         </span>
       </div>
       <div

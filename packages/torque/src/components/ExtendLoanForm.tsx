@@ -133,15 +133,19 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     if (this.state.assetDetails === null) {
       return null
     }
+    const estimatedDate = this.props.loanOrderState.loanData
+      ? this.props.loanOrderState.loanData?.endTimestamp
+          .multipliedBy(1000)
+          .plus(this.state.selectedValue * 24 * 60 * 60 * 1000)
+          .toNumber()
+      : Date.now() + this.state.selectedValue * 24 * 60 * 60 * 1000
     return (
       <form className="extend-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
           <div className="extend-loan-form__info-extended-by-container">
             <div className="extend-loan-form__info-extended-by-msg">Loan end date</div>
             <div className="extend-loan-form__info-extended-by-price">
-              {new Date(
-                Date.now() + this.state.selectedValue * 24 * 60 * 60 * 1000
-              ).toLocaleDateString(undefined, {
+              {new Date(estimatedDate).toLocaleDateString(undefined, {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric'

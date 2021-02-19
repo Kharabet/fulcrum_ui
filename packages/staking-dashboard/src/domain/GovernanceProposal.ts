@@ -6,7 +6,7 @@ import {
   CompoundGovernorAlphaProposalCreatedEventArgs,
   CompoundGovernorAlphaProposalExecutedEventArgs,
   CompoundGovernorAlphaProposalQueuedEventArgs
-} from '../contracts/CompoundGovernorAlpha'
+} from 'bzx-common/src/contracts/typescript-wrappers/CompoundGovernorAlpha'
 export enum GovernanceProposalStates {
   Pending,
   Active,

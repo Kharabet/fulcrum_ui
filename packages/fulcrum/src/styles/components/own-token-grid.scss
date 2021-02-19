@@ -6,10 +6,10 @@ $width-col-token-name: 14%;
 //$width-col-position-type: 8%;
 $width-col-asset-unit: 11%;
 $width-col-position: 11%;
-$width-col-asset-price: 13%;
-$width-col-liquidation-price: 13%;
-$width-col-collateral: 13%;
-$width-col-position-value: 12%;
+$width-col-asset-price: 9%;
+$width-col-liquidation-price: 9%;
+$width-col-collateral: 12%;
+$width-col-position-value: 10%;
 $width-col-profit: 12%;
 $width-col-actions: 12%;
 $primary-color: #e9f4ff;
@@ -45,6 +45,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
     $width-col-token-name
     $width-col-position
     $width-col-asset-price
+    $width-col-asset-price
     $width-col-liquidation-price
     $width-col-collateral
     $width-col-position-value
@@ -60,6 +61,7 @@ $secondary-dark-color: rgba(#333c46, 0.4);
   grid-template-columns:
     $width-col-token-name
     $width-col-position
+    $width-col-asset-price
     $width-col-asset-price
     $width-col-liquidation-price
     $width-col-collateral
@@ -252,7 +254,12 @@ $secondary-dark-color: rgba(#333c46, 0.4);
     }
   }
   &__col-profit {
-    margin-top: 15px;
+    .positive {
+      color: #00c0ab;
+    }
+    .negative {
+      color: #ff4f4f;
+    }
     &-switch {
       border-radius: 22px;
       background-color: var(--primary-bg);
@@ -278,6 +285,15 @@ $secondary-dark-color: rgba(#333c46, 0.4);
           color: #ffffff;
         }
       }
+    }
+    .body-header {
+      display: block;
+      font-size: 12px;
+      color: #8992a4;
+      margin-bottom: 0;
+    }
+    svg {
+      width: 16px;
     }
   }
 }
@@ -322,35 +338,21 @@ $secondary-dark-color: rgba(#333c46, 0.4);
         grid-column-start: 4;
         grid-column-end: 7;
       }
-      // &__col-position-type {
-      //   flex-wrap: wrap;
-      //   order: 3;
-      //   align-self: flex-start;
-      //   justify-content: center;
 
-      //   padding-top: 11px;
-      //   grid-column-start: 3;
-      //   grid-column-end: 5;
-      //   .body-header {
-      //     visibility: hidden;
-      //   }
-      //   .position-type-marker {
-      //     font-size: 10px;
-      //     width: 71px;
-      //     padding: 7px 0;
-      //     text-align: center;
-      //   }
-      // }
       &__col-asset-price {
         order: 3;
         grid-column-start: 1;
         grid-column-end: 4;
       }
-
+      &__col-current-price {
+        order: 6;
+        grid-column-start: 4;
+        grid-column-end: 7;
+      }
       &__col-position-value {
-        order: 5;
-        grid-column-start: 1;
-        grid-column-end: 4;
+        order: 7;
+        grid-column-start: 4;
+        grid-column-end: 7;
       }
       &__col-action {
         order: 4;
@@ -363,35 +365,49 @@ $secondary-dark-color: rgba(#333c46, 0.4);
       }
 
       &__col-liquidation-price {
-        order: 6;
-        grid-column-start: 4;
-        grid-column-end: 7;
+        order: 4;
+        grid-column-start: 1;
+        grid-column-end: 4;
       }
 
       &__col-profit {
-        order: 7;
-        grid-column-start: 4;
-        grid-column-end: 7;
+        order: 8;
+        grid-column-start: 1;
+        grid-column-end: 4;
+        position: relative;
+        .body-header {
+          display: block;
+        }
+        span {
+          margin-bottom: 3px;        
+        }
+        &-switch {
+          left: 80px;
+          bottom: -2px;
+        }
       }
+
       &__open-manage-collateral {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         padding: 4px;
-        top: 0;
-        right: -30px;
+        top: -2px;
+        right: -26px;
       }
+
       &__open-extend-loan {
-        top: 20px;
-        right: -30px;
-        width: 16px;
-        height: 16px;
+        display: flex;
+        top: -2px;
+        right: -49px;
+        width: 18px;
+        height: 18px;
       }
       &__col-asset-collateral-small {
         text-indent: 10px;
         font-size: 10px;
-        bottom: 7px;
+        bottom: 8px;
         left: auto;
-        right: -75px;
+        right: -92px;
       }
       &_button {
         font-size: 14px;

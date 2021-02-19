@@ -76,4 +76,23 @@
   .mb-20 {
     margin-bottom: 20px;
   }
+  &__liquidation-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #758295;
+    margin-bottom: 20px;
+    &-container {
+      display: flex;
+      align-items: center;
+    }
+  }
+  .liquidation-dropdown {
+    &-button {
+      span {
+        font-weight: 400;
+        font-size: 16px;
+      }
+    }
+  }
 }

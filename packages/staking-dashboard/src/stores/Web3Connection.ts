@@ -1,7 +1,7 @@
 import hashUtils from 'app-lib/hashUtils'
 import * as mobx from 'mobx'
-import ProviderType from 'src/domain/ProviderType'
-import ProviderTypeDetails from 'src/domain/ProviderTypeDetails'
+import ProviderType from 'bzx-common/src/domain/ProviderType'
+import ProviderTypeDetails from 'bzx-common/src/domain/ProviderTypeDetails'
 import ProviderTypeDictionary from 'src/domain/ProviderTypeDictionary'
 import RootStore from 'src/stores/RootStore'
 
@@ -163,9 +163,10 @@ export default class Web3Connection {
     )
     mobx.when(
       () => !!this.web3React,
-      () => setTimeout(() => {
-        this.checkAndStartStoredProvider()
-      }, 100)
+      () =>
+        setTimeout(() => {
+          this.checkAndStartStoredProvider()
+        }, 100)
     )
   }
 

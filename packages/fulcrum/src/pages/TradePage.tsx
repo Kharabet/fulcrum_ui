@@ -595,6 +595,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // https://etherscan.io/tx/0xd69e0d550a665975ce963b4069206257c279223bf3fda4cbe019efff2b70bf61
 
     const maintenanceMargin = loan.loanData.maintenanceMargin
+
     const currentCollateralToPrincipalRate = collateralToPrincipalRate
       ? collateralToPrincipalRate
       : await FulcrumProvider.Instance.getKyberSwapRate(loan.collateralAsset, loan.loanAsset)
@@ -627,6 +628,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     const baseAsset = positionType === PositionType.LONG ? loan.collateralAsset : loan.loanAsset
 
     const quoteAsset = positionType === PositionType.LONG ? loan.loanAsset : loan.collateralAsset
+
+    const currentPrice =
+      positionType === PositionType.LONG
+        ? currentCollateralToPrincipalRate
+        : new BigNumber(1).div(currentCollateralToPrincipalRate)
 
     let leverage = new BigNumber(10 ** 38)
       .div(loan.loanData.startMargin.times(10 ** 18))
@@ -831,6 +837,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ? depositAmountLoanToken
           : collateral,
       openPrice,
+      currentPrice,
       liquidationPrice,
       profitCollateralToken,
       profitLoanToken,

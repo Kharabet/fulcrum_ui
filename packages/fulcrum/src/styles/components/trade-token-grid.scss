@@ -6,22 +6,22 @@
     &:not(:last-child) {
       margin-bottom: 20px;
     }
-    &:last-child {
-      @media screen and (min-width: $breakpoint-mobile-min) and (max-width: $breakpoint-desktop-max) {
-        .trade-token-grid-row__col-price {
-          margin-left: 40px;
-        }
-      }
-    }
+    // &:last-child {
+    //   @media screen and (min-width: $breakpoint-mobile-min) and (max-width: $breakpoint-desktop-max) {
+    //     .trade-token-grid-row__col-price {
+    //       margin-left: 40px;
+    //     }
+    //   }
+    // }
   }
   .trade-token-grid-header,
   .trade-token-grid-row {
     justify-content: space-between;
     align-items: center;
+
     @media screen and (min-width: $breakpoint-mobile-min) {
       display: grid;
-      column-gap: 35px;
-      grid-template-columns: 5% 27% 13% 13% 8% 13%;
+      grid-template-columns: 6% 27% 12.5% 12.5% 8% 13%;
     }
     @media screen and (max-width: $breakpoint-mobile-max) {
       display: flex;
@@ -83,9 +83,7 @@
       font-size: 18px;
       padding: 20px 30px;
     }
-    @media screen and (min-width: $breakpoint-mobile-min) {
-      column-gap: 35px;
-    }
+   
     @media screen and (max-width: $breakpoint-mobile-max) {
       line-height: 1.45;
       padding: 25px 15px;

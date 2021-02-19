@@ -11,6 +11,7 @@ import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { TorqueProvider } from '../services/TorqueProvider'
 import Slider from 'rc-slider'
 import { Loader } from './Loader'
+import { LiquidationDropdown } from './LiquidationDropdown'
 
 export interface IManageCollateralFormWeb3Props {
   loanOrderState: IBorrowedFundsState
@@ -41,6 +42,7 @@ interface IManageCollateralFormWeb3State {
 
   didSubmit: boolean
   isLoading: boolean
+  activeTokenLiquidation: Asset
 }
 
 export class ManageCollateralFormWeb3 extends Component<
@@ -70,7 +72,8 @@ export class ManageCollateralFormWeb3 extends Component<
       balanceTooLow: false,
       inputAmountText: '',
       didSubmit: false,
-      isLoading: true
+      isLoading: true,
+      activeTokenLiquidation: this.props.loanOrderState.collateralAsset
     }
 
     this._inputChange = new Subject()
@@ -88,10 +91,9 @@ export class ManageCollateralFormWeb3 extends Component<
       .subscribe((value: ICollateralChangeEstimate) => {
         this.setState({
           ...this.state,
-          liquidationPrice: value.liquidationPrice,
           collateralAmount: value.collateralAmount,
           collateralizedPercent: value.collateralizedPercent,
-          inputAmountText: this.formatPrecision(value.collateralAmount.toString())
+          inputAmountText: this.formatPrecision(value.collateralAmount.toString(), true)
         })
       })
   }
@@ -211,11 +213,11 @@ export class ManageCollateralFormWeb3 extends Component<
     )
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<IManageCollateralFormWeb3Props>,
     prevState: Readonly<IManageCollateralFormWeb3State>,
     snapshot?: any
-  ): void {
+  ): Promise<void> {
     if (
       prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId ||
       prevState.loanValue !== this.state.loanValue
@@ -232,12 +234,48 @@ export class ManageCollateralFormWeb3 extends Component<
         )
       })
     }
+    if (prevState.assetDetails !== this.state.assetDetails) {
+      this.getLiquidationPrice()
+  }
+  }
+
+  public getLiquidationPrice = async () => {
+    const loanAssetDecimals =
+      AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18
+    const collateralAssetDecimals =
+      AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!.decimals || 18
+    const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals))
+    const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals))
+
+    const currentCollateralAmount = this.state.collateralAmount.times(10 ** collateralAssetDecimals)
+    const collateralAmount =
+      this.state.loanValue > this.state.selectedValue
+        ? this.props.loanOrderState.loanData!.collateral.minus(currentCollateralAmount)
+        : this.props.loanOrderState.loanData!.collateral.plus(currentCollateralAmount)
+
+    // liquidation_collateralToLoanRate = ((maintenance_margin * principal / 10^20) + principal) / collateral * 10^18
+    const liquidationCollateralToLoanRate = this.props.loanOrderState
+      .loanData!.maintenanceMargin.times(
+        this.props.loanOrderState.loanData!.principal.times(loanAssetPrecision)
+      )
+      .div(10 ** 20)
+      .plus(this.props.loanOrderState.loanData!.principal.times(loanAssetPrecision))
+      .div(collateralAmount.times(collateralAssetPrecision))
+      .times(10 ** 18)
+
+    const liquidationPrice = liquidationCollateralToLoanRate.div(10 ** 18)
+
+    this.setState({ ...this.state, liquidationPrice })
   }
 
   public render() {
     if (this.state.assetDetails === null) {
       return null
     }
+    const liquidationPrice =
+      this.state.activeTokenLiquidation === this.props.loanOrderState.collateralAsset
+        ? this.state.liquidationPrice
+        : new BigNumber(1).div(this.state.liquidationPrice)
     const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
@@ -283,6 +321,23 @@ export class ManageCollateralFormWeb3 extends Component<
           <div className="manage-collateral-form__tips">
             <div className="manage-collateral-form__tip">Withdraw</div>
             <div className="manage-collateral-form__tip">Top Up</div>
+          </div>
+
+          <div className="manage-collateral-form__liquidation-price">
+            <span>Liq. price</span>
+            <div className="manage-collateral-form__liquidation-price-container">
+              <span title={liquidationPrice.toFixed()}>
+                {this.formatPrecision(liquidationPrice.toFixed(), false)}
+              </span>
+              <LiquidationDropdown
+                selectedAsset={this.state.activeTokenLiquidation}
+                loanAsset={this.props.loanOrderState.loanAsset}
+                collateralAsset={this.props.loanOrderState.collateralAsset}
+                onAssetChange={(activeTokenLiquidation) =>
+                  this.setState({ activeTokenLiquidation })
+                }
+              />
+            </div>
           </div>
 
           <div className="manage-collateral-form__info-liquidated-at-msg mb-20">
@@ -338,7 +393,6 @@ export class ManageCollateralFormWeb3 extends Component<
   }
 
   private rxGetEstimate = (selectedValue: number): Observable<ICollateralChangeEstimate> => {
-
     let collateralAmount = new BigNumber(0)
     if (this.state.loanValue !== selectedValue && this.props.loanOrderState.loanData) {
       if (selectedValue < this.state.loanValue) {
@@ -361,6 +415,7 @@ export class ManageCollateralFormWeb3 extends Component<
         selectedValue < this.state.loanValue
       ).then((value) => {
         observer.next(value)
+        this.getLiquidationPrice()
         this.changeStateLoading()
       })
     })
@@ -485,7 +540,7 @@ export class ManageCollateralFormWeb3 extends Component<
     }
   }
 
-  public formatPrecision(outputText: string): string {
+  public formatPrecision(outputText: string, isNecessarySign: boolean): string {
     const output = Number(outputText)
     let sign = ''
     if (this.state.loanValue > this.state.selectedValue) sign = '-'
@@ -494,6 +549,6 @@ export class ManageCollateralFormWeb3 extends Component<
     if (x < 0) x = 0
     if (x > 5) x = 5
     let result = new Number(output.toFixed(x)).toString()
-    return result != '0' ? sign + result : result
+    return isNecessarySign && result != '0' ? sign + result : result
   }
 }

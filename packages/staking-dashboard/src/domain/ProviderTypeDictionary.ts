@@ -11,8 +11,8 @@ import { ReactComponent as TorusLogoShort } from 'app-images/logo_short___torus.
 import { ReactComponent as TrezorLogoShort } from 'app-images/logo_short___trezor.svg'
 import { ReactComponent as TrustWalletLogoShort } from 'app-images/logo_short___trustwallet.svg'
 import { ReactComponent as WalletConnectLogoShort } from 'app-images/logo_short___walletconnect.svg'
-import ProviderType from './ProviderType'
-import ProviderTypeDetails from './ProviderTypeDetails'
+import ProviderType from 'bzx-common/src/domain/ProviderType'
+import ProviderTypeDetails from 'bzx-common/src/domain/ProviderTypeDetails'
 import {
   authereum,
   bitski,

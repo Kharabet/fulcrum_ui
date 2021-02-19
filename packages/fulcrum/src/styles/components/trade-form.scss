@@ -20,7 +20,7 @@
   }
   &__left_block {
     display: flex;
-    align-items: center;
+    padding-top: 73px;
     background-color: var(--trade-form-left-bg);
     &:before {
       content: '';
