@@ -74,6 +74,9 @@ Button.propTypes = {
   onClickEmit: PropTypes.oneOf(['event', 'value', 'name-value']),
   name: PropTypes.string,
   value: PropTypes.any,
+  /**
+   * If active is true, a css class "active" is added
+   */
   active: PropTypes.bool,
   notify: PropTypes.bool,
   block: PropTypes.bool.isRequired
