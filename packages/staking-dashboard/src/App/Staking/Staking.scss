@@ -8,3 +8,9 @@
     justify-content: center;
   }
 }
+
+.staking__tab {
+  // Temporarily there to better align tabs in the center
+  @extend .btn--tab;
+  min-width: 100px;
+}
