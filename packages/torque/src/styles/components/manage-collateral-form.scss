@@ -87,4 +87,12 @@
       align-items: center;
     }
   }
+  .liquidation-dropdown {
+    &-button {
+      span {
+        font-weight: 400;
+        font-size: 16px;
+      }
+    }
+  }
 }

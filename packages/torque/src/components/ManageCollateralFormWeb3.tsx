@@ -325,7 +325,9 @@ export class ManageCollateralFormWeb3 extends Component<
           <div className="manage-collateral-form__liquidation-price">
             <span>Liq. price</span>
             <div className="manage-collateral-form__liquidation-price-container">
-              <span>{this.formatPrecision(liquidationPrice.toFixed(), false)}</span>
+              <span title={liquidationPrice.toFixed()}>
+                {this.formatPrecision(liquidationPrice.toFixed(), false)}
+              </span>
               <LiquidationDropdown
                 selectedAsset={this.state.activeTokenLiquidation}
                 loanAsset={this.props.loanOrderState.loanAsset}
