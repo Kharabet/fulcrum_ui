@@ -1,5 +1,5 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
-import ProviderType from '../../domain/ProviderType'
+import ProviderType from 'bzx-common/src/domain/ProviderType'
 
 export default class ProviderChangedEvent {
   public providerType: ProviderType

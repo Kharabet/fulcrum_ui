@@ -42,7 +42,7 @@ button {
   position: relative;
   border: 0;
   background: transparent;
-  padding: 14px 16px 14px 16px;
+  padding: 14px $spacing-base;
   height: 44px;
   vertical-align: baseline;
   text-decoration: none;
@@ -54,8 +54,8 @@ button {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 10%;
-    width: 80%;
+    left: $spacing-base / 2;
+    width: calc(100% - #{$spacing-base});
     height: 3px;
     background-color: #dfe6ec;
     border-radius: 2px;
