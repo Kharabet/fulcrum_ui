@@ -112,7 +112,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       {...props}
                       isMobileMedia={this.state.isMobileMedia}
                       doNetworkConnect={this.doNetworkConnect}
-                      activeTab={this.state.activeTab}
+                      activeTab={Tab.Stats}
                       setActiveTab={this.setActiveTab}
                     />
                   )}
@@ -124,7 +124,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       {...props}
                       isMobileMedia={this.state.isMobileMedia}
                       doNetworkConnect={this.doNetworkConnect}
-                      activeTab={this.state.activeTab}
+                      activeTab={Tab.Liquidations}
                       setActiveTab={this.setActiveTab}
                     />
                   )}
