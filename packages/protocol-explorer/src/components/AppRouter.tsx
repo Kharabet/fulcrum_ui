@@ -1,6 +1,6 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import React, { Component } from 'react'
-import { Route, Router, Switch } from 'react-router-dom'
+import { Redirect, Route, Router, Switch } from 'react-router-dom'
 import { ProviderType } from '../domain/ProviderType'
 import { NavService } from '../services/NavService'
 
@@ -130,18 +130,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                   )}
                 />
                 <Route
-                  path={'/stats'}
-                  render={(props) => (
-                    <TabContainer
-                      {...props}
-                      isMobileMedia={this.state.isMobileMedia}
-                      doNetworkConnect={this.doNetworkConnect}
-                      activeTab={this.state.activeTab}
-                      setActiveTab={this.setActiveTab}
-                    />
-                  )}
-                />
-                <Route
                   path={'/search/:filter'}
                   render={(props) => (
                     <TabContainer
@@ -166,6 +154,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     />
                   )}
                 />
+                <Route path="*" render={() => <Redirect to="/" />} />
               </Switch>
             </Router>
           </div>

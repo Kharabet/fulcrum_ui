@@ -81,7 +81,7 @@ a {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-cursor: pointer;
+  cursor: pointer;
   width: 56px;
   height: 32px;
   left: 351px;
@@ -99,4 +99,16 @@ cursor: pointer;
     width: 46px;
     height: 24px;
   }
+}
+.bzrx-gradient {
+  background: linear-gradient(315deg, #003cda 19.25%, #33dfcc 86.5%);
+  border-radius: 50%;
+}
+.aave-gradient {
+  background: linear-gradient(229.92deg, #b6509e 15.42%, #2ebac6 84.43%);
+  border-radius: 50%;
+}
+.uni-gradient {
+  background: linear-gradient(130.6deg, #ffffff 15.49%, #ffe1ef 90.22%);
+  border-radius: 50%;
 }

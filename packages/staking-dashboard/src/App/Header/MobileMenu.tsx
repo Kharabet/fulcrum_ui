@@ -24,6 +24,7 @@ export function MobileMenu({ appVM }: { appVM: AppVM }) {
           </div>
           <div className="margin-bottom-2">
             <ExternalLink
+              targetBlank={false}
               className="header__link"
               href="https://app.fulcrum.trade/trade">
               Trade
@@ -31,18 +32,23 @@ export function MobileMenu({ appVM }: { appVM: AppVM }) {
           </div>
           <div className="margin-bottom-2">
             <ExternalLink
+              targetBlank={false}
               className="header__link"
               href="https://app.fulcrum.trade/lend">
               Lend
             </ExternalLink>
           </div>
           <div className="margin-bottom-2">
-            <ExternalLink className="header__link" href="https://app.torque.loans" >
+            <ExternalLink
+              targetBlank={false}
+              className="header__link"
+              href="https://app.torque.loans">
               Borrow
             </ExternalLink>
           </div>
           <div className="margin-bottom-2 sm-hidden">
             <ExternalLink
+              targetBlank={true}
               href="https://bzx.network/blog/staking-bzrx"
               showIcon={true}
               className="header__item-menu">
