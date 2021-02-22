@@ -4,8 +4,11 @@ import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import { ExplorerProvider } from '../services/ExplorerProvider'
+import { Tab } from 'src/domain/Tab'
 
-export interface IAssetSelectorProps {}
+export interface IAssetSelectorProps {
+  setActiveTab: (tab: Tab) => void
+}
 
 export interface IAssetSelectorState {
   apr: string | any

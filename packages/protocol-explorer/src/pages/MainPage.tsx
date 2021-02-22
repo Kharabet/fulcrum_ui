@@ -125,7 +125,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
           <Search onSearch={this.onSearch} />
         </section>
         <section className="asset-selector-section">
-          <AssetSelector />
+          <AssetSelector setActiveTab={this.props.setActiveTab} />
         </section>
       </React.Fragment>
     )
