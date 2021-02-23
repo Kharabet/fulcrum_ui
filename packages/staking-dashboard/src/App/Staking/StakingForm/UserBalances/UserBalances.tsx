@@ -4,6 +4,16 @@ import RootStore from 'src/stores/RootStore'
 import { Loader } from 'ui-framework'
 import Balances from './Balances'
 
+const loader = (
+  <Loader
+    className="calculator__balance-loader"
+    quantityDots={3}
+    sizeDots="small"
+    title=""
+    isOverlay={false}
+  />
+)
+
 export function UserBalances({ rootStore }: { rootStore: RootStore }) {
   const { stakingStore, etherscanURL } = rootStore
   const { userBalances } = stakingStore
@@ -13,20 +23,13 @@ export function UserBalances({ rootStore }: { rootStore: RootStore }) {
     <div>
       <div className="grid--staking">
         <div className="panel--white padded-2">
-          {userBalances.pending && (
-            <Loader
-              className="calculator__balance-loader"
-              quantityDots={3}
-              sizeDots="small"
-              title=""
-              isOverlay={false}
-            />
-          )}
+          {userBalances.pendingWalletBalance && loader}
           <h3 className="section-header">Wallet Balance</h3>
           <Balances wallet={wallet} etherscanURL={etherscanURL} />
         </div>
 
         <div className="panel--white padded-2">
+          {userBalances.pendingStakedBalance && loader}
           <h3 className="section-header">Staking Balance</h3>
           <Balances wallet={staked} etherscanURL={etherscanURL} />
         </div>

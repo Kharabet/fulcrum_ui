@@ -8,7 +8,7 @@ import GovernanceProposal, {
   GovernanceProposalStates,
   IGovernanceProposalProposer,
   IGovernanceProposalReturnData,
-  IGovernanceProposalsEvents
+  IGovernanceProposalsEvents,
 } from 'src/domain/GovernanceProposal'
 import ProposalCreated from 'src/domain/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
@@ -26,7 +26,7 @@ import {
   CompoundGovernorAlphaProposalCanceledEventArgs,
   CompoundGovernorAlphaProposalCreatedEventArgs,
   CompoundGovernorAlphaProposalExecutedEventArgs,
-  CompoundGovernorAlphaProposalQueuedEventArgs
+  CompoundGovernorAlphaProposalQueuedEventArgs,
 } from 'bzx-common/src/contracts/typescript-wrappers/CompoundGovernorAlpha'
 import ethGasStation from 'app-lib/apis/ethGasStation'
 import stakingApi from 'app-lib/stakingApi'
@@ -223,7 +223,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const stakingAddress = this.contractsSource.getStakingV1Address()
 
     const txHash = await erc20Contract.approve(stakingAddress, amount).sendTransactionAsync({
-      from: account
+      from: account,
     })
 
     return this.waitForTransactionMined(txHash)
@@ -254,7 +254,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         forVotes,
         againstVotes,
         canceled,
-        executed
+        executed,
       ] = await governanceContract.proposals(new BigNumber(i)).callAsync()
       proposalsData.push({
         id,
@@ -265,7 +265,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         forVotes,
         againstVotes,
         canceled,
-        executed
+        executed,
       })
       proposalsStates.push(
         new BigNumber(await governanceContract.state(new BigNumber(i)).callAsync())
@@ -344,16 +344,16 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       fromBlock: '0x895440', //9000000
       toBlock: 'latest',
       topics: [ProposalCreated.topic0],
-      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+      address: this.contractsSource.getCompoundGovernorAlphaAddress(),
     })
     for (const i in createdEvents) {
       if (!createdEvents[i]) {
         continue
       }
       const event: LogEntry = createdEvents[i]
-      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
-        CompoundGovernorAlphaProposalCreatedEventArgs
-      >(event)
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<CompoundGovernorAlphaProposalCreatedEventArgs>(
+        event
+      )
       if ('args' in decodedData) {
         proposalsCreatedEvents.push(decodedData)
       } else {
@@ -365,16 +365,16 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       fromBlock: '0x895440', //9000000
       toBlock: 'latest',
       topics: ['0x9a2e42fd6722813d69113e7d0079d3d940171428df7373df9c7f7617cfda2892'],
-      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+      address: this.contractsSource.getCompoundGovernorAlphaAddress(),
     })
     for (const i in queuedEvents) {
       if (!createdEvents[i]) {
         continue
       }
       const event: LogEntry = queuedEvents[i]
-      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
-        CompoundGovernorAlphaProposalQueuedEventArgs
-      >(event)
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<CompoundGovernorAlphaProposalQueuedEventArgs>(
+        event
+      )
       if ('args' in decodedData) {
         proposalsQueuedEvents.push(decodedData)
       } else {
@@ -386,16 +386,16 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       fromBlock: '0x895440', //9000000
       toBlock: 'latest',
       topics: ['0x712ae1383f79ac853f8d882153778e0260ef8f03b504e2866e0593e04d2b291f'],
-      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+      address: this.contractsSource.getCompoundGovernorAlphaAddress(),
     })
     for (const i in executedEvents) {
       if (!createdEvents[i]) {
         continue
       }
       const event: LogEntry = executedEvents[i]
-      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
-        CompoundGovernorAlphaProposalExecutedEventArgs
-      >(event)
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<CompoundGovernorAlphaProposalExecutedEventArgs>(
+        event
+      )
       if ('args' in decodedData) {
         proposalsExecutedEvents.push(decodedData)
       } else {
@@ -406,16 +406,16 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       fromBlock: '0x895440', //9000000
       toBlock: 'latest',
       topics: ['0x789cf55be980739dad1d0699b93b58e806b51c9d96619bfa8fe0a28abaa7b30c'],
-      address: this.contractsSource.getCompoundGovernorAlphaAddress()
+      address: this.contractsSource.getCompoundGovernorAlphaAddress(),
     })
     for (const i in canceledEvents) {
       if (!createdEvents[i]) {
         continue
       }
       const event: LogEntry = canceledEvents[i]
-      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<
-        CompoundGovernorAlphaProposalCanceledEventArgs
-      >(event)
+      const decodedData = this.web3Wrapper.abiDecoder.tryToDecodeLogOrNoop<CompoundGovernorAlphaProposalCanceledEventArgs>(
+        event
+      )
       if ('args' in decodedData) {
         proposalsCanceledEvents.push(decodedData)
       } else {
@@ -426,7 +426,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       proposalsCreatedEvents,
       proposalsQueuedEvents,
       proposalsExecutedEvents,
-      proposalsCanceledEvents
+      proposalsCanceledEvents,
     }
   }
 
@@ -464,7 +464,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         state: GovernanceProposalStates.Pending,
         blockNumber: proposalData.startBlock.toNumber(),
         txnHash: creationEvent.transactionHash,
-        date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
+        date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber),
       })
 
     creationEvent.blockNumber &&
@@ -473,7 +473,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         state: GovernanceProposalStates.Active,
         blockNumber: proposalData.startBlock.toNumber(),
         txnHash: creationEvent.transactionHash,
-        date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber)
+        date: await this.web3Wrapper.getBlockTimestampAsync(creationEvent.blockNumber),
       })
 
     proposalData.endBlock.lt(currentBlockNumber) &&
@@ -483,7 +483,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
             ? GovernanceProposalStates.Defeated
             : GovernanceProposalStates.Succeeded,
         blockNumber: proposalData.endBlock.toNumber(),
-        date: await this.web3Wrapper.getBlockTimestampAsync(proposalData.endBlock.toNumber())
+        date: await this.web3Wrapper.getBlockTimestampAsync(proposalData.endBlock.toNumber()),
       })
 
     queuedEvent &&
@@ -493,7 +493,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         state: GovernanceProposalStates.Queued,
         blockNumber: queuedEvent.blockNumber,
         txnHash: queuedEvent.transactionHash,
-        date: await this.web3Wrapper.getBlockTimestampAsync(queuedEvent.blockNumber)
+        date: await this.web3Wrapper.getBlockTimestampAsync(queuedEvent.blockNumber),
       })
 
     executedEvent &&
@@ -503,7 +503,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         state: GovernanceProposalStates.Executed,
         blockNumber: executedEvent.blockNumber,
         txnHash: executedEvent.transactionHash,
-        date: await this.web3Wrapper.getBlockTimestampAsync(executedEvent.blockNumber)
+        date: await this.web3Wrapper.getBlockTimestampAsync(executedEvent.blockNumber),
       })
 
     // 1209600 is Timelock contract GRACE_PERIOD
@@ -514,7 +514,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         blockNumber: proposalData.eta.plus(1209600).toNumber(),
         date: await this.web3Wrapper.getBlockTimestampAsync(
           proposalData.eta.plus(1209600).toNumber()
-        )
+        ),
       })
 
     canceledEvent &&
@@ -524,7 +524,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         state: GovernanceProposalStates.Canceled,
         blockNumber: canceledEvent.blockNumber,
         txnHash: canceledEvent.transactionHash,
-        date: await this.web3Wrapper.getBlockTimestampAsync(canceledEvent.blockNumber)
+        date: await this.web3Wrapper.getBlockTimestampAsync(canceledEvent.blockNumber),
       })
 
     return history
@@ -538,7 +538,9 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
 
     const governanceContract = this.contractsSource.getCompoundGovernorAlphaContract()
-    const [targets, values, signatures, callDatas] = await governanceContract.getActions(id).callAsync()
+    const [targets, values, signatures, callDatas] = await governanceContract
+      .getActions(id)
+      .callAsync()
     signatures.forEach((x, i) => {
       const paramsMatchArray = x.match(/.*\((.*)\)/)
       if (!paramsMatchArray || !paramsMatchArray[1]) {
@@ -558,7 +560,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         value,
         signature,
         callData,
-        title
+        title,
       } as IGovernanceProposalActionItem)
     })
     return result
@@ -590,14 +592,14 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     const { gasAmount } = await this.getGasEstimate(() =>
       vbzrxContract.claim().estimateGasAsync({
-        from: account
+        from: account,
       })
     )
 
     const txHash = await vbzrxContract.claim().sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await ethGasStation.getGasPrice()
+      gasPrice: await ethGasStation.getGasPrice(),
     })
 
     await this.waitForTransactionMined(txHash)
@@ -634,7 +636,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
         bzrx: new BigNumber(0),
         vbzrx: new BigNumber(0),
         ibzrx: new BigNumber(0),
-        bpt: new BigNumber(0)
+        bpt: new BigNumber(0),
       }
     }
     const [bzrx, ibzrx, vbzrx, bpt] = await stakingContract.balanceOfByAssets(address).callAsync()
@@ -671,10 +673,9 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
     const helper = await this.contractsSource.getHelperContract()
     const addresses = this.getStakeableAddresses()
-    const [bzrx, vbzrx, ibzrx, bpt] = await helper.balanceOf(
-      [addresses.bzrx, addresses.vbzrx, addresses.ibzrx, addresses.bpt],
-      userAddress
-    ).callAsync()
+    const [bzrx, vbzrx, ibzrx, bpt] = await helper
+      .balanceOf([addresses.bzrx, addresses.vbzrx, addresses.ibzrx, addresses.bpt], userAddress)
+      .callAsync()
 
     return { bzrx, vbzrx, ibzrx, bpt }
   }
@@ -691,11 +692,13 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     const helper = await this.contractsSource.getHelperContract()
     const addresses = this.getStakeableAddresses()
     const stakingAddress = this.contractsSource.getStakingV1Address()
-    const [bzrx, vbzrx, ibzrx, bpt] = await helper.allowance(
-      [addresses.bzrx, addresses.vbzrx, addresses.ibzrx, addresses.bpt],
-      userAddress,
-      stakingAddress
-    ).callAsync()
+    const [bzrx, vbzrx, ibzrx, bpt] = await helper
+      .allowance(
+        [addresses.bzrx, addresses.vbzrx, addresses.ibzrx, addresses.bpt],
+        userAddress,
+        stakingAddress
+      )
+      .callAsync()
 
     return { bzrx, vbzrx, ibzrx, bpt }
   }
@@ -788,14 +791,14 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     // [bzrx, stableCoin, bzrxVesting, stableCoinVesting]
     const result = await stakingContract.earned(account).callAsync({
-      from: account
+      from: account,
     })
 
     return {
       bzrx: result[0].div(10 ** 18),
       stableCoin: result[1].div(10 ** 18),
       bzrxVesting: result[2].div(10 ** 18),
-      stableCoinVesting: result[3].div(10 ** 18)
+      stableCoinVesting: result[3].div(10 ** 18),
     }
   }
 
@@ -811,7 +814,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
 
     const vestingLastSyncTime = await stakingContract.vestingLastSync(account).callAsync({
-      from: account
+      from: account,
     })
 
     /**
@@ -849,7 +852,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       .integerValue(BigNumber.ROUND_UP)
     return {
       gasAmount: gasAmountBN ? gasAmountBN.toString() : this.gasLimit,
-      gasAmountBN
+      gasAmountBN,
     }
   }
 
@@ -865,7 +868,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }
 
     return staking.delegate(account).callAsync({
-      from: account
+      from: account,
     })
   }
 
@@ -878,7 +881,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     const bZxContract = await this.contractsSource.getiBZxContract()
     const vbzrxAmount = await bZxContract.rewardsBalanceOf(account).callAsync({
-      from: account
+      from: account,
     })
 
     return vbzrxAmount.div(10 ** 18)
@@ -910,7 +913,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
       opId,
       opType: 'staking',
       type: 'created',
-      value: Date.now()
+      value: Date.now(),
     })
     return { opId, type: 'staking', result: this._stake(tokenAmounts, opId) }
   }
@@ -941,14 +944,14 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     const { gasAmount } = await this.getGasEstimate(() =>
       stakingContract.stake(addresses, amounts).estimateGasAsync({
-        from: account
+        from: account,
       })
     )
 
     const txHash = await stakingContract.stake(addresses, amounts).sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await ethGasStation.getGasPrice()
+      gasPrice: await ethGasStation.getGasPrice(),
     })
 
     if (opId) {
@@ -984,14 +987,14 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     const { gasAmount } = await this.getGasEstimate(() =>
       stakingContract.unstake(addresses, amounts).estimateGasAsync({
-        from: account
+        from: account,
       })
     )
 
     const txHash = await stakingContract.unstake(addresses, amounts).sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await ethGasStation.getGasPrice()
+      gasPrice: await ethGasStation.getGasPrice(),
     })
 
     await this.waitForTransactionMined(txHash)
@@ -1007,14 +1010,14 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     const { gasAmount } = await this.getGasEstimate(() =>
       stakingContract.claim(shouldRestake).estimateGasAsync({
-        from: account
+        from: account,
       })
     )
 
     const txHash = await stakingContract.claim(shouldRestake).sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await ethGasStation.getGasPrice()
+      gasPrice: await ethGasStation.getGasPrice(),
     })
 
     await this.waitForTransactionMined(txHash)
@@ -1033,14 +1036,14 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     const { gasAmount } = await this.getGasEstimate(() =>
       bZxContract.claimRewards(account).estimateGasAsync({
-        from: account
+        from: account,
       })
     )
 
     const txHash = await bZxContract.claimRewards(account).sendTransactionAsync({
       from: account,
       gas: gasAmount,
-      gasPrice: await ethGasStation.getGasPrice()
+      gasPrice: await ethGasStation.getGasPrice(),
     })
 
     await this.waitForTransactionMined(txHash)
