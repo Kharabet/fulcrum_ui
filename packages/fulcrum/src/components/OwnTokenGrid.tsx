@@ -7,9 +7,10 @@ import { ReactComponent as Placeholder } from '../assets/images/history_placehol
 import '../styles/components/own-token-grid.scss'
 
 export interface IOwnTokenGridProps {
-  isMobileMedia: boolean
+  isMobileMedia: boolean  
+  isDataLoaded:boolean
+  ownRowsData: IOwnTokenGridRowProps[]
   onStartTrading: () => void
-  ownRowsData: IOwnTokenGridRowProps[] | undefined
 }
 
 export class OwnTokenGrid extends Component<IOwnTokenGridProps> {
@@ -18,7 +19,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps> {
   }
 
   public render() {
-    if (this.props.ownRowsData === undefined) {
+    if (!this.props.isDataLoaded) {
       return (
         <PreloaderChart quantityDots={4} sizeDots={'middle'} title={'Loading'} isOverlay={false} />
       )
