@@ -1,6 +1,6 @@
 import * as mobx from 'mobx'
 
-type dialogProp = 'visible' | 'id'
+type dialogProp = 'id' | 'state'
 
 /**
  * Generic View Model for simple dialogs.
@@ -8,11 +8,12 @@ type dialogProp = 'visible' | 'id'
  */
 export default class DialogVM {
   public id = ''
-  public visible = false
   public transitionDelay = 0
-  public hiding = false
-  public showing = false
   public state: 'showing' | 'hiding' | 'visible' | 'hidden' = 'hidden'
+
+  public get visible() {
+    return this.state === 'visible' || this.state === 'showing' || this.state === 'hiding'
+  }
 
   /**
    * Helper to set values through mobx actions.
@@ -25,28 +26,32 @@ export default class DialogVM {
     if (this.transitionDelay) {
       this.state = 'showing'
       setTimeout(() => {
-        this.state = 'visible'
+        this.set('state', 'visible')
       }, this.transitionDelay)
+    } else {
+      this.set('state', 'visible')
     }
-    this.visible = true
   }
 
+  /**
+   * @param {function=} cb optional callback to run after once hidden. Useful if there is a transition.
+   */
   public hide(cb?: any) {
     if (this.transitionDelay) {
-      this.state = 'hidden'
+      this.set('state', 'hiding')
+      setTimeout(() => {
+        this.set('state', 'hidden')
+        if (typeof cb === 'function') {
+          cb()
+        }
+      }, this.transitionDelay)
+    } else {
+      this.set('state', 'hidden')
     }
-    setTimeout(() => {
-      this.visible = false
-      if (typeof cb === 'function') {
-        cb()
-      }
-    }, this.transitionDelay)
   }
 
-
-
   public toggle() {
-    this.visible = !this.visible
+    this.state === 'visible' ? this.hide() : this.show()
   }
 
   /**
@@ -56,8 +61,21 @@ export default class DialogVM {
    */
   constructor(props?: { id?: string; visible?: boolean; transitionDelay?: number }) {
     if (props) {
-      Object.assign(this, props)
+      const { visible, ...otherProps } = props
+      Object.assign(this, otherProps)
+      if (props.visible) {
+        this.state = 'visible'
+      }
     }
-    mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
+    mobx.makeObservable(this, {
+      id: mobx.observable,
+      visible: mobx.computed,
+      transitionDelay: mobx.observable,
+      state: mobx.observable,
+      set: mobx.action.bound,
+      show: mobx.action.bound,
+      hide: mobx.action.bound,
+      toggle: mobx.action.bound,
+    })
   }
 }
