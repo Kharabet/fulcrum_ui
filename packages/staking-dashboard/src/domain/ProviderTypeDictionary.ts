@@ -11,6 +11,7 @@ import { ReactComponent as TorusLogoShort } from 'app-images/logo_short___torus.
 import { ReactComponent as TrezorLogoShort } from 'app-images/logo_short___trezor.svg'
 import { ReactComponent as TrustWalletLogoShort } from 'app-images/logo_short___trustwallet.svg'
 import { ReactComponent as WalletConnectLogoShort } from 'app-images/logo_short___walletconnect.svg'
+import { ReactComponent as GenericWalletShort } from 'app-images/logo_short___genericwallet.svg'
 import ProviderType from 'bzx-common/src/domain/ProviderType'
 import ProviderTypeDetails from 'bzx-common/src/domain/ProviderTypeDetails'
 import {
@@ -24,7 +25,7 @@ import {
   torus,
   trezor,
   walletconnect,
-  walletlink
+  walletlink,
 } from './WalletConnectors'
 
 const connectorsByName: { [name: string]: AbstractConnector | null } = {
@@ -40,7 +41,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.Trezor]: trezor,
   [ProviderType.WalletConnect]: walletconnect,
   [ProviderType.WalletLink]: walletlink,
-  [ProviderType.None]: null
+  [ProviderType.None]: null,
 }
 
 export default class ProviderTypeDictionary {
@@ -56,7 +57,7 @@ export default class ProviderTypeDictionary {
     ProviderType.Squarelink,
     ProviderType.Bitski,
     ProviderType.Torus,
-    ProviderType.Authereum
+    ProviderType.Authereum,
   ]
 
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<
@@ -66,25 +67,25 @@ export default class ProviderTypeDictionary {
     [ProviderType.MetaMask, new ProviderTypeDetails('MetaMask', injected, MetamaskLogoShort)],
     [
       ProviderType.TrustWallet,
-      new ProviderTypeDetails('TrustWallet', injected, TrustWalletLogoShort)
+      new ProviderTypeDetails('TrustWallet', injected, TrustWalletLogoShort),
     ],
     [ProviderType.Bitski, new ProviderTypeDetails('Bitski', bitski, BitskiLogoShort)],
     [ProviderType.Fortmatic, new ProviderTypeDetails('Fortmatic', fortmatic, FortmaticLogoShort)],
     [
       ProviderType.WalletConnect,
-      new ProviderTypeDetails('WalletConnect', walletconnect, WalletConnectLogoShort)
+      new ProviderTypeDetails('WalletConnect', walletconnect, WalletConnectLogoShort),
     ],
     [ProviderType.Portis, new ProviderTypeDetails('Portis', portis, PortisLogoShort)],
     [
       ProviderType.Squarelink,
-      new ProviderTypeDetails('Squarelink', squarelink, SquarelinkLogoShort)
+      new ProviderTypeDetails('Squarelink', squarelink, SquarelinkLogoShort),
     ],
     [ProviderType.Ledger, new ProviderTypeDetails('Ledger', ledger, LedgerLogoShort)],
     [ProviderType.Torus, new ProviderTypeDetails('Torus', torus, TorusLogoShort)],
     [ProviderType.Authereum, new ProviderTypeDetails('Authereum', authereum, AuthereumLogoShort)],
     [ProviderType.Trezor, new ProviderTypeDetails('Trezor', trezor, AuthereumLogoShort)],
     [ProviderType.WalletLink, new ProviderTypeDetails('Coinbase', walletlink, WalletLinkLogoShort)],
-    [ProviderType.None, new ProviderTypeDetails('None', null)]
+    [ProviderType.None, new ProviderTypeDetails('None', null, GenericWalletShort)],
   ])
 
   public static async getProviderTypeByConnector(value: AbstractConnector): Promise<ProviderType> {

@@ -20,18 +20,16 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
   const { web3Connection } = props
   const { etherscanWalletLink, shortWalletAddress, supportedNetwork } = web3Connection
 
-  const providerTypeDetails = ProviderTypeDictionary.providerTypes.get(props.providerType) || null
+  const providerTypeDetails = ProviderTypeDictionary.providerTypes.get(props.providerType)
 
   if (!providerTypeDetails) {
     return null
   }
 
+  const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
+
   if (props.isConnected) {
     const walletAddressText = supportedNetwork ? shortWalletAddress : 'Wrong Network!'
-    const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
-    if (!ProviderLogoIcon) {
-      return null
-    }
     return (
       <ButtonBasic
         className="provider-menu__list-item provider-menu__list-item--selected"
@@ -60,10 +58,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       </ButtonBasic>
     )
   }
-  const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
-  if (!ProviderLogoIcon) {
-    return null
-  }
+
   return (
     <ButtonBasic
       className="provider-menu__list-item"

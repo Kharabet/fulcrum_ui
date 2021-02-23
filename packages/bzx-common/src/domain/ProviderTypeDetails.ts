@@ -3,18 +3,18 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 export default class ProviderTypeDetails {
   public readonly displayName: string = ''
   public readonly connector: AbstractConnector | null = null
-  public readonly reactLogoSvgShort?: React.FunctionComponent<
+  public readonly reactLogoSvgShort: React.FunctionComponent<
     React.SVGProps<SVGSVGElement> & {
-      title?: string | undefined
+      title?: string
     }
   >
 
   constructor(
     displayName: string,
     connector: AbstractConnector | null,
-    reactLogoSvgShort?: React.FunctionComponent<
+    reactLogoSvgShort: React.FunctionComponent<
       React.SVGProps<SVGSVGElement> & {
-        title?: string | undefined
+        title?: string
       }
     >
   ) {

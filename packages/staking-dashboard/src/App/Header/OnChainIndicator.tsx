@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react'
 import React from 'react'
 import AppVM from '../AppVM'
+import { ReactComponent as GenericWalletShort } from 'app-images/logo_short___genericwallet.svg'
 
 export function OnChainIndicator({ appVM }: { appVM: AppVM }) {
   const { etherscanURL, web3Connection } = appVM.rootStore
@@ -27,7 +28,12 @@ export function OnChainIndicator({ appVM }: { appVM: AppVM }) {
 
     return (
       <button className="btn--onchain-indicator" onClick={appVM.providerMenu.show}>
-        <div className="on-chain-indicator__provider-txt">Click To Connect Wallet</div>
+        <div className="flex-row-center">
+          <div className="on-chain-indicator__svg">
+            <GenericWalletShort />
+          </div>
+          <div className="on-chain-indicator__description margin-left-05">Connect Wallet</div>
+        </div>
       </button>
     )
   }
@@ -35,19 +41,17 @@ export function OnChainIndicator({ appVM }: { appVM: AppVM }) {
   if (providerTypeDetails === null) {
     return (
       <button className="btn--onchain-indicator">
-        <div className="on-chain-indicator__provider-txt">Unknown provider</div>
+        <div className="on-chain-indicator__description">Unknown provider</div>
       </button>
     )
   }
   const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
-  if (!ProviderLogoIcon) {
-    return null
-  }
+
   return (
     <button className="btn--onchain-indicator" onClick={appVM.providerMenu.show}>
       <div className="flex-row-center">
         <div className="on-chain-indicator__svg">
-          {ProviderLogoIcon !== null && <ProviderLogoIcon />}
+          <ProviderLogoIcon />
         </div>
         <div className="margin-left-05 txt-left">
           <div className="on-chain-indicator__description">{providerTypeDetails.displayName}</div>
