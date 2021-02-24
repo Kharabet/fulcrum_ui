@@ -91,17 +91,17 @@ export const authereum = new AuthereumConnector({ chainId: networkId })
 
 export const fortmatic = new FortmaticConnector({
   apiKey: configProviders.Fortmatic_ApiKey as string,
-  chainId: 1
+  chainId: networkId
 })
 
 export const portis = new PortisConnector({
   dAppId: configProviders.Portis_DAppId as string,
-  networks: [1]
+  networks: [networkId]
 })
 
 export const squarelink = new SquarelinkConnector({
   clientId: configProviders.Squarelink_ClientId as string,
-  networks: [1]
+  networks: [networkId]
 })
 
 export const bitski = new BitskiConnector({
