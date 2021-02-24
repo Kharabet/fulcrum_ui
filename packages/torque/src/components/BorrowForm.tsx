@@ -95,6 +95,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       await this.setInputDefaults()
       await this.setMaxBorrow()
       await this.setEstimatedFee()
+      this.setState({ isLoading: false })
     })
 
     this._borrowAmountChange = new Subject<string>()
@@ -135,9 +136,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         }
         this.setState({ isLoading: true })
         await this.setBorrowEstimate(next.borrowAmount)
-        if (next.exceedsLiquidity) {
-          this._borrowAmountChange.next(next.borrowAmount.toFixed(5))
-        }
+        // if (next.exceedsLiquidity) {
+        //   this._borrowAmountChange.next(next.borrowAmount.toFixed(5))
+        // }
         await this.setEstimatedFee()
         await this.setLiquidationPrice()
         await this.checkBalanceTooLow()
@@ -554,7 +555,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public onMaxClick = async () => {
-    const precisionDigits = TorqueProvider.Instance.isStableAsset(this.state.collateralAsset) ? 2 : 5
+    const precisionDigits = TorqueProvider.Instance.isStableAsset(this.state.collateralAsset)
+      ? 2
+      : 5
     if (this.state.balanceValue.eq(0)) {
       return
     }

@@ -89,10 +89,15 @@ export class ManageCollateralFormWeb3 extends Component<
     )
       .pipe(switchMap((value) => this.rxGetEstimate(value)))
       .subscribe((value: ICollateralChangeEstimate) => {
+        const balanceTooLow =
+          value.collateralAmount.gt(this.state.assetBalanceValue) &&
+          this.state.loanValue < this.state.selectedValue
+
         this.setState({
           ...this.state,
           collateralAmount: value.collateralAmount,
           collateralizedPercent: value.collateralizedPercent,
+          balanceTooLow,
           inputAmountText: this.formatPrecision(value.collateralAmount.toString(), true)
         })
       })
@@ -118,7 +123,9 @@ export class ManageCollateralFormWeb3 extends Component<
                 const collateralizedPercent = this.props.loanOrderState.collateralizedPercent
                   .multipliedBy(100)
                   .plus(100)
-
+                const collateralAssetDecimals =
+                  AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!
+                    .decimals || 18
                 // const marginPremium = TorqueProvider.Instance.getMarginPremiumAmount(this.props.loanOrderState.collateralAsset);
 
                 /*const expectedMinCollateral = this.props.loanOrderState.collateralAmount
@@ -199,7 +206,7 @@ export class ManageCollateralFormWeb3 extends Component<
                     gasAmountNeeded: gasAmountNeeded,
                     collateralizedPercent: collateralizedPercent,
                     collateralExcess: collateralExcess,
-                    assetBalanceValue: assetBalanceNormalizedBN.toNumber()
+                    assetBalanceValue: assetBalance.div(10 ** collateralAssetDecimals).toNumber()
                   },
                   () => {
                     this._selectedValueUpdate.next(this.state.selectedValue)
@@ -373,7 +380,9 @@ export class ManageCollateralFormWeb3 extends Component<
             ) : (
               <button
                 type="submit"
-                className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+                className={`btn btn-size--small ${
+                  this.state.didSubmit || this.state.balanceTooLow ? `btn-disabled` : ``
+                }`}>
                 {this.state.didSubmit
                   ? 'Submitting...'
                   : this.state.loanValue > this.state.selectedValue
@@ -543,11 +552,11 @@ export class ManageCollateralFormWeb3 extends Component<
     const output = Number(outputText)
     let sign = ''
     if (this.state.loanValue > this.state.selectedValue) sign = '-'
-    let n = Math.log(Math.abs(output)) / Math.LN10
+    const n = Math.log(Math.abs(output)) / Math.LN10
     let x = 4 - n
     if (x < 0) x = 0
     if (x > 5) x = 5
-    let result = new Number(output.toFixed(x)).toString()
-    return isNecessarySign && result != '0' ? sign + result : result
+    const result = Number(output.toFixed(x)).toString()
+    return isNecessarySign && result !== '0' ? sign + result : result
   }
 }
