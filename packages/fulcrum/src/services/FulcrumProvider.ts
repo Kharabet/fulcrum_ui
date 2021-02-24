@@ -82,6 +82,8 @@ const getNetworkIdByString = (networkName: string | undefined) => {
       return 4
     case 'kovan':
       return 42
+    case 'bsc':
+      return 56
     default:
       return 0
   }
@@ -677,7 +679,7 @@ export class FulcrumProvider {
             vaultBalance = vaultBalance.times(precision)
 
             if (swapRates && swapRates[i]) {
-            if (asset === Asset.BZRX) {
+              if (asset === Asset.BZRX) {
                 const bzrxVestingTokenContract = await this.contractsSource.getBzrxVestingContract()
                 const ibzxAddress = this.contractsSource.getiBZxAddress()
 
@@ -697,7 +699,7 @@ export class FulcrumProvider {
                 // how much vBZRX tokens already vested. This gives coefficient for vBZRX token price from BZRX price
                 const vbzrxWorthPart = new BigNumber(1).minus(
                   vbzrxTotalVested.div(vbzrxTotalSupply)
-              )
+                )
                 // vBZRX locked in bZx protocol
                 const vbzrxProtocolLockedAmount = (
                   await this.getErc20BalanceOfUser(vbzrxAddress, ibzxAddress)
@@ -719,17 +721,17 @@ export class FulcrumProvider {
                 const bptTotalSupply = await bptErc20Contract.totalSupply.callAsync()
 
                 const bzrxBalanceOfBpt = await this.getErc20BalanceOfUser(bzrxAddress, bptAddress)
-                // share of bzrx liquidity that belongs to staking contract from all bzrx tokens in pool 
+                // share of bzrx liquidity that belongs to staking contract from all bzrx tokens in pool
                 const bzrxShareOfBptStakedLockedAmount = bzrxBalanceOfBpt
-                .div(bptTotalSupply)
-                .times(bptBalanceOfStaking)
+                  .div(bptTotalSupply)
+                  .times(bptBalanceOfStaking)
 
                 vaultBalance = vaultBalance
                   .plus(vbzrxProtocolLockedAmount)
                   .plus(vbzrxStakedLockedAmount)
                   .plus(bzrxStakedLockedAmount)
                   .plus(bzrxShareOfBptStakedLockedAmount)
-            }
+              }
               if (asset === Asset.ETH) {
                 const bptAddress = AssetsDictionary.assets
                   .get(Asset.BPT)!
@@ -745,29 +747,41 @@ export class FulcrumProvider {
                 )
                 const bptTotalSupply = await bptErc20Contract.totalSupply.callAsync()
                 const wethBalanceOfBpt = await this.getErc20BalanceOfUser(wethAddress, bptAddress)
-                
-                // share of weth liquidity that belongs to staking contract from all weth tokens in pool 
+
+                // share of weth liquidity that belongs to staking contract from all weth tokens in pool
                 const wethShareOfBptStakedLockedAmount = wethBalanceOfBpt
                   .times(bptBalanceOfStaking)
                   .div(bptTotalSupply)
                 vaultBalance = vaultBalance.plus(wethShareOfBptStakedLockedAmount)
               }
-              if (asset == Asset.DAI ){
+              if (asset == Asset.DAI) {
                 // underlying DAI in 3CRV
-                const underlyingDaiInCRV = await threePoolContract.balances.callAsync(new BigNumber(0))
-                const shareOfDaiInStakedCrv = underlyingDaiInCRV.times(precision).times(shareOfCrvLockedInStaking)
+                const underlyingDaiInCRV = await threePoolContract.balances.callAsync(
+                  new BigNumber(0)
+                )
+                const shareOfDaiInStakedCrv = underlyingDaiInCRV
+                  .times(precision)
+                  .times(shareOfCrvLockedInStaking)
                 vaultBalance = vaultBalance.plus(shareOfDaiInStakedCrv)
               }
-              if (asset == Asset.USDC ){
+              if (asset == Asset.USDC) {
                 // underlying USDC in 3CRV
-                const underlyingUsdcInCRV = await threePoolContract.balances.callAsync(new BigNumber(1))
-                const shareOfUsdcInStakedCrv = underlyingUsdcInCRV.times(precision).times(shareOfCrvLockedInStaking)
+                const underlyingUsdcInCRV = await threePoolContract.balances.callAsync(
+                  new BigNumber(1)
+                )
+                const shareOfUsdcInStakedCrv = underlyingUsdcInCRV
+                  .times(precision)
+                  .times(shareOfCrvLockedInStaking)
                 vaultBalance = vaultBalance.plus(shareOfUsdcInStakedCrv)
               }
-              if (asset == Asset.USDT ){
+              if (asset == Asset.USDT) {
                 // underlying USDT in 3CRV
-                const underlyingUsdtInCRV = await threePoolContract.balances.callAsync(new BigNumber(2))
-                const shareOfUsdtInStakedCrv = underlyingUsdtInCRV.times(precision).times(shareOfCrvLockedInStaking)
+                const underlyingUsdtInCRV = await threePoolContract.balances.callAsync(
+                  new BigNumber(2)
+                )
+                const shareOfUsdtInStakedCrv = underlyingUsdtInCRV
+                  .times(precision)
+                  .times(shareOfCrvLockedInStaking)
                 vaultBalance = vaultBalance.plus(shareOfUsdtInStakedCrv)
               }
               usdSupply = totalAssetSupply!.times(swapRates[i]).dividedBy(10 ** 18)
@@ -1282,6 +1296,14 @@ export class FulcrumProvider {
 
   public gasPrice = async (): Promise<BigNumber> => {
     if (networkName === 'kovan') return new BigNumber(1).multipliedBy(10 ** 9) // 1 gwei
+    if (networkName === 'bsc') {
+      const contractDefaults = this.web3Wrapper!.getContractDefaults()
+      if (contractDefaults && contractDefaults.gasPrice !== undefined) {
+        return new BigNumber(contractDefaults.gasPrice)
+      }else{
+        return new BigNumber(1).multipliedBy(10 ** 9)
+      }
+    }
     let result = new BigNumber(1000).multipliedBy(10 ** 9) // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
 
@@ -2275,7 +2297,7 @@ export class FulcrumProvider {
     if (networkName !== 'mainnet') {
       // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract
       return this.getSwapRate(srcAsset, destAsset)
-  }
+    }
     let result: BigNumber = new BigNumber(0)
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
@@ -2286,7 +2308,7 @@ export class FulcrumProvider {
         srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
-  }
+      }
       try {
         const oneEthWorthTokenAmount = await fetch(
           `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`
