@@ -2,6 +2,7 @@ const webpack = require('webpack')
 const path = require('path')
 const dotenv = require('dotenv')
 const gitCommitId = require('git-commit-id')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const fs = require('fs')
 
 // Getting the config from dotenv if present (Normally only for local development)
@@ -25,6 +26,23 @@ if (!networks.includes(envVars.REACT_APP_ETH_NETWORK)) {
 }
 
 console.log('Config', JSON.stringify(envVars, null, 2))
+
+const plugins = [
+  new webpack.NormalModuleReplacementPlugin(/(.*)BUILD_APP_NETWORK(\.*)/, function(resource) {
+    resource.request = resource.request.replace(
+      /BUILD_APP_NETWORK/,
+      process.env.REACT_APP_ETH_NETWORK
+    )
+  }),
+  new webpack.DefinePlugin({
+    'process.env.GIT_COMMIT': JSON.stringify(envVars.GIT_COMMIT),
+    'process.env.APP_VERSION': JSON.stringify(envVars.GIT_COMMIT)
+  })
+]
+
+if (process.env.ANALYZE_BUNDLE) {
+  plugins.push(new BundleAnalyzerPlugin())
+}
 
 module.exports = {
   webpack: {
@@ -53,18 +71,7 @@ module.exports = {
       }
       return webpackConfig
     },
-    plugins: [
-      new webpack.NormalModuleReplacementPlugin(/(.*)BUILD_APP_NETWORK(\.*)/, function(resource) {
-        resource.request = resource.request.replace(
-          /BUILD_APP_NETWORK/,
-          process.env.REACT_APP_ETH_NETWORK
-        )
-      }),
-      new webpack.DefinePlugin({
-        'process.env.GIT_COMMIT': JSON.stringify(envVars.GIT_COMMIT),
-        'process.env.APP_VERSION': JSON.stringify(envVars.GIT_COMMIT)
-      })
-    ]
+    plugins
   },
   babel: {
     plugins: [

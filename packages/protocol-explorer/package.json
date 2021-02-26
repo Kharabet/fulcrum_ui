@@ -61,7 +61,6 @@
     "typescript": "^3.4.5"
   },
   "scripts": {
-    "analyse": "node analyse.js",
     "clean": "rm -rf ./node_modules",
     "start": "cross-env-shell \"craco start --config ../bzx-common/craco.config.js\"",
     "lint": "tslint 'src/**/*.{ts,tsx}'",
