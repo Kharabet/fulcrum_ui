@@ -78,7 +78,7 @@ export class UnlendEthProcessor {
         from: account,
         gas: gasAmountBN.toString(),
         gasPrice: await FulcrumProvider.Instance.gasPrice(),
-      }, { shouldValidate: false })
+      })
       task.setTxHash(txHash)
     } catch (e) {
       throw e

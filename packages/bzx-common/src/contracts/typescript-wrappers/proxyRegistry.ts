@@ -2,29 +2,29 @@
 // tslint:disable:whitespace no-unbound-method no-trailing-whitespace
 // tslint:disable:no-unused-variable
 import {
-    AwaitTransactionSuccessOpts,
-    ContractFunctionObj,
-    ContractTxFunctionObj,
-    SendTransactionOpts,
-    BaseContract,
-    PromiseWithTransactionHash,
-    methodAbiToFunctionSignature,
-    linkLibrariesInBytecode,
+  AwaitTransactionSuccessOpts,
+  ContractFunctionObj,
+  ContractTxFunctionObj,
+  SendTransactionOpts,
+  BaseContract,
+  PromiseWithTransactionHash,
+  methodAbiToFunctionSignature,
+  linkLibrariesInBytecode,
 } from '@0x/base-contract';
 import { schemas } from '@0x/json-schemas';
 import {
-    BlockParam,
-    BlockParamLiteral,
-    BlockRange,
-    CallData,
-    ContractAbi,
-    ContractArtifact,
-    DecodedLogArgs,
-    MethodAbi,
-    TransactionReceiptWithDecodedLogs,
-    TxData,
-    TxDataPayable,
-    SupportedProvider,
+  BlockParam,
+  BlockParamLiteral,
+  BlockRange,
+  CallData,
+  ContractAbi,
+  ContractArtifact,
+  DecodedLogArgs,
+  MethodAbi,
+  TransactionReceiptWithDecodedLogs,
+  TxData,
+  TxDataPayable,
+  SupportedProvider,
 } from 'ethereum-types';
 import { BigNumber, classUtils, hexUtils, logUtils, providerUtils } from '@0x/utils';
 import { EventCallback, IndexedFilterValues, SimpleContractArtifact } from '@0x/types';
@@ -40,427 +40,421 @@ import * as ethers from 'ethers';
 // tslint:disable:no-parameter-reassignment
 // tslint:disable-next-line:class-name
 export class proxyRegistryContract extends BaseContract {
-    /**
-     * @ignore
-     */
+  /**
+    * @ignore
+    */
 public static deployedBytecode: string | undefined;
 public static contractName = 'proxyRegistry';
-    private readonly _methodABIIndex: { [name: string]: number } = {};
+  private readonly _methodABIIndex: { [name: string]: number } = {};
 public static async deployFrom0xArtifactAsync(
-        artifact: ContractArtifact | SimpleContractArtifact,
-        supportedProvider: SupportedProvider,
-        txDefaults: Partial<TxData>,
-        logDecodeDependencies: { [contractName: string]: (ContractArtifact | SimpleContractArtifact) },
-            factory_: string,
-    ): Promise<proxyRegistryContract> {
-        assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
-            schemas.addressSchema,
-            schemas.numberSchema,
-            schemas.jsNumber,
-        ]);
-        if (artifact.compilerOutput === undefined) {
-            throw new Error('Compiler output not found in the artifact file');
-        }
-        const provider = providerUtils.standardizeOrThrow(supportedProvider);
-        const bytecode = artifact.compilerOutput.evm.bytecode.object;
-        const abi = artifact.compilerOutput.abi;
-        const logDecodeDependenciesAbiOnly: { [contractName: string]: ContractAbi } = {};
-        if (Object.keys(logDecodeDependencies) !== undefined) {
-            for (const key of Object.keys(logDecodeDependencies)) {
-                logDecodeDependenciesAbiOnly[key] = logDecodeDependencies[key].compilerOutput.abi;
-            }
-        }
-        return proxyRegistryContract.deployAsync(bytecode, abi, provider, txDefaults, logDecodeDependenciesAbiOnly, factory_
-);
+    artifact: ContractArtifact | SimpleContractArtifact,
+    supportedProvider: SupportedProvider,
+    txDefaults: Partial<TxData>,
+    logDecodeDependencies: { [contractName: string]: (ContractArtifact | SimpleContractArtifact) },
+      factory_: string,
+  ): Promise<proxyRegistryContract> {
+    assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
+      schemas.addressSchema,
+      schemas.numberSchema,
+      schemas.jsNumber,
+    ]);
+    if (artifact.compilerOutput === undefined) {
+      throw new Error('Compiler output not found in the artifact file');
     }
-
-    public static async deployWithLibrariesFrom0xArtifactAsync(
-        artifact: ContractArtifact,
-        libraryArtifacts: { [libraryName: string]: ContractArtifact },
-        supportedProvider: SupportedProvider,
-        txDefaults: Partial<TxData>,
-        logDecodeDependencies: { [contractName: string]: (ContractArtifact | SimpleContractArtifact) },
-            factory_: string,
-    ): Promise<proxyRegistryContract> {
-        assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
-            schemas.addressSchema,
-            schemas.numberSchema,
-            schemas.jsNumber,
-        ]);
-        if (artifact.compilerOutput === undefined) {
-            throw new Error('Compiler output not found in the artifact file');
-        }
-        const provider = providerUtils.standardizeOrThrow(supportedProvider);
-        const abi = artifact.compilerOutput.abi;
-        const logDecodeDependenciesAbiOnly: { [contractName: string]: ContractAbi } = {};
-        if (Object.keys(logDecodeDependencies) !== undefined) {
-            for (const key of Object.keys(logDecodeDependencies)) {
-                logDecodeDependenciesAbiOnly[key] = logDecodeDependencies[key].compilerOutput.abi;
-            }
-        }
-        const libraryAddresses = await proxyRegistryContract._deployLibrariesAsync(
-            artifact,
-            libraryArtifacts,
-            new Web3Wrapper(provider),
-            txDefaults
-        );
-        const bytecode = linkLibrariesInBytecode(
-            artifact,
-            libraryAddresses,
-        );
-        return proxyRegistryContract.deployAsync(bytecode, abi, provider, txDefaults, logDecodeDependenciesAbiOnly, factory_
-);
+    const provider = providerUtils.standardizeOrThrow(supportedProvider);
+    const bytecode = artifact.compilerOutput.evm.bytecode.object;
+    const abi = artifact.compilerOutput.abi;
+    const logDecodeDependenciesAbiOnly: { [contractName: string]: ContractAbi } = {};
+    if (Object.keys(logDecodeDependencies) !== undefined) {
+      for (const key of Object.keys(logDecodeDependencies)) {
+        logDecodeDependenciesAbiOnly[key] = logDecodeDependencies[key].compilerOutput.abi;
+      }
     }
+    return proxyRegistryContract.deployAsync(bytecode, abi, provider, txDefaults, logDecodeDependenciesAbiOnly, factory_
+);
+  }
 
-    public static async deployAsync(
-        bytecode: string,
-        abi: ContractAbi,
-        supportedProvider: SupportedProvider,
-        txDefaults: Partial<TxData>,
-        logDecodeDependencies: { [contractName: string]: ContractAbi },
-            factory_: string,
-    ): Promise<proxyRegistryContract> {
-        assert.isHexString('bytecode', bytecode);
-        assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
-            schemas.addressSchema,
-            schemas.numberSchema,
-            schemas.jsNumber,
-        ]);
-        const provider = providerUtils.standardizeOrThrow(supportedProvider);
-        const constructorAbi = BaseContract._lookupConstructorAbi(abi);
-        [factory_
+  public static async deployWithLibrariesFrom0xArtifactAsync(
+    artifact: ContractArtifact,
+    libraryArtifacts: { [libraryName: string]: ContractArtifact },
+    supportedProvider: SupportedProvider,
+    txDefaults: Partial<TxData>,
+    logDecodeDependencies: { [contractName: string]: (ContractArtifact | SimpleContractArtifact) },
+      factory_: string,
+  ): Promise<proxyRegistryContract> {
+    assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
+      schemas.addressSchema,
+      schemas.numberSchema,
+      schemas.jsNumber,
+    ]);
+    if (artifact.compilerOutput === undefined) {
+      throw new Error('Compiler output not found in the artifact file');
+    }
+    const provider = providerUtils.standardizeOrThrow(supportedProvider);
+    const abi = artifact.compilerOutput.abi;
+    const logDecodeDependenciesAbiOnly: { [contractName: string]: ContractAbi } = {};
+    if (Object.keys(logDecodeDependencies) !== undefined) {
+      for (const key of Object.keys(logDecodeDependencies)) {
+        logDecodeDependenciesAbiOnly[key] = logDecodeDependencies[key].compilerOutput.abi;
+      }
+    }
+    const libraryAddresses = await proxyRegistryContract._deployLibrariesAsync(
+      artifact,
+      libraryArtifacts,
+      new Web3Wrapper(provider),
+      txDefaults
+    );
+    const bytecode = linkLibrariesInBytecode(
+      artifact,
+      libraryAddresses,
+    );
+    return proxyRegistryContract.deployAsync(bytecode, abi, provider, txDefaults, logDecodeDependenciesAbiOnly, factory_
+);
+  }
+
+  public static async deployAsync(
+    bytecode: string,
+    abi: ContractAbi,
+    supportedProvider: SupportedProvider,
+    txDefaults: Partial<TxData>,
+    logDecodeDependencies: { [contractName: string]: ContractAbi },
+      factory_: string,
+  ): Promise<proxyRegistryContract> {
+    assert.isHexString('bytecode', bytecode);
+    assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
+      schemas.addressSchema,
+      schemas.numberSchema,
+      schemas.jsNumber,
+    ]);
+    const provider = providerUtils.standardizeOrThrow(supportedProvider);
+    const constructorAbi = BaseContract._lookupConstructorAbi(abi);
+    [factory_
 ] = BaseContract._formatABIDataItemList(
-            constructorAbi.inputs,
-            [factory_
+      constructorAbi.inputs,
+      [factory_
 ],
-            BaseContract._bigNumberToString,
-        );
-        const iface = new ethers.utils.Interface(abi);
-        const deployInfo = iface.deployFunction;
-        const txData = deployInfo.encode(bytecode, [factory_
+      BaseContract._bigNumberToString,
+    );
+    const iface = new ethers.utils.Interface(abi);
+    const deployInfo = iface.deployFunction;
+    const txData = deployInfo.encode(bytecode, [factory_
 ]);
-        const web3Wrapper = new Web3Wrapper(provider);
-        const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
+    const web3Wrapper = new Web3Wrapper(provider);
+    const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
+      {
+        data: txData,
+        ...txDefaults,
+      },
+      web3Wrapper.estimateGasAsync.bind(web3Wrapper),
+    );
+    const txHash = await web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+    logUtils.log(`transactionHash: ${txHash}`);
+    const txReceipt = await web3Wrapper.awaitTransactionSuccessAsync(txHash);
+    logUtils.log(`proxyRegistry successfully deployed at ${txReceipt.contractAddress}`);
+    const contractInstance = new proxyRegistryContract(txReceipt.contractAddress as string, provider, txDefaults, logDecodeDependencies);
+    contractInstance.constructorArgs = [factory_
+];
+    return contractInstance;
+  }
+
+  /**
+    * @returns      The contract ABI
+    */
+  public static ABI(): ContractAbi {
+    const abi = [
+      { 
+        constant: false,
+        inputs: [
+        ],
+        name: 'build',
+        outputs: [
+          {
+            name: 'proxy',
+            type: 'address',
+          },
+        ],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+      { 
+        constant: true,
+        inputs: [
+          {
+            name: 'index_0',
+            type: 'address',
+          },
+        ],
+        name: 'proxies',
+        outputs: [
+          {
+            name: '',
+            type: 'address',
+          },
+        ],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+      { 
+        constant: false,
+        inputs: [
+          {
+            name: 'owner',
+            type: 'address',
+          },
+        ],
+        name: 'build',
+        outputs: [
+          {
+            name: 'proxy',
+            type: 'address',
+          },
+        ],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+      { 
+        inputs: [
+          {
+            name: 'factory_',
+            type: 'address',
+          },
+        ],
+        outputs: [
+        ],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'constructor',
+      },
+    ] as ContractAbi;
+    return abi;
+  }
+
+  protected static async _deployLibrariesAsync(
+    artifact: ContractArtifact,
+    libraryArtifacts: { [libraryName: string]: ContractArtifact },
+    web3Wrapper: Web3Wrapper,
+    txDefaults: Partial<TxData>,
+    libraryAddresses: { [libraryName: string]: string } = {},
+  ): Promise<{ [libraryName: string]: string }> {
+    const links = artifact.compilerOutput.evm.bytecode.linkReferences;
+    // Go through all linked libraries, recursively deploying them if necessary.
+    for (const link of Object.values(links)) {
+      for (const libraryName of Object.keys(link)) {
+        if (!libraryAddresses[libraryName]) {
+          // Library not yet deployed.
+          const libraryArtifact = libraryArtifacts[libraryName];
+          if (!libraryArtifact) {
+            throw new Error(`Missing artifact for linked library "${libraryName}"`);
+          }
+          // Deploy any dependent libraries used by this library.
+          await proxyRegistryContract._deployLibrariesAsync(
+            libraryArtifact,
+            libraryArtifacts,
+            web3Wrapper,
+            txDefaults,
+            libraryAddresses,
+          );
+          // Deploy this library.
+          const linkedLibraryBytecode = linkLibrariesInBytecode(
+            libraryArtifact,
+            libraryAddresses,
+          );
+          const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
             {
-                data: txData,
-                ...txDefaults,
+              data: linkedLibraryBytecode,
+              ...txDefaults,
             },
             web3Wrapper.estimateGasAsync.bind(web3Wrapper),
+          );
+          const txHash = await web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+          logUtils.log(`transactionHash: ${txHash}`);
+          const { contractAddress } = await web3Wrapper.awaitTransactionSuccessAsync(txHash);
+          logUtils.log(`${libraryArtifact.contractName} successfully deployed at ${contractAddress}`);
+          libraryAddresses[libraryArtifact.contractName] = contractAddress as string;
+        }
+      }
+    }
+    return libraryAddresses;
+  }
+
+  public getFunctionSignature(methodName: string): string {
+    const index = this._methodABIIndex[methodName];
+    const methodAbi = proxyRegistryContract.ABI()[index] as MethodAbi; // tslint:disable-line:no-unnecessary-type-assertion
+    const functionSignature = methodAbiToFunctionSignature(methodAbi);
+    return functionSignature;
+  }
+
+  public getABIDecodedTransactionData<T>(methodName: string, callData: string): T {
+    const functionSignature = this.getFunctionSignature(methodName);
+    const self = (this as any) as proxyRegistryContract;
+    const abiEncoder = self._lookupAbiEncoder(functionSignature);
+    const abiDecodedCallData = abiEncoder.strictDecode<T>(callData);
+    return abiDecodedCallData;
+  }
+
+  public getABIDecodedReturnData<T>(methodName: string, callData: string): T {
+    const functionSignature = this.getFunctionSignature(methodName);
+    const self = (this as any) as proxyRegistryContract;
+    const abiEncoder = self._lookupAbiEncoder(functionSignature);
+    const abiDecodedCallData = abiEncoder.strictDecodeReturnValue<T>(callData);
+    return abiDecodedCallData;
+  }
+
+  public getSelector(methodName: string): string {
+    const functionSignature = this.getFunctionSignature(methodName);
+    const self = (this as any) as proxyRegistryContract;
+    const abiEncoder = self._lookupAbiEncoder(functionSignature);
+    return abiEncoder.getSelector();
+  }
+
+  public build1(
+  ): ContractTxFunctionObj<string
+> {
+    const self = this as any as proxyRegistryContract;
+    const functionSignature = 'build()';
+
+    return {
+      async sendTransactionAsync(
+        txData?: Partial<TxData> | undefined,
+        opts: SendTransactionOpts = { shouldValidate: true },
+      ): Promise<string> {
+        const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
+          { data: this.getABIEncodedTransactionData(), ...txData },
+          this.estimateGasAsync.bind(this),
         );
-        const txHash = await web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-        logUtils.log(`transactionHash: ${txHash}`);
-        const txReceipt = await web3Wrapper.awaitTransactionSuccessAsync(txHash);
-        logUtils.log(`proxyRegistry successfully deployed at ${txReceipt.contractAddress}`);
-        const contractInstance = new proxyRegistryContract(txReceipt.contractAddress as string, provider, txDefaults, logDecodeDependencies);
-        contractInstance.constructorArgs = [factory_
-];
-        return contractInstance;
-    }
-
-    /**
-     * @returns      The contract ABI
-     */
-    public static ABI(): ContractAbi {
-        const abi = [
-            { 
-                constant: false,
-                inputs: [
-                ],
-                name: 'build',
-                outputs: [
-                    {
-                        name: 'proxy',
-                        type: 'address',
-                    },
-                ],
-                payable: false,
-                stateMutability: 'nonpayable',
-                type: 'function',
-            },
-            { 
-                constant: true,
-                inputs: [
-                    {
-                        name: 'index_0',
-                        type: 'address',
-                    },
-                ],
-                name: 'proxies',
-                outputs: [
-                    {
-                        name: '',
-                        type: 'address',
-                    },
-                ],
-                payable: false,
-                stateMutability: 'view',
-                type: 'function',
-            },
-            { 
-                constant: false,
-                inputs: [
-                    {
-                        name: 'owner',
-                        type: 'address',
-                    },
-                ],
-                name: 'build',
-                outputs: [
-                    {
-                        name: 'proxy',
-                        type: 'address',
-                    },
-                ],
-                payable: false,
-                stateMutability: 'nonpayable',
-                type: 'function',
-            },
-            { 
-                inputs: [
-                    {
-                        name: 'factory_',
-                        type: 'address',
-                    },
-                ],
-                outputs: [
-                ],
-                payable: false,
-                stateMutability: 'nonpayable',
-                type: 'constructor',
-            },
-        ] as ContractAbi;
-        return abi;
-    }
-
-    protected static async _deployLibrariesAsync(
-        artifact: ContractArtifact,
-        libraryArtifacts: { [libraryName: string]: ContractArtifact },
-        web3Wrapper: Web3Wrapper,
-        txDefaults: Partial<TxData>,
-        libraryAddresses: { [libraryName: string]: string } = {},
-    ): Promise<{ [libraryName: string]: string }> {
-        const links = artifact.compilerOutput.evm.bytecode.linkReferences;
-        // Go through all linked libraries, recursively deploying them if necessary.
-        for (const link of Object.values(links)) {
-            for (const libraryName of Object.keys(link)) {
-                if (!libraryAddresses[libraryName]) {
-                    // Library not yet deployed.
-                    const libraryArtifact = libraryArtifacts[libraryName];
-                    if (!libraryArtifact) {
-                        throw new Error(`Missing artifact for linked library "${libraryName}"`);
-                    }
-                    // Deploy any dependent libraries used by this library.
-                    await proxyRegistryContract._deployLibrariesAsync(
-                        libraryArtifact,
-                        libraryArtifacts,
-                        web3Wrapper,
-                        txDefaults,
-                        libraryAddresses,
-                    );
-                    // Deploy this library.
-                    const linkedLibraryBytecode = linkLibrariesInBytecode(
-                        libraryArtifact,
-                        libraryAddresses,
-                    );
-                    const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
-                        {
-                            data: linkedLibraryBytecode,
-                            ...txDefaults,
-                        },
-                        web3Wrapper.estimateGasAsync.bind(web3Wrapper),
-                    );
-                    const txHash = await web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-                    logUtils.log(`transactionHash: ${txHash}`);
-                    const { contractAddress } = await web3Wrapper.awaitTransactionSuccessAsync(txHash);
-                    logUtils.log(`${libraryArtifact.contractName} successfully deployed at ${contractAddress}`);
-                    libraryAddresses[libraryArtifact.contractName] = contractAddress as string;
-                }
-            }
-        }
-        return libraryAddresses;
-    }
-
-    public getFunctionSignature(methodName: string): string {
-        const index = this._methodABIIndex[methodName];
-        const methodAbi = proxyRegistryContract.ABI()[index] as MethodAbi; // tslint:disable-line:no-unnecessary-type-assertion
-        const functionSignature = methodAbiToFunctionSignature(methodAbi);
-        return functionSignature;
-    }
-
-    public getABIDecodedTransactionData<T>(methodName: string, callData: string): T {
-        const functionSignature = this.getFunctionSignature(methodName);
-        const self = (this as any) as proxyRegistryContract;
+        return self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      },
+      awaitTransactionSuccessAsync(
+        txData?: Partial<TxData>,
+        opts: AwaitTransactionSuccessOpts = { shouldValidate: true },
+      ): PromiseWithTransactionHash<TransactionReceiptWithDecodedLogs> {
+        return self._promiseWithTransactionHash(this.sendTransactionAsync(txData, opts), opts);
+      },
+      async estimateGasAsync(
+        txData?: Partial<TxData> | undefined,
+      ): Promise<number> {
+        const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
+          { data: this.getABIEncodedTransactionData(), ...txData }
+        );
+        return self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      },
+      async callAsync(
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+      ): Promise<string
+      > {
+        BaseContract._assertCallParams(callData, defaultBlock);
+        const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
         const abiEncoder = self._lookupAbiEncoder(functionSignature);
-        const abiDecodedCallData = abiEncoder.strictDecode<T>(callData);
-        return abiDecodedCallData;
+        BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+        return abiEncoder.strictDecodeReturnValue<string
+      >(rawCallResult);
+      },
+      getABIEncodedTransactionData(): string {
+        return self._strictEncodeArguments(functionSignature, []);
+      },
     }
+  };
+  public proxies(
+        index_0: string,
+  ): ContractFunctionObj<string
+> {
+    const self = this as any as proxyRegistryContract;
+      assert.isString('index_0', index_0);
+    const functionSignature = 'proxies(address)';
 
-    public getABIDecodedReturnData<T>(methodName: string, callData: string): T {
-        const functionSignature = this.getFunctionSignature(methodName);
-        const self = (this as any) as proxyRegistryContract;
+    return {
+      async callAsync(
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+      ): Promise<string
+      > {
+        BaseContract._assertCallParams(callData, defaultBlock);
+        const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
         const abiEncoder = self._lookupAbiEncoder(functionSignature);
-        const abiDecodedCallData = abiEncoder.strictDecodeReturnValue<T>(callData);
-        return abiDecodedCallData;
+        BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+        return abiEncoder.strictDecodeReturnValue<string
+      >(rawCallResult);
+      },
+      getABIEncodedTransactionData(): string {
+        return self._strictEncodeArguments(functionSignature, [index_0.toLowerCase()
+      ]);
+      },
     }
+  };
+  public build2(
+        owner: string,
+  ): ContractTxFunctionObj<string
+> {
+    const self = this as any as proxyRegistryContract;
+      assert.isString('owner', owner);
+    const functionSignature = 'build(address)';
 
-    public getSelector(methodName: string): string {
-        const functionSignature = this.getFunctionSignature(methodName);
-        const self = (this as any) as proxyRegistryContract;
+    return {
+      async sendTransactionAsync(
+        txData?: Partial<TxData> | undefined,
+        opts: SendTransactionOpts = { shouldValidate: true },
+      ): Promise<string> {
+        const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
+          { data: this.getABIEncodedTransactionData(), ...txData },
+          this.estimateGasAsync.bind(this),
+        );
+        return self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      },
+      awaitTransactionSuccessAsync(
+        txData?: Partial<TxData>,
+        opts: AwaitTransactionSuccessOpts = { shouldValidate: true },
+      ): PromiseWithTransactionHash<TransactionReceiptWithDecodedLogs> {
+        return self._promiseWithTransactionHash(this.sendTransactionAsync(txData, opts), opts);
+      },
+      async estimateGasAsync(
+        txData?: Partial<TxData> | undefined,
+      ): Promise<number> {
+        const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
+          { data: this.getABIEncodedTransactionData(), ...txData }
+        );
+        return self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      },
+      async callAsync(
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+      ): Promise<string
+      > {
+        BaseContract._assertCallParams(callData, defaultBlock);
+        const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
         const abiEncoder = self._lookupAbiEncoder(functionSignature);
-        return abiEncoder.getSelector();
+        BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+        return abiEncoder.strictDecodeReturnValue<string
+      >(rawCallResult);
+      },
+      getABIEncodedTransactionData(): string {
+        return self._strictEncodeArguments(functionSignature, [owner.toLowerCase()
+      ]);
+      },
     }
-
-    public build1(
-    ): ContractTxFunctionObj<string
-> {
-        const self = this as any as proxyRegistryContract;
-        const functionSignature = 'build()';
-
-        return {
-            async sendTransactionAsync(
-                txData?: Partial<TxData> | undefined,
-                opts: SendTransactionOpts = { shouldValidate: true },
-            ): Promise<string> {
-                const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
-                    { data: this.getABIEncodedTransactionData(), ...txData },
-                    this.estimateGasAsync.bind(this),
-                );
-                if (opts.shouldValidate !== false) {
-                    await this.callAsync(txDataWithDefaults);
-                }
-                return self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            },
-            awaitTransactionSuccessAsync(
-                txData?: Partial<TxData>,
-                opts: AwaitTransactionSuccessOpts = { shouldValidate: true },
-            ): PromiseWithTransactionHash<TransactionReceiptWithDecodedLogs> {
-                return self._promiseWithTransactionHash(this.sendTransactionAsync(txData, opts), opts);
-            },
-            async estimateGasAsync(
-                txData?: Partial<TxData> | undefined,
-            ): Promise<number> {
-                const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
-                    { data: this.getABIEncodedTransactionData(), ...txData }
-                );
-                return self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            },
-            async callAsync(
-                callData: Partial<CallData> = {},
-                defaultBlock?: BlockParam,
-            ): Promise<string
-            > {
-                BaseContract._assertCallParams(callData, defaultBlock);
-                const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
-                const abiEncoder = self._lookupAbiEncoder(functionSignature);
-                BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
-                return abiEncoder.strictDecodeReturnValue<string
-            >(rawCallResult);
-            },
-            getABIEncodedTransactionData(): string {
-                return self._strictEncodeArguments(functionSignature, []);
-            },
-        }
-    };
-    public proxies(
-            index_0: string,
-    ): ContractFunctionObj<string
-> {
-        const self = this as any as proxyRegistryContract;
-            assert.isString('index_0', index_0);
-        const functionSignature = 'proxies(address)';
-
-        return {
-            async callAsync(
-                callData: Partial<CallData> = {},
-                defaultBlock?: BlockParam,
-            ): Promise<string
-            > {
-                BaseContract._assertCallParams(callData, defaultBlock);
-                const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
-                const abiEncoder = self._lookupAbiEncoder(functionSignature);
-                BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
-                return abiEncoder.strictDecodeReturnValue<string
-            >(rawCallResult);
-            },
-            getABIEncodedTransactionData(): string {
-                return self._strictEncodeArguments(functionSignature, [index_0.toLowerCase()
-            ]);
-            },
-        }
-    };
-    public build2(
-            owner: string,
-    ): ContractTxFunctionObj<string
-> {
-        const self = this as any as proxyRegistryContract;
-            assert.isString('owner', owner);
-        const functionSignature = 'build(address)';
-
-        return {
-            async sendTransactionAsync(
-                txData?: Partial<TxData> | undefined,
-                opts: SendTransactionOpts = { shouldValidate: true },
-            ): Promise<string> {
-                const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
-                    { data: this.getABIEncodedTransactionData(), ...txData },
-                    this.estimateGasAsync.bind(this),
-                );
-                if (opts.shouldValidate !== false) {
-                    await this.callAsync(txDataWithDefaults);
-                }
-                return self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-            },
-            awaitTransactionSuccessAsync(
-                txData?: Partial<TxData>,
-                opts: AwaitTransactionSuccessOpts = { shouldValidate: true },
-            ): PromiseWithTransactionHash<TransactionReceiptWithDecodedLogs> {
-                return self._promiseWithTransactionHash(this.sendTransactionAsync(txData, opts), opts);
-            },
-            async estimateGasAsync(
-                txData?: Partial<TxData> | undefined,
-            ): Promise<number> {
-                const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
-                    { data: this.getABIEncodedTransactionData(), ...txData }
-                );
-                return self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            },
-            async callAsync(
-                callData: Partial<CallData> = {},
-                defaultBlock?: BlockParam,
-            ): Promise<string
-            > {
-                BaseContract._assertCallParams(callData, defaultBlock);
-                const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
-                const abiEncoder = self._lookupAbiEncoder(functionSignature);
-                BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
-                return abiEncoder.strictDecodeReturnValue<string
-            >(rawCallResult);
-            },
-            getABIEncodedTransactionData(): string {
-                return self._strictEncodeArguments(functionSignature, [owner.toLowerCase()
-            ]);
-            },
-        }
-    };
+  };
 
 
 
-    constructor(
-        address: string,
-        supportedProvider: SupportedProvider,
-        txDefaults?: Partial<TxData>,
-        logDecodeDependencies?: { [contractName: string]: ContractAbi },
-        deployedBytecode: string | undefined = proxyRegistryContract.deployedBytecode,
-    ) {
-        super('proxyRegistry', proxyRegistryContract.ABI(), address, supportedProvider, txDefaults, logDecodeDependencies, deployedBytecode);
-        classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', '_web3Wrapper']);
+  constructor(
+    address: string,
+    supportedProvider: SupportedProvider,
+    txDefaults?: Partial<TxData>,
+    logDecodeDependencies?: { [contractName: string]: ContractAbi },
+    deployedBytecode: string | undefined = proxyRegistryContract.deployedBytecode,
+  ) {
+    super('proxyRegistry', proxyRegistryContract.ABI(), address, supportedProvider, txDefaults, logDecodeDependencies, deployedBytecode);
+    classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', '_web3Wrapper']);
 proxyRegistryContract.ABI().forEach((item, index) => {
-            if (item.type === 'function') {
-                const methodAbi = item as MethodAbi;
-                this._methodABIIndex[methodAbi.name] = index;
-            }
-        });
-    }
+      if (item.type === 'function') {
+        const methodAbi = item as MethodAbi;
+        this._methodABIIndex[methodAbi.name] = index;
+      }
+    });
+  }
 }
 
 // tslint:disable:max-file-line-count
