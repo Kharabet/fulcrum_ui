@@ -204,7 +204,7 @@ export class TradeBuyProcessor {
                 value: sendAmountForValue,
                 gas: gasAmountBN.toString(),
                 gasPrice: await FulcrumProvider.Instance.gasPrice(),
-              })
+              }, { shouldValidate: false })
           : await tokenContract
               .marginTrade(
                 '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -220,7 +220,7 @@ export class TradeBuyProcessor {
                 value: sendAmountForValue,
                 gas: gasAmountBN.toString(),
                 gasPrice: await FulcrumProvider.Instance.gasPrice(),
-              })
+              }, { shouldValidate: false })
       task.setTxHash(txHash)
     } catch (e) {
       throw e

@@ -583,14 +583,14 @@ export class FulcrumProvider {
       if (allowance.gt(0) && amountInBaseUnits.gt(allowance)) {
         const zeroApprovHash = await tokenErc20Contract
           .approve(spender, new BigNumber(0))
-          .sendTransactionAsync({ from: account })
+          .sendTransactionAsync({ from: account }, { shouldValidate: false })
         await this.waitForTransactionMined(zeroApprovHash)
       }
     }
 
     result = await tokenErc20Contract.approve(spender, amountInBaseUnits).sendTransactionAsync({
       from: account,
-    })
+    }, { shouldValidate: false })
 
     return result
   }
