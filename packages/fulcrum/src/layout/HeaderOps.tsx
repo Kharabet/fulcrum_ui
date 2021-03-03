@@ -90,7 +90,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { title: 'Lend', link: '/lend', external: false },
 
         { title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
-        { title: 'Stake', link: 'https://staking.bzx.network', external: true, newTab: true }
+        { title: 'Stake', link: 'https://staking.bzx.network', external: true }
       ],
       onMenuToggle: this.onMenuToggle
     }
@@ -142,8 +142,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         {
           title: 'Stake',
           link: 'https://staking.bzx.network',
-          external: true,
-          newTab: true
+          external: true
         },
         {
           title: `${this.props.headerClass === 'trade' ? 'Trade FAQ' : 'Lend FAQ'}`,

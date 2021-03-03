@@ -5,7 +5,6 @@ export interface IHeaderMenuItemProps {
   title: string
   link: string
   external: boolean
-  newTab?: boolean
 }
 
 export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
@@ -13,19 +12,9 @@ export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
     return (
       <div className="header-menu__item">
         {this.props.external ? (
-          this.props.newTab ? (
-            <a
-              href={this.props.link}
-              className={`header-menu__item-link`}
-              target="_blank"
-              rel="noopener noreferrer">
-              <span>{this.props.title}</span>
-            </a>
-          ) : (
-            <a href={this.props.link} className={`header-menu__item-link`}>
-              <span>{this.props.title}</span>
-            </a>
-          )
+          <a href={this.props.link} className={`header-menu__item-link`}>
+            <span>{this.props.title}</span>
+          </a>
         ) : (
           <NavLink
             to={this.props.link}

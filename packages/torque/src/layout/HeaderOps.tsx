@@ -35,7 +35,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       { title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
       { title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
       { title: 'Borrow', link: '/borrow', external: false },
-      { title: 'Stake', link: 'https://staking.bzx.network', external: true, newTab: true }
+      { title: 'Stake', link: 'https://staking.bzx.network', external: true }
     ]
   }
 
@@ -44,7 +44,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       { title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
       { title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
       { title: 'Borrow', link: '/borrow', external: false },
-      { title: 'Stake', link: 'https://staking.bzx.network', external: true, newTab: true },
+      { title: 'Stake', link: 'https://staking.bzx.network', external: true },
       { title: 'Borrow FAQ', link: 'https://torque.loans/', external: true },
       {
         title: 'Help Center',

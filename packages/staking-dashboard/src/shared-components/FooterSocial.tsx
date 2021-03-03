@@ -36,7 +36,7 @@ export function FooterSocial(props: IFooterSocialProps) {
         </div>
       )}
       <div className="item-social">
-        <p className="data-protocol">Stakers Dashboard is built on the bZx protocol</p>
+        <p className="data-protocol">The Staking Dashboard is built on the bZx protocol</p>
         <a href="https://bzx.network/" target="_blank" rel="noopener noreferrer" className="logo">
           <div className="logo-sign">
             <LogoSign />

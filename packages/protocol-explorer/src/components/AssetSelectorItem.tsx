@@ -4,12 +4,14 @@ import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { Line } from 'react-chartjs-2'
-import { Link } from 'react-router-dom'
+import { NavService } from '../services/NavService'
+import { Tab } from 'src/domain/Tab'
 
 export interface IAssetSelectorItemProps {
   asset: Asset
   apr: any
   tvl: any
+  setActiveTab: (tab: Tab) => void
 }
 
 interface IAssetSelectorState {
@@ -56,6 +58,13 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   public componentDidMount(): void {
     this.getAssetStatsHistory()
+  }
+
+  public openStatsToken = () => {
+    let asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails
+    const assetName = asset.displayName.toLocaleLowerCase()
+    NavService.Instance.History.push(`/stats/${assetName}`)
+    this.props.setActiveTab(Tab.Unknown)
   }
 
   public render() {
@@ -129,7 +138,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     }
     const TokenIcon = asset.reactLogoSvg
     return (
-      <Link to={`/stats/${asset.displayName.toLocaleLowerCase()}`} className="asset-selector-item">
+      <div className="asset-selector-item" onClick={this.openStatsToken}>
         <div className="asset-selector-item-row">
           <span className="asset-selector-icon">
             {this.props.asset !== Asset.UNKNOWN && <TokenIcon />}
@@ -145,13 +154,14 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
             </span>
           </span>
           <span className="asset-selector-apr">
-            <span className="value green-color">{apr ? apr.toFixed(2) : 0.0}%&nbsp;</span>APR
+            <span className="value green-color">{apr ? apr.toFixed(2) : 0.0}%&nbsp;</span>
+            APR
           </span>
         </div>
         <div className="asset-selector-chart">
           <Line ref="chart" data={chartData} options={options} />
         </div>
-      </Link>
+      </div>
     )
   }
 

@@ -26,16 +26,19 @@ export function Header({ appVM }: { appVM: AppVM }) {
           </Link>
           <div className="flex-row md-visible">
             <ExternalLink
+              targetBlank={false}
               className="header__link margin-right-3"
               href="https://app.fulcrum.trade/trade">
               Trade
             </ExternalLink>
             <ExternalLink
+              targetBlank={false}
               className="header__link margin-right-3"
               href="https://app.fulcrum.trade/lend">
               Lend
             </ExternalLink>
             <ExternalLink
+              targetBlank={false}
               className="header__link margin-right-3"
               href="https://app.torque.loans">
               Borrow
@@ -46,6 +49,7 @@ export function Header({ appVM }: { appVM: AppVM }) {
             <div className="sm-visible">
               <div className="flex ai-c header-right">
                 <ExternalLink
+                  targetBlank={true}
                   href="https://bzx.network/blog/staking-bzrx"
                   className="header__item-menu">
                   Staking FAQ

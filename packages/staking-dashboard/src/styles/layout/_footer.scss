@@ -53,7 +53,7 @@ footer {
       &:not(:last-child) {
         margin-bottom: 20px;
         @media screen and (max-width: $width-max-sm) {
-          margin-bottom: 15px;
+          margin-bottom: $spacing-base;
         }
       }
     }
@@ -63,8 +63,8 @@ footer {
   width: calc(100% / 12 * 5);
 
   @media screen and (min-width: $width-min-sm) {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: $spacing-base;
+    padding-right: $spacing-base;
   }
   @media screen and (max-width: $width-max-sm) {
     display: flex;
@@ -89,7 +89,7 @@ footer {
       width: 56px;
 
       &:not(:last-child) {
-        margin-right: 15px;
+        margin-right: $spacing-base;
       }
       &:hover {
         circle,
@@ -118,17 +118,14 @@ footer {
   .data-protocol {
     font-weight: 600;
     margin-bottom: 20px;
-    font-size: 18px;
-    @media screen and (max-width: $width-max-sm) {
-      font-size: 16px;
-    }
+    font-size: 16px;
   }
   .data-year {
     flex-wrap: wrap;
     font-size: 14px;
     margin-top: 75px;
     @media screen and (max-width: $width-max-md) {
-      margin-bottom: 15px;
+      margin-bottom: $spacing-base;
       margin-top: 42px;
     }
 
@@ -139,7 +136,7 @@ footer {
     }
 
     p {
-      margin-right: 15px;
+      margin-right: $spacing-base;
     }
     a {
       color: darken($green-color, 10%);
