@@ -17,24 +17,7 @@
   },
   "scripts": {
     "clean-all": "rimraf -rf ./packages/**/node_modules ./node_modules",
-    "build-all": "yarn run build-alchemy-web3 && yarn run build-fulcrum-ropsten",
     "build-alchemy-web3": "./scripts/build-alchemy-web3.sh",
-    "build-fulcrum-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-fulcrum.sh\"",
-    "build-fulcrum-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-fulcrum.sh\"",
-    "build-fulcrum-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-fulcrum.sh\"",
-    "build-fulcrum-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-fulcrum.sh\"",
-    "build-torque-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-torque.sh\"",
-    "build-torque-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-torque.sh\"",
-    "build-torque-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-torque.sh\"",
-    "build-torque-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-torque.sh\"",
-    "build-protocol-explorer-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-protocol-explorer.sh\"",
-    "build-protocol-explorer-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-protocol-explorer.sh\"",
-    "build-protocol-explorer-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-protocol-explorer.sh\"",
-    "build-protocol-explorer-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet NODE_OPTIONS=--max_old_space_size=4096 \"./scripts/build-protocol-explorer.sh\"",
-    "build-staking-dashboard-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby NODE_OPTIONS=--max_old_space_size=6144 \"./scripts/build-staking-dashboard.sh\"",
-    "build-staking-dashboard-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan NODE_OPTIONS=--max_old_space_size=6144 \"./scripts/build-staking-dashboard.sh\"",
-    "build-staking-dashboard-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten NODE_OPTIONS=--max_old_space_size=6144 \"./scripts/build-staking-dashboard.sh\"",
-    "build-staking-dashboard-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet NODE_OPTIONS=--max_old_space_size=6144  \"./scripts/build-staking-dashboard.sh\"",
     "build-bzx-api": "cross-env-shell \"./scripts/build-bzx-api.sh\""
   }
 }
