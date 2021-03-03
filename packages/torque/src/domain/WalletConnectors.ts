@@ -24,6 +24,8 @@ const getNetworkIdByString = (networkName: string | undefined) => {
       return 4
     case 'kovan':
       return 42
+    case 'bsc':
+      return 56
     default:
       return 0
   }

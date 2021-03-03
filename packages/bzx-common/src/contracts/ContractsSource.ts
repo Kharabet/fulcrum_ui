@@ -78,6 +78,9 @@ const getNetworkNameById = (networkId: number): string => {
     case 42:
       networkName = 'kovan'
       break
+    case 56:
+      networkName = 'bsc'
+      break
     default:
       networkName = 'local'
       break

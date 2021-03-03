@@ -1300,7 +1300,7 @@ export class FulcrumProvider {
       const contractDefaults = this.web3Wrapper!.getContractDefaults()
       if (contractDefaults && contractDefaults.gasPrice !== undefined) {
         return new BigNumber(contractDefaults.gasPrice)
-      }else{
+      } else {
         return new BigNumber(1).multipliedBy(10 ** 9)
       }
     }
@@ -1724,6 +1724,10 @@ export class FulcrumProvider {
       case 42:
         networkName = 'kovan'
         etherscanURL = 'https://kovan.etherscan.io/'
+        break
+      case 56:
+        networkName = 'bsc'
+        etherscanURL = 'https://bscscan.com/'
         break
       default:
         networkId = 0

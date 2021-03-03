@@ -82,6 +82,8 @@ const getNetworkIdByString = (networkName: string | undefined) => {
       return 4
     case 'kovan':
       return 42
+    case 'bsc':
+      return 56
     default:
       return 0
   }
@@ -341,6 +343,10 @@ export class TorqueProvider {
         networkName = 'kovan'
         etherscanURL = 'https://kovan.etherscan.io/'
         break
+      case 56:
+        networkName = 'bsc'
+        etherscanURL = 'https://bscscan.com/'
+        break
       default:
         networkId = 0
         networkName = 'local'
@@ -450,7 +456,11 @@ export class TorqueProvider {
     depositAmount: BigNumber,
     collaterizationPercent: BigNumber
   ): Promise<IBorrowEstimate> => {
-    const result = { borrowAmount: new BigNumber(0), gasEstimate: new BigNumber(0), exceedsLiquidity: false }
+    const result = {
+      borrowAmount: new BigNumber(0),
+      gasEstimate: new BigNumber(0),
+      exceedsLiquidity: false
+    }
 
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getITokenContract(borrowAsset)
@@ -459,7 +469,7 @@ export class TorqueProvider {
       if (depositAmount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
         const collateralToLoanRate = await this.getSwapRate(collateralAsset, borrowAsset)
         const liquidity = await this.getAvailableLiquidity(borrowAsset)
-        if (depositAmount.times(collateralToLoanRate).gte(liquidity)){
+        if (depositAmount.times(collateralToLoanRate).gte(liquidity)) {
           result.borrowAmount = liquidity.times(0.8)
           result.exceedsLiquidity = true
           return result
@@ -2584,7 +2594,7 @@ export class TorqueProvider {
       reject(e)
     }
   }
-  
+
   private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
     switch (asset) {
       case Asset.WBTC:
@@ -2597,54 +2607,54 @@ export class TorqueProvider {
     }
   }
 
- // Returns swap rate from Kyber
- public async getKyberSwapRate(
-  srcAsset: Asset,
-  destAsset: Asset,
-  srcAmount?: BigNumber
-): Promise<BigNumber> {
-  if (networkName !== 'mainnet') {
-    // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract
-    return this.getSwapRate(srcAsset, destAsset)
-  }
-  let result: BigNumber = new BigNumber(0)
-  const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
-  const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
-
-  if (srcAssetErc20Address && destAssetErc20Address) {
-    const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
-    if (!srcAmount) {
-      srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
-    } else {
-      srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
+  // Returns swap rate from Kyber
+  public async getKyberSwapRate(
+    srcAsset: Asset,
+    destAsset: Asset,
+    srcAmount?: BigNumber
+  ): Promise<BigNumber> {
+    if (networkName !== 'mainnet') {
+      // Kyebr doesn't support our kovan tokens so the price for them is taken from our PriceFeed contract
+      return this.getSwapRate(srcAsset, destAsset)
     }
-    try {
-      const oneEthWorthTokenAmount = await fetch(
-        `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`
-      )
-        .then((resp) => resp.json())
-        .then((resp) => 1 / resp.data[0].src_qty[0])
-        .catch(console.error)
-      if (oneEthWorthTokenAmount) {
-        srcAmount = new BigNumber(oneEthWorthTokenAmount)
-          .times(10 ** srcAssetDecimals)
-          .dp(0, BigNumber.ROUND_HALF_UP)
+    let result: BigNumber = new BigNumber(0)
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
+
+    if (srcAssetErc20Address && destAssetErc20Address) {
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
+      if (!srcAmount) {
+        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
+      } else {
+        srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
       }
+      try {
+        const oneEthWorthTokenAmount = await fetch(
+          `https://api.kyber.network/buy_rate?id=${srcAssetErc20Address}&qty=1`
+        )
+          .then((resp) => resp.json())
+          .then((resp) => 1 / resp.data[0].src_qty[0])
+          .catch(console.error)
+        if (oneEthWorthTokenAmount) {
+          srcAmount = new BigNumber(oneEthWorthTokenAmount)
+            .times(10 ** srcAssetDecimals)
+            .dp(0, BigNumber.ROUND_HALF_UP)
+        }
 
-      const swapPriceData = await fetch(
-        `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${srcAmount}`
-      )
-        .then((resp) => resp.json())
-        .catch(console.error)
+        const swapPriceData = await fetch(
+          `https://api.kyber.network/expectedRate?source=${srcAssetErc20Address}&dest=${destAssetErc20Address}&sourceAmount=${srcAmount}`
+        )
+          .then((resp) => resp.json())
+          .catch(console.error)
 
-      result = new BigNumber(swapPriceData['expectedRate']).dividedBy(10 ** 18)
-    } catch (e) {
-      console.error(e)
-      result = new BigNumber(0)
+        result = new BigNumber(swapPriceData['expectedRate']).dividedBy(10 ** 18)
+      } catch (e) {
+        console.error(e)
+        result = new BigNumber(0)
+      }
     }
+    return result
   }
-  return result
-}
 
   public sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -2661,14 +2671,14 @@ export class TorqueProvider {
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api
     const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
-    const etherscanApiUrl = `https://${
-      networkName === 'kovan' ? 'api-kovan' : 'api'
-    }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${blockNumber -
+    const blockExplorerUrl = networkName === 'kovan' ? 'https://bscscan.com'
+    :  networkName === 'kovan' ? 'https://api-kovan.etherscan.io' : 'https://api.etherscan.io' 
+    const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${blockNumber -
       days * blocksPerDay}&toBlock=latest&address=${bzxContractAddress}&topic0=${
       LiquidationEvent.topic0
     }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
 
-    const liquidationEventResponse = await fetch(etherscanApiUrl)
+    const liquidationEventResponse = await fetch(blockExplorerApiUrl)
     const liquidationEventResponseJson = await liquidationEventResponse.json()
     if (liquidationEventResponseJson.status !== '1') return result
     const events = liquidationEventResponseJson.result

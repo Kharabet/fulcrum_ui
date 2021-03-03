@@ -34,10 +34,10 @@ const getLogsFromEtherscan = async (
   const etherscanApiKey = apiKey
   const topicsQueryParams: string[] = []
   topics.forEach((topic, i) => topicsQueryParams.push(`topic${i}=${topic}&`))
-  const etherscanApiUrl = `https://${
-    networkName === 'kovan' ? 'api-kovan' : 'api'
-  }.etherscan.io/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&address=${address}&${topicsQueryParams.join('')}apikey=${etherscanApiKey}`
-  const liquidationResponse = await fetch(etherscanApiUrl)
+  const blockExplorerUrl = networkName === 'kovan' ? 'https://bscscan.com'
+    :  networkName === 'kovan' ? 'https://api-kovan.etherscan.io' : 'https://api.etherscan.io' 
+  const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&address=${address}&${topicsQueryParams.join('')}apikey=${etherscanApiKey}`
+  const liquidationResponse = await fetch(blockExplorerApiUrl)
   const liquidationResponseJson = await liquidationResponse.json()
   return liquidationResponseJson.status === '1' ? liquidationResponseJson.result : undefined
 }
