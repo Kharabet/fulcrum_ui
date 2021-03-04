@@ -1733,7 +1733,7 @@ export class FulcrumProvider {
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
-
+    // to get human-readable amount result should be divided always by 10**18 
     return result
   }
 
