@@ -9,6 +9,9 @@ import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc2
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
+    if (FulcrumProvider.Instance.unsupportedNetwork) {
+      throw new Error('You are connected to the wrong network!')
+    }
     if (
       !(
         FulcrumProvider.Instance.contractsSource &&
@@ -27,7 +30,7 @@ export class ManageCollateralProcessor {
         'Initializing',
         'Submitting collateral',
         'Updating the blockchain',
-        'Transaction completed'
+        'Transaction completed',
       ])
     } else {
       task.processingStart([
@@ -37,7 +40,7 @@ export class ManageCollateralProcessor {
         'Waiting for token allowance',
         'Submitting collateral',
         'Updating the blockchain',
-        'Transaction completed'
+        'Transaction completed',
       ])
     }
 
@@ -78,10 +81,12 @@ export class ManageCollateralProcessor {
       }
       // Detecting token allowance
       task.processingStepNext()
-      erc20allowance = await tokenErc20Contract.allowance.callAsync(
-        account,
-        FulcrumProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
-      )
+      erc20allowance = await tokenErc20Contract
+        .allowance(
+          account,
+          FulcrumProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
+        )
+        .callAsync()
 
       // Prompting token allowance
       task.processingStepNext()
@@ -110,15 +115,13 @@ export class ManageCollateralProcessor {
 
     if (!taskRequest.isWithdrawal) {
       try {
-        const gasAmount = await bZxContract.depositCollateral.estimateGasAsync(
-          taskRequest.loanId,
-          collateralAmountInBaseUnits,
-          {
+        const gasAmount = await bZxContract
+          .depositCollateral(taskRequest.loanId, collateralAmountInBaseUnits)
+          .estimateGasAsync({
             from: account,
             value: isETHCollateralAsset ? collateralAmountInBaseUnitsValue : undefined,
-            gas: FulcrumProvider.Instance.gasLimit
-          }
-        )
+            gas: FulcrumProvider.Instance.gasLimit,
+          })
         gasAmountBN = new BigNumber(gasAmount)
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
@@ -127,47 +130,46 @@ export class ManageCollateralProcessor {
       }
 
       try {
-        txHash = await bZxContract.depositCollateral.sendTransactionAsync(
-          taskRequest.loanId, // loanId
-          collateralAmountInBaseUnits, // depositAmount
-          {
+        txHash = await bZxContract
+          .depositCollateral(
+            taskRequest.loanId, // loanId
+            collateralAmountInBaseUnits // depositAmount
+          )
+          .sendTransactionAsync({
             from: account,
             value: isETHCollateralAsset ? collateralAmountInBaseUnitsValue : undefined,
             gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : '3000000',
-            gasPrice: await FulcrumProvider.Instance.gasPrice()
-          }
-        )
+            gasPrice: await FulcrumProvider.Instance.gasPrice(),
+          })
         task.setTxHash(txHash)
       } catch (e) {
         throw e
       }
     } else {
       try {
-        const gasAmount = await bZxContract.withdrawCollateral.estimateGasAsync(
-          taskRequest.loanId,
-          account,
-          collateralAmountInBaseUnits,
-          {
+        const gasAmount = await bZxContract
+          .withdrawCollateral(taskRequest.loanId, account, collateralAmountInBaseUnits)
+          .estimateGasAsync({
             from: account,
-            gas: FulcrumProvider.Instance.gasLimit
-          }
-        )
+            gas: FulcrumProvider.Instance.gasLimit,
+          })
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(2).integerValue(BigNumber.ROUND_UP)
       } catch (e) {
         throw e
       }
 
       try {
-        txHash = await bZxContract.withdrawCollateral.sendTransactionAsync(
-          taskRequest.loanId, // loanId
-          account, // trader
-          collateralAmountInBaseUnits, // depositAmount
-          {
+        txHash = await bZxContract
+          .withdrawCollateral(
+            taskRequest.loanId, // loanId
+            account, // trader
+            collateralAmountInBaseUnits // depositAmount
+          )
+          .sendTransactionAsync({
             from: account,
             gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : '3000000',
-            gasPrice: await FulcrumProvider.Instance.gasPrice()
-          }
-        )
+            gasPrice: await FulcrumProvider.Instance.gasPrice(),
+          })
         task.setTxHash(txHash)
       } catch (e) {
         throw e

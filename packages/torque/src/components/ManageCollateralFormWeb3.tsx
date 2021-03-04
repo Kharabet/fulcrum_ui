@@ -243,7 +243,7 @@ export class ManageCollateralFormWeb3 extends Component<
     }
     if (prevState.assetDetails !== this.state.assetDetails) {
       this.getLiquidationPrice()
-    }
+  }
   }
 
   public getLiquidationPrice = async () => {
@@ -283,6 +283,7 @@ export class ManageCollateralFormWeb3 extends Component<
       this.state.activeTokenLiquidation === this.props.loanOrderState.collateralAsset
         ? this.state.liquidationPrice
         : new BigNumber(1).div(this.state.liquidationPrice)
+    const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
@@ -352,7 +353,7 @@ export class ManageCollateralFormWeb3 extends Component<
 
           <div className="input-container">
             <div className="input-row">
-              <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+              <span className="asset-icon"><TokenIcon /></span>
               {this.state.isLoading ? (
                 <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
               ) : (

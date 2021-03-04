@@ -8,7 +8,6 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 
-
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { ReactComponent as SearchIcon } from '../assets/images/ic__search.svg'
 
@@ -46,7 +45,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     const search = document.querySelector('.select-options__search') as HTMLElement
     const inputSelect = document.querySelector('.select-options__input') as HTMLElement
     const target = e.target as HTMLElement
-    if (target == selectStyled || target == search || target == inputSelect) return
+    if (!selectStyled || !ul || target == selectStyled || target == search || target == inputSelect) return
     selectStyled.classList.remove('active')
 
     ul.style.display = 'none'
@@ -93,13 +92,14 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     setOptions(result)
   }, [inputValue])
 
+  const TokenIcon = asset.reactLogoSvg
   return (
     <div className="select">
       {/* <select className="select-hidden" value={props.selectedOption.value}>
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        {asset.reactLogoSvg.render()}
+        <TokenIcon />
         {props.selectedOption.baseToken}/{props.selectedOption.quoteToken}
       </div>
       <ul className="select-options">
@@ -118,17 +118,24 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         </div>
 
         <SimpleBar style={{ maxHeight: 480 }} autoHide={false}>
-          {options.map((option, i) => (
-            <li
-              data-basetoken={option.baseToken}
-              data-quotetoken={option.quoteToken}
-              data-index={i}
-              key={i}
-              onClick={onLiClick}>
-              {AssetsDictionary.assets.get(option.baseToken)!.reactLogoSvg.render()}
-              {option.baseToken}/{option.quoteToken}
-            </li>
-          ))}
+          {options.map((option, i) => {
+            const TokenIcon = AssetsDictionary.assets.get(option.baseToken)!.reactLogoSvg as React.FunctionComponent<
+            React.SVGProps<SVGSVGElement> & {
+              title?: string | undefined
+            }
+          >
+            return (
+              <li
+                data-basetoken={option.baseToken}
+                data-quotetoken={option.quoteToken}
+                data-index={i}
+                key={i}
+                onClick={onLiClick}>
+                <TokenIcon />
+                {option.baseToken}/{option.quoteToken}
+              </li>
+            )
+          })}
         </SimpleBar>
 
         {!options.length && (

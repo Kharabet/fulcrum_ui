@@ -34,8 +34,8 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       const tagManagerArgs = {
         dataLayer: {
           event: 'select-provider',
-          providerName: props.providerType
-        }
+          providerName: props.providerType,
+        },
       }
       TagManager.dataLayer(tagManagerArgs)
     }
@@ -53,6 +53,10 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
     const etherscanURL = TorqueProvider.Instance.web3ProviderSettings
       ? TorqueProvider.Instance.web3ProviderSettings.etherscanURL
       : ''
+    const TokenIcon = providerTypeDetails.reactLogoSvgShort
+    if (!TokenIcon) {
+      return null
+    }
 
     return (
       <li
@@ -75,12 +79,15 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
           )}
         </div>
         <div className="provider-menu__list-item-content-img">
-          {providerTypeDetails.reactLogoSvgShort.render()}
+          <TokenIcon />
         </div>
       </li>
     )
   }
-
+  const TokenIcon = providerTypeDetails.reactLogoSvgShort
+  if (!TokenIcon) {
+    return null
+  }
   return (
     <li className={`provider-menu__list-item `} onClick={onClick}>
       <div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>
@@ -88,7 +95,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
         {props.isActivating ? (
           <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
         ) : (
-          providerTypeDetails.reactLogoSvgShort.render()
+          <TokenIcon />
         )}
       </div>
     </li>

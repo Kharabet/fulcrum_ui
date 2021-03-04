@@ -12,3 +12,4 @@ secrets.js
 .next
 .idea
 persist-storage
+.eslintcache

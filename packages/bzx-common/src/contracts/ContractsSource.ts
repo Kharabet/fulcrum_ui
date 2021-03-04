@@ -197,7 +197,6 @@ export default class ContractsSource {
 
   private getCompoundGovernorAlphaContractRaw(): CompoundGovernorAlphaContract {
     return new CompoundGovernorAlphaContract(
-      compoundGovernorAlphaJson.abi,
       this.getCompoundGovernorAlphaAddress().toLowerCase(),
       this.provider
     )
@@ -213,17 +212,17 @@ export default class ContractsSource {
 
   private async getStakingV1ContractRaw() {
     const address = stakingV1Addresses.get(this.networkId) || ''
-    return new StakingV1Contract(stakingV1Json.abi, address, this.provider)
+    return new StakingV1Contract(address, this.provider)
   }
 
   private async getBzrxVestingContractRaw() {
     const address = vbzrxAddresses.get(this.networkId) || ''
-    return new BZRXVestingTokenContract(bzrxVestingJson.abi, address.toLowerCase(), this.provider)
+    return new BZRXVestingTokenContract(address.toLowerCase(), this.provider)
   }
 
   public async getHelperContractRaw() {
     const address = helperAddresses.get(this.networkId) || ''
-    return new HelperImplContract(HelperImplJson.abi, address.toLowerCase(), this.provider)
+    return new HelperImplContract(address.toLowerCase(), this.provider)
   }
 
   public getiBZxAddress(): string {
@@ -368,7 +367,7 @@ export default class ContractsSource {
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init()
-    return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider)
+    return new erc20Contract(addressErc20.toLowerCase(), this.provider)
   }
 
   private getITokenContractRaw(asset: Asset): iTokenContract | null {
@@ -382,14 +381,13 @@ export default class ContractsSource {
     }
     const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null
     return tokenContractInfo
-      ? new iTokenContract(this.iTokenJson.abi, tokenContractInfo.token, this.provider)
+      ? new iTokenContract(tokenContractInfo.token, this.provider)
       : null
   }
 
   private async getOracleContractRaw(): Promise<oracleContract> {
     await this.Init()
     return new oracleContract(
-      this.oracleJson.abi,
       this.getOracleAddress().toLowerCase(),
       this.provider
     )
@@ -398,7 +396,6 @@ export default class ContractsSource {
   private async getDAppHelperContractRaw(): Promise<DAppHelperContract> {
     await this.Init()
     return new DAppHelperContract(
-      this.DAppHelperJson.abi,
       this.getDAppHelperAddress().toLowerCase(),
       this.provider
     )
@@ -406,7 +403,6 @@ export default class ContractsSource {
   private async getIKyberNetworkProxyContractRaw(): Promise<IKyberNetworkProxyContract> {
     await this.Init()
     return new IKyberNetworkProxyContract(
-      this.IKyberNetworkProxyJson.abi,
       this.getIKyberNetworkProxyContractAddress().toLowerCase(),
       this.provider
     )
@@ -475,7 +471,7 @@ export default class ContractsSource {
 
   private async getiBZxContractRaw() {
     const address = ibzxAddresses.get(this.networkId) || ''
-    return new iBZxContract(iBZxJson.abi, address.toLowerCase(), this.provider)
+    return new iBZxContract(address.toLowerCase(), this.provider)
   }
 
   private getCompoundComptrollerAddress(): string {
@@ -494,7 +490,6 @@ export default class ContractsSource {
   private async getCompoundComptrollerContractRaw(): Promise<CompoundComptrollerContract> {
     await this.Init()
     return new CompoundComptrollerContract(
-      this.compoundComptrollerJson.abi,
       this.getCompoundComptrollerAddress().toLowerCase(),
       this.provider
     )
@@ -502,7 +497,7 @@ export default class ContractsSource {
 
   private async getCTokenContractRaw(address: string): Promise<CTokenContract> {
     await this.Init()
-    return new CTokenContract(this.cTokenJson.abi, address.toLowerCase(), this.provider)
+    return new CTokenContract(address.toLowerCase(), this.provider)
   }
 
   private getSoloAddress(): string {
@@ -520,7 +515,7 @@ export default class ContractsSource {
 
   private async getSoloContractRaw(): Promise<SoloContract> {
     await this.Init()
-    return new SoloContract(this.soloJson.abi, this.getSoloAddress().toLowerCase(), this.provider)
+    return new SoloContract(this.getSoloAddress().toLowerCase(), this.provider)
   }
 
   private static getSoloMarketRaw(asset: Asset): number {
@@ -554,7 +549,6 @@ export default class ContractsSource {
   private async getCompoundBridgeContractRaw(): Promise<CompoundBridgeContract> {
     await this.Init()
     return new CompoundBridgeContract(
-      this.compoundBridgeJson.abi,
       this.getCompoundBridgeAddress().toLowerCase(),
       this.provider
     )
@@ -576,7 +570,6 @@ export default class ContractsSource {
   private async getSoloBridgeContractRaw(): Promise<SoloBridgeContract> {
     await this.Init()
     return new SoloBridgeContract(
-      this.soloBridgeJson.abi,
       this.getSoloBridgeAddress().toLowerCase(),
       this.provider
     )
@@ -584,28 +577,27 @@ export default class ContractsSource {
 
   private async getCdpContractRaw(addressCdp: string): Promise<GetCdpsContract> {
     await this.Init()
-    return new GetCdpsContract(this.cdpsJson.abi, addressCdp.toLowerCase(), this.provider)
+    return new GetCdpsContract(addressCdp.toLowerCase(), this.provider)
   }
 
   private async getVatContractRaw(addressVat: string): Promise<vatContract> {
     await this.Init()
-    return new vatContract(this.vatJson.abi, addressVat.toLowerCase(), this.provider)
+    return new vatContract(addressVat.toLowerCase(), this.provider)
   }
 
   private async getCdpManagerRaw(addressCdp: string): Promise<cdpManagerContract> {
     await this.Init()
-    return new cdpManagerContract(this.cdpJson.abi, addressCdp.toLowerCase(), this.provider)
+    return new cdpManagerContract(addressCdp.toLowerCase(), this.provider)
   }
 
   private async getMakerBridgeRaw(address: string): Promise<makerBridgeContract> {
     await this.Init()
-    return new makerBridgeContract(this.makerBridgeJson.abi, address.toLowerCase(), this.provider)
+    return new makerBridgeContract(address.toLowerCase(), this.provider)
   }
 
   private async getProxyRegistryRaw(address: string): Promise<proxyRegistryContract> {
     await this.Init()
     return new proxyRegistryContract(
-      this.proxyRegistryJson.abi,
       address.toLowerCase(),
       this.provider
     )
@@ -613,13 +605,12 @@ export default class ContractsSource {
 
   private async getDsProxyRaw(address: string): Promise<dsProxyJsonContract> {
     await this.Init()
-    return new dsProxyJsonContract(this.dsProxyJson.abi, address.toLowerCase(), this.provider)
+    return new dsProxyJsonContract(address.toLowerCase(), this.provider)
   }
 
   private async getSaiToDaiBridgeRaw(address: string): Promise<saiToDAIBridgeContract> {
     await this.Init()
     return new saiToDAIBridgeContract(
-      this.saiToDAIBridgeJson.abi,
       address.toLowerCase(),
       this.provider
     )
@@ -628,7 +619,6 @@ export default class ContractsSource {
   private async getInstaRegistryRaw(address: string): Promise<instaRegistryContract> {
     await this.Init()
     return new instaRegistryContract(
-      this.instaRegistryJson.abi,
       address.toLowerCase(),
       this.provider
     )
@@ -644,7 +634,6 @@ export default class ContractsSource {
 
   private async getThreePoolContractRaw() {
     return new ThreePoolContract(
-      this.threePoolJson.abi,
       this.getThreePoolContractAddress().toLowerCase(),
       this.provider
     )

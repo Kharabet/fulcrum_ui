@@ -116,6 +116,9 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
     ) : (
       <IconInfo />
     )
+    const LoanTokenIcon = loanAssetDt.reactLogoSvg
+    const CollateralTokenIcon = collateralAssetDt.reactLogoSvg
+    const CollateralToken2Icon = collateralAssetDt2 && collateralAssetDt2.reactLogoSvg
     return (
       <div className={`refinance-asset-selector-item `}>
         <div className="refinance-asset__main-block">
@@ -157,7 +160,7 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
               <div className="text">Fixed APR</div>
             </div>
             <div className="refinance-asset-selector__torque-loan-container">
-              <div className="asset-icon">{loanAssetDt.reactLogoSvg.render()}</div>
+              <div className="asset-icon"><LoanTokenIcon /></div>
               <div className="loan-value">
                 <div className="value">{this.props.borrowAmount}</div>
                 <div className="text">Loan</div>
@@ -174,7 +177,7 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
             {this.state.isShow && (
               <div className="refinance-asset-selector__collateral-container">
                 <div className="refinance-asset-selector__collateral">
-                  <div className="asset-icon">{collateralAssetDt.reactLogoSvg.render()}</div>
+                  <div className="asset-icon"><CollateralTokenIcon /></div>
                   <div className="collateral-value">
                     <div className={`value ${this.props.isDisabled ? 'red' : ''}`}>
                       {this.props.collateral[0].balance}
@@ -192,7 +195,7 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
                 {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
                 {this.state.isShow && collateralAssetDt2 && (
                   <div className="refinance-asset-selector__collateral">
-                    <div className="asset-icon">{collateralAssetDt2.reactLogoSvg.render()}</div>
+                    <div className="asset-icon"><CollateralToken2Icon/></div>
                     <div className="collateral-value">
                       <div className={`value ${this.props.isDisabled ? 'red' : ''}`}>
                         {this.props.collateral[1].balance}

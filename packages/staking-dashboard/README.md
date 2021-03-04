@@ -58,7 +58,7 @@ accounts[0].transfer(myAccount, 10e18)
 BZRX.transfer(myAccount, 123e18, {"from": BZRX.address})
 vBZRX.transfer(myAccount, 234e18, {"from": vBZRX.address})
 ## Note: BPT "stolen" from a whale, change address if needed
-BPT.transferFrom("0xe95ebce2b02ee07def5ed6b53289801f7fc137a4", myAccount, 345e18, {"from": "0xe95ebce2b02ee07def5ed6b53289801f7fc137a4"})
+BPT.transferFrom("0xe95ebce2b02ee07def5ed6b53289801f7fc137a4", myAccount, 10000e18, {"from": "0xe95ebce2b02ee07def5ed6b53289801f7fc137a4"})
 BZRX.approve(iBZRX, 10*10**50, {"from": myAccount})
 iBZRX.mint(myAccount, 25*10**18, {"from": myAccount})
 ## Spending Approvals

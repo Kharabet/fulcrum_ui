@@ -293,13 +293,13 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         }
       }
     }
-
+    const TokenIcon = asset.reactLogoSvg
     return (
       <React.Fragment>
         <div className="container">
           <div className="flex fw-w fd-sm-c jc-sb ai-c mb-30">
             <div className="flex ai-c as-sm-fs ">
-              <span className="flex mr-15 icon-wrapper">{asset.reactLogoSvg.render()}</span>
+              <span className="flex mr-15 icon-wrapper"><TokenIcon /></span>
               <h1>{this.state.asset.toUpperCase()} Stats</h1>
             </div>
             <GroupButton setPeriodChart={this.setPeriodChart} />

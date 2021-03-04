@@ -21,7 +21,7 @@ import {
   LiquidationEvent,
   MintEvent,
   RolloverEvent,
-  TradeEvent
+  TradeEvent,
 } from 'bzx-common/src/domain/events'
 import {
   getBorrowHistory,
@@ -32,7 +32,7 @@ import {
   getLogsFromEtherscan,
   getMintHistory,
   getRolloverHistory,
-  getTradeHistory
+  getTradeHistory,
 } from 'bzx-common/src/utils'
 
 import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
@@ -127,7 +127,7 @@ export class ExplorerProvider {
         Asset.UNI,
         Asset.AAVE,
         Asset.LRC,
-        Asset.COMP
+        Asset.COMP,
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
@@ -276,7 +276,7 @@ export class ExplorerProvider {
     return {
       networkId,
       networkName,
-      etherscanURL
+      etherscanURL,
     }
   }
 
@@ -307,19 +307,17 @@ export class ExplorerProvider {
     }
 
     if (resetRequiredAssets.includes(asset)) {
-      const allowance = await tokenErc20Contract.allowance.callAsync(account, spender)
+      const allowance = await tokenErc20Contract.allowance(account, spender).callAsync()
       if (allowance.gt(0) && amountInBaseUnits.gt(allowance)) {
-        const zeroApprovHash = await tokenErc20Contract.approve.sendTransactionAsync(
-          spender,
-          new BigNumber(0),
-          { from: account }
-        )
+        const zeroApprovHash = await tokenErc20Contract
+          .approve(spender, new BigNumber(0))
+          .sendTransactionAsync({ from: account })
         await this.waitForTransactionMined(zeroApprovHash)
       }
     }
 
-    result = await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, {
-      from: account
+    result = await tokenErc20Contract.approve(spender, amountInBaseUnits).sendTransactionAsync({
+      from: account,
     })
 
     return result
@@ -459,11 +457,9 @@ export class ExplorerProvider {
     const iBZxContract = await this.contractsSource.getiBZxContract()
 
     if (!iBZxContract) return result
-    const loansData = await iBZxContract.getActiveLoans.callAsync(
-      new BigNumber(start),
-      new BigNumber(count),
-      isUnhealthy
-    )
+    const loansData = await iBZxContract
+      .getActiveLoans(new BigNumber(start), new BigNumber(count), isUnhealthy)
+      .callAsync()
 
     const mappedAssetsShown = this.assetsShown.map((asset) => this.wethToEth(asset))
     const usdPrices = await this.getSwapToUsdRatesOffChain(mappedAssetsShown)
@@ -502,7 +498,7 @@ export class ExplorerProvider {
         maxLiquidatable: e.maxLiquidatable.dividedBy(10 ** loanPrecision),
         maxLiquidatableUsd: maxLiquidatableUsd,
         maxSeizable: e.maxSeizable.dividedBy(10 ** collateralPrecision),
-        loanData: e
+        loanData: e,
       })
     })
 
@@ -526,7 +522,7 @@ export class ExplorerProvider {
       }
       const loan = rolloverPendingLoans[i]
       try {
-        const rolloverEstimate = await iBZxContract.rollover.callAsync(loan.loanId, '0x')
+        const rolloverEstimate = await iBZxContract.rollover(loan.loanId, '0x').callAsync()
         const rebateAsset = this.contractsSource.getAssetFromAddress(rolloverEstimate[0])
         const decimals = AssetsDictionary.assets.get(rebateAsset)?.decimals || 18
         if (rebateAsset === Asset.UNKNOWN) {
@@ -581,7 +577,7 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.borrowedAmount.div(10 ** decimals),
           action: 'Open Fulcrum Loan',
-          asset: e.loanToken
+          asset: e.loanToken,
         } as ITxRowProps
       } else if (e instanceof RolloverEvent) {
         const decimals = AssetsDictionary.assets.get(e.collateralToken)!.decimals! || 18
@@ -593,7 +589,7 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.collateralAmountUsed.div(10 ** decimals),
           action: 'Rollover Fulcrum Loan',
-          asset: e.loanToken
+          asset: e.loanToken,
         } as ITxRowProps
       } else if (e instanceof CloseWithSwapEvent) {
         const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18
@@ -605,7 +601,7 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.loanCloseAmount.div(10 ** decimals),
           action: 'Close Fulcrum Loan',
-          asset: e.loanToken
+          asset: e.loanToken,
         } as ITxRowProps
       } else if (e instanceof LiquidationEvent) {
         const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18
@@ -617,7 +613,7 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.repayAmount.div(10 ** decimals),
           action: 'Liquidate Fulcrum Loan',
-          asset: e.loanToken
+          asset: e.loanToken,
         } as ITxRowProps
       } else if (e instanceof CloseWithDepositEvent) {
         const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18
@@ -629,7 +625,7 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.repayAmount.div(10 ** decimals),
           action: 'Close Torque Loan',
-          asset: e.loanToken
+          asset: e.loanToken,
         } as ITxRowProps
       } else if (e instanceof BorrowEvent) {
         const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18
@@ -641,7 +637,7 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
           quantity: e.newPrincipal.div(10 ** decimals),
           action: 'Open Torque Loan',
-          asset: e.loanToken
+          asset: e.loanToken,
         } as ITxRowProps
       } else if (e instanceof BurnEvent) {
         const decimals = AssetsDictionary.assets.get(e.asset)!.decimals! || 18
@@ -653,7 +649,7 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.burner}`,
           quantity: e.assetAmount.div(10 ** decimals),
           action: 'Burn Token',
-          asset: e.asset
+          asset: e.asset,
         } as ITxRowProps
       } else {
         //MintEvent
@@ -666,7 +662,7 @@ export class ExplorerProvider {
           etherscanAddressUrl: `${etherscanUrl}address/${e.minter}`,
           quantity: e.assetAmount.div(10 ** decimals),
           action: 'Mint iToken',
-          asset: e.asset
+          asset: e.asset,
         }
       }
     })
@@ -785,7 +781,7 @@ export class ExplorerProvider {
 
       const helperContract = await this.contractsSource.getDAppHelperContract()
       if (helperContract) {
-        result = await helperContract.assetRates.callAsync(usdTokenAddress, underlyings, amounts)
+        result = await helperContract.assetRates(usdTokenAddress, underlyings, amounts).callAsync()
       }
     }
 
@@ -840,10 +836,9 @@ export class ExplorerProvider {
       const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals))
 
       try {
-        const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
-          srcAssetErc20Address,
-          destAssetErc20Address
-        )
+        const swapPriceData: BigNumber[] = await oracleContract
+          .queryRate(srcAssetErc20Address, destAssetErc20Address)
+          .callAsync()
         result = swapPriceData[0]
           .times(srcAssetPrecision)
           .div(destAssetPrecision)
@@ -1077,10 +1072,9 @@ export class ExplorerProvider {
         if (assetAddress) {
           const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
           if (tokenContract) {
-            result = await tokenContract.allowance.callAsync(
-              account,
-              '0x55eb3dd3f738cfdda986b8eff3fa784477552c61'
-            )
+            result = await tokenContract
+              .allowance(account, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61')
+              .callAsync()
           }
         }
       }
@@ -1101,7 +1095,7 @@ export class ExplorerProvider {
       if (account) {
         const tokenContract = await this.contractsSource.getErc20Contract(addressErc20)
         if (tokenContract) {
-          result = await tokenContract.balanceOf.callAsync(account)
+          result = await tokenContract.balanceOf(account).callAsync()
         }
       }
     }
@@ -1164,8 +1158,8 @@ export class ExplorerProvider {
     const id = new BigNumber(
       Web3Utils.soliditySha3(collateralTokenAddress, platform === Platform.Torque) || 0
     )
-    const loanId = await iToken.loanParamsIds.callAsync(id)
-    const loanParams = await iBZxContract.loanParams.callAsync(loanId)
+    const loanId = await iToken.loanParamsIds(id).callAsync()
+    const loanParams = await iBZxContract.loanParams(loanId).callAsync()
     const result = {
       loanId: loanParams[0],
       principal: loanParams[3],
@@ -1173,7 +1167,7 @@ export class ExplorerProvider {
       platform: platform,
       initialMargin: loanParams[5].div(10 ** 18),
       maintenanceMargin: loanParams[6].div(10 ** 18),
-      liquidationPenalty: new BigNumber(0)
+      liquidationPenalty: new BigNumber(0),
     } as IParamRowProps
     return result
   }
@@ -1186,7 +1180,7 @@ export class ExplorerProvider {
         if (asset !== collateralAsset) {
           pairs.push({
             asset,
-            collateralAsset
+            collateralAsset,
           })
         }
       })

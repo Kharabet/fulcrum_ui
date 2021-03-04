@@ -24,7 +24,7 @@ export function InputAmount(props: IInputAmountProps) {
     <React.Fragment>
       <div className="input-container">
         <div className="input-row">
-          <span className="asset-icon">{props.asset.render()}</span>
+          <span className="asset-icon"><props.asset /></span>
           <input
             ref={_setInputRef}
             className="input-amount"

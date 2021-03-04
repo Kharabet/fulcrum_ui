@@ -162,7 +162,7 @@ export const RolloverRow = (props: IRolloverRowProps) => {
       window.setTimeout(() => ReactTooltip.hide(copyEl.current), 1000)
     })
   }
-
+  const RebateTokenIcon = rebateToken.reactLogoSvg
   return (
     <React.Fragment>
       {isLoadingTransaction ? (
@@ -185,7 +185,7 @@ export const RolloverRow = (props: IRolloverRowProps) => {
           </div>
           <div className="table-row-loan__amount" />
           <div title={props.gasRebate.toFixed()} className="table-row-loan__collateral">
-            {rebateToken.reactLogoSvg.render()}&nbsp;{props.gasRebate.toFixed(2)}
+            <RebateTokenIcon />&nbsp;{props.gasRebate.toFixed(2)}
           </div>
           <div className="table-row-loan__action">
             <button className="action" onClick={onRolloverClick}>

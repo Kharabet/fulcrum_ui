@@ -4,7 +4,7 @@ import * as mobx from 'mobx'
 import { StakingProvider } from 'src/services/StakingProvider'
 import RootStore from '../RootStore'
 
-type userBalanceProp = 'pending' | 'stakingProvider' | 'error'
+type userBalanceProp = 'pendingWalletBalance' | 'pendingStakedBalance' | 'stakingProvider' | 'error'
 type tokens = 'bpt' | 'bzrx' | 'vbzrx' | 'ibzrx' | 'crv'
 
 export class TokenBalances {
@@ -109,7 +109,8 @@ export default class UserBalances {
   public rootStore: RootStore
   public wallet = new TokenBalances()
   public staked = new TokenBalances()
-  public pending = false
+  public pendingWalletBalance = false
+  public pendingStakedBalance = false
   public stakingProvider: StakingProvider
   public error: Error | null = null
   public loaded = false
@@ -119,7 +120,7 @@ export default class UserBalances {
       bzrx: this.wallet.bzrx.plus(this.staked.bzrx),
       ibzrx: this.wallet.ibzrx.plus(this.staked.ibzrx),
       vbzrx: this.wallet.vbzrx.plus(this.staked.vbzrx),
-      bpt: this.wallet.bpt.plus(this.staked.bpt)
+      bpt: this.wallet.bpt.plus(this.staked.bpt),
     }
   }
 
@@ -144,14 +145,19 @@ export default class UserBalances {
     const { walletAddress } = this.rootStore.web3Connection
     try {
       const sp = this.stakingProvider
-      this.set('pending', true)
+      this.set('pendingWalletBalance', true)
       const walletAmounts = await sp.getStakeableBalances(walletAddress)
-      const stakedAmounts = await sp.getStakedBalances(walletAddress)
+      this.set('pendingWalletBalance', false)
       mobx.runInAction(() => {
         this.wallet.bzrx = walletAmounts.bzrx.div(10 ** 18)
         this.wallet.vbzrx = walletAmounts.vbzrx.div(10 ** 18)
         this.wallet.ibzrx = walletAmounts.ibzrx.div(10 ** 18)
         this.wallet.bpt = walletAmounts.bpt.div(10 ** 18)
+      })
+      this.set('pendingStakedBalance', true)
+      const stakedAmounts = await sp.getStakedBalances(walletAddress)
+      this.set('pendingStakedBalance', false)
+      mobx.runInAction(() => {
         this.staked.bzrx = stakedAmounts.bzrx.div(10 ** 18)
         this.staked.vbzrx = stakedAmounts.vbzrx.div(10 ** 18)
         this.staked.ibzrx = stakedAmounts.ibzrx.div(10 ** 18)
@@ -163,7 +169,7 @@ export default class UserBalances {
       this.set('error', err)
       console.error(err)
     } finally {
-      this.assign({ loaded: true, pending: false })
+      this.assign({ loaded: true, pendingStakedBalance: false, pendingWalletBalance: false })
     }
   }
 
@@ -176,7 +182,7 @@ export default class UserBalances {
   public getCopy() {
     return {
       wallet: this.wallet.getCopy(),
-      staked: this.staked.getCopy()
+      staked: this.staked.getCopy(),
     }
   }
 

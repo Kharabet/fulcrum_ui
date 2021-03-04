@@ -11,7 +11,6 @@ import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import configProviders from './../config/providers.json'
-import { LocationListener } from './LocationListener'
 import { ProviderMenu } from './ProviderMenu'
 import { RiskDisclosure } from './RiskDisclosure'
 import { errors } from 'ethers'
@@ -149,7 +148,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
               <MaintenancePage />
             ) : (
               <BrowserRouter>
-                <LocationListener doNetworkConnect={this.doNetworkConnect}>
                   <Switch>
                     {!isMainnetProd ? (
                       <Route
@@ -301,7 +299,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                   )}
 
                   <Footer isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                </LocationListener>
               </BrowserRouter>
             )}
           </div>
