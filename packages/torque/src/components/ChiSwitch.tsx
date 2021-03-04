@@ -4,7 +4,6 @@ import Asset from 'bzx-common/src/assets/Asset'
 import { TorqueProvider } from '../services/TorqueProvider'
 import '../styles/components/chi-switch.scss'
 import { CheckBox } from './CheckBox'
-import { propTypes } from 'qrcode.react'
 
 export interface IChiSwithProps {
   noLabel?: boolean

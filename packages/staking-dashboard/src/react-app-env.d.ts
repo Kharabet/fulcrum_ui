@@ -1,6 +1,5 @@
 /// <reference types="react-scripts" />
 declare module 'react-number-easing'
-declare module 'node-fetch'
 declare module 'react-intercom'
 
 declare namespace NodeJS {
