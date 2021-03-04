@@ -371,7 +371,7 @@ export class TorqueProvider {
         // result = result.multipliedBy(10 ** (18 - precision));
       }
     }
-
+    // to get human-readable amount result should be divided by asset decimals
     return result
   }
 
