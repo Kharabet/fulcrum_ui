@@ -136,6 +136,8 @@ export class FulcrumProvider {
       this.lendAssetsShown = [Asset.fWETH, Asset.USDC, Asset.WBTC]
     } else if (networkName === 'ropsten') {
       this.lendAssetsShown = [Asset.ETH, Asset.DAI]
+    } else if (networkName === 'bsc') {
+      this.lendAssetsShown = [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTCB, Asset.USDT]
     } else {
       this.lendAssetsShown = [
         Asset.ETH,

@@ -24,6 +24,12 @@
   }
   @media only screen and (min-width: $breakpoint-desktop-min) {
     min-height: 400px;
+    &.bsc{
+      min-height: auto;
+      height: auto;
+      margin-bottom: 40px;
+      padding-top: 20px;
+    }
   }
 }
 .chart-wrapper {

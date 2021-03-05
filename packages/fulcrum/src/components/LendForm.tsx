@@ -367,11 +367,17 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                 </div>
               )}
 
-              {this.props.asset === Asset.ETH ? (
+              {process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH ? (
                 <AssetDropdown
                   selectedAsset={this.state.useWrapped ? Asset.WETH : Asset.ETH}
                   onAssetChange={this.onChangeUseWrapped}
                   assets={[Asset.WETH, Asset.ETH]}
+                />
+              ) :  process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB ? (
+                <AssetDropdown
+                  selectedAsset={this.state.useWrapped ? Asset.WBNB : Asset.BNB}
+                  onAssetChange={this.onChangeUseWrapped}
+                  assets={[Asset.WBNB, Asset.BNB]}
                 />
               ) : (
                 <AssetDropdown selectedAsset={this.props.asset} assets={[this.props.asset]} />

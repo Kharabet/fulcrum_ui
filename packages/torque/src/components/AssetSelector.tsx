@@ -42,6 +42,8 @@ const AssetSelector = (props: IAssetSelectorProps) => {
       Asset.LRC,
       Asset.COMP
     ]
+  } else if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+    assetsShown = [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTCB, Asset.USDT]
   } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
     assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
   } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {

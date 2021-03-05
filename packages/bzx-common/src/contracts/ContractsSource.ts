@@ -43,7 +43,8 @@ const ibzxAddresses = new Map([
   [1, '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'],
   [3, '0xbe49f4cd73041cdf24a7b721627de577b3bab000'],
   [4, '0xc45755a7cfc9385290e6fece1f040c0453e7b0e5'],
-  [42, '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a']
+  [42, '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a'],
+  [56, '0xc47812857a74425e2039b57891a3dfcf51602d5d'],
 ])
 
 const stakingV1Addresses = new Map([
@@ -244,6 +245,9 @@ export default class ContractsSource {
       case 42:
         address = '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a'
         break
+        case 56:
+          address = '0xc47812857a74425e2039b57891a3dfcf51602d5d'
+          break
     }
 
     return address
@@ -284,6 +288,9 @@ export default class ContractsSource {
       case 42:
         address = '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a'
         break
+      case 56:
+        address = '0xc47812857a74425e2039b57891a3dfcf51602d5d'
+        break
     }
 
     return address
@@ -303,6 +310,9 @@ export default class ContractsSource {
         break
       case 42:
         address = '0x17aEef301D3db36f79A4a9A2D05138148b22C200'
+        break
+      case 56:
+        address = '0x43ccac29802332e1fd3a41264ddbe34ce3073a88'
         break
     }
 

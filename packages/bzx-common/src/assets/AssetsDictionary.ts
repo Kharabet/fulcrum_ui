@@ -1,9 +1,12 @@
-import  Asset  from './Asset'
+import Asset from './Asset'
 import AssetDetails from './AssetDetails'
 
 import aave_logo, { ReactComponent as AAVELogo } from './images/ic_token_aave.svg'
 import bat_logo, { ReactComponent as BATLogo } from './images/ic_token_bat.svg'
+import wbtc_logo, { ReactComponent as WBTCLogo } from './images/ic_token_wbtc.svg'
 import btc_logo, { ReactComponent as BTCLogo } from './images/ic_token_btc.svg'
+import bnb_logo, { ReactComponent as BNBLogo } from './images/ic_token_bnb.svg'
+import busd_logo, { ReactComponent as BUSDLogo } from './images/ic_token_busd.svg'
 import bzrx_logo, { ReactComponent as BZRXLogo } from './images/ic_token_bzrx.svg'
 import chai_logo, { ReactComponent as CHAILogo } from './images/ic_token_chai.svg'
 import chi_logo, { ReactComponent as CHILogo } from './images/ic_token_chi.svg'
@@ -63,8 +66,8 @@ export default class AssetsDictionary {
       new AssetDetails(
         'WBTC',
         8,
-        btc_logo,
-        BTCLogo,
+        wbtc_logo,
+        WBTCLogo,
         '#966AFF',
         '#E9CAEE',
         new Map<number, string | null>([
@@ -102,7 +105,8 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0xdac17f958d2ee523a2206206994597c13d831ec7'],
           [3, ''],
-          [42, '0x4c4462c6bca4c92bf41c40f9a4047f35fd296996']
+          [42, '0x4c4462c6bca4c92bf41c40f9a4047f35fd296996'],
+          [56, '0x55d398326f99059ff775485246999027b3197955']
         ])
       )
     ],
@@ -201,7 +205,8 @@ export default class AssetsDictionary {
           [1, '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'],
           [3, '0xc778417e063141139fce010982780140aa0cd5ab'],
           [4, '0xc778417e063141139fce010982780140aa0cd5ab'],
-          [42, '0xd0a1e359811322d97991e03f863a0c30c2cf029c']
+          [42, '0xd0a1e359811322d97991e03f863a0c30c2cf029c'],
+          [56, '0x2170ed0880ac9a755fd29b2688956bd959f933f8']
         ])
       )
     ],
@@ -218,7 +223,8 @@ export default class AssetsDictionary {
           [1, '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'],
           [3, '0xc778417e063141139fce010982780140aa0cd5ab'],
           [4, '0xc778417e063141139fce010982780140aa0cd5ab'],
-          [42, '0xd0a1e359811322d97991e03f863a0c30c2cf029c']
+          [42, '0xd0a1e359811322d97991e03f863a0c30c2cf029c'],
+          [56, '0x2170ed0880ac9a755fd29b2688956bd959f933f8']
         ])
       )
     ],
@@ -441,5 +447,53 @@ export default class AssetsDictionary {
         ])
       )
     ],
+    [
+      Asset.WBNB,
+      new AssetDetails(
+        'WBNB',
+        18,
+        bnb_logo,
+        BNBLogo,
+        '#F3BA2F',
+        '#F3BA2F',
+        new Map<number, string | null>([[56, '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c']])
+      )
+    ],
+    [
+      Asset.BNB,
+      new AssetDetails(
+        'BNB',
+        18,
+        bnb_logo,
+        BNBLogo,
+        '#F3BA2F',
+        '#F3BA2F',
+        new Map<number, string | null>([[56, '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c']])
+      )
+    ],
+    [
+      Asset.BUSD,
+      new AssetDetails(
+        'BUSD',
+        18,
+        busd_logo,
+        BUSDLogo,
+        '#F0B90B',
+        '#F0B90B',
+        new Map<number, string | null>([[56, '0xe9e7cea3dedca5984780bafc599bd69add087d56']])
+      )
+    ],
+    [
+      Asset.BTCB,
+      new AssetDetails(
+        'BTCB',
+        18,
+        btc_logo,
+        BTCLogo,
+        '#F7931A',
+        '#F7931A',
+        new Map<number, string | null>([[56, '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c']])
+      )
+    ]
   ])
 }
