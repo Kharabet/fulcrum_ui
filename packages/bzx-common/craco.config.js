@@ -5,8 +5,9 @@ const gitCommitId = require('git-commit-id')
 const fs = require('fs')
 
 // Getting the config from dotenv if present (Normally only for local development)
-if (fs.existsSync('.env')) {
-  const envConfig = dotenv.parse(fs.readFileSync('.env'))
+const env = path.resolve(__dirname, '../../.env')
+if (fs.existsSync(env)) {
+  const envConfig = dotenv.parse(fs.readFileSync(env))
   for (const k in envConfig) {
     process.env[k] = envConfig[k]
   }
