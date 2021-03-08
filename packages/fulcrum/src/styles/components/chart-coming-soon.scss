@@ -3,24 +3,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1e262e;
+  background-color: var(--bg-header);
   border-radius: 32px;
-  & > span {
-    font-weight: bold;
-    font-size: 52px;
-    line-height: 150%;
-    color: #758295;
-    margin-left: 50px;
-    background: #1e262e;
-    border-radius: 32px;
-  }
+  padding: 20px 0;
+  flex-wrap: wrap;
+}
 
-  @media (max-width: $breakpoint-mobile-max) {
-    padding: 20px 0;
-    flex-wrap: wrap;
-    > span {
-      margin-left: 0;
-      font-size: 24px;
-    }
+.chart-placeholder__text {
+  font-weight: bold;
+  line-height: 150%;
+  color: #758295;
+  font-size: 24px;
+  border-radius: 32px;
+  font-size: 24px;
+  margin-left: 0;
+}
+
+.chart-placeholder__mascot {
+  height: 100px;
+}
+
+@media screen and (min-width: $breakpoint-laptop-min) {
+  .chart-placeholder__mascot {
+    height: auto;
+  }
+  .chart-placeholder__text {
+    font-size: 52px;
+    margin-left: 50px;
   }
 }

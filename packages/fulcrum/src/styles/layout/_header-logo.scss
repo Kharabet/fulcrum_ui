@@ -5,12 +5,13 @@
   a {
     display: flex;
     align-items: center;
+    position: relative;
     svg {
       height: auto;
     }
     .fulcrum-logo-sign {
       display: flex;
-      margin-right: 20px;
+      margin-right: 10px;
       border-radius: 8px;
       background: linear-gradient(314.85deg, #003cda 19.25%, #33dfcc 86.5%);
       @media screen and (max-width: $breakpoint-mobile-max) {
@@ -21,6 +22,7 @@
         }
       }
     }
+
     .fulcrum-logo {
       display: flex;
       svg {
@@ -37,6 +39,39 @@
           width: 100px;
         }
       }
+    }
+  }
+}
+
+.header-logo.bsc {
+  .fulcrum-logo {
+    position: relative;
+  }
+
+  .bsc-logo {
+    position: absolute;
+    left: 164px;
+    bottom: -1px;
+  }
+}
+
+@media screen and (min-width: $breakpoint-mobile-max) {
+  .header-logo.bsc {
+    .fulcrum-logo {
+      top: -8px;
+    }
+    .bsc-logo {
+      left: 0;
+      bottom: 51px;
+    }
+  }
+}
+
+@media screen and (min-width: $breakpoint-laptop-min) {
+  .header-logo.bsc {
+    .bsc-logo {
+      left: 54px;
+      bottom: -15px;
     }
   }
 }

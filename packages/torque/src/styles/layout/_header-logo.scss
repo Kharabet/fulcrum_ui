@@ -24,3 +24,33 @@
     }
   }
 }
+
+.header-logo.bsc {
+  .header-logo-full {
+    position: relative;
+  }
+
+  .bsc-logo {
+    position: absolute;
+    left: 145px;
+    bottom: -1px;
+  }
+}
+
+@media screen and (min-width: $breakpoint-mobile-max) {
+  .header-logo.bsc {
+    .bsc-logo {
+      left: 0;
+      bottom: 51px;
+    }
+  }
+}
+
+@media screen and (min-width: $breakpoint-laptop-min) {
+  .header-logo.bsc {
+    .bsc-logo {
+      left: 64px;
+      bottom: -24px;
+    }
+  }
+}

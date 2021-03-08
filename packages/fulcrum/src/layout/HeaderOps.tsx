@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { OnChainIndicator } from '../components/OnChainIndicator'
-import { HeaderLogo } from './HeaderLogo'
+import HeaderLogo from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
 import ic_close from '../assets/images/ic_close.svg'
 import menu_icon from '../assets/images/ic_menu.svg'
