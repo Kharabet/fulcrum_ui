@@ -1030,7 +1030,10 @@ export class FulcrumProvider {
 
         result = BigNumber.min(marketLiquidity, balance)
 
-        if (depositToken === Asset.ETH) {
+        if (
+          (networkName === 'mainnet' && depositToken === Asset.ETH) ||
+          (networkName === 'bsc' && depositToken === Asset.BNB)
+        ) {
           result = result.gt(this.gasBufferForTrade)
             ? result.minus(this.gasBufferForTrade)
             : new BigNumber(0)
@@ -1067,7 +1070,10 @@ export class FulcrumProvider {
     let infoMessage: string = ''
     if (request.lendType === LendType.LEND) {
       maxLendAmount = await this.getAssetTokenBalanceOfUser(request.asset)
-      if (request.asset === Asset.ETH) {
+      if (
+        (networkName === 'mainnet' && request.asset === Asset.ETH) ||
+        (networkName === 'bsc' && request.asset === Asset.BNB)
+      ) {
         maxLendAmount = maxLendAmount.gt(this.gasBufferForLend)
           ? maxLendAmount.minus(this.gasBufferForLend)
           : new BigNumber(0)
@@ -1340,7 +1346,10 @@ export class FulcrumProvider {
     let maybeNeedsApproval = false
     let account: string | undefined = undefined
 
-    if (asset === Asset.ETH) {
+    if (
+      (networkName === 'mainnet' && asset === Asset.ETH) ||
+      (networkName === 'bsc' && asset === Asset.BNB)
+    ) {
       return false
     }
 
@@ -1369,7 +1378,10 @@ export class FulcrumProvider {
     let maybeNeedsApproval = false
     let account: string | undefined
 
-    if (request.depositToken === Asset.ETH) {
+    if (
+      (networkName === 'mainnet' && request.depositToken === Asset.ETH) ||
+      (networkName === 'bsc' && request.depositToken === Asset.BNB)
+    ) {
       return false
     }
 
@@ -1642,9 +1654,10 @@ export class FulcrumProvider {
 
       //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
       const collateralTokenAddress =
-        collateralToken !== Asset.ETH
-          ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
-          : FulcrumProvider.ZERO_ADDRESS
+        (networkName === 'mainnet' && collateralToken === Asset.ETH) ||
+        (networkName === 'bsc' && collateralToken === Asset.BNB)
+          ? FulcrumProvider.ZERO_ADDRESS
+          : FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
 
       const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18
       const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18
@@ -1749,7 +1762,10 @@ export class FulcrumProvider {
     if (asset === Asset.UNKNOWN) {
       // always 0
       result = new BigNumber(0)
-    } else if (asset === Asset.ETH) {
+    } else if (
+      (networkName === 'mainnet' && asset === Asset.ETH) ||
+      (networkName === 'bsc' && asset === Asset.BNB)
+    ) {
       // get eth (wallet) balance
       result = await this.getEthBalance()
     } else {
@@ -2583,7 +2599,10 @@ console.log(err, added);
       if (taskRequest.lendType === LendType.LEND) {
         await this.addTokenToMetaMask(task)
 
-        if (taskRequest.asset === Asset.ETH) {
+        if (
+          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && taskRequest.asset === Asset.ETH) ||
+          (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.asset === Asset.BNB)
+        ) {
           const { LendEthProcessor } = await import('./processors/LendEthProcessor')
           const processor = new LendEthProcessor()
           await processor.run(task, account, skipGas)
@@ -2597,7 +2616,10 @@ console.log(err, added);
           await processor.run(task, account, skipGas)
         }
       } else {
-        if (taskRequest.asset === Asset.ETH) {
+        if (
+          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && taskRequest.asset === Asset.ETH) ||
+          (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.asset === Asset.BNB)
+        ) {
           const { UnlendEthProcessor } = await import('./processors/UnlendEthProcessor')
           const processor = new UnlendEthProcessor()
           await processor.run(task, account, skipGas)
@@ -3069,7 +3091,9 @@ console.log(err, added);
     //: FulcrumProvider.ZERO_ADDRESS
 
     const sendAmountForValue =
-      depositToken === Asset.WETH || depositToken === Asset.ETH
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+        (depositToken === Asset.WETH || depositToken === Asset.ETH)) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && depositToken === Asset.BNB)
         ? amountInBaseUnits
         : new BigNumber(0)
 
@@ -3153,7 +3177,10 @@ console.log(err, added);
   }
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH // || asset === Asset.WETH;
+    return (
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && asset === Asset.ETH) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && asset === Asset.BNB)
+    ) // || asset === Asset.WETH;
   }
 
   public getLoanExtendParams = async (

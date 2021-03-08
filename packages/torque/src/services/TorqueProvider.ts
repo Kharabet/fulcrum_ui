@@ -1698,9 +1698,21 @@ export class TorqueProvider {
       )
       .map((e) => {
         let loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
-        loanAsset = this.isETHAsset(loanAsset) ? Asset.ETH : loanAsset
+        loanAsset = this.isETHAsset(loanAsset)
+          ? process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+            ? Asset.ETH
+            : process.env.REACT_APP_ETH_NETWORK === 'bsc'
+            ? Asset.BNB
+            : loanAsset
+          : loanAsset
         let collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
-        collateralAsset = this.isETHAsset(collateralAsset) ? Asset.ETH : collateralAsset
+        collateralAsset = this.isETHAsset(collateralAsset)
+          ? process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+            ? Asset.ETH
+            : process.env.REACT_APP_ETH_NETWORK === 'bsc'
+            ? Asset.BNB
+            : collateralAsset
+          : collateralAsset
 
         const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
@@ -2169,7 +2181,11 @@ export class TorqueProvider {
   };*/
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH || asset === Asset.WETH
+    return (
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+        (asset === Asset.ETH || asset === Asset.WETH)) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && (asset === Asset.BNB || asset === Asset.WBNB))
+    )
   }
 
   public isStableAsset = (asset: Asset): boolean => {
@@ -2671,8 +2687,12 @@ export class TorqueProvider {
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api
     const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
-    const blockExplorerUrl = networkName === 'kovan' ? 'https://bscscan.com'
-    :  networkName === 'kovan' ? 'https://api-kovan.etherscan.io' : 'https://api.etherscan.io' 
+    const blockExplorerUrl =
+      networkName === 'kovan'
+        ? 'https://bscscan.com'
+        : networkName === 'kovan'
+        ? 'https://api-kovan.etherscan.io'
+        : 'https://api.etherscan.io'
     const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${blockNumber -
       days * blocksPerDay}&toBlock=latest&address=${bzxContractAddress}&topic0=${
       LiquidationEvent.topic0

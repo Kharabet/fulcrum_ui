@@ -168,7 +168,10 @@ export class ManageCollateralFormWeb3 extends Component<
                 }
 
                 // check balance
-                if (this.props.loanOrderState.collateralAsset === Asset.ETH) {
+                if ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+                this.props.loanOrderState.loanAsset === Asset.ETH) ||
+              (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+                this.props.loanOrderState.loanAsset === Asset.BNB)) {
                   assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
                     ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
                     : new BigNumber(0)
@@ -471,7 +474,10 @@ export class ManageCollateralFormWeb3 extends Component<
         let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(
           this.props.loanOrderState.collateralAsset
         )
-        if (this.props.loanOrderState.collateralAsset === Asset.ETH) {
+        if ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+        this.props.loanOrderState.loanAsset === Asset.ETH) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+        this.props.loanOrderState.loanAsset === Asset.BNB)) {
           assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
             ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
             : new BigNumber(0)

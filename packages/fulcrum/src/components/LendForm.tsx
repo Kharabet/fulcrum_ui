@@ -158,14 +158,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     const assetDetails = AssetsDictionary.assets.get(this.props.asset)
 
-    let assetOrWrapped: Asset
-    if (this.props.asset === Asset.ETH) {
-      assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH
-    } else if (this.props.asset === Asset.DAI) {
-      assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI
-    } else {
-      assetOrWrapped = this.props.asset
-    }
+    const assetOrWrapped: Asset = this.getAssetOrWrapped()
 
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset)
     const maxLendAmountArr = await FulcrumProvider.Instance.getMaxLendValue(
@@ -299,14 +292,17 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       (!this.state.maxLendAmount || this.state.maxLendAmount.gt(0)) &&
       this.props.lendType === LendType.LEND &&
       this.state.maybeNeedsApproval &&
-      this.props.asset !== Asset.ETH
+      this.props.asset !== Asset.ETH && this.props.asset !== Asset.BNB
 
     return (
       <form
         className={`lend-form${this.state.isExpired ? ' expired' : ''}`}
         onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
-        <div className={`lend-form__image ${this.props.asset === Asset.ETH ? 'notice' : ''}`}>
+        <div
+          className={`lend-form__image ${
+            this.props.asset === Asset.ETH || this.props.asset === Asset.BNB ? 'notice' : ''
+          }`}>
           {this.state.iTokenAddress &&
           FulcrumProvider.Instance.web3ProviderSettings &&
           FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
@@ -373,7 +369,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                   onAssetChange={this.onChangeUseWrapped}
                   assets={[Asset.WETH, Asset.ETH]}
                 />
-              ) :  process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB ? (
+              ) : process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB ? (
                 <AssetDropdown
                   selectedAsset={this.state.useWrapped ? Asset.WBNB : Asset.BNB}
                   onAssetChange={this.onChangeUseWrapped}
@@ -468,10 +464,18 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       })
   }
 
-  public onChangeUseWrapped = async (asset: Asset) => {
-    if (this.state.useWrapped && asset === Asset.ETH) {
+  public onChangeUseWrapped = (asset: Asset) => {
+    if (
+      this.state.useWrapped &&
+      ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) ||
+        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB))
+    ) {
       this._isMounted && this.setState({ useWrapped: false })
-    } else if (!this.state.useWrapped && asset === Asset.WETH) {
+    } else if (
+      !this.state.useWrapped &&
+      ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) ||
+        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB))
+    ) {
       this._isMounted && this.setState({ useWrapped: true })
     }
   }
@@ -585,14 +589,8 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       TagManager.dataLayer(tagManagerArgs)
     }
 
-    let assetOrWrapped: Asset
-    if (this.props.asset === Asset.ETH) {
-      assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH
-    } else if (this.props.asset === Asset.DAI) {
-      assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI
-    } else {
-      assetOrWrapped = this.props.asset
-    }
+    const assetOrWrapped: Asset = this.getAssetOrWrapped()
+
 
     if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
       // indicates a 100% burn
@@ -607,17 +605,24 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     await this.derivedUpdate()
   }
 
-  private rxFromMaxAmountWithMultiplier = (
-    multiplier: BigNumber = new BigNumber(1)
-  ): Observable<ILendAmountChangeEvent | null> => {
+  private getAssetOrWrapped = (): Asset => {
     let assetOrWrapped: Asset
-    if (this.props.asset === Asset.ETH) {
+    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) {
       assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH
+    } else if (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB) {
+      assetOrWrapped = this.state.useWrapped ? Asset.WBNB : Asset.BNB
     } else if (this.props.asset === Asset.DAI) {
       assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI
     } else {
       assetOrWrapped = this.props.asset
     }
+    return assetOrWrapped
+  }
+
+  private rxFromMaxAmountWithMultiplier = (
+    multiplier: BigNumber = new BigNumber(1)
+  ): Observable<ILendAmountChangeEvent | null> => {
+    const assetOrWrapped: Asset = this.getAssetOrWrapped()
 
     const multipliedLendAmount = this.state.maxLendAmount
       ? this.state.maxLendAmount.multipliedBy(multiplier)
@@ -678,14 +683,8 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       }
 
       if (!amount.isNaN()) {
-        let assetOrWrapped: Asset
-        if (this.props.asset === Asset.ETH) {
-          assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH
-        } else if (this.props.asset === Asset.DAI) {
-          assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI
-        } else {
-          assetOrWrapped = this.props.asset
-        }
+        const assetOrWrapped: Asset = this.getAssetOrWrapped()
+
 
         const lendRequest = new LendRequest(this.props.lendType, assetOrWrapped, amount)
 

@@ -357,7 +357,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.returnTokenIsCollateral
     )
     const gasPrice = await FulcrumProvider.Instance.gasPrice()
-    const rate = await FulcrumProvider.Instance.getSwapToUsdRate(Asset.ETH)
+    const rate = await FulcrumProvider.Instance.getSwapToUsdRate(process.env.REACT_APP_ETH_NETWORK === 'bsc' ? Asset.BNB : Asset.ETH)
     const estimatedFee = await FulcrumProvider.Instance.getTradeEstimatedGas(
       tradeRequest,
       false

@@ -44,7 +44,11 @@ export class TradeBuyProcessor {
     let tokenErc20Contract: erc20Contract | null = null
     let assetErc20Address: string | null = ''
     let erc20allowance = new BigNumber(0)
-    if (taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH) {
+    if (
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+        (taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH)) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.depositToken === Asset.BNB)
+    ) {
       task.processingStart([
         'Initializing',
         'Submitting trade',
@@ -53,7 +57,6 @@ export class TradeBuyProcessor {
       ])
 
       assetErc20Address = '0x0000000000000000000000000000000000000000'
-
     } else {
       //Initializing
       task.processingStart([
@@ -123,13 +126,16 @@ export class TradeBuyProcessor {
 
     //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
     const collateralTokenAddress =
-      collateralToken !== Asset.ETH
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && taskRequest.depositToken === Asset.ETH) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.depositToken === Asset.BNB)
         ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
         : FulcrumProvider.ZERO_ADDRESS
     const loanData = '0x'
 
     const sendAmountForValue =
-      taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+        (taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH)) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.depositToken === Asset.BNB)
         ? amountInBaseUnits
         : new BigNumber(0)
 
