@@ -39,7 +39,7 @@ enum Asset {
   CRV = 'CRV',
   WBNB='WBNB',
   BNB='BNB',
-  BTCB='BTCB',
+  BTC='BTC',
   BUSD='BUSD',
   UNKNOWN = 'UNKNOWN'
 }

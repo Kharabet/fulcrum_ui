@@ -484,9 +484,9 @@ export default class AssetsDictionary {
       )
     ],
     [
-      Asset.BTCB,
+      Asset.BTC,
       new AssetDetails(
-        'BTCB',
+        'BTC',
         18,
         btc_logo,
         BTCLogo,

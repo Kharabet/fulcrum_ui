@@ -334,6 +334,9 @@ export default class ContractsSource {
       case 42:
         address = '0xa40cDd78BFBe0E8ca643081Df43A45ED8C2C12bB'
         break
+      case 56:
+        address = '0xc29db5b558718c3ea48ba828c97ed3a68bef35a0'
+        break
     }
 
     return address

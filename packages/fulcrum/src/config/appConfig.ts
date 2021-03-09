@@ -64,8 +64,8 @@ export const TRADE_PAIRS: Array<{ baseToken: Asset; quoteToken: Asset }> =
         { baseToken: Asset.BNB, quoteToken: Asset.USDT },
         { baseToken: Asset.ETH, quoteToken: Asset.BUSD },
         { baseToken: Asset.ETH, quoteToken: Asset.USDT },
-        { baseToken: Asset.BTCB, quoteToken: Asset.BUSD },
-        { baseToken: Asset.BTCB, quoteToken: Asset.USDT },
+        { baseToken: Asset.BTC, quoteToken: Asset.BUSD },
+        { baseToken: Asset.BTC, quoteToken: Asset.USDT },
         { baseToken: Asset.BUSD, quoteToken: Asset.USDT },
       ]
     : []

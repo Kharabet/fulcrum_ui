@@ -19,6 +19,7 @@ import { Loader } from './Loader'
 const isMainnet = process.env.NODE_ENV && process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export interface IBorrowFormProps {
+  assetsShown: Asset[]
   borrowAsset: Asset
   interestRate: BigNumber
   liquidity: BigNumber
@@ -65,16 +66,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
     this.state = {
       borrowAmount: new BigNumber(0),
-      collateralAsset: TorqueProvider.Instance.isETHAsset(props.borrowAsset) && isMainnet
-        ? Asset.USDC
-        : TorqueProvider.Instance.isETHAsset(props.borrowAsset) && process.env.REACT_APP_ETH_NETWORK === 'bsc'
-        ? Asset.BUSD
-        : isMainnet
-        ? Asset.ETH
-        : process.env.REACT_APP_ETH_NETWORK === 'bsc'
-        ? Asset.BUSD 
-        : process.env.REACT_APP_ETH_NETWORK === 'kovan'
-        ? Asset.fWETH : Asset.ETH,
+      collateralAsset:
+        this.props.assetsShown[0] === this.props.borrowAsset
+          ? this.props.assetsShown[1]
+          : this.props.assetsShown[0],
       borrowAmountValue: '',
       depositAmount: new BigNumber(0),
       depositAmountValue: '',
@@ -215,7 +210,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     )
 
     const gasPrice = await TorqueProvider.Instance.gasPrice()
-    const rate = await TorqueProvider.Instance.getSwapToUsdRate(process.env.REACT_APP_ETH_NETWORK === 'bsc' ? Asset.BNB : Asset.ETH)
+    const rate = await TorqueProvider.Instance.getSwapToUsdRate(
+      process.env.REACT_APP_ETH_NETWORK === 'bsc' ? Asset.BNB : Asset.ETH
+    )
     const estimatedFee = await TorqueProvider.Instance.getBorrowEstimatedGas(
       tradeRequest,
       false
@@ -559,7 +556,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public onMaxClick = async () => {
-    const precisionDigits = TorqueProvider.Instance.isStableAsset(this.state.collateralAsset) ? 2 : 5
+    const precisionDigits = TorqueProvider.Instance.isStableAsset(this.state.collateralAsset)
+      ? 2
+      : 5
     if (this.state.balanceValue.eq(0)) {
       return
     }
@@ -584,7 +583,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private checkBalanceTooLow = async () => {
     const collateralAsset = this.state.collateralAsset
     let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(collateralAsset)
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && collateralAsset === Asset.ETH || process.env.REACT_APP_ETH_NETWORK === 'bsc' && collateralAsset === Asset.BNB) {
+    if (
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && collateralAsset === Asset.ETH) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && collateralAsset === Asset.BNB)
+    ) {
       assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
         ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
         : new BigNumber(0)
@@ -655,7 +657,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private setMaxBorrow = async () => {
     await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset).then(
       async (balance) => {
-        if (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.state.collateralAsset === Asset.ETH || process.env.REACT_APP_ETH_NETWORK === 'bsc' && Asset.BNB) {
+        if (
+          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+            this.state.collateralAsset === Asset.ETH) ||
+          (process.env.REACT_APP_ETH_NETWORK === 'bsc' && Asset.BNB)
+        ) {
           balance = balance.gt(TorqueProvider.Instance.gasBufferForTxn)
             ? balance.minus(TorqueProvider.Instance.gasBufferForTxn)
             : new BigNumber(0)

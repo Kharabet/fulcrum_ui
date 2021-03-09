@@ -50,7 +50,7 @@ export class CollateralTokenSelector extends Component<
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assets = [Asset.fWETH, Asset.USDC, Asset.WBTC]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
-      this.assets = [Asset.BUSD, Asset.BNB, Asset.USDT, Asset.ETH, Asset.BTCB]
+      this.assets = [Asset.BUSD, Asset.BNB, Asset.USDT, Asset.ETH, Asset.BTC]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
       this.assets = [Asset.ETH, Asset.DAI]
     } else {
