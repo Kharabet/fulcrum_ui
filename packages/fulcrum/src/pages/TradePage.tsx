@@ -249,7 +249,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       <div className="trade-page">
         {!this.state.isSupportNetwork ? (
           <main>
-            {this.state.recentLiquidationsNumber > 0 && (
+            {process.env.REACT_APP_ETH_NETWORK !== 'bsc' &&  this.state.recentLiquidationsNumber > 0 && (
               <InfoBlock localstorageItemProp="past-liquidations-info">
                 {this.state.recentLiquidationsNumber === 1
                   ? 'One'

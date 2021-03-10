@@ -20,6 +20,8 @@ import Asset from '../assets/Asset'
 import ContractsSource from '../contracts/ContractsSource'
 import AssetsDictionary from '../assets/AssetsDictionary'
 
+const fromBlockNumber = process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? '0x989680' :  process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 5566818 : '0x54ee30'
+
 const getLogsFromEtherscan = async (
   fromBlock: string,
   toBlock: string,
@@ -56,7 +58,7 @@ const getLiquidationHistory = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -124,7 +126,7 @@ const getTradeHistory = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -192,7 +194,7 @@ const getRolloverHistory = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -257,7 +259,7 @@ const getCloseWithSwapHistory = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -315,7 +317,7 @@ const getCloseWithDepositHistory = async (
   if (!bzxContractAddress) return result
   const events = await web3Wrapper.getLogsAsync({
     topics: [CloseWithDepositEvent.topic0],
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -373,7 +375,7 @@ const getBorrowHistory = async (
   if (!bzxContractAddress) return result
   const events = await web3Wrapper.getLogsAsync({
     topics: [BorrowEvent.topic0],
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -434,7 +436,7 @@ const getBurnHistory = async (
   if (!tokenContractAddress) return result
   const events = await web3Wrapper.getLogsAsync({
     topics: [BurnEvent.topic0],
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: tokenContractAddress
   })
@@ -471,7 +473,7 @@ const getMintHistory = async (
   if (!tokenContractAddress) return result
   const events = await web3Wrapper.getLogsAsync({
     topics: [MintEvent.topic0],
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: tokenContractAddress
   })
@@ -512,7 +514,7 @@ const getOldRewradEvents = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -561,7 +563,7 @@ const getNewRewradEvents = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -634,7 +636,7 @@ const getPayTradingFeeHistory = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -690,7 +692,7 @@ const getDepositCollateralHistory = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
@@ -746,7 +748,7 @@ const getWithdrawCollateralHistory = async (
   }
   const events = await web3Wrapper.getLogsAsync({
     topics: topics,
-    fromBlock: '0x989680',
+    fromBlock: fromBlockNumber,
     toBlock: 'latest',
     address: bzxContractAddress
   })
