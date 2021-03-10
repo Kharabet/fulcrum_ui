@@ -19,9 +19,9 @@ export const ChiSwitch = () => {
     const checked = event.target.checked
     if (checked) {
       const allowance = await FulcrumProvider.Instance.getGasTokenAllowance()
-      if (!allowance.gt(0)) {
+      if (!allowance.gt(0) && FulcrumProvider.Instance.contractsSource) {
         await FulcrumProvider.Instance.setApproval(
-          '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+          FulcrumProvider.Instance.contractsSource.getTokenHolderAddress(),
           Asset.CHI,
           new BigNumber(10 ** 18)
         )

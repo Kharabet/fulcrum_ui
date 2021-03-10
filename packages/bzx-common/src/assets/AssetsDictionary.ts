@@ -45,6 +45,7 @@ export default class AssetsDictionary {
         new Map<number, string | null>([
           [1, '0x0000000000004946c0e9f43f4dee607b0ef1fa1c'],
           [42, '0x0000000000004946c0e9f43f4dee607b0ef1fa1c'],
+          [56, '0x0000000000004946c0e9f43f4dee607b0ef1fa1c'],
         ])
       ),
     ],

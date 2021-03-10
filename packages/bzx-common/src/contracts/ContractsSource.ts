@@ -62,6 +62,12 @@ const governanceAddresses = new Map([
   [3, '0xc5bfed3bb38a3c4078d4f130f57ca4c560551d45'],
 ])
 
+const tokenHolderAddresses = new Map([
+  [1, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61'],
+  [42, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61'],
+  [56, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61'],
+])
+
 const helperAddresses = new Map([[1, '0xFad79f3922cCef7AeB8A5674f36E45B6E81A10C7']])
 
 const getNetworkNameById = (networkId: number): string => {
@@ -210,6 +216,14 @@ export default class ContractsSource {
     const address = stakingV1Addresses.get(this.networkId)
     if (!address) {
       throw new Error('getStakingV1Address')
+    }
+    return address
+  }
+  
+  public getTokenHolderAddress() {
+    const address = tokenHolderAddresses.get(this.networkId)
+    if (!address) {
+      throw new Error('getTokenHolderAddress')
     }
     return address
   }

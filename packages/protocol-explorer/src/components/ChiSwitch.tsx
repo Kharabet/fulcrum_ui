@@ -17,9 +17,9 @@ export const ChiSwitch = () => {
     const checked = event.target.checked
     if (checked) {
       const allowance = await ExplorerProvider.Instance.getGasTokenAllowance()
-      if (!allowance.gt(0)) {
+      if (!allowance.gt(0) && ExplorerProvider.Instance.contractsSource) {
         await ExplorerProvider.Instance.setApproval(          
-          '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+          ExplorerProvider.Instance.contractsSource.getTokenHolderAddress(),
           Asset.CHI,
           new BigNumber(10 ** 18)
         )
