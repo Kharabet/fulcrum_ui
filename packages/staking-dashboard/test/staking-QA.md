@@ -4,6 +4,8 @@ The main features of the staking dashboard and how they are expected to work.
 
 The tokens related to staking: BZRX, vBZRX, iBZRX, BPT, 3CRV.
 
+**Check the README.md** at the root of staking-dashboard folder to know how to use a local mainnet fork for testing.
+
 ## Sections: "Staking" & "Rewards"
 
 The UI should show tabs to switch sections from "staking" and "rewards".

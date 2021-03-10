@@ -81,6 +81,7 @@ interface ITradePageState {
   historyEvents: IHistoryEvents | undefined
   historyRowsData: IHistoryTokenGridRowProps[]
   tradeRequestId: number
+  isDataLoaded: boolean
   isLoadingTransaction: boolean
   request: TradeRequest | ManageCollateralRequest | RolloverRequest | ExtendLoanRequest | undefined
   isTxCompleted: boolean
@@ -144,6 +145,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       historyRowsData: [],
       tradeRequestId: 0,
       recentLiquidationsNumber: 0,
+      isDataLoaded: false,
       isLoadingTransaction: false,
       isTxCompleted: false,
       request: undefined,
@@ -189,7 +191,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.getTokenRowsData()
     await this.getInnerOwnRowsData()
     await this.setRecentLiquidationsNumber()
-    await this.fetchPositionsRecursive(3)
+    // await this.fetchPositionsRecursive(3)
     setTimeout(() => {
       this.forceUpdate() // solves bug with positions not appearing on the first render.
     }, 5000)
@@ -197,12 +199,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   private fetchPositionsRecursive = async (retries: number) => {
     await this.getInnerOwnRowsData()
-    await this.getOwnRowsData()
-    if (!this._isMounted || this.state.ownRowsData.length > 0 || retries === 0) {
-      return //exit recursive call
-    } else {
-      window.setTimeout(() => this.fetchPositionsRecursive(--retries), 1000)
-    }
+    await this.getOwnRowsData().then(() => {
+      if (!this._isMounted || this.state.ownRowsData.length > 0 || retries === 0) {
+        return this._isMounted && this.setState({ isDataLoaded: true }) //exit recursive call
+      } else {
+        window.setTimeout(() => this.fetchPositionsRecursive(--retries), 1000)
+      }
+    })
   }
 
   private async setRecentLiquidationsNumber() {
@@ -324,6 +327,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
             {this.state.activeTokenGridTab === TokenGridTab.Open && (
               <OwnTokenGrid
+                isDataLoaded={this.state.isDataLoaded}
                 ownRowsData={this.state.ownRowsData}
                 isMobileMedia={this.props.isMobileMedia}
                 onStartTrading={() => this.onTokenGridTabChange(TokenGridTab.Chart)}
@@ -439,6 +443,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         loans: [],
         openedPositionsCount: 0,
         recentLiquidationsNumber: 0,
+        isDataLoaded: false,
         historyEvents: undefined
       })
   }
@@ -452,7 +457,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // await this.getInnerOwnRowsData()
     // await this.getOwnRowsData()
 
-    await this.fetchPositionsRecursive(10)
+    await this.fetchPositionsRecursive(3)
     await this.getHistoryEvents()
   }
 
@@ -588,7 +593,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     ;(await this._isMounted) && this.setState({ ...this.state, activeTokenGridTab })
 
     activeTokenGridTab === TokenGridTab.Open &&
-      this.state.ownRowsData.length === 0 &&
+      this.state.ownRowsData === undefined &&
       (await this.getOwnRowsData())
 
     activeTokenGridTab === TokenGridTab.History &&
@@ -872,24 +877,24 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     //     this.setState({ ownRowsData: [], loans: undefined, openedPositionsCount: 0 })
     //   return null
     // }
-    const ownRowsData: IOwnTokenGridRowProps[] = []
-    let loans: IBorrowedFundsState[] | undefined
-    loans = await FulcrumProvider.Instance.getUserMarginTradeLoans()
+    await FulcrumProvider.Instance.getUserMarginTradeLoans().then(async (loans) => {
+      const ownRowsData: IOwnTokenGridRowProps[] = []
 
-    for (const loan of loans) {
-      if (!loan.loanData) continue
+      for (const loan of loans) {
+        if (!loan.loanData) continue
 
-      const ownRowDataProps = await this.getOwnRowDataProps(loan)
+        const ownRowDataProps = await this.getOwnRowDataProps(loan)
 
-      ownRowsData.push(ownRowDataProps)
-    }
+        ownRowsData.push(ownRowDataProps)
+      }
 
-    ;(await this._isMounted) &&
-      this.setState({
-        ...this.state,
-        ownRowsData: ownRowsData,
-        loans: loans
-      })
+      this._isMounted &&
+        this.setState({
+          ...this.state,
+          ownRowsData: ownRowsData,
+          loans: loans
+        })
+    })
   }
 
   public getInnerOwnRowsData = async () => {

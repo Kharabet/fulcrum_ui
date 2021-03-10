@@ -87,7 +87,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       sliderValue: 0,
       collaterizationPercents: '',
       assetDetails: assetDetails || null,
-      liquidationPrice: new BigNumber(0)
+      liquidationPrice: new BigNumber(0),
     }
 
     this._initDefaults = new Subject<null>()
@@ -95,6 +95,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       await this.setInputDefaults()
       await this.setMaxBorrow()
       await this.setEstimatedFee()
+      this.setState({ isLoading: false })
     })
 
     this._borrowAmountChange = new Subject<string>()
@@ -135,9 +136,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         }
         this.setState({ isLoading: true })
         await this.setBorrowEstimate(next.borrowAmount)
-        if (next.exceedsLiquidity) {
-          this._borrowAmountChange.next(next.borrowAmount.toFixed(5))
-        }
+        // if (next.exceedsLiquidity) {
+        //   this._borrowAmountChange.next(next.borrowAmount.toFixed(5))
+        // }
         await this.setEstimatedFee()
         await this.setLiquidationPrice()
         await this.checkBalanceTooLow()
@@ -167,7 +168,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         minValue: minInitialMargin.plus(0.3019),
         collaterizationPercents: initialMargin.toFixed(0),
         borrowAmountValue: '0',
-        borrowAmount: new BigNumber(0)
+        borrowAmount: new BigNumber(0),
       },
       async () => {
         await this.setLiquidationPrice()
@@ -295,12 +296,13 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         : this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0)
         ? `Loan is too large`
         : undefined
+    const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <form className="borrow-form" onSubmit={this.onSubmit}>
         <section className="borrow-form__left_block">
           <div className="borrow-form__info_block">
             <div className="borrow-form__info_block__logo">
-              {this.state.assetDetails.reactLogoSvg.render()}
+              <TokenIcon />
             </div>
             <div className="borrow-form__asset-stats">
               <div className="borrow-form__info_block__asset">Borrow {this.props.borrowAsset}</div>
@@ -502,10 +504,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 sku: 'Borrow-' + this.props.borrowAsset + '-' + this.state.collateralAsset,
                 category: 'Borrow',
                 price: usdPrice,
-                quantity: 1
-              }
-            ]
-          }
+                quantity: 1,
+              },
+            ],
+          },
         }
         TagManager.dataLayer(tagManagerArgs)
       }
@@ -527,7 +529,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       this.setState(
         {
           collateralAsset: asset,
-          isLoading: true
+          isLoading: true,
         },
         async () => {
           await this.setInputDefaults()
@@ -547,7 +549,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         ...this.state,
         borrowAmountValue: inputAmountText,
         borrowAmount: new BigNumber(inputAmountText),
-        isLoading: true
+        isLoading: true,
       },
       () => {
         this._borrowAmountChange.next(this.state.borrowAmountValue)
@@ -572,7 +574,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         sliderValue: this.inverseCurve(this.state.minValue),
         collaterizationPercents: this.state.minValue.toFixed(0),
         depositAmount: this.state.balanceValue,
-        depositAmountValue
+        depositAmountValue,
       },
       () => {
         this._depositAmountChange.next(depositAmountValue)
@@ -607,7 +609,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
     this.setState({
       depositAmount: depositAmount,
-      depositAmountValue: depositAmountValue
+      depositAmountValue: depositAmountValue,
     })
   }
 
@@ -618,7 +620,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
     this.setState({
       borrowAmount,
-      borrowAmountValue
+      borrowAmountValue,
     })
   }
 
@@ -631,7 +633,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     this.setState(
       {
         sliderValue,
-        collaterizationPercents: this.sliderCurve(sliderValue).toFixed(0)
+        collaterizationPercents: this.sliderCurve(sliderValue).toFixed(0),
       },
       () => this._collateralChange.next()
     )
@@ -646,7 +648,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       {
         depositAmount: new BigNumber(depositAmountValue),
         depositAmountValue: depositAmountValue,
-        isLoading: true
+        isLoading: true,
       },
       () => {
         this._depositAmountChange.next(depositAmountValue)
@@ -684,7 +686,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         this.setState({
           balanceValue: depositAmount,
           depositAmountValue,
-          depositAmount
+          depositAmount,
         })
       }
     )

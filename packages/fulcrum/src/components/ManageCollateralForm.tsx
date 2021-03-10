@@ -245,7 +245,7 @@ export default class ManageCollateralForm extends Component<
                     gasAmountNeeded: gasAmountNeeded,
                     collateralizedPercent: collateralizedPercent,
                     collateralExcess: collateralExcess,
-                    assetBalanceValue: assetBalanceNormalizedBN,
+                    assetBalanceValue: assetBalance.div(10 ** 18),
                     ethBalanceValue: ethBalance
                   },
                   () => {
@@ -294,7 +294,8 @@ export default class ManageCollateralForm extends Component<
           ? this.props.loan.loanData!.collateral.minus(currentCollateralAmount)
           : this.props.loan.loanData!.collateral.plus(currentCollateralAmount)
 
-      const liquidationCollateralToLoanRate = this.props.loan
+      const liquidationCollateralToLoanRate = this
+      .props.loan
         .loanData!.maintenanceMargin.times(
           this.props.loan.loanData!.principal.times(loanAssetPrecision)
         )
@@ -321,7 +322,9 @@ export default class ManageCollateralForm extends Component<
       this.state.ethBalanceValue && this.state.ethBalanceValue.lte(this.state.gasAmountNeeded)
         ? 'Insufficient funds for gas'
         : this.state.balanceTooLow
-        ? 'Your wallet is empty'
+        ? 'Your wallet is empty':
+        this.state.assetBalanceValue.lt(this.state.inputAmountText)?
+        `Insufficient ${this.props.loan.collateralAsset} balance in your wallet!`
         : ''
     const liquidationPrice =
       this.state.activeTokenLiquidation === this.props.loan.collateralAsset
@@ -401,7 +404,10 @@ export default class ManageCollateralForm extends Component<
                 Withdraw
               </button>
             ) : (
-              <button type="submit" className="manage-collateral-form__action-top-up">
+              <button
+                type="submit"
+                className="manage-collateral-form__action-top-up"
+                disabled={!!amountMsg}>
                 Top Up
               </button>
             )}
@@ -548,7 +554,7 @@ export default class ManageCollateralForm extends Component<
         selectedValue = this.state.minValue
       }
 
-      this.setState({ ...this.state, selectedValue: selectedValue })
+      this.setState({ selectedValue: selectedValue })
 
       observer.next(selectedValue)
     })

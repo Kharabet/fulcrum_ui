@@ -37,7 +37,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
 
     return (
       <div className="inner-own-token-grid">
-        {!this.props.isMobileMedia && (
+        {(!this.props.isMobileMedia || !this.props.isLoadingTransaction) && (
           <InnerOwnTokenGridHeader
             asset={this.props.ownRowsData[0].baseToken}
             quoteToken={this.props.ownRowsData[0].quoteToken}

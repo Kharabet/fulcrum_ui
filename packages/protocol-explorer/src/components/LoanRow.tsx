@@ -116,6 +116,9 @@ export const LoanRow = (props: ILoanRowProps) => {
     changeLoadingTransaction(false, undefined)
   }
 
+  const LoanTokenIcon = loanToken.reactLogoSvg
+  const CollateralTokenIcon = collateralToken.reactLogoSvg
+
   return (
     <React.Fragment>
       {isLoadingTransaction ? (
@@ -130,10 +133,10 @@ export const LoanRow = (props: ILoanRowProps) => {
             <CopyToClipboard>{props.loanId}</CopyToClipboard>
           </div>
           <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">
-            {loanToken.reactLogoSvg.render()} {props.payOffAmount.toFixed(3)}
+            <LoanTokenIcon />&nbsp;{props.payOffAmount.toFixed(3)}
           </div>
           <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">
-            {collateralToken.reactLogoSvg.render()}
+            <CollateralTokenIcon />
             {props.seizeAmount.toFixed(3)}
           </div>
           <div className="table-row-loan__action">

@@ -308,7 +308,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.props.leverage
       }x-${this.props.positionType.toLocaleLowerCase()}-${this.props.baseToken}/`
     )
-    await this.onInsertMaxValue(1)
+      await this.onInsertMaxValue(1)
 
     this._timer = window.setTimeout(() => this.setState({ isExpired: true }), this._staleDataDelay)
   }
@@ -423,7 +423,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       submitButtonText = `${this.props.positionType === PositionType.LONG ? 'Buy' : 'Sell'} / ${
         this.props.positionType
       }`
-    } else {
+      } else {
       amountMsg =
         this.state.ethBalance &&
         this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
@@ -444,14 +444,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
 
     const canSubmit = this.state.inputAmountValue.gt(0)
-
+    const TokenIcon = this.state.assetDetails.reactLogoSvg 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
         <div className="trade-form__left_block">
           <div className="trade-form__info_block">
             <div className="trade-form__info_block__logo">
-              {this.state.assetDetails.reactLogoSvg.render()}
+              <TokenIcon />
             </div>
             <div className="trade-form__asset-stats">
               <div className="trade-form__info_block__asset">
@@ -467,10 +467,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                   </span>
                   {`${this.props.leverage.toString()}x`}
                   <PositionTypeMarkerAlt value={this.props.positionType} />
-                </div>
               </div>
             </div>
           </div>
+        </div>
         </div>
         <div
           className={`trade-form__form-container ${
@@ -521,12 +521,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               </div>
             </div>
 
-            <TradeExpectedResult
-              entryPrice={this.state.baseToQuoteTokenRate}
-              liquidationPrice={this.state.liquidationPrice}
+              <TradeExpectedResult
+                entryPrice={this.state.baseToQuoteTokenRate}
+                liquidationPrice={this.state.liquidationPrice}
               estimatedFee={this.state.estimatedFee}
-              quoteToken={this.props.quoteToken}
-            />
+                quoteToken={this.props.quoteToken}
+              />
           </div>
 
           {!this.state.isLoading && (
@@ -558,7 +558,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               </button>
             )}
           </div>
-        </div>
+                  </div>
       </form>
     )
   }

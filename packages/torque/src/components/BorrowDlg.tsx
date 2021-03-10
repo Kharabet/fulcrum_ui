@@ -13,7 +13,7 @@ interface IBorrowDlgState {
   liquidity: BigNumber
 
   executorParams: {
-    resolve: (value: BorrowRequest) => void
+    resolve: (value?: BorrowRequest | PromiseLike<BorrowRequest>) => void
     reject: (reason?: any) => void
   } | null
 }
@@ -32,7 +32,7 @@ export class BorrowDlg extends Component<IBorrowdlgProps, IBorrowDlgState> {
       executorParams: null,
       interestRate: new BigNumber(0),
       liquidity: new BigNumber(0)
-    }
+  }
   }
 
   public render() {
@@ -67,6 +67,7 @@ export class BorrowDlg extends Component<IBorrowdlgProps, IBorrowDlgState> {
     return new Promise<BorrowRequest>((resolve, reject) => {
       this.setState({
         isOpen: true,
+        //@ts-ignore
         executorParams: { resolve: resolve, reject: reject },
         borrowAsset,
         liquidity,

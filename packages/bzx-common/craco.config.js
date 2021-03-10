@@ -1,5 +1,32 @@
 const webpack = require('webpack')
 const path = require('path')
+const dotenv = require('dotenv')
+const gitCommitId = require('git-commit-id')
+const fs = require('fs')
+
+// Getting the config from dotenv if present (Normally only for local development)
+const env = path.resolve(__dirname, '../../.env')
+if (fs.existsSync(env)) {
+  const envConfig = dotenv.parse(fs.readFileSync(env))
+  for (const k in envConfig) {
+    process.env[k] = envConfig[k]
+  }
+}
+
+const envVars = {
+  GIT_COMMIT: gitCommitId({ cwd: path.resolve(__dirname, '../../') }).slice(0, 7),
+  REACT_APP_ETH_NETWORK: process.env.REACT_APP_ETH_NETWORK,
+  NODE_ENV: process.env.NODE_ENV,
+}
+
+const networks = ['mainnet', 'kovan', 'ropsten', 'rinkeby', 'bsc']
+
+// Check that we are passing a valid network for the build
+if (!networks.includes(envVars.REACT_APP_ETH_NETWORK)) {
+  throw new Error(`Invalid network specified during build. "${envVars.REACT_APP_ETH_NETWORK}"`)
+}
+
+console.log('Config', JSON.stringify(envVars, null, 2))
 
 module.exports = {
   webpack: {
@@ -16,7 +43,7 @@ module.exports = {
 
         const newIncludePaths = [
           // relative path to my yarn workspace library
-          path.resolve(__dirname, '../bzx-common')
+          path.resolve(__dirname, '../bzx-common'),
         ]
         if (tsxRule) {
           if (Array.isArray(tsxRule.include)) {
@@ -29,13 +56,17 @@ module.exports = {
       return webpackConfig
     },
     plugins: [
-      new webpack.NormalModuleReplacementPlugin(/(.*)BUILD_APP_NETWORK(\.*)/, function(resource) {
+      new webpack.NormalModuleReplacementPlugin(/(.*)BUILD_APP_NETWORK(\.*)/, function (resource) {
         resource.request = resource.request.replace(
           /BUILD_APP_NETWORK/,
           process.env.REACT_APP_ETH_NETWORK
         )
-      })
-    ]
+      }),
+      new webpack.DefinePlugin({
+        'process.env.GIT_COMMIT': JSON.stringify(envVars.GIT_COMMIT),
+        'process.env.APP_VERSION': JSON.stringify(envVars.GIT_COMMIT),
+      }),
+    ],
   },
   babel: {
     plugins: [
@@ -49,10 +80,10 @@ module.exports = {
             'app-lib': './src/lib',
             'app-services': './src/services',
             'shared-components': './src/shared-components',
-            'ui-framework': './src/ui-framework'
-          }
-        }
-      ]
-    ]
-  }
+            'ui-framework': './src/ui-framework',
+          },
+        },
+      ],
+    ],
+  },
 }

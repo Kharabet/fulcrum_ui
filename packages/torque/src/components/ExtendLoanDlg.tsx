@@ -52,6 +52,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
       this.setState({
         ...this.state,
         isOpen: true,
+        // @ts-ignore
         executorParams: { resolve: resolve, reject: reject },
         loanOrderState: item
       })

@@ -10,6 +10,9 @@ import { FulcrumProvider } from '../FulcrumProvider'
 
 export class LendChaiProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
+    if (FulcrumProvider.Instance.unsupportedNetwork) {
+      throw new Error('You are connected to the wrong network!')
+    }
     if (
       !(
         FulcrumProvider.Instance.contractsSource &&
@@ -58,10 +61,10 @@ export class LendChaiProcessor {
 
     // Detecting token allowance
     let approvePromise: Promise<string> | null = null
-    const erc20allowance = await tokenErc20Contract.allowance.callAsync(
+    const erc20allowance = await tokenErc20Contract.allowance(
       account,
       tokenContract.address
-    )
+    ).callAsync()
     task.processingStepNext()
 
     let txHash: string = ''
@@ -87,10 +90,10 @@ export class LendChaiProcessor {
         gasAmountBN = new BigNumber(600000)
       } else {
         // estimating gas amount
-        const gasAmount = await tokenContract.mintWithChai.estimateGasAsync(
+        const gasAmount = await tokenContract.mintWithChai(
           account,
-          amountInBaseUnits,
-          {
+          amountInBaseUnits
+          ).estimateGasAsync({
             from: account,
             gas: FulcrumProvider.Instance.gasLimit
           }
@@ -101,7 +104,7 @@ export class LendChaiProcessor {
       }
 
       // Submitting loan
-      txHash = await tokenContract.mintWithChai.sendTransactionAsync(account, amountInBaseUnits, {
+      txHash = await tokenContract.mintWithChai(account, amountInBaseUnits).sendTransactionAsync({
         from: account,
         gas: gasAmountBN.toString(),
         gasPrice: await FulcrumProvider.Instance.gasPrice()

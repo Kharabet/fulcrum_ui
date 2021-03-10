@@ -9,6 +9,9 @@ import { FulcrumProvider } from '../FulcrumProvider'
 
 export class UnlendChaiProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
+    if (FulcrumProvider.Instance.unsupportedNetwork) {
+      throw new Error('You are connected to the wrong network!')
+    }
     if (
       !(
         FulcrumProvider.Instance.contractsSource &&
@@ -35,7 +38,7 @@ export class UnlendChaiProcessor {
       'Initializing',
       'Closing loan',
       'Updating the blockchain',
-      'Transaction completed'
+      'Transaction completed',
     ])
 
     // no additional inits or checks
@@ -55,14 +58,12 @@ export class UnlendChaiProcessor {
       gasAmountBN = new BigNumber(600000)
     } else {
       // estimating gas amount
-      const gasAmount = await tokenContract.burnToChai.estimateGasAsync(
-        account,
-        amountInBaseUnits,
-        {
+      const gasAmount = await tokenContract
+        .burnToChai(account, amountInBaseUnits)
+        .estimateGasAsync({
           from: account,
-          gas: FulcrumProvider.Instance.gasLimit
-        }
-      )
+          gas: FulcrumProvider.Instance.gasLimit,
+        })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
@@ -71,10 +72,10 @@ export class UnlendChaiProcessor {
     let txHash: string = ''
     try {
       // Submitting unloan
-      txHash = await tokenContract.burnToChai.sendTransactionAsync(account, amountInBaseUnits, {
+      txHash = await tokenContract.burnToChai(account, amountInBaseUnits).sendTransactionAsync({
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice()
+        gasPrice: await FulcrumProvider.Instance.gasPrice(),
       })
       task.setTxHash(txHash)
     } catch (e) {

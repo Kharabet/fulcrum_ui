@@ -89,10 +89,15 @@ export class ManageCollateralFormWeb3 extends Component<
     )
       .pipe(switchMap((value) => this.rxGetEstimate(value)))
       .subscribe((value: ICollateralChangeEstimate) => {
+        const balanceTooLow =
+          value.collateralAmount.gt(this.state.assetBalanceValue) &&
+          this.state.loanValue < this.state.selectedValue
+
         this.setState({
           ...this.state,
           collateralAmount: value.collateralAmount,
           collateralizedPercent: value.collateralizedPercent,
+          balanceTooLow,
           inputAmountText: this.formatPrecision(value.collateralAmount.toString(), true)
         })
       })
@@ -118,7 +123,9 @@ export class ManageCollateralFormWeb3 extends Component<
                 const collateralizedPercent = this.props.loanOrderState.collateralizedPercent
                   .multipliedBy(100)
                   .plus(100)
-
+                const collateralAssetDecimals =
+                  AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!
+                    .decimals || 18
                 // const marginPremium = TorqueProvider.Instance.getMarginPremiumAmount(this.props.loanOrderState.collateralAsset);
 
                 /*const expectedMinCollateral = this.props.loanOrderState.collateralAmount
@@ -202,7 +209,7 @@ export class ManageCollateralFormWeb3 extends Component<
                     gasAmountNeeded: gasAmountNeeded,
                     collateralizedPercent: collateralizedPercent,
                     collateralExcess: collateralExcess,
-                    assetBalanceValue: assetBalanceNormalizedBN.toNumber()
+                    assetBalanceValue: assetBalance.div(10 ** collateralAssetDecimals).toNumber()
                   },
                   () => {
                     this._selectedValueUpdate.next(this.state.selectedValue)
@@ -239,7 +246,7 @@ export class ManageCollateralFormWeb3 extends Component<
     }
     if (prevState.assetDetails !== this.state.assetDetails) {
       this.getLiquidationPrice()
-    }
+  }
   }
 
   public getLiquidationPrice = async () => {
@@ -279,6 +286,7 @@ export class ManageCollateralFormWeb3 extends Component<
       this.state.activeTokenLiquidation === this.props.loanOrderState.collateralAsset
         ? this.state.liquidationPrice
         : new BigNumber(1).div(this.state.liquidationPrice)
+    const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
@@ -348,7 +356,7 @@ export class ManageCollateralFormWeb3 extends Component<
 
           <div className="input-container">
             <div className="input-row">
-              <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+              <span className="asset-icon"><TokenIcon /></span>
               {this.state.isLoading ? (
                 <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
               ) : (
@@ -376,7 +384,9 @@ export class ManageCollateralFormWeb3 extends Component<
             ) : (
               <button
                 type="submit"
-                className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+                className={`btn btn-size--small ${
+                  this.state.didSubmit || this.state.balanceTooLow ? `btn-disabled` : ``
+                }`}>
                 {this.state.didSubmit
                   ? 'Submitting...'
                   : this.state.loanValue > this.state.selectedValue
@@ -549,11 +559,11 @@ export class ManageCollateralFormWeb3 extends Component<
     const output = Number(outputText)
     let sign = ''
     if (this.state.loanValue > this.state.selectedValue) sign = '-'
-    let n = Math.log(Math.abs(output)) / Math.LN10
+    const n = Math.log(Math.abs(output)) / Math.LN10
     let x = 4 - n
     if (x < 0) x = 0
     if (x > 5) x = 5
-    let result = new Number(output.toFixed(x)).toString()
-    return isNecessarySign && result != '0' ? sign + result : result
+    const result = Number(output.toFixed(x)).toString()
+    return isNecessarySign && result !== '0' ? sign + result : result
   }
 }

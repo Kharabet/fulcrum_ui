@@ -136,11 +136,12 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         enabled: false
       }
     }
+    const TokenIcon = asset.reactLogoSvg
     return (
       <div className="asset-selector-item" onClick={this.openStatsToken}>
         <div className="asset-selector-item-row">
           <span className="asset-selector-icon">
-            {this.props.asset !== Asset.UNKNOWN && asset.reactLogoSvg.render()}
+            {this.props.asset !== Asset.UNKNOWN && <TokenIcon />}
           </span>
           <span className="asset-selector-name">{asset.displayName}</span>
         </div>

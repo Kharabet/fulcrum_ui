@@ -1,216 +1,598 @@
-// tslint:disable:no-consecutive-blank-lines ordered-imports align trailing-comma whitespace class-name
-// tslint:disable:no-unbound-method
-// tslint:disable:variable-name
-import { BaseContract } from '@0x/base-contract'
+// tslint:disable:no-consecutive-blank-lines ordered-imports align trailing-comma enum-naming
+// tslint:disable:whitespace no-unbound-method no-trailing-whitespace
+// tslint:disable:no-unused-variable
+import {
+  AwaitTransactionSuccessOpts,
+  ContractFunctionObj,
+  ContractTxFunctionObj,
+  SendTransactionOpts,
+  BaseContract,
+  PromiseWithTransactionHash,
+  methodAbiToFunctionSignature,
+  linkLibrariesInBytecode,
+} from '@0x/base-contract';
+import { schemas } from '@0x/json-schemas';
 import {
   BlockParam,
+  BlockParamLiteral,
+  BlockRange,
   CallData,
   ContractAbi,
+  ContractArtifact,
   DecodedLogArgs,
+  MethodAbi,
+  TransactionReceiptWithDecodedLogs,
   TxData,
   TxDataPayable,
-  SupportedProvider
-} from 'ethereum-types'
-import { BigNumber, classUtils } from '@0x/utils'
+  SupportedProvider,
+} from 'ethereum-types';
+import { BigNumber, classUtils, hexUtils, logUtils, providerUtils } from '@0x/utils';
+import { EventCallback, IndexedFilterValues, SimpleContractArtifact } from '@0x/types';
+import { Web3Wrapper } from '@0x/web3-wrapper';
+import { assert } from '@0x/assert';
+import * as ethers from 'ethers';
 // tslint:enable:no-unused-variable
 
+
+
 /* istanbul ignore next */
+// tslint:disable:array-type
 // tslint:disable:no-parameter-reassignment
 // tslint:disable-next-line:class-name
 export class SoloContract extends BaseContract {
-  public getAccountValues = {
-    async callAsync(
-      account: { owner: string; number: BigNumber },
-      callData: Partial<CallData> = {},
-      defaultBlock?: BlockParam
-    ): Promise<[{ value: BigNumber }, { value: BigNumber }]> {
-      const self = (this as any) as SoloContract
-      const encodedData = self._strictEncodeArguments('getAccountValues((address,uint256))', [
-        account
-      ])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...callData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      )
-      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
-      const abiEncoder = self._lookupAbiEncoder('getAccountValues((address,uint256))')
-      // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<
-        [{ value: BigNumber }, { value: BigNumber }]
-      >(rawCallResult)
-      // tslint:enable boolean-naming
-      return result
+  /**
+    * @ignore
+    */
+public static deployedBytecode: string | undefined;
+public static contractName = 'Solo';
+  private readonly _methodABIIndex: { [name: string]: number } = {};
+public static async deployFrom0xArtifactAsync(
+    artifact: ContractArtifact | SimpleContractArtifact,
+    supportedProvider: SupportedProvider,
+    txDefaults: Partial<TxData>,
+    logDecodeDependencies: { [contractName: string]: (ContractArtifact | SimpleContractArtifact) },
+  ): Promise<SoloContract> {
+    assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
+      schemas.addressSchema,
+      schemas.numberSchema,
+      schemas.jsNumber,
+    ]);
+    if (artifact.compilerOutput === undefined) {
+      throw new Error('Compiler output not found in the artifact file');
     }
-  }
-  public getAccountBalances = {
-    async callAsync(
-      account: { owner: string; number: BigNumber },
-      callData: Partial<CallData> = {},
-      defaultBlock?: BlockParam
-    ): Promise<
-      [
-        string[],
-        Array<{ sign: boolean; value: BigNumber }>,
-        Array<{ sign: boolean; value: BigNumber }>
-      ]
-    > {
-      const self = (this as any) as SoloContract
-      const encodedData = self._strictEncodeArguments('getAccountBalances((address,uint256))', [
-        account
-      ])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...callData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      )
-      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
-      const abiEncoder = self._lookupAbiEncoder('getAccountBalances((address,uint256))')
-      // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<
-        [
-          string[],
-          Array<{ sign: boolean; value: BigNumber }>,
-          Array<{ sign: boolean; value: BigNumber }>
-        ]
-      >(rawCallResult)
-      // tslint:enable boolean-naming
-      return result
+    const provider = providerUtils.standardizeOrThrow(supportedProvider);
+    const bytecode = artifact.compilerOutput.evm.bytecode.object;
+    const abi = artifact.compilerOutput.abi;
+    const logDecodeDependenciesAbiOnly: { [contractName: string]: ContractAbi } = {};
+    if (Object.keys(logDecodeDependencies) !== undefined) {
+      for (const key of Object.keys(logDecodeDependencies)) {
+        logDecodeDependenciesAbiOnly[key] = logDecodeDependencies[key].compilerOutput.abi;
+      }
     }
+    return SoloContract.deployAsync(bytecode, abi, provider, txDefaults, logDecodeDependenciesAbiOnly, );
   }
-  public setOperators = {
-    async sendTransactionAsync(
-      args: Array<{ operator: string; trusted: boolean }>,
-      txData: Partial<TxData> = {}
-    ): Promise<string> {
-      const self = (this as any) as SoloContract
-      const encodedData = self._strictEncodeArguments('setOperators((address,bool)[])', [args])
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...txData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults(),
-        (self as any).setOperators.estimateGasAsync.bind(self, args)
-      )
-      const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults)
-      return txHash
-    },
-    async estimateGasAsync(
-      args: Array<{ operator: string; trusted: boolean }>,
-      txData: Partial<TxData> = {}
-    ): Promise<number> {
-      const self = (this as any) as SoloContract
-      const encodedData = self._strictEncodeArguments('setOperators((address,bool)[])', [args])
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...txData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      )
-      const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults)
-      return gas
-    },
-    getABIEncodedTransactionData(args: Array<{ operator: string; trusted: boolean }>): string {
-      const self = (this as any) as SoloContract
-      const abiEncodedTransactionData = self._strictEncodeArguments(
-        'setOperators((address,bool)[])',
-        [args]
-      )
-      return abiEncodedTransactionData
-    },
-    async callAsync(
-      args: Array<{ operator: string; trusted: boolean }>,
-      callData: Partial<CallData> = {},
-      defaultBlock?: BlockParam
-    ): Promise<void> {
-      const self = (this as any) as SoloContract
-      const encodedData = self._strictEncodeArguments('setOperators((address,bool)[])', [args])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...callData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      )
-      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
-      const abiEncoder = self._lookupAbiEncoder('setOperators((address,bool)[])')
-      // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<void>(rawCallResult)
-      // tslint:enable boolean-naming
-      return result
+
+  public static async deployWithLibrariesFrom0xArtifactAsync(
+    artifact: ContractArtifact,
+    libraryArtifacts: { [libraryName: string]: ContractArtifact },
+    supportedProvider: SupportedProvider,
+    txDefaults: Partial<TxData>,
+    logDecodeDependencies: { [contractName: string]: (ContractArtifact | SimpleContractArtifact) },
+  ): Promise<SoloContract> {
+    assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
+      schemas.addressSchema,
+      schemas.numberSchema,
+      schemas.jsNumber,
+    ]);
+    if (artifact.compilerOutput === undefined) {
+      throw new Error('Compiler output not found in the artifact file');
     }
-  }
-  public getIsLocalOperator = {
-    async callAsync(
-      owner: string,
-      operator: string,
-      callData: Partial<CallData> = {},
-      defaultBlock?: BlockParam
-    ): Promise<boolean> {
-      const self = (this as any) as SoloContract
-      const encodedData = self._strictEncodeArguments('getIsLocalOperator(address,address)', [
-        owner,
-        operator
-      ])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...callData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      )
-      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
-      const abiEncoder = self._lookupAbiEncoder('getIsLocalOperator(address,address)')
-      // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<boolean>(rawCallResult)
-      // tslint:enable boolean-naming
-      return result
+    const provider = providerUtils.standardizeOrThrow(supportedProvider);
+    const abi = artifact.compilerOutput.abi;
+    const logDecodeDependenciesAbiOnly: { [contractName: string]: ContractAbi } = {};
+    if (Object.keys(logDecodeDependencies) !== undefined) {
+      for (const key of Object.keys(logDecodeDependencies)) {
+        logDecodeDependenciesAbiOnly[key] = logDecodeDependencies[key].compilerOutput.abi;
+      }
     }
+    const libraryAddresses = await SoloContract._deployLibrariesAsync(
+      artifact,
+      libraryArtifacts,
+      new Web3Wrapper(provider),
+      txDefaults
+    );
+    const bytecode = linkLibrariesInBytecode(
+      artifact,
+      libraryAddresses,
+    );
+    return SoloContract.deployAsync(bytecode, abi, provider, txDefaults, logDecodeDependenciesAbiOnly, );
   }
-  public getMarketInterestRate = {
-    async callAsync(
-      marketId: BigNumber,
-      callData: Partial<CallData> = {},
-      defaultBlock?: BlockParam
-    ): Promise<{ value: BigNumber }> {
-      const self = (this as any) as SoloContract
-      const encodedData = self._strictEncodeArguments('getMarketInterestRate(uint256)', [marketId])
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...callData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      )
-      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock)
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult)
-      const abiEncoder = self._lookupAbiEncoder('getMarketInterestRate(uint256)')
-      // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<{ value: BigNumber }>(rawCallResult)
-      // tslint:enable boolean-naming
-      return result
+
+  public static async deployAsync(
+    bytecode: string,
+    abi: ContractAbi,
+    supportedProvider: SupportedProvider,
+    txDefaults: Partial<TxData>,
+    logDecodeDependencies: { [contractName: string]: ContractAbi },
+  ): Promise<SoloContract> {
+    assert.isHexString('bytecode', bytecode);
+    assert.doesConformToSchema('txDefaults', txDefaults, schemas.txDataSchema, [
+      schemas.addressSchema,
+      schemas.numberSchema,
+      schemas.jsNumber,
+    ]);
+    const provider = providerUtils.standardizeOrThrow(supportedProvider);
+    const constructorAbi = BaseContract._lookupConstructorAbi(abi);
+    [] = BaseContract._formatABIDataItemList(
+      constructorAbi.inputs,
+      [],
+      BaseContract._bigNumberToString,
+    );
+    const iface = new ethers.utils.Interface(abi);
+    const deployInfo = iface.deployFunction;
+    const txData = deployInfo.encode(bytecode, []);
+    const web3Wrapper = new Web3Wrapper(provider);
+    const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
+      {
+        data: txData,
+        ...txDefaults,
+      },
+      web3Wrapper.estimateGasAsync.bind(web3Wrapper),
+    );
+    const txHash = await web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+    logUtils.log(`transactionHash: ${txHash}`);
+    const txReceipt = await web3Wrapper.awaitTransactionSuccessAsync(txHash);
+    logUtils.log(`Solo successfully deployed at ${txReceipt.contractAddress}`);
+    const contractInstance = new SoloContract(txReceipt.contractAddress as string, provider, txDefaults, logDecodeDependencies);
+    contractInstance.constructorArgs = [];
+    return contractInstance;
+  }
+
+  /**
+    * @returns      The contract ABI
+    */
+  public static ABI(): ContractAbi {
+    const abi = [
+      { 
+        constant: true,
+        inputs: [
+          {
+            name: 'account',
+            type: 'tuple',
+            components: [
+              {
+                name: 'owner',
+                type: 'address',
+              },
+              {
+                name: 'number',
+                type: 'uint256',
+              },
+            ]
+          },
+        ],
+        name: 'getAccountValues',
+        outputs: [
+          {
+            name: '',
+            type: 'tuple',
+            components: [
+              {
+                name: 'value',
+                type: 'uint256',
+              },
+            ]
+          },
+          {
+            name: '',
+            type: 'tuple',
+            components: [
+              {
+                name: 'value',
+                type: 'uint256',
+              },
+            ]
+          },
+        ],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+      { 
+        constant: true,
+        inputs: [
+          {
+            name: 'account',
+            type: 'tuple',
+            components: [
+              {
+                name: 'owner',
+                type: 'address',
+              },
+              {
+                name: 'number',
+                type: 'uint256',
+              },
+            ]
+          },
+        ],
+        name: 'getAccountBalances',
+        outputs: [
+          {
+            name: '',
+            type: 'address[]',
+          },
+          {
+            name: '',
+            type: 'tuple[]',
+            components: [
+              {
+                name: 'sign',
+                type: 'bool',
+              },
+              {
+                name: 'value',
+                type: 'uint128',
+              },
+            ]
+          },
+          {
+            name: '',
+            type: 'tuple[]',
+            components: [
+              {
+                name: 'sign',
+                type: 'bool',
+              },
+              {
+                name: 'value',
+                type: 'uint256',
+              },
+            ]
+          },
+        ],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+      { 
+        constant: false,
+        inputs: [
+          {
+            name: 'args',
+            type: 'tuple[]',
+            components: [
+              {
+                name: 'operator',
+                type: 'address',
+              },
+              {
+                name: 'trusted',
+                type: 'bool',
+              },
+            ]
+          },
+        ],
+        name: 'setOperators',
+        outputs: [
+        ],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+      { 
+        constant: true,
+        inputs: [
+          {
+            name: 'owner',
+            type: 'address',
+          },
+          {
+            name: 'operator',
+            type: 'address',
+          },
+        ],
+        name: 'getIsLocalOperator',
+        outputs: [
+          {
+            name: '',
+            type: 'bool',
+          },
+        ],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+      { 
+        constant: true,
+        inputs: [
+          {
+            name: 'marketId',
+            type: 'uint256',
+          },
+        ],
+        name: 'getMarketInterestRate',
+        outputs: [
+          {
+            name: '',
+            type: 'tuple',
+            components: [
+              {
+                name: 'value',
+                type: 'uint256',
+              },
+            ]
+          },
+        ],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ] as ContractAbi;
+    return abi;
+  }
+
+  protected static async _deployLibrariesAsync(
+    artifact: ContractArtifact,
+    libraryArtifacts: { [libraryName: string]: ContractArtifact },
+    web3Wrapper: Web3Wrapper,
+    txDefaults: Partial<TxData>,
+    libraryAddresses: { [libraryName: string]: string } = {},
+  ): Promise<{ [libraryName: string]: string }> {
+    const links = artifact.compilerOutput.evm.bytecode.linkReferences;
+    // Go through all linked libraries, recursively deploying them if necessary.
+    for (const link of Object.values(links)) {
+      for (const libraryName of Object.keys(link)) {
+        if (!libraryAddresses[libraryName]) {
+          // Library not yet deployed.
+          const libraryArtifact = libraryArtifacts[libraryName];
+          if (!libraryArtifact) {
+            throw new Error(`Missing artifact for linked library "${libraryName}"`);
+          }
+          // Deploy any dependent libraries used by this library.
+          await SoloContract._deployLibrariesAsync(
+            libraryArtifact,
+            libraryArtifacts,
+            web3Wrapper,
+            txDefaults,
+            libraryAddresses,
+          );
+          // Deploy this library.
+          const linkedLibraryBytecode = linkLibrariesInBytecode(
+            libraryArtifact,
+            libraryAddresses,
+          );
+          const txDataWithDefaults = await BaseContract._applyDefaultsToContractTxDataAsync(
+            {
+              data: linkedLibraryBytecode,
+              ...txDefaults,
+            },
+            web3Wrapper.estimateGasAsync.bind(web3Wrapper),
+          );
+          const txHash = await web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+          logUtils.log(`transactionHash: ${txHash}`);
+          const { contractAddress } = await web3Wrapper.awaitTransactionSuccessAsync(txHash);
+          logUtils.log(`${libraryArtifact.contractName} successfully deployed at ${contractAddress}`);
+          libraryAddresses[libraryArtifact.contractName] = contractAddress as string;
+        }
+      }
     }
+    return libraryAddresses;
   }
-  constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
-    super('Solo', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults)
-    classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper'])
+
+  public getFunctionSignature(methodName: string): string {
+    const index = this._methodABIIndex[methodName];
+    const methodAbi = SoloContract.ABI()[index] as MethodAbi; // tslint:disable-line:no-unnecessary-type-assertion
+    const functionSignature = methodAbiToFunctionSignature(methodAbi);
+    return functionSignature;
   }
-} // tslint:disable:max-file-line-count
-// tslint:enable:no-unbound-method
+
+  public getABIDecodedTransactionData<T>(methodName: string, callData: string): T {
+    const functionSignature = this.getFunctionSignature(methodName);
+    const self = (this as any) as SoloContract;
+    const abiEncoder = self._lookupAbiEncoder(functionSignature);
+    const abiDecodedCallData = abiEncoder.strictDecode<T>(callData);
+    return abiDecodedCallData;
+  }
+
+  public getABIDecodedReturnData<T>(methodName: string, callData: string): T {
+    const functionSignature = this.getFunctionSignature(methodName);
+    const self = (this as any) as SoloContract;
+    const abiEncoder = self._lookupAbiEncoder(functionSignature);
+    const abiDecodedCallData = abiEncoder.strictDecodeReturnValue<T>(callData);
+    return abiDecodedCallData;
+  }
+
+  public getSelector(methodName: string): string {
+    const functionSignature = this.getFunctionSignature(methodName);
+    const self = (this as any) as SoloContract;
+    const abiEncoder = self._lookupAbiEncoder(functionSignature);
+    return abiEncoder.getSelector();
+  }
+
+  public getAccountValues(
+        account: {owner: string;number: BigNumber},
+  ): ContractFunctionObj<[{value: BigNumber}, {value: BigNumber}]
+> {
+    const self = this as any as SoloContract;
+      
+    const functionSignature = 'getAccountValues((address,uint256))';
+
+    return {
+      async callAsync(
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+      ): Promise<[{value: BigNumber}, {value: BigNumber}]
+      > {
+        BaseContract._assertCallParams(callData, defaultBlock);
+        const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
+        const abiEncoder = self._lookupAbiEncoder(functionSignature);
+        BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+        return abiEncoder.strictDecodeReturnValue<[{value: BigNumber}, {value: BigNumber}]
+      >(rawCallResult);
+      },
+      getABIEncodedTransactionData(): string {
+        return self._strictEncodeArguments(functionSignature, [account
+      ]);
+      },
+    }
+  };
+  public getAccountBalances(
+        account: {owner: string;number: BigNumber},
+  ): ContractFunctionObj<[string[], Array<{sign: boolean;value: BigNumber}>, Array<{sign: boolean;value: BigNumber}>]
+> {
+    const self = this as any as SoloContract;
+      
+    const functionSignature = 'getAccountBalances((address,uint256))';
+
+    return {
+      async callAsync(
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+      ): Promise<[string[], Array<{sign: boolean;value: BigNumber}>, Array<{sign: boolean;value: BigNumber}>]
+      > {
+        BaseContract._assertCallParams(callData, defaultBlock);
+        const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
+        const abiEncoder = self._lookupAbiEncoder(functionSignature);
+        BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+        return abiEncoder.strictDecodeReturnValue<[string[], Array<{sign: boolean;value: BigNumber}>, Array<{sign: boolean;value: BigNumber}>]
+      >(rawCallResult);
+      },
+      getABIEncodedTransactionData(): string {
+        return self._strictEncodeArguments(functionSignature, [account
+      ]);
+      },
+    }
+  };
+  public setOperators(
+        args: Array<{operator: string;trusted: boolean}>,
+  ): ContractTxFunctionObj<void
+> {
+    const self = this as any as SoloContract;
+      assert.isArray('args', args);
+    const functionSignature = 'setOperators((address,bool)[])';
+
+    return {
+      async sendTransactionAsync(
+        txData?: Partial<TxData> | undefined,
+        opts: SendTransactionOpts = { shouldValidate: true },
+      ): Promise<string> {
+        const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
+          { data: this.getABIEncodedTransactionData(), ...txData },
+          this.estimateGasAsync.bind(this),
+        );
+        return self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      },
+      awaitTransactionSuccessAsync(
+        txData?: Partial<TxData>,
+        opts: AwaitTransactionSuccessOpts = { shouldValidate: true },
+      ): PromiseWithTransactionHash<TransactionReceiptWithDecodedLogs> {
+        return self._promiseWithTransactionHash(this.sendTransactionAsync(txData, opts), opts);
+      },
+      async estimateGasAsync(
+        txData?: Partial<TxData> | undefined,
+      ): Promise<number> {
+        const txDataWithDefaults = await self._applyDefaultsToTxDataAsync(
+          { data: this.getABIEncodedTransactionData(), ...txData }
+        );
+        return self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      },
+      async callAsync(
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+      ): Promise<void
+      > {
+        BaseContract._assertCallParams(callData, defaultBlock);
+        const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
+        const abiEncoder = self._lookupAbiEncoder(functionSignature);
+        BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+        return abiEncoder.strictDecodeReturnValue<void
+      >(rawCallResult);
+      },
+      getABIEncodedTransactionData(): string {
+        return self._strictEncodeArguments(functionSignature, [args
+      ]);
+      },
+    }
+  };
+  public getIsLocalOperator(
+        owner: string,
+        operator: string,
+  ): ContractFunctionObj<boolean
+> {
+    const self = this as any as SoloContract;
+      assert.isString('owner', owner);
+      assert.isString('operator', operator);
+    const functionSignature = 'getIsLocalOperator(address,address)';
+
+    return {
+      async callAsync(
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+      ): Promise<boolean
+      > {
+        BaseContract._assertCallParams(callData, defaultBlock);
+        const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
+        const abiEncoder = self._lookupAbiEncoder(functionSignature);
+        BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+        return abiEncoder.strictDecodeReturnValue<boolean
+      >(rawCallResult);
+      },
+      getABIEncodedTransactionData(): string {
+        return self._strictEncodeArguments(functionSignature, [owner.toLowerCase(),
+      operator.toLowerCase()
+      ]);
+      },
+    }
+  };
+  public getMarketInterestRate(
+        marketId: BigNumber,
+  ): ContractFunctionObj<{value: BigNumber}
+> {
+    const self = this as any as SoloContract;
+      assert.isBigNumber('marketId', marketId);
+    const functionSignature = 'getMarketInterestRate(uint256)';
+
+    return {
+      async callAsync(
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+      ): Promise<{value: BigNumber}
+      > {
+        BaseContract._assertCallParams(callData, defaultBlock);
+        const rawCallResult = await self._performCallAsync({ data: this.getABIEncodedTransactionData(), ...callData }, defaultBlock);
+        const abiEncoder = self._lookupAbiEncoder(functionSignature);
+        BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+        return abiEncoder.strictDecodeReturnValue<{value: BigNumber}
+      >(rawCallResult);
+      },
+      getABIEncodedTransactionData(): string {
+        return self._strictEncodeArguments(functionSignature, [marketId
+      ]);
+      },
+    }
+  };
+
+
+
+  constructor(
+    address: string,
+    supportedProvider: SupportedProvider,
+    txDefaults?: Partial<TxData>,
+    logDecodeDependencies?: { [contractName: string]: ContractAbi },
+    deployedBytecode: string | undefined = SoloContract.deployedBytecode,
+  ) {
+    super('Solo', SoloContract.ABI(), address, supportedProvider, txDefaults, logDecodeDependencies, deployedBytecode);
+    classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', '_web3Wrapper']);
+SoloContract.ABI().forEach((item, index) => {
+      if (item.type === 'function') {
+        const methodAbi = item as MethodAbi;
+        this._methodABIIndex[methodAbi.name] = index;
+      }
+    });
+  }
+}
+
+// tslint:disable:max-file-line-count
+// tslint:enable:no-unbound-method no-parameter-reassignment no-consecutive-blank-lines ordered-imports align
+// tslint:enable:trailing-comma whitespace no-trailing-whitespace

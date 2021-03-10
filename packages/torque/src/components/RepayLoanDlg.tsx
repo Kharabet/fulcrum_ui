@@ -52,6 +52,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
       this.setState({
         ...this.state,
         isOpen: true,
+        // @ts-ignore
         executorParams: { resolve: resolve, reject: reject },
         loanOrderState: item
       })

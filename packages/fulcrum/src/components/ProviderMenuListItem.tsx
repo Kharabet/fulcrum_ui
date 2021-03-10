@@ -47,8 +47,8 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       const tagManagerArgs = {
         dataLayer: {
           event: 'select-provider',
-          providerName: props.providerType
-        }
+          providerName: props.providerType,
+        },
       }
       TagManager.dataLayer(tagManagerArgs)
     }
@@ -65,7 +65,10 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
     const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings
       ? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
       : ''
-
+    const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
+    if (!ProviderLogoIcon) {
+      return null
+    }
     return (
       <li
         className={`provider-menu__list-item provider-menu__list-item--selected`}
@@ -87,17 +90,20 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
           )}
         </div>
         <div className="provider-menu__list-item-content-img">
-          {providerTypeDetails.reactLogoSvgShort.render()}
+          <ProviderLogoIcon />
         </div>
       </li>
     )
   }
-
+  const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
+  if (!ProviderLogoIcon) {
+    return null
+  }
   return (
     <li className={`provider-menu__list-item `} onClick={onClick}>
       <div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>
       <div className="provider-menu__list-item-content-img">
-        {props.isActivating ? <Loader /> : providerTypeDetails.reactLogoSvgShort.render()}
+        {props.isActivating ? <Loader /> : <ProviderLogoIcon />}
       </div>
     </li>
   )

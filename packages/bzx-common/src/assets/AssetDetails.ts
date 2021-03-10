@@ -1,10 +1,15 @@
+import React from 'react'
 export default class AssetDetails {
   public addressErc20: Map<number, string | null> = new Map<number, string>()
   public bgBrightColor: string = '#000000'
   public bgLightColor: string = '#FFFFFF'
   public displayName: string = ''
   public logoSvg: any = null
-  public reactLogoSvg: any = null
+  public reactLogoSvg: React.FunctionComponent<
+  React.SVGProps<SVGSVGElement> & {
+    title?: string | undefined
+  }
+>
   private _decimals: number = 18
 
   get decimals(): number {
@@ -19,7 +24,11 @@ export default class AssetDetails {
     displayName: string,
     decimals: number,
     logoSvg: any,
-    reactLogoSvg: any,
+    reactLogoSvg: React.FunctionComponent<
+    React.SVGProps<SVGSVGElement> & {
+      title?: string | undefined
+    }
+  >,
     bgBrightColor: string,
     bgLightColor: string,
     addressErc20: Map<number, string | null>

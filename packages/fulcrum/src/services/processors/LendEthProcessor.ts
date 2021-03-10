@@ -9,6 +9,9 @@ import { FulcrumProvider } from '../FulcrumProvider'
 
 export class LendEthProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
+    if (FulcrumProvider.Instance.unsupportedNetwork) {
+      throw new Error('You are connected to the wrong network!')
+    }
     if (
       !(
         FulcrumProvider.Instance.contractsSource &&
@@ -50,7 +53,7 @@ export class LendEthProcessor {
       gasAmountBN = new BigNumber(600000)
     } else {
       // estimating gas amount
-      const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, {
+      const gasAmount = await tokenContract.mintWithEther(account).estimateGasAsync({
         from: account,
         value: amountInBaseUnits,
         gas: FulcrumProvider.Instance.gasLimit
@@ -63,7 +66,7 @@ export class LendEthProcessor {
     let txHash: string = ''
     try {
       // Submitting loan
-      txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, {
+      txHash = await tokenContract.mintWithEther(account).sendTransactionAsync({
         from: account,
         value: amountInBaseUnits,
         gas: gasAmountBN.toString(),

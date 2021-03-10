@@ -43,7 +43,7 @@ export class HistoryTokenGridRow extends Component<
       isLoadedRate: false,
       isShowCollapse: false,
       latestEvent: null,
-      otherEvents: []
+      otherEvents: [],
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -64,10 +64,10 @@ export class HistoryTokenGridRow extends Component<
     this._isMounted &&
       this.setState({
         ...this.state,
-        isLoading: true
+        isLoading: true,
       })
     const latestEvent = {
-      ...this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1]
+      ...this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1],
     }
     const otherEvents = this.props.eventsGroup.events.slice(0, -1).reverse()
     this._isMounted &&
@@ -75,7 +75,7 @@ export class HistoryTokenGridRow extends Component<
         ...this.state,
         latestEvent,
         otherEvents,
-        isLoading: false
+        isLoading: false,
         // isLoadedRate: true
       })
   }
@@ -117,8 +117,9 @@ export class HistoryTokenGridRow extends Component<
 
   public renderOtherEvents = () => {
     const quoteToken = AssetsDictionary.assets.get(this.props.eventsGroup.quoteToken)!
+    const QuoteTokenIcon = quoteToken.reactLogoSvg
     const baseToken = AssetsDictionary.assets.get(this.props.eventsGroup.baseToken)!
-
+    const BaseTokenIcon = baseToken.reactLogoSvg
     const precisionDigits = this.props.eventsGroup.quoteToken === Asset.WBTC ? 4 : 2
 
     return (
@@ -128,6 +129,8 @@ export class HistoryTokenGridRow extends Component<
           (event.payTradingFeeEvent &&
             AssetsDictionary.assets.get(event.payTradingFeeEvent.token as Asset)!) ||
           undefined
+        const PayTradingFeeTokenIcon = payTradingFeeToken?.reactLogoSvg
+
         return (
           <div key={i} className="history-token-grid-row history-token-grid-row-inner">
             <div className="history-token-grid-row-inner__col history-token-grid-row-inner__col-token-date">
@@ -139,7 +142,7 @@ export class HistoryTokenGridRow extends Component<
                 {event.date.toLocaleDateString('en-US', {
                   day: '2-digit',
                   month: 'short',
-                  year: 'numeric'
+                  year: 'numeric',
                 })}
               </a>
             </div>
@@ -154,7 +157,8 @@ export class HistoryTokenGridRow extends Component<
               <span className="label">Position</span>
               {event.positionValue.gt(0) ? (
                 <React.Fragment>
-                  {baseToken.reactLogoSvg.render()}&nbsp;
+                  <BaseTokenIcon />
+                  &nbsp;
                   {event.positionValue.toFixed(4)}
                 </React.Fragment>
               ) : (
@@ -170,7 +174,8 @@ export class HistoryTokenGridRow extends Component<
                   '-'
                 ) : (
                   <React.Fragment>
-                    {quoteToken.reactLogoSvg.render()}&nbsp;
+                    <QuoteTokenIcon />
+                    &nbsp;
                     {event.tradePrice.toFixed(precisionDigits)}
                   </React.Fragment>
                 )
@@ -189,7 +194,8 @@ export class HistoryTokenGridRow extends Component<
                   '-'
                 ) : (
                   <React.Fragment>
-                    {quoteToken.reactLogoSvg.render()}&nbsp;
+                    <QuoteTokenIcon />
+                    &nbsp;
                     {event.value.toFixed(precisionDigits)}
                   </React.Fragment>
                 )
@@ -211,9 +217,13 @@ export class HistoryTokenGridRow extends Component<
                 Fee / Rewards <span className="bzrx">BZRX</span>
               </span>
               {!this.state.isLoading ? (
-                event.payTradingFeeEvent && payTradingFeeToken && event.earnRewardEvent ? (
+                event.payTradingFeeEvent &&
+                payTradingFeeToken &&
+                event.earnRewardEvent &&
+                PayTradingFeeTokenIcon ? (
                   <React.Fragment>
-                    {payTradingFeeToken.reactLogoSvg.render()}&nbsp;
+                    <PayTradingFeeTokenIcon />
+                    &nbsp;
                     {event.payTradingFeeEvent.amount.toFixed(4)} /{' '}
                     {event.earnRewardEvent.amount.toFixed(2)}
                   </React.Fragment>
@@ -230,7 +240,8 @@ export class HistoryTokenGridRow extends Component<
               <span className="label">Profit</span>
               {event.profit instanceof BigNumber ? (
                 <React.Fragment>
-                  {quoteToken.reactLogoSvg.render()}&nbsp;
+                  <QuoteTokenIcon />
+                  &nbsp;
                   {event.profit.toFixed(3)}
                 </React.Fragment>
               ) : (
@@ -251,11 +262,16 @@ export class HistoryTokenGridRow extends Component<
       this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1]
     // const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: PositionHistoryData) => a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));
     const quoteToken = AssetsDictionary.assets.get(this.props.eventsGroup.quoteToken)!
+    const QuoteTokenIcon = quoteToken.reactLogoSvg
     const baseToken = AssetsDictionary.assets.get(this.props.eventsGroup.baseToken)!
+    const BaseTokenIcon = baseToken.reactLogoSvg
+
     const payTradingFeeToken =
       (latestEvent.payTradingFeeEvent &&
         AssetsDictionary.assets.get(latestEvent.payTradingFeeEvent!.token as Asset)!) ||
       undefined
+
+    const PayTradingFeeTokenIcon = payTradingFeeToken?.reactLogoSvg
     const precisionDigits = this.props.eventsGroup.quoteToken === Asset.WBTC ? 4 : 2
     return (
       <div>
@@ -269,7 +285,7 @@ export class HistoryTokenGridRow extends Component<
               {latestEvent.date.toLocaleDateString('en-US', {
                 day: '2-digit',
                 month: 'short',
-                year: 'numeric'
+                year: 'numeric',
               })}
             </a>
           </div>
@@ -294,7 +310,8 @@ export class HistoryTokenGridRow extends Component<
             <span className="label">Position</span>
             {latestEvent.positionValue.gt(0) ? (
               <React.Fragment>
-                {baseToken.reactLogoSvg.render()}&nbsp;
+                <BaseTokenIcon />
+                &nbsp;
                 {latestEvent.positionValue.toFixed(4)}
               </React.Fragment>
             ) : (
@@ -312,7 +329,8 @@ export class HistoryTokenGridRow extends Component<
                 '-'
               ) : (
                 <React.Fragment>
-                  {quoteToken.reactLogoSvg.render()}&nbsp;
+                  <QuoteTokenIcon />
+                  &nbsp;
                   {latestEvent.tradePrice.toFixed(precisionDigits)}
                 </React.Fragment>
               )
@@ -341,7 +359,8 @@ export class HistoryTokenGridRow extends Component<
                 '-'
               ) : (
                 <React.Fragment>
-                  {quoteToken.reactLogoSvg.render()}&nbsp;
+                  <QuoteTokenIcon />
+                  &nbsp;
                   {latestEvent.value.toFixed(precisionDigits)}
                 </React.Fragment>
               )
@@ -362,9 +381,11 @@ export class HistoryTokenGridRow extends Component<
             {!this.state.isLoading ? (
               latestEvent.payTradingFeeEvent &&
               payTradingFeeToken &&
-              latestEvent.earnRewardEvent ? (
+              latestEvent.earnRewardEvent &&
+              PayTradingFeeTokenIcon ? (
                 <React.Fragment>
-                  {payTradingFeeToken.reactLogoSvg.render()}&nbsp;
+                  <PayTradingFeeTokenIcon />
+                  &nbsp;
                   {latestEvent.payTradingFeeEvent.amount.toFixed(4)} /{' '}
                   {latestEvent.earnRewardEvent.amount.toFixed(2)}
                 </React.Fragment>
@@ -384,7 +405,8 @@ export class HistoryTokenGridRow extends Component<
               latestEvent.profit instanceof BigNumber ? (
                 // ? <React.Fragment><span className="sign-currency">$</span>{!this.state.isShowCollapse ? profitSum.toFixed(3) : latestEvent.profit.toFixed(3)}</React.Fragment>
                 <React.Fragment>
-                  {quoteToken.reactLogoSvg.render()}&nbsp;
+                  <QuoteTokenIcon />
+                  &nbsp;
                   {latestEvent.profit.toFixed(3)}
                 </React.Fragment>
               ) : (
@@ -411,7 +433,6 @@ export class HistoryTokenGridRow extends Component<
   }
 
   public toggleCollapse = () => {
-    
     this.setState({ ...this.state, isShowCollapse: !this.state.isShowCollapse })
   }
 }

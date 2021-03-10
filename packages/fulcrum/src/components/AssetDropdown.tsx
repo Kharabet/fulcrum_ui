@@ -46,7 +46,7 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
         return (
           <div key={e} className="asset-dropdown-item" onClick={() => this.onSelect(e)}>
             <div className="asset-dropdown-item__image-container">
-              {assetDetails.reactLogoSvg.render()}
+              <assetDetails.reactLogoSvg/>
             </div>
             <div className="asset-dropdown-item__description-container">
               <div className="asset-dropdown-item__name">{assetDetails.displayName}</div>
@@ -78,7 +78,7 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
             this.props.assets.length === 1 ? 'empty' : ''
           }`}
           onClick={this.onOpenClick}>
-          {activeAssetDetails.reactLogoSvg.render()}
+          <activeAssetDetails.reactLogoSvg/>
           <span>{activeAssetDetails.displayName}</span>
         </div>
         {this.state.isOpened ? (

@@ -1,0 +1,32 @@
+.btn--onchain-indicator {
+  // refactor
+  border: 1px solid #b9c7d6;
+  border-radius: 100px;
+  background-color: #fff;
+  cursor: pointer;
+  padding: 0 $spacing-base * 1.5;
+  width: 210px;
+  height: 50px;
+}
+
+.on-chain-indicator__svg > svg {
+  height: 28px;
+  fill: $color-gray-dark;
+}
+
+.on-chain-indicator__description {
+  text-align: left;
+  font-size: 15px;
+  color: $color-gray-dark;
+  font-weight: 800;
+}
+
+@media screen and (max-width: $width-max-md) {
+  .on-chain-indicator__wallet-address {
+    padding: 0 0.5rem;
+    border-left: solid 0px;
+  }
+  a.on-chain-indicator__wallet-address {
+    padding: 0;
+  }
+}

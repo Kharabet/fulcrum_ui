@@ -42,11 +42,12 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
   }
 
   public render() {
+    const TokenIcon = this.props.asset
     return (
       <React.Fragment>
         <div className="input-container">
           <div className="input-row">
-            <span className="asset-icon">{this.props.asset.render()}</span>
+            <span className="asset-icon"><TokenIcon /></span>
             <input
               ref={this._setInputRef}
               className="input-amount"

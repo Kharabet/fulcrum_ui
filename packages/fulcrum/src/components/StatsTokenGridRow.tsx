@@ -29,7 +29,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
       assetDetails: null,
       usdSupply: null,
       usdTotalLocked: null,
-      decimals: 18
+      decimals: 18,
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -48,7 +48,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
 
     this.setState({
       ...this.state,
-      assetDetails: assetDetails || null
+      assetDetails: assetDetails || null,
     })
   }
 
@@ -136,24 +136,18 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
 
     let customBorrowTitle
     let customBorrowText
-    if (
-      details.borrowInterestRate &&
-      this.props.reserveDetails.asset! !== Asset.ETHv1
-    ) {
-      customBorrowTitle = `${details.borrowInterestRate.toFixed(
-        18
-      )}%`
+    if (details.borrowInterestRate && this.props.reserveDetails.asset! !== Asset.ETHv1) {
+      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}%`
       customBorrowText = (
         <React.Fragment>
-          <span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>
-          %
+          <span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>%
         </React.Fragment>
       )
     } else {
       customBorrowTitle = ``
       customBorrowText = `-`
     }
-
+    const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <div className="stats-grid-row">
         {details.addressErc20 &&
@@ -167,7 +161,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
             target="_blank"
             rel="noopener noreferrer">
             <div className="stats-grid-row__image">
-              {this.state.assetDetails.reactLogoSvg.render()}
+              <TokenIcon />
             </div>
             <span className="stats-grid-row__asset-name fw-800 color-primary">
               {details.asset!}
@@ -176,7 +170,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
         ) : (
           <div className="stats-grid-row__col stats-grid-row__col-name">
             <div className="stats-grid-row__image">
-              {this.state.assetDetails.reactLogoSvg.render()}
+              <TokenIcon />
             </div>
             <span className="stats-grid-row__asset-name fw-800 color-primary">
               {details.asset!}

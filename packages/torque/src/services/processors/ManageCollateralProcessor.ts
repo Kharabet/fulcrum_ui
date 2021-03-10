@@ -23,7 +23,7 @@ export class ManageCollateralProcessor {
         'Initializing',
         'Submitting loan',
         'Updating the blockchain',
-        'Transaction completed'
+        'Transaction completed',
       ])
     } else {
       task.processingStart([
@@ -33,7 +33,7 @@ export class ManageCollateralProcessor {
         'Waiting for token allowance',
         'Submitting loan',
         'Updating the blockchain',
-        'Transaction completed'
+        'Transaction completed',
       ])
     }
 
@@ -74,10 +74,12 @@ export class ManageCollateralProcessor {
       }
       // Detecting token allowance
       task.processingStepNext()
-      erc20allowance = await tokenErc20Contract.allowance.callAsync(
-        account,
-        TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
-      )
+      erc20allowance = await tokenErc20Contract
+        .allowance(
+          account,
+          TorqueProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase()
+        )
+        .callAsync()
 
       // Prompting token allowance
       task.processingStepNext()
@@ -106,15 +108,13 @@ export class ManageCollateralProcessor {
 
     if (!taskRequest.isWithdrawal) {
       try {
-        const gasAmount = await bZxContract.depositCollateral.estimateGasAsync(
-          taskRequest.loanId,
-          collateralAmountInBaseUnits,
-          {
+        const gasAmount = await bZxContract
+          .depositCollateral(taskRequest.loanId, collateralAmountInBaseUnits)
+          .estimateGasAsync({
             from: account,
             value: isETHCollateralAsset ? collateralAmountInBaseUnitsValue : undefined,
-            gas: TorqueProvider.Instance.gasLimit
-          }
-        )
+            gas: TorqueProvider.Instance.gasLimit,
+          })
         gasAmountBN = new BigNumber(gasAmount)
           .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
@@ -123,47 +123,46 @@ export class ManageCollateralProcessor {
       }
 
       try {
-        txHash = await bZxContract.depositCollateral.sendTransactionAsync(
-          taskRequest.loanId, // loanId
-          collateralAmountInBaseUnits, // depositAmount
-          {
+        txHash = await bZxContract
+          .depositCollateral(
+            taskRequest.loanId, // loanId
+            collateralAmountInBaseUnits // depositAmount
+          )
+          .sendTransactionAsync({
             from: account,
             value: isETHCollateralAsset ? collateralAmountInBaseUnitsValue : undefined,
             gas: gasAmountBN ? gasAmountBN.toString() : '3000000',
-            gasPrice: await TorqueProvider.Instance.gasPrice()
-          }
-        )
+            gasPrice: await TorqueProvider.Instance.gasPrice(),
+          })
         task.setTxHash(txHash)
       } catch (e) {
         throw e
       }
     } else {
       try {
-        const gasAmount = await bZxContract.withdrawCollateral.estimateGasAsync(
-          taskRequest.loanId,
-          account,
-          collateralAmountInBaseUnits,
-          {
+        const gasAmount = await bZxContract
+          .withdrawCollateral(taskRequest.loanId, account, collateralAmountInBaseUnits)
+          .estimateGasAsync({
             from: account,
-            gas: TorqueProvider.Instance.gasLimit
-          }
-        )
+            gas: TorqueProvider.Instance.gasLimit,
+          })
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(2).integerValue(BigNumber.ROUND_UP)
       } catch (e) {
         // throw e
       }
 
       try {
-        txHash = await bZxContract.withdrawCollateral.sendTransactionAsync(
-          taskRequest.loanId, // loanId
-          account, // trader
-          collateralAmountInBaseUnits, // depositAmount
-          {
+        txHash = await bZxContract
+          .withdrawCollateral(
+            taskRequest.loanId, // loanId
+            account, // trader
+            collateralAmountInBaseUnits // depositAmount
+          )
+          .sendTransactionAsync({
             from: account,
             gas: gasAmountBN ? gasAmountBN.toString() : '3000000',
-            gasPrice: await TorqueProvider.Instance.gasPrice()
-          }
-        )
+            gasPrice: await TorqueProvider.Instance.gasPrice(),
+          })
         task.setTxHash(txHash)
       } catch (e) {
         throw e

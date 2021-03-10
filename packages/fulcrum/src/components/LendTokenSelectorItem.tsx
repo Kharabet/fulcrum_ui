@@ -175,6 +175,7 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
   if (!assetDetails) {
     return null
   }
+  const TokenIcon = assetDetails.reactLogoSvg
   return (
     <div
       className={`token-selector-item ${
@@ -182,10 +183,8 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
       } ${isLoadingTransaction ? 'loading-transaction' : ''}`}>
       <div className="token-selector-item__image">
         {props.isLoading || isLoadingTransaction ? (
-          <CircleLoader>{assetDetails.reactLogoSvg.render()}</CircleLoader>
-        ) : (
-          assetDetails.reactLogoSvg.render()
-        )}
+          <CircleLoader><TokenIcon /></CircleLoader>
+        ) : <TokenIcon />}
       </div>
 
       {isLoadingTransaction && request ? (

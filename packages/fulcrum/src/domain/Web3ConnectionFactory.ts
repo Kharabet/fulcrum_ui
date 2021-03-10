@@ -10,7 +10,7 @@ import configProviders from '../config/providers.json'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorUpdate } from '@web3-react/types'
 import { ProviderType } from './ProviderType'
-import { AlchemySubprovider } from '@alch/alchemy-web3'
+// import { AlchemySubprovider } from '@alch/alchemy-web3'
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK
 
 export class Web3ConnectionFactory {
@@ -83,10 +83,10 @@ export class Web3ConnectionFactory {
     return new RPCSubprovider(rpcUrl)
   }
 
-  public static async getAlchemyProvider(): Promise<AlchemySubprovider> {
-    const rpcUrl = Web3ConnectionFactory.getRPCUrl()
-    return new AlchemySubprovider(rpcUrl, {writeProvider: null})
-  }
+  // public static async getAlchemyProvider(): Promise<AlchemySubprovider> {
+  //   const rpcUrl = Web3ConnectionFactory.getRPCUrl()
+  //   return new AlchemySubprovider(rpcUrl, {writeProvider: null})
+  // }
 
   public static getRPCUrl(): string {
     let url

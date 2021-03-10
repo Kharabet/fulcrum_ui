@@ -293,7 +293,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       this.props.lendType === LendType.LEND &&
       this.state.maybeNeedsApproval &&
       this.props.asset !== Asset.ETH && this.props.asset !== Asset.BNB
-
+    const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <form
         className={`lend-form${this.state.isExpired ? ' expired' : ''}`}
@@ -312,11 +312,9 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
               target="_blank"
               rel="noopener noreferrer">
-              {this.state.assetDetails.reactLogoSvg.render()}
+              <TokenIcon />
             </a>
-          ) : (
-            this.state.assetDetails.reactLogoSvg.render()
-          )}
+          ) : <TokenIcon />}
           {/*{this.props.asset === Asset.ETH && this.props.lendType === LendType.LEND &&
             <p className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</p>
           }
