@@ -2304,6 +2304,21 @@ export class TorqueProvider {
     return result
   }
 
+  public getAssetBorrowInterestRate = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0)
+
+    if (this.contractsSource && this.web3Wrapper) {
+      const iTokenContract = await this.contractsSource.getITokenContract(asset)
+      if (iTokenContract) {
+        let borrowRate = await iTokenContract.nextBorrowInterestRate(new BigNumber(0)).callAsync()
+        borrowRate = borrowRate.dividedBy(10 ** 20) // value is represented as rate, not percents
+        result = borrowRate
+      }
+    }
+
+    return result
+  }
+
   public getAvailableLiquidity = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
 

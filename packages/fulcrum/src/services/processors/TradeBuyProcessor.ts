@@ -131,10 +131,10 @@ export class TradeBuyProcessor {
 
     //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
     const collateralTokenAddress =
-      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && taskRequest.depositToken === Asset.ETH) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.depositToken === Asset.BNB)
-        ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
-        : FulcrumProvider.ZERO_ADDRESS
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && collateralToken === Asset.ETH) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && collateralToken === Asset.BNB)
+      ? FulcrumProvider.ZERO_ADDRESS
+      : FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
     const loanData = '0x'
 
     const sendAmountForValue =

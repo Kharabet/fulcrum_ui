@@ -5,6 +5,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 import { TorqueProvider } from '../services/TorqueProvider'
 import AssetSelectorItem from './AssetSelectorItem'
 import { BorrowDlg } from './BorrowDlg'
+import { TorqueProviderEvents } from 'src/services/events/TorqueProviderEvents'
 
 export interface IAssetSelectorProps {
   borrowDlgRef: React.RefObject<BorrowDlg>
@@ -19,20 +20,26 @@ const AssetSelector = (props: IAssetSelectorProps) => {
   const [liquidities, setLiquidity] = useState()
 
   useEffect(() => {
-    getInterestRates()
-    getLiquidity()
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, derivedUpdate)
+    return () => {
+      TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderChanged, derivedUpdate)
+    }
   }, [])
 
+  const derivedUpdate = () => {
+    getInterestRates()
+    getLiquidity()
+  }
   const getInterestRates = async () => {
     let interestRatesData = {}
     // TODO: add API endpoints for bsc
     if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
       const assetsInterestRates = await Promise.all(
-        props.assetsShown.map((asset) => TorqueProvider.Instance.getAssetInterestRate(asset))
+        props.assetsShown.map((asset) => TorqueProvider.Instance.getAssetBorrowInterestRate(asset))
       )
       props.assetsShown.forEach((asset, i) => {
         // @ts-ignore
-        interestRatesData[asset.toLowerCase()] = assetsInterestRates[i]
+        interestRatesData[asset.toLowerCase()] = { borrowApr: assetsInterestRates[i] }
       })
     } else {
       const interestRatesRequest = await fetch(`${apiUrl}/interest-rates`)
