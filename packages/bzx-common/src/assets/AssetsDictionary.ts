@@ -459,7 +459,7 @@ export default class AssetsDictionary {
         bnb_logo,
         BNBLogo,
         '#F3BA2F',
-        '#F3BA2F',
+        '#f3ba2f9e',
         new Map<number, string | null>([[56, '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c']])
       ),
     ],
@@ -471,7 +471,7 @@ export default class AssetsDictionary {
         bnb_logo,
         BNBLogo,
         '#F3BA2F',
-        '#F3BA2F',
+        '#f3ba2f9e',
         new Map<number, string | null>([[56, '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c']])
       ),
     ],
@@ -483,7 +483,7 @@ export default class AssetsDictionary {
         busd_logo,
         BUSDLogo,
         '#F0B90B',
-        '#F0B90B',
+        '#f0b90b9e',
         new Map<number, string | null>([[56, '0xe9e7cea3dedca5984780bafc599bd69add087d56']])
       ),
     ],
@@ -495,7 +495,7 @@ export default class AssetsDictionary {
         btc_logo,
         BTCLogo,
         '#F7931A',
-        '#F7931A',
+        '#f7931a9e',
         new Map<number, string | null>([[56, '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c']])
       ),
     ],
