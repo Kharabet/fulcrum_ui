@@ -42,6 +42,10 @@ import '../styles/pages/_trade-page.scss'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { InfoBlock } from '../components/InfoBlock'
 import { StatsTokenGrid } from '../components/StatsTokenGrid'
+import TVChartComingSoon from '../components/TVChartComingSoon'
+
+const networkName = process.env.REACT_APP_ETH_NETWORK
+
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
@@ -93,10 +97,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private readonly loanIdsWithOldOpenPriceFormat = loansWithOldOpenPriceFormat
   constructor(props: any) {
     super(props)
-    if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+    if (networkName === 'kovan') {
       this.baseTokens = [Asset.fWETH, Asset.WBTC]
       this.quoteTokens = [Asset.USDC, Asset.WBTC]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
+    } else if (networkName === 'ropsten') {
       // this.baseTokens = [
       // ];
     } else {
@@ -117,7 +121,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.BZRX, Asset.WBTC]
     }
     this.stablecoins = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.SUSD]
-    const activePair = window.localStorage.getItem('activePair') || undefined
+    const activePair =  window.localStorage.getItem(`${networkName}-activePair`) || undefined
     const localStoragePair: { baseToken: Asset; quoteToken: Asset } | undefined =
       (activePair && JSON.parse(activePair)) || undefined
     this.state = {
@@ -245,7 +249,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       <div className="trade-page">
         {!this.state.isSupportNetwork ? (
           <main>
-            {this.state.recentLiquidationsNumber > 0 && (
+            {process.env.REACT_APP_ETH_NETWORK !== 'bsc' &&  this.state.recentLiquidationsNumber > 0 && (
               <InfoBlock localstorageItemProp="past-liquidations-info">
                 {this.state.recentLiquidationsNumber === 1
                   ? 'One'
@@ -281,11 +285,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             <div
               className={`chart-wrapper${
                 this.state.activeTokenGridTab !== TokenGridTab.Chart ? ' hidden' : ''
+              }${
+                networkName === 'bsc' ? ' bsc' : ''
               }`}>
-              <TVChartContainer
-                symbol={`${tvBaseToken}_${tvQuoteToken}`}
-                preset={this.props.isMobileMedia ? 'mobile' : undefined}
-              />
+              {networkName === 'bsc' ? (
+                <TVChartComingSoon />
+              ) : (
+                <TVChartContainer
+                  symbol={`${tvBaseToken}_${tvQuoteToken}`}
+                  preset={this.props.isMobileMedia ? 'mobile' : undefined}
+                />
+              )}
             </div>
 
             {this.state.activeTokenGridTab === TokenGridTab.Chart && (
@@ -417,7 +427,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       quoteToken
     }
     await this.onTokenGridTabChange(TokenGridTab.Chart)
-    window.localStorage.setItem('activePair', JSON.stringify(marketPair))
+    window.localStorage.setItem(`${networkName}-activePair`, JSON.stringify(marketPair))
     ;(await this._isMounted) && this.setState({ ...this.state, selectedMarket: marketPair })
   }
 

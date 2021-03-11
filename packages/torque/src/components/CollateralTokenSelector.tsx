@@ -49,6 +49,8 @@ export class CollateralTokenSelector extends Component<
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assets = [Asset.fWETH, Asset.USDC, Asset.WBTC]
+    } else if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+      this.assets = [Asset.BUSD, Asset.BNB, Asset.USDT, Asset.ETH, Asset.BTC]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
       this.assets = [Asset.ETH, Asset.DAI]
     } else {
@@ -96,7 +98,7 @@ export class CollateralTokenSelector extends Component<
       <React.Fragment>
         {this.state.isOpen ? (
           <React.Fragment>
-            <div className="collateral-token-selector__wrapper" onClick={this.onClose}/>
+            <div className="collateral-token-selector__wrapper" onClick={this.onClose} />
 
             <div className="collateral-token-selector__container">
               <div className="collateral-token-selector__items">

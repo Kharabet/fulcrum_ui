@@ -205,7 +205,12 @@ export default class ManageCollateralForm extends Component<
                 }
 
                 // check balance
-                if (this.props.loan!.collateralAsset === Asset.ETH) {
+                if (
+                  (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+                    this.props.loan!.collateralAsset === Asset.ETH) ||
+                  (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+                    this.props.loan!.collateralAsset === Asset.BNB)
+                ) {
                   assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade)
                     ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade)
                     : new BigNumber(0)
@@ -466,7 +471,12 @@ export default class ManageCollateralForm extends Component<
         let assetBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
           this.props.loan!.collateralAsset
         )
-        if (this.props.loan!.collateralAsset === Asset.ETH) {
+        if (
+          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+            this.props.loan!.collateralAsset === Asset.ETH) ||
+          (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+            this.props.loan!.collateralAsset === Asset.BNB)
+        ) {
           assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade)
             ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade)
             : new BigNumber(0)

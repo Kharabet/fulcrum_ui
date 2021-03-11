@@ -34,7 +34,8 @@ var chainIdToNetwork = {
   1: 'mainnet',
   3: 'ropsten',
   4: 'rinkeby',
-  42: 'kovan'
+  42: 'kovan',
+  56: 'bsc'
 };
 var FortmaticConnector = /*#__PURE__*/function (_AbstractConnector) {
   _inheritsLoose(FortmaticConnector, _AbstractConnector);

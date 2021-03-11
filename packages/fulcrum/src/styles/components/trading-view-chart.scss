@@ -16,7 +16,6 @@
     background-color: var(--primary-bg);
   }
 
-
   @media only screen and (min-width: $breakpoint-laptop-min) and (max-height: 820px) {
     //margin-top: -30px;
     margin-bottom: -10px;
@@ -24,6 +23,12 @@
   }
   @media only screen and (min-width: $breakpoint-desktop-min) {
     min-height: 400px;
+    &.bsc {
+      min-height: auto;
+      height: auto;
+      margin-bottom: 40px;
+      padding-top: 20px;
+    }
   }
 }
 .chart-wrapper {
@@ -36,5 +41,17 @@
   @media (max-width: $breakpoint-mobile-max) {
     padding-left: 15px;
     padding-right: 15px;
+  }
+}
+
+.chart-wrapper.bsc {
+  height: 144px;
+  margin-bottom: 60px;
+  border-top: 0;
+}
+
+@media screen and (min-width: $breakpoint-laptop-min) {
+  .chart-wrapper.bsc {
+    height: 278px;
   }
 }

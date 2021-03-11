@@ -40,8 +40,10 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
           Asset.UNI,
           Asset.AAVE,
           Asset.LRC,
-          Asset.COMP,
+          Asset.COMP
         ]
+      : process.env.REACT_APP_ETH_NETWORK === 'bsc'
+      ? [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTC, Asset.USDT]
       : [Asset.fWETH, Asset.USDC, Asset.WBTC]
 
   private static readonly apiUrl: string = 'https://api.bzx.network/v1'

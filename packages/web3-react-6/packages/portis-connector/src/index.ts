@@ -8,6 +8,7 @@ const chainIdToNetwork: { [network: number]: string } = {
   4: 'rinkeby',
   5: 'goerli',
   42: 'kovan',
+  56: 'bsc',
   100: 'xdai',
   30: 'orchid',
   31: 'orchidTestnet',

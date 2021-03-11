@@ -110,7 +110,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     if (!FulcrumProvider.Instance.contractsSource) return
     if (switchButton.checked) {
       await FulcrumProvider.Instance.setApproval(
-        '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+        FulcrumProvider.Instance.contractsSource.getTokenHolderAddress(),
         Asset.CHI,
         new BigNumber(10 ** 18)
       )
@@ -119,7 +119,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       setChi(true)
     } else {
       await FulcrumProvider.Instance.setApproval(
-        '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+        FulcrumProvider.Instance.contractsSource.getTokenHolderAddress(),
         Asset.CHI,
         new BigNumber(0)
       )

@@ -18,7 +18,11 @@ interface IBorrowDlgState {
   } | null
 }
 
-export class BorrowDlg extends Component<any, IBorrowDlgState> {
+interface IBorrowdlgProps {
+  assetsShown: Asset[]
+}
+
+export class BorrowDlg extends Component<IBorrowdlgProps, IBorrowDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context)
 
@@ -38,11 +42,9 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         className="modal-content-div"
         overlayClassName="modal-overlay-div borrow"
         onRequestClose={this.hide}>
-        <DialogHeader
-          title={``}
-          onDecline={this.onFormDecline}
-        />
+        <DialogHeader title={``} onDecline={this.onFormDecline} />
         <BorrowForm
+          assetsShown={this.props.assetsShown}
           borrowAsset={this.state.borrowAsset}
           interestRate={this.state.interestRate}
           liquidity={this.state.liquidity}

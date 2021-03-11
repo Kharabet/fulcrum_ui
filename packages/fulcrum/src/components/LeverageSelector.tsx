@@ -18,7 +18,7 @@ export class LeverageSelector extends Component<ILeverageSelectorProps> {
     for (let i = this.props.minValue; i <= this.props.maxValue; i++) {
       values.push(i)
     }
-    if (this.props.asset === Asset.DAI) {
+    if (this.props.asset === Asset.DAI || this.props.asset === Asset.BUSD) {
       values.push(10)
       values.push(15)
     }
