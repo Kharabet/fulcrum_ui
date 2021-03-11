@@ -39,7 +39,7 @@ import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 
 import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'
-import configProviders from '../config/providers.json'
+import configProviders from 'bzx-common/src/config/providers.ts'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
