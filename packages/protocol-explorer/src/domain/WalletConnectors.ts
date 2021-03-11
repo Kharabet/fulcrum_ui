@@ -11,7 +11,7 @@ import { SquarelinkConnector } from '@web3-react/squarelink-connector'
 import { BitskiConnector } from '@web3-react/bitski-connector'
 import { TorusConnector } from '@web3-react/torus-connector'
 
-import configProviders from 'bzx-common/src/config/providers.ts'
+import configProviders from 'bzx-common/src/config/providers'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 
 const getNetworkIdByString = (networkName: string | undefined) => {
@@ -24,13 +24,10 @@ const getNetworkIdByString = (networkName: string | undefined) => {
       return 4
     case 'kovan':
       return 42
-    case 'bsc':
-      return 56
     default:
       return 0
   }
 }
-
 const networkName = process.env.REACT_APP_ETH_NETWORK
 const networkId = getNetworkIdByString(networkName)
 
@@ -38,7 +35,7 @@ const RPC_URL = Web3ConnectionFactory.getRPCUrl()
 
 const POLLING_INTERVAL = 3600000
 
-export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 42, 56] })
+export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 42] })
 
 // export const network = new NetworkConnector({
 //   urls: { 1: RPC_URLS[1], 4: RPC_URLS[4] },
@@ -55,7 +52,7 @@ export const walletconnect = new WalletConnectConnector({
 
 export const walletlink = new WalletLinkConnector({
   url: RPC_URL,
-  appName: 'bZx'
+  appName: 'bZx Protocol Explorer'
 })
 
 export const ledger = new LedgerConnector({
@@ -107,7 +104,6 @@ export const squarelink = new SquarelinkConnector({
 export const bitski = new BitskiConnector({
   clientId: configProviders.Bitski_ClientId as string,
   network: networkId,
-  // callback.html in public folder of the app
   redirectUri: `${window.location.origin}/callback.html`
 })
 

@@ -17,7 +17,7 @@ import { errors } from 'ethers'
 import siteConfig from './../config/SiteConfig.json'
 
 import { Web3ReactProvider } from '@web3-react/core'
-import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'

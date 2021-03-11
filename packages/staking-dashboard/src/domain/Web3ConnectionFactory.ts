@@ -2,7 +2,7 @@ import { RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorUpdate } from '@web3-react/types'
-import configProviders from 'bzx-common/src/config/providers.ts'
+import configProviders from 'bzx-common/src/config/providers'
 import appConfig from 'bzx-common/src/config/appConfig'
 import ProviderType from 'bzx-common/src/domain/ProviderType'
 
