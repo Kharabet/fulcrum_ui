@@ -608,7 +608,6 @@ export class FulcrumProvider {
     }
   }
 
-  
   public getAvailableLiquidity = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0)
 
@@ -646,14 +645,16 @@ export class FulcrumProvider {
     let bzrxPrice = new BigNumber(0)
     let ethPrice = new BigNumber(0)
     try {
-      swapRates = (await this.getSwapToUsdRateBatch(assets, networkName === 'bsc' ? Asset.BUSD : Asset.DAI))[0]
+      swapRates = (
+        await this.getSwapToUsdRateBatch(assets, networkName === 'bsc' ? Asset.BUSD : Asset.DAI)
+      )[0]
     } catch (e) {
       //console.log(e);
     }
 
     //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
 
-        const reserveData = await helperContract.reserveDetails(tokens).callAsync()
+    const reserveData = await helperContract.reserveDetails(tokens).callAsync()
     let usdSupplyAll = new BigNumber(0)
     let usdTotalLockedAll = new BigNumber(0)
     if (!reserveData || reserveData[0].length === 0) {
@@ -1347,13 +1348,13 @@ export class FulcrumProvider {
       try {
         const newCurrentMargin: [BigNumber, BigNumber] = await oracleContract
           .getCurrentMargin(
-          borrowedFundsState.loanData.loanToken,
-          borrowedFundsState.loanData.collateralToken,
-          borrowedFundsState.loanData.principal,
-          isWithdrawal
-            ? new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1))
-            : new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
-        )
+            borrowedFundsState.loanData.loanToken,
+            borrowedFundsState.loanData.collateralToken,
+            borrowedFundsState.loanData.principal,
+            isWithdrawal
+              ? new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1))
+              : new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
+          )
           .callAsync()
         result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18)
       } catch (e) {
@@ -1395,12 +1396,8 @@ export class FulcrumProvider {
   public gasPrice = async (): Promise<BigNumber> => {
     if (networkName === 'kovan') return new BigNumber(1).multipliedBy(10 ** 9) // 1 gwei
     if (networkName === 'bsc') {
-      const contractDefaults = this.web3Wrapper!.getContractDefaults()
-      if (contractDefaults && contractDefaults.gasPrice !== undefined) {
-        return new BigNumber(contractDefaults.gasPrice)
-      } else {
-        return new BigNumber(1).multipliedBy(10 ** 9)
-      }
+      // always 10 gwei
+      return new BigNumber(10).multipliedBy(10 ** 9)
     }
     let result = new BigNumber(1000).multipliedBy(10 ** 9) // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
@@ -1503,7 +1500,12 @@ export class FulcrumProvider {
     destToken: Asset,
     tradedAmountEstimate: BigNumber
   ): Promise<BigNumber> => {
-    if (tradedAmountEstimate.eq(0) || srcToken === destToken || this.unsupportedNetwork || networkName === 'bsc') {
+    if (
+      tradedAmountEstimate.eq(0) ||
+      srcToken === destToken ||
+      this.unsupportedNetwork ||
+      networkName === 'bsc'
+    ) {
       return new BigNumber(0)
     }
 
@@ -1757,11 +1759,11 @@ export class FulcrumProvider {
       try {
         const marginDetails = await tokenContract
           .getEstimatedMarginDetails(
-          leverageAmount,
-          loanTokenSent,
-          collateralTokenSent,
-          collateralTokenAddress!
-        )
+            leverageAmount,
+            loanTokenSent,
+            collateralTokenSent,
+            collateralTokenAddress!
+          )
           .callAsync()
         result.principal = marginDetails[0].div(10 ** loanTokenDecimals)
         result.collateral = marginDetails[1].div(10 ** collateralTokenDecimals)
@@ -1871,7 +1873,7 @@ export class FulcrumProvider {
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
-    // to get human-readable amount result should be divided always by 10**18 
+    // to get human-readable amount result should be divided always by 10**18
     return result
   }
 
@@ -2005,11 +2007,11 @@ export class FulcrumProvider {
             isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
               ? await iBZxContract
                   .closeWithSwapWithGasToken(
-                  request.loanId,
-                  account,
-                  account,
-                  amountInBaseUnits,
-                  request.returnTokenIsCollateral, // returnTokenIsCollateral
+                    request.loanId,
+                    account,
+                    account,
+                    amountInBaseUnits,
+                    request.returnTokenIsCollateral, // returnTokenIsCollateral
                     request.loanDataBytes
                   )
                   .callAsync({
@@ -2018,10 +2020,10 @@ export class FulcrumProvider {
                   })
               : await iBZxContract
                   .closeWithSwap(
-                  request.loanId,
-                  account,
-                  amountInBaseUnits,
-                  request.returnTokenIsCollateral, // returnTokenIsCollateral
+                    request.loanId,
+                    account,
+                    amountInBaseUnits,
+                    request.returnTokenIsCollateral, // returnTokenIsCollateral
                     request.loanDataBytes
                   )
                   .callAsync({
@@ -2093,13 +2095,13 @@ export class FulcrumProvider {
 
     const loansData = await iBZxContract
       .getUserLoans(
-      account,
-      new BigNumber(0),
-      new BigNumber(50),
-      1, // margin trade loans
-      false,
-      false
-    )
+        account,
+        new BigNumber(0),
+        new BigNumber(50),
+        1, // margin trade loans
+        false,
+        false
+      )
       .callAsync()
     // console.log(loansData);
     const zero = new BigNumber(0)
@@ -2171,13 +2173,13 @@ export class FulcrumProvider {
 
     const loansData = await iBZxContract
       .getUserLoans(
-      account,
-      new BigNumber(0),
-      new BigNumber(50),
-      1, // margin trade loans
-      false,
-      false
-    )
+        account,
+        new BigNumber(0),
+        new BigNumber(50),
+        1, // margin trade loans
+        false,
+        false
+      )
       .callAsync()
 
     const loansByPair: IBorrowedFundsState[] = []
@@ -2365,7 +2367,10 @@ export class FulcrumProvider {
     );
 
     return swapRates[0][0];*/
-    return this.getSwapRate(asset,networkName ==='bsc'? Asset.BUSD : isMainnetProd ? Asset.DAI : Asset.USDC)
+    return this.getSwapRate(
+      asset,
+      networkName === 'bsc' ? Asset.BUSD : isMainnetProd ? Asset.DAI : Asset.USDC
+    )
   }
 
   private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
@@ -3125,7 +3130,7 @@ console.log(err, added);
                   },
                 ],
               },
-                  }
+            }
             isMainnetProd && TagManager.dataLayer(tagManagerArgs)
             this.eventEmitter.emit(
               FulcrumProviderEvents.LendTransactionMined,
@@ -3143,7 +3148,7 @@ console.log(err, added);
                   },
                 ],
               },
-                  }
+            }
             isMainnetProd && TagManager.dataLayer(tagManagerArgs)
           } else if (request instanceof TradeRequest) {
             const tagManagerArgs = {
@@ -3157,7 +3162,7 @@ console.log(err, added);
                   },
                 ],
               },
-                  }
+            }
             isMainnetProd && TagManager.dataLayer(tagManagerArgs)
           }
         }
@@ -3219,13 +3224,13 @@ console.log(err, added);
         gasAmount = isGasTokenEnabled
           ? await tokenContract
               .marginTradeWithGasToken(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              new BigNumber(leverageAmount),
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              account,
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(leverageAmount),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                account,
                 '0x'
               )
               .estimateGasAsync({
@@ -3235,12 +3240,12 @@ console.log(err, added);
               })
           : await tokenContract
               .marginTrade(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              new BigNumber(leverageAmount),
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(leverageAmount),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
                 '0x'
               )
               .estimateGasAsync({
@@ -3256,12 +3261,12 @@ console.log(err, added);
         gasAmount = isGasTokenEnabled
           ? await tokenContract
               .closeWithSwapWithGasToken(
-              request.loanId,
-              account,
-              account,
-              amountInBaseUnits,
+                request.loanId,
+                account,
+                account,
+                amountInBaseUnits,
 
-              request.returnTokenIsCollateral,
+                request.returnTokenIsCollateral,
                 '0x'
               )
               .estimateGasAsync({
@@ -3270,10 +3275,10 @@ console.log(err, added);
               })
           : await tokenContract
               .closeWithSwap(
-              request.loanId,
-              account,
-              amountInBaseUnits,
-              request.returnTokenIsCollateral,
+                request.loanId,
+                account,
+                amountInBaseUnits,
+                request.returnTokenIsCollateral,
                 '0x'
               )
               .estimateGasAsync({

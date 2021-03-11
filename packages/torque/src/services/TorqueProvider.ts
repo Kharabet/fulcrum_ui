@@ -1610,6 +1610,11 @@ export class TorqueProvider {
   }*/
 
   public gasPrice = async (): Promise<BigNumber> => {
+    if (networkName === 'kovan') return new BigNumber(1).multipliedBy(10 ** 9) // 1 gwei
+    if (networkName === 'bsc') {
+      // always 10 gwei
+        return new BigNumber(10).multipliedBy(10 ** 9)
+    }
     let result = new BigNumber(1000).multipliedBy(10 ** 9) // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
 
