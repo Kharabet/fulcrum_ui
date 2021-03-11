@@ -18,7 +18,7 @@ import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { TasksQueue } from '../services/TasksQueue'
-import { CircleLoader } from './CircleLoader'
+import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { NotificationRollover } from './NotificationRollover'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
 import { Preloader } from './Preloader'
@@ -79,7 +79,7 @@ export class InnerOwnTokenGridRow extends Component<
       request: undefined,
       resultTx: false,
       valueChange: new BigNumber(0),
-      activeTokenProfit: props.baseToken
+      activeTokenProfit: props.baseToken,
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -113,27 +113,21 @@ export class InnerOwnTokenGridRow extends Component<
       openValue = this.props.loan.loanData.collateral
         .div(10 ** collateralAssetDecimals)
         .times(this.props.openPrice)
-      valueChange = this.props.value
-        .minus(openValue)
-        .div(openValue)
-        .times(100)
+      valueChange = this.props.value.minus(openValue).div(openValue).times(100)
     } else {
       const loanAssetDecimals =
         AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
       openValue = this.props.loan.loanData.principal
         .div(10 ** loanAssetDecimals)
         .times(this.props.openPrice)
-      valueChange = this.props.value
-        .minus(openValue)
-        .div(openValue)
-        .times(100)
+      valueChange = this.props.value.minus(openValue).div(openValue).times(100)
     }
 
     this._isMounted &&
       this.setState({
         ...this.state,
         valueChange: valueChange.dp(2, BigNumber.ROUND_HALF_UP),
-        isLoading: false
+        isLoading: false,
       })
   }
 
@@ -160,7 +154,7 @@ export class InnerOwnTokenGridRow extends Component<
             ...this.state,
             isLoadingTransaction: false,
             request: undefined,
-            resultTx: false
+            resultTx: false,
           })
         this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }, 5000)
@@ -229,7 +223,7 @@ export class InnerOwnTokenGridRow extends Component<
       this.setState({
         ...this.state,
         isLoadingTransaction,
-        request
+        request,
       })
 
     await this.derivedUpdate()
@@ -293,7 +287,7 @@ export class InnerOwnTokenGridRow extends Component<
         : `<ul class="tooltip__info__profit__ul"><li>Left: value of total position profit including collateral change </li><li>Right: value of traded asset</li></ul><p class="ta-c">${this.props.baseToken}/${this.props.quoteToken} pair for example</p><div class="tooltip__info__profit__table"><div>Profit in ${this.props.baseToken} + the change of your ${this.props.quoteToken} collateral</div><div class="short-label">Profit in ${this.props.quoteToken}</div></div>`
     const profitTooltip = `<p class="tooltip__info__profit__title">Profit is displayed in two ways:</p>${insertProfitTooltip}`
     const profitClass =
-    Number(profitTitle) < 0 ? 'negative' : Number(profitTitle) > 0 ? 'positive' : ''
+      Number(profitTitle) < 0 ? 'negative' : Number(profitTitle) > 0 ? 'positive' : ''
 
     return (
       <React.Fragment>
@@ -412,9 +406,11 @@ export class InnerOwnTokenGridRow extends Component<
               </span>
 
               {!this.state.isLoading ? (
-                  this.props.liquidationPrice.isNaN() || !this.props.liquidationPrice.isFinite() 
-                  ? "-"
-                  : this.props.liquidationPrice.toFixed(precisionDigits)
+                this.props.liquidationPrice.isNaN() || !this.props.liquidationPrice.isFinite() ? (
+                  '-'
+                ) : (
+                  this.props.liquidationPrice.toFixed(precisionDigits)
+                )
               ) : (
                 <Preloader width="74px" />
               )}
@@ -437,42 +433,43 @@ export class InnerOwnTokenGridRow extends Component<
                 />
               </span>
               {!this.state.isLoading ? (
-            <span className={profitClass}>
-              {profitClass === 'positive' ? '+' : ''}
-              {profitValue}
-              {Number(profitTitle) ? (
-                <div className="own-token-grid-row__col-profit-switch">
-                  <label
-                    className={`${
-                      this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''
-                    }`}
-                    onClick={() => {
-                      this.setActiveTokenProfit(this.props.baseToken)
-                    }}>
-                    {this.props.baseToken}
-                  </label>
-                  <label
-                    className={`${
-                      this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
-                    }`}
-                    onClick={() => {
-                      this.setActiveTokenProfit(this.props.quoteToken)
-                    }}>
-                    {this.props.quoteToken}
-                  </label>
-                </div>
+                <span className={profitClass}>
+                  {profitClass === 'positive' ? '+' : ''}
+                  {profitValue}
+                  {Number(profitTitle) ? (
+                    <div className="own-token-grid-row__col-profit-switch">
+                      <label
+                        className={`${
+                          this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''
+                        }`}
+                        onClick={() => {
+                          this.setActiveTokenProfit(this.props.baseToken)
+                        }}>
+                        {this.props.baseToken}
+                      </label>
+                      <label
+                        className={`${
+                          this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
+                        }`}
+                        onClick={() => {
+                          this.setActiveTokenProfit(this.props.quoteToken)
+                        }}>
+                        {this.props.quoteToken}
+                      </label>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                </span>
               ) : (
-                ''
+                <Preloader width="74px" />
               )}
-            </span>
-          ) : (
-            <Preloader width="74px" />
-          )}
             </div>
             <div className="inner-own-token-grid-row__col-action opacityIn rightIn">
               <button
-                className={`inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half  ${isRollover &&
-                  'rollover-warning'}`}
+                className={`inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half  ${
+                  isRollover && 'rollover-warning'
+                }`}
                 onClick={isRollover ? this.onRolloverClick : this.onSellClick}
                 disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
                 {isRollover ? 'Rollover' : 'Close Position'}

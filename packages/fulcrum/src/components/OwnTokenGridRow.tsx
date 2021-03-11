@@ -15,7 +15,7 @@ import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { TasksQueue } from '../services/TasksQueue'
-import { CircleLoader } from './CircleLoader'
+import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { Preloader } from './Preloader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 import { NotificationRollover } from './NotificationRollover'
@@ -71,7 +71,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       isLoadingTransaction: false,
       request: undefined,
       resultTx: false,
-      activeTokenProfit: props.baseToken
+      activeTokenProfit: props.baseToken,
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -99,7 +99,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this._isMounted &&
       this.setState({
         ...this.state,
-        isLoading: false
+        isLoading: false,
       })
   }
 
@@ -126,7 +126,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             ...this.state,
             isLoadingTransaction: false,
             request: undefined,
-            resultTx: false
+            resultTx: false,
           })
         this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }, 5000)
@@ -430,8 +430,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button
-            className={`own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half ${isRollover &&
-              'rollover-warning'}`}
+            className={`own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half ${
+              isRollover && 'rollover-warning'
+            }`}
             onClick={isRollover ? this.onRolloverClick : this.onSellClick}
             disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
             {isRollover ? 'Rollover' : 'CLOSE POSITION'}

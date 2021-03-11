@@ -9,7 +9,7 @@ import { RequestTask } from '../domain/RequestTask'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { TasksQueue } from '../services/TasksQueue'
-import { CircleLoader } from './CircleLoader'
+import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import CopyToClipboard from './CopyToClipboard'
 import { TxLoaderStep } from './TxLoaderStep'
 
@@ -58,7 +58,7 @@ export const LoanRow = (props: ILoanRowProps) => {
         ExplorerProviderEvents.AskToCloseProgressDlg,
         onAskToCloseProgressDlg
       )
-      }
+    }
   })
 
   const onLiquidateClick = async () => {
@@ -133,7 +133,8 @@ export const LoanRow = (props: ILoanRowProps) => {
             <CopyToClipboard>{props.loanId}</CopyToClipboard>
           </div>
           <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">
-            <LoanTokenIcon />&nbsp;{props.payOffAmount.toFixed(3)}
+            <LoanTokenIcon />
+            &nbsp;{props.payOffAmount.toFixed(3)}
           </div>
           <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">
             <CollateralTokenIcon />

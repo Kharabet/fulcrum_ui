@@ -10,7 +10,7 @@ import { RolloverRequest } from '../domain/RolloverRequest'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { TasksQueue } from '../services/TasksQueue'
-import { CircleLoader } from './CircleLoader'
+import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { TxLoaderStep } from './TxLoaderStep'
 
 import Clipboard from 'clipboard'
@@ -185,7 +185,8 @@ export const RolloverRow = (props: IRolloverRowProps) => {
           </div>
           <div className="table-row-loan__amount" />
           <div title={props.gasRebate.toFixed()} className="table-row-loan__collateral">
-            <RebateTokenIcon />&nbsp;{props.gasRebate.toFixed(2)}
+            <RebateTokenIcon />
+            &nbsp;{props.gasRebate.toFixed(2)}
           </div>
           <div className="table-row-loan__action">
             <button className="action" onClick={onRolloverClick}>

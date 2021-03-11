@@ -17,7 +17,7 @@ import { LeverageSelector } from './LeverageSelector'
 import { PositionTypeMarker } from './PositionTypeMarker'
 import { Preloader } from './Preloader'
 
-import { CircleLoader } from './CircleLoader'
+import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 
 import ReactTooltip from 'react-tooltip'
@@ -67,7 +67,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
-      resultTx: false
+      resultTx: false,
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -93,8 +93,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private async derivedUpdate() {
     const collateralToPrincipalRate =
       this.props.positionType === PositionType.LONG
-        ? await FulcrumProvider.Instance.getKyberSwapRate(this.props.baseToken, this.props.quoteToken)
-        : await FulcrumProvider.Instance.getKyberSwapRate(this.props.quoteToken, this.props.baseToken)
+        ? await FulcrumProvider.Instance.getKyberSwapRate(
+            this.props.baseToken,
+            this.props.quoteToken
+          )
+        : await FulcrumProvider.Instance.getKyberSwapRate(
+            this.props.quoteToken,
+            this.props.baseToken
+          )
 
     const baseTokenPrice =
       this.props.positionType === PositionType.LONG
@@ -132,7 +138,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         baseTokenPrice,
         interestRate,
         liquidationPrice,
-        isLoading: false
+        isLoading: false,
       })
   }
 
@@ -158,7 +164,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             ...this.state,
             isLoadingTransaction: false,
             request: undefined,
-            resultTx: false
+            resultTx: false,
           })
         this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
       }, 5000)
@@ -317,7 +323,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <span className="trade-token-grid-row__title">Liquidation Price</span>
             )}
             {this.state.liquidationPrice.gt(0) && !this.state.isLoading ? (
-              <React.Fragment>{this.state.liquidationPrice.toFixed(precisionDigits)}</React.Fragment>
+              <React.Fragment>
+                {this.state.liquidationPrice.toFixed(precisionDigits)}
+              </React.Fragment>
             ) : (
               <Preloader width="74px" />
             )}
@@ -340,10 +348,15 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           </div>
           <div className="trade-token-grid-row__col-action">
             <button
-              className={`trade-token-grid-row__button ${this.props.positionType === PositionType.LONG ?'':'trade-token-grid-row__button-short'} trade-token-grid-row__button--size-half`}
+              className={`trade-token-grid-row__button ${
+                this.props.positionType === PositionType.LONG
+                  ? ''
+                  : 'trade-token-grid-row__button-short'
+              } trade-token-grid-row__button--size-half`}
               disabled={siteConfig.TradeBuyDisabled || this.state.isLoadingTransaction}
               onClick={this.onBuyClick}>
-               {this.props.positionType === PositionType.LONG ? 'Buy' : 'Sell'} / {this.props.positionType}
+              {this.props.positionType === PositionType.LONG ? 'Buy' : 'Sell'} /{' '}
+              {this.props.positionType}
             </button>
           </div>
         </div>
