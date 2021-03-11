@@ -4,7 +4,7 @@ import TagManager from 'react-gtm-module'
 // import ReactGA from "react-ga";
 import Intercom from 'react-intercom'
 import { Redirect, Route, Router, Switch } from 'react-router-dom'
-import configProviders from '../config/providers.json'
+import configProviders from 'bzx-common/src/config/providers.ts'
 import { ProviderType } from '../domain/ProviderType'
 import TabContainer from '../layout/TabContainer'
 
