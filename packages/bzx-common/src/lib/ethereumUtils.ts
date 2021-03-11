@@ -1,18 +1,19 @@
-type networks = 'mainnet' | 'ropsten' | 'rinkeby' | 'kovan'
+type networks = 'mainnet' | 'ropsten' | 'rinkeby' | 'kovan' | 'bsc'
 
 enum networkIds {
   mainnet = 1,
   ropsten = 3,
-  rinkeby = 4,
-  kovan = 42
+  rinkeby = 4,  
+  kovan = 42,
+  bsc = 56
 }
 
-function getNetworkIdByString(networkName: string | undefined): 1 | 3 | 4 | 42 | 0 {
+function getNetworkIdByString(networkName: networks | undefined): 1 | 3 | 4 | 42 | 56 | 0 {
   
-  if (!networkName || !networkIds[networkName as networks]) {
+  if (!networkName || !networkIds[networkName]) {
     return 0
   }
-  return networkIds[networkName as networks]
+  return networkIds[networkName]
 }
 
 function getWeb3ProviderSettings(networkId: number | null) {

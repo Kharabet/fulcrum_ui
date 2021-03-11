@@ -8,7 +8,7 @@ import constantAddress from '../config/constant.json'
 
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ProviderType } from '../domain/ProviderType'
-import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { ExplorerProviderEvents } from './events/ExplorerProviderEvents'
 

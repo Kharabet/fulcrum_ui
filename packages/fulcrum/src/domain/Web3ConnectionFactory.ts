@@ -5,7 +5,7 @@ import {
   Web3ProviderEngine
 } from '@0x/subproviders'
 
-import configProviders from 'bzx-common/src/config/providers.ts'
+import configProviders from 'bzx-common/src/config/providers'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorUpdate } from '@web3-react/types'

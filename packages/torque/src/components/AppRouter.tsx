@@ -19,7 +19,7 @@ import Modal from 'react-modal'
 
 import { ProviderMenu } from './ProviderMenu'
 import { Web3ReactProvider } from '@web3-react/core'
-import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { errors } from 'ethers'
