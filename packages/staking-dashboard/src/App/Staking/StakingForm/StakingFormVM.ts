@@ -1,7 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import stakingUtils from 'bzx-common/src/lib/stakingUtils'
 import * as mobx from 'mobx'
-import appConfig from 'src/config/appConfig'
+import appConfig from 'bzx-common/src/config/appConfig'
 import { stakeableToken } from 'src/domain/stakingTypes'
 import { RootStore, StakingStore } from 'src/stores'
 import UserBalances from 'src/stores/StakingStore/UserBalances'

@@ -19,7 +19,7 @@ import { ExtendLoanForm } from '../components/ExtendLoanForm'
 import Asset from 'bzx-common/src/assets/Asset'
 
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import { TRADE_PAIRS } from '../config/appConfig'
+import { TRADE_PAIRS } from 'bzx-common/src/config/appConfig'
 import {
   CloseWithSwapEvent,
   DepositCollateralEvent,

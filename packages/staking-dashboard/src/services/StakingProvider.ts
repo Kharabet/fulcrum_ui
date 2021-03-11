@@ -12,7 +12,7 @@ import GovernanceProposal, {
 } from 'src/domain/GovernanceProposal'
 import ProposalCreated from 'src/domain/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
-import appConfig from '../config/appConfig'
+import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from '../domain/Asset'
 import AssetsDictionary from '../domain/AssetsDictionary'
 import ProviderType from 'bzx-common/src/domain/ProviderType'

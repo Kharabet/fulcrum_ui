@@ -32,7 +32,7 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import '../styles/components/history-token-grid.scss'
-import { TRADE_PAIRS } from '../config/appConfig'
+import { TRADE_PAIRS } from 'bzx-common/src/config/appConfig'
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean

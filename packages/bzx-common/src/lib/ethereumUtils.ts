@@ -7,11 +7,12 @@ enum networkIds {
   kovan = 42
 }
 
-function getNetworkIdByString(networkName: networks | undefined): 1 | 3 | 4 | 42 | 0 {
-  if (!networkName || !networkIds[networkName]) {
+function getNetworkIdByString(networkName: string | undefined): 1 | 3 | 4 | 42 | 0 {
+  
+  if (!networkName || !networkIds[networkName as networks]) {
     return 0
   }
-  return networkIds[networkName]
+  return networkIds[networkName as networks]
 }
 
 function getWeb3ProviderSettings(networkId: number | null) {
