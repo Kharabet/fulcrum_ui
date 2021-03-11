@@ -11,7 +11,7 @@ import { SquarelinkConnector } from '@web3-react/squarelink-connector'
 import { BitskiConnector } from '@web3-react/bitski-connector'
 import { TorusConnector } from '@web3-react/torus-connector'
 
-import configProviders from 'bzx-common/src/config/providers.ts'
+import configProviders from 'bzx-common/src/config/providers'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 
 const getNetworkIdByString = (networkName: string | undefined) => {
