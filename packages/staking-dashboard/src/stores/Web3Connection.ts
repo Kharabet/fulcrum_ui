@@ -1,4 +1,4 @@
-import hashUtils from 'app-lib/hashUtils'
+import hashUtils from 'bzx-common/src/lib/hashUtils'
 import * as mobx from 'mobx'
 import ProviderType from 'bzx-common/src/domain/ProviderType'
 import ProviderTypeDetails from 'bzx-common/src/domain/ProviderTypeDetails'
