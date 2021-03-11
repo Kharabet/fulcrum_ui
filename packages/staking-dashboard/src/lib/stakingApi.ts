@@ -1,4 +1,4 @@
-import IRep from 'src/domain/IRep'
+import IRep from 'bzx-common/src/domain/staking/IRep'
 import hashUtils from 'app-lib/hashUtils'
 
 /**

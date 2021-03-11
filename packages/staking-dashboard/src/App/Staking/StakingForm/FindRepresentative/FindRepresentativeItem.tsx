@@ -7,7 +7,7 @@ import { ReactComponent as IBzrxIcon } from 'app-images/token-ibzrx.svg'
 import Representative1 from 'app-images/representative1.png'
 import Representative2 from 'app-images/representative2.png'
 import Representative3 from 'app-images/representative3.png'
-import IRep from 'src/domain/IRep'
+import IRep from 'bzx-common/src/domain/staking/IRep'
 
 export interface IFindRepresentativeItemProps {
   index: number

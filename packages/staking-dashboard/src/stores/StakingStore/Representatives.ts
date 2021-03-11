@@ -1,7 +1,7 @@
 import stakingApi from 'app-lib/stakingApi'
 import stakingUtils from 'app-lib/stakingUtils'
 import * as mobx from 'mobx'
-import IRep from 'src/domain/IRep'
+import IRep from 'bzx-common/src/domain/staking/IRep'
 import { StakingProvider } from 'src/services/StakingProvider'
 
 type representativesProp =
