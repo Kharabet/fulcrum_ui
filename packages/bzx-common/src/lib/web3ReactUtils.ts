@@ -10,10 +10,10 @@ import { PortisConnector } from '@web3-react/portis-connector'
 import { SquarelinkConnector } from '@web3-react/squarelink-connector'
 import { BitskiConnector } from '@web3-react/bitski-connector'
 import { TorusConnector } from '@web3-react/torus-connector'
-import fulcrumLogo from '../assets/images/fulcrum_logo.svg'
 
-import configProviders from '../config/providers.json'
-import { Web3ConnectionFactory } from './Web3ConnectionFactory'
+import configProviders from 'bzx-common/src/config/providers.ts'
+import { Web3ConnectionFactory } from '../../../fulcrum/src/domain/Web3ConnectionFactory'
+
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
     case 'mainnet':
@@ -30,6 +30,7 @@ const getNetworkIdByString = (networkName: string | undefined) => {
       return 0
   }
 }
+
 const networkName = process.env.REACT_APP_ETH_NETWORK
 const networkId = getNetworkIdByString(networkName)
 
@@ -54,8 +55,7 @@ export const walletconnect = new WalletConnectConnector({
 
 export const walletlink = new WalletLinkConnector({
   url: RPC_URL,
-  appName: 'bZx | Fulcrum'
-  // appLogoUrl: `https://app.fulcrum.trade${fulcrumLogo}`
+  appName: 'bZx'
 })
 
 export const ledger = new LedgerConnector({
@@ -107,6 +107,7 @@ export const squarelink = new SquarelinkConnector({
 export const bitski = new BitskiConnector({
   clientId: configProviders.Bitski_ClientId as string,
   network: networkId,
+  // callback.html in public folder of the app
   redirectUri: `${window.location.origin}/callback.html`
 })
 

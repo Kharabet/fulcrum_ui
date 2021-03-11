@@ -26,7 +26,7 @@ import {
   trezor,
   walletconnect,
   walletlink
-} from './WalletConnectors'
+} from 'bzx-common/src/lib/web3ReactUtils'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
 const connectorsByName: { [name: string]: AbstractConnector | null } = {

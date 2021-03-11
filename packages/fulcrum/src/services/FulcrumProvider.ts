@@ -31,7 +31,7 @@ import { TasksQueueEvents } from './events/TasksQueueEvents'
 import { TasksQueue } from './TasksQueue'
 
 import TagManager from 'react-gtm-module'
-import configProviders from '../config/providers.json'
+import configProviders from 'bzx-common/src/config/providers.ts'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
