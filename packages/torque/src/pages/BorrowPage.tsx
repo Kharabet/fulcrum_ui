@@ -26,7 +26,7 @@ if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
     Asset.UNI,
     Asset.AAVE,
     Asset.LRC,
-    Asset.COMP
+    Asset.COMP,
   ]
 } else if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
   assetsShown = [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTC, Asset.USDT]
