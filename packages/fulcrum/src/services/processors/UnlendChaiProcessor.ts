@@ -1,3 +1,4 @@
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
 import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTokenContract'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
@@ -75,7 +76,7 @@ export class UnlendChaiProcessor {
       txHash = await tokenContract.burnToChai(account, amountInBaseUnits).sendTransactionAsync({
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice(),
+        gasPrice: await ethGasStation.getGasPrice(),
       })
       task.setTxHash(txHash)
     } catch (e) {

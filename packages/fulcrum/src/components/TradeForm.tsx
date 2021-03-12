@@ -1,3 +1,4 @@
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
@@ -356,7 +357,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.tradeAmountValue,
       this.state.returnTokenIsCollateral
     )
-    const gasPrice = await FulcrumProvider.Instance.gasPrice()
+    const gasPrice = await ethGasStation.getGasPrice()
     const rate = await FulcrumProvider.Instance.getSwapToUsdRate(
       process.env.REACT_APP_ETH_NETWORK === 'bsc' ? Asset.BNB : Asset.ETH
     )

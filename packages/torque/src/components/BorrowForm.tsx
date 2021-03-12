@@ -1,3 +1,4 @@
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
@@ -210,7 +211,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       this.state.depositAmount
     )
 
-    const gasPrice = await TorqueProvider.Instance.gasPrice()
+    const gasPrice = await ethGasStation.getGasPrice()
     const rate = await TorqueProvider.Instance.getSwapToUsdRate(
       process.env.REACT_APP_ETH_NETWORK === 'bsc' ? Asset.BNB : Asset.ETH
     )

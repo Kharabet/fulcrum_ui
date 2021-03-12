@@ -1,3 +1,4 @@
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
@@ -73,12 +74,12 @@ export class RolloverProcessor {
               .sendTransactionAsync({
                 from: account,
                 gas: gasAmountBN.toString(),
-                gasPrice: await FulcrumProvider.Instance.gasPrice(),
+                gasPrice: await ethGasStation.getGasPrice(),
               })
           : await iBZxContract.rollover(taskRequest.loanId, loanData).sendTransactionAsync({
               from: account,
               gas: gasAmountBN.toString(),
-              gasPrice: await FulcrumProvider.Instance.gasPrice(),
+              gasPrice: await ethGasStation.getGasPrice(),
             })
 
       task.setTxHash(txHash)

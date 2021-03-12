@@ -1,3 +1,4 @@
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
@@ -200,7 +201,7 @@ export class BorrowProcessor {
                 from: account,
                 value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
                 gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : '3000000',
-                gasPrice: await TorqueProvider.Instance.gasPrice(),
+                gasPrice: await ethGasStation.getGasPrice(),
               })
           : await iTokenContract
               .borrow(
@@ -217,7 +218,7 @@ export class BorrowProcessor {
                 from: account,
                 value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
                 gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : '3000000',
-                gasPrice: await TorqueProvider.Instance.gasPrice(),
+                gasPrice: await ethGasStation.getGasPrice(),
               })
       task.setTxHash(txHash)
     } catch (e) {
