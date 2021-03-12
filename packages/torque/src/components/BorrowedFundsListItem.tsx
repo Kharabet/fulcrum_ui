@@ -227,10 +227,10 @@ export class BorrowedFundsListItem extends Component<
 
     if (this.state.isEmpty) return null
 
-    const liquidationPrice = 
-    this.state.activeTokenLiquidation === this.props.item.collateralAsset
-      ? this.state.liquidationPrice
-      : new BigNumber(1).div(this.state.liquidationPrice)
+    const liquidationPrice =
+      this.state.activeTokenLiquidation === this.props.item.collateralAsset
+        ? this.state.liquidationPrice
+        : new BigNumber(1).div(this.state.liquidationPrice)
 
     return (
       <div className={`borrowed-funds-list-item`}>
@@ -312,6 +312,8 @@ export class BorrowedFundsListItem extends Component<
             <span className="value">{borrowedFundsItem.collateralAmount.toFixed(4)}</span>&nbsp;
             {borrowedFundsItem.collateralAsset === Asset.WETH
               ? Asset.ETH
+              : borrowedFundsItem.collateralAsset === Asset.WBNB
+              ? Asset.BNB
               : borrowedFundsItem.collateralAsset}
           </div>
           <div

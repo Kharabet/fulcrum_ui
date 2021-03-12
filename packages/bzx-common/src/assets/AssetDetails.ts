@@ -3,7 +3,6 @@ export default class AssetDetails {
   public addressErc20: Map<number, string | null> = new Map<number, string>()
   public bgBrightColor: string = '#000000'
   public bgLightColor: string = '#FFFFFF'
-  public decimals: number = 18
   public displayName: string = ''
   public logoSvg: any = null
   public reactLogoSvg: React.FunctionComponent<
@@ -11,6 +10,15 @@ export default class AssetDetails {
     title?: string | undefined
   }
 >
+  private _decimals: number = 18
+
+  get decimals(): number {
+    return process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 18 : this._decimals || 18
+  }
+
+  set decimals(value) {
+    this._decimals = value
+  }
 
   constructor(
     displayName: string,

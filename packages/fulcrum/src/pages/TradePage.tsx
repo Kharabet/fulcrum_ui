@@ -26,7 +26,7 @@ import {
   LiquidationEvent,
   RolloverEvent,
   TradeEvent,
-  WithdrawCollateralEvent
+  WithdrawCollateralEvent,
 } from 'bzx-common/src/domain/events'
 
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
@@ -42,6 +42,9 @@ import '../styles/pages/_trade-page.scss'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { InfoBlock } from '../components/InfoBlock'
 import { StatsTokenGrid } from '../components/StatsTokenGrid'
+import TVChartComingSoon from '../components/TVChartComingSoon'
+
+const networkName = process.env.REACT_APP_ETH_NETWORK
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'))
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'))
@@ -93,12 +96,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private readonly loanIdsWithOldOpenPriceFormat = loansWithOldOpenPriceFormat
   constructor(props: any) {
     super(props)
-    if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+    if (networkName === 'kovan') {
       this.baseTokens = [Asset.fWETH, Asset.WBTC]
       this.quoteTokens = [Asset.USDC, Asset.WBTC]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
+    } else if (networkName === 'ropsten') {
       // this.baseTokens = [
       // ];
+    } else if (networkName === 'bsc') {
+      this.baseTokens = [Asset.BNB, Asset.ETH, Asset.BTC, Asset.BUSD]
+      this.quoteTokens = [Asset.BUSD, Asset.USDT]
     } else {
       this.baseTokens = [
         Asset.ETH,
@@ -112,18 +118,18 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.UNI,
         Asset.AAVE,
         Asset.LRC,
-        Asset.COMP
+        Asset.COMP,
       ]
       this.quoteTokens = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.BZRX, Asset.WBTC]
     }
     this.stablecoins = [Asset.DAI, Asset.USDC, Asset.USDT, Asset.SUSD]
-    const activePair = window.localStorage.getItem('activePair') || undefined
+    const activePair = window.localStorage.getItem(`${networkName}-activePair`) || undefined
     const localStoragePair: { baseToken: Asset; quoteToken: Asset } | undefined =
       (activePair && JSON.parse(activePair)) || undefined
     this.state = {
       selectedMarket: localStoragePair || {
         baseToken: this.baseTokens[0],
-        quoteToken: this.quoteTokens[0]
+        quoteToken: this.quoteTokens[0],
       },
       loans: undefined,
       isTradeModalOpen: false,
@@ -146,7 +152,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: false,
       request: undefined,
       activePositionType: PositionType.LONG,
-      isSupportNetwork: true
+      isSupportNetwork: true,
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -230,7 +236,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         this.setState({
           ...this.state,
           historyEvents: undefined,
-          historyRowsData: []
+          historyRowsData: [],
         })
       })
     }
@@ -245,27 +251,28 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       <div className="trade-page">
         {!this.state.isSupportNetwork ? (
           <main>
-            {this.state.recentLiquidationsNumber > 0 && (
-              <InfoBlock localstorageItemProp="past-liquidations-info">
-                {this.state.recentLiquidationsNumber === 1
-                  ? 'One'
-                  : this.state.recentLiquidationsNumber}
-                &nbsp;of your loans&nbsp;
-                {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated during
-                the past {this.daysNumberForLoanActionNotification} days. For more information visit
-                your&nbsp;
-                <a
-                  href="#"
-                  className="regular-link"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    this.onTokenGridTabChange(TokenGridTab.History)
-                  }}>
-                  Trade History
-                </a>
-                .
-              </InfoBlock>
-            )}
+            {process.env.REACT_APP_ETH_NETWORK !== 'bsc' &&
+              this.state.recentLiquidationsNumber > 0 && (
+                <InfoBlock localstorageItemProp="past-liquidations-info">
+                  {this.state.recentLiquidationsNumber === 1
+                    ? 'One'
+                    : this.state.recentLiquidationsNumber}
+                  &nbsp;of your loans&nbsp;
+                  {this.state.recentLiquidationsNumber === 1 ? 'has' : 'have'} been liquidated
+                  during the past {this.daysNumberForLoanActionNotification} days. For more
+                  information visit your&nbsp;
+                  <a
+                    href="#"
+                    className="regular-link"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      this.onTokenGridTabChange(TokenGridTab.History)
+                    }}>
+                    Trade History
+                  </a>
+                  .
+                </InfoBlock>
+              )}
             <TokenGridTabs
               tradePairs={TRADE_PAIRS}
               baseTokens={this.baseTokens}
@@ -281,11 +288,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             <div
               className={`chart-wrapper${
                 this.state.activeTokenGridTab !== TokenGridTab.Chart ? ' hidden' : ''
-              }`}>
-              <TVChartContainer
-                symbol={`${tvBaseToken}_${tvQuoteToken}`}
-                preset={this.props.isMobileMedia ? 'mobile' : undefined}
-              />
+              }${networkName === 'bsc' ? ' bsc' : ''}`}>
+              {networkName === 'bsc' ? (
+                <TVChartComingSoon />
+              ) : (
+                <TVChartContainer
+                  symbol={`${tvBaseToken}_${tvQuoteToken}`}
+                  preset={this.props.isMobileMedia ? 'mobile' : undefined}
+                />
+              )}
             </div>
 
             {this.state.activeTokenGridTab === TokenGridTab.Chart && (
@@ -414,10 +425,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public onTabSelect = async (baseToken: Asset, quoteToken: Asset) => {
     const marketPair = {
       baseToken,
-      quoteToken
+      quoteToken,
     }
     await this.onTokenGridTabChange(TokenGridTab.Chart)
-    window.localStorage.setItem('activePair', JSON.stringify(marketPair))
+    window.localStorage.setItem(`${networkName}-activePair`, JSON.stringify(marketPair))
     ;(await this._isMounted) && this.setState({ ...this.state, selectedMarket: marketPair })
   }
 
@@ -434,7 +445,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         openedPositionsCount: 0,
         recentLiquidationsNumber: 0,
         isDataLoaded: false,
-        historyEvents: undefined
+        historyEvents: undefined,
       })
   }
 
@@ -469,7 +480,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ...this.state,
           isManageCollateralModalOpen: true,
           loanId: request.loanId,
-          request
+          request,
         })
     }
   }
@@ -483,7 +494,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isManageCollateralModalOpen: false
+        isManageCollateralModalOpen: false,
       })
   }
 
@@ -505,7 +516,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ...this.state,
           isExtendLoanModalOpen: true,
           loanId: request.loanId,
-          request
+          request,
         })
     }
   }
@@ -514,7 +525,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isExtendLoanModalOpen: false
+        isExtendLoanModalOpen: false,
       })
   }
   public onExtendLoanConfirmed = async (request: ExtendLoanRequest) => {
@@ -523,7 +534,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     this.setState({
       ...this.state,
       isExtendLoanModalOpen: false,
-      request
+      request,
     })
   }
 
@@ -547,7 +558,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           tradeLeverage: request.leverage,
           loanId: request.loanId,
           tradeRequestId: request.id,
-          request
+          request,
         })
     }
   }
@@ -559,7 +570,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         isTradeModalOpen: false,
-        request
+        request,
       })
   }
 
@@ -567,7 +578,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.onRolloverConfirmed(request)
     this.setState({
       ...this.state,
-      request
+      request,
     })
   }
 
@@ -575,7 +586,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isTradeModalOpen: false
+        isTradeModalOpen: false,
       })
   }
 
@@ -853,7 +864,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       onRolloverConfirmed: this.onRolloverConfirmed,
       changeLoadingTransaction: this.changeLoadingTransaction,
       onTransactionsCompleted: this.onTransactionsCompleted,
-      isTxCompleted: this.state.isTxCompleted
+      isTxCompleted: this.state.isTxCompleted,
     } as IOwnTokenGridRowProps
   }
 
@@ -882,7 +893,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         this.setState({
           ...this.state,
           ownRowsData: ownRowsData,
-          loans: loans
+          loans: loans,
         })
     })
   }
@@ -925,7 +936,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ...this.state,
         openedPositionsCount: loansByPair.allUsersLoansCount,
         innerOwnRowsData,
-        loans: !this.state.loans ? loans : this.state.loans
+        loans: !this.state.loans ? loans : this.state.loans,
       })
   }
 
@@ -953,7 +964,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     //   tokenRates.push({ token, rate });
     // });
 
-    const groupBy = function(
+    const groupBy = function (
       xs: (
         | TradeEvent
         | LiquidationEvent
@@ -964,7 +975,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       )[],
       key: any
     ) {
-      return xs.reduce(function(rv: any, x: any) {
+      return xs.reduce(function (rv: any, x: any) {
         ;(rv[x[key]] = rv[x[key]] || []).push(x)
         return rv
       }, {})
@@ -1018,7 +1029,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         historyRowsData: [],
-        historyEvents: historyEvents
+        historyEvents: historyEvents,
       })
   }
 
@@ -1038,7 +1049,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
         this.state.selectedMarket.baseToken,
         this.state.selectedMarket.quoteToken
-      )
+      ),
     })
     tokenRowsData.push({
       baseToken: this.state.selectedMarket.baseToken,
@@ -1054,7 +1065,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       maintenanceMargin: await FulcrumProvider.Instance.getMaintenanceMargin(
         this.state.selectedMarket.quoteToken,
         this.state.selectedMarket.baseToken
-      )
+      ),
     })
     ;(await this._isMounted) && this.setState({ ...this.state, tokenRowsData: tokenRowsData })
   }
@@ -1071,7 +1082,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         isLoadingTransaction,
-        request
+        request,
       })
   }
 
@@ -1079,7 +1090,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isTxCompleted: !this.state.isTxCompleted
+        isTxCompleted: !this.state.isTxCompleted,
       })
   }
 

@@ -82,6 +82,8 @@ const getNetworkIdByString = (networkName: string | undefined) => {
       return 4
     case 'kovan':
       return 42
+    case 'bsc':
+      return 56
     default:
       return 0
   }
@@ -134,6 +136,8 @@ export class FulcrumProvider {
       this.lendAssetsShown = [Asset.fWETH, Asset.USDC, Asset.WBTC]
     } else if (networkName === 'ropsten') {
       this.lendAssetsShown = [Asset.ETH, Asset.DAI]
+    } else if (networkName === 'bsc') {
+      this.lendAssetsShown = [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTC, Asset.USDT]
     } else {
       this.lendAssetsShown = [
         Asset.ETH,
@@ -604,248 +608,327 @@ export class FulcrumProvider {
     }
   }
 
+  public getAvailableLiquidity = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0)
+
+    if (this.contractsSource && this.web3Wrapper) {
+      const iTokenContract = await this.contractsSource.getITokenContract(asset)
+      if (iTokenContract) {
+        const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
+        const totalAssetSupply = await iTokenContract.totalAssetSupply().callAsync()
+        const totalAssetBorrow = await iTokenContract.totalAssetBorrow().callAsync()
+
+        const marketLiquidity = totalAssetSupply.minus(totalAssetBorrow)
+        result = marketLiquidity.div(10 ** decimals)
+      }
+    }
+
+    return result
+  }
+
   public getReserveDetails = async (assets: Asset[]): Promise<ReserveDetails[]> => {
     const result: ReserveDetails[] = []
     if (this.unsupportedNetwork) {
       return result
     }
-    if (this.contractsSource) {
-      const addressLookup = await this.contractsSource.getITokenAddressesAndReduce(assets)
-      assets = addressLookup[0]
-      const tokens = addressLookup[1]
-      const helperContract = await this.contractsSource.getDAppHelperContract()
-      if (tokens && helperContract) {
-        let swapRates
-        let bzrxPrice = new BigNumber(0)
-        let ethPrice = new BigNumber(0)
-        try {
-          swapRates = (await this.getSwapToUsdRateBatch(assets, Asset.DAI))[0]
-        } catch (e) {
-          //console.log(e);
-        }
-
-        // 3CRV swap contract
-        const threePoolContract = await this.contractsSource.getThreePoolContract()
-
-        const crvAddress = AssetsDictionary.assets
-          .get(Asset.CRV)!
-          .addressErc20.get(this.web3ProviderSettings.networkId)!
-
-        const crvErc20Contract = await this.contractsSource.getErc20Contract(crvAddress)
-
-        const stakingV1Address = this.contractsSource.getStakingV1Address()
-
-        const crvStakedLockedAmount = await crvErc20Contract.balanceOf(stakingV1Address).callAsync()
-        const crvTotalSupply = await crvErc20Contract.totalSupply().callAsync()
-
-        // get a share of 3CRV tokens in staking contract compare to all exisiting 3CRV tokens
-        const shareOfCrvLockedInStaking = crvStakedLockedAmount.div(crvTotalSupply)
-
-        //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
-
-        const reserveData = await helperContract.reserveDetails(tokens).callAsync()
-        let usdSupplyAll = new BigNumber(0)
-        let usdTotalLockedAll = new BigNumber(0)
-        if (reserveData && reserveData[0].length > 0) {
-          for (let i = 0; i < reserveData[0].length; i++) {
-            let asset = assets[i]
-            let symbol: string = ''
-            let name: string = ''
-            let assetAddress: string = tokens[i]
-
-            let totalAssetSupply = new BigNumber(reserveData[0][i])
-            let totalAssetBorrow = new BigNumber(reserveData[1][i])
-            let supplyInterestRate = new BigNumber(reserveData[2][i])
-            let borrowInterestRate = new BigNumber(reserveData[4][i])
-            let torqueBorrowInterestRate = new BigNumber(reserveData[4][i])
-            let vaultBalance = new BigNumber(reserveData[5][i])
-            let marketLiquidity = totalAssetSupply.minus(totalAssetBorrow)
-
-            const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
-            let usdSupply = new BigNumber(0)
-            let usdTotalLocked = new BigNumber(0)
-
-            if (asset === Asset.ETHv1) {
-              vaultBalance = await this.getAssetTokenBalanceOfUser(
-                Asset.WETH,
-                '0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633'
-              )
-            }
-
-            const precision = new BigNumber(10 ** (18 - decimals))
-            totalAssetSupply = totalAssetSupply.times(precision)
-            totalAssetBorrow = totalAssetBorrow.times(precision)
-            marketLiquidity = marketLiquidity.times(precision)
-            //liquidityReserved = liquidityReserved.times(precision);
-            vaultBalance = vaultBalance.times(precision)
-
-            if (swapRates && swapRates[i]) {
-              if (asset === Asset.BZRX) {
-                const bzrxVestingTokenContract = await this.contractsSource.getBzrxVestingContract()
-                const ibzxAddress = this.contractsSource.getiBZxAddress()
-
-                const vbzrxAddress = AssetsDictionary.assets
-                  .get(Asset.vBZRX)!
-                  .addressErc20.get(this.web3ProviderSettings.networkId)!
-                const bzrxAddress = AssetsDictionary.assets
-                  .get(Asset.BZRX)!
-                  .addressErc20.get(this.web3ProviderSettings.networkId)!
-                const bptAddress = AssetsDictionary.assets
-                  .get(Asset.BPT)!
-                  .addressErc20.get(this.web3ProviderSettings.networkId)!
-                const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
-
-                const vbzrxTotalVested = await bzrxVestingTokenContract.totalVested().callAsync()
-                const vbzrxTotalSupply = await bzrxVestingTokenContract.totalSupply().callAsync()
-                // how much vBZRX tokens already vested. This gives coefficient for vBZRX token price from BZRX price
-                const vbzrxWorthPart = new BigNumber(1).minus(
-                  vbzrxTotalVested.div(vbzrxTotalSupply)
-                )
-                // vBZRX locked in bZx protocol
-                const vbzrxProtocolLockedAmount = (
-                  await this.getErc20BalanceOfUser(vbzrxAddress, ibzxAddress)
-                ).times(vbzrxWorthPart)
-
-                // vBZRX locked in Staking protocol
-                const vbzrxStakedLockedAmount = (
-                  await this.getErc20BalanceOfUser(vbzrxAddress, stakingV1Address)
-                ).times(vbzrxWorthPart)
-                const bzrxStakedLockedAmount = await this.getErc20BalanceOfUser(
-                  bzrxAddress,
-                  stakingV1Address
-                )
-
-                const bptBalanceOfStaking = await this.getErc20BalanceOfUser(
-                  bptAddress,
-                  stakingV1Address
-                )
-                const bptTotalSupply = await bptErc20Contract.totalSupply().callAsync()
-
-                const bzrxBalanceOfBpt = await this.getErc20BalanceOfUser(bzrxAddress, bptAddress)
-                // share of bzrx liquidity that belongs to staking contract from all bzrx tokens in pool
-                const bzrxShareOfBptStakedLockedAmount = bzrxBalanceOfBpt
-                  .div(bptTotalSupply)
-                  .times(bptBalanceOfStaking)
-
-                vaultBalance = vaultBalance
-                  .plus(vbzrxProtocolLockedAmount)
-                  .plus(vbzrxStakedLockedAmount)
-                  .plus(bzrxStakedLockedAmount)
-                  .plus(bzrxShareOfBptStakedLockedAmount)
-              }
-              if (asset === Asset.ETH) {
-                const bptAddress = AssetsDictionary.assets
-                  .get(Asset.BPT)!
-                  .addressErc20.get(this.web3ProviderSettings.networkId)!
-                const wethAddress = AssetsDictionary.assets
-                  .get(Asset.WETH)!
-                  .addressErc20.get(this.web3ProviderSettings.networkId)!
-                const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
-
-                const bptBalanceOfStaking = await this.getErc20BalanceOfUser(
-                  bptAddress,
-                  stakingV1Address
-                )
-                const bptTotalSupply = await bptErc20Contract.totalSupply().callAsync()
-                const wethBalanceOfBpt = await this.getErc20BalanceOfUser(wethAddress, bptAddress)
-
-                // share of weth liquidity that belongs to staking contract from all weth tokens in pool
-                const wethShareOfBptStakedLockedAmount = wethBalanceOfBpt
-                  .times(bptBalanceOfStaking)
-                  .div(bptTotalSupply)
-                vaultBalance = vaultBalance.plus(wethShareOfBptStakedLockedAmount)
-              }
-              if (asset == Asset.DAI) {
-                // underlying DAI in 3CRV
-                const underlyingDaiInCRV = await threePoolContract
-                  .balances(new BigNumber(0))
-                  .callAsync()
-                const shareOfDaiInStakedCrv = underlyingDaiInCRV
-                  .times(precision)
-                  .times(shareOfCrvLockedInStaking)
-                vaultBalance = vaultBalance.plus(shareOfDaiInStakedCrv)
-              }
-              if (asset == Asset.USDC) {
-                // underlying USDC in 3CRV
-                const underlyingUsdcInCRV = await threePoolContract
-                  .balances(new BigNumber(1))
-                  .callAsync()
-                const shareOfUsdcInStakedCrv = underlyingUsdcInCRV
-                  .times(precision)
-                  .times(shareOfCrvLockedInStaking)
-                vaultBalance = vaultBalance.plus(shareOfUsdcInStakedCrv)
-              }
-              if (asset == Asset.USDT) {
-                // underlying USDT in 3CRV
-                const underlyingUsdtInCRV = await threePoolContract
-                  .balances(new BigNumber(2))
-                  .callAsync()
-                const shareOfUsdtInStakedCrv = underlyingUsdtInCRV
-                  .times(precision)
-                  .times(shareOfCrvLockedInStaking)
-                vaultBalance = vaultBalance.plus(shareOfUsdtInStakedCrv)
-              }
-              usdSupply = totalAssetSupply!.times(swapRates[i]).dividedBy(10 ** 18)
-              usdSupplyAll = usdSupplyAll.plus(usdSupply)
-
-              usdTotalLocked = marketLiquidity
-                .plus(vaultBalance)
-                .times(swapRates[i])
-                .dividedBy(10 ** 18)
-              usdTotalLockedAll = usdTotalLockedAll.plus(usdTotalLocked)
-            }
-
-            result.push(
-              new ReserveDetails(
-                asset,
-                assetAddress,
-                symbol,
-                name,
-                decimals,
-                null, // tokenPrice.dividedBy(10 ** 18),
-                marketLiquidity.dividedBy(10 ** 18),
-                // liquidityReserved.dividedBy(10 ** 18),
-                new BigNumber(0),
-                totalAssetSupply.dividedBy(10 ** 18),
-                totalAssetBorrow.dividedBy(10 ** 18),
-                supplyInterestRate.dividedBy(10 ** 18),
-                borrowInterestRate.dividedBy(10 ** 18),
-                torqueBorrowInterestRate.dividedBy(10 ** 18),
-                // avgBorrowInterestRate.dividedBy(10 ** 18),
-                new BigNumber(0),
-                vaultBalance.dividedBy(10 ** 18),
-                swapRates ? swapRates[i] : new BigNumber(0),
-                usdSupply.dividedBy(10 ** 18),
-                usdTotalLocked.dividedBy(10 ** 18)
-              )
-            )
-          }
-          result.push(
-            new ReserveDetails(
-              Asset.UNKNOWN,
-              '',
-              '',
-              '',
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              usdSupplyAll.dividedBy(10 ** 18),
-              usdTotalLockedAll.dividedBy(10 ** 18)
-            )
-          )
-        }
-      }
+    if (!this.contractsSource) {
+      return result
+    }
+    const addressLookup = this.contractsSource.getITokenAddressesAndReduce(assets)
+    assets = addressLookup[0]
+    const tokens = addressLookup[1]
+    const helperContract = await this.contractsSource.getDAppHelperContract()
+    if (!tokens || !helperContract) {
+      return result
+    }
+    let swapRates
+    let bzrxPrice = new BigNumber(0)
+    let ethPrice = new BigNumber(0)
+    try {
+      swapRates = (
+        await this.getSwapToUsdRateBatch(assets, networkName === 'bsc' ? Asset.BUSD : Asset.DAI)
+      )[0]
+    } catch (e) {
+      //console.log(e);
     }
 
+    //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
+
+    const reserveData = await helperContract.reserveDetails(tokens).callAsync()
+    let usdSupplyAll = new BigNumber(0)
+    let usdTotalLockedAll = new BigNumber(0)
+    if (!reserveData || reserveData[0].length === 0) {
+      return result
+    }
+    for (let i = 0; i < reserveData[0].length; i++) {
+      let asset = assets[i]
+      let symbol: string = ''
+      let name: string = ''
+      let assetAddress: string = tokens[i]
+
+      let totalAssetSupply = new BigNumber(reserveData[0][i])
+      let totalAssetBorrow = new BigNumber(reserveData[1][i])
+      let supplyInterestRate = new BigNumber(reserveData[2][i])
+      let borrowInterestRate = new BigNumber(reserveData[4][i])
+      let torqueBorrowInterestRate = new BigNumber(reserveData[4][i])
+      let vaultBalance = new BigNumber(reserveData[5][i])
+      let marketLiquidity = totalAssetSupply.minus(totalAssetBorrow)
+
+      const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
+      let usdSupply = new BigNumber(0)
+      let usdTotalLocked = new BigNumber(0)
+
+      if (asset === Asset.ETHv1) {
+        vaultBalance = await this.getAssetTokenBalanceOfUser(
+          Asset.WETH,
+          '0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633'
+        )
+      }
+
+      const precision = new BigNumber(10 ** (18 - decimals))
+      totalAssetSupply = totalAssetSupply.times(precision)
+      totalAssetBorrow = totalAssetBorrow.times(precision)
+      marketLiquidity = marketLiquidity.times(precision)
+      //liquidityReserved = liquidityReserved.times(precision);
+      vaultBalance = vaultBalance.times(precision)
+
+      if (swapRates && swapRates[i]) {
+        usdSupply = totalAssetSupply!.times(swapRates[i]).dividedBy(10 ** 18)
+        usdSupplyAll = usdSupplyAll.plus(usdSupply)
+
+        usdTotalLocked = marketLiquidity
+          .plus(vaultBalance)
+          .times(swapRates[i])
+          .dividedBy(10 ** 18)
+        usdTotalLockedAll = usdTotalLockedAll.plus(usdTotalLocked)
+      }
+
+      result.push(
+        new ReserveDetails(
+          asset,
+          assetAddress,
+          symbol,
+          name,
+          decimals,
+          null, // tokenPrice.dividedBy(10 ** 18),
+          marketLiquidity.dividedBy(10 ** 18),
+          // liquidityReserved.dividedBy(10 ** 18),
+          new BigNumber(0),
+          totalAssetSupply.dividedBy(10 ** 18),
+          totalAssetBorrow.dividedBy(10 ** 18),
+          supplyInterestRate.dividedBy(10 ** 18),
+          borrowInterestRate.dividedBy(10 ** 18),
+          torqueBorrowInterestRate.dividedBy(10 ** 18),
+          // avgBorrowInterestRate.dividedBy(10 ** 18),
+          new BigNumber(0),
+          vaultBalance.dividedBy(10 ** 18),
+          swapRates ? swapRates[i] : new BigNumber(0),
+          usdSupply.dividedBy(10 ** 18),
+          usdTotalLocked.dividedBy(10 ** 18)
+        )
+      )
+    }
+    result.push(
+      new ReserveDetails(
+        Asset.UNKNOWN,
+        '',
+        '',
+        '',
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        usdSupplyAll.dividedBy(10 ** 18),
+        usdTotalLockedAll.dividedBy(10 ** 18)
+      )
+    )
+    const allReserveDetails = result.find((e) => e.asset === Asset.UNKNOWN)
+
+    if (networkName === 'mainnet' && allReserveDetails) {
+      // 3CRV swap contract
+      const threePoolContract = await this.contractsSource.getThreePoolContract()
+
+      const crvAddress = AssetsDictionary.assets
+        .get(Asset.CRV)!
+        .addressErc20.get(this.web3ProviderSettings.networkId)!
+
+      const crvErc20Contract = await this.contractsSource.getErc20Contract(crvAddress)
+
+      const stakingV1Address = this.contractsSource.getStakingV1Address()
+
+      const crvStakedLockedAmount = await crvErc20Contract.balanceOf(stakingV1Address).callAsync()
+      const crvTotalSupply = await crvErc20Contract.totalSupply().callAsync()
+
+      // get a share of 3CRV tokens in staking contract compare to all exisiting 3CRV tokens
+      const shareOfCrvLockedInStaking = crvStakedLockedAmount.div(crvTotalSupply)
+
+      const ethReserveDetails = result.find((e) => e.asset === Asset.ETH)
+      if (ethReserveDetails) {
+        const bptAddress = AssetsDictionary.assets
+          .get(Asset.BPT)!
+          .addressErc20.get(this.web3ProviderSettings.networkId)!
+        const wethAddress = AssetsDictionary.assets
+          .get(Asset.WETH)!
+          .addressErc20.get(this.web3ProviderSettings.networkId)!
+        const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
+
+        const bptBalanceOfStaking = await this.getErc20BalanceOfUser(bptAddress, stakingV1Address)
+        const bptTotalSupply = await bptErc20Contract.totalSupply().callAsync()
+        const wethBalanceOfBpt = await this.getErc20BalanceOfUser(wethAddress, bptAddress)
+
+        // share of weth liquidity that belongs to staking contract from all weth tokens in pool
+        const wethShareOfBptStakedLockedAmount = wethBalanceOfBpt
+          .times(bptBalanceOfStaking)
+          .div(bptTotalSupply)
+        ethReserveDetails.lockedAssets = ethReserveDetails.lockedAssets!.plus(
+          wethShareOfBptStakedLockedAmount.div(10 ** 18)
+        )
+        const stakingEthUsdLocked = wethShareOfBptStakedLockedAmount
+          .times(ethReserveDetails.swapToUSDPrice!.dividedBy(10 ** 18))
+          .div(10 ** 18)
+        ethReserveDetails.usdTotalLocked = ethReserveDetails.usdTotalLocked!.plus(
+          stakingEthUsdLocked
+        )
+        allReserveDetails.usdTotalLocked = allReserveDetails.usdTotalLocked!.plus(
+          stakingEthUsdLocked
+        )
+      }
+
+      const bzrxReserveDetails = result.find((e) => e.asset === Asset.BZRX)
+      if (bzrxReserveDetails) {
+        const bzrxVestingTokenContract = await this.contractsSource.getBzrxVestingContract()
+        const ibzxAddress = this.contractsSource.getiBZxAddress()
+
+        const vbzrxAddress = AssetsDictionary.assets
+          .get(Asset.vBZRX)!
+          .addressErc20.get(this.web3ProviderSettings.networkId)!
+        const bzrxAddress = AssetsDictionary.assets
+          .get(Asset.BZRX)!
+          .addressErc20.get(this.web3ProviderSettings.networkId)!
+        const bptAddress = AssetsDictionary.assets
+          .get(Asset.BPT)!
+          .addressErc20.get(this.web3ProviderSettings.networkId)!
+        const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
+
+        const vbzrxTotalVested = await bzrxVestingTokenContract.totalVested().callAsync()
+        const vbzrxTotalSupply = await bzrxVestingTokenContract.totalSupply().callAsync()
+        // how much vBZRX tokens already vested. This gives coefficient for vBZRX token price from BZRX price
+        const vbzrxWorthPart = new BigNumber(1).minus(vbzrxTotalVested.div(vbzrxTotalSupply))
+        // vBZRX locked in bZx protocol
+        const vbzrxProtocolLockedAmount = (
+          await this.getErc20BalanceOfUser(vbzrxAddress, ibzxAddress)
+        ).times(vbzrxWorthPart)
+
+        // vBZRX locked in Staking protocol
+        const vbzrxStakedLockedAmount = (
+          await this.getErc20BalanceOfUser(vbzrxAddress, stakingV1Address)
+        ).times(vbzrxWorthPart)
+        const bzrxStakedLockedAmount = await this.getErc20BalanceOfUser(
+          bzrxAddress,
+          stakingV1Address
+        )
+
+        const bptBalanceOfStaking = await this.getErc20BalanceOfUser(bptAddress, stakingV1Address)
+        const bptTotalSupply = await bptErc20Contract.totalSupply().callAsync()
+
+        const bzrxBalanceOfBpt = await this.getErc20BalanceOfUser(bzrxAddress, bptAddress)
+        // share of bzrx liquidity that belongs to staking contract from all bzrx tokens in pool
+        const bzrxShareOfBptStakedLockedAmount = bzrxBalanceOfBpt
+          .div(bptTotalSupply)
+          .times(bptBalanceOfStaking)
+
+        const stakingBzrxLockedAmount = vbzrxProtocolLockedAmount
+          .plus(vbzrxStakedLockedAmount)
+          .plus(bzrxStakedLockedAmount)
+          .plus(bzrxShareOfBptStakedLockedAmount)
+        bzrxReserveDetails.lockedAssets = bzrxReserveDetails.lockedAssets!.plus(
+          stakingBzrxLockedAmount.div(10 ** 18)
+        )
+        const stakingBzrxUsdLocked = stakingBzrxLockedAmount
+          .times(bzrxReserveDetails.swapToUSDPrice!.dividedBy(10 ** 18))
+          .div(10 ** 18)
+        bzrxReserveDetails.usdTotalLocked = bzrxReserveDetails.usdTotalLocked!.plus(
+          stakingBzrxUsdLocked
+        )
+        allReserveDetails.usdTotalLocked = allReserveDetails.usdTotalLocked!.plus(
+          stakingBzrxUsdLocked
+        )
+      }
+      const daiReserveDetails = result.find((e) => e.asset === Asset.DAI)
+      if (daiReserveDetails) {
+        const precision = new BigNumber(10 ** (18 - daiReserveDetails.decimals!))
+        // underlying DAI in 3CRV
+        const underlyingDaiInCRV = await threePoolContract.balances(new BigNumber(0)).callAsync()
+        const shareOfDaiInStakedCrv = underlyingDaiInCRV
+          .times(precision)
+          .times(shareOfCrvLockedInStaking)
+        daiReserveDetails.lockedAssets = daiReserveDetails.lockedAssets!.plus(
+          shareOfDaiInStakedCrv.div(10 ** 18)
+        )
+        const stakingDaiUsdLocked = shareOfDaiInStakedCrv
+          .times(daiReserveDetails.swapToUSDPrice!.dividedBy(10 ** 18))
+          .div(10 ** 18)
+
+        daiReserveDetails.usdTotalLocked = daiReserveDetails.usdTotalLocked!.plus(
+          stakingDaiUsdLocked
+        )
+        allReserveDetails.usdTotalLocked = allReserveDetails.usdTotalLocked!.plus(
+          stakingDaiUsdLocked
+        )
+      }
+      const usdtReserveDetails = result.find((e) => e.asset === Asset.USDT)
+      if (usdtReserveDetails) {
+        const precision = new BigNumber(10 ** (18 - usdtReserveDetails.decimals!))
+        // underlying USDT in 3CRV
+        const underlyingUsdtInCRV = await threePoolContract.balances(new BigNumber(2)).callAsync()
+        const shareOfUsdtInStakedCrv = underlyingUsdtInCRV
+          .times(precision)
+          .times(shareOfCrvLockedInStaking)
+        usdtReserveDetails.lockedAssets = usdtReserveDetails.lockedAssets!.plus(
+          shareOfUsdtInStakedCrv.div(10 ** 18)
+        )
+        const stakingUsdtUsdLocked = shareOfUsdtInStakedCrv
+          .times(usdtReserveDetails.swapToUSDPrice!.dividedBy(10 ** 18))
+          .div(10 ** 18)
+
+        usdtReserveDetails.usdTotalLocked = usdtReserveDetails.usdTotalLocked!.plus(
+          stakingUsdtUsdLocked
+        )
+        allReserveDetails.usdTotalLocked = allReserveDetails.usdTotalLocked!.plus(
+          stakingUsdtUsdLocked
+        )
+      }
+      const usdcReserveDetails = result.find((e) => e.asset === Asset.USDC)
+      if (usdcReserveDetails) {
+        const precision = new BigNumber(10 ** (18 - usdcReserveDetails.decimals!))
+        // underlying USDC in 3CRV
+        const underlyingUsdcInCRV = await threePoolContract.balances(new BigNumber(1)).callAsync()
+        const shareOfUsdcInStakedCrv = underlyingUsdcInCRV
+          .times(precision)
+          .times(shareOfCrvLockedInStaking)
+        usdcReserveDetails.lockedAssets = usdcReserveDetails.lockedAssets!.plus(
+          shareOfUsdcInStakedCrv.div(10 ** 18)
+        )
+        const stakingUsdcUsdLocked = shareOfUsdcInStakedCrv
+          .times(usdcReserveDetails.swapToUSDPrice!.dividedBy(10 ** 18))
+          .div(10 ** 18)
+
+        usdcReserveDetails.usdTotalLocked = usdcReserveDetails.usdTotalLocked!.plus(
+          stakingUsdcUsdLocked
+        )
+        allReserveDetails.usdTotalLocked = allReserveDetails.usdTotalLocked!.plus(
+          stakingUsdcUsdLocked
+        )
+      }
+    }
     return result
   }
 
@@ -1038,7 +1121,10 @@ export class FulcrumProvider {
 
         result = BigNumber.min(marketLiquidity, balance)
 
-        if (depositToken === Asset.ETH) {
+        if (
+          (networkName === 'mainnet' && depositToken === Asset.ETH) ||
+          (networkName === 'bsc' && depositToken === Asset.BNB)
+        ) {
           result = result.gt(this.gasBufferForTrade)
             ? result.minus(this.gasBufferForTrade)
             : new BigNumber(0)
@@ -1075,7 +1161,10 @@ export class FulcrumProvider {
     let infoMessage: string = ''
     if (request.lendType === LendType.LEND) {
       maxLendAmount = await this.getAssetTokenBalanceOfUser(request.asset)
-      if (request.asset === Asset.ETH) {
+      if (
+        (networkName === 'mainnet' && request.asset === Asset.ETH) ||
+        (networkName === 'bsc' && request.asset === Asset.BNB)
+      ) {
         maxLendAmount = maxLendAmount.gt(this.gasBufferForLend)
           ? maxLendAmount.minus(this.gasBufferForLend)
           : new BigNumber(0)
@@ -1306,6 +1395,10 @@ export class FulcrumProvider {
 
   public gasPrice = async (): Promise<BigNumber> => {
     if (networkName === 'kovan') return new BigNumber(1).multipliedBy(10 ** 9) // 1 gwei
+    if (networkName === 'bsc') {
+      // always 10 gwei
+      return new BigNumber(10).multipliedBy(10 ** 9)
+    }
     let result = new BigNumber(1000).multipliedBy(10 ** 9) // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
 
@@ -1340,7 +1433,10 @@ export class FulcrumProvider {
     let maybeNeedsApproval = false
     let account: string | undefined = undefined
 
-    if (asset === Asset.ETH) {
+    if (
+      (networkName === 'mainnet' && asset === Asset.ETH) ||
+      (networkName === 'bsc' && asset === Asset.BNB)
+    ) {
       return false
     }
 
@@ -1369,7 +1465,10 @@ export class FulcrumProvider {
     let maybeNeedsApproval = false
     let account: string | undefined
 
-    if (request.depositToken === Asset.ETH) {
+    if (
+      (networkName === 'mainnet' && request.depositToken === Asset.ETH) ||
+      (networkName === 'bsc' && request.depositToken === Asset.BNB)
+    ) {
       return false
     }
 
@@ -1401,7 +1500,12 @@ export class FulcrumProvider {
     destToken: Asset,
     tradedAmountEstimate: BigNumber
   ): Promise<BigNumber> => {
-    if (tradedAmountEstimate.eq(0) || srcToken === destToken || this.unsupportedNetwork) {
+    if (
+      tradedAmountEstimate.eq(0) ||
+      srcToken === destToken ||
+      this.unsupportedNetwork ||
+      networkName === 'bsc'
+    ) {
       return new BigNumber(0)
     }
 
@@ -1644,9 +1748,10 @@ export class FulcrumProvider {
 
       //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
       const collateralTokenAddress =
-        collateralToken !== Asset.ETH
-          ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
-          : FulcrumProvider.ZERO_ADDRESS
+        (networkName === 'mainnet' && collateralToken === Asset.ETH) ||
+        (networkName === 'bsc' && collateralToken === Asset.BNB)
+          ? FulcrumProvider.ZERO_ADDRESS
+          : FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
 
       const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18
       const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18
@@ -1731,6 +1836,10 @@ export class FulcrumProvider {
         networkName = 'kovan'
         etherscanURL = 'https://kovan.etherscan.io/'
         break
+      case 56:
+        networkName = 'bsc'
+        etherscanURL = 'https://bscscan.com/'
+        break
       default:
         networkId = 0
         networkName = 'local'
@@ -1749,7 +1858,10 @@ export class FulcrumProvider {
     if (asset === Asset.UNKNOWN) {
       // always 0
       result = new BigNumber(0)
-    } else if (asset === Asset.ETH) {
+    } else if (
+      (networkName === 'mainnet' && asset === Asset.ETH) ||
+      (networkName === 'bsc' && asset === Asset.BNB)
+    ) {
       // get eth (wallet) balance
       result = await this.getEthBalance()
     } else {
@@ -1761,7 +1873,7 @@ export class FulcrumProvider {
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
-    // to get human-readable amount result should be divided always by 10**18 
+    // to get human-readable amount result should be divided always by 10**18
     return result
   }
 
@@ -1797,7 +1909,7 @@ export class FulcrumProvider {
           const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
           if (tokenContract) {
             result = await tokenContract
-              .allowance(account, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61')
+              .allowance(account, this.contractsSource.getTokenHolderAddress())
               .callAsync()
           }
         }
@@ -2255,7 +2367,10 @@ export class FulcrumProvider {
     );
 
     return swapRates[0][0];*/
-    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
+    return this.getSwapRate(
+      asset,
+      networkName === 'bsc' ? Asset.BUSD : isMainnetProd ? Asset.DAI : Asset.USDC
+    )
   }
 
   private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
@@ -2600,7 +2715,10 @@ console.log(err, added);
       if (taskRequest.lendType === LendType.LEND) {
         await this.addTokenToMetaMask(task)
 
-        if (taskRequest.asset === Asset.ETH) {
+        if (
+          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && taskRequest.asset === Asset.ETH) ||
+          (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.asset === Asset.BNB)
+        ) {
           const { LendEthProcessor } = await import('./processors/LendEthProcessor')
           const processor = new LendEthProcessor()
           await processor.run(task, account, skipGas)
@@ -2614,7 +2732,10 @@ console.log(err, added);
           await processor.run(task, account, skipGas)
         }
       } else {
-        if (taskRequest.asset === Asset.ETH) {
+        if (
+          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && taskRequest.asset === Asset.ETH) ||
+          (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.asset === Asset.BNB)
+        ) {
           const { UnlendEthProcessor } = await import('./processors/UnlendEthProcessor')
           const processor = new UnlendEthProcessor()
           await processor.run(task, account, skipGas)
@@ -3086,7 +3207,9 @@ console.log(err, added);
     //: FulcrumProvider.ZERO_ADDRESS
 
     const sendAmountForValue =
-      depositToken === Asset.WETH || depositToken === Asset.ETH
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+        (depositToken === Asset.WETH || depositToken === Asset.ETH)) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && depositToken === Asset.BNB)
         ? amountInBaseUnits
         : new BigNumber(0)
 
@@ -3174,7 +3297,10 @@ console.log(err, added);
   }
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH // || asset === Asset.WETH;
+    return (
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && asset === Asset.ETH) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && asset === Asset.BNB)
+    ) // || asset === Asset.WETH;
   }
 
   public getLoanExtendParams = async (

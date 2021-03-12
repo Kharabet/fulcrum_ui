@@ -8,29 +8,30 @@
 @import 'base/base';
 @import 'base/typography';
 
-@import 'components/check-box';
+
+
+
 @import 'components/asset-dropdown';
-
-@import 'components/preloader';
-
-@import 'components/provider-menu';
-
-@import 'components/on-chain-indicator';
-@import 'components/switch-button';
-@import 'components/switch-pro';
-@import 'components/risk-disclosure';
+@import 'components/chart-coming-soon';
+@import 'components/check-box';
 @import 'components/circle-loader';
-@import 'components/trade-tx-animation';
+@import 'components/extend-loan.scss';
 @import 'components/manage-token-grid.scss';
+@import 'components/on-chain-indicator';
+@import 'components/preloader';
+@import 'components/provider-menu';
+@import 'components/risk-disclosure';
 @import 'components/rollover-note.scss';
 @import 'components/slider.scss';
-@import 'components/extend-loan.scss';
+@import 'components/switch-button';
+@import 'components/switch-pro';
+@import 'components/trade-tx-animation';
 
 @import 'layout/footer';
-@import 'layout/header';
-@import 'layout/header.mobile';
 @import 'layout/header-logo';
-@import 'layout/header-menu';
 @import 'layout/header-menu.mobile';
+@import 'layout/header-menu';
+@import 'layout/header.mobile';
+@import 'layout/header';
 
 @import 'base/modal';

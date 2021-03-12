@@ -189,7 +189,10 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     if (!this.state.didSubmit) {
       this.setState({ ...this.state, didSubmit: true })
 
-      if (this.props.loanOrderState.loanAsset === Asset.ETH) {
+      if ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+      this.props.loanOrderState.loanAsset === Asset.ETH) ||
+    (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+      this.props.loanOrderState.loanAsset === Asset.BNB)) {
         const assetBalance = this.state.assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
           ? this.state.assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
           : new BigNumber(0)

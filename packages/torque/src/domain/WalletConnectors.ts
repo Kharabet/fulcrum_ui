@@ -24,6 +24,8 @@ const getNetworkIdByString = (networkName: string | undefined) => {
       return 4
     case 'kovan':
       return 42
+    case 'bsc':
+      return 56
     default:
       return 0
   }
@@ -35,7 +37,7 @@ const RPC_URL = Web3ConnectionFactory.getRPCUrl()
 
 const POLLING_INTERVAL = 3600000
 
-export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 42] })
+export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 42, 56] })
 
 // export const network = new NetworkConnector({
 //   urls: { 1: RPC_URLS[1], 4: RPC_URLS[4] },

@@ -1073,7 +1073,7 @@ export class ExplorerProvider {
           const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
           if (tokenContract) {
             result = await tokenContract
-              .allowance(account, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61')
+              .allowance(account, this.contractsSource.getTokenHolderAddress())
               .callAsync()
           }
         }

@@ -43,22 +43,29 @@ const ibzxAddresses = new Map([
   [1, '0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f'],
   [3, '0xbe49f4cd73041cdf24a7b721627de577b3bab000'],
   [4, '0xc45755a7cfc9385290e6fece1f040c0453e7b0e5'],
-  [42, '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a']
+  [42, '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a'],
+  [56, '0xc47812857a74425e2039b57891a3dfcf51602d5d'],
 ])
 
 const stakingV1Addresses = new Map([
   [1, '0xe95ebce2b02ee07def5ed6b53289801f7fc137a4'],
-  [42, '0xE7eD6747FaC5360f88a2EFC03E00d25789F69291']
+  [42, '0xE7eD6747FaC5360f88a2EFC03E00d25789F69291'],
 ])
 
 const vbzrxAddresses = new Map([
   [1, '0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F'],
-  [42, '0x6F8304039f34fd6A6acDd511988DCf5f62128a32']
+  [42, '0x6F8304039f34fd6A6acDd511988DCf5f62128a32'],
 ])
 
 const governanceAddresses = new Map([
   [1, '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'],
-  [3, '0xc5bfed3bb38a3c4078d4f130f57ca4c560551d45']
+  [3, '0xc5bfed3bb38a3c4078d4f130f57ca4c560551d45'],
+])
+
+const tokenHolderAddresses = new Map([
+  [1, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61'],
+  [42, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61'],
+  [56, '0x55eb3dd3f738cfdda986b8eff3fa784477552c61'],
 ])
 
 const helperAddresses = new Map([[1, '0xFad79f3922cCef7AeB8A5674f36E45B6E81A10C7']])
@@ -77,6 +84,9 @@ const getNetworkNameById = (networkId: number): string => {
       break
     case 42:
       networkName = 'kovan'
+      break
+    case 56:
+      networkName = 'bsc'
       break
     default:
       networkName = 'local'
@@ -182,7 +192,7 @@ export default class ContractsSource {
         name: val[3],
         symbol: val[4],
         index: new BigNumber(index),
-        version: parseInt(val[5], 10)
+        version: parseInt(val[5], 10),
       }
 
       ContractsSource.iTokensContractInfos.set(val[4], t)
@@ -206,6 +216,14 @@ export default class ContractsSource {
     const address = stakingV1Addresses.get(this.networkId)
     if (!address) {
       throw new Error('getStakingV1Address')
+    }
+    return address
+  }
+  
+  public getTokenHolderAddress() {
+    const address = tokenHolderAddresses.get(this.networkId)
+    if (!address) {
+      throw new Error('getTokenHolderAddress')
     }
     return address
   }
@@ -239,6 +257,9 @@ export default class ContractsSource {
         break
       case 42:
         address = '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a'
+        break
+      case 56:
+        address = '0xc47812857a74425e2039b57891a3dfcf51602d5d'
         break
     }
 
@@ -280,6 +301,9 @@ export default class ContractsSource {
       case 42:
         address = '0x5cfba2639a3db0D9Cc264Aa27B2E6d134EeA486a'
         break
+      case 56:
+        address = '0xc47812857a74425e2039b57891a3dfcf51602d5d'
+        break
     }
 
     return address
@@ -300,6 +324,9 @@ export default class ContractsSource {
       case 42:
         address = '0x17aEef301D3db36f79A4a9A2D05138148b22C200'
         break
+      case 56:
+        address = '0x43ccac29802332e1fd3a41264ddbe34ce3073a88'
+        break
     }
 
     return address
@@ -319,6 +346,9 @@ export default class ContractsSource {
         break
       case 42:
         address = '0xa40cDd78BFBe0E8ca643081Df43A45ED8C2C12bB'
+        break
+      case 56:
+        address = '0xc29db5b558718c3ea48ba828c97ed3a68bef35a0'
         break
     }
 
@@ -374,31 +404,25 @@ export default class ContractsSource {
     let symbol
     if (asset === Asset.WETH) {
       symbol = `iETH`
+    } else if (asset === Asset.WBNB) {
+      symbol = `iBNB`
     } else if (asset === Asset.CHAI) {
       symbol = `iDAI`
     } else {
       symbol = `i${asset}`
     }
     const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null
-    return tokenContractInfo
-      ? new iTokenContract(tokenContractInfo.token, this.provider)
-      : null
+    return tokenContractInfo ? new iTokenContract(tokenContractInfo.token, this.provider) : null
   }
 
   private async getOracleContractRaw(): Promise<oracleContract> {
     await this.Init()
-    return new oracleContract(
-      this.getOracleAddress().toLowerCase(),
-      this.provider
-    )
+    return new oracleContract(this.getOracleAddress().toLowerCase(), this.provider)
   }
 
   private async getDAppHelperContractRaw(): Promise<DAppHelperContract> {
     await this.Init()
-    return new DAppHelperContract(
-      this.getDAppHelperAddress().toLowerCase(),
-      this.provider
-    )
+    return new DAppHelperContract(this.getDAppHelperAddress().toLowerCase(), this.provider)
   }
   private async getIKyberNetworkProxyContractRaw(): Promise<IKyberNetworkProxyContract> {
     await this.Init()
@@ -548,10 +572,7 @@ export default class ContractsSource {
 
   private async getCompoundBridgeContractRaw(): Promise<CompoundBridgeContract> {
     await this.Init()
-    return new CompoundBridgeContract(
-      this.getCompoundBridgeAddress().toLowerCase(),
-      this.provider
-    )
+    return new CompoundBridgeContract(this.getCompoundBridgeAddress().toLowerCase(), this.provider)
   }
 
   private getSoloBridgeAddress(): string {
@@ -569,10 +590,7 @@ export default class ContractsSource {
 
   private async getSoloBridgeContractRaw(): Promise<SoloBridgeContract> {
     await this.Init()
-    return new SoloBridgeContract(
-      this.getSoloBridgeAddress().toLowerCase(),
-      this.provider
-    )
+    return new SoloBridgeContract(this.getSoloBridgeAddress().toLowerCase(), this.provider)
   }
 
   private async getCdpContractRaw(addressCdp: string): Promise<GetCdpsContract> {
@@ -597,10 +615,7 @@ export default class ContractsSource {
 
   private async getProxyRegistryRaw(address: string): Promise<proxyRegistryContract> {
     await this.Init()
-    return new proxyRegistryContract(
-      address.toLowerCase(),
-      this.provider
-    )
+    return new proxyRegistryContract(address.toLowerCase(), this.provider)
   }
 
   private async getDsProxyRaw(address: string): Promise<dsProxyJsonContract> {
@@ -610,18 +625,12 @@ export default class ContractsSource {
 
   private async getSaiToDaiBridgeRaw(address: string): Promise<saiToDAIBridgeContract> {
     await this.Init()
-    return new saiToDAIBridgeContract(
-      address.toLowerCase(),
-      this.provider
-    )
+    return new saiToDAIBridgeContract(address.toLowerCase(), this.provider)
   }
 
   private async getInstaRegistryRaw(address: string): Promise<instaRegistryContract> {
     await this.Init()
-    return new instaRegistryContract(
-      address.toLowerCase(),
-      this.provider
-    )
+    return new instaRegistryContract(address.toLowerCase(), this.provider)
   }
 
   private async getDsProxyAllowJSON() {
@@ -633,10 +642,7 @@ export default class ContractsSource {
   }
 
   private async getThreePoolContractRaw() {
-    return new ThreePoolContract(
-      this.getThreePoolContractAddress().toLowerCase(),
-      this.provider
-    )
+    return new ThreePoolContract(this.getThreePoolContractAddress().toLowerCase(), this.provider)
   }
 
   private static getAssetFromIlkRaw(ilk: string): Asset {

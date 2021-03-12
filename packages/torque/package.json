@@ -59,9 +59,11 @@
     "analyse": "node analyse.js",
     "clean": "rm -rf ./node_modules",
     "start": "cross-env-shell \"craco start --config ../bzx-common/craco.config.js\"",
+    "start-bsc": "cross-env-shell REACT_APP_ETH_NETWORK=bsc \"craco start --config ../bzx-common/craco.config.js\"",
     "lint": "tslint 'src/**/*.{ts,tsx}'",
     "lint:fix": "tslint 'src/**/*.{ts,tsx}' --fix",
     "build": "cross-env-shell NODE_OPTIONS=--max_old_space_size=4096 \"craco build --config ../bzx-common/craco.config.js\"",
+    "build-bsc": "cross-env-shell REACT_APP_ETH_NETWORK=bsc \"craco build --config ../bzx-common/craco.config.js\"",
     "build-stats": "cross-env-shell REACT_APP_ETH_NETWORK=kovan NODE_OPTIONS=--max_old_space_size=4096 \"craco build -- --stats\"",
     "test": "cross-env-shell \"craco test --config ../bzx-common/craco.config.js\"",
     "eject": "craco eject"

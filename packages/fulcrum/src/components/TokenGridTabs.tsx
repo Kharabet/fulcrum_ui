@@ -89,13 +89,13 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               {TokenGridTab.Chart}
             </div>
             <OpenPositionsButton {...this.props} />
-            <div
+            {process.env.REACT_APP_ETH_NETWORK !== 'bsc' && <div
               className={`tab ${
                 this.props.activeTokenGridTab === TokenGridTab.History ? `active` : ``
               }`}
               onClick={this.showTradeHistory}>
               {TokenGridTab.History}
-            </div>
+            </div>}
             <div
               className={`tab ${
                 this.props.activeTokenGridTab === TokenGridTab.Stats ? `active` : ``

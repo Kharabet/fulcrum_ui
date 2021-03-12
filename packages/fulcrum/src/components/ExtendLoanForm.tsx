@@ -221,7 +221,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     let assetBalance = (await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.props.loan.loanAsset
     ))
-    if (this.props.loan.loanAsset === Asset.ETH) {
+    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.loan.loanAsset === Asset.ETH ||
+    process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.loan.loanAsset === Asset.BNB) {
       assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTxn)
         ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTxn)
         : new BigNumber(0)

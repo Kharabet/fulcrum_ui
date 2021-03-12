@@ -26,32 +26,56 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   constructor(props: IHeaderOpsProps) {
     super(props)
     this.state = {
-      isMenuOpen: false
+      isMenuOpen: false,
     }
   }
 
   private MenuDesktop: IHeaderMenuProps = {
     items: [
-      { title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
-      { title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
+      {
+        title: 'Trade',
+        link: `https://${
+          process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
+        }.fulcrum.trade/trade`,
+        external: true,
+      },
+      {
+        title: 'Lend',
+        link: `https://${
+          process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
+        }.fulcrum.trade/lend`,
+        external: true,
+      },
       { title: 'Borrow', link: '/borrow', external: false },
-      { title: 'Stake', link: 'https://staking.bzx.network', external: true }
-    ]
+      { title: 'Stake', link: 'https://staking.bzx.network', external: true },
+    ],
   }
 
   private MenuMobile: IHeaderMenuProps = {
     items: [
-      { title: 'Trade', link: 'https://app.fulcrum.trade/trade', external: true },
-      { title: 'Lend', link: 'https://app.fulcrum.trade/lend', external: true },
+      {
+        title: 'Trade',
+        link: `https://${
+          process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
+        }.fulcrum.trade/trade`,
+        external: true,
+      },
+      {
+        title: 'Lend',
+        link: `https://${
+          process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
+        }.fulcrum.trade/lend`,
+        external: true,
+      },
       { title: 'Borrow', link: '/borrow', external: false },
       { title: 'Stake', link: 'https://staking.bzx.network', external: true },
       { title: 'Borrow FAQ', link: 'https://torque.loans/', external: true },
       {
         title: 'Help Center',
         link: 'https://help.bzx.network/en/collections/2008807-torque',
-        external: true
-      }
-    ]
+        external: true,
+      },
+    ],
   }
 
   public componentWillUnmount(): void {
