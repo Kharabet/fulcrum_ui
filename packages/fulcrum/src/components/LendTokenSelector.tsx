@@ -72,26 +72,11 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
     let liquidities = { data: {}, success: false }
     // TODO: add API endpoints for bsc
     if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
-      const assetsAPRs = await Promise.all(
-        assets.map((asset) => FulcrumProvider.Instance.getLendTokenInterestRate(asset))
-      )
-      const assetsLiquidities = await Promise.all(
-        assets.map((asset) => FulcrumProvider.Instance.getAvailableLiquidity(asset))
-      )
-      assets.forEach((asset, i) => {
-        // @ts-ignore
-        aprs.data[asset.toLowerCase()] = assetsAPRs[i]
-        // @ts-ignore
-        liquidities.data[asset.toLowerCase()] = assetsLiquidities[i]
-      })
-      // @ts-ignore
-      aprs.success = true
-      // @ts-ignore
-      liquidities.success = true
-    } else {
-      aprs = await (await fetch(`${apiUrl}/supply-rate-apr`)).json()
-      liquidities = await (await fetch(`${apiUrl}/liquidity`)).json()
+      setIsLoading(false)
+      return
     }
+    aprs = await (await fetch(`${apiUrl}/supply-rate-apr`)).json()
+    liquidities = await (await fetch(`${apiUrl}/liquidity`)).json()
 
     if (!aprs.success || !liquidities.success) {
       setIsLoading(false)
@@ -123,20 +108,59 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
   }
 
   const derivedUpdate = async () => {
-    if (lendTokenItemProps.size === 0) {
+    if (lendTokenItemProps.size === 0 && process.env.REACT_APP_ETH_NETWORK !== 'bsc') {
       setRetry(true)
       return
     } else {
       setRetry(false)
     }
+
+    let aprs = { data: {}, success: false }
+    let liquidities = { data: {}, success: false }
+    if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+      const assetsAPRs = await Promise.all(
+        assets.map((asset) => FulcrumProvider.Instance.getLendTokenInterestRate(asset))
+      )
+      const assetsLiquidities = await Promise.all(
+        assets.map((asset) => FulcrumProvider.Instance.getAvailableLiquidity(asset))
+      )
+      assets.forEach((asset, i) => {
+        // @ts-ignore
+        aprs.data[asset.toLowerCase()] = assetsAPRs[i]
+        // @ts-ignore
+        liquidities.data[asset.toLowerCase()] = assetsLiquidities[i]
+      })
+      // @ts-ignore
+      aprs.success = true
+      // @ts-ignore
+      liquidities.success = true
+    }
     const newLendTokenItemProps = new Map<Asset, ILendTokenSelectorItemProps>(lendTokenItemProps)
     for (const token in assets) {
-      if (!assets[token] || newLendTokenItemProps.get(assets[token]) === undefined) {
+      if (!assets[token]) {
         continue
       }
 
       const asset = assets[token]
-      const currentLendTokenItemProps = newLendTokenItemProps.get(asset)!
+      let currentLendTokenItemProps = undefined
+      if (process.env.REACT_APP_ETH_NETWORK !== 'bsc') {
+        currentLendTokenItemProps = newLendTokenItemProps.get(asset)!
+      } else {
+        // @ts-ignore
+        const interestRate = aprs.data[asset.toLowerCase()]
+        // @ts-ignore
+        const liquidity = liquidities.data[asset.toLowerCase()]
+
+        currentLendTokenItemProps = {
+          profit: new BigNumber(0),
+          balanceOfUser: new BigNumber(0),
+          asset,
+          onLend: props.onLend,
+          interestRate: new BigNumber(interestRate || 0),
+          liquidity: new BigNumber(liquidity || 0),
+          isLoading: false,
+        } as ILendTokenSelectorItemProps
+      }
 
       newLendTokenItemProps.set(asset, {
         ...currentLendTokenItemProps,
