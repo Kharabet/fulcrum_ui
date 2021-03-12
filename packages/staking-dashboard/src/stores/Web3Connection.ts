@@ -2,7 +2,7 @@ import hashUtils from 'bzx-common/src/lib/hashUtils'
 import * as mobx from 'mobx'
 import ProviderType from 'bzx-common/src/domain/ProviderType'
 import ProviderTypeDetails from 'bzx-common/src/domain/ProviderTypeDetails'
-import ProviderTypeDictionary from 'src/domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import RootStore from 'src/stores/RootStore'
 
 type connectionStatusProp =

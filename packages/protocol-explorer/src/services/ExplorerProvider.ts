@@ -35,7 +35,7 @@ import {
   getTradeHistory,
 } from 'bzx-common/src/utils'
 
-import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 
 import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'

@@ -52,7 +52,7 @@ import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { TorqueProviderEvents } from './events/TorqueProviderEvents'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
-import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import { RequestStatus } from '../domain/RequestStatus'
 import { RequestTask } from '../domain/RequestTask'
 import { TasksQueueEvents } from './events/TasksQueueEvents'

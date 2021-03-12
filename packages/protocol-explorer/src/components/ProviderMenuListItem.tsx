@@ -1,6 +1,6 @@
 import React from 'react'
 import { ProviderType } from '../domain/ProviderType'
-import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import { useWeb3React } from '@web3-react/core'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { Loader } from './Loader'

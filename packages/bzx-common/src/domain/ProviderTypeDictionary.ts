@@ -1,33 +1,32 @@
-import { ProviderType } from './ProviderType'
-import { ProviderTypeDetails } from './ProviderTypeDetails'
-
-import { ReactComponent as BitskiLogoShort } from '../assets/images/logo_short___bitski.svg'
-import { ReactComponent as FortmaticLogoShort } from '../assets/images/logo_short___fortmatic.svg'
-import { ReactComponent as MetamaskLogoShort } from '../assets/images/logo_short___metamask.svg'
-import { ReactComponent as PortisLogoShort } from '../assets/images/logo_short___portis.svg'
-import { ReactComponent as SquarelinkLogoShort } from '../assets/images/logo_short___squarelink.svg'
-import { ReactComponent as LedgerLogoShort } from '../assets/images/logo_short___ledger.svg'
-import { ReactComponent as TrustWalletLogoShort } from '../assets/images/logo_short___trustwallet.svg'
-import { ReactComponent as TorusLogoShort } from '../assets/images/logo_short___torus.svg'
-import { ReactComponent as AuthereumLogoShort } from '../assets/images/logo_short___authereum.svg'
-import { ReactComponent as TrezorLogoShort } from '../assets/images/logo_short___trezor.svg'
-import { ReactComponent as WalletConnectLogoShort } from '../assets/images/logo_short___walletconnect.svg'
-import { ReactComponent as WalletLinkLogoShort } from '../assets/images/logo_short___coinbase.svg'
-
+import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ReactComponent as AuthereumLogoShort } from './../assets/images/providers/logo_short___authereum.svg'
+import { ReactComponent as BitskiLogoShort } from './../assets/images/providers/logo_short___bitski.svg'
+import { ReactComponent as WalletLinkLogoShort } from './../assets/images/providers/logo_short___coinbase.svg'
+import { ReactComponent as FortmaticLogoShort } from './../assets/images/providers/logo_short___fortmatic.svg'
+import { ReactComponent as LedgerLogoShort } from './../assets/images/providers/logo_short___ledger.svg'
+import { ReactComponent as MetamaskLogoShort } from './../assets/images/providers/logo_short___metamask.svg'
+import { ReactComponent as PortisLogoShort } from './../assets/images/providers/logo_short___portis.svg'
+import { ReactComponent as SquarelinkLogoShort } from './../assets/images/providers/logo_short___squarelink.svg'
+import { ReactComponent as TorusLogoShort } from './../assets/images/providers/logo_short___torus.svg'
+import { ReactComponent as TrezorLogoShort } from './../assets/images/providers/logo_short___trezor.svg'
+import { ReactComponent as TrustWalletLogoShort } from './../assets/images/providers/logo_short___trustwallet.svg'
+import { ReactComponent as WalletConnectLogoShort } from './../assets/images/providers/logo_short___walletconnect.svg'
+import { ReactComponent as GenericWalletShort } from './../assets/images/providers/logo_short___genericwallet.svg'
+import ProviderType from './ProviderType'
+import ProviderTypeDetails from './ProviderTypeDetails'
 import {
-  injected,
+  authereum,
+  bitski,
   fortmatic,
+  injected,
+  ledger,
   portis,
   squarelink,
-  bitski,
-  ledger,
   torus,
-  authereum,
   trezor,
   walletconnect,
   walletlink,
-} from 'bzx-common/src/lib/web3ReactUtils'
-import { AbstractConnector } from '@web3-react/abstract-connector'
+} from './../lib/web3ReactUtils'
 
 const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.MetaMask]: injected,
@@ -45,7 +44,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.None]: null,
 }
 
-export class ProviderTypeDictionary {
+export default class ProviderTypeDictionary {
   public static readonly WalletProviders: ProviderType[] = [
     ProviderType.MetaMask,
     ProviderType.TrustWallet,
@@ -86,7 +85,7 @@ export class ProviderTypeDictionary {
     [ProviderType.Authereum, new ProviderTypeDetails('Authereum', authereum, AuthereumLogoShort)],
     [ProviderType.Trezor, new ProviderTypeDetails('Trezor', trezor, AuthereumLogoShort)],
     [ProviderType.WalletLink, new ProviderTypeDetails('Coinbase', walletlink, WalletLinkLogoShort)],
-    [ProviderType.None, new ProviderTypeDetails('None', null)],
+    [ProviderType.None, new ProviderTypeDetails('None', null, GenericWalletShort)],
   ])
 
   public static async getProviderTypeByConnector(value: AbstractConnector): Promise<ProviderType> {

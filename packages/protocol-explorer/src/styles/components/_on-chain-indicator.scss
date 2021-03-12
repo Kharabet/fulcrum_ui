@@ -17,7 +17,10 @@
       border-color: transparent;
     }
     .on-chain-indicator__provider-txt {
-      color: #5b88ff;
+      color: #495460;
+      justify-content: flex-start;
+
+      align-items: center;
     }
   }
 }
@@ -39,6 +42,11 @@
   outline: none;
   .on-chain-indicator__svg {
     display: flex;
+    margin-right: 8px;
+    svg {
+      height: 28px;
+      fill: #495460;
+    }
   }
   .on-chain-indicator__description {
     display: flex;
@@ -80,12 +88,12 @@
   }
 
   .on-chain-indicator__wallet-address {
+    justify-content: center;
     color: #758295;
     font-size: 13px;
   }
   span.on-chain-indicator__wallet-address,
   span.on-chain-indicator__provider-txt {
-    justify-content: center;
     display: flex;
     width: 100%;
   }
