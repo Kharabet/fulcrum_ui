@@ -40,7 +40,7 @@ import { TradeType } from '../domain/TradeType'
 import loansWithOldOpenPriceFormat from '../config/loansWithOldOpenPriceFormat'
 import '../styles/pages/_trade-page.scss'
 import { RolloverRequest } from '../domain/RolloverRequest'
-import { InfoBlock } from '../components/InfoBlock'
+import InfoBlock from 'bzx-common/src/shared-components/InfoBlock'
 import { StatsTokenGrid } from '../components/StatsTokenGrid'
 import TVChartComingSoon from '../components/TVChartComingSoon'
 
