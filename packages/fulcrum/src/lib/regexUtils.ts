@@ -31,5 +31,5 @@ function getWordListCheck (strings: string[]) {
 export default {
   escapeString,
   regexFromStrings,
-  getWordListCheck
+  getWordListCheck,
 }

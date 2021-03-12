@@ -19,7 +19,7 @@ const envVars = {
   NODE_ENV: process.env.NODE_ENV,
 }
 
-const networks = ['mainnet', 'kovan', 'ropsten', 'rinkeby']
+const networks = ['mainnet', 'kovan', 'ropsten', 'rinkeby', 'bsc']
 
 // Check that we are passing a valid network for the build
 if (!networks.includes(envVars.REACT_APP_ETH_NETWORK)) {

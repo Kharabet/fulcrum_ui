@@ -5,9 +5,11 @@ import Asset from 'bzx-common/src/assets/Asset'
 import { TorqueProvider } from '../services/TorqueProvider'
 import AssetSelectorItem from './AssetSelectorItem'
 import { BorrowDlg } from './BorrowDlg'
+import { TorqueProviderEvents } from 'src/services/events/TorqueProviderEvents'
 
 export interface IAssetSelectorProps {
   borrowDlgRef: React.RefObject<BorrowDlg>
+  assetsShown: Asset[]
   doNetworkConnect: () => void
   setLoansActiveTab: () => void
 }
@@ -18,59 +20,63 @@ const AssetSelector = (props: IAssetSelectorProps) => {
   const [liquidities, setLiquidity] = useState()
 
   useEffect(() => {
-    getInterestRates()
-    getLiquidity()
+    derivedUpdate()
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, derivedUpdate)
+    return () => {
+      TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderChanged, derivedUpdate)
+    }
   }, [])
 
-  // true includes ENS support
-  let assetsShown: Asset[]
-
-  if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
-    assetsShown = [
-      Asset.ETH,
-      Asset.DAI,
-      Asset.USDC,
-      Asset.USDT,
-      Asset.WBTC,
-      Asset.LINK,
-      Asset.YFI,
-      Asset.BZRX,
-      Asset.MKR,
-      Asset.KNC,
-      Asset.UNI,
-      Asset.AAVE,
-      Asset.LRC,
-      Asset.COMP
-    ]
-  } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
-    assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
-  } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
-    assetsShown = [Asset.DAI, Asset.ETH]
-  } else {
-    assetsShown = []
+  const derivedUpdate = () => {
+    getInterestRates()
+    getLiquidity()
   }
-
   const getInterestRates = async () => {
-    const interestRatesRequest = await fetch(`${apiUrl}/interest-rates`)
-    const interestRatesJson = await interestRatesRequest.json()
-    let interestRatesData = []
-    if (interestRatesJson.success) {
-      interestRatesData = interestRatesJson.data
+    let interestRatesData = {}
+    // TODO: add API endpoints for bsc
+    if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+      const assetsInterestRates = await Promise.all(
+        props.assetsShown.map((asset) => TorqueProvider.Instance.getAssetBorrowInterestRate(asset))
+      )
+      props.assetsShown.forEach((asset, i) => {
+        // @ts-ignore
+        interestRatesData[asset.toLowerCase()] = { borrowApr: assetsInterestRates[i] }
+      })
+    } else {
+      const interestRatesRequest = await fetch(`${apiUrl}/interest-rates`)
+      const interestRatesJson = await interestRatesRequest.json()
+      let interestRatesData = []
+      if (interestRatesJson.success) {
+        interestRatesData = interestRatesJson.data
+      }
     }
+    // @ts-ignore
     setInterestRates(interestRatesData)
   }
 
   const getLiquidity = async () => {
-    const liquidityRequest = await fetch(`${apiUrl}/liquidity`)
-    const liquidityJson = await liquidityRequest.json()
-    let liquidityData = []
-    if (liquidityJson.success) {
-      liquidityData = liquidityJson.data
+    let liquidityData = {}
+    // TODO: add API endpoints for bsc
+    if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+      const assetsLiquidities = await Promise.all(
+        props.assetsShown.map((asset) => TorqueProvider.Instance.getAvailableLiquidity(asset))
+      )
+      props.assetsShown.forEach((asset, i) => {
+        // @ts-ignore
+        liquidityData[asset.toLowerCase()] = assetsLiquidities[i]
+      })
+    } else {
+      const liquidityRequest = await fetch(`${apiUrl}/liquidity`)
+      const liquidityJson = await liquidityRequest.json()
+      if (liquidityJson.success) {
+        liquidityData = liquidityJson.data
+      }
     }
+    //@ts-ignore
     setLiquidity(liquidityData)
   }
 
-  const assetSelectorItems = assetsShown.map((asset) => {
+  const assetSelectorItems = props.assetsShown.map((asset) => {
     const interestRate =
       interestRates && interestRates![asset.toLowerCase()]
         ? new BigNumber(interestRates![asset.toLowerCase()]['borrowApr']).times(100)

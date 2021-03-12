@@ -37,6 +37,10 @@ enum Asset {
   COMP = 'COMP',
   BPT = 'BPT',
   CRV = 'CRV',
+  WBNB='WBNB',
+  BNB='BNB',
+  BTC='BTC',
+  BUSD='BUSD',
   UNKNOWN = 'UNKNOWN'
 }
 export default Asset

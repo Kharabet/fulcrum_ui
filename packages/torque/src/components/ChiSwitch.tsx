@@ -22,9 +22,9 @@ export const ChiSwitch = (props: IChiSwithProps) => {
     const checked = event.target.checked
     if (checked) {
       const allowance = await TorqueProvider.Instance.getGasTokenAllowance()
-      if (!allowance.gt(0)) {
+      if (!allowance.gt(0) && TorqueProvider.Instance.contractsSource) {
         await TorqueProvider.Instance.setApproval(
-          '0x55eb3dd3f738cfdda986b8eff3fa784477552c61',
+          TorqueProvider.Instance.contractsSource.getTokenHolderAddress(),
           Asset.CHI,
           new BigNumber(10 ** 18)
         )

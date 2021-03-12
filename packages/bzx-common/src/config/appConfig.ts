@@ -31,7 +31,8 @@ const infiniteApproval = new BigNumber(10 * 10 ** 50)
 const vestingDurationAfterCliff = 110376000
 
 export const TRADE_PAIRS: Array<{ baseToken: Asset; quoteToken: Asset }> =
-  (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && [
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+    ? [
     { baseToken: Asset.ETH, quoteToken: Asset.DAI },
     { baseToken: Asset.ETH, quoteToken: Asset.USDC },
     { baseToken: Asset.ETH, quoteToken: Asset.USDT },
@@ -78,8 +79,18 @@ export const TRADE_PAIRS: Array<{ baseToken: Asset; quoteToken: Asset }> =
     { baseToken: Asset.COMP, quoteToken: Asset.USDC },
     { baseToken: Asset.COMP, quoteToken: Asset.USDT },
     { baseToken: Asset.COMP, quoteToken: Asset.BZRX }
-  ]) ||
-  []
+      ]
+    : process.env.REACT_APP_ETH_NETWORK === 'bsc'
+    ? [
+        { baseToken: Asset.BNB, quoteToken: Asset.BUSD },
+        { baseToken: Asset.BNB, quoteToken: Asset.USDT },
+        { baseToken: Asset.ETH, quoteToken: Asset.BUSD },
+        { baseToken: Asset.ETH, quoteToken: Asset.USDT },
+        { baseToken: Asset.BTC, quoteToken: Asset.BUSD },
+        { baseToken: Asset.BTC, quoteToken: Asset.USDT },
+        { baseToken: Asset.BUSD, quoteToken: Asset.USDT },
+      ]
+    : []
 
 export default {
   appNetwork,

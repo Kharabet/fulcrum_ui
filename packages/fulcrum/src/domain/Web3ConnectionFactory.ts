@@ -91,6 +91,9 @@ export class Web3ConnectionFactory {
   public static getRPCUrl(): string {
     let url
     let key
+    if (ethNetwork === 'bsc'){
+      return "https://bsc-dataseed.binance.org/"
+    }
     if (process.env.NODE_ENV !== 'development') {
       if (ethNetwork === 'kovan') {
         key = configProviders.Alchemy_ApiKey_kovan
