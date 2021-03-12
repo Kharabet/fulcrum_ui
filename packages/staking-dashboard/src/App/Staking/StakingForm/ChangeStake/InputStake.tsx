@@ -9,7 +9,7 @@ const icons: { [index: string]: React.ReactNode } = {
   bzrx: <TokenBzrx className="stake-input__token-logo" />,
   vbzrx: <TokenVBzrx className="stake-input__token-logo" />,
   bpt: <TokenBpt className="stake-input__token-logo" />,
-  ibzrx: <TokenBpt className="stake-input__token-logo" />
+  ibzrx: <TokenBpt className="stake-input__token-logo" />,
 }
 
 interface IStakeInputProps {

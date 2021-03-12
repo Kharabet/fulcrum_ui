@@ -37,7 +37,12 @@ export default function Governance({ vm }: { vm: GovernanceVM }) {
         </thead>
         <tbody>
           {proposalsList.map((proposal) => (
-            <GovernanceItem key={proposal.id} proposal={proposal} vm={vm} openProposals={vm.showProposal} />
+            <GovernanceItem
+              key={proposal.id}
+              proposal={proposal}
+              vm={vm}
+              openProposals={vm.showProposal}
+            />
           ))}
         </tbody>
       </table>

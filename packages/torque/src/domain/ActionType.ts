@@ -3,5 +3,5 @@ export enum ActionType {
   ManageCollateral = 'ManageCollateral',
   ExtendLoan = 'ExtendLoan',
   RepayLoan = 'RepayLoan',
-  None = 'None'
+  None = 'None',
 }

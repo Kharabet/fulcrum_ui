@@ -44,8 +44,7 @@
         width: calc(100% / 3);
       }
     }
-      
-      }
+  }
   .trade-token-grid-header {
     font-size: 12px;
     font-weight: 600;
@@ -83,7 +82,7 @@
       font-size: 18px;
       padding: 20px 30px;
     }
-   
+
     @media screen and (max-width: $breakpoint-mobile-max) {
       line-height: 1.45;
       padding: 25px 15px;
@@ -159,7 +158,7 @@
         cursor: not-allowed;
       }
     }
-      }
+  }
 
   .fw-sign {
     font-weight: 400;
@@ -224,6 +223,6 @@
         color: #a2abb8;
         margin-top: 20px;
       }
-       }
     }
+  }
 }

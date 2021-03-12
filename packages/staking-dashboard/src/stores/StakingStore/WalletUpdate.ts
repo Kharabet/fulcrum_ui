@@ -32,7 +32,7 @@ export default class WalletUpdate {
       return {
         token: tokenAmount.token,
         amount: to!.amount.minus(tokenAmount.amount),
-        staked: tokenAmount.staked
+        staked: tokenAmount.staked,
       }
     })
     mobx.makeAutoObservable(this, undefined, { deep: false, autoBind: true })

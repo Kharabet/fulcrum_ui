@@ -1,7 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 export default class PayTradingFeeEvent {
   public static readonly topic0: string =
     '0xb23479169712c443e6b00fb0cec3506a5f5926f541df4243d313e11c8c5c71ed'

@@ -63,7 +63,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       inputAmountText: '',
       maxDepositAmount: new BigNumber(0),
       isLoading: false,
-      buttonValue: 0.5
+      buttonValue: 0.5,
     }
 
     this._selectedValueUpdate = new Subject()
@@ -73,7 +73,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         this.setState({
           ...this.state,
           depositAmount: value.depositAmount,
-          inputAmountText: this.formatPrecision(value.depositAmount)
+          inputAmountText: this.formatPrecision(value.depositAmount),
         })
       })
   }
@@ -91,7 +91,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
                 maxValue: collateralState.maxValue,
                 assetDetails: AssetsDictionary.assets.get(this.props.loan.loanAsset) || null,
                 selectedValue: collateralState.currentValue,
-                extendManagementAddress: extendManagementAddress
+                extendManagementAddress: extendManagementAddress,
               },
               () => {
                 this._selectedValueUpdate.next(this.state.selectedValue)
@@ -116,7 +116,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               {
                 ...this.state,
                 extendManagementAddress: extendManagementAddress,
-                gasAmountNeeded: gasAmountNeeded
+                gasAmountNeeded: gasAmountNeeded,
               },
               () => {
                 this._selectedValueUpdate.next(this.state.selectedValue)
@@ -134,7 +134,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       {
         ...this.state,
         selectedValue: selectedValueNumber,
-        buttonValue: value
+        buttonValue: value,
         ///isLoading: true
       },
       () => {
@@ -165,7 +165,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               {new Date(estimatedDate).toLocaleDateString(undefined, {
                 day: 'numeric',
                 month: 'long',
-                year: 'numeric'
+                year: 'numeric',
               })}
             </div>
           </div>
@@ -195,7 +195,10 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         </section>
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">
-            <button type="submit" className={`btn btn-size--small button-extend`} disabled={this.state.balanceTooLow}>
+            <button
+              type="submit"
+              className={`btn btn-size--small button-extend`}
+              disabled={this.state.balanceTooLow}>
               Front interest
             </button>
           </div>
@@ -218,11 +221,14 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   private checkBalance = async (): Promise<boolean> => {
     const precision = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
 
-    let assetBalance = (await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+    let assetBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.props.loan.loanAsset
-    ))
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.loan.loanAsset === Asset.ETH ||
-    process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.loan.loanAsset === Asset.BNB) {
+    )
+    if (
+      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+        this.props.loan.loanAsset === Asset.ETH) ||
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.loan.loanAsset === Asset.BNB)
+    ) {
       assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTxn)
         ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTxn)
         : new BigNumber(0)
@@ -233,14 +239,14 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     if (assetBalance.lt(amountInBaseUnits)) {
       this.setState({
         ...this.state,
-        balanceTooLow: true
+        balanceTooLow: true,
       })
 
       return false
     } else {
       this.setState({
         ...this.state,
-        balanceTooLow: false
+        balanceTooLow: false,
       })
 
       return true
@@ -270,7 +276,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     await this.checkBalance()
     this.setState({
       ...this.state,
-      inputAmountText
+      inputAmountText,
     })
   }
 

@@ -24,7 +24,7 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
   constructor(props: IHeaderProps) {
     super(props)
     this.state = {
-      isMenuOpen: false
+      isMenuOpen: false,
     }
   }
 

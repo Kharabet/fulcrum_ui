@@ -17,7 +17,7 @@ enum Asset {
   WBTC = 'WBTC',
   WETH = 'WETH',
   ZRX = 'ZRX',
-  UNKNOWN = 'UNKNOWN'
+  UNKNOWN = 'UNKNOWN',
 }
 
 export default Asset

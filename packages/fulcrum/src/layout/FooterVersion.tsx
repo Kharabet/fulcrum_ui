@@ -14,7 +14,9 @@ function FooterVersion() {
         Powered by <a href="//bzx.network">bZx</a>
       </div>
       <div className="footer-menu__item">
-        <button className="impersonate-button" onClick={onImpersonateShowClick}>🕵️</button>
+        <button className="impersonate-button" onClick={onImpersonateShowClick}>
+          🕵️
+        </button>
         {isImpersonateShown && <ImpersonateInput />}
       </div>
     </div>

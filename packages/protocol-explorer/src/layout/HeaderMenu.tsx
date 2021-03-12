@@ -9,7 +9,7 @@ export class HeaderMenu extends Component<IHeaderMenuProps> {
       { title: 'Lend', link: 'https://app.fulcrum.trade/lend' },
 
       { title: 'Borrow', link: 'https://app.torque.loans/borrow' },
-      { title: 'Stake', link: 'https://staking.bzx.network' }
+      { title: 'Stake', link: 'https://staking.bzx.network' },
     ]
     const menuItems = itemsMenu.map((e: IHeaderMenuItemProps, index: number) => (
       <HeaderMenuItem key={index} {...e} />

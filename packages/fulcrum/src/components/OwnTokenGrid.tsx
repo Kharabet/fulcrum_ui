@@ -7,8 +7,8 @@ import { ReactComponent as Placeholder } from '../assets/images/history_placehol
 import '../styles/components/own-token-grid.scss'
 
 export interface IOwnTokenGridProps {
-  isMobileMedia: boolean  
-  isDataLoaded:boolean
+  isMobileMedia: boolean
+  isDataLoaded: boolean
   ownRowsData: IOwnTokenGridRowProps[]
   onStartTrading: () => void
 }

@@ -2,7 +2,7 @@ export enum stakeableToken {
   'bzrx' = 'bzrx',
   'ibzrx' = 'ibzrx',
   'vbzrx' = 'vbzrx',
-  'bpt' = 'bpt'
+  'bpt' = 'bpt',
 }
 
 /**
@@ -13,5 +13,5 @@ export enum stakingWalletToken {
   'ibzrx' = 'ibzrx',
   'vbzrx' = 'vbzrx',
   'bpt' = 'bpt',
-  'crv' = 'crv'
+  'crv' = 'crv',
 }

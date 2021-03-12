@@ -42,7 +42,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       borrowAmount: new BigNumber(0),
       borrowMoreColalterizationMin: new BigNumber(150),
       inputAmountText: '',
-      didSubmit: false
+      didSubmit: false,
     }
 
     this._inputTextChange = new Subject<string>()
@@ -111,16 +111,10 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             <div className="d-flex j-c-sb">
               <div>
                 <div
-                  title={`${loan.collateralizedPercent
-                    .multipliedBy(100)
-                    .plus(100)
-                    .toFixed(18)}%`}
+                  title={`${loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`}
                   className={`borrow-more-loan-form__body-collateralized ${collateralizedStateSelector}`}>
                   <span className="value">
-                    {loan.collateralizedPercent
-                      .multipliedBy(100)
-                      .plus(100)
-                      .toFixed(2)}
+                    {loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}
                   </span>
                   %
                 </div>
@@ -146,7 +140,9 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
           )}
           <div className="input-container mt-30">
             <div className="input-row">
-              <span className="asset-icon"><TokenIcon /></span>
+              <span className="asset-icon">
+                <TokenIcon />
+              </span>
               <input
                 ref={this._setInputRef}
                 className="input-amount"
@@ -224,10 +220,10 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
                   this.props.loanOrderState.collateralAsset,
                 category: 'Borrow More',
                 price: new BigNumber(usdPrice),
-                quantity: 1
-              }
-            ]
-          }
+                quantity: 1,
+              },
+            ],
+          },
         }
         TagManager.dataLayer(tagManagerArgs)
       }
@@ -252,7 +248,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       {
         ...this.state,
         inputAmountText: amountText,
-        borrowAmount: new BigNumber(amountText)
+        borrowAmount: new BigNumber(amountText),
       },
       () => {
         // emitting next event for processing with rx.js
@@ -278,7 +274,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       .div(100)
     this.setState({
       ...this.state,
-      borrowMoreLoanOrderState
+      borrowMoreLoanOrderState,
     })
   }
 }

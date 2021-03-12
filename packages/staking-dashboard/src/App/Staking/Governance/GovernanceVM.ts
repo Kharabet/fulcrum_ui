@@ -12,7 +12,7 @@ export default class GovernanceVM {
   public proposalPopup = new DialogVM()
 
   public showProposal = (id: number) => {
-    this.activeProposal = this.governanceStore.proposalsList.find(proposal => proposal.id === id)
+    this.activeProposal = this.governanceStore.proposalsList.find((proposal) => proposal.id === id)
     this.activeProposal && this.proposalPopup.show()
   }
 

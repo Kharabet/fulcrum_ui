@@ -1,4 +1,3 @@
-
 import {
   CloseWithSwapEvent,
   DepositCollateralEvent,
@@ -8,7 +7,7 @@ import {
   PayTradingFeeEvent,
   RolloverEvent,
   TradeEvent,
-  WithdrawCollateralEvent
+  WithdrawCollateralEvent,
 } from 'bzx-common/src/domain/events'
 
 export interface IHistoryEvents {
@@ -20,6 +19,6 @@ export interface IHistoryEvents {
     | WithdrawCollateralEvent
     | DepositCollateralEvent
   >
-  earnRewardEvents: Array<(EarnRewardEvent|EarnRewardEventNew)>
+  earnRewardEvents: Array<EarnRewardEvent | EarnRewardEventNew>
   payTradingFeeEvents: PayTradingFeeEvent[]
 }

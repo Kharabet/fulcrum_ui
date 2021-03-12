@@ -34,8 +34,8 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       const tagManagerArgs = {
         dataLayer: {
           event: 'select-provider',
-          providerName: props.providerType
-        }
+          providerName: props.providerType,
+        },
       }
       TagManager.dataLayer(tagManagerArgs)
     }
@@ -53,7 +53,9 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       ? ExplorerProvider.Instance.web3ProviderSettings.etherscanURL
       : ''
     const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
-    if (!ProviderLogoIcon) {return null}
+    if (!ProviderLogoIcon) {
+      return null
+    }
     return (
       <li
         className={`provider-menu__list-item provider-menu__list-item--selected`}
@@ -80,16 +82,20 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       </li>
     )
   }
-  
+
   const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
-  if (!ProviderLogoIcon) {return null}
+  if (!ProviderLogoIcon) {
+    return null
+  }
   return (
     <li className={`provider-menu__list-item `} onClick={onClick}>
       <div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>
       <div className="provider-menu__list-item-content-img">
         {props.isActivating ? (
           <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
-        ) : <ProviderLogoIcon />}
+        ) : (
+          <ProviderLogoIcon />
+        )}
       </div>
     </li>
   )

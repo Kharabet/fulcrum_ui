@@ -144,7 +144,7 @@
       overflow: hidden;
       display: flex;
       align-items: center;
-      justify-content: space-between;     
+      justify-content: space-between;
     }
     &__amount,
     &__collateral {
@@ -186,7 +186,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-   
+
     .rotate-icon {
       transform: rotate(180deg);
     }

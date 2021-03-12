@@ -21,7 +21,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
     this.state = {
       numberPagination: 0,
       quantityGrids: 0,
-      isLastRow: false
+      isLastRow: false,
     }
   }
 
@@ -81,7 +81,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
       this.setState({
         ...this.state,
         numberPagination: this.state.numberPagination + 1,
-        isLastRow: isLastRow
+        isLastRow: isLastRow,
       })
     }
   }
@@ -91,7 +91,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
       this.setState({
         ...this.state,
         numberPagination: this.state.numberPagination - 1,
-        isLastRow: false
+        isLastRow: false,
       })
     }
   }

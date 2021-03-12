@@ -10,7 +10,7 @@ export default class ObservableViewport {
   public static getViewPortSize() {
     return {
       width: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
-      height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
     }
   }
 
@@ -27,10 +27,10 @@ export default class ObservableViewport {
   constructor() {
     // Track viewport dimensions
     this.throttledUpdateViewportSize = _.throttle(this.updateViewportSize.bind(this), 150, {
-      leading: false
+      leading: false,
     })
     window.addEventListener('resize', this.throttledUpdateViewportSize, {
-      passive: true
+      passive: true,
     })
     mobx.makeAutoObservable(this, undefined, { autoBind: true, deep: false })
   }

@@ -4,7 +4,7 @@ import {
   IChartingLibraryWidget,
   LanguageCode,
   StudyOverrides,
-  widget
+  widget,
 } from '../charting_library/charting_library.min'
 import { PreloaderChart } from './PreloaderChart'
 
@@ -56,7 +56,7 @@ export class TVChartContainer extends React.PureComponent<
     super(props, context)
     this.state = {
       preset: this.props.preset,
-      ready: true
+      ready: true,
     }
     const that = this
     // this.baseSymbol = "DAI";
@@ -84,7 +84,7 @@ export class TVChartContainer extends React.PureComponent<
       'header_screenshot',
       'use_localstorage_for_settings',
       'header_fullscreen_button',
-      'go_to_date'
+      'go_to_date',
       // 'timeframes_toolbar'
     ],
     libraryPath: '/charting_library/',
@@ -101,10 +101,10 @@ export class TVChartContainer extends React.PureComponent<
     overrides:
       localStorage.theme === 'dark'
         ? {
-            'paneProperties.background': '#283038'
+            'paneProperties.background': '#283038',
           }
         : {},
-    custom_css_url: '/charting_library/custom_css.css'
+    custom_css_url: '/charting_library/custom_css.css',
   }
 
   private tvWidget: IChartingLibraryWidget | null = null
@@ -133,7 +133,7 @@ export class TVChartContainer extends React.PureComponent<
       overrides:
         localStorage.theme === 'dark'
           ? {
-              'paneProperties.background': '#283038'
+              'paneProperties.background': '#283038',
             }
           : {},
       time_frames: [
@@ -141,15 +141,15 @@ export class TVChartContainer extends React.PureComponent<
         { text: '1w', resolution: '60', description: '1 Week' },
         { text: '1m', resolution: '360', description: '1 Month' },
         { text: '1y', resolution: '720', description: '1 Year' },
-        { text: '3y', resolution: '720', description: '3 Years' }
+        { text: '3y', resolution: '720', description: '3 Years' },
       ],
 
-      custom_css_url: this.props.custom_css_url
+      custom_css_url: this.props.custom_css_url,
     }
   }
   public componentDidMount(): void {
     this.observer.observe(document.documentElement, {
-      attributes: true // configure it to listen to attribute changes
+      attributes: true, // configure it to listen to attribute changes
     })
     const widgetOptions: ChartingLibraryWidgetOptions = this.GetWidgetOptions()
     const tvWidget = new widget(widgetOptions)

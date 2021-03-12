@@ -73,7 +73,9 @@ function ExpectedResult(props: IExpectedResultProps) {
           </div>
           <div title={`${liquidationPrice.toFixed(18)}`} className="expected-result__column-value">
             <div>
-              {isLiquidationPriceLoaded && !props.liquidationPrice.isNaN() && props.liquidationPrice.isFinite() ? (
+              {isLiquidationPriceLoaded &&
+              !props.liquidationPrice.isNaN() &&
+              props.liquidationPrice.isFinite() ? (
                 <span className={`value ${props.loanStatus}`}>
                   {formatPrecision(liquidationPrice)}
                 </span>
@@ -86,9 +88,7 @@ function ExpectedResult(props: IExpectedResultProps) {
       </div>
       <div className="expected-result__column">
         <div className="expected-result__column-row">
-          <div className="expected-result__column-title">
-            Gas Fees         
-          </div>
+          <div className="expected-result__column-title">Gas Fees</div>
           <div
             title={`${props.estimatedFee.toFixed(18)}`}
             className="expected-result__column-value">

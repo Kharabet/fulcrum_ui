@@ -12,7 +12,7 @@ function escapeString(str: string) {
  * @param strings eg: ['example.com', 'anotherdomain.com']
  * @returns A regular expression like /example\.com|anotherdomain\.com/mi
  */
-function regexFromStrings (strings: string[]) {
+function regexFromStrings(strings: string[]) {
   return new RegExp(strings.map(escapeString).join('|'), 'mi')
 }
 
@@ -21,9 +21,9 @@ function regexFromStrings (strings: string[]) {
  * Takes into account special characters and is case insensitive.
  * @param strings List of words
  */
-function getWordListCheck (strings: string[]) {
+function getWordListCheck(strings: string[]) {
   const regex = regexFromStrings(strings)
-  return function checkWord (word: string) {
+  return function checkWord(word: string) {
     return regex.test(word)
   }
 }

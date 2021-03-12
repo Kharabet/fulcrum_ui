@@ -32,7 +32,7 @@ export class RefinanceAssetSelector extends Component<
       isLoading: true,
       isItems: true,
       refinanceCompoundData: [],
-      refinanceData: []
+      refinanceData: [],
     }
     this._isMounted = false
     TorqueProvider.Instance.eventEmitter.on(
@@ -70,7 +70,7 @@ export class RefinanceAssetSelector extends Component<
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isLoading: true
+        isLoading: true,
       })
     if (
       TorqueProvider.Instance.providerType === ProviderType.None ||
@@ -82,7 +82,7 @@ export class RefinanceAssetSelector extends Component<
         this.setState({
           refinanceCompoundData: [],
           refinanceData: [],
-          isLoading: false
+          isLoading: false,
         })
       return
     }
@@ -94,7 +94,7 @@ export class RefinanceAssetSelector extends Component<
         isLoading: false,
         isItems: refinanceData.length > 0 || refinanceCompoundData.length > 0,
         refinanceData,
-        refinanceCompoundData
+        refinanceCompoundData,
       })
   }
 

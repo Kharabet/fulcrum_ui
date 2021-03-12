@@ -22,7 +22,7 @@ $width-col-fee-reward-desktop: 15%;
     padding: 0 15px;
     margin-top: -36px;
   }
- 
+
   .collapse {
     &.show {
       display: block;
@@ -80,7 +80,7 @@ $width-col-fee-reward-desktop: 15%;
       &-position-value {
         width: $width-col-position-value;
         align-items: center;
-        svg{
+        svg {
           width: 20px;
           height: 20px;
         }
@@ -94,7 +94,7 @@ $width-col-fee-reward-desktop: 15%;
       &-profit {
         width: $width-col-profit;
         align-items: center;
-        svg{
+        svg {
           width: 20px;
           height: 20px;
         }
@@ -102,7 +102,7 @@ $width-col-fee-reward-desktop: 15%;
       &-position {
         width: $width-col-position;
         align-items: center;
-        svg{
+        svg {
           width: 20px;
           height: 20px;
         }
@@ -113,7 +113,7 @@ $width-col-fee-reward-desktop: 15%;
       &-asset-price {
         width: $width-col-asset-price;
         align-items: center;
-        svg{
+        svg {
           width: 20px;
           height: 20px;
         }
@@ -124,7 +124,7 @@ $width-col-fee-reward-desktop: 15%;
       &-fee-reward {
         width: $width-col-fee-reward;
         align-items: center;
-        svg{
+        svg {
           width: 20px;
           height: 20px;
         }
@@ -212,7 +212,6 @@ $width-col-fee-reward-desktop: 15%;
       }
       &-fee-reward {
         @media (min-width: $breakpoint-mobile-min) {
-          
         }
       }
       &-profit {

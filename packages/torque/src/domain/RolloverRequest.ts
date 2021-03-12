@@ -1,4 +1,3 @@
-
 export class RolloverRequest {
   public id: number
   public loanId: string

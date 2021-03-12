@@ -1,6 +1,6 @@
 import React from 'react'
 import { FooterMenu } from './FooterMenu'
-import  FooterVersion  from './FooterVersion'
+import FooterVersion from './FooterVersion'
 
 interface IFooterProps {
   isRiskDisclosureModalOpen: () => void

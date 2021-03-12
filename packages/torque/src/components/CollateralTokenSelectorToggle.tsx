@@ -31,7 +31,7 @@ export class CollateralTokenSelectorToggle extends Component<
 
     this.state = {
       assetDetails: null,
-      activeToggle: false
+      activeToggle: false,
     }
   }
 

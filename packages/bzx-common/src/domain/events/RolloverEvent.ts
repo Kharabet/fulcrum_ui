@@ -1,7 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 export default class RolloverEvent {
   public static readonly topic0: string =
     '0x21e656d09cbbafac02fd00fc98d308d0df53e46fa0a7b4358eca09302afc2e58'
@@ -14,7 +13,7 @@ export default class RolloverEvent {
   public readonly collateralAmountUsed: BigNumber
   public readonly interestAmountAdded: BigNumber
   public readonly loanEndTimestamp: Date
-  public readonly gasRebate: BigNumber 
+  public readonly gasRebate: BigNumber
   public readonly blockNumber: BigNumber
   public readonly txHash: string
 

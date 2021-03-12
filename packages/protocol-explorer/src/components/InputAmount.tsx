@@ -24,13 +24,15 @@ export function InputAmount(props: IInputAmountProps) {
     <React.Fragment>
       <div className="input-container">
         <div className="input-row">
-          <span className="asset-icon"><props.asset /></span>
+          <span className="asset-icon">
+            <props.asset />
+          </span>
           <input
             ref={_setInputRef}
             className="input-amount"
             type="number"
             step="any"
-            placeholder={props.children||'Enter amount'}
+            placeholder={props.children || 'Enter amount'}
             value={props.inputAmountText}
             onChange={props.onAmountChange}
           />

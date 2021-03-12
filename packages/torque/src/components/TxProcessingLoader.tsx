@@ -26,7 +26,7 @@ export class TxProcessingLoader extends Component<
     this.state = {
       requestTask: TasksQueue.Instance.getTasksList().find(
         (t) => t.request.id === this.props.taskId
-      )
+      ),
     }
 
     TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged)
@@ -106,7 +106,7 @@ export class TxProcessingLoader extends Component<
     const tasks = TasksQueue.Instance.getTasksList().find((t) => t.request.id === this.props.taskId)
     this.setState({
       ...this.state,
-      requestTask: tasks
+      requestTask: tasks,
     })
   }
 }

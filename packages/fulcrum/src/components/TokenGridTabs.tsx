@@ -89,13 +89,15 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               {TokenGridTab.Chart}
             </div>
             <OpenPositionsButton {...this.props} />
-            {process.env.REACT_APP_ETH_NETWORK !== 'bsc' && <div
-              className={`tab ${
-                this.props.activeTokenGridTab === TokenGridTab.History ? `active` : ``
-              }`}
-              onClick={this.showTradeHistory}>
-              {TokenGridTab.History}
-            </div>}
+            {process.env.REACT_APP_ETH_NETWORK !== 'bsc' && (
+              <div
+                className={`tab ${
+                  this.props.activeTokenGridTab === TokenGridTab.History ? `active` : ``
+                }`}
+                onClick={this.showTradeHistory}>
+                {TokenGridTab.History}
+              </div>
+            )}
             <div
               className={`tab ${
                 this.props.activeTokenGridTab === TokenGridTab.Stats ? `active` : ``
@@ -148,11 +150,11 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
         if (baseToken === Asset.DAI) {
           dropDownSelectOptions.push({
             baseToken: baseToken,
-            quoteToken: Asset.USDC
+            quoteToken: Asset.USDC,
           })
           dropDownSelectOptions.push({
             baseToken: baseToken,
-            quoteToken: Asset.USDT
+            quoteToken: Asset.USDT,
           })
           return
         }
@@ -162,13 +164,13 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
             stablecoin !== Asset.WBTC &&
             dropDownSelectOptions.push({
               baseToken: baseToken,
-              quoteToken: stablecoin
+              quoteToken: stablecoin,
             })
         )
         if (baseToken === Asset.ETH) {
           dropDownSelectOptions.push({
             baseToken: baseToken,
-            quoteToken: Asset.WBTC
+            quoteToken: Asset.WBTC,
           })
         }
       })
@@ -183,7 +185,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     return {
       options: dropDownSelectOptions,
       selectedOption: activeDropDownOption || dropDownSelectOptions[0],
-      onDropdownSelect: this.onDropdownSelect.bind(this)
+      onDropdownSelect: this.onDropdownSelect.bind(this),
     }
   }
 

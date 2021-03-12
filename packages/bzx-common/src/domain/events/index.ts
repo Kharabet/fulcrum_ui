@@ -25,5 +25,5 @@ export {
   EarnRewardEventNew,
   PayTradingFeeEvent,
   WithdrawCollateralEvent,
-  DepositCollateralEvent
+  DepositCollateralEvent,
 }

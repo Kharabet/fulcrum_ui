@@ -14,5 +14,5 @@ export const tokenIcons: { [index: string]: React.ReactNode } = {
   vbzrx: <TokenVBzrx className="token-logo" />,
   bpt: <TokenBpt className="token-logo" />,
   ibzrx: <TokenIBzrx className="token-logo" />,
-  crv: <TokenCrv className="token-logo" />
+  crv: <TokenCrv className="token-logo" />,
 }

@@ -6,12 +6,12 @@ interface IFooterProps {
   isRiskDisclosureModalOpen: () => void
 }
 
-function Footer( props:IFooterProps) {
-    return (
-      <footer className="footer">
-        <FooterVersion />
-        <FooterMenu {...props} />
-      </footer>
-    )
+function Footer(props: IFooterProps) {
+  return (
+    <footer className="footer">
+      <FooterVersion />
+      <FooterMenu {...props} />
+    </footer>
+  )
 }
 export default React.memo(Footer)

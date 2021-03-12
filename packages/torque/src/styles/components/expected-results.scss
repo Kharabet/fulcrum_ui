@@ -16,7 +16,7 @@
     flex-direction: column;
     width: calc(50%);
     padding: 0 10px;
-   
+
     &-row {
       & + .expected-result__column-row {
         margin-top: 18px;
@@ -54,7 +54,7 @@
       color: #1cd8c4;
     }
   }
-  .liquidation-price{
+  .liquidation-price {
     display: flex;
     justify-content: space-between;
     padding: 0;

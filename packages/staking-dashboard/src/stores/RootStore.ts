@@ -23,7 +23,7 @@ export default class RootStore {
     if (error) {
       return {
         error,
-        stackMessages: errorUtils.getErrorStackMessages(error)
+        stackMessages: errorUtils.getErrorStackMessages(error),
       }
     }
 
@@ -31,7 +31,7 @@ export default class RootStore {
     if (governanceError) {
       return {
         error: governanceError,
-        stackMessages: errorUtils.getErrorStackMessages(governanceError)
+        stackMessages: errorUtils.getErrorStackMessages(governanceError),
       }
     }
     return null

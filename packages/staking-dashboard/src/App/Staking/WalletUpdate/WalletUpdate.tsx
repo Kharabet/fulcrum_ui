@@ -13,7 +13,7 @@ export function WalletUpdate({ appVM }: { appVM: AppVM }) {
 
   const lines = Math.ceil(walletUpdate.from.length / 2)
   const styles = {
-    height: `${lines * 40 + 84}px`
+    height: `${lines * 40 + 84}px`,
   }
 
   const cssClass = `st-side-dialog--${walletUpdatePopup.state} padded-1`

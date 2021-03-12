@@ -42,7 +42,7 @@ export class LendChaiProcessor {
       'Waiting for token allowance',
       'Submitting loan',
       'Updating the blockchain',
-      'Transaction completed'
+      'Transaction completed',
     ])
 
     // init erc20 contract for base token
@@ -61,10 +61,9 @@ export class LendChaiProcessor {
 
     // Detecting token allowance
     let approvePromise: Promise<string> | null = null
-    const erc20allowance = await tokenErc20Contract.allowance(
-      account,
-      tokenContract.address
-    ).callAsync()
+    const erc20allowance = await tokenErc20Contract
+      .allowance(account, tokenContract.address)
+      .callAsync()
     task.processingStepNext()
 
     let txHash: string = ''
@@ -90,14 +89,12 @@ export class LendChaiProcessor {
         gasAmountBN = new BigNumber(600000)
       } else {
         // estimating gas amount
-        const gasAmount = await tokenContract.mintWithChai(
-          account,
-          amountInBaseUnits
-          ).estimateGasAsync({
+        const gasAmount = await tokenContract
+          .mintWithChai(account, amountInBaseUnits)
+          .estimateGasAsync({
             from: account,
-            gas: FulcrumProvider.Instance.gasLimit
-          }
-        )
+            gas: FulcrumProvider.Instance.gasLimit,
+          })
         gasAmountBN = new BigNumber(gasAmount)
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
           .integerValue(BigNumber.ROUND_UP)
@@ -107,7 +104,7 @@ export class LendChaiProcessor {
       txHash = await tokenContract.mintWithChai(account, amountInBaseUnits).sendTransactionAsync({
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice()
+        gasPrice: await FulcrumProvider.Instance.gasPrice(),
       })
       task.setTxHash(txHash)
 

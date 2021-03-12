@@ -27,11 +27,9 @@ const InnerOwnTokenGridHeader = (props: IInnerOwnTokenGridHeaderProps) => {
         className={`inner-own-token-grid-header__col-token-image ${
           props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`
         }`}>
-        <span className="inner-own-token-grid-header__text">
-         
-        </span>
+        <span className="inner-own-token-grid-header__text"></span>
       </div>
-  
+
       <div
         className={`inner-own-token-grid-header__col-asset-price ${
           props.isLoadingTransaction && props.loader ? `opacity` : `opacityIn`

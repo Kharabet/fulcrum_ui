@@ -36,7 +36,7 @@ export default class StakingFormVM {
       bzrx: new BigNumber(this.bzrxInput),
       vbzrx: new BigNumber(this.vbzrxInput),
       ibzrx: new BigNumber(this.ibzrxInput),
-      bpt: new BigNumber(this.bptInput)
+      bpt: new BigNumber(this.bptInput),
     }
   }
 
@@ -207,7 +207,7 @@ export default class StakingFormVM {
           vbzrxInput: tokens.vbzrx.toFixed(2, 1),
           bptInput: tokens.bpt.toFixed(2, 1),
           ibzrxInput: tokens.ibzrx.toFixed(2, 1),
-          unstakeSelected
+          unstakeSelected,
         }
       },
       (update) => {

@@ -43,5 +43,5 @@ function isValidRepAddress(address: string) {
 
 export default {
   verifyStake,
-  isValidRepAddress
+  isValidRepAddress,
 }

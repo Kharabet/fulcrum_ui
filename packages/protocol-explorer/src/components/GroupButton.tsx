@@ -7,7 +7,7 @@ export const GroupButton = (props: IGroupButtonProps) => {
   const onClick = (event: any) => {
     const buttons = document.querySelectorAll('.button-period')
     const gridButtonItems = [].slice.call(buttons)
-    gridButtonItems.forEach(function(item: any, i: any) {
+    gridButtonItems.forEach(function (item: any, i: any) {
       if (item.classList.contains('active')) {
         item.classList.remove('active')
       }

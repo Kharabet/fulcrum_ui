@@ -2,7 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react'
 import {
   IGovernanceProposalHistoryItem,
-  GovernanceProposalStates
+  GovernanceProposalStates,
 } from 'src/domain/GovernanceProposal'
 import ExternalLink from 'shared-components/ExternalLink'
 
@@ -34,7 +34,7 @@ export function ProposalHistoryItem(props: IProviderMenuListItemProps) {
           month: 'short',
           year: 'numeric',
           hour: '2-digit',
-          minute: 'numeric'
+          minute: 'numeric',
         })}
       </td>
     </tr>

@@ -5,7 +5,7 @@ import {
   CompoundGovernorAlphaProposalCanceledEventArgs,
   CompoundGovernorAlphaProposalCreatedEventArgs,
   CompoundGovernorAlphaProposalExecutedEventArgs,
-  CompoundGovernorAlphaProposalQueuedEventArgs
+  CompoundGovernorAlphaProposalQueuedEventArgs,
 } from 'bzx-common/src/contracts/typescript-wrappers/CompoundGovernorAlpha'
 export enum GovernanceProposalStates {
   Pending,
@@ -15,7 +15,7 @@ export enum GovernanceProposalStates {
   Succeeded,
   Queued,
   Expired,
-  Executed
+  Executed,
 }
 
 export interface IGovernanceProposalHistoryItem {

@@ -28,7 +28,7 @@ const ParamRow = (props: IParamRowProps) => {
           <span className="table-row-param__from-address">{getShortHash(props.loanId, 24)}</span>
           <CopyToClipboard>{props.loanId}</CopyToClipboard>
         </div>
-        <div className="table-row-param__value">{props.initialMargin.toFixed()}%</div>     
+        <div className="table-row-param__value">{props.initialMargin.toFixed()}%</div>
         <div className="table-row-param__value">{props.maintenanceMargin.toFixed()}%</div>
         <div className="table-row-param__value">{props.liquidationPenalty.toFixed()}%</div>
       </div>

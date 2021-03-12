@@ -6,7 +6,7 @@ import AppVM from '../AppVM'
 import OnChainIndicator from './OnChainIndicator'
 
 const styles = {
-  links: { width: '110px' }
+  links: { width: '110px' },
 }
 
 export function MobileMenu({ appVM }: { appVM: AppVM }) {

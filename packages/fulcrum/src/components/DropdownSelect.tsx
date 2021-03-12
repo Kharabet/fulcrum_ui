@@ -45,7 +45,8 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     const search = document.querySelector('.select-options__search') as HTMLElement
     const inputSelect = document.querySelector('.select-options__input') as HTMLElement
     const target = e.target as HTMLElement
-    if (!selectStyled || !ul || target == selectStyled || target == search || target == inputSelect) return
+    if (!selectStyled || !ul || target == selectStyled || target == search || target == inputSelect)
+      return
     selectStyled.classList.remove('active')
 
     ul.style.display = 'none'
@@ -119,11 +120,12 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
 
         <SimpleBar style={{ maxHeight: 480 }} autoHide={false}>
           {options.map((option, i) => {
-            const TokenIcon = AssetsDictionary.assets.get(option.baseToken)!.reactLogoSvg as React.FunctionComponent<
-            React.SVGProps<SVGSVGElement> & {
-              title?: string | undefined
-            }
-          >
+            const TokenIcon = AssetsDictionary.assets.get(option.baseToken)!
+              .reactLogoSvg as React.FunctionComponent<
+              React.SVGProps<SVGSVGElement> & {
+                title?: string | undefined
+              }
+            >
             return (
               <li
                 data-basetoken={option.baseToken}

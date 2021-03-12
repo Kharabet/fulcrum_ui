@@ -98,7 +98,7 @@ export default class ManageCollateralForm extends Component<
       didSubmit: false,
       isLoading: true,
       liquidationPrice: new BigNumber(0),
-      activeTokenLiquidation: this.props.loan.collateralAsset
+      activeTokenLiquidation: this.props.loan.collateralAsset,
     }
 
     this._inputChange = new Subject()
@@ -131,7 +131,7 @@ export default class ManageCollateralForm extends Component<
           collateralTooLow: next!.collateralizedPercent.lt(
             this.props.loan!.loanData!.maintenanceMargin.div(10 ** 18).plus(10) || 25
           ),
-          inputAmountText: this.formatPrecision(next!.collateralAmount.toString(), true)
+          inputAmountText: this.formatPrecision(next!.collateralAmount.toString(), true),
         })
       })
   }
@@ -146,7 +146,7 @@ export default class ManageCollateralForm extends Component<
         ...this.state,
         minValue: collateralState.minValue,
         maxValue: collateralState.maxValue,
-        assetDetails: AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null
+        assetDetails: AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null,
       })
 
       FulcrumProvider.Instance.getManageCollateralGasAmount().then((gasAmountNeeded) => {
@@ -246,7 +246,7 @@ export default class ManageCollateralForm extends Component<
                     collateralizedPercent: collateralizedPercent,
                     collateralExcess: collateralExcess,
                     assetBalanceValue: assetBalance.div(10 ** 18),
-                    ethBalanceValue: ethBalance
+                    ethBalanceValue: ethBalance,
                   },
                   () => {
                     if (this.props.isOpenModal) {
@@ -294,8 +294,7 @@ export default class ManageCollateralForm extends Component<
           ? this.props.loan.loanData!.collateral.minus(currentCollateralAmount)
           : this.props.loan.loanData!.collateral.plus(currentCollateralAmount)
 
-      const liquidationCollateralToLoanRate = this
-      .props.loan
+      const liquidationCollateralToLoanRate = this.props.loan
         .loanData!.maintenanceMargin.times(
           this.props.loan.loanData!.principal.times(loanAssetPrecision)
         )
@@ -322,9 +321,9 @@ export default class ManageCollateralForm extends Component<
       this.state.ethBalanceValue && this.state.ethBalanceValue.lte(this.state.gasAmountNeeded)
         ? 'Insufficient funds for gas'
         : this.state.balanceTooLow
-        ? 'Your wallet is empty':
-        this.state.assetBalanceValue.lt(this.state.inputAmountText)?
-        `Insufficient ${this.props.loan.collateralAsset} balance in your wallet!`
+        ? 'Your wallet is empty'
+        : this.state.assetBalanceValue.lt(this.state.inputAmountText)
+        ? `Insufficient ${this.props.loan.collateralAsset} balance in your wallet!`
         : ''
     const liquidationPrice =
       this.state.activeTokenLiquidation === this.props.loan.collateralAsset
@@ -422,7 +421,7 @@ export default class ManageCollateralForm extends Component<
       ...this.state,
       selectedValue: value,
       buttonValue: 0,
-      isLoading: true
+      isLoading: true,
     })
   }
 
@@ -448,7 +447,7 @@ export default class ManageCollateralForm extends Component<
         ...this.state,
         selectedValue: selectedValue.toNumber(),
         buttonValue: value,
-        isLoading: true
+        isLoading: true,
       },
       () => {
         // emitting next event for processing with rx.js
@@ -490,20 +489,20 @@ export default class ManageCollateralForm extends Component<
           this.setState({
             ...this.state,
             balanceTooLow: true,
-            didSubmit: false
+            didSubmit: false,
           })
 
           return
         } else {
           this.setState({
             ...this.state,
-            balanceTooLow: false
+            balanceTooLow: false,
           })
         }
       } else {
         this.setState({
           ...this.state,
-          balanceTooLow: false
+          balanceTooLow: false,
         })
       }
 

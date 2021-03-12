@@ -25,7 +25,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     super(props)
     this.state = {
       tvl: [],
-      labels: []
+      labels: [],
     }
   }
 
@@ -43,7 +43,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     let tvl: any = []
 
     if (responseJson.success) {
-      responseJson.data.forEach(function(item: any) {
+      responseJson.data.forEach(function (item: any) {
         labels.push(new Date(item['timestamp'] * 1000).getDate())
         tvl.push(+item['tvl'])
       })
@@ -91,9 +91,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
             pointBackgroundColor: '#003CDA',
             pointBorderColor: '#ffffff',
             pointRadius: radius,
-            pointBorderRadius: 1
-          }
-        ]
+            pointBorderRadius: 1,
+          },
+        ],
       }
     }
     const canvas = document.createElement('canvas')
@@ -106,35 +106,35 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
           {
             display: false,
             gridLines: {
-              display: false
-            }
-          }
+              display: false,
+            },
+          },
         ],
         yAxes: [
           {
             ticks: {
               drawTicks: false,
               max: Math.max(...this.state.tvl) + deviation,
-              min: Math.min(...this.state.tvl) - deviation
+              min: Math.min(...this.state.tvl) - deviation,
             },
-            display: false
-          }
-        ]
+            display: false,
+          },
+        ],
       },
       legend: {
-        display: false
+        display: false,
       },
       elements: {
         point: {
-          radius: 0
+          radius: 0,
         },
         line: {
-          cubicInterpolationMode: 'monotone'
-        }
+          cubicInterpolationMode: 'monotone',
+        },
       },
       tooltips: {
-        enabled: false
-      }
+        enabled: false,
+      },
     }
     const TokenIcon = asset.reactLogoSvg
     return (

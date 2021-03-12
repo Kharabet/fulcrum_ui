@@ -25,7 +25,7 @@
       text-transform: capitalize;
       cursor: pointer;
       border-bottom: 3px solid transparent;
-    
+
       padding: 10px 20px;
       &:hover {
         color: #5b88ff;
@@ -33,12 +33,12 @@
       @media screen and (min-width: $breakpoint-mobile-min) {
         padding: 10px 20px;
       }
-     
+
       &.active {
         position: relative;
         color: var(--primary-text);
-          border-bottom-color: #276bfb;
-          border-radius: 2px;
+        border-bottom-color: #276bfb;
+        border-radius: 2px;
         // &:after {
         //   content: '';
         //   height: 8px;
@@ -82,7 +82,6 @@
     &__items {
       justify-content: left;
       margin-top: -10px;
-      
     }
     &__container {
       margin-bottom: 10px;

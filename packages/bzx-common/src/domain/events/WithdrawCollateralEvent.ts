@@ -1,7 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 export default class WithdrawCollateralEvent {
   public static readonly topic0: string =
     '0x7b1bab051266a4a36232da9b4341daf225fa42f7202b0e7207b9b502644ff1bb'

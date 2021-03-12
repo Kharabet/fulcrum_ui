@@ -5,5 +5,5 @@ export enum FulcrumProviderEvents {
   LendTransactionMined = 'LendTransactionMined',
   TradeTransactionMined = 'TradeTransactionMined',
   AskToOpenProgressDlg = 'AskToOpenProgressDlg',
-  AskToCloseProgressDlg = 'AskToCloseProgressDlg'
+  AskToCloseProgressDlg = 'AskToCloseProgressDlg',
 }

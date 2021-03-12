@@ -21,7 +21,7 @@ export class RolloversGrid extends Component<IRolloversGridProps, IRolloversGrid
     this.state = {
       numberPagination: 0,
       quantityGrids: 0,
-      isLastRow: false
+      isLastRow: false,
     }
   }
 
@@ -47,7 +47,7 @@ export class RolloversGrid extends Component<IRolloversGridProps, IRolloversGrid
           <div className="table-header table-header-loan">
             <div className="table-header-loan__id">Loan ID</div>
             <div className="table-header-loan__amount" />
-            <div className="table-header-loan__collateral">Rollover Rebate to Recive</div> 
+            <div className="table-header-loan__collateral">Rollover Rebate to Recive</div>
             <div className="table-header-loan__action">Action</div>
           </div>
           {assetItems}
@@ -81,7 +81,7 @@ export class RolloversGrid extends Component<IRolloversGridProps, IRolloversGrid
       this.setState({
         ...this.state,
         numberPagination: this.state.numberPagination + 1,
-        isLastRow: isLastRow
+        isLastRow: isLastRow,
       })
     }
   }
@@ -91,7 +91,7 @@ export class RolloversGrid extends Component<IRolloversGridProps, IRolloversGrid
       this.setState({
         ...this.state,
         numberPagination: this.state.numberPagination - 1,
-        isLastRow: false
+        isLastRow: false,
       })
     }
   }

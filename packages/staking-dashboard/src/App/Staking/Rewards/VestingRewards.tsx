@@ -31,7 +31,10 @@ export function VestingRewards({ vm }: { vm: RewardsVM }) {
           <p>
             <b>When you stake vesting BZRX</b> (vBZRX), your staking rewards are unlocked on the
             same schedule as the vesting. Learn more{' '}
-            <ExternalLink href="https://bzx.network/blog/staking-bzrx" targetBlank={true}>here</ExternalLink>.
+            <ExternalLink href="https://bzx.network/blog/staking-bzrx" targetBlank={true}>
+              here
+            </ExternalLink>
+            .
           </p>
         </div>
       </div>

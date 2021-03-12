@@ -24,7 +24,7 @@ export class TxGrid extends Component<ITxGridProps, ITxGridState> {
       typeSort: 'up',
       numberPagination: 0,
       quantityGrids: 0,
-      isLastRow: false
+      isLastRow: false,
     }
     this.quantityVisibleRow = props.quantityTx
   }
@@ -107,7 +107,7 @@ export class TxGrid extends Component<ITxGridProps, ITxGridState> {
       this.setState({
         ...this.state,
         numberPagination: this.state.numberPagination + 1,
-        isLastRow: isLastRow
+        isLastRow: isLastRow,
       })
     }
   }
@@ -117,7 +117,7 @@ export class TxGrid extends Component<ITxGridProps, ITxGridState> {
       this.setState({
         ...this.state,
         numberPagination: this.state.numberPagination - 1,
-        isLastRow: false
+        isLastRow: false,
       })
     }
   }

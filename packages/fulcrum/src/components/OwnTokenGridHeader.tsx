@@ -1,6 +1,6 @@
 import React from 'react'
 const OwnTokenGridHeader = () => {
- return (
+  return (
     <div className="own-token-grid-header">
       <div className="own-token-grid-header__col-token-name">
         <span className="own-token-grid-header__text">Pair</span>
@@ -14,7 +14,7 @@ const OwnTokenGridHeader = () => {
       <div className="own-token-grid-header__col-asset-price">
         <span className="own-token-grid-header__text">Open Price</span>
       </div>
-           <div className="own-token-grid-header__col-current-price">
+      <div className="own-token-grid-header__col-current-price">
         <span className="own-token-grid-header__text">Current Price</span>
       </div>
       <div className="own-token-grid-header__col-liquidation-price">
@@ -27,7 +27,7 @@ const OwnTokenGridHeader = () => {
         <span className="own-token-grid-header__text">Position Value</span>
       </div>
       <div className="own-token-grid-header__col-profit">
-        <span className="own-token-grid-header__text">Profit</span>        
+        <span className="own-token-grid-header__text">Profit</span>
       </div>
     </div>
   )

@@ -5,7 +5,7 @@ import { TokenBalances } from 'src/stores/StakingStore/UserBalances'
 
 export function Balances({
   wallet,
-  etherscanURL
+  etherscanURL,
 }: {
   wallet: TokenBalances
   etherscanURL: string

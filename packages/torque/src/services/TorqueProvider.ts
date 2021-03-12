@@ -440,10 +440,10 @@ export class TorqueProvider {
 
         const borrowEstimate = await iTokenContract
           .getDepositAmountForBorrow(
-          amount.multipliedBy(10 ** loanPrecision),
-          new BigNumber(7884000), // approximately 3 months
-          collateralAssetErc20Address
-        )
+            amount.multipliedBy(10 ** loanPrecision),
+            new BigNumber(7884000), // approximately 3 months
+            collateralAssetErc20Address
+          )
           .callAsync()
 
         result.depositAmount = borrowEstimate.dividedBy(10 ** collateralPrecision)
@@ -482,10 +482,10 @@ export class TorqueProvider {
 
         const borrowEstimate = await iTokenContract
           .getBorrowAmountForDeposit(
-          depositAmount.multipliedBy(10 ** collateralPrecision),
-          new BigNumber(7884000), // approximately 3 months
-          collateralAssetErc20Address
-        )
+            depositAmount.multipliedBy(10 ** collateralPrecision),
+            new BigNumber(7884000), // approximately 3 months
+            collateralAssetErc20Address
+          )
           .callAsync()
         const minInitialMargin = await this.getMinInitialMargin(borrowAsset, collateralAsset)
         // getBorrowAmountForDeposit estimates borrow amount for 20% less collaterization than getDepositAmountForBorrow
@@ -876,9 +876,9 @@ export class TorqueProvider {
     const solo: SoloContract = await this.contractsSource.getSoloContract()
     const [tokens, , balances] = await solo
       .getAccountBalances({
-      owner: account,
+        owner: account,
         number: new BigNumber(0),
-    })
+      })
       .callAsync()
 
     const deposits: IRefinanceToken[] = []
@@ -956,9 +956,9 @@ export class TorqueProvider {
           // @ts-ignore
           const txHash = await token.contract
             .approve(
-            compoundBridge.address,
+              compoundBridge.address,
               new BigNumber(100000000000).times(10 ** token.decimals)
-          )
+            )
             .sendTransactionAsync({ from: account })
           promises.push(this.waitForTransactionMined(txHash))
         } catch (e) {
@@ -1072,14 +1072,14 @@ export class TorqueProvider {
     try {
       const txHash = await soloBridge
         .migrateLoan(
-        { owner: account, number: new BigNumber(0) },
-        new BigNumber(loan.market),
-        amount,
-        markets,
-        amounts,
-        amounts,
+          { owner: account, number: new BigNumber(0) },
+          new BigNumber(loan.market),
+          amount,
+          markets,
+          amounts,
+          amounts,
           borrowAmounts
-      )
+        )
         .sendTransactionAsync({ from: account })
       return await this.waitForTransactionMined(txHash)
     } catch (e) {
@@ -1414,12 +1414,12 @@ export class TorqueProvider {
             if (receipt.status) {
               const result = await makerBridge
                 .migrateLoan(
-                [refRequest.cdpId],
-                [new BigNumber(dart)],
-                [new BigNumber(dink)],
-                [new BigNumber(dink)],
+                  [refRequest.cdpId],
+                  [new BigNumber(dart)],
+                  [new BigNumber(dink)],
+                  [new BigNumber(dink)],
                   [new BigNumber(dart)]
-              )
+                )
                 .sendTransactionAsync({ from: refRequest.accountAddress })
               receipt = await this.waitForTransactionMined(result)
               if (receipt.status === 1) {
@@ -1613,7 +1613,7 @@ export class TorqueProvider {
     if (networkName === 'kovan') return new BigNumber(1).multipliedBy(10 ** 9) // 1 gwei
     if (networkName === 'bsc') {
       // always 10 gwei
-        return new BigNumber(10).multipliedBy(10 ** 9)
+      return new BigNumber(10).multipliedBy(10 ** 9)
     }
     let result = new BigNumber(1000).multipliedBy(10 ** 9) // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
@@ -1655,13 +1655,13 @@ export class TorqueProvider {
 
     const loansData = await iBZxContract
       .getUserLoans(
-      account,
-      new BigNumber(0),
-      new BigNumber(50),
-      2, // Torque loans
-      false,
-      false
-    )
+        account,
+        new BigNumber(0),
+        new BigNumber(50),
+        2, // Torque loans
+        false,
+        false
+      )
       .callAsync()
     const zero = new BigNumber(0)
     const rolloverData = loansData.filter(
@@ -1920,13 +1920,13 @@ export class TorqueProvider {
       try {
         const newCurrentMargin: [BigNumber, BigNumber] = await oracleContract
           .getCurrentMargin(
-          borrowedFundsState.loanData.loanToken,
-          borrowedFundsState.loanData.collateralToken,
-          borrowedFundsState.loanData.principal,
-          isWithdrawal
-            ? new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1))
-            : new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
-        )
+            borrowedFundsState.loanData.loanToken,
+            borrowedFundsState.loanData.collateralToken,
+            borrowedFundsState.loanData.principal,
+            isWithdrawal
+              ? new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1))
+              : new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
+          )
           .callAsync()
         result.collateralizedPercent = newCurrentMargin[0].dividedBy(10 ** 18).plus(100)
       } catch (e) {
@@ -2684,8 +2684,9 @@ export class TorqueProvider {
         : networkName === 'kovan'
         ? 'https://api-kovan.etherscan.io'
         : 'https://api.etherscan.io'
-    const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${blockNumber -
-      days * blocksPerDay}&toBlock=latest&address=${bzxContractAddress}&topic0=${
+    const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${
+      blockNumber - days * blocksPerDay
+    }&toBlock=latest&address=${bzxContractAddress}&topic0=${
       LiquidationEvent.topic0
     }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
 
@@ -2738,14 +2739,14 @@ export class TorqueProvider {
         isGasTokenEnabled && ChiTokenBalance.gt(0)
           ? await iTokenContract
               .borrowWithGasToken(
-              request.loanId,
-              borrowAmountInBaseUnits,
-              new BigNumber(7884000), // approximately 3 months
-              depositAmountInBaseUnits,
-              isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
-              account,
-              account,
-              account,
+                request.loanId,
+                borrowAmountInBaseUnits,
+                new BigNumber(7884000), // approximately 3 months
+                depositAmountInBaseUnits,
+                isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+                account,
+                account,
+                account,
                 '0x'
               )
               .estimateGasAsync({
@@ -2755,13 +2756,13 @@ export class TorqueProvider {
               })
           : await iTokenContract
               .borrow(
-              request.loanId,
-              borrowAmountInBaseUnits,
-              new BigNumber(7884000), // approximately 3 months
-              depositAmountInBaseUnits,
-              isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
-              account,
-              account,
+                request.loanId,
+                borrowAmountInBaseUnits,
+                new BigNumber(7884000), // approximately 3 months
+                depositAmountInBaseUnits,
+                isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+                account,
+                account,
                 '0x'
               )
               .estimateGasAsync({

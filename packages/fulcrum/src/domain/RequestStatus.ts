@@ -3,5 +3,5 @@ export enum RequestStatus {
   IN_PROGRESS = 'In progress',
   FAILED = 'Failed',
   FAILED_SKIPGAS = 'Failed_SkipGas',
-  DONE = 'Done'
+  DONE = 'Done',
 }

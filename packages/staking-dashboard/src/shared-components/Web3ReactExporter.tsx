@@ -12,12 +12,10 @@ export function Web3ReactExporter(props: IWeb3ReactExporterProps) {
   const { connector, activate, deactivate, active, error } = context
 
   React.useEffect(() => {
-    web3Connection.getWeb3ReactContext({connector, activate, deactivate, active, error})
+    web3Connection.getWeb3ReactContext({ connector, activate, deactivate, active, error })
   }, [connector, activate, deactivate, active, error, web3Connection])
 
-  return (
-    <div/>
-  )
+  return <div />
 }
 
 export default React.memo(Web3ReactExporter)

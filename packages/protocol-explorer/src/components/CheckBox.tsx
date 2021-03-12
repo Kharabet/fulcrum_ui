@@ -6,19 +6,17 @@ export interface ICheckBoxProps {
   onChange: ChangeEventHandler<HTMLInputElement>
 }
 
-export const CheckBox =(props:ICheckBoxProps)=> {
-  
-    return (
-      <label className="cb-container">
-        <span className="cb-label">{props.children}</span>
-        <input
-          type="checkbox"
-          className="cb-checkbox"
-          checked={props.checked}
-          onChange={props.onChange}
-        />
-        <span className="cb-checkmark" />
-      </label>
-    )
-  
+export const CheckBox = (props: ICheckBoxProps) => {
+  return (
+    <label className="cb-container">
+      <span className="cb-label">{props.children}</span>
+      <input
+        type="checkbox"
+        className="cb-checkbox"
+        checked={props.checked}
+        onChange={props.onChange}
+      />
+      <span className="cb-checkmark" />
+    </label>
+  )
 }

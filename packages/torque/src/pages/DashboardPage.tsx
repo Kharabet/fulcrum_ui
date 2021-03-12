@@ -43,7 +43,7 @@ export class DashboardPage extends PureComponent<IDashboardPageParams, IDashboar
       items: [],
       itemsAwaiting: [],
       isDataLoading: true,
-      recentLiquidationsNumber: 0
+      recentLiquidationsNumber: 0,
     }
 
     this._isMounted = false
@@ -63,14 +63,14 @@ export class DashboardPage extends PureComponent<IDashboardPageParams, IDashboar
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isDataLoading: true
+        isDataLoading: true,
       })
     if (TorqueProvider.Instance.unsupportedNetwork) {
       ;(await this._isMounted) &&
         this.setState({
           items: [],
           itemsAwaiting: [],
-          isDataLoading: false
+          isDataLoading: false,
         })
       return
     }
@@ -85,7 +85,7 @@ export class DashboardPage extends PureComponent<IDashboardPageParams, IDashboar
         this.setState({
           items: [],
           itemsAwaiting: [],
-          isDataLoading: false
+          isDataLoading: false,
         })
       return
     }
@@ -100,7 +100,7 @@ export class DashboardPage extends PureComponent<IDashboardPageParams, IDashboar
         ...this.state,
         items: items,
         itemsAwaiting: itemsAwaiting,
-        isDataLoading: false
+        isDataLoading: false,
       })
   }
 

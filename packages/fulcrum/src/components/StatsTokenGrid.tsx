@@ -40,7 +40,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
           Asset.UNI,
           Asset.AAVE,
           Asset.LRC,
-          Asset.COMP
+          Asset.COMP,
         ]
       : process.env.REACT_APP_ETH_NETWORK === 'bsc'
       ? [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTC, Asset.USDT]
@@ -52,7 +52,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
     this.state = {
       tokenRowsData: null,
-      totalsRow: null
+      totalsRow: null,
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -74,7 +74,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
       this.setState({
         ...this.state,
         tokenRowsData: rowData,
-        totalsRow
+        totalsRow,
       })
     }
   }
@@ -155,7 +155,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
     reserveDetails.forEach((e) => {
       rowsData.push({
-        reserveDetails: e
+        reserveDetails: e,
       })
     })
 

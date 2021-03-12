@@ -34,5 +34,5 @@ async function getGasPrice() {
 }
 
 export default {
-  getGasPrice
+  getGasPrice,
 }

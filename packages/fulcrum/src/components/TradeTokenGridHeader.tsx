@@ -19,7 +19,7 @@ const TradeTokenGridHeader = (props: ITradeTokenGridHeaderProps) => {
       <div className="trade-token-grid-header__col-token-name">
         <span className="trade-token-grid-header__text">Asset</span>
       </div>
-      
+
       <div className="trade-token-grid-header__col-leverage">
         <span className="trade-token-grid-header__text">Leverage</span>
       </div>

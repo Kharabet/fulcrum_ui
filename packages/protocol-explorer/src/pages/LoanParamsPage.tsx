@@ -39,7 +39,7 @@ const LoanParamsPage = (props: ILoanParamsPageProps) => {
             loanId: item.loanId,
             initialMargin: item.initialMargin,
             maintenanceMargin: item.maintenanceMargin,
-            liquidationPenalty: item.liquidationPenalty
+            liquidationPenalty: item.liquidationPenalty,
           } as IParamRowProps
         })
         const filteredResult = resultData.filter((item) => item.platform === Platform.Fulcrum)

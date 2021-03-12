@@ -1,7 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 export interface IBorrowedFundsState {
   accountAddress: string
   loanId: string

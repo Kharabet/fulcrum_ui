@@ -36,8 +36,8 @@ if (isMainnetProd) {
     gtmId: configProviders.Google_TrackingID,
     dataLayer: {
       name: 'Home',
-      status: 'Intailized'
-    }
+      status: 'Intailized',
+    },
   }
   TagManager.initialize(tagManagerArgs)
   // ReactGA.initialize(configProviders.Google_TrackingID);
@@ -65,7 +65,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper,
       isMobileMedia: window.innerWidth <= 959,
-      isChiEnabled: TorqueProvider.getLocalstorageItem('isChiEnabled') === 'true'
+      isChiEnabled: TorqueProvider.getLocalstorageItem('isChiEnabled') === 'true',
     }
 
     TorqueProvider.Instance.eventEmitter.on(
@@ -131,60 +131,60 @@ export class AppRouter extends Component<any, IAppRouterState> {
             <MaintenancePage />
           ) : (
             <Router history={NavService.Instance.History}>
-                <Switch>
-                  <Route
-                    exact={true}
-                    path={'/'}
-                    render={(props) => (
-                      <TabContainer
-                        {...props}
-                        isMobileMedia={this.state.isMobileMedia}
-                        doNetworkConnect={this.doNetworkConnect}
-                        isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
-                      />
-                    )}
-                  />
-                  <Route
-                    path={'/borrow'}
-                    render={(props) => (
-                      <TabContainer
-                        {...props}
-                        isMobileMedia={this.state.isMobileMedia}
-                        doNetworkConnect={this.doNetworkConnect}
-                        isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
-                      />
-                    )}
-                  />
-                  <Route
-                    path={'/dashboard'}
-                    render={(props) => (
-                      <TabContainer
-                        {...props}
-                        isMobileMedia={this.state.isMobileMedia}
-                        doNetworkConnect={this.doNetworkConnect}
-                        isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
-                      />
-                    )}
-                  />
-                  <Route path="*" render={() => <Redirect to="/" />} />
-                </Switch>
-                {isMainnetProd ? (
-                  <Route
-                    path="/"
-                    render={({ location }) => {
-                      const tagManagerArgs = {
-                        dataLayer: {
-                          userProject: 'Torque',
-                          page: location.pathname + location.search
-                        }
-                      }
-                      TagManager.dataLayer(tagManagerArgs)
-                      return null
-                    }}
-                  />
-                ) : (
-                  ``
-                )}
+              <Switch>
+                <Route
+                  exact={true}
+                  path={'/'}
+                  render={(props) => (
+                    <TabContainer
+                      {...props}
+                      isMobileMedia={this.state.isMobileMedia}
+                      doNetworkConnect={this.doNetworkConnect}
+                      isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
+                    />
+                  )}
+                />
+                <Route
+                  path={'/borrow'}
+                  render={(props) => (
+                    <TabContainer
+                      {...props}
+                      isMobileMedia={this.state.isMobileMedia}
+                      doNetworkConnect={this.doNetworkConnect}
+                      isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
+                    />
+                  )}
+                />
+                <Route
+                  path={'/dashboard'}
+                  render={(props) => (
+                    <TabContainer
+                      {...props}
+                      isMobileMedia={this.state.isMobileMedia}
+                      doNetworkConnect={this.doNetworkConnect}
+                      isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}
+                    />
+                  )}
+                />
+                <Route path="*" render={() => <Redirect to="/" />} />
+              </Switch>
+              {isMainnetProd ? (
+                <Route
+                  path="/"
+                  render={({ location }) => {
+                    const tagManagerArgs = {
+                      dataLayer: {
+                        userProject: 'Torque',
+                        page: location.pathname + location.search,
+                      },
+                    }
+                    TagManager.dataLayer(tagManagerArgs)
+                    return null
+                  }}
+                />
+              ) : (
+                ``
+              )}
             </Router>
           )}
         </div>
@@ -224,7 +224,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isProviderMenuModalOpen: false
+        isProviderMenuModalOpen: false,
       })
     await TorqueProvider.Instance.setReadonlyWeb3Provider()
 
@@ -248,7 +248,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
           {
             ...this.state,
             isLoading: true,
-            isProviderMenuModalOpen: false
+            isProviderMenuModalOpen: false,
           },
           async () => {
             await TorqueProvider.Instance.setWeb3Provider(connector, account)
@@ -268,7 +268,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       ;(await this._isMounted) &&
         this.setState({
           ...this.state,
-          isProviderMenuModalOpen: false
+          isProviderMenuModalOpen: false,
         })
     }
   }
@@ -284,7 +284,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
         ...this.state,
         selectedProviderType: event.providerType,
         isLoading: false,
-        web3: event.web3
+        web3: event.web3,
       })
   }
   public onRiskDisclosureRequestClose = async () => {

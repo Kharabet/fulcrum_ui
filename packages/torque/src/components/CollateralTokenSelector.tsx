@@ -28,7 +28,7 @@ export class CollateralTokenSelector extends Component<
       isOpen: false,
       borrowAsset: Asset.UNKNOWN,
       collateralAsset: Asset.UNKNOWN,
-      executorParams: null
+      executorParams: null,
     }
     if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
       this.assets = [
@@ -45,7 +45,7 @@ export class CollateralTokenSelector extends Component<
         Asset.UNI,
         Asset.AAVE,
         Asset.LRC,
-        Asset.COMP
+        Asset.COMP,
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
       this.assets = [Asset.fWETH, Asset.USDC, Asset.WBTC]
@@ -125,7 +125,7 @@ export class CollateralTokenSelector extends Component<
         // @ts-ignore
         executorParams: { resolve: resolve, reject: reject },
         borrowAsset: borrowAsset,
-        collateralAsset: collateralAsset
+        collateralAsset: collateralAsset,
       })
     })
   }

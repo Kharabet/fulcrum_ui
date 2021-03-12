@@ -111,7 +111,7 @@ export default class Rewards {
       return rewards
     } catch (err) {
       const error = errorUtils.decorateError(err, {
-        title: 'Failed to get rewards balances'
+        title: 'Failed to get rewards balances',
       })
       this.set('error', error)
     } finally {
@@ -126,7 +126,7 @@ export default class Rewards {
       await this.stakingProvider.claimStakingRewards(shouldRestake)
       this.assign({
         bzrx: new BigNumber(0),
-        stableCoin: new BigNumber(0)
+        stableCoin: new BigNumber(0),
       })
       return claimedAmounts
     } catch (err) {

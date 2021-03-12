@@ -11,7 +11,7 @@ import {
   LiquidationEvent,
   MintEvent,
   RolloverEvent,
-  TradeEvent
+  TradeEvent,
 } from 'bzx-common/src/domain/events'
 import { ITxRowProps } from '../components/TxRow'
 import { ExplorerProvider } from '../services/ExplorerProvider'
@@ -44,7 +44,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           ? Asset.fWETH
           : (props.match.params.token.toUpperCase() as Asset),
       events: [],
-      isDataLoading: true
+      isDataLoading: true,
     }
 
     this._isMounted = false
@@ -62,14 +62,14 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     ;(await this._isMounted) &&
       this.setState({
         ...this.state,
-        isDataLoading: true
+        isDataLoading: true,
       })
 
     if (ExplorerProvider.Instance.unsupportedNetwork) {
       ;(await this._isMounted) &&
         this.setState({
           events: [],
-          isDataLoading: false
+          isDataLoading: false,
         })
       return
     }
@@ -85,7 +85,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       this.props.doNetworkConnect()
       ;(await this._isMounted) &&
         this.setState({
-          events: []
+          events: [],
         })
       return
     }
@@ -138,7 +138,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       this.setState({
         ...this.state,
         events,
-        isDataLoading: false
+        isDataLoading: false,
       })
   }
 

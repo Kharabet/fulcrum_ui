@@ -47,16 +47,16 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       let innerHtml = `<tbody class="${
         heighttooltipEl + spacingChart > tooltip.caretY ? `bottom` : ``
       } ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}">` //'<thead>';
-      titleLines.forEach(function(title: number) {
+      titleLines.forEach(function (title: number) {
         innerHtml += '<tr><th class="chartjs-tooltip-time"><span>' + title + '</span></th></tr>'
       })
-      bodyLines.forEach(function(body: number) {
+      bodyLines.forEach(function (body: number) {
         innerHtml +=
           '<tr><td class="chartjs-tooltip-value"><span><span class="sign sign-currency">$</span>' +
           body +
           '</span></td></tr>'
       })
-      footerLines.forEach(function(footer: number) {
+      footerLines.forEach(function (footer: number) {
         innerHtml += `<tr><td class="chartjs-tooltip-change24 ${footer < 0 ? `down` : `up`} ${
           heighttooltipEl + spacingChart < tooltip.caretY ? `bottom` : `top`
         } ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}"><span>${Math.abs(
@@ -86,15 +86,15 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     intersect: false,
     custom: this.customTooltips,
     callbacks: {
-      label: function(tooltipItems: any, data: any) {
+      label: function (tooltipItems: any, data: any) {
         const change24 = data.datasets[tooltipItems.datasetIndex].change24[tooltipItems.index]
         if (tooltipItems.yLabel > 100000)
           return { data: `${(tooltipItems.yLabel / 1000000).toFixed(3)}m`, change24: change24 }
         if (tooltipItems.yLabel > 100)
           return { data: `${(tooltipItems.yLabel / 1000).toFixed(3)}k`, change24: change24 }
         return { data: `${tooltipItems.yLabel.toFixed(3)}`, change24: change24 }
-      }
-    }
+      },
+    },
   }
 
   public getColors() {
@@ -124,9 +124,9 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
             borderColor: this.props.isMainChart ? '#276bfb' : '#edf5ff',
             pointBackgroundColor: 'transparent',
             pointBorderColor: 'transparent',
-            change24: this.props.change24
-          }
-        ]
+            change24: this.props.change24,
+          },
+        ],
       }
     }
     const canvas = document.createElement('canvas')
@@ -152,24 +152,24 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
                   : index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1
                   ? ''
                   : value
-              }
+              },
             },
             gridLines: {
               drawBorder: false,
-              color: this.getColors()
-            }
-          }
+              color: this.getColors(),
+            },
+          },
         ],
         yAxes: [
           {
-            display: false
-          }
-        ]
+            display: false,
+          },
+        ],
       },
       legend: {
-        display: false
+        display: false,
       },
-      tooltips: this.props.isMainChart ? this.optionsTooltips : { enabled: false }
+      tooltips: this.props.isMainChart ? this.optionsTooltips : { enabled: false },
     }
     return (
       <React.Fragment>

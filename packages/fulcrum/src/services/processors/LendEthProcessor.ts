@@ -35,7 +35,7 @@ export class LendEthProcessor {
       'Initializing',
       'Submitting loan',
       'Updating the blockchain',
-      'Transaction completed'
+      'Transaction completed',
     ])
 
     // no additional inits or checks
@@ -56,7 +56,7 @@ export class LendEthProcessor {
       const gasAmount = await tokenContract.mintWithEther(account).estimateGasAsync({
         from: account,
         value: amountInBaseUnits,
-        gas: FulcrumProvider.Instance.gasLimit
+        gas: FulcrumProvider.Instance.gasLimit,
       })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
@@ -70,7 +70,7 @@ export class LendEthProcessor {
         from: account,
         value: amountInBaseUnits,
         gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice()
+        gasPrice: await FulcrumProvider.Instance.gasPrice(),
       })
       task.setTxHash(txHash)
     } catch (e) {

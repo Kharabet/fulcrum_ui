@@ -34,7 +34,7 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
   constructor(props: IInputAmountProps) {
     super(props)
     this.state = {
-      isChangeCollateralOpen: false
+      isChangeCollateralOpen: false,
     }
   }
 

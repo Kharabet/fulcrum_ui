@@ -21,7 +21,7 @@ export interface IAssetSelectorItemProps {
   liquidity: BigNumber
   borrowDlgRef: React.RefObject<BorrowDlg>
   doNetworkConnect: () => void
-  setLoansActiveTab: ()=> void
+  setLoansActiveTab: () => void
 }
 
 const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
@@ -92,7 +92,11 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
       return
     }
     try {
-      const borrowRequest = await props.borrowDlgRef.current.getValue(props.asset, props.interestRate, props.liquidity)
+      const borrowRequest = await props.borrowDlgRef.current.getValue(
+        props.asset,
+        props.interestRate,
+        props.liquidity
+      )
       setRequest(borrowRequest)
       await TorqueProvider.Instance.onDoBorrow(borrowRequest)
     } catch (error) {
@@ -144,7 +148,9 @@ const AssetSelectorItem = (props: IAssetSelectorItemProps) => {
         </div>
         <div className="asset-selector-footer">
           <div className="asset-selector__title">{props.asset}</div>
-          <div className="asset-selector__icon"><TokenIcon /></div>
+          <div className="asset-selector__icon">
+            <TokenIcon />
+          </div>
           <div className="asset-selector__arrow">
             <ArrowRight />
           </div>

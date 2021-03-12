@@ -20,7 +20,7 @@ export default class InputBasic extends Component {
     }
     if (this.props.scrollToOnMount) {
       this.inputField.scrollIntoView({
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
   }
@@ -121,8 +121,8 @@ InputBasic.propTypes = {
     'number',
     'textarea',
     'checkbox',
-    'range'
-  ])
+    'range',
+  ]),
 }
 
 InputBasic.defaultProps = {
@@ -130,5 +130,5 @@ InputBasic.defaultProps = {
   scrollToOnMount: false,
   selectOnFocus: false,
   onChangeEmit: 'event',
-  type: 'text'
+  type: 'text',
 }

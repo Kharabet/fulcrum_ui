@@ -7,7 +7,6 @@ import { RepayLoanRequest } from './RepayLoanRequest'
 import { RequestStatus } from './RequestStatus'
 import { RolloverRequest } from './RolloverRequest'
 
-
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null
 
@@ -24,7 +23,12 @@ export class RequestTask {
   public error: Error | null
 
   constructor(
-    request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | RolloverRequest
+    request:
+      | BorrowRequest
+      | ManageCollateralRequest
+      | ExtendLoanRequest
+      | RepayLoanRequest
+      | RolloverRequest
   ) {
     this.request = request
     this.status = RequestStatus.AWAITING

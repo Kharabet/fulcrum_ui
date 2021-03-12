@@ -12,5 +12,5 @@ export enum ProviderType {
   Torus = 'Torus',
   Authereum = 'Authereum',
   Trezor = 'Trezor',
-  None = 'None'
+  None = 'None',
 }

@@ -49,7 +49,7 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
     this.state = {
       isShow: true,
       isShowInfoCollateralAssetDt0: false,
-      isShowInfoCollateralAssetDt1: false
+      isShowInfoCollateralAssetDt1: false,
     }
     this._isMounted = false
   }
@@ -72,7 +72,7 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
     this._isMounted &&
       this.setState({
         ...this.state,
-        isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0
+        isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0,
       })
   }
 
@@ -80,7 +80,7 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
     this._isMounted &&
       this.setState({
         ...this.state,
-        isShowInfoCollateralAssetDt1: !this.state.isShowInfoCollateralAssetDt1
+        isShowInfoCollateralAssetDt1: !this.state.isShowInfoCollateralAssetDt1,
       })
   }
 
@@ -160,7 +160,9 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
               <div className="text">Fixed APR</div>
             </div>
             <div className="refinance-asset-selector__torque-loan-container">
-              <div className="asset-icon"><LoanTokenIcon /></div>
+              <div className="asset-icon">
+                <LoanTokenIcon />
+              </div>
               <div className="loan-value">
                 <div className="value">{this.props.borrowAmount}</div>
                 <div className="text">Loan</div>
@@ -177,7 +179,9 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
             {this.state.isShow && (
               <div className="refinance-asset-selector__collateral-container">
                 <div className="refinance-asset-selector__collateral">
-                  <div className="asset-icon"><CollateralTokenIcon /></div>
+                  <div className="asset-icon">
+                    <CollateralTokenIcon />
+                  </div>
                   <div className="collateral-value">
                     <div className={`value ${this.props.isDisabled ? 'red' : ''}`}>
                       {this.props.collateral[0].balance}
@@ -195,7 +199,9 @@ export class RefinanceCard extends Component<IRefinanceCardProps, IRefinanceCard
                 {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
                 {this.state.isShow && collateralAssetDt2 && (
                   <div className="refinance-asset-selector__collateral">
-                    <div className="asset-icon"><CollateralToken2Icon/></div>
+                    <div className="asset-icon">
+                      <CollateralToken2Icon />
+                    </div>
                     <div className="collateral-value">
                       <div className={`value ${this.props.isDisabled ? 'red' : ''}`}>
                         {this.props.collateral[1].balance}

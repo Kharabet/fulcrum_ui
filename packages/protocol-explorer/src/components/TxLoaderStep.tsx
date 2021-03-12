@@ -32,7 +32,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
         (t) => t.request.loanId === this.props.taskId
       ),
       title: { message: 'Loading', isWarning: false },
-      complete: false
+      complete: false,
     }
 
     TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged)
@@ -165,7 +165,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
     this._isMounted &&
       this.setState({
         ...this.state,
-        title: title
+        title: title,
       })
 
     const div = this.stepDiv.current
@@ -183,7 +183,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
       ;(await this._isMounted) &&
         this.setState({
           ...this.state,
-          requestTask: task
+          requestTask: task,
         })
     }, 500)
   }

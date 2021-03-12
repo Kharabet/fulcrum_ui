@@ -23,7 +23,7 @@ export class RefinancePage extends PureComponent<
     super(props, context)
 
     this.state = {
-      isShowLoader: true
+      isShowLoader: true,
     }
   }
 

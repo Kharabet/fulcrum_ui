@@ -27,7 +27,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       isSupportedNetwork: true,
       etherscanURL: '',
       accountText: '',
-      providerTypeDetails: null
+      providerTypeDetails: null,
     }
 
     ExplorerProvider.Instance.eventEmitter.on(
@@ -43,14 +43,14 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   private onProviderIsChanging = async () => {
     this.setState({
       ...this.state,
-      isLoading: true
+      isLoading: true,
     })
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     this.setState({
       ...this.state,
-      isLoading: true
+      isLoading: true,
     })
     await this.derivedUpdate()
   }
@@ -92,7 +92,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       isSupportedNetwork,
       etherscanURL,
       accountText,
-      providerTypeDetails: providerTypeDetails || null
+      providerTypeDetails: providerTypeDetails || null,
     })
   }
 
@@ -102,7 +102,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       isSupportedNetwork,
       etherscanURL,
       providerTypeDetails,
-      accountText
+      accountText,
     } = this.state
 
     let walletAddressText: string

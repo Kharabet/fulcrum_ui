@@ -28,7 +28,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
         (t) => t.request.id === this.props.taskId
       ),
       title: null,
-      complete: false
+      complete: false,
     }
 
     TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged)
@@ -129,9 +129,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       <React.Fragment>
         {this.state.requestTask && this.state.requestTask.txHash ? (
           <a
-            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${
-              this.state.requestTask.txHash
-            }`}
+            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${this.state.requestTask.txHash}`}
             target="_blank"
             rel="noopener noreferrer">
             <div
@@ -162,7 +160,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
     this._isMounted &&
       this.setState({
         ...this.state,
-        title: title
+        title: title,
       })
 
     const div = this.stepDiv.current
@@ -180,7 +178,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       ;(await this._isMounted) &&
         this.setState({
           ...this.state,
-          requestTask: task
+          requestTask: task,
         })
     }, 500)
   }

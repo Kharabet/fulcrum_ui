@@ -21,7 +21,7 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
   constructor(props: IInputAmountProps) {
     super(props)
     this.state = {
-      interestAmount: props.interestAmount
+      interestAmount: props.interestAmount,
     }
   }
 
@@ -47,7 +47,9 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
       <React.Fragment>
         <div className="input-container">
           <div className="input-row">
-            <span className="asset-icon"><TokenIcon /></span>
+            <span className="asset-icon">
+              <TokenIcon />
+            </span>
             <input
               ref={this._setInputRef}
               className="input-amount"

@@ -157,9 +157,8 @@
   &.lend-estimate {
     color: #a2abb8;
     .expired & {
-        visibility: hidden;
+      visibility: hidden;
     }
-    
   }
 }
 

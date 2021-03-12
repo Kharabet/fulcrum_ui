@@ -23,7 +23,7 @@ export class BorrowedFundsAwaitingListItem extends Component<
 
     this.state = {
       assetDetails: null,
-      etherscanURL: ''
+      etherscanURL: '',
     }
   }
 
@@ -51,7 +51,7 @@ export class BorrowedFundsAwaitingListItem extends Component<
     this.setState({
       ...this.state,
       assetDetails: assetDetails,
-      etherscanURL
+      etherscanURL,
     })
   }
 

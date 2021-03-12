@@ -40,7 +40,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       utilization: [],
       tvlWidth: 2,
       aprWidth: 2,
-      utilizationWidth: 2
+      utilizationWidth: 2,
     }
 
     this.activeLabelUpdate = new Subject<string>()
@@ -51,7 +51,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           ...this.state,
           tvlWidth: value[0],
           aprWidth: value[1],
-          utilizationWidth: value[2]
+          utilizationWidth: value[2],
         })
       })
   }
@@ -95,7 +95,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     let utilization: any = []
     const period = this.state.periodChart
     if (responseJson.success) {
-      responseJson.data.forEach(function(item: any) {
+      responseJson.data.forEach(function (item: any) {
         const months = [
           'Jan',
           'Feb',
@@ -108,7 +108,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           'Sep',
           'Oct',
           'Nov',
-          'Dec'
+          'Dec',
         ]
         period === 1
           ? labels.push(
@@ -135,7 +135,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       tvl: tvl,
       apr: apr,
       utilization: utilization,
-      labels: labels
+      labels: labels,
     })
   }
 
@@ -166,7 +166,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             pointBorderColor: 'transparent',
             borderColor: '#276BFB',
             pointRadius: 12,
-            borderWidth: this.state.tvlWidth
+            borderWidth: this.state.tvlWidth,
           },
           {
             label: 'Supply APR',
@@ -177,7 +177,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             pointBorderColor: 'transparent',
             borderColor: '#33DFCC',
             borderWidth: this.state.aprWidth,
-            pointRadius: 12
+            pointRadius: 12,
           },
           {
             label: 'Utilization',
@@ -188,9 +188,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             pointBorderColor: 'transparent',
             borderColor: '#B79EFF',
             borderWidth: this.state.utilizationWidth,
-            pointRadius: 12
-          }
-        ]
+            pointRadius: 12,
+          },
+        ],
       }
     }
     const canvas = document.createElement('canvas')
@@ -216,15 +216,15 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
                   : index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1
                   ? ''
                   : value
-              }
+              },
             },
             gridLines: {
               drawBorder: false,
               zeroLineWidth: 1,
               zeroLineColor: '#fff',
-              color: this.getColors(this.state.utilization)
-            }
-          }
+              color: this.getColors(this.state.utilization),
+            },
+          },
         ],
         yAxes: [
           {
@@ -232,40 +232,40 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             ticks: {
               drawTicks: false,
               max: Math.max(...this.state.tvl) + deviation,
-              min: Math.min(...this.state.tvl) - deviation
+              min: Math.min(...this.state.tvl) - deviation,
             },
-            display: false
+            display: false,
           },
           {
             id: 'B',
             ticks: {
               max: 102,
               min: -2,
-              drawTicks: false
+              drawTicks: false,
             },
 
-            display: false
+            display: false,
           },
           {
             id: 'C',
             ticks: {
               max: 102,
               min: -2,
-              drawTicks: false
+              drawTicks: false,
             },
 
-            display: false
-          }
-        ]
+            display: false,
+          },
+        ],
       },
       legend: {
-        display: false
+        display: false,
       },
       layout: {
         padding: {
           top: this.props.isMobileMedia ? 0 : 50,
-          bottom: 0
-        }
+          bottom: 0,
+        },
       },
       tooltips: {
         enabled: false,
@@ -274,7 +274,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         custom: this.customTooltips,
         displayColors: true,
         callbacks: {
-          label: function(tooltipItems: any, data: any) {
+          label: function (tooltipItems: any, data: any) {
             let labels: any = []
             const activeYScale = '_active' in this ? this['_active'][0]['_yScale']['id'] : ''
 
@@ -284,14 +284,14 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
                 label: item.label,
                 value: item.data[tooltipItems.index],
                 currency: item.label === 'TVL' ? true : false,
-                borderColor: item.borderColor
+                borderColor: item.borderColor,
               })
             })
 
             return { data: labels }
-          }
-        }
-      }
+          },
+        },
+      },
     }
     const TokenIcon = asset.reactLogoSvg
     return (
@@ -299,7 +299,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         <div className="container">
           <div className="flex fw-w fd-sm-c jc-sb ai-c mb-30">
             <div className="flex ai-c as-sm-fs ">
-              <span className="flex mr-15 icon-wrapper"><TokenIcon /></span>
+              <span className="flex mr-15 icon-wrapper">
+                <TokenIcon />
+              </span>
               <h1>{this.state.asset.toUpperCase()} Stats</h1>
             </div>
             <GroupButton setPeriodChart={this.setPeriodChart} />

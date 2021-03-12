@@ -16,9 +16,9 @@ export const UnhealthyChart = (props: IUnhealthyChartProps) => {
           data: [props.healthyLoansUsd.toNumber(), props.unhealthyLoansUsd.toNumber()],
           backgroundColor: ['#E7EBF0', '#B79EFF'],
           hoverBackgroundColor: ['#E7EBF0', '#B79EFF'],
-          hoverBorderColor: ['#ffffff', '#ffffff']
-        }
-      ]
+          hoverBorderColor: ['#ffffff', '#ffffff'],
+        },
+      ],
     }
   }
   const canvas = document.createElement('canvas')
@@ -32,22 +32,22 @@ export const UnhealthyChart = (props: IUnhealthyChartProps) => {
         {
           display: false,
           gridLines: {
-            drawBorder: false
-          }
-        }
+            drawBorder: false,
+          },
+        },
       ],
       yAxes: [
         {
-          display: false
-        }
-      ]
+          display: false,
+        },
+      ],
     },
     legend: {
-      display: false
+      display: false,
     },
     tooltips: {
-      enabled: false
-    }
+      enabled: false,
+    },
   }
   return (
     <React.Fragment>

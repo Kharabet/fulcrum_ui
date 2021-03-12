@@ -27,7 +27,7 @@ function formatAmount(value: BigNumber): string {
 
 export function FindRepresentativeItem(props: IFindRepresentativeItemProps) {
   const { representative } = props
-  const {bzrx, vbzrx, ibzrx, bpt} = representative
+  const { bzrx, vbzrx, ibzrx, bpt } = representative
 
   return (
     <li className="item-find-representative" onClick={() => props.onRepClick()}>

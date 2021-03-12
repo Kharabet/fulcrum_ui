@@ -7,7 +7,6 @@ import {
 } from 'bzx-common/src/domain/events'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 export class PositionHistoryData {
   public readonly loanId: string
   public readonly date: Date

@@ -24,10 +24,11 @@ export default class TabContainer extends PureComponent<
   constructor(props: any) {
     super(props)
     this.state = {
-      activeTab: Tab.Borrow
+      activeTab: Tab.Borrow,
     }
   }
-  public setActiveTab = (tab: Tab) => {    this.setState({ activeTab: tab })
+  public setActiveTab = (tab: Tab) => {
+    this.setState({ activeTab: tab })
   }
   public componentDidMount(): void {
     if (this.props.location.pathname === '/dashboard') {

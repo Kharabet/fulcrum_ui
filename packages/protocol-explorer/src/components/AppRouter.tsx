@@ -44,7 +44,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       selectedProviderType: ExplorerProvider.Instance.providerType,
       web3: ExplorerProvider.Instance.web3Wrapper,
       isMobileMedia: window.innerWidth <= 991,
-      activeTab: Tab.Stats
+      activeTab: Tab.Stats,
     }
 
     ExplorerProvider.Instance.eventEmitter.on(
@@ -197,7 +197,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this._isMounted &&
       this.setState({
         ...this.state,
-        isProviderMenuModalOpen: false
+        isProviderMenuModalOpen: false,
       })
     await ExplorerProvider.Instance.setReadonlyWeb3Provider()
 
@@ -221,7 +221,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
           {
             ...this.state,
             isLoading: true,
-            isProviderMenuModalOpen: false
+            isProviderMenuModalOpen: false,
           },
           async () => {
             await ExplorerProvider.Instance.setWeb3Provider(connector, account)
@@ -241,7 +241,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       this._isMounted &&
         this.setState({
           ...this.state,
-          isProviderMenuModalOpen: false
+          isProviderMenuModalOpen: false,
         })
     }
   }
@@ -257,7 +257,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
         ...this.state,
         selectedProviderType: event.providerType,
         isLoading: false,
-        web3: event.web3
+        web3: event.web3,
       })
   }
 

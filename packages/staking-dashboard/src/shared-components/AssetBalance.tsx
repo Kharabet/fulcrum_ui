@@ -52,7 +52,7 @@ export function AssetBalance(props: IAssetBalanceProps) {
 
 AssetBalance.defaultProps = {
   variant: '',
-  size: 'normal'
+  size: 'normal',
 }
 
 export default React.memo(AssetBalance)

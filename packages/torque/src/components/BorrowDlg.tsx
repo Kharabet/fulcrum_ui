@@ -31,8 +31,8 @@ export class BorrowDlg extends Component<IBorrowdlgProps, IBorrowDlgState> {
       borrowAsset: Asset.UNKNOWN,
       executorParams: null,
       interestRate: new BigNumber(0),
-      liquidity: new BigNumber(0)
-  }
+      liquidity: new BigNumber(0),
+    }
   }
 
   public render() {
@@ -71,7 +71,7 @@ export class BorrowDlg extends Component<IBorrowdlgProps, IBorrowDlgState> {
         executorParams: { resolve: resolve, reject: reject },
         borrowAsset,
         liquidity,
-        interestRate
+        interestRate,
       })
     })
   }

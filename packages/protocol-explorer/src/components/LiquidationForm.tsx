@@ -43,7 +43,7 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
       ExplorerProvider.Instance.getAssetTokenBalanceOfUser(
         ExplorerProvider.Instance.wethToEth(props.request.loanToken),
         account
-      )
+      ),
     ])
       .then(([ethBalanceResp, repayAssetBalanceResp]) => {
         setEthBalance(ethBalanceResp)

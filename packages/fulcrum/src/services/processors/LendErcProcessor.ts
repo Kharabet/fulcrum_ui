@@ -9,7 +9,6 @@ import { FulcrumProviderEvents } from '../events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../FulcrumProvider'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 export class LendErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
     if (FulcrumProvider.Instance.unsupportedNetwork) {
@@ -44,7 +43,7 @@ export class LendErcProcessor {
       'Waiting for token allowance',
       'Submitting loan',
       'Updating the blockchain',
-      'Transaction completed'
+      'Transaction completed',
     ])
 
     // init erc20 contract for base token
@@ -63,10 +62,9 @@ export class LendErcProcessor {
 
     // Detecting token allowance
     let approvePromise: Promise<string> | null = null
-    const erc20allowance = await tokenErc20Contract.allowance(
-      account,
-      tokenContract.address
-    ).callAsync()
+    const erc20allowance = await tokenErc20Contract
+      .allowance(account, tokenContract.address)
+      .callAsync()
     task.processingStepNext()
 
     let txHash: string = ''
@@ -101,7 +99,7 @@ export class LendErcProcessor {
         // estimating gas amount
         const gasAmount = await tokenContract.mint(account, amountInBaseUnits).estimateGasAsync({
           from: account,
-          gas: FulcrumProvider.Instance.gasLimit
+          gas: FulcrumProvider.Instance.gasLimit,
         })
         gasAmountBN = new BigNumber(gasAmount)
           .multipliedBy(FulcrumProvider.Instance.gasBufferCoeff)
@@ -112,7 +110,7 @@ export class LendErcProcessor {
       txHash = await tokenContract.mint(account, amountInBaseUnits).sendTransactionAsync({
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice()
+        gasPrice: await FulcrumProvider.Instance.gasPrice(),
       })
       task.setTxHash(txHash)
 

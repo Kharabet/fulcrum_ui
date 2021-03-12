@@ -15,5 +15,5 @@ function shortHash(hash: string, charsAtBeginning: number = 6, charsAtEnd: numbe
 }
 
 export default {
-  shortHash
+  shortHash,
 }

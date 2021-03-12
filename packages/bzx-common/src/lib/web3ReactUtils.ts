@@ -50,12 +50,12 @@ export const walletconnect = new WalletConnectConnector({
   rpc: { [networkId]: RPC_URL },
   bridge: 'https://bridge.walletconnect.org',
   qrcode: true,
-  pollingInterval: POLLING_INTERVAL
+  pollingInterval: POLLING_INTERVAL,
 })
 
 export const walletlink = new WalletLinkConnector({
   url: RPC_URL,
-  appName: 'bZx'
+  appName: 'bZx',
 })
 
 export const ledger = new LedgerConnector({
@@ -65,8 +65,8 @@ export const ledger = new LedgerConnector({
   accountFetchingConfigs: {
     shouldAskForOnDeviceConfirmation: true,
     numAddressesToReturn: 100,
-    addressSearchLimit: 1000
-  }
+    addressSearchLimit: 1000,
+  },
 })
 
 export const trezor = new TrezorConnector({
@@ -80,9 +80,9 @@ export const trezor = new TrezorConnector({
     accountFetchingConfigs: {
       shouldAskForOnDeviceConfirmation: true,
       numAddressesToReturn: 100,
-      addressSearchLimit: 1000
-    }
-  }
+      addressSearchLimit: 1000,
+    },
+  },
 })
 
 // export const frame = new FrameConnector({ supportedChainIds: [1] })
@@ -91,38 +91,38 @@ export const authereum = new AuthereumConnector({ chainId: networkId })
 
 export const fortmatic = new FortmaticConnector({
   apiKey: configProviders.Fortmatic_ApiKey as string,
-  chainId: networkId
+  chainId: networkId,
 })
 
 export const portis = new PortisConnector({
   dAppId: configProviders.Portis_DAppId as string,
-  networks: [networkId]
+  networks: [networkId],
 })
 
 export const squarelink = new SquarelinkConnector({
   clientId: configProviders.Squarelink_ClientId as string,
-  networks: [networkId]
+  networks: [networkId],
 })
 
 export const bitski = new BitskiConnector({
   clientId: configProviders.Bitski_ClientId as string,
   network: networkId,
   // callback.html in public folder of the app
-  redirectUri: `${window.location.origin}/callback.html`
+  redirectUri: `${window.location.origin}/callback.html`,
 })
 
 export const torus = new TorusConnector({
   chainId: networkId,
   constructorOptions: {
-    buttonPosition: 'top-left' // default: bottom-left
+    buttonPosition: 'top-left', // default: bottom-left
   },
   initOptions: {
     buildEnv: 'production',
     enableLogging: false,
     network: {
       host: networkName || 'mainnet',
-      chainId: networkId
+      chainId: networkId,
     },
-    showTorusButton: true
-  }
+    showTorusButton: true,
+  },
 })

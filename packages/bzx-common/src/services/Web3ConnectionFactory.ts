@@ -85,8 +85,8 @@ export default class Web3ConnectionFactory {
   public static getRPCUrl(): string {
     let url
     let key
-    if (process.env.REACT_APP_ETH_NETWORK  === 'bsc'){
-      return "https://bsc-dataseed.binance.org/"
+    if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+      return 'https://bsc-dataseed.binance.org/'
     }
     if (process.env.NODE_ENV !== 'development') {
       if (appConfig.isKovan) {

@@ -47,14 +47,14 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       didSubmit: false,
       interestAmount: 0,
       assetBalance: new BigNumber(0),
-      ethBalance: new BigNumber(0)
+      ethBalance: new BigNumber(0),
     }
 
     this._inputTextChange = new Subject<string>()
     this._inputTextChange.pipe(debounceTime(100)).subscribe((value: string) => {
       this.setState({
         ...this.state,
-        repayAmountText: value
+        repayAmountText: value,
       })
     })
   }
@@ -71,7 +71,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
                   assetDetails:
                     AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
                   repayManagementAddress: repayManagementAddress,
-                  gasAmountNeeded: gasAmountNeeded
+                  gasAmountNeeded: gasAmountNeeded,
                 },
                 () => {
                   this._inputTextChange.next(this.state.repayAmountText)
@@ -96,14 +96,14 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           assetBalance: balance,
           repayAmount: repayAmount,
           repayAmountText: repayAmountText,
-          balanceTooLow: isBalanceTooLow
+          balanceTooLow: isBalanceTooLow,
         })
       }
     )
     TorqueProvider.Instance.getEthBalance().then((ethBalance) => {
       this.setState({
         ...this.state,
-        ethBalance: ethBalance
+        ethBalance: ethBalance,
       })
     })
   }
@@ -124,7 +124,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
               {
                 ...this.state,
                 repayManagementAddress: repayManagementAddress,
-                gasAmountNeeded: gasAmountNeeded
+                gasAmountNeeded: gasAmountNeeded,
               },
               () => {
                 this._inputTextChange.next(this.state.repayAmountText)
@@ -141,8 +141,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   public render() {
     if (this.state.assetDetails === null) return null
 
-    const ratio = this.state.assetBalance.div(this.props.loanOrderState.amountOwed
-      .times(10 ** this.state.assetDetails.decimals))
+    const ratio = this.state.assetBalance.div(
+      this.props.loanOrderState.amountOwed.times(10 ** this.state.assetDetails.decimals)
+    )
 
     return (
       <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
@@ -189,10 +190,12 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     if (!this.state.didSubmit) {
       this.setState({ ...this.state, didSubmit: true })
 
-      if ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-      this.props.loanOrderState.loanAsset === Asset.ETH) ||
-    (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-      this.props.loanOrderState.loanAsset === Asset.BNB)) {
+      if (
+        (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+          this.props.loanOrderState.loanAsset === Asset.ETH) ||
+        (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+          this.props.loanOrderState.loanAsset === Asset.BNB)
+      ) {
         const assetBalance = this.state.assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
           ? this.state.assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
           : new BigNumber(0)
@@ -206,7 +209,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       if (this.state.assetBalance.lt(amountInBaseUnits)) {
         this.setState({
           ...this.state,
-          didSubmit: false
+          didSubmit: false,
         })
         return
       }
@@ -254,7 +257,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         ...this.state,
         repayAmountText: repayAmountText,
         repayAmount: repayAmount,
-        interestAmount: 0
+        interestAmount: 0,
       },
       () => {
         // emitting next event for processing with rx.js

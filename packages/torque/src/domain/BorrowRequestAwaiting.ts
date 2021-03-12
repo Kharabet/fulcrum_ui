@@ -36,7 +36,7 @@ export class BorrowRequestAwaiting {
       collateralAsset: bra.collateralAsset,
       depositAmount: bra.depositAmount.toFixed(),
       networkId: bra.networkId,
-      txHash: bra.txHash
+      txHash: bra.txHash,
     }
 
     return result

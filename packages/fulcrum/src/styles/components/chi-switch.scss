@@ -20,7 +20,7 @@
 
       &:checked + .cb-checkmark,
       .cb-checkmark {
-        background-color:var(--chi-switch-bg);
+        background-color: var(--chi-switch-bg);
         &:before {
           background-color: #00c0ab;
           transform: translateX(0px);
@@ -55,7 +55,7 @@
       z-index: 2;
       background-color: #758295;
       @media screen and (max-width: $mobile-version-width) {
-        right: 2.5px;        
+        right: 2.5px;
       }
     }
   }

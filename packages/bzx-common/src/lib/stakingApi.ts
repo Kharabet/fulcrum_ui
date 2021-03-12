@@ -15,14 +15,13 @@ function getShortHash(hash: string, count: number) {
  */
 async function getRepsInfo(repsBaseInfoList: IRep[]): Promise<IRep[]> {
   // TODO: track CORS issue https://github.com/3box/3box-js/issues/649
-  const profiles = await (await fetch(
-    'https://cors-anywhere.herokuapp.com/https://ipfs.3box.io/profileList',
-    {
+  const profiles = await (
+    await fetch('https://cors-anywhere.herokuapp.com/https://ipfs.3box.io/profileList', {
       body: JSON.stringify({ addressList: repsBaseInfoList.map((e) => e.wallet), didList: [] }),
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    }
-  )).json()
+      headers: { 'Content-Type': 'application/json' },
+    })
+  ).json()
   const repsList = repsBaseInfoList.map((repBaseInfo) => {
     repBaseInfo.name =
       profiles[repBaseInfo.wallet] && profiles[repBaseInfo.wallet].name
@@ -58,11 +57,15 @@ async function getRepInfo(rep: IRep): Promise<IRep> {
  * Get profile of a representative
  * @param {string} address user's wallet address
  */
-async function getUserFrom3Box(address: string): Promise<{address: string, name: string, imageSrc?: string}> {
+async function getUserFrom3Box(
+  address: string
+): Promise<{ address: string; name: string; imageSrc?: string }> {
   // Note: getProfile returns an empty object when profile does not exist
   const profile = await fetch(
     `https://cors-proxy.bzx.network/https://ipfs.3box.io/profile?address=${address}`
-  ).then((resp) => resp.json()).catch(e => ({name: undefined, image: undefined}))
+  )
+    .then((resp) => resp.json())
+    .catch((e) => ({ name: undefined, image: undefined }))
   const name = profile.name || hashUtils.shortHash(address)
   const imageSrc = profile.image
     ? `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl['/']}`
@@ -74,5 +77,5 @@ async function getUserFrom3Box(address: string): Promise<{address: string, name:
 export default {
   getRepInfo,
   getRepsInfo,
-  getUserFrom3Box
+  getUserFrom3Box,
 }

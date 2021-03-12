@@ -73,7 +73,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         Asset.UNI,
         Asset.AAVE,
         Asset.LRC,
-        Asset.COMP
+        Asset.COMP,
       ]
     }
 
@@ -92,7 +92,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       }>,
       request: null,
       isDataLoading: true,
-      isModalOpen: false
+      isModalOpen: false,
     }
 
     this._isMounted = false
@@ -119,7 +119,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const eventsWithDay = events.map(
       (e: { event: LiquidationEvent; repayAmountUsd: BigNumber }) => ({
         ...e,
-        day: Math.floor(e.event.timeStamp!.getTime() / (1000 * 60 * 60 * 24))
+        day: Math.floor(e.event.timeStamp!.getTime() / (1000 * 60 * 60 * 24)),
       })
     )
     const eventsWithDayByDay = groupBy(eventsWithDay, 'day')
@@ -132,7 +132,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       .map((e: Asset) => ({
         label: e,
         data: [] as Array<{ x: string; y: number }>,
-        backgroundColor: AssetsDictionary.assets.get(e)!.bgBrightColor
+        backgroundColor: AssetsDictionary.assets.get(e)!.bgBrightColor,
       }))
     Object.keys(eventsWithDayByDay).forEach((day: string) => {
       for (const assetShown of this.assetsShown) {
@@ -152,9 +152,9 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               x: new Date(day * 1000 * 60 * 60 * 24).toLocaleDateString('en-US', {
                 day: '2-digit',
                 month: '2-digit',
-                year: 'numeric'
+                year: 'numeric',
               }),
-              y: 0
+              y: 0,
             })
           continue
         }
@@ -171,16 +171,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
             x: new Date(day * 1000 * 60 * 60 * 24).toLocaleDateString('en-US', {
               day: '2-digit',
               month: '2-digit',
-              year: 'numeric'
+              year: 'numeric',
             }),
-            y: repayAmountUsd.dp(4, BigNumber.ROUND_CEIL).toNumber()
+            y: repayAmountUsd.dp(4, BigNumber.ROUND_CEIL).toNumber(),
           })
       }
     })
 
     this.setState({
       ...this.state,
-      barChartDatasets: datasets
+      barChartDatasets: datasets,
     })
   }
 
@@ -188,14 +188,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     this._isMounted &&
       this.setState({
         ...this.state,
-        isDataLoading: true
+        isDataLoading: true,
       })
 
     if (ExplorerProvider.Instance.unsupportedNetwork) {
       this._isMounted &&
         this.setState({
           events: [],
-          isDataLoading: false
+          isDataLoading: false,
         })
       return
     }
@@ -267,7 +267,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       collateralToken: e.collateralAsset,
       onLiquidationUpdated: this.derivedUpdate.bind(this),
       onLiquidationRequested: this.onLiquidationRequested,
-      doNetworkConnect: this.props.doNetworkConnect
+      doNetworkConnect: this.props.doNetworkConnect,
     }))
 
     const rollovers = rolloversData.map((e: IRolloverData) => ({
@@ -275,7 +275,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       rebateAsset: e.rebateAsset,
       gasRebate: e.gasRebate,
       onRolloverUpdated: this.derivedUpdate.bind(this),
-      doNetworkConnect: this.props.doNetworkConnect
+      doNetworkConnect: this.props.doNetworkConnect,
     }))
 
     await this.setState({
@@ -287,7 +287,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       isDataLoading: false,
       unhealthyLoansUsd,
       healthyLoansUsd,
-      rollovers
+      rollovers,
     })
   }
 
@@ -323,7 +323,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     this._isMounted &&
       this.setState({
         ...this.state,
-        isDataLoading: true
+        isDataLoading: true,
       })
 
     await this.derivedUpdate()
@@ -339,7 +339,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   public render() {
     const getData = (_canvas: any) => {
       return {
-        datasets: this.state.barChartDatasets
+        datasets: this.state.barChartDatasets,
       }
     }
 
@@ -357,17 +357,17 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
             time: {
               unit: 'day',
               displayFormats: {
-                quarter: 'MMM D'
-              }
+                quarter: 'MMM D',
+              },
             },
             gridLines: {
               display: false,
-              drawBorder: false
+              drawBorder: false,
             },
             ticks: {
-              source: 'data'
-            }
-          }
+              source: 'data',
+            },
+          },
         ],
         yAxes: [
           {
@@ -376,16 +376,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               drawBorder: false,
               zeroLineWidth: 1,
               zeroLineColor: '#E9F4FF',
-              color: '#E9F4FF'
+              color: '#E9F4FF',
             },
             ticks: {
-              display: false
-            }
-          }
-        ]
+              display: false,
+            },
+          },
+        ],
       },
       legend: {
-        display: false
+        display: false,
       },
       tooltips: {
         enabled: false,
@@ -397,11 +397,11 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
             return {
               value: tooltipItems.yLabel,
               bgColor: bgColor,
-              label: data.datasets[tooltipItems.datasetIndex].label
+              label: data.datasets[tooltipItems.datasetIndex].label,
             }
-          }
-        }
-      }
+          },
+        },
+      },
     }
     return (
       <React.Fragment>

@@ -79,14 +79,14 @@ Button.propTypes = {
    */
   active: PropTypes.bool,
   notify: PropTypes.bool,
-  block: PropTypes.bool.isRequired
+  block: PropTypes.bool.isRequired,
 }
 
 Button.defaultProps = {
   className: '',
   isLoading: false,
   block: false,
-  notify: false
+  notify: false,
 }
 
 export default React.memo(Button)

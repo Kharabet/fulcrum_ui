@@ -59,7 +59,7 @@ export function ProposalDetails({ vm }: { vm: GovernanceVM }) {
                 width: `${activeProposal.votesFor
                   .div(activeProposal.votesFor.plus(activeProposal.votesAgainst))
                   .times(100)
-                  .toNumber()}%`
+                  .toNumber()}%`,
               }}
             />
           </div>

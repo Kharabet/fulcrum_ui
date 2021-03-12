@@ -1,7 +1,6 @@
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 
-
 export default class DepositCollateralEvent {
   public static readonly topic0: string =
     '0xa8a69faa6a38cc9c2beed79e034e1bd99f7eac877a5cee9f0118a8667b7ed93e'

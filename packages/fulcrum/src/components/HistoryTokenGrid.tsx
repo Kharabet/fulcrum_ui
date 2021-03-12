@@ -9,7 +9,7 @@ import {
   LiquidationEvent,
   RolloverEvent,
   TradeEvent,
-  WithdrawCollateralEvent
+  WithdrawCollateralEvent,
 } from 'bzx-common/src/domain/events'
 
 import { IHistoryEvents } from '../domain/IHistoryEvents'
@@ -69,7 +69,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       quantityGrids: 0,
       historyRowsData: [],
       isLastRow: false,
-      isLoading: true
+      isLoading: true,
     }
 
     FulcrumProvider.Instance.eventEmitter.on(
@@ -103,7 +103,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         historyRowsData: this.props.historyRowsData,
         quantityGrids,
         isLastRow,
-        isLoading: false
+        isLoading: false,
       })
     }
   }
@@ -125,7 +125,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
       this.setState({
         ...this.setState,
-        isLastRow
+        isLastRow,
       })
     }
   }
@@ -510,7 +510,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         eventsGroup: positionEventsGroup,
         stablecoins: this.props.stablecoins,
         isHidden: false,
-        getAssetUSDRate: this.getAssetUSDRate
+        getAssetUSDRate: this.getAssetUSDRate,
       })
     }
     const quantityEvents = Object.keys(historyEvents.groupedEvents).length
@@ -523,7 +523,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       historyRowsData,
       quantityGrids,
       isLastRow,
-      isLoading: false
+      isLoading: false,
     })
 
     this.props.updateHistoryRowsData(historyRowsData)
@@ -555,7 +555,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         {
           ...this.state,
           numberPagination: this.state.numberPagination - 1,
-          isLastRow: false
+          isLastRow: false,
         },
         this.getHistoryRowsData
       )

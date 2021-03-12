@@ -7,7 +7,7 @@ import { DialogVM } from 'ui-framework'
 export default class UIStore {
   public rootStore: RootStore
   public media = new MediaQuery()
-  public walletUpdatePopup = new DialogVM({transitionDelay: 200})
+  public walletUpdatePopup = new DialogVM({ transitionDelay: 200 })
 
   public static colors = {
     light: {
@@ -15,7 +15,7 @@ export default class UIStore {
     },
     dark: {
       // TODO
-    }
+    },
   }
 
   get theme(): 'dark' | 'light' {

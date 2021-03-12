@@ -14,5 +14,5 @@ function register(uiStore: { theme: 'light' | 'dark' }) {
 }
 
 export default {
-  register
+  register,
 }

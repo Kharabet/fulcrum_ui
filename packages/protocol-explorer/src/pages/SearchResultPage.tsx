@@ -31,7 +31,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       filteredEvents: [],
       showSearchResult: false,
       isLoading: false,
-      filter: props.match.params.filter.toLowerCase()
+      filter: props.match.params.filter.toLowerCase(),
     }
     this._isMounted = false
     ExplorerProvider.Instance.eventEmitter.on(
@@ -101,7 +101,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       this.setState({
         ...this.state,
         events,
-        isLoading: false
+        isLoading: false,
       })
     this.onSearch(this.state.filter)
   }
@@ -117,7 +117,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
         this.setState({
           ...this.state,
           showSearchResult: false,
-          filteredEvents: []
+          filteredEvents: [],
         })
       return
     }
@@ -133,7 +133,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
         ...this.state,
         showSearchResult: true,
         filteredEvents,
-        filter: filter
+        filter: filter,
       })
   }
 

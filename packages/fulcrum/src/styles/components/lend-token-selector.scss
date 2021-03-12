@@ -168,7 +168,7 @@
         font-style: normal;
         font-stretch: normal;
         text-align: left;
-        
+
         color: var(--primary-text);
         margin-top: 13px;
         margin-bottom: 20px;
@@ -337,18 +337,18 @@
       .token-selector-item__descriptions {
         .token-selector-item__description {
           align-items: flex-end;
-      
+
           .token-selector-item__name {
             top: 15px;
             position: absolute;
           }
           .token-selector-item__balance-container {
-            order:-1;
+            order: -1;
             margin-bottom: 18px;
           }
           .token-selector-item__interest-rate-container {
             margin-bottom: 18px;
-            order:-1;
+            order: -1;
             .token-selector-item__interest-rate-title {
               text-align: left;
             }

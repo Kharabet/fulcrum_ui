@@ -55,7 +55,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
         isOpen: true,
         // @ts-ignore
         executorParams: { resolve: resolve, reject: reject },
-        loanOrderState: item
+        loanOrderState: item,
       })
     })
   }

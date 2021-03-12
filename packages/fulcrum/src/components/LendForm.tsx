@@ -102,7 +102,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       chaiPrice: null,
       isLoading: true,
       infoMessage: '',
-      isExpired: false
+      isExpired: false,
     }
 
     this._inputChange = new Subject()
@@ -133,7 +133,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               lendAmountText: '',
               lendAmount: new BigNumber(0),
               lendedAmountEstimate: new BigNumber(0),
-              isLoading: false
+              isLoading: false,
             })
         }
       })
@@ -153,7 +153,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     this._isMounted &&
       this.setState({
         isExpired: false,
-        isLoading: true
+        isLoading: true,
       })
 
     const assetDetails = AssetsDictionary.assets.get(this.props.asset)
@@ -198,7 +198,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
         tokenPrice: tokenPrice,
         chaiPrice: chaiPrice,
         isLoading: false,
-        infoMessage: infoMessage
+        infoMessage: infoMessage,
       })
     this._timer = window.setTimeout(() => this.setState({ isExpired: true }), this._staleDataDelay)
   }
@@ -292,7 +292,8 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       (!this.state.maxLendAmount || this.state.maxLendAmount.gt(0)) &&
       this.props.lendType === LendType.LEND &&
       this.state.maybeNeedsApproval &&
-      this.props.asset !== Asset.ETH && this.props.asset !== Asset.BNB
+      this.props.asset !== Asset.ETH &&
+      this.props.asset !== Asset.BNB
     const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <form
@@ -314,7 +315,9 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               rel="noopener noreferrer">
               <TokenIcon />
             </a>
-          ) : <TokenIcon />}
+          ) : (
+            <TokenIcon />
+          )}
           {/*{this.props.asset === Asset.ETH && this.props.lendType === LendType.LEND &&
             <p className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</p>
           }
@@ -579,16 +582,15 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               sku: this.props.asset,
               category: this.props.lendType,
               price: new BigNumber(usdPrice),
-              quantity: 1
-            }
-          ]
-        }
+              quantity: 1,
+            },
+          ],
+        },
       }
       TagManager.dataLayer(tagManagerArgs)
     }
 
     const assetOrWrapped: Asset = this.getAssetOrWrapped()
-
 
     if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
       // indicates a 100% burn
@@ -639,7 +641,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
           lendAmountText: multipliedLendAmount ? this.formatPrecision(multipliedLendAmount) : '0',
           lendAmount: multipliedLendAmount || new BigNumber(0),
           maxLendAmount: this.state.maxLendAmount || new BigNumber(0),
-          lendedAmountEstimate: lendedAmountEstimate || new BigNumber(0)
+          lendedAmountEstimate: lendedAmountEstimate || new BigNumber(0),
         })
       })
 
@@ -683,7 +685,6 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       if (!amount.isNaN()) {
         const assetOrWrapped: Asset = this.getAssetOrWrapped()
 
-
         const lendRequest = new LendRequest(this.props.lendType, assetOrWrapped, amount)
 
         // updating stored value only if the new input value is a valid number
@@ -694,7 +695,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               lendAmountText: this.formatPrecision(amount),
               lendAmount: amount,
               maxLendAmount: this.state.maxLendAmount || new BigNumber(0),
-              lendedAmountEstimate: lendedAmountEstimate
+              lendedAmountEstimate: lendedAmountEstimate,
             })
           }
         )

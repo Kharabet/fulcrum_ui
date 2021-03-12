@@ -25,7 +25,7 @@ export default class ButtonBasic extends React.Component {
     }
     if (this.props.scrollToOnMount) {
       this.btnElement.scrollIntoView({
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
   }
@@ -106,7 +106,7 @@ ButtonBasic.propTypes = {
   onClickEmit: PropTypes.oneOf(['event', 'value', 'name-value']).isRequired,
   preventDefault: PropTypes.bool.isRequired,
   scrollToOnMount: PropTypes.bool.isRequired,
-  value: PropTypes.any
+  value: PropTypes.any,
 }
 
 ButtonBasic.defaultProps = {
@@ -116,5 +116,5 @@ ButtonBasic.defaultProps = {
   onClickEmit: 'event',
   preventDefault: false,
   scrollToOnMount: false,
-  type: 'button'
+  type: 'button',
 }

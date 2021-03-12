@@ -1,12 +1,12 @@
-.clipboard{
-    &__id {      
-        &-copy {
-          display: flex;
-          align-items: center;
-          &:hover {
-            opacity: 0.7;
-            cursor: pointer;
-          }
-        }
+.clipboard {
+  &__id {
+    &-copy {
+      display: flex;
+      align-items: center;
+      &:hover {
+        opacity: 0.7;
+        cursor: pointer;
+      }
     }
+  }
 }

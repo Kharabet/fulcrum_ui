@@ -12,7 +12,7 @@ import {
   PayTradingFeeEvent,
   RolloverEvent,
   TradeEvent,
-  WithdrawCollateralEvent
+  WithdrawCollateralEvent,
 } from '../domain/events'
 
 import { LogEntry, Web3Wrapper } from '@0x/web3-wrapper'
@@ -20,7 +20,12 @@ import Asset from '../assets/Asset'
 import ContractsSource from '../contracts/ContractsSource'
 import AssetsDictionary from '../assets/AssetsDictionary'
 
-const fromBlockNumber = process.env.REACT_APP_ETH_NETWORK === 'mainnet' ? '0x989680' :  process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 5566818 : '0x54ee30'
+const fromBlockNumber =
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+    ? '0x989680'
+    : process.env.REACT_APP_ETH_NETWORK === 'bsc'
+    ? 5566818
+    : '0x54ee30'
 
 const getLogsFromEtherscan = async (
   fromBlock: string,
@@ -36,9 +41,15 @@ const getLogsFromEtherscan = async (
   const etherscanApiKey = apiKey
   const topicsQueryParams: string[] = []
   topics.forEach((topic, i) => topicsQueryParams.push(`topic${i}=${topic}&`))
-  const blockExplorerUrl = networkName === 'kovan' ? 'https://bscscan.com'
-    :  networkName === 'kovan' ? 'https://api-kovan.etherscan.io' : 'https://api.etherscan.io' 
-  const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&address=${address}&${topicsQueryParams.join('')}apikey=${etherscanApiKey}`
+  const blockExplorerUrl =
+    networkName === 'kovan'
+      ? 'https://bscscan.com'
+      : networkName === 'kovan'
+      ? 'https://api-kovan.etherscan.io'
+      : 'https://api.etherscan.io'
+  const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&address=${address}&${topicsQueryParams.join(
+    ''
+  )}apikey=${etherscanApiKey}`
   const liquidationResponse = await fetch(blockExplorerApiUrl)
   const liquidationResponseJson = await liquidationResponse.json()
   return liquidationResponseJson.status === '1' ? liquidationResponseJson.result : undefined
@@ -60,7 +71,7 @@ const getLiquidationHistory = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
   const reverseEvents = events.reverse()
   for (const i in reverseEvents) {
@@ -128,7 +139,7 @@ const getTradeHistory = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
   const reverseEvents = events.reverse()
   for (const i in reverseEvents) {
@@ -196,7 +207,7 @@ const getRolloverHistory = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
   const reverseEvents = events.reverse()
   for (const i in reverseEvents) {
@@ -261,7 +272,7 @@ const getCloseWithSwapHistory = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
   const reverseEvents = events.reverse()
   for (const i in reverseEvents) {
@@ -319,7 +330,7 @@ const getCloseWithDepositHistory = async (
     topics: [CloseWithDepositEvent.topic0],
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
   const reverseEvents = events.reverse()
   for (const i in reverseEvents) {
@@ -377,7 +388,7 @@ const getBorrowHistory = async (
     topics: [BorrowEvent.topic0],
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
   const reverseEvents = events.reverse()
   for (const i in reverseEvents) {
@@ -438,7 +449,7 @@ const getBurnHistory = async (
     topics: [BurnEvent.topic0],
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: tokenContractAddress
+    address: tokenContractAddress,
   })
   const reverseEvents = events.reverse()
   for (const i in reverseEvents) {
@@ -475,7 +486,7 @@ const getMintHistory = async (
     topics: [MintEvent.topic0],
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: tokenContractAddress
+    address: tokenContractAddress,
   })
   const reverseEvents = events.reverse()
   for (const i in reverseEvents) {
@@ -516,7 +527,7 @@ const getOldRewradEvents = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
 
   const reverseEvents = events.reverse()
@@ -565,7 +576,7 @@ const getNewRewradEvents = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
 
   const reverseEvents = events.reverse()
@@ -638,7 +649,7 @@ const getPayTradingFeeHistory = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
 
   const reverseEvents = events.reverse()
@@ -694,7 +705,7 @@ const getDepositCollateralHistory = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
 
   const reverseEvents = events.reverse()
@@ -750,7 +761,7 @@ const getWithdrawCollateralHistory = async (
     topics: topics,
     fromBlock: fromBlockNumber,
     toBlock: 'latest',
-    address: bzxContractAddress
+    address: bzxContractAddress,
   })
 
   const reverseEvents = events.reverse()
@@ -802,5 +813,5 @@ export {
   getPayTradingFeeHistory,
   getRolloverHistory,
   getTradeHistory,
-  getWithdrawCollateralHistory
+  getWithdrawCollateralHistory,
 }

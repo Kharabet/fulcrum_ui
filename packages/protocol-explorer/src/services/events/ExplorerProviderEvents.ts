@@ -3,5 +3,5 @@ export enum ExplorerProviderEvents {
   ProviderChanged = 'ProviderChanged',
   ProviderIsChanging = 'ProviderIsChanging',
   AskToOpenProgressDlg = 'AskToOpenProgressDlg',
-  AskToCloseProgressDlg = 'AskToCloseProgressDlg'
+  AskToCloseProgressDlg = 'AskToCloseProgressDlg',
 }

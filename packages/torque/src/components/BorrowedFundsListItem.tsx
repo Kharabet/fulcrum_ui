@@ -71,7 +71,7 @@ export class BorrowedFundsListItem extends Component<
       isInProgress: props.item.isInProgress,
       isEmpty: false,
       request: undefined,
-      activeTokenLiquidation: this.props.item.collateralAsset
+      activeTokenLiquidation: this.props.item.collateralAsset,
     }
     TorqueProvider.Instance.eventEmitter.on(
       TorqueProviderEvents.AskToOpenProgressDlg,
@@ -91,7 +91,7 @@ export class BorrowedFundsListItem extends Component<
     this.setState({
       ...this.state,
       isLoadingTransaction,
-      request
+      request,
     })
 
     await this.derivedUpdate()
@@ -140,7 +140,7 @@ export class BorrowedFundsListItem extends Component<
       {
         ...this.state,
         isEmpty: thisLoan ? false : true,
-        borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem
+        borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem,
       },
       async () => {
         await this.derivedUpdate()
@@ -173,7 +173,7 @@ export class BorrowedFundsListItem extends Component<
       ...this.state,
       assetDetails: assetDetails,
       interestRate: this.props.item.interestRate,
-      liquidationPrice
+      liquidationPrice,
     })
   }
 
@@ -277,10 +277,7 @@ export class BorrowedFundsListItem extends Component<
                     .toFixed(18)}%`}
                   className={`borrowed-funds-list-item__body-collateralized ${collateralizedStateSelector}`}>
                   <span className="value">
-                    {borrowedFundsItem.collateralizedPercent
-                      .multipliedBy(100)
-                      .plus(100)
-                      .toFixed(2)}
+                    {borrowedFundsItem.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}
                   </span>
                   %
                 </div>
@@ -389,7 +386,7 @@ export class BorrowedFundsListItem extends Component<
 
     try {
       const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({
-        ...this.state.borrowedFundsItem
+        ...this.state.borrowedFundsItem,
       })
       this.setState({ ...this.state, request: manageCollateralRequest })
       await TorqueProvider.Instance.onDoManageCollateral(manageCollateralRequest)
@@ -406,7 +403,7 @@ export class BorrowedFundsListItem extends Component<
 
     try {
       const repayLoanRequest = await this.props.repayLoanDlgRef.current.getValue({
-        ...this.state.borrowedFundsItem
+        ...this.state.borrowedFundsItem,
       })
       this.setState({ ...this.state, request: repayLoanRequest })
       await TorqueProvider.Instance.onDoRepayLoan(repayLoanRequest)
@@ -423,7 +420,7 @@ export class BorrowedFundsListItem extends Component<
 
     try {
       const extendLoanRequest = await this.props.extendLoanDlgRef.current.getValue({
-        ...this.state.borrowedFundsItem
+        ...this.state.borrowedFundsItem,
       })
       this.setState({ ...this.state, request: extendLoanRequest })
       await TorqueProvider.Instance.onDoExtendLoan(extendLoanRequest)
@@ -446,7 +443,7 @@ export class BorrowedFundsListItem extends Component<
 
     try {
       const borroweMoreRequest = await this.props.borrowMoreDlgRef.current.getValue({
-        ...this.state.borrowedFundsItem
+        ...this.state.borrowedFundsItem,
       })
       this.setState({ ...this.state, request: borroweMoreRequest })
       await TorqueProvider.Instance.onDoBorrow(borroweMoreRequest)

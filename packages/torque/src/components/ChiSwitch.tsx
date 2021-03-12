@@ -36,7 +36,7 @@ export const ChiSwitch = (props: IChiSwithProps) => {
   return (
     <div className="chi-switch">
       <CheckBox checked={isGasTokenEnabled} onChange={onChange}>
-        {props.noLabel ? '':'Use CHI token'}
+        {props.noLabel ? '' : 'Use CHI token'}
       </CheckBox>
     </div>
   )

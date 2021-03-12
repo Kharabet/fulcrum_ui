@@ -48,7 +48,7 @@ export function InputStake(props: IStakeInputProps) {
         <div
           className="stake-input__progress"
           style={{
-            width: `calc(100%*${props.value}/${props.max.toFixed(2, 1)})`
+            width: `calc(100%*${props.value}/${props.max.toFixed(2, 1)})`,
           }}
         />
       </div>

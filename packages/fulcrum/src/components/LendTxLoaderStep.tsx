@@ -19,7 +19,7 @@ export class LendTxLoaderStep extends Component<ILendTxLoaderStepProps, ILendTxL
     this.state = {
       requestTask: TasksQueue.Instance.getTasksList().find(
         (t) => t.request.id === this.props.taskId
-      )
+      ),
     }
 
     TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged)
@@ -155,7 +155,7 @@ export class LendTxLoaderStep extends Component<ILendTxLoaderStepProps, ILendTxL
       ;(await this._isMounted) &&
         this.setState({
           ...this.state,
-          requestTask: task
+          requestTask: task,
         })
     }, 500)
   }

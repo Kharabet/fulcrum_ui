@@ -46,7 +46,7 @@ export class LeverageSelector extends Component<ILeverageSelectorProps> {
         <li
           className="active-selector leverage-selector__item leverage-selector__item--selected"
           style={{
-            left: `calc(((100% - 4px) / ${values.length} * ${activeIndex}) + 2px)`
+            left: `calc(((100% - 4px) / ${values.length} * ${activeIndex}) + 2px)`,
           }}>
           <span>{`${this.props.value}x`}</span>
         </li>

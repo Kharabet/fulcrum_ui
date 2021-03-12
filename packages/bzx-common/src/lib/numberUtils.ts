@@ -3,12 +3,12 @@ import { BigNumber } from '@0x/utils'
 const formatWithSeparator = {
   decimalSeparator: '.',
   groupSeparator: ',',
-  groupSize: 3
+  groupSize: 3,
 }
 
 const formatNoSeparator = {
   decimalSeparator: '.',
-  groupSeparator: ''
+  groupSeparator: '',
 }
 
 /**
@@ -83,5 +83,5 @@ export default {
   format,
   formatPriceWithSign,
   round,
-  roundWithSign
+  roundWithSign,
 }

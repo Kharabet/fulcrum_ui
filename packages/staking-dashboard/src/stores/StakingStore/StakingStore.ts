@@ -121,12 +121,12 @@ export default class StakingStore {
         acc.from.push({
           token: tokenAmount.token,
           amount: balance[tokenAmount.token],
-          staked: tokenAmount.staked
+          staked: tokenAmount.staked,
         })
         acc.to.push({
           token: tokenAmount.token,
           amount: wallet[tokenAmount.token].plus(tokenAmount.amount),
-          staked: tokenAmount.staked
+          staked: tokenAmount.staked,
         })
         return acc
       },
@@ -148,7 +148,7 @@ export default class StakingStore {
     const claimed = await this.rewards.claimStakingRewards(shouldRestake)
     this.updateUserWallet([
       { token: 'bzrx', amount: claimed.bzrx, staked: shouldRestake },
-      { token: 'crv', amount: claimed.stableCoin, staked: false }
+      { token: 'crv', amount: claimed.stableCoin, staked: false },
     ])
   }
 

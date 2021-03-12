@@ -8,7 +8,7 @@ import regexUtils from '../lib/regexUtils'
  */
 const checkEventFilter = regexUtils.getWordListCheck([
   'ResizeObserver', // this is a browser bug
-  'XDR encoding' // browser bug in Firefox especially
+  'XDR encoding', // browser bug in Firefox especially
 ])
 
 /**
@@ -44,7 +44,7 @@ function init(provider: {
         return null
       }
       return event
-    }
+    },
   })
 
   provider.eventEmitter.on('ProviderChanged', () => {
@@ -53,5 +53,5 @@ function init(provider: {
 }
 
 export default {
-  init
+  init,
 }

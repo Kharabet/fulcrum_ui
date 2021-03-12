@@ -34,5 +34,5 @@ function getErrorStackMessages(error: any, message = ''): string {
 
 export default {
   decorateError,
-  getErrorStackMessages
+  getErrorStackMessages,
 }

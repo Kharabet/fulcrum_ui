@@ -4,5 +4,5 @@ export enum TorqueProviderEvents {
   ProviderIsChanging = 'ProviderIsChanging',
   BorrowTransactionMined = 'BorrowTransactionMined',
   AskToOpenProgressDlg = 'AskToOpenProgressDlg',
-  AskToCloseProgressDlg = 'AskToCloseProgressDlg'
+  AskToCloseProgressDlg = 'AskToCloseProgressDlg',
 }

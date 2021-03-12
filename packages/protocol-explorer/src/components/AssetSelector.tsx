@@ -22,7 +22,7 @@ export class AssetSelector extends Component<IAssetSelectorProps, IAssetSelector
     super(props)
     this.state = {
       apr: [],
-      tvl: []
+      tvl: [],
     }
   }
 

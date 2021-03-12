@@ -51,7 +51,7 @@ describe('stakingUtils', () => {
       let tokensToStake = {
         bzrx: new BigNumber(101),
         vbzrx: new BigNumber(99),
-        bpt: new BigNumber(99),        
+        bpt: new BigNumber(99),
         ibzrx: new BigNumber(0),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(false)
@@ -59,16 +59,16 @@ describe('stakingUtils', () => {
       tokensToStake = {
         bzrx: new BigNumber(99),
         vbzrx: new BigNumber(101),
-        bpt: new BigNumber(99),        
-        ibzrx: new BigNumber(99)
+        bpt: new BigNumber(99),
+        ibzrx: new BigNumber(99),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(false)
 
       tokensToStake = {
         bzrx: new BigNumber(99),
         vbzrx: new BigNumber(99),
-        bpt: new BigNumber(101),        
-        ibzrx: new BigNumber(99)
+        bpt: new BigNumber(101),
+        ibzrx: new BigNumber(99),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(false)
     })
@@ -77,16 +77,16 @@ describe('stakingUtils', () => {
       let tokensToStake = {
         bzrx: new BigNumber(100),
         vbzrx: new BigNumber(100),
-        bpt: new BigNumber(100),        
-        ibzrx: new BigNumber(100)
+        bpt: new BigNumber(100),
+        ibzrx: new BigNumber(100),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(true)
 
       tokensToStake = {
         bzrx: new BigNumber(0),
         vbzrx: new BigNumber(0),
-        bpt: new BigNumber(1),        
-        ibzrx: new BigNumber(0)
+        bpt: new BigNumber(1),
+        ibzrx: new BigNumber(0),
       }
       expect(stakingUtils.verifyStake(userBalancesMock, tokensToStake)).toBe(true)
     })

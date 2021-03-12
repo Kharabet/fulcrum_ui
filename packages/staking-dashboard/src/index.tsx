@@ -17,8 +17,8 @@ if (appConfig.isMainnetProd) {
     gtmId: configProviders.Google_TrackingID,
     dataLayer: {
       name: 'Home',
-      status: 'Intailized'
-    }
+      status: 'Intailized',
+    },
   }
   TagManager.initialize(tagManagerArgs)
 }

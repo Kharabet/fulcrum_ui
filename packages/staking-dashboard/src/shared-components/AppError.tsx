@@ -14,15 +14,15 @@ export function AppError({ rootStore }: { rootStore: RootStore }) {
           <h3 className="app-error__title">
             <small>{appError.error.title || 'Error'}</small>
           </h3>
-          {!appError.error.noError &&
+          {!appError.error.noError && (
             <textarea
               className="app-error__message"
               defaultValue={appError.stackMessages}
               readOnly={true}
             />
-          }
+          )}
           <ButtonBasic className="app-error__close btn--invisible" onClick={rootStore.clearError}>
-            <CloseIcon title="Close"/>
+            <CloseIcon title="Close" />
           </ButtonBasic>
         </div>
       )}

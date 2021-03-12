@@ -24,12 +24,12 @@ export default function App({ vm }: { vm: AppVM }) {
           <Header appVM={vm} />
           <Switch>
             <Route exact={true} path="/">
-              <Staking appVM={vm}/>
+              <Staking appVM={vm} />
             </Route>
           </Switch>
         </>
       </Router>
-      <AppError rootStore={vm.rootStore}/>
+      <AppError rootStore={vm.rootStore} />
       <Footer />
       {appConfig.isMainnetProd ? <Intercom appID="dfk4n5ut" /> : null}
     </React.Fragment>

@@ -55,7 +55,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       didSubmit: false,
       interestAmount: 0,
       inputAmountText: '',
-      maxDepositAmount: new BigNumber(0)
+      maxDepositAmount: new BigNumber(0),
     }
 
     this._selectedValueUpdate = new Subject()
@@ -74,7 +74,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         this.setState({
           ...this.state,
           depositAmount: value.depositAmount,
-          inputAmountText: this.formatPrecision(value.depositAmount)
+          inputAmountText: this.formatPrecision(value.depositAmount),
         })
       })
   }
@@ -93,7 +93,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               assetDetails:
                 AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
               selectedValue: collateralState.currentValue,
-              extendManagementAddress: extendManagementAddress
+              extendManagementAddress: extendManagementAddress,
             },
             () => {
               this._selectedValueUpdate.next(this.state.selectedValue)
@@ -117,7 +117,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               {
                 ...this.state,
                 extendManagementAddress: extendManagementAddress,
-                gasAmountNeeded: gasAmountNeeded
+                gasAmountNeeded: gasAmountNeeded,
               },
               () => {
                 this._selectedValueUpdate.next(this.state.selectedValue)
@@ -148,7 +148,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               {new Date(estimatedDate).toLocaleDateString(undefined, {
                 day: 'numeric',
                 month: 'long',
-                year: 'numeric'
+                year: 'numeric',
               })}
             </div>
           </div>
@@ -236,7 +236,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     this.setState({
       ...this.state,
       selectedValue: value,
-      interestAmount: 0
+      interestAmount: 0,
     })
   }
 
@@ -276,14 +276,14 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         this.setState({
           ...this.state,
           balanceTooLow: true,
-          didSubmit: false
+          didSubmit: false,
         })
 
         return
       } else {
         this.setState({
           ...this.state,
-          balanceTooLow: false
+          balanceTooLow: false,
         })
       }
 
@@ -303,7 +303,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     if (Number(inputAmountText) === 0) {
       this.setState({
         ...this.state,
-        inputAmountText
+        inputAmountText,
       })
     } else {
       // setting Text to update display at the same time
@@ -311,7 +311,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         {
           ...this.state,
           inputAmountText,
-          interestAmount: 0
+          interestAmount: 0,
         },
         () => {
           this._inputChange.next(inputAmountText)

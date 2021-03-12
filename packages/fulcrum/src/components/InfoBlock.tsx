@@ -18,7 +18,7 @@ export class InfoBlock extends Component<IInfoBlockProps, IInfoBlockState> {
     const localStorageItem = localStorage.getItem(this.props.localstorageItemProp)
 
     this.state = {
-      isLocalstorageItemAccepted: localStorageItem && localStorageItem.length > 0 ? true : false
+      isLocalstorageItemAccepted: localStorageItem && localStorageItem.length > 0 ? true : false,
     }
   }
   onAccept = () => {

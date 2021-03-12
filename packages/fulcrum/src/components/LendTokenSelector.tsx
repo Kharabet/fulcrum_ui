@@ -115,7 +115,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
         onLend: props.onLend,
         interestRate: new BigNumber(interestRate || 0),
         liquidity: new BigNumber(liquidity || 0),
-        isLoading: false
+        isLoading: false,
       } as ILendTokenSelectorItemProps)
     }
     setLendTokenItemProps(newLendTokenItemProps)
@@ -140,7 +140,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
 
       newLendTokenItemProps.set(asset, {
         ...currentLendTokenItemProps,
-        isLoading: true
+        isLoading: true,
       } as ILendTokenSelectorItemProps)
       setLendTokenItemProps(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps)) // create a copy of object so re-render will happen
 
@@ -151,7 +151,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
       ) {
         newLendTokenItemProps.set(asset, {
           ...currentLendTokenItemProps,
-          isLoading: false
+          isLoading: false,
         } as ILendTokenSelectorItemProps)
         setLendTokenItemProps(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps))
         continue
@@ -164,7 +164,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
         onLend: props.onLend,
         interestRate: new BigNumber(currentLendTokenItemProps.interestRate || 0),
         liquidity: new BigNumber(currentLendTokenItemProps.liquidity || 0),
-        isLoading: false
+        isLoading: false,
       } as ILendTokenSelectorItemProps)
       setLendTokenItemProps(new Map<Asset, ILendTokenSelectorItemProps>(newLendTokenItemProps))
     }

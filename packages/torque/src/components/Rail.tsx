@@ -23,12 +23,12 @@ export const Rail: FunctionComponent<IRailProps> = (props) => {
         className="rail__outer"
         style={{
           width: `${width}%`,
-          overflow: `hidden`
+          overflow: `hidden`,
         }}>
         <div
           className="rail__inner"
           style={{
-            width: `${10000 / width}%`
+            width: `${10000 / width}%`,
           }}
         />
       </div>

@@ -1,5 +1,4 @@
 export enum Platform {
-    Fulcrum = 'Fulcrum',
-    Torque = 'Torque'
-  }
-  
+  Fulcrum = 'Fulcrum',
+  Torque = 'Torque',
+}

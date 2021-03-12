@@ -35,7 +35,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
       diffWithPrevPrecents: 0,
       labels: [],
       data: [],
-      change24: []
+      change24: [],
     }
 
     this._isMounted = false
@@ -161,7 +161,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     const change24: any = []
     const period = this.state.periodChart
     if (responseJson.success) {
-      responseJson.data.forEach(function(item: any) {
+      responseJson.data.forEach(function (item: any) {
         const months = [
           'Jan',
           'Feb',
@@ -174,7 +174,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
           'Sep',
           'Oct',
           'Nov',
-          'Dec'
+          'Dec',
         ]
         period === 1
           ? labels.push(

@@ -73,7 +73,7 @@ export class ManageCollateralFormWeb3 extends Component<
       inputAmountText: '',
       didSubmit: false,
       isLoading: true,
-      activeTokenLiquidation: this.props.loanOrderState.collateralAsset
+      activeTokenLiquidation: this.props.loanOrderState.collateralAsset,
     }
 
     this._inputChange = new Subject()
@@ -98,7 +98,7 @@ export class ManageCollateralFormWeb3 extends Component<
           collateralAmount: value.collateralAmount,
           collateralizedPercent: value.collateralizedPercent,
           balanceTooLow,
-          inputAmountText: this.formatPrecision(value.collateralAmount.toString(), true)
+          inputAmountText: this.formatPrecision(value.collateralAmount.toString(), true),
         })
       })
   }
@@ -111,7 +111,7 @@ export class ManageCollateralFormWeb3 extends Component<
           minValue: collateralState.minValue,
           maxValue: collateralState.maxValue,
           assetDetails:
-            AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null
+            AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null,
         })
 
         TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then((gasAmountNeeded) => {
@@ -175,10 +175,12 @@ export class ManageCollateralFormWeb3 extends Component<
                 }
 
                 // check balance
-                if ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-                this.props.loanOrderState.loanAsset === Asset.ETH) ||
-              (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-                this.props.loanOrderState.loanAsset === Asset.BNB)) {
+                if (
+                  (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+                    this.props.loanOrderState.loanAsset === Asset.ETH) ||
+                  (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+                    this.props.loanOrderState.loanAsset === Asset.BNB)
+                ) {
                   assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
                     ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
                     : new BigNumber(0)
@@ -209,7 +211,7 @@ export class ManageCollateralFormWeb3 extends Component<
                     gasAmountNeeded: gasAmountNeeded,
                     collateralizedPercent: collateralizedPercent,
                     collateralExcess: collateralExcess,
-                    assetBalanceValue: assetBalance.div(10 ** collateralAssetDecimals).toNumber()
+                    assetBalanceValue: assetBalance.div(10 ** collateralAssetDecimals).toNumber(),
                   },
                   () => {
                     this._selectedValueUpdate.next(this.state.selectedValue)
@@ -236,7 +238,7 @@ export class ManageCollateralFormWeb3 extends Component<
         this.setState(
           {
             ...this.state,
-            gasAmountNeeded: gasAmountNeeded
+            gasAmountNeeded: gasAmountNeeded,
           },
           () => {
             this._selectedValueUpdate.next(this.state.selectedValue)
@@ -246,7 +248,7 @@ export class ManageCollateralFormWeb3 extends Component<
     }
     if (prevState.assetDetails !== this.state.assetDetails) {
       this.getLiquidationPrice()
-  }
+    }
   }
 
   public getLiquidationPrice = async () => {
@@ -356,7 +358,9 @@ export class ManageCollateralFormWeb3 extends Component<
 
           <div className="input-container">
             <div className="input-row">
-              <span className="asset-icon"><TokenIcon /></span>
+              <span className="asset-icon">
+                <TokenIcon />
+              </span>
               {this.state.isLoading ? (
                 <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
               ) : (
@@ -466,7 +470,7 @@ export class ManageCollateralFormWeb3 extends Component<
   private onChange = async (value: number) => {
     this.setState({
       ...this.state,
-      selectedValue: value
+      selectedValue: value,
     })
   }
 
@@ -484,10 +488,12 @@ export class ManageCollateralFormWeb3 extends Component<
         let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(
           this.props.loanOrderState.collateralAsset
         )
-        if ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-        this.props.loanOrderState.loanAsset === Asset.ETH) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-        this.props.loanOrderState.loanAsset === Asset.BNB)) {
+        if (
+          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+            this.props.loanOrderState.loanAsset === Asset.ETH) ||
+          (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+            this.props.loanOrderState.loanAsset === Asset.BNB)
+        ) {
           assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
             ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
             : new BigNumber(0)
@@ -501,20 +507,20 @@ export class ManageCollateralFormWeb3 extends Component<
           this.setState({
             ...this.state,
             balanceTooLow: true,
-            didSubmit: false
+            didSubmit: false,
           })
 
           return
         } else {
           this.setState({
             ...this.state,
-            balanceTooLow: false
+            balanceTooLow: false,
           })
         }
       } else {
         this.setState({
           ...this.state,
-          balanceTooLow: false
+          balanceTooLow: false,
         })
       }
 
@@ -540,7 +546,7 @@ export class ManageCollateralFormWeb3 extends Component<
     this.setState(
       {
         ...this.state,
-        inputAmountText
+        inputAmountText,
       },
       () => {
         // emitting next event for processing with rx.js
