@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/browser'
 import type { EventEmitter } from 'events'
-import appConfig from '../config/appConfig'
+import appConfig from 'bzx-common/src/config/appConfig'
 import regexUtils from '../lib/regexUtils'
 
 /**

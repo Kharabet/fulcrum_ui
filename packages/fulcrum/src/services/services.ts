@@ -1,4 +1,4 @@
-import appConfig from '../config/appConfig'
+import appConfig from 'bzx-common/src/config/appConfig'
 import { FulcrumProvider } from './FulcrumProvider'
 import sentryService from './sentryService'
 

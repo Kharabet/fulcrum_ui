@@ -4,7 +4,7 @@ import StakingStore from './StakingStore'
 import TransactionStore from './TransactionStore'
 import UIStore from './UIStore'
 import Web3Connection from './Web3Connection'
-import appConfig from 'src/config/appConfig'
+import appConfig from 'bzx-common/src/config/appConfig'
 import errorUtils from 'bzx-common/src/lib/errorUtils'
 import GovernanceStore from './GovernanceStore'
 

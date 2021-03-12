@@ -12,7 +12,7 @@ function getNetworkIdByString(networkName: networks | undefined): 1 | 3 | 4 | 42
   if (!networkName || !networkIds[networkName]) {
     return 0
   }
-  return networkIds[networkName]
+  return networkIds[networkName as networks]
 }
 
 function getWeb3ProviderSettings(networkId: number | null) {
