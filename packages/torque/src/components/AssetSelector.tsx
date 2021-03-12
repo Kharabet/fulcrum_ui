@@ -20,6 +20,7 @@ const AssetSelector = (props: IAssetSelectorProps) => {
   const [liquidities, setLiquidity] = useState()
 
   useEffect(() => {
+    derivedUpdate()
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, derivedUpdate)
     return () => {
       TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderChanged, derivedUpdate)
