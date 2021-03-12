@@ -8,6 +8,7 @@ import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
 import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
 import Footer from './Footer'
 import { SwitchButtonInput } from '../components/SwitchButtonInput'
+import { profileEnd } from 'console'
 
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void
@@ -29,7 +30,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     this.state = {
       isMenuOpen: false,
       scrollMenu: false,
-      heightDevice: 0
+      heightDevice: 0,
     }
   }
 
@@ -89,10 +90,16 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { title: 'Trade', link: '/trade', external: false },
         { title: 'Lend', link: '/lend', external: false },
 
-        { title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
-        { title: 'Stake', link: 'https://staking.bzx.network', external: true }
+        {
+          title: 'Borrow',
+          link: `https://${
+            process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
+          }.torque.loans/borrow`,
+          external: true,
+        },
+        { title: 'Stake', link: 'https://staking.bzx.network', external: true },
       ],
-      onMenuToggle: this.onMenuToggle
+      onMenuToggle: this.onMenuToggle,
     }
 
     return (
@@ -138,11 +145,17 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       items: [
         { title: 'Trade', link: '/trade', external: false },
         { title: 'Lend', link: '/lend', external: false },
-        { title: 'Borrow', link: 'https://app.torque.loans/borrow', external: true },
+        {
+          title: 'Borrow',
+          link: `https://${
+            process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
+          }.torque.loans/borrow`,
+          external: true,
+        },
         {
           title: 'Stake',
           link: 'https://staking.bzx.network',
-          external: true
+          external: true,
         },
         {
           title: `${this.props.headerClass === 'trade' ? 'Trade FAQ' : 'Lend FAQ'}`,
@@ -151,15 +164,15 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
               ? 'https://fulcrum.trade/'
               : 'https://fulcrum.trade/lending'
           }`,
-          external: true
+          external: true,
         },
         {
           title: 'Help Center',
           link: 'https://bzx.network/faq-fulcrum.html',
-          external: true
-        }
+          external: true,
+        },
       ],
-      onMenuToggle: this.onMenuToggle
+      onMenuToggle: this.onMenuToggle,
     }
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
