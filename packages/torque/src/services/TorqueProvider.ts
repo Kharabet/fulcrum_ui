@@ -1609,40 +1609,6 @@ export class TorqueProvider {
     return receipt.status === 1 ? receipt : null;
   }*/
 
-  public gasPrice = async (): Promise<BigNumber> => {
-    if (networkName === 'kovan') return new BigNumber(1).multipliedBy(10 ** 9) // 1 gwei
-    if (networkName === 'bsc') {
-      // always 10 gwei
-      return new BigNumber(10).multipliedBy(10 ** 9)
-    }
-    let result = new BigNumber(1000).multipliedBy(10 ** 9) // upper limit 120 gwei
-    const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9) // lower limit 3 gwei
-
-    const url = `https://ethgasstation.info/json/ethgasAPI.json`
-    try {
-      const response = await fetch(url)
-      const jsonData = await response.json()
-      if (jsonData.average) {
-        // ethgasstation values need divide by 10 to get gwei
-        const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8)
-        const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10 ** 8)
-        if (gasPriceAvg.lt(result)) {
-          result = gasPriceAvg
-        } else if (gasPriceSafeLow.lt(result)) {
-          result = gasPriceSafeLow
-        }
-      }
-    } catch (error) {
-      result = new BigNumber(1000).multipliedBy(10 ** 9) // error default 60 gwei
-    }
-
-    if (result.lt(lowerLimit)) {
-      result = lowerLimit
-    }
-
-    return result
-  }
-
   public getLoansList = async (): Promise<IBorrowedFundsState[]> => {
     let result: IBorrowedFundsState[] = []
 

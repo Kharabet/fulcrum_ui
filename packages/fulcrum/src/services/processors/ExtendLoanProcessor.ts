@@ -1,3 +1,4 @@
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { RequestTask } from '../../domain/RequestTask'
@@ -132,7 +133,7 @@ export class ExtendLoanProcessor {
           from: account,
           value: isETHBorrowAsset ? depositAmountInBaseUnits : undefined,
           gas: !gasAmountBN.eq(0) ? gasAmountBN.toString() : gasLimit,
-          gasPrice: await FulcrumProvider.Instance.gasPrice(),
+          gasPrice: await ethGasStation.getGasPrice(),
         })
       task.setTxHash(txHash)
     } catch (e) {

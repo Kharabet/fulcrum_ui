@@ -1,3 +1,4 @@
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
 import { RequestTask } from '../../domain/RequestTask'
 import { TradeRequest } from '../../domain/TradeRequest'
@@ -210,7 +211,7 @@ export class TradeBuyProcessor {
                 from: account,
                 value: sendAmountForValue,
                 gas: gasAmountBN.toString(),
-                gasPrice: await FulcrumProvider.Instance.gasPrice(),
+                gasPrice: await ethGasStation.getGasPrice(),
               })
           : await tokenContract
               .marginTrade(
@@ -226,7 +227,7 @@ export class TradeBuyProcessor {
                 from: account,
                 value: sendAmountForValue,
                 gas: gasAmountBN.toString(),
-                gasPrice: await FulcrumProvider.Instance.gasPrice(),
+                gasPrice: await ethGasStation.getGasPrice(),
               })
       task.setTxHash(txHash)
     } catch (e) {
