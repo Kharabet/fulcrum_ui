@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { ProviderType } from '../domain/ProviderType'
 import { ProviderTypeDetails } from '../domain/ProviderTypeDetails'
-import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
+import { ReactComponent as GenericWalletShort } from 'bzx-common/src/assets/images/providers/logo_short___genericwallet.svg'
 
 export interface IOnChainIndicatorProps {
   doNetworkConnect: () => void
@@ -182,11 +183,15 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       } else {
         return (
           <React.Fragment>
-            <span className="on-chain-indicator__provider-txt">Click To Connect Wallet</span>
             {TorqueProvider.Instance.unsupportedNetwork ? (
               <span className="on-chain-indicator__wallet-address">{walletAddressText}</span>
             ) : (
-              ``
+              <span className="on-chain-indicator__provider-txt">
+                <div className="on-chain-indicator__svg">
+                  <GenericWalletShort />
+                </div>
+                Connect Wallet
+              </span>
             )}
           </React.Fragment>
         )

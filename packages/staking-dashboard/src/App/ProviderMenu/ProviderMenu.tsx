@@ -2,7 +2,7 @@ import { ReactComponent as CloseIcon } from 'app-images/ic__close.svg'
 import { observer } from 'mobx-react'
 import React from 'react'
 import Modal from 'react-modal'
-import ProviderTypeDictionary from 'src/domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import AppVM from '../AppVM'
 import ProviderMenuListItem from './ProviderMenuListItem'
 

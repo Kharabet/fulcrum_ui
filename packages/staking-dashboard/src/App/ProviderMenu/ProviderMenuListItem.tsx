@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react'
 import React from 'react'
 import ProviderType from 'bzx-common/src/domain/ProviderType'
-import ProviderTypeDictionary from 'src/domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import { Loader, ButtonBasic } from 'ui-framework'
 import Web3Connection from 'src/stores/Web3Connection'
 

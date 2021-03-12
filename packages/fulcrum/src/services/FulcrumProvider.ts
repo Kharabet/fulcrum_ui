@@ -57,7 +57,7 @@ import {
   getWithdrawCollateralHistory,
 } from 'bzx-common/src/utils'
 
-import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ILoanParams } from '../domain/ILoanParams'
 import { RolloverRequest } from '../domain/RolloverRequest'

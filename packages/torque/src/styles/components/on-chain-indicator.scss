@@ -21,6 +21,11 @@
   outline: none;
   .on-chain-indicator__svg {
     display: flex;
+    margin-right: 8px;
+    svg {
+      height: 28px;
+      fill: #495460;
+    }
   }
   .on-chain-indicator__description {
     display: flex;
@@ -59,9 +64,12 @@
     letter-spacing: normal;
 
     padding: 0 1rem;
+    justify-content: flex-start;
+    align-items: center;
   }
 
   .on-chain-indicator__wallet-address {
+    justify-content: center;
     color: #758295;
     font-size: 13px;
     /*display: inline-block;
@@ -85,7 +93,6 @@
   }
   span.on-chain-indicator__wallet-address,
   span.on-chain-indicator__provider-txt {
-    justify-content: center;
     display: flex;
     width: 100%;
   }
