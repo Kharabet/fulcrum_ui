@@ -14,7 +14,7 @@ import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
 import siteConfig from '../config/SiteConfig.json'
-import { RiskDisclosure } from './RiskDisclosure'
+import RiskDisclosure from 'bzx-common/src/shared-components/RiskDisclosure'
 import Modal from 'react-modal'
 
 import { ProviderMenu } from './ProviderMenu'
