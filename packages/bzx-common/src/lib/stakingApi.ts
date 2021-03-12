@@ -1,5 +1,5 @@
 import IRep from 'bzx-common/src/domain/staking/IRep'
-import hashUtils from 'app-lib/hashUtils'
+import hashUtils from 'bzx-common/src/lib/hashUtils'
 
 /**
  * @param {string} hash address or transaction id

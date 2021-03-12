@@ -3,7 +3,7 @@ import { BigNumber } from '@0x/utils'
 import * as mobx from 'mobx'
 import { StakingProvider } from 'src/services/StakingProvider'
 import StakingStore from '../StakingStore'
-import errorUtils from 'app-lib/errorUtils'
+import errorUtils from 'bzx-common/src/lib/errorUtils'
 
 type rewardsProp =
   | 'bzrx'

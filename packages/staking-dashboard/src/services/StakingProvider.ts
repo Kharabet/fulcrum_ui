@@ -28,8 +28,8 @@ import {
   CompoundGovernorAlphaProposalExecutedEventArgs,
   CompoundGovernorAlphaProposalQueuedEventArgs,
 } from 'bzx-common/src/contracts/typescript-wrappers/CompoundGovernorAlpha'
-import ethGasStation from 'app-lib/apis/ethGasStation'
-import stakingApi from 'app-lib/stakingApi'
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
+import stakingApi from 'bzx-common/src/lib/stakingApi'
 
 // @ts-ignore
 import web3EthAbiUntyped, { AbiCoder } from 'web3-eth-abi'

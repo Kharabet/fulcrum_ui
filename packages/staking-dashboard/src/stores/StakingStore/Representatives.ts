@@ -1,5 +1,5 @@
-import stakingApi from 'app-lib/stakingApi'
-import stakingUtils from 'app-lib/stakingUtils'
+import stakingApi from 'bzx-common/src/lib/stakingApi'
+import stakingUtils from 'bzx-common/src/lib/stakingUtils'
 import * as mobx from 'mobx'
 import IRep from 'bzx-common/src/domain/staking/IRep'
 import { StakingProvider } from 'src/services/StakingProvider'

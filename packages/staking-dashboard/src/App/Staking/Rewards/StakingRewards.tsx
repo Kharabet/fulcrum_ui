@@ -4,7 +4,7 @@ import AssetBalance from 'shared-components/AssetBalance'
 import ExternalLink from 'shared-components/ExternalLink'
 import { Button, InputBasic } from 'ui-framework'
 import RewardsVM from './RewardsVM'
-import numberUtils from 'app-lib/numberUtils'
+import numberUtils from 'bzx-common/src/lib/numberUtils'
 
 export function StakingRewards({ vm }: { vm: RewardsVM }) {
   const { rewards } = vm

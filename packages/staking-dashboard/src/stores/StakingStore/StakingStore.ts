@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import errorUtils from 'app-lib/errorUtils'
+import errorUtils from 'bzx-common/src/lib/errorUtils'
 import sleep from 'bard-instruments/lib/async/sleep'
 import * as mobx from 'mobx'
 import { stakeableToken } from 'src/domain/stakingTypes'

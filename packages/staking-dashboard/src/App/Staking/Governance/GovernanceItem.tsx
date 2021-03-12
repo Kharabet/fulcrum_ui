@@ -1,6 +1,6 @@
 import React from 'react'
 import GovernanceProposal from 'src/domain/GovernanceProposal'
-import hashUtils from 'app-lib/hashUtils'
+import hashUtils from 'bzx-common/src/lib/hashUtils'
 import { observer } from 'mobx-react'
 import GovernanceVM from './GovernanceVM'
 
