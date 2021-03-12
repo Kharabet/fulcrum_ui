@@ -8,7 +8,7 @@ import constantAddress from '../config/constant.json'
 
 import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { ProviderType } from '../domain/ProviderType'
-import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { ExplorerProviderEvents } from './events/ExplorerProviderEvents'
 
@@ -39,7 +39,7 @@ import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 
 import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'
-import configProviders from '../config/providers.json'
+import configProviders from 'bzx-common/src/config/providers.ts'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'

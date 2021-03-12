@@ -2,7 +2,7 @@ import { BigNumber } from '@0x/utils'
 import ethereumUtils from 'bzx-common/src/lib/ethereumUtils'
 import Asset from "bzx-common/src/assets/Asset"
 
-const appNetwork = process.env.REACT_APP_ETH_NETWORK
+const appNetwork = process.env.REACT_APP_ETH_NETWORK as 'mainnet' | 'ropsten' | 'rinkeby' | 'kovan' | 'bsc' | undefined
 const releaseVersion = '2.0.0' // process.env.RELEASE_VERSION in the future
 
 const isMainnetProd =

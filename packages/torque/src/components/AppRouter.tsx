@@ -4,7 +4,7 @@ import TagManager from 'react-gtm-module'
 // import ReactGA from "react-ga";
 import Intercom from 'react-intercom'
 import { Redirect, Route, Router, Switch } from 'react-router-dom'
-import configProviders from '../config/providers.json'
+import configProviders from 'bzx-common/src/config/providers.ts'
 import { ProviderType } from '../domain/ProviderType'
 import TabContainer from '../layout/TabContainer'
 
@@ -19,7 +19,7 @@ import Modal from 'react-modal'
 
 import { ProviderMenu } from './ProviderMenu'
 import { Web3ReactProvider } from '@web3-react/core'
-import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { errors } from 'ethers'

@@ -22,7 +22,7 @@ import { ReserveDetails } from '../domain/ReserveDetails'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeTokenKey } from '../domain/TradeTokenKey'
 import { TradeType } from '../domain/TradeType'
-import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { FulcrumProviderEvents } from './events/FulcrumProviderEvents'
@@ -31,7 +31,7 @@ import { TasksQueueEvents } from './events/TasksQueueEvents'
 import { TasksQueue } from './TasksQueue'
 
 import TagManager from 'react-gtm-module'
-import configProviders from '../config/providers.json'
+import configProviders from 'bzx-common/src/config/providers.ts'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
