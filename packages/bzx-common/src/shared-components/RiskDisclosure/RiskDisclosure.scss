@@ -1,5 +1,15 @@
 @import './../../ui-framework/styles/variables.scss';
+:root {
+  --risk-disclosure-background: #ffffff;
+  --risk-disclosure-color: #444e5a;
+  --risk-disclosure-button: #00c0ab;
+}
 
+[data-theme='dark'] {
+  --risk-disclosure-background: #444e5a;
+  --risk-disclosure-color: #ffffff;
+  --risk-disclosure-button: #29323d;
+}
 .disclosure {
   position: relative;
   background-color: var(--risk-disclosure-background);
