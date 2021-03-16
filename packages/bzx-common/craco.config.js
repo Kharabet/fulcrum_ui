@@ -17,6 +17,7 @@ const envVars = {
   GIT_COMMIT: gitCommitId({ cwd: path.resolve(__dirname, '../../') }).slice(0, 7),
   REACT_APP_ETH_NETWORK: process.env.REACT_APP_ETH_NETWORK,
   NODE_ENV: process.env.NODE_ENV,
+  DISABLE_ESLINT_PLUGIN: process.env.DISABLE_ESLINT_PLUGIN,
 }
 
 const networks = ['mainnet', 'kovan', 'ropsten', 'rinkeby', 'bsc']

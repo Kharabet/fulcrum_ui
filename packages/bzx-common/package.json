@@ -1,14 +1,16 @@
 {
-    "name": "@bzxnetwork/bzx-common",
-    "version": "2.0.0",
-    "description": "Package with common classes or services for other dapps",
-    "keywords": [],
-    "author": "",
-    "license": "Apache-2.0",
-    "dependencies": {
-        "@0x/abi-gen": "^5.4.17",
-        "@0x/base-contract": "^6.2.16",
-        "@0x/utils": "^6.2.0"
-    },
-    "scripts": {}
+  "name": "@bzxnetwork/bzx-common",
+  "version": "2.0.0",
+  "description": "Package with common classes or services for other dapps",
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@0x/abi-gen": "^5.4.17",
+    "@0x/base-contract": "^6.2.16",
+    "@0x/utils": "^6.2.0"
+  },
+  "scripts": {
+    "lint": "eslint 'src/**/*.{ts,tsx}'"
+  }
 }

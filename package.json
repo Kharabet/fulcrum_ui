@@ -11,11 +11,20 @@
     "packages/web3-react-6/packages/*"
   ],
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "4.18.0",
+    "@typescript-eslint/parser": "4.18.0",
     "cross-env": "^7.0.3",
+    "eslint": "7.22.0",
+    "eslint-config-prettier": "8.1.0",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-prettier": "3.3.1",
+    "eslint-plugin-react": "7.22.0",
     "lerna": "^3.14.1",
+    "prettier": "2.2.1",
     "rimraf": "^3.0.2"
   },
   "scripts": {
+    "lint": "eslint . --quiet",
     "clean-all": "rimraf -rf ./packages/**/node_modules ./node_modules",
     "build-alchemy-web3": "./scripts/build-alchemy-web3.sh",
     "build-bzx-api": "cross-env-shell \"./scripts/build-bzx-api.sh\""
