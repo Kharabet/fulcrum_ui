@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-
-import '../styles/components/info-block.scss'
+import './InfoBlock.scss'
 
 export interface IInfoBlockProps {
   localstorageItemProp: string
@@ -11,7 +10,7 @@ export interface IInfoBlockState {
   isLocalstorageItemAccepted: boolean
 }
 
-export class InfoBlock extends Component<IInfoBlockProps, IInfoBlockState> {
+class InfoBlock extends Component<IInfoBlockProps, IInfoBlockState> {
   constructor(props: IInfoBlockProps, context?: any) {
     super(props, context)
 
@@ -47,3 +46,5 @@ export class InfoBlock extends Component<IInfoBlockProps, IInfoBlockState> {
     )
   }
 }
+
+export default InfoBlock

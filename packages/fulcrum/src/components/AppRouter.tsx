@@ -12,7 +12,7 @@ import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import configProviders from 'bzx-common/src/config/providers.ts'
 import { ProviderMenu } from './ProviderMenu'
-import { RiskDisclosure } from './RiskDisclosure'
+import RiskDisclosure from 'bzx-common/src/shared-components/RiskDisclosure'
 import { errors } from 'ethers'
 import siteConfig from './../config/SiteConfig.json'
 

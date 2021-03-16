@@ -1,0 +1,130 @@
+@import './../../ui-framework/styles/variables.scss';
+:root {
+  --risk-disclosure-background: #ffffff;
+  --risk-disclosure-color: #444e5a;
+  --risk-disclosure-button: #00c0ab;
+}
+
+[data-theme='dark'] {
+  --risk-disclosure-background: #444e5a;
+  --risk-disclosure-color: #ffffff;
+  --risk-disclosure-button: #29323d;
+}
+.disclosure {
+  position: relative;
+  background-color: var(--risk-disclosure-background);
+  color: var(--risk-disclosure-color);
+  box-sizing: border-box;
+  padding: 30px 48px;
+
+  @media screen and (min-width: $breakpoint-mobile-min) {
+    width: 650px;
+    margin: 90px auto;
+  }
+  @media screen and (max-width: 679px) {
+    width: calc(100vw - 30px);
+    margin: 30px 0;
+  }
+  h3 {
+    font-weight: 800;
+    line-height: 1.5;
+    margin: 15px auto 10px auto;
+    @media screen and (min-width: $breakpoint-mobile-min) {
+      font-size: 18px;
+    }
+    @media screen and (max-width: $breakpoint-mobile-max) {
+      font-size: 16px;
+    }
+  }
+  p {
+    line-height: 1.8;
+    &:not(:last-child) {
+      margin-bottom: 15px;
+    }
+    @media screen and (min-width: $breakpoint-mobile-min) {
+      font-size: 14px;
+    }
+    @media screen and (max-width: $breakpoint-mobile-max) {
+      font-size: 12px;
+    }
+  }
+  a {
+    color: #276bfb;
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+  ul {
+    list-style: none;
+    padding-left: 15px;
+    li {
+      position: relative;
+      line-height: 2;
+      @media screen and (min-width: $breakpoint-mobile-min) {
+        font-size: 14px;
+      }
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        font-size: 12px;
+      }
+      &:before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: #276bfb;
+        position: absolute;
+        left: -15px;
+        @media screen and (min-width: $breakpoint-mobile-min) {
+          top: 12px;
+        }
+        @media screen and (max-width: $breakpoint-mobile-max) {
+          top: 10px;
+        }
+      }
+    }
+  }
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__close {
+    display: flex;
+    cursor: pointer;
+  }
+  &__title {
+    font-size: 22px;
+    line-height: 1.5;
+    font-weight: 900;
+    font-style: normal;
+    font-stretch: normal;
+    color: var(--risk-disclosure-color);
+  }
+  &__content {
+    margin-top: 30px;
+  }
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    button {
+      font-family: 'Muli', sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #ffffff;
+      border-radius: 40px;
+      border: none;
+      outline: none;
+      background-color: var(--risk-disclosure-button);
+      cursor: pointer;
+      &:hover {
+        opacity: 0.9;
+      }
+      @media screen and (min-width: $breakpoint-mobile-min) {
+        padding: 12px 25px;
+      }
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        padding: 7px 18px;
+      }
+    }
+  }
+}

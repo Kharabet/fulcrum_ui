@@ -10,7 +10,7 @@ import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ProviderType } from '../domain/ProviderType'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
-import { InfoBlock } from '../components/InfoBlock'
+import InfoBlock from 'bzx-common/src/shared-components/InfoBlock'
 
 export interface IDashboardPageParams {
   doNetworkConnect: () => void

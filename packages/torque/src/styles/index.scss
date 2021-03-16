@@ -1,3 +1,4 @@
+@import './../../../bzx-common/src/styles/index.scss';
 @import 'abstracts/functions';
 @import 'abstracts/mixins';
 @import 'abstracts/variables';
@@ -20,7 +21,6 @@
 @import 'components/collateral-token-selector';
 @import 'components/dialog';
 @import 'components/extend-loan-form';
-@import 'components/info-block';
 @import 'components/manage-collateral-form';
 @import 'components/on-chain-indicator';
 @import 'components/switch-button';
@@ -28,7 +28,6 @@
 @import 'components/ops-selector';
 @import 'components/provider-menu';
 @import 'components/repay-loan-form';
-@import 'components/risk-disclosure';
 @import 'components/loader';
 @import 'components/input-amount';
 @import 'components/progress-fragment';
