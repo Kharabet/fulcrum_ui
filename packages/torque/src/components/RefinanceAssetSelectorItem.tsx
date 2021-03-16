@@ -18,8 +18,7 @@ import Slider from 'rc-slider'
 import { NavService } from '../services/NavService'
 import { RefinanceMakerRequest } from '../domain/RefinanceMakerRequest'
 import { Confirm } from './Confirm'
-import { RequestTask } from '../domain/RequestTask'
-import { RequestStatus } from '../domain/RequestStatus'
+import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import { TxProcessingLoader } from './TxProcessingLoader'
 
 export interface IRefinanceAssetSelectorItemProps {

@@ -10,11 +10,9 @@ import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
+import { TasksQueue, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
-import { TasksQueue } from '../services/TasksQueue'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { BorrowMoreDlg } from './BorrowMoreDlg'
 import { ExtendLoanDlg } from './ExtendLoanDlg'
@@ -41,12 +39,12 @@ interface IBorrowedFundsListItemState {
   isEmpty: boolean
   isLoadingTransaction: boolean
   request:
-    | ManageCollateralRequest
-    | RepayLoanRequest
-    | ExtendLoanRequest
-    | BorrowRequest
-    | RolloverRequest
-    | undefined
+  | ManageCollateralRequest
+  | RepayLoanRequest
+  | ExtendLoanRequest
+  | BorrowRequest
+  | RolloverRequest
+  | undefined
   activeTokenLiquidation: Asset
 }
 
@@ -301,17 +299,16 @@ export class BorrowedFundsListItem extends Component<
             <Rail sliderValue={sliderValue} sliderMin={sliderMin} sliderMax={sliderMax} />
           </div>
           <div
-            title={`${borrowedFundsItem.collateralAmount.toFixed(18)} ${
-              borrowedFundsItem.collateralAsset
-            }`}
+            title={`${borrowedFundsItem.collateralAmount.toFixed(18)} ${borrowedFundsItem.collateralAsset
+              }`}
             className="borrowed-funds-list-item__body-collateralized-value">
             Collateral:&nbsp;
             <span className="value">{borrowedFundsItem.collateralAmount.toFixed(4)}</span>&nbsp;
             {borrowedFundsItem.collateralAsset === Asset.WETH
               ? Asset.ETH
               : borrowedFundsItem.collateralAsset === Asset.WBNB
-              ? Asset.BNB
-              : borrowedFundsItem.collateralAsset}
+                ? Asset.BNB
+                : borrowedFundsItem.collateralAsset}
           </div>
           <div
             title={`${liquidationPrice.toFixed()}`}
@@ -340,9 +337,8 @@ export class BorrowedFundsListItem extends Component<
             <div className="borrowed-funds-list-item__extend">
               {remainingDays.lte(6) && (
                 <div
-                  className={`remaining ${
-                    isRollover ? `danger` : remainingDays.lte(3) ? `warning` : ``
-                  }`}>
+                  className={`remaining ${isRollover ? `danger` : remainingDays.lte(3) ? `warning` : ``
+                    }`}>
                   {isRollover ? `Warning` : `${remainingDays.toFixed(0, 1)} days`}
                   <IconInfo
                     className="tooltip__icon"

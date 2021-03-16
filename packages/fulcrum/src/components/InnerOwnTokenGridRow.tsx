@@ -10,14 +10,12 @@ import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import { TasksQueue } from '../services/TasksQueue'
+import { TasksQueue, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { NotificationRollover } from './NotificationRollover'
 import { IOwnTokenGridRowProps } from './OwnTokenGridRow'
@@ -251,8 +249,8 @@ export class InnerOwnTokenGridRow extends Component<
             ? `${this.props.profitCollateralToken.toFixed()}`
             : `${this.props.profitLoanToken.toFixed()}`
           : this.state.activeTokenProfit === this.props.baseToken
-          ? `${this.props.profitLoanToken.toFixed()}`
-          : `${this.props.profitCollateralToken.toFixed()}`
+            ? `${this.props.profitLoanToken.toFixed()}`
+            : `${this.props.profitCollateralToken.toFixed()}`
       profitValue =
         this.props.positionType === PositionType.LONG ? (
           <React.Fragment>
@@ -323,13 +321,12 @@ export class InnerOwnTokenGridRow extends Component<
                     {this.props.value.toFixed(precisionDigits)}
                     <span
                       title={this.state.valueChange.toFixed()}
-                      className={`inner-own-token-grid-row__col-asset-price-small ${
-                        this.state.valueChange.gt(0)
+                      className={`inner-own-token-grid-row__col-asset-price-small ${this.state.valueChange.gt(0)
                           ? 'positive'
                           : this.state.valueChange.lt(0)
-                          ? 'negative'
-                          : ''
-                      }`}>
+                            ? 'negative'
+                            : ''
+                        }`}>
                       {this.state.valueChange.gt(0) ? '+' : ''}
                       {this.state.valueChange.toFixed(2)}%
                     </span>
@@ -350,23 +347,21 @@ export class InnerOwnTokenGridRow extends Component<
                     <span title={this.props.collateral.toFixed(18)}>
                       {this.props.collateral.toFixed(2)}
                       <div
-                        className={`inner-own-token-grid-row__open-manage-collateral ${
-                          this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)
+                        className={`inner-own-token-grid-row__open-manage-collateral ${this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)
                             ? 'danger'
                             : ''
-                        }`}
+                          }`}
                         onClick={this.onManageClick}>
                         <OpenManageCollateral />
                       </div>
                     </span>
                     <span
-                      className={`inner-own-token-grid-row__col-asset-collateral-small ${
-                        this.props.loan.collateralizedPercent.lte(
-                          this.props.maintenanceMargin.plus(0.1)
-                        )
+                      className={`inner-own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(
+                        this.props.maintenanceMargin.plus(0.1)
+                      )
                           ? 'danger'
                           : ''
-                      }`}
+                        }`}
                       title={collateralizedPercent.toFixed(18)}>
                       {collateralizedPercent.toFixed(2)}%
                     </span>
@@ -439,18 +434,16 @@ export class InnerOwnTokenGridRow extends Component<
                   {Number(profitTitle) ? (
                     <div className="own-token-grid-row__col-profit-switch">
                       <label
-                        className={`${
-                          this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''
-                        }`}
+                        className={`${this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''
+                          }`}
                         onClick={() => {
                           this.setActiveTokenProfit(this.props.baseToken)
                         }}>
                         {this.props.baseToken}
                       </label>
                       <label
-                        className={`${
-                          this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
-                        }`}
+                        className={`${this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
+                          }`}
                         onClick={() => {
                           this.setActiveTokenProfit(this.props.quoteToken)
                         }}>
@@ -467,9 +460,8 @@ export class InnerOwnTokenGridRow extends Component<
             </div>
             <div className="inner-own-token-grid-row__col-action opacityIn rightIn">
               <button
-                className={`inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half  ${
-                  isRollover && 'rollover-warning'
-                }`}
+                className={`inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half  ${isRollover && 'rollover-warning'
+                  }`}
                 onClick={isRollover ? this.onRolloverClick : this.onSellClick}
                 disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
                 {isRollover ? 'Rollover' : 'Close Position'}

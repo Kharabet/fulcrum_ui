@@ -4,8 +4,8 @@ import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTo
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import { LendRequest } from '../../domain/LendRequest'
-import { RequestTask } from '../../domain/RequestTask'
-import { FulcrumProviderEvents } from '../events/FulcrumProviderEvents'
+
+import { RequestTask } from 'app-lib/tasksQueue'
 import { FulcrumProvider } from '../FulcrumProvider'
 
 export class UnlendChaiProcessor {

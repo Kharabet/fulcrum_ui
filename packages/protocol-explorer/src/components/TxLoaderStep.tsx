@@ -1,12 +1,6 @@
 import React, { Component } from 'react'
-
-import { RequestTask } from '../domain/RequestTask'
-import { TasksQueueEvents } from '../services/events/TasksQueueEvents'
-import { TasksQueue } from '../services/TasksQueue'
+import { TasksQueue, TasksQueueEvents, RequestTask } from 'app-lib/tasksQueue'
 import { ExplorerProvider } from '../services/ExplorerProvider'
-import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
-
-import { toChecksumAddress } from 'web3-utils'
 
 export interface ITitle {
   message: string
@@ -132,9 +126,8 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
       <React.Fragment>
         {this.state.requestTask && this.state.requestTask.txHash ? (
           <a
-            href={`${ExplorerProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${
-              this.state.requestTask!.txHash
-            }`}
+            href={`${ExplorerProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash
+              }`}
             target="_blank"
             rel="noopener noreferrer">
             <div
@@ -180,7 +173,7 @@ export class TxLoaderStep extends Component<ITxLoaderStepProps, ITxLoaderStepSta
       div.classList.add('animation-out')
     }
     window.setTimeout(async () => {
-      ;(await this._isMounted) &&
+      ; (await this._isMounted) &&
         this.setState({
           ...this.state,
           requestTask: task,

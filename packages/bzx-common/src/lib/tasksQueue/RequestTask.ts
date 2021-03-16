@@ -1,20 +1,18 @@
 import { EventEmitter } from 'events'
-import { TasksQueueEvents } from '../services/events/TasksQueueEvents'
-import { LiquidationRequest } from './LiquidationRequest'
-import { RequestStatus } from './RequestStatus'
-import { RolloverRequest } from './RolloverRequest'
+import TasksQueueEvents from './TasksQueueEvents'
+import RequestStatus from './RequestStatus'
 
-export class RequestTask {
+export default class RequestTask {
   private eventEmitter: EventEmitter | null = null
 
-  public readonly request: LiquidationRequest | RolloverRequest
+  public readonly request: any
   public status: RequestStatus
   public steps: string[]
   public stepCurrent: number
   public txHash: string | null
   public error: Error | null
 
-  constructor(request: LiquidationRequest | RolloverRequest) {
+  constructor(request: any) {
     this.request = request
     this.status = RequestStatus.AWAITING
     this.steps = ['Preparing processing...']
@@ -50,7 +48,6 @@ export class RequestTask {
 
   public processingStepNext() {
     this.stepCurrent++
-
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged)
     }
@@ -61,8 +58,8 @@ export class RequestTask {
     this.status = isSuccessful
       ? RequestStatus.DONE
       : skipGas
-      ? RequestStatus.FAILED_SKIPGAS
-      : RequestStatus.FAILED
+        ? RequestStatus.FAILED_SKIPGAS
+        : RequestStatus.FAILED
 
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged)

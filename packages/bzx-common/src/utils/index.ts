@@ -42,7 +42,7 @@ const getLogsFromEtherscan = async (
   const topicsQueryParams: string[] = []
   topics.forEach((topic, i) => topicsQueryParams.push(`topic${i}=${topic}&`))
   const blockExplorerUrl =
-    networkName === 'kovan'
+    networkName === 'bsc'
       ? 'https://bscscan.com'
       : networkName === 'kovan'
       ? 'https://api-kovan.etherscan.io'

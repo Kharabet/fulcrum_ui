@@ -39,18 +39,15 @@ import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 
 import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'
-import configProviders from 'bzx-common/src/config/providers.ts'
+import configProviders from 'bzx-common/src/config/providers'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { IRolloverData } from '../domain/IRolloverData'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { Platform } from '../domain/Platform'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
+import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import { RolloverRequest } from '../domain/RolloverRequest'
-import { TasksQueue } from '../services/TasksQueue'
-import { TasksQueueEvents } from './events/TasksQueueEvents'
 
 const isMainnetProd =
   process.env.NODE_ENV &&

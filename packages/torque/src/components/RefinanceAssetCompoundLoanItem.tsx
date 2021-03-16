@@ -19,8 +19,8 @@ import { NavService } from '../services/NavService'
 import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest'
 import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest'
 import { TxProcessingLoader } from './TxProcessingLoader'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
+import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
+
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean

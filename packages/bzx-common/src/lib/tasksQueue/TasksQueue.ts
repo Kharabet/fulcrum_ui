@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events'
-import { RequestTask } from '../domain/RequestTask'
-import { TasksQueueEvents } from './events/TasksQueueEvents'
+import RequestTask from './RequestTask'
+import TasksQueueEvents from './TasksQueueEvents'
 
-export class TasksQueue {
+export default class TasksQueue {
   public static Instance: TasksQueue
 
   private readonly requestTasks: RequestTask[]

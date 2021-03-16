@@ -1,6 +1,6 @@
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
-import { RequestTask } from '../../domain/RequestTask'
+import { RequestTask } from 'app-lib/tasksQueue'
 import { TradeRequest } from '../../domain/TradeRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
 

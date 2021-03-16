@@ -1,6 +1,5 @@
 import React, { Component, ReactNode } from 'react'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
+import { RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import { TorqueProvider } from '../services/TorqueProvider'
 
 export interface ITasksListItemDetailsProps {
@@ -32,8 +31,8 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
           ? 'task-list-item-details__step-title--in-progress'
           : 'task-list-item-details__step-title--failed'
         : index < this.props.task.stepCurrent
-        ? 'task-list-item-details__step-title--done'
-        : 'task-list-item-details__step-title--future'
+          ? 'task-list-item-details__step-title--done'
+          : 'task-list-item-details__step-title--future'
 
     const stepStateClassName =
       index + 1 === this.props.task.stepCurrent
@@ -63,8 +62,8 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
           ? 'task-list-item-details__step-img--in-progress'
           : 'task-list-item-details__step-img--failed'
         : index < this.props.task.stepCurrent
-        ? 'task-list-item-details__step-img--done'
-        : 'task-list-item-details__step-img--future'
+          ? 'task-list-item-details__step-img--done'
+          : 'task-list-item-details__step-img--future'
 
     return tx && TorqueProvider.Instance.web3ProviderSettings ? (
       <a

@@ -1,6 +1,7 @@
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
-import { RequestTask } from '../../domain/RequestTask'
+
+import { RequestTask } from 'app-lib/tasksQueue'
 import { TradeRequest } from '../../domain/TradeRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
 import { PositionType } from '../../domain/PositionType'
@@ -133,7 +134,7 @@ export class TradeBuyProcessor {
     //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
     const collateralTokenAddress =
       (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && collateralToken === Asset.ETH) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && collateralToken === Asset.BNB)
+        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && collateralToken === Asset.BNB)
         ? FulcrumProvider.ZERO_ADDRESS
         : FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
     const loanData = '0x'
@@ -141,7 +142,7 @@ export class TradeBuyProcessor {
     const sendAmountForValue =
       (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
         (taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH)) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.depositToken === Asset.BNB)
+        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.depositToken === Asset.BNB)
         ? amountInBaseUnits
         : new BigNumber(0)
 
@@ -154,36 +155,36 @@ export class TradeBuyProcessor {
       const gasAmount =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
           ? await tokenContract
-              .marginTradeWithGasToken(
-                '0x0000000000000000000000000000000000000000000000000000000000000000',
-                leverageAmount,
-                loanTokenSent,
-                collateralTokenSent,
-                collateralTokenAddress!,
-                account,
-                account,
-                loanData
-              )
-              .estimateGasAsync({
-                from: account,
-                value: sendAmountForValue,
-                gas: FulcrumProvider.Instance.gasLimit,
-              })
+            .marginTradeWithGasToken(
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+              leverageAmount,
+              loanTokenSent,
+              collateralTokenSent,
+              collateralTokenAddress!,
+              account,
+              account,
+              loanData
+            )
+            .estimateGasAsync({
+              from: account,
+              value: sendAmountForValue,
+              gas: FulcrumProvider.Instance.gasLimit,
+            })
           : await tokenContract
-              .marginTrade(
-                '0x0000000000000000000000000000000000000000000000000000000000000000',
-                leverageAmount,
-                loanTokenSent,
-                collateralTokenSent,
-                collateralTokenAddress!,
-                account,
-                loanData
-              )
-              .estimateGasAsync({
-                from: account,
-                value: sendAmountForValue,
-                gas: FulcrumProvider.Instance.gasLimit,
-              })
+            .marginTrade(
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+              leverageAmount,
+              loanTokenSent,
+              collateralTokenSent,
+              collateralTokenAddress!,
+              account,
+              loanData
+            )
+            .estimateGasAsync({
+              from: account,
+              value: sendAmountForValue,
+              gas: FulcrumProvider.Instance.gasLimit,
+            })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(FulcrumProvider.Instance.gasBufferCoeffForTrade)
         .integerValue(BigNumber.ROUND_UP)
