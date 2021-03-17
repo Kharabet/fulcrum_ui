@@ -16,7 +16,7 @@ import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
 import '../styles/components/trade-form.scss'

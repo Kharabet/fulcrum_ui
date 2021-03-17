@@ -10,7 +10,7 @@ import TabContainer from '../layout/TabContainer'
 
 import { MaintenancePage } from '../pages/MaintenancePage'
 //import { RefinancePage } from "../pages/RefinancePage";
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { TorqueProvider } from '../services/TorqueProvider'
 import siteConfig from '../config/SiteConfig.json'

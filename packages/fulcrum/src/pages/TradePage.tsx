@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react'
 import Modal from 'react-modal'
 
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
 import { HistoryTokenGrid } from '../components/HistoryTokenGrid'

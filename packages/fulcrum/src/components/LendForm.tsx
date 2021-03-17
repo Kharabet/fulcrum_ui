@@ -12,7 +12,7 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'

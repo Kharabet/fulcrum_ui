@@ -3,7 +3,7 @@ import { ProviderType } from '../domain/ProviderType'
 import { ProviderTypeDetails } from '../domain/ProviderTypeDetails'
 import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { ReactComponent as GenericWalletShort } from 'bzx-common/src/assets/images/providers/logo_short___genericwallet.svg'
 

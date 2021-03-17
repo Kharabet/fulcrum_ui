@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import Web3Utils from 'web3-utils'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 
 function ImpersonateInput() {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
