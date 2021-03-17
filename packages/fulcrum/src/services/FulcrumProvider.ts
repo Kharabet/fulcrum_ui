@@ -1,39 +1,13 @@
 import { Web3ProviderEngine } from '@0x/subproviders'
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
-import { EventEmitter } from 'events'
-import Asset from 'bzx-common/src/assets/Asset'
-
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
-import { IPriceDataPoint } from '../domain/IPriceDataPoint'
-import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
-import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
-import { ICollateralManagementParams } from '../domain/ICollateralManagementParams'
-import { LendRequest } from '../domain/LendRequest'
-import { LendType } from '../domain/LendType'
-import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
-import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
-import { PositionType } from '../domain/PositionType'
-import { ProviderType } from '../domain/ProviderType'
-import { ReserveDetails } from '../domain/ReserveDetails'
-import { TradeRequest } from '../domain/TradeRequest'
-import { TradeTokenKey } from '../domain/TradeTokenKey'
-import { TradeType } from '../domain/TradeType'
-import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
-import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
-import { FulcrumProviderEvents } from './events/FulcrumProviderEvents'
-import { LendTransactionMinedEvent } from './events/LendTransactionMinedEvent'
-import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
-
-import TagManager from 'react-gtm-module'
-import configProviders from 'bzx-common/src/config/providers'
-
 import { AbstractConnector } from '@web3-react/abstract-connector'
-
-import Web3Utils from 'web3-utils'
-
+import { RequestStatus, RequestTask, TasksQueue, TasksQueueEvents } from 'app-lib/tasksQueue'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import appConfig from 'bzx-common/src/config/appConfig'
+import configProviders from 'bzx-common/src/config/providers'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import {
   CloseWithSwapEvent,
   DepositCollateralEvent,
@@ -45,6 +19,8 @@ import {
   TradeEvent,
   WithdrawCollateralEvent,
 } from 'bzx-common/src/domain/events'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import {
   getCloseWithSwapHistory,
   getDepositCollateralHistory,
@@ -56,37 +32,34 @@ import {
   getTradeHistory,
   getWithdrawCollateralHistory,
 } from 'bzx-common/src/utils'
-
-import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
+import { EventEmitter } from 'events'
+import TagManager from 'react-gtm-module'
+import Web3Utils from 'web3-utils'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { ILoanParams } from '../domain/ILoanParams'
-import { RolloverRequest } from '../domain/RolloverRequest'
-import { IExtendState } from '../domain/IExtendState'
+import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
+import { ICollateralManagementParams } from '../domain/ICollateralManagementParams'
 import { IExtendEstimate } from '../domain/IExtendEstimate'
+import { IExtendState } from '../domain/IExtendState'
+import { ILoanParams } from '../domain/ILoanParams'
+import { IPriceDataPoint } from '../domain/IPriceDataPoint'
+import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
+import { LendRequest } from '../domain/LendRequest'
+import { LendType } from '../domain/LendType'
+import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { PositionType } from '../domain/PositionType'
+import { ProviderType } from '../domain/ProviderType'
+import { ReserveDetails } from '../domain/ReserveDetails'
+import { RolloverRequest } from '../domain/RolloverRequest'
+import { TradeRequest } from '../domain/TradeRequest'
+import { TradeTokenKey } from '../domain/TradeTokenKey'
+import { TradeType } from '../domain/TradeType'
+import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import { FulcrumProviderEvents } from './events/FulcrumProviderEvents'
+import { LendTransactionMinedEvent } from './events/LendTransactionMinedEvent'
 
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1
-    case 'ropsten':
-      return 3
-    case 'rinkeby':
-      return 4
-    case 'kovan':
-      return 42
-    case 'bsc':
-      return 56
-    default:
-      return 0
-  }
-}
 const networkName = process.env.REACT_APP_ETH_NETWORK
-const initialNetworkId = getNetworkIdByString(networkName)
+const initialNetworkId = appConfig.appNetworkId
 
 export class FulcrumProvider {
   public static Instance: FulcrumProvider
@@ -161,7 +134,7 @@ export class FulcrumProvider {
     const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType')
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
-    this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId)
+    this.web3ProviderSettings = appConfig.web3ProviderSettings
     // setting up readonly provider only when user wasn't connected earlier with the wallet
     providerType === null ||
       (providerType === ProviderType.None &&
@@ -192,8 +165,8 @@ export class FulcrumProvider {
     return this.impersonateAddress
       ? this.impersonateAddress
       : this.accounts.length > 0 && this.accounts[0]
-        ? this.accounts[0].toLowerCase()
-        : undefined
+      ? this.accounts[0].toLowerCase()
+      : undefined
   }
   public static getLocalstorageItem(item: string): string {
     let response = ''
@@ -1710,7 +1683,7 @@ export class FulcrumProvider {
       //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
       const collateralTokenAddress =
         (networkName === 'mainnet' && collateralToken === Asset.ETH) ||
-          (networkName === 'bsc' && collateralToken === Asset.BNB)
+        (networkName === 'bsc' && collateralToken === Asset.BNB)
           ? FulcrumProvider.ZERO_ADDRESS
           : FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
 
@@ -1776,43 +1749,6 @@ export class FulcrumProvider {
 
   //   return requestAmount.multipliedBy(request.leverage);
   // }
-
-  public static getWeb3ProviderSettings(networkId: number): IWeb3ProviderSettings {
-    // tslint:disable-next-line:one-variable-per-declaration
-    let networkName, etherscanURL
-    switch (networkId) {
-      case 1:
-        networkName = 'mainnet'
-        etherscanURL = 'https://etherscan.io/'
-        break
-      case 3:
-        networkName = 'ropsten'
-        etherscanURL = 'https://ropsten.etherscan.io/'
-        break
-      case 4:
-        networkName = 'rinkeby'
-        etherscanURL = 'https://rinkeby.etherscan.io/'
-        break
-      case 42:
-        networkName = 'kovan'
-        etherscanURL = 'https://kovan.etherscan.io/'
-        break
-      case 56:
-        networkName = 'bsc'
-        etherscanURL = 'https://bscscan.com/'
-        break
-      default:
-        networkId = 0
-        networkName = 'local'
-        etherscanURL = ''
-        break
-    }
-    return {
-      networkId,
-      networkName,
-      etherscanURL,
-    }
-  }
 
   public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0)
@@ -1967,30 +1903,30 @@ export class FulcrumProvider {
           result =
             isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
               ? await iBZxContract
-                .closeWithSwapWithGasToken(
-                  request.loanId,
-                  account,
-                  account,
-                  amountInBaseUnits,
-                  request.returnTokenIsCollateral, // returnTokenIsCollateral
-                  request.loanDataBytes
-                )
-                .callAsync({
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit,
-                })
+                  .closeWithSwapWithGasToken(
+                    request.loanId,
+                    account,
+                    account,
+                    amountInBaseUnits,
+                    request.returnTokenIsCollateral, // returnTokenIsCollateral
+                    request.loanDataBytes
+                  )
+                  .callAsync({
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit,
+                  })
               : await iBZxContract
-                .closeWithSwap(
-                  request.loanId,
-                  account,
-                  amountInBaseUnits,
-                  request.returnTokenIsCollateral, // returnTokenIsCollateral
-                  request.loanDataBytes
-                )
-                .callAsync({
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit,
-                })
+                  .closeWithSwap(
+                    request.loanId,
+                    account,
+                    amountInBaseUnits,
+                    request.returnTokenIsCollateral, // returnTokenIsCollateral
+                    request.loanDataBytes
+                  )
+                  .callAsync({
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit,
+                  })
         } catch (e) {
           console.error(e)
         }
@@ -2330,7 +2266,7 @@ export class FulcrumProvider {
     return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
-      networkName === 'bsc' ? Asset.BUSD : isMainnetProd ? Asset.DAI : Asset.USDC
+      networkName === 'bsc' ? Asset.BUSD : appConfig.isMainnetProd ? Asset.DAI : Asset.USDC
     )
   }
 
@@ -3092,7 +3028,7 @@ console.log(err, added);
                 ],
               },
             }
-            isMainnetProd && TagManager.dataLayer(tagManagerArgs)
+            appConfig.isMainnetProd && TagManager.dataLayer(tagManagerArgs)
             this.eventEmitter.emit(
               FulcrumProviderEvents.LendTransactionMined,
               new LendTransactionMinedEvent(request.asset, txHash)
@@ -3110,7 +3046,7 @@ console.log(err, added);
                 ],
               },
             }
-            isMainnetProd && TagManager.dataLayer(tagManagerArgs)
+            appConfig.isMainnetProd && TagManager.dataLayer(tagManagerArgs)
           } else if (request instanceof TradeRequest) {
             const tagManagerArgs = {
               dataLayer: {
@@ -3124,7 +3060,7 @@ console.log(err, added);
                 ],
               },
             }
-            isMainnetProd && TagManager.dataLayer(tagManagerArgs)
+            appConfig.isMainnetProd && TagManager.dataLayer(tagManagerArgs)
           }
         }
       } else {
@@ -3170,7 +3106,7 @@ console.log(err, added);
     const sendAmountForValue =
       (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
         (depositToken === Asset.WETH || depositToken === Asset.ETH)) ||
-        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && depositToken === Asset.BNB)
+      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && depositToken === Asset.BNB)
         ? amountInBaseUnits
         : new BigNumber(0)
 
@@ -3184,69 +3120,69 @@ console.log(err, added);
       try {
         gasAmount = isGasTokenEnabled
           ? await tokenContract
-            .marginTradeWithGasToken(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              new BigNumber(leverageAmount),
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              account,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              value: sendAmountForValue,
-              gas: FulcrumProvider.Instance.gasLimit,
-            })
+              .marginTradeWithGasToken(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(leverageAmount),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                account,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                value: sendAmountForValue,
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
           : await tokenContract
-            .marginTrade(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              new BigNumber(leverageAmount),
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              value: sendAmountForValue,
-              gas: FulcrumProvider.Instance.gasLimit,
-            })
-      } catch (e) { }
+              .marginTrade(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(leverageAmount),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                value: sendAmountForValue,
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
+      } catch (e) {}
     } else {
       const tokenContract = await this.contractsSource.getiBZxContract()
       if (!tokenContract) return result
       try {
         gasAmount = isGasTokenEnabled
           ? await tokenContract
-            .closeWithSwapWithGasToken(
-              request.loanId,
-              account,
-              account,
-              amountInBaseUnits,
+              .closeWithSwapWithGasToken(
+                request.loanId,
+                account,
+                account,
+                amountInBaseUnits,
 
-              request.returnTokenIsCollateral,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              gas: FulcrumProvider.Instance.gasLimit,
-            })
+                request.returnTokenIsCollateral,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
           : await tokenContract
-            .closeWithSwap(
-              request.loanId,
-              account,
-              amountInBaseUnits,
-              request.returnTokenIsCollateral,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              gas: FulcrumProvider.Instance.gasLimit,
-            })
-      } catch (e) { }
+              .closeWithSwap(
+                request.loanId,
+                account,
+                amountInBaseUnits,
+                request.returnTokenIsCollateral,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
+      } catch (e) {}
     }
     return new BigNumber(gasAmount || 0)
       .multipliedBy(this.gasBufferCoeffForTrade)

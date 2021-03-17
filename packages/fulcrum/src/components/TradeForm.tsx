@@ -1,16 +1,15 @@
-import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
+import '../styles/components/trade-form.scss'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import appConfig from 'bzx-common/src/config/appConfig'
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
-import Asset from 'bzx-common/src/assets/Asset'
-
-import AssetDetails from 'bzx-common/src/assets/AssetDetails'
-
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { PositionType } from '../domain/PositionType'
 import { TradeRequest } from '../domain/TradeRequest'
@@ -18,18 +17,11 @@ import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-
-import '../styles/components/trade-form.scss'
 import { InputAmount } from './InputAmount'
 import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import TradeExpectedResult from './TradeExpectedResult'
-
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber
@@ -681,7 +673,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     const usdPrice = this.state.tradeAmountValue.multipliedBy(rateUSD)
 
-    if (isMainnetProd) {
+    if (appConfig.isMainnetProd) {
       const randomNumber = Math.floor(Math.random() * 100000) + 1
       const tagManagerArgs = {
         dataLayer: {

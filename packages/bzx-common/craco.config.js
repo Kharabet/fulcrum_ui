@@ -43,7 +43,7 @@ module.exports = {
 
         const newIncludePaths = [
           // relative path to my yarn workspace library
-          path.resolve(__dirname, '../bzx-common')
+          path.resolve(__dirname, '../bzx-common'),
         ]
         if (tsxRule) {
           if (Array.isArray(tsxRule.include)) {

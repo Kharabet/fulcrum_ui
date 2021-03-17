@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils'
-import ethereumUtils from 'bzx-common/src/lib/ethereumUtils'
-import Asset from 'bzx-common/src/assets/Asset'
+import Asset from '../assets/Asset'
+import ethereumUtils from '../lib/ethereumUtils'
 
 const appNetwork = process.env.REACT_APP_ETH_NETWORK as
   | 'mainnet'

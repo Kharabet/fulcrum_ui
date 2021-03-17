@@ -1,28 +1,25 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
+import { AbstractConnector } from '@web3-react/abstract-connector'
+import { Web3ReactProvider } from '@web3-react/core'
+import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
+import appConfig from 'bzx-common/src/config/appConfig'
+import configProviders from 'bzx-common/src/config/providers'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
+import RiskDisclosure from 'bzx-common/src/shared-components/RiskDisclosure'
+import { errors } from 'ethers'
 import React, { Component, Suspense } from 'react'
-
 import TagManager from 'react-gtm-module'
 import Modal from 'react-modal'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
+import { PreloaderChart } from '../components/PreloaderChart'
+import siteConfig from '../config/SiteConfig.json'
 import Footer from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
-
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import configProviders from 'bzx-common/src/config/providers'
 import { ProviderMenu } from './ProviderMenu'
-import RiskDisclosure from 'bzx-common/src/shared-components/RiskDisclosure'
-import { errors } from 'ethers'
-import siteConfig from './../config/SiteConfig.json'
-
-import { Web3ReactProvider } from '@web3-react/core'
-import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
-import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
-import { AbstractConnector } from '@web3-react/abstract-connector'
-import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
-
-import { PreloaderChart } from '../components/PreloaderChart'
 
 const Intercom = React.lazy(() => import('react-intercom'))
 const LendPage = React.lazy(() => import('../pages/LendPage'))
@@ -31,12 +28,7 @@ const MaintenancePage = React.lazy(() => import('../pages/MaintenancePage'))
 const StatsPage = React.lazy(() => import('../pages/StatsPage'))
 const TradePage = React.lazy(() => import('../pages/TradePage'))
 
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-
-if (isMainnetProd) {
+if (appConfig.isMainnetProd) {
   const tagManagerArgs = {
     gtmId: configProviders.Google_TrackingID,
     dataLayer: {
@@ -107,7 +99,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public render() {
     return (
       <Web3ReactProvider getLibrary={this.getLibrary}>
-        {isMainnetProd && !this.state.isMobileMedia ? (
+        {appConfig.isMainnetProd && !this.state.isMobileMedia ? (
           <React.Fragment>
             <Suspense
               fallback={
@@ -149,7 +141,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             ) : (
               <BrowserRouter>
                 <Switch>
-                  {!isMainnetProd ? (
+                  {!appConfig.isMainnetProd ? (
                     <Route
                       exact={true}
                       path="/"
@@ -265,7 +257,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       </React.Fragment>
                     )}
                   />
-                  {isMainnetProd ? (
+                  {appConfig.isMainnetProd ? (
                     <Route
                       path="*"
                       component={() => {
@@ -277,7 +269,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     <Route path="*" render={() => <Redirect to="/" />} />
                   )}
                 </Switch>
-                {isMainnetProd ? (
+                {appConfig.isMainnetProd ? (
                   <Route
                     path="/"
                     render={({ location }) => {

@@ -1,15 +1,17 @@
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
-import { EventEmitter } from 'events'
-
-import Web3Utils from 'web3-utils'
-
-import constantAddress from '../config/constant.json'
+import { AbstractConnector } from '@web3-react/abstract-connector'
+import ethereumUtils from 'app-lib/ethereumUtils'
+import { RequestStatus, RequestTask, TasksQueue, TasksQueueEvents } from 'app-lib/tasksQueue'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import appConfig from 'bzx-common/src/config/appConfig'
+import configProviders from 'bzx-common/src/config/providers'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { cdpManagerContract } from 'bzx-common/src/contracts/typescript-wrappers/cdpManager'
 import { CompoundBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/CompoundBridge'
 import { CompoundComptrollerContract } from 'bzx-common/src/contracts/typescript-wrappers/CompoundComptroller'
 import { dsProxyJsonContract } from 'bzx-common/src/contracts/typescript-wrappers/dsProxyJson'
-// import rawEncode  from "ethereumjs-abi";
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 import { GetCdpsContract } from 'bzx-common/src/contracts/typescript-wrappers/getCdps'
 import { instaRegistryContract } from 'bzx-common/src/contracts/typescript-wrappers/instaRegistry'
@@ -18,18 +20,21 @@ import { proxyRegistryContract } from 'bzx-common/src/contracts/typescript-wrapp
 import { saiToDAIBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/saiToDaiBridge'
 import { SoloContract } from 'bzx-common/src/contracts/typescript-wrappers/solo'
 import { SoloBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/SoloBridge'
-
 import { vatContract } from 'bzx-common/src/contracts/typescript-wrappers/vat'
-import Asset from 'bzx-common/src/assets/Asset'
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
+import { EventEmitter } from 'events'
+import Web3Utils from 'web3-utils'
+import constantAddress from '../config/constant.json'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { BorrowRequestAwaiting } from '../domain/BorrowRequestAwaiting'
+import { LiquidationEvent } from '../domain/events/LiquidationEvent'
 import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { IDepositEstimate } from '../domain/IDepositEstimate'
 import { IBorrowEstimate } from '../domain/IBorrowEstimate'
 import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
 import { ICollateralManagementParams } from '../domain/ICollateralManagementParams'
+import { IDepositEstimate } from '../domain/IDepositEstimate'
 import { IExtendEstimate } from '../domain/IExtendEstimate'
 import { IExtendState } from '../domain/IExtendState'
 import { ILoanParams } from '../domain/ILoanParams'
@@ -46,20 +51,8 @@ import {
 } from '../domain/RefinanceData'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
 import { RolloverRequest } from '../domain/RolloverRequest'
-import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import { BorrowRequestAwaitingStore } from './BorrowRequestAwaitingStore'
-import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import { TorqueProviderEvents } from './events/TorqueProviderEvents'
-import { AbstractConnector } from '@web3-react/abstract-connector'
-import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
-import configProviders from 'bzx-common/src/config/providers'
-import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
-
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 let configAddress: any
 if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
@@ -68,24 +61,8 @@ if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
   configAddress = constantAddress.kovan
 }
 
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1
-    case 'ropsten':
-      return 3
-    case 'rinkeby':
-      return 4
-    case 'kovan':
-      return 42
-    case 'bsc':
-      return 56
-    default:
-      return 0
-  }
-}
-const networkName = process.env.REACT_APP_ETH_NETWORK
-const initialNetworkId = getNetworkIdByString(networkName)
+const networkName = appConfig.appNetwork
+const initialNetworkId = appConfig.appNetworkId
 
 export class TorqueProvider {
   public static Instance: TorqueProvider
@@ -138,11 +115,11 @@ export class TorqueProvider {
     const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType')
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
-    this.web3ProviderSettings = TorqueProvider.getWeb3ProviderSettings(initialNetworkId)
+    this.web3ProviderSettings = appConfig.web3ProviderSettings
     if (!providerType || providerType === ProviderType.None) {
       // TorqueProvider.Instance.isLoading = true;
       // setting up readonly provider
-      this.web3ProviderSettings = TorqueProvider.getWeb3ProviderSettings(initialNetworkId)
+      this.web3ProviderSettings = appConfig.web3ProviderSettings
       Web3ConnectionFactory.setReadonlyProvider().then(() => {
         const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
         const engine = Web3ConnectionFactory.currentWeb3Engine
@@ -263,7 +240,7 @@ export class TorqueProvider {
     let networkId = providerData[3]
     const selectedAccount = providerData[4]
 
-    this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId)
+    this.web3ProviderSettings = ethereumUtils.getWeb3ProviderSettings(networkId)
     if (this.web3Wrapper) {
       if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
         // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
@@ -271,7 +248,7 @@ export class TorqueProvider {
         this.unsupportedNetwork = true
         canWrite = false // revert back to read-only
         networkId = await this.web3Wrapper.getNetworkIdAsync()
-        this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId)
+        this.web3ProviderSettings = ethereumUtils.getWeb3ProviderSettings(networkId)
       } else {
         this.unsupportedNetwork = false
       }
@@ -317,43 +294,6 @@ export class TorqueProvider {
       await this.contractsSource.Init()
     }
     TorqueProvider.Instance.isLoading = false
-  }
-
-  public static getWeb3ProviderSettings(networkId: number | null): IWeb3ProviderSettings {
-    // tslint:disable-next-line:one-variable-per-declaration
-    let networkName, etherscanURL
-    switch (networkId) {
-      case 1:
-        networkName = 'mainnet'
-        etherscanURL = 'https://etherscan.io/'
-        break
-      case 3:
-        networkName = 'ropsten'
-        etherscanURL = 'https://ropsten.etherscan.io/'
-        break
-      case 4:
-        networkName = 'rinkeby'
-        etherscanURL = 'https://rinkeby.etherscan.io/'
-        break
-      case 42:
-        networkName = 'kovan'
-        etherscanURL = 'https://kovan.etherscan.io/'
-        break
-      case 56:
-        networkName = 'bsc'
-        etherscanURL = 'https://bscscan.com/'
-        break
-      default:
-        networkId = 0
-        networkName = 'local'
-        etherscanURL = ''
-        break
-    }
-    return {
-      networkId,
-      networkName,
-      etherscanURL,
-    }
   }
 
   public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
@@ -509,7 +449,7 @@ export class TorqueProvider {
       return new BigNumber(1)
     }
 
-    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
+    return this.getSwapRate(asset, appConfig.isMainnetProd ? Asset.DAI : Asset.USDC)
   }
 
   public async getSwapRate(

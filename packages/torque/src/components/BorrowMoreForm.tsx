@@ -1,19 +1,15 @@
 import { BigNumber } from '@0x/utils'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import appConfig from 'bzx-common/src/config/appConfig'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { Subject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { ChiSwitch } from './ChiSwitch'
 import { Rail } from './Rail'
-
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export interface IBorrowMoreFormProps {
   loanOrderState: IBorrowedFundsState
@@ -204,7 +200,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       let usdPrice = this.state.borrowAmount
       usdPrice = usdPrice.multipliedBy(usdAmount)
 
-      if (isMainnetProd) {
+      if (appConfig.isMainnetProd) {
         const tagManagerArgs = {
           dataLayer: {
             event: 'purchase',

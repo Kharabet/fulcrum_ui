@@ -19,11 +19,6 @@ import { ProviderMenu } from './ProviderMenu'
 import { Tab } from '../domain/Tab'
 import TabContainer from './TabContainer'
 
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-
 interface IAppRouterState {
   isProviderMenuModalOpen: boolean
   selectedProviderType: ProviderType

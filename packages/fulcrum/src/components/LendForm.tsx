@@ -1,31 +1,22 @@
 import { BigNumber } from '@0x/utils'
+import '../styles/components/input-amount.scss'
+import '../styles/components/lend-form.scss'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import appConfig from 'bzx-common/src/config/appConfig'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import Asset from 'bzx-common/src/assets/Asset'
-
-import AssetDetails from 'bzx-common/src/assets/AssetDetails'
-
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
+import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-
-import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { AssetDropdown } from './AssetDropdown'
 import { Preloader } from './Preloader'
-
-import '../styles/components/input-amount.scss'
-import '../styles/components/lend-form.scss'
-
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean
@@ -569,7 +560,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     const usdPrice = sendAmount.multipliedBy(usdAmount)
 
-    if (isMainnetProd && LendType.LEND) {
+    if (appConfig.isMainnetProd && LendType.LEND) {
       const randomNumber = Math.floor(Math.random() * 100000) + 1
       const tagManagerArgs = {
         dataLayer: {
