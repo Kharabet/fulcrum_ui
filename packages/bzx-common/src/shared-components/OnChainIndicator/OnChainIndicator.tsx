@@ -24,7 +24,7 @@ interface IOnChainIndicatorState {
   isSupportedNetwork: boolean
   etherscanURL: string
   accountText: string
-  providerTypeDetails: ProviderTypeDetails | null
+  providerTypeDetails: ProviderTypeDetails
 }
 
 class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicatorState> {
@@ -36,7 +36,7 @@ class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicat
       isSupportedNetwork: true,
       etherscanURL: '',
       accountText: '',
-      providerTypeDetails: null,
+      providerTypeDetails: ProviderTypeDictionary.providerTypes.get(ProviderType.None)!,
     }
 
     props.provider.eventEmitter.on(props.providerIsChanging, this.onProviderIsChanging)
@@ -94,7 +94,8 @@ class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicat
       isSupportedNetwork,
       etherscanURL,
       accountText,
-      providerTypeDetails: providerTypeDetails || null,
+      providerTypeDetails:
+        providerTypeDetails || ProviderTypeDictionary.providerTypes.get(ProviderType.None)!,
     })
   }
 
@@ -143,10 +144,17 @@ class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicat
     accountText: string | null,
     walletAddressText: string
   ) {
-    if (isLoading) {
+    if (isLoading && providerTypeDetails) {
+      const ProviderIcon = providerTypeDetails.reactLogoSvgShort
+
       return (
         <React.Fragment>
-          <span className="on-chain-indicator__provider-txt">Loading Wallet...</span>
+          <div className="on-chain-indicator__svg">
+            <ProviderIcon />
+          </div>
+          <div className="on-chain-indicator__description">
+            <span className="on-chain-indicator__provider-txt">Loading Wallet...</span>
+          </div>
         </React.Fragment>
       )
     } else {
@@ -158,7 +166,12 @@ class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicat
               <ProviderIcon />
             </div>
             <div className="on-chain-indicator__description">
-              <span>{providerTypeDetails.displayName}</span>
+              <span>
+                {providerTypeDetails !==
+                ProviderTypeDictionary.providerTypes.get(ProviderType.None)!
+                  ? providerTypeDetails.displayName
+                  : 'Connect Wallet'}
+              </span>
               {walletAddressText ? (
                 isSupportedNetwork && accountText && etherscanURL ? (
                   <a
