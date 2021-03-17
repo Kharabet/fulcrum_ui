@@ -54,7 +54,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import configProviders from 'bzx-common/src/config/providers'
 import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
-import { LiquidationEvent } from '../domain/events/LiquidationEvent'
+import { LiquidationEvent } from 'bzx-common/src/domain/events'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
