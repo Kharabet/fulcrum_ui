@@ -1,10 +1,19 @@
+@import './../../ui-framework/styles/variables.scss';
+
+:root {
+  --indicator-border: #b9c7d6;
+}
+
+[data-theme='dark'] {
+  --indicator-border: #a2abb8;
+}
 .on-chain-indicator {
   display: inline-block;
-  height: 100%;
   height: 49px;
 }
 
 .on-chain-indicator__container {
+  font-family: 'Muli', sans-serif;
   height: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -39,15 +48,6 @@
       margin-bottom: 3px;
     }
   }
-  .on-chain-indicator__provider-img {
-    display: inline-block;
-    text-align: center;
-    vertical-align: top;
-    height: 1rem;
-    line-height: 2rem;
-    margin: 0.5rem 1rem;
-  }
-
   .on-chain-indicator__provider-txt {
     display: inline-block;
     text-align: center;
@@ -83,9 +83,6 @@
   }
   .on-chain-indicator__container {
     margin: 0;
-    .on-chain-indicator__provider-img {
-      margin: 0.5rem 0.5rem;
-    }
     .on-chain-indicator__wallet-address {
       padding: 0 0.5rem;
       border-left: solid 0px;

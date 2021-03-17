@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { OnChainIndicator } from '../components/OnChainIndicator'
+import OnChainIndicator from 'bzx-common/src/shared-components/OnChainIndicator'
 import { TorqueProvider } from '../services/TorqueProvider'
+import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import { HeaderLogo } from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
 
@@ -123,7 +124,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
                 <span>Help Center</span>
               </a>
             </div>
-            <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            <OnChainIndicator
+              doNetworkConnect={this.props.doNetworkConnect}
+              provider={TorqueProvider.Instance}
+              providerIsChanging={TorqueProviderEvents.ProviderIsChanging}
+              providerChanged={TorqueProviderEvents.ProviderChanged}
+            />
           </div>
         </div>
       </header>
@@ -151,7 +157,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           {this.state.isMenuOpen ? (
             <div className={sidebarClass}>
               <div className="header_btn">
-                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+                <OnChainIndicator
+                  doNetworkConnect={this.props.doNetworkConnect}
+                  provider={TorqueProvider.Instance}
+                  providerIsChanging={TorqueProviderEvents.ProviderIsChanging}
+                  providerChanged={TorqueProviderEvents.ProviderChanged}
+                />
               </div>
               <div className="header_nav_menu">
                 <HeaderMenu items={this.MenuMobile.items} />
