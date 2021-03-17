@@ -449,7 +449,7 @@ export class TorqueProvider {
       return new BigNumber(1)
     }
 
-    return this.getSwapRate(asset, appConfig.isProduction ? Asset.DAI : Asset.USDC)
+    return this.getSwapRate(asset, appConfig.tokenForUsdSwapRate)
   }
 
   public async getSwapRate(

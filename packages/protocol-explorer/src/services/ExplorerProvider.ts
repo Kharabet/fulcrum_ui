@@ -749,7 +749,7 @@ export class ExplorerProvider {
       return this.getSwapToUsdRateOffChain(asset)
     }
 
-    return this.getSwapRate(asset, appConfig.isProduction ? Asset.DAI : Asset.USDC)
+    return this.getSwapRate(asset, appConfig.tokenForUsdSwapRate)
   }
 
   public async getSwapRate(

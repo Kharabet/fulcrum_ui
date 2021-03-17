@@ -21,6 +21,8 @@ const isBsc = appNetwork === 'bsc'
 
 const isMainnet = appNetwork === 'mainnet'
 
+const tokenForUsdSwapRate = isMainnet ? Asset.DAI : isBsc ? Asset.BUSD : Asset.USDC
+
 /**
  * mainnet: 1, ropsten: 3, rinkeby: 4, kovan: 42, default (local): 0
  */
@@ -107,13 +109,14 @@ export default {
   appNetworkId,
   bptDecimals,
   infiniteApproval,
-  isKovan,
   isBsc,
-  isMainnet,
   isGTMEnabled,
+  isKovan,
+  isMainnet,
   isProduction,
+  releaseVersion,
+  tokenForUsdSwapRate,
+  TRADE_PAIRS,
   vestingDurationAfterCliff,
   web3ProviderSettings,
-  releaseVersion,
-  TRADE_PAIRS,
 }

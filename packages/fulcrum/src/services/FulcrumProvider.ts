@@ -2264,10 +2264,7 @@ export class FulcrumProvider {
     );
 
     return swapRates[0][0];*/
-    return this.getSwapRate(
-      asset,
-      networkName === 'bsc' ? Asset.BUSD : appConfig.isProduction ? Asset.DAI : Asset.USDC
-    )
+    return this.getSwapRate(asset, appConfig.tokenForUsdSwapRate)
   }
 
   private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
