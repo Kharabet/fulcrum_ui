@@ -8,7 +8,7 @@ Before starting the project need to install:
 
 - [Node.js](https://nodejs.org/uk/) release 14.x or later with **npm** required.
 - Yarn through the npm package manager `npm install --global yarn`
-- [node-jyp](https://github.com/nodejs/node-gyp)  - Node.js native addon build tool
+- [node-jyp](https://github.com/nodejs/node-gyp) - Node.js native addon build tool
 - Install all project dependencies with `yarn` command
 
 ## Working with different networks
@@ -40,6 +40,7 @@ The following must be done in the contract repo folder.
   - `ETHERSCAN_TOKEN`
 
 **UI setup**
+
 - Set `REACT_APP_ETH_NETWORK = mainnet` variable in the root `.env` file
 - The UI is started with `yarn`
 - The local fork will be available on `localhost:8545`
@@ -84,3 +85,7 @@ accounts[0].transfer(myAccount, 10e18)
 ### Running ganache cli standalone
 
 `ganache-cli --accounts 10 --hardfork istanbul --fork https://mainnet.infura.io/v3/11e3d4b69e3b45869281bddc2e67477e --gasLimit 10000000 --mnemonic brownie --port 8545 -v`
+
+### Analyze bundle
+
+Add `ANALYZE_BUNDLE=true` in your `.env` to enable [webpack analysis](https://github.com/webpack-contrib/webpack-bundle-analyzer).
