@@ -31,7 +31,7 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import '../styles/components/history-token-grid.scss'
-import { TRADE_PAIRS } from 'bzx-common/src/config/appConfig'
+import { tradePairs } from 'bzx-common/src/config/appConfig'
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean
@@ -177,10 +177,11 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
               <ArrowPagination />
             </div>
             <div
-              className={`next ${this.state.numberPagination === this.state.quantityGrids || this.state.isLastRow
-                ? `disabled`
-                : ``
-                }`}
+              className={`next ${
+                this.state.numberPagination === this.state.quantityGrids || this.state.isLastRow
+                  ? `disabled`
+                  : ``
+              }`}
               onClick={this.nextPagination}>
               <ArrowPagination />
             </div>
@@ -210,12 +211,12 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       const tradeEvent = events[0] as TradeEvent
 
       let positionType
-      const possiblePairs = TRADE_PAIRS.filter(
+      const possiblePairs = tradePairs.filter(
         (p) =>
           (p.baseToken === tradeEvent.loanToken && p.quoteToken === tradeEvent.collateralToken) ||
           (p.baseToken === tradeEvent.collateralToken && p.quoteToken === tradeEvent.loanToken)
       )
-      if (TRADE_PAIRS.length > 0 && possiblePairs && possiblePairs.length > 0) {
+      if (tradePairs.length > 0 && possiblePairs && possiblePairs.length > 0) {
         if (possiblePairs.length > 1) {
           console.error(
             "The position fits to more than one pair. Couldn't treat it exactly as LONG/SHORT"
@@ -259,15 +260,15 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         positionType === PositionType.LONG
           ? tradeEvent.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
             ? new BigNumber(10 ** 36)
-              .div(tradeEvent.entryPrice)
-              .div(10 ** 18)
-              .times(10 ** (collateralAssetDecimalsFirstEvent - loanAssetDecimalsFirstEvent))
+                .div(tradeEvent.entryPrice)
+                .div(10 ** 18)
+                .times(10 ** (collateralAssetDecimalsFirstEvent - loanAssetDecimalsFirstEvent))
             : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
           : tradeEvent.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
-            ? tradeEvent.entryPrice
+          ? tradeEvent.entryPrice
               .div(10 ** 18)
               .times(10 ** (loanAssetDecimalsFirstEvent - collateralAssetDecimalsFirstEvent))
-            : tradeEvent.entryPrice.div(10 ** 18)
+          : tradeEvent.entryPrice.div(10 ** 18)
 
       const positionEventsGroup = new PositionEventsGroup(
         loanId,
@@ -310,17 +311,17 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionSize.div(10 ** collateralAssetDecimals)
             tradePrice = event.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
               ? new BigNumber(10 ** 36)
-                .div(event.entryPrice)
-                .div(10 ** 18)
-                .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+                  .div(event.entryPrice)
+                  .div(10 ** 18)
+                  .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
               : new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18)
             value = positionValue.times(tradePrice)
           } else {
             positionValue = event.borrowedAmount.div(10 ** loanAssetDecimals)
             tradePrice = event.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
               ? event.entryPrice
-                .div(10 ** 18)
-                .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
+                  .div(10 ** 18)
+                  .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
               : event.entryPrice.div(10 ** 18)
             value = positionValue.times(tradePrice)
           }
@@ -350,9 +351,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionCloseSize.div(10 ** collateralAssetDecimals)
             tradePrice = event.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
               ? new BigNumber(10 ** 36)
-                .div(event.exitPrice)
-                .div(10 ** 18)
-                .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
+                  .div(event.exitPrice)
+                  .div(10 ** 18)
+                  .times(10 ** (collateralAssetDecimals - loanAssetDecimals))
               : new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18)
             value = positionValue.times(tradePrice)
             profit = tradePrice.minus(openPrice).times(positionValue)
@@ -360,8 +361,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.loanCloseAmount.div(10 ** loanAssetDecimals)
             tradePrice = event.blockNumber.gt(blockNumberWhenPricePrecisionWasChanged)
               ? event.exitPrice
-                .div(10 ** 18)
-                .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
+                  .div(10 ** 18)
+                  .times(10 ** (loanAssetDecimals - collateralAssetDecimals))
               : event.exitPrice.div(10 ** 18)
             value = positionValue.times(tradePrice)
             profit = openPrice.minus(tradePrice).times(positionValue)
