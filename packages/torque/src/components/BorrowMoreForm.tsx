@@ -200,7 +200,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       let usdPrice = this.state.borrowAmount
       usdPrice = usdPrice.multipliedBy(usdAmount)
 
-      if (appConfig.isMainnetProd) {
+      if (appConfig.isGTMEnabled) {
         const tagManagerArgs = {
           dataLayer: {
             event: 'purchase',

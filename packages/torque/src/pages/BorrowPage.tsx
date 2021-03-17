@@ -1,8 +1,9 @@
-import Asset from 'bzx-common/src/assets/Asset'
-import React, { RefObject, useState } from 'react'
-import AssetSelector from '../components/AssetSelector'
 import { BorrowDlg } from '../components/BorrowDlg'
 import { TorqueProvider } from '../services/TorqueProvider'
+import appConfig from 'bzx-common/src/config/appConfig'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetSelector from '../components/AssetSelector'
+import React, { RefObject, useState } from 'react'
 
 export interface IBorrowPageProps {
   doNetworkConnect: () => void
@@ -11,7 +12,7 @@ export interface IBorrowPageProps {
 }
 let assetsShown: Asset[]
 
-if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+if (appConfig.isMainnet) {
   assetsShown = [
     Asset.ETH,
     Asset.DAI,
@@ -28,9 +29,9 @@ if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
     Asset.LRC,
     Asset.COMP,
   ]
-} else if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+} else if (appConfig.isBsc) {
   assetsShown = [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTC, Asset.USDT]
-} else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+} else if (appConfig.isKovan) {
   assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
 } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
   assetsShown = [Asset.DAI, Asset.ETH]

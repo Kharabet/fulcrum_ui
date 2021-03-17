@@ -1,11 +1,12 @@
 import { BigNumber } from '@0x/utils'
-import React, { useEffect, useState } from 'react'
-import { Loader } from '../components/Loader'
-import Asset from 'bzx-common/src/assets/Asset'
-import { TorqueProvider } from '../services/TorqueProvider'
-import AssetSelectorItem from './AssetSelectorItem'
 import { BorrowDlg } from './BorrowDlg'
+import { Loader } from '../components/Loader'
+import { TorqueProvider } from '../services/TorqueProvider'
 import { TorqueProviderEvents } from 'src/services/events/TorqueProviderEvents'
+import appConfig from 'bzx-common/src/config/appConfig'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetSelectorItem from './AssetSelectorItem'
+import React, { useEffect, useState } from 'react'
 
 export interface IAssetSelectorProps {
   borrowDlgRef: React.RefObject<BorrowDlg>
@@ -34,7 +35,7 @@ const AssetSelector = (props: IAssetSelectorProps) => {
   const getInterestRates = async () => {
     let interestRatesData = {}
     // TODO: add API endpoints for bsc
-    if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+    if (appConfig.isBsc) {
       const assetsInterestRates = await Promise.all(
         props.assetsShown.map((asset) => TorqueProvider.Instance.getAssetBorrowInterestRate(asset))
       )
@@ -57,7 +58,7 @@ const AssetSelector = (props: IAssetSelectorProps) => {
   const getLiquidity = async () => {
     let liquidityData = {}
     // TODO: add API endpoints for bsc
-    if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+    if (appConfig.isBsc) {
       const assetsLiquidities = await Promise.all(
         props.assetsShown.map((asset) => TorqueProvider.Instance.getAvailableLiquidity(asset))
       )

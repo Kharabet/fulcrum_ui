@@ -1,15 +1,14 @@
-import React, { Component } from 'react'
-import { OnChainIndicator } from '../components/OnChainIndicator'
-import { TorqueProvider } from '../services/TorqueProvider'
 import { HeaderLogo } from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
-
-import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
+import { OnChainIndicator } from '../components/OnChainIndicator'
 import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
-import Footer from './Footer'
-
-import siteConfig from '../config/SiteConfig.json'
+import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
 import { Tab } from '../domain/Tab'
+import { TorqueProvider } from '../services/TorqueProvider'
+import appConfig from 'bzx-common/src/config/appConfig'
+import Footer from './Footer'
+import React, { Component } from 'react'
+import siteConfig from '../config/SiteConfig.json'
 
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void
@@ -34,16 +33,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     items: [
       {
         title: 'Trade',
-        link: `https://${
-          process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
-        }.fulcrum.trade/trade`,
+        link: `https://${appConfig.isBsc ? 'bsc' : 'app'}.fulcrum.trade/trade`,
         external: true,
       },
       {
         title: 'Lend',
-        link: `https://${
-          process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
-        }.fulcrum.trade/lend`,
+        link: `https://${appConfig.isBsc ? 'bsc' : 'app'}.fulcrum.trade/lend`,
         external: true,
       },
       { title: 'Borrow', link: '/borrow', external: false },
@@ -55,16 +50,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     items: [
       {
         title: 'Trade',
-        link: `https://${
-          process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
-        }.fulcrum.trade/trade`,
+        link: `https://${appConfig.isBsc ? 'bsc' : 'app'}.fulcrum.trade/trade`,
         external: true,
       },
       {
         title: 'Lend',
-        link: `https://${
-          process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
-        }.fulcrum.trade/lend`,
+        link: `https://${appConfig.isBsc ? 'bsc' : 'app'}.fulcrum.trade/lend`,
         external: true,
       },
       { title: 'Borrow', link: '/borrow', external: false },

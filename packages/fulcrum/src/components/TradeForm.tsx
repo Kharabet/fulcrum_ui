@@ -351,7 +351,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     )
     const gasPrice = await ethGasStation.getGasPrice()
     const rate = await FulcrumProvider.Instance.getSwapToUsdRate(
-      process.env.REACT_APP_ETH_NETWORK === 'bsc' ? Asset.BNB : Asset.ETH
+      appConfig.isBsc ? Asset.BNB : Asset.ETH
     )
     const estimatedFee = await FulcrumProvider.Instance.getTradeEstimatedGas(
       tradeRequest,
@@ -673,7 +673,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     const usdPrice = this.state.tradeAmountValue.multipliedBy(rateUSD)
 
-    if (appConfig.isMainnetProd) {
+    if (appConfig.isGTMEnabled) {
       const randomNumber = Math.floor(Math.random() * 100000) + 1
       const tagManagerArgs = {
         dataLayer: {

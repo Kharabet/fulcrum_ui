@@ -20,12 +20,9 @@ import Asset from '../assets/Asset'
 import ContractsSource from '../contracts/ContractsSource'
 import AssetsDictionary from '../assets/AssetsDictionary'
 
-const fromBlockNumber =
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-    ? '0x989680'
-    : process.env.REACT_APP_ETH_NETWORK === 'bsc'
-    ? 5566818
-    : '0x54ee30'
+import appConfig from 'bzx-common/src/config/appConfig'
+
+const fromBlockNumber = appConfig.isMainnet ? '0x989680' : appConfig.isBsc ? 5566818 : '0x54ee30'
 
 const getLogsFromEtherscan = async (
   fromBlock: string,

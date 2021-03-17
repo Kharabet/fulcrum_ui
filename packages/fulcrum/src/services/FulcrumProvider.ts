@@ -2266,7 +2266,7 @@ export class FulcrumProvider {
     return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
-      networkName === 'bsc' ? Asset.BUSD : appConfig.isMainnetProd ? Asset.DAI : Asset.USDC
+      networkName === 'bsc' ? Asset.BUSD : appConfig.isProduction ? Asset.DAI : Asset.USDC
     )
   }
 
@@ -2613,8 +2613,8 @@ console.log(err, added);
         await this.addTokenToMetaMask(task)
 
         if (
-          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && taskRequest.asset === Asset.ETH) ||
-          (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.asset === Asset.BNB)
+          (appConfig.isMainnet && taskRequest.asset === Asset.ETH) ||
+          (appConfig.isBsc && taskRequest.asset === Asset.BNB)
         ) {
           const { LendEthProcessor } = await import('./processors/LendEthProcessor')
           const processor = new LendEthProcessor()
@@ -2630,8 +2630,8 @@ console.log(err, added);
         }
       } else {
         if (
-          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && taskRequest.asset === Asset.ETH) ||
-          (process.env.REACT_APP_ETH_NETWORK === 'bsc' && taskRequest.asset === Asset.BNB)
+          (appConfig.isMainnet && taskRequest.asset === Asset.ETH) ||
+          (appConfig.isBsc && taskRequest.asset === Asset.BNB)
         ) {
           const { UnlendEthProcessor } = await import('./processors/UnlendEthProcessor')
           const processor = new UnlendEthProcessor()
@@ -3028,7 +3028,7 @@ console.log(err, added);
                 ],
               },
             }
-            appConfig.isMainnetProd && TagManager.dataLayer(tagManagerArgs)
+            appConfig.isGTMEnabled && TagManager.dataLayer(tagManagerArgs)
             this.eventEmitter.emit(
               FulcrumProviderEvents.LendTransactionMined,
               new LendTransactionMinedEvent(request.asset, txHash)
@@ -3046,7 +3046,7 @@ console.log(err, added);
                 ],
               },
             }
-            appConfig.isMainnetProd && TagManager.dataLayer(tagManagerArgs)
+            appConfig.isGTMEnabled && TagManager.dataLayer(tagManagerArgs)
           } else if (request instanceof TradeRequest) {
             const tagManagerArgs = {
               dataLayer: {
@@ -3060,7 +3060,7 @@ console.log(err, added);
                 ],
               },
             }
-            appConfig.isMainnetProd && TagManager.dataLayer(tagManagerArgs)
+            appConfig.isGTMEnabled && TagManager.dataLayer(tagManagerArgs)
           }
         }
       } else {
@@ -3104,9 +3104,8 @@ console.log(err, added);
     //: FulcrumProvider.ZERO_ADDRESS
 
     const sendAmountForValue =
-      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-        (depositToken === Asset.WETH || depositToken === Asset.ETH)) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && depositToken === Asset.BNB)
+      (appConfig.isMainnet && (depositToken === Asset.WETH || depositToken === Asset.ETH)) ||
+      (appConfig.isBsc && depositToken === Asset.BNB)
         ? amountInBaseUnits
         : new BigNumber(0)
 
@@ -3194,10 +3193,7 @@ console.log(err, added);
   }
 
   public isETHAsset = (asset: Asset): boolean => {
-    return (
-      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && asset === Asset.ETH) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && asset === Asset.BNB)
-    ) // || asset === Asset.WETH;
+    return (appConfig.isMainnet && asset === Asset.ETH) || (appConfig.isBsc && asset === Asset.BNB) // || asset === Asset.WETH;
   }
 
   public getLoanExtendParams = async (

@@ -55,7 +55,7 @@ import { BorrowRequestAwaitingStore } from './BorrowRequestAwaitingStore'
 import { TorqueProviderEvents } from './events/TorqueProviderEvents'
 
 let configAddress: any
-if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+if (appConfig.isMainnet) {
   configAddress = constantAddress.mainnet
 } else {
   configAddress = constantAddress.kovan
@@ -449,7 +449,7 @@ export class TorqueProvider {
       return new BigNumber(1)
     }
 
-    return this.getSwapRate(asset, appConfig.isMainnetProd ? Asset.DAI : Asset.USDC)
+    return this.getSwapRate(asset, appConfig.isProduction ? Asset.DAI : Asset.USDC)
   }
 
   public async getSwapRate(
@@ -1584,17 +1584,17 @@ export class TorqueProvider {
       .map((e) => {
         let loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
         loanAsset = this.isETHAsset(loanAsset)
-          ? process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+          ? appConfig.isMainnet
             ? Asset.ETH
-            : process.env.REACT_APP_ETH_NETWORK === 'bsc'
+            : appConfig.isBsc
             ? Asset.BNB
             : loanAsset
           : loanAsset
         let collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
         collateralAsset = this.isETHAsset(collateralAsset)
-          ? process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+          ? appConfig.isMainnet
             ? Asset.ETH
-            : process.env.REACT_APP_ETH_NETWORK === 'bsc'
+            : appConfig.isBsc
             ? Asset.BNB
             : collateralAsset
           : collateralAsset
@@ -2063,9 +2063,8 @@ export class TorqueProvider {
 
   public isETHAsset = (asset: Asset): boolean => {
     return (
-      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-        (asset === Asset.ETH || asset === Asset.WETH)) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && (asset === Asset.BNB || asset === Asset.WBNB))
+      (appConfig.isMainnet && (asset === Asset.ETH || asset === Asset.WETH)) ||
+      (appConfig.isBsc && (asset === Asset.BNB || asset === Asset.WBNB))
     )
   }
 

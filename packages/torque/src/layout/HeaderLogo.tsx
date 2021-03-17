@@ -1,20 +1,19 @@
+import { NavService } from '../services/NavService'
 import { ReactComponent as BSCLogo } from 'bzx-common/src/assets/images/binance/bsc_logo.svg'
-import React, { Component } from 'react'
 import { ReactComponent as TorqueLogo } from '../assets/images/torque_logo.svg'
 import { ReactComponent as TorqueLogoPartial } from '../assets/images/torque_logo_partial.svg'
 import { Tab } from '../domain/Tab'
-import { NavService } from '../services/NavService'
+import appConfig from 'bzx-common/src/config/appConfig'
+import React, { Component } from 'react'
 
 export interface IHeaderOpsProps {
   setActiveTab: (tab: Tab) => void
 }
 
-const bsc = process.env.REACT_APP_ETH_NETWORK === 'bsc'
-
 export class HeaderLogo extends Component<IHeaderOpsProps> {
   public render() {
     return (
-      <div className={`header-logo ${bsc ? 'bsc' : ''}`}>
+      <div className={`header-logo ${appConfig.isBsc ? 'bsc' : ''}`}>
         <div
           onClick={() => {
             NavService.Instance.History.push('/')
@@ -26,7 +25,7 @@ export class HeaderLogo extends Component<IHeaderOpsProps> {
           <div className="header-logo-partial">
             <TorqueLogoPartial />
           </div>
-          {process.env.REACT_APP_ETH_NETWORK === 'bsc' && (
+          {appConfig.isBsc && (
             <React.Fragment>
               <div className="bsc-logo">
                 <BSCLogo />

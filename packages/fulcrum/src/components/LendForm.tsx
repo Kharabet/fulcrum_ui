@@ -355,13 +355,13 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                 </div>
               )}
 
-              {process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH ? (
+              {appConfig.isMainnet && this.props.asset === Asset.ETH ? (
                 <AssetDropdown
                   selectedAsset={this.state.useWrapped ? Asset.WETH : Asset.ETH}
                   onAssetChange={this.onChangeUseWrapped}
                   assets={[Asset.WETH, Asset.ETH]}
                 />
-              ) : process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB ? (
+              ) : appConfig.isBsc && this.props.asset === Asset.BNB ? (
                 <AssetDropdown
                   selectedAsset={this.state.useWrapped ? Asset.WBNB : Asset.BNB}
                   onAssetChange={this.onChangeUseWrapped}
@@ -459,14 +459,14 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
   public onChangeUseWrapped = (asset: Asset) => {
     if (
       this.state.useWrapped &&
-      ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) ||
-        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB))
+      ((appConfig.isMainnet && this.props.asset === Asset.ETH) ||
+        (appConfig.isBsc && this.props.asset === Asset.BNB))
     ) {
       this._isMounted && this.setState({ useWrapped: false })
     } else if (
       !this.state.useWrapped &&
-      ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) ||
-        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB))
+      ((appConfig.isMainnet && this.props.asset === Asset.ETH) ||
+        (appConfig.isBsc && this.props.asset === Asset.BNB))
     ) {
       this._isMounted && this.setState({ useWrapped: true })
     }
@@ -560,7 +560,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     const usdPrice = sendAmount.multipliedBy(usdAmount)
 
-    if (appConfig.isMainnetProd && LendType.LEND) {
+    if (appConfig.isGTMEnabled && LendType.LEND) {
       const randomNumber = Math.floor(Math.random() * 100000) + 1
       const tagManagerArgs = {
         dataLayer: {
@@ -598,9 +598,9 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
   private getAssetOrWrapped = (): Asset => {
     let assetOrWrapped: Asset
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) {
+    if (appConfig.isMainnet && this.props.asset === Asset.ETH) {
       assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB) {
+    } else if (appConfig.isBsc && this.props.asset === Asset.BNB) {
       assetOrWrapped = this.state.useWrapped ? Asset.WBNB : Asset.BNB
     } else if (this.props.asset === Asset.DAI) {
       assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI

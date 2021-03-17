@@ -9,12 +9,12 @@ const tasksQueue = new TasksQueue()
  * Start / Init services like Sentry
  */
 function start() {
-  if (appConfig.isMainnetProd) {
+  if (appConfig.isProduction) {
     sentryService.init(FulcrumProvider.Instance)
   }
 }
 
 export default {
   start,
-  tasksQueue
+  tasksQueue,
 }

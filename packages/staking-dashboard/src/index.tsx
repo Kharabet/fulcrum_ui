@@ -12,7 +12,7 @@ import RootStore from './stores/RootStore'
 const rootStore = new RootStore({ stakingProvider })
 rootStore.init()
 
-if (appConfig.isMainnetProd) {
+if (appConfig.isGTMEnabled) {
   const tagManagerArgs = {
     gtmId: configProviders.Google_TrackingID,
     dataLayer: {

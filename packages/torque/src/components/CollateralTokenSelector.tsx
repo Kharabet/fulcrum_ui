@@ -1,8 +1,9 @@
+import 'simplebar/dist/simplebar.min.css'
+import { CollateralTokenSelectorItem } from './CollateralTokenSelectorItem'
+import appConfig from 'bzx-common/src/config/appConfig'
+import Asset from 'bzx-common/src/assets/Asset'
 import React, { Component } from 'react'
 import SimpleBar from 'simplebar-react'
-import 'simplebar/dist/simplebar.min.css'
-import Asset from 'bzx-common/src/assets/Asset'
-import { CollateralTokenSelectorItem } from './CollateralTokenSelectorItem'
 
 interface ICollateralTokenSelectorProps {
   updateStateActiveToggle: (state: boolean) => void
@@ -30,7 +31,7 @@ export class CollateralTokenSelector extends Component<
       collateralAsset: Asset.UNKNOWN,
       executorParams: null,
     }
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+    if (appConfig.isMainnet) {
       this.assets = [
         Asset.ETH,
         Asset.DAI,
@@ -47,9 +48,9 @@ export class CollateralTokenSelector extends Component<
         Asset.LRC,
         Asset.COMP,
       ]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+    } else if (appConfig.isKovan) {
       this.assets = [Asset.fWETH, Asset.USDC, Asset.WBTC]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+    } else if (appConfig.isBsc) {
       this.assets = [Asset.BUSD, Asset.BNB, Asset.USDT, Asset.ETH, Asset.BTC]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
       this.assets = [Asset.ETH, Asset.DAI]

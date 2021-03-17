@@ -51,7 +51,7 @@ import { RolloverRequest } from '../domain/RolloverRequest'
 import ethereumUtils from 'app-lib/ethereumUtils'
 
 let configAddress: any
-if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+if (appConfig.isMainnet) {
   configAddress = constantAddress.mainnet
 } else {
   configAddress = constantAddress.kovan
@@ -90,7 +90,7 @@ export class ExplorerProvider {
     this.eventEmitter = new EventEmitter()
     this.eventEmitter.setMaxListeners(1000)
 
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+    if (appConfig.isMainnet) {
       this.assetsShown = [
         Asset.ETH,
         Asset.DAI,
@@ -107,7 +107,7 @@ export class ExplorerProvider {
         Asset.LRC,
         Asset.COMP,
       ]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+    } else if (appConfig.isKovan) {
       this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
       this.assetsShown = [Asset.DAI, Asset.ETH]
@@ -749,7 +749,7 @@ export class ExplorerProvider {
       return this.getSwapToUsdRateOffChain(asset)
     }
 
-    return this.getSwapRate(asset, appConfig.isMainnetProd ? Asset.DAI : Asset.USDC)
+    return this.getSwapRate(asset, appConfig.isProduction ? Asset.DAI : Asset.USDC)
   }
 
   public async getSwapRate(

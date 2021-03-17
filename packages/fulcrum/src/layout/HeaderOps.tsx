@@ -1,14 +1,14 @@
-import React, { Component } from 'react'
-import { OnChainIndicator } from '../components/OnChainIndicator'
-import HeaderLogo from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
+import { OnChainIndicator } from '../components/OnChainIndicator'
+import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
+import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
+import { SwitchButtonInput } from '../components/SwitchButtonInput'
+import appConfig from 'bzx-common/src/config/appConfig'
+import Footer from './Footer'
+import HeaderLogo from './HeaderLogo'
 import ic_close from '../assets/images/ic_close.svg'
 import menu_icon from '../assets/images/ic_menu.svg'
-import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
-import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
-import Footer from './Footer'
-import { SwitchButtonInput } from '../components/SwitchButtonInput'
-import { profileEnd } from 'console'
+import React, { Component } from 'react'
 
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void
@@ -92,9 +92,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
         {
           title: 'Borrow',
-          link: `https://${
-            process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
-          }.torque.loans/borrow`,
+          link: `https://${appConfig.isBsc ? 'bsc' : 'app'}.torque.loans/borrow`,
           external: true,
         },
         { title: 'Stake', link: 'https://staking.bzx.network', external: true },
@@ -147,9 +145,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { title: 'Lend', link: '/lend', external: false },
         {
           title: 'Borrow',
-          link: `https://${
-            process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 'bsc' : 'app'
-          }.torque.loans/borrow`,
+          link: `https://${appConfig.isBsc ? 'bsc' : 'app'}.torque.loans/borrow`,
           external: true,
         },
         {

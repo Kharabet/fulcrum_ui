@@ -1,15 +1,16 @@
 import { BigNumber } from '@0x/utils'
-import React, { ChangeEvent, Component, FormEvent } from 'react'
-import { Subject } from 'rxjs'
+import { ChiSwitch } from './ChiSwitch'
 import { debounceTime } from 'rxjs/operators'
+import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
+import { InputAmount } from './InputAmount'
+import { RepayLoanRequest } from '../domain/RepayLoanRequest'
+import { Subject } from 'rxjs'
+import { TorqueProvider } from '../services/TorqueProvider'
+import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { RepayLoanRequest } from '../domain/RepayLoanRequest'
-import { TorqueProvider } from '../services/TorqueProvider'
-import { ChiSwitch } from './ChiSwitch'
-import { InputAmount } from './InputAmount'
+import React, { ChangeEvent, Component, FormEvent } from 'react'
 
 export interface IRepayLoanFormProps {
   loanOrderState: IBorrowedFundsState
@@ -191,10 +192,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       this.setState({ ...this.state, didSubmit: true })
 
       if (
-        (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-          this.props.loanOrderState.loanAsset === Asset.ETH) ||
-        (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-          this.props.loanOrderState.loanAsset === Asset.BNB)
+        (appConfig.isMainnet && this.props.loanOrderState.loanAsset === Asset.ETH) ||
+        (appConfig.isBsc && this.props.loanOrderState.loanAsset === Asset.BNB)
       ) {
         const assetBalance = this.state.assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
           ? this.state.assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)

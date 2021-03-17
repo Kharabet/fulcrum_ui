@@ -1,4 +1,6 @@
+import appConfig from 'bzx-common/src/config/appConfig'
 import React from 'react'
+
 export default class AssetDetails {
   public addressErc20: Map<number, string | null> = new Map<number, string>()
   public bgBrightColor: string = '#000000'
@@ -6,14 +8,14 @@ export default class AssetDetails {
   public displayName: string = ''
   public logoSvg: any = null
   public reactLogoSvg: React.FunctionComponent<
-  React.SVGProps<SVGSVGElement> & {
-    title?: string | undefined
-  }
->
+    React.SVGProps<SVGSVGElement> & {
+      title?: string | undefined
+    }
+  >
   private _decimals: number = 18
 
   get decimals(): number {
-    return process.env.REACT_APP_ETH_NETWORK === 'bsc' ? 18 : this._decimals || 18
+    return appConfig.isBsc ? 18 : this._decimals || 18
   }
 
   set decimals(value) {
@@ -25,10 +27,10 @@ export default class AssetDetails {
     decimals: number,
     logoSvg: any,
     reactLogoSvg: React.FunctionComponent<
-    React.SVGProps<SVGSVGElement> & {
-      title?: string | undefined
-    }
-  >,
+      React.SVGProps<SVGSVGElement> & {
+        title?: string | undefined
+      }
+    >,
     bgBrightColor: string,
     bgLightColor: string,
     addressErc20: Map<number, string | null>

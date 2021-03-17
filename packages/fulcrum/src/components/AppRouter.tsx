@@ -28,7 +28,7 @@ const MaintenancePage = React.lazy(() => import('../pages/MaintenancePage'))
 const StatsPage = React.lazy(() => import('../pages/StatsPage'))
 const TradePage = React.lazy(() => import('../pages/TradePage'))
 
-if (appConfig.isMainnetProd) {
+if (appConfig.isGTMEnabled) {
   const tagManagerArgs = {
     gtmId: configProviders.Google_TrackingID,
     dataLayer: {
@@ -99,7 +99,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public render() {
     return (
       <Web3ReactProvider getLibrary={this.getLibrary}>
-        {appConfig.isMainnetProd && !this.state.isMobileMedia ? (
+        {appConfig.isProduction && !this.state.isMobileMedia ? (
           <React.Fragment>
             <Suspense
               fallback={
@@ -141,7 +141,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             ) : (
               <BrowserRouter>
                 <Switch>
-                  {!appConfig.isMainnetProd ? (
+                  {!appConfig.isProduction ? (
                     <Route
                       exact={true}
                       path="/"
@@ -257,7 +257,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       </React.Fragment>
                     )}
                   />
-                  {appConfig.isMainnetProd ? (
+                  {appConfig.isProduction ? (
                     <Route
                       path="*"
                       component={() => {
@@ -269,7 +269,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     <Route path="*" render={() => <Redirect to="/" />} />
                   )}
                 </Switch>
-                {appConfig.isMainnetProd ? (
+                {appConfig.isGTMEnabled ? (
                   <Route
                     path="/"
                     render={({ location }) => {

@@ -21,6 +21,7 @@ import { LiquidationDropdown } from './LiquidationDropdown'
 
 import '../styles/components/manage-collateral-form.scss'
 import { PositionType } from '../domain/PositionType'
+import appConfig from 'bzx-common/src/config/appConfig'
 
 export interface IManageCollateralFormProps {
   loan: IBorrowedFundsState
@@ -206,10 +207,8 @@ export default class ManageCollateralForm extends Component<
 
                 // check balance
                 if (
-                  (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-                    this.props.loan!.collateralAsset === Asset.ETH) ||
-                  (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-                    this.props.loan!.collateralAsset === Asset.BNB)
+                  (appConfig.isMainnet && this.props.loan!.collateralAsset === Asset.ETH) ||
+                  (appConfig.isBsc && this.props.loan!.collateralAsset === Asset.BNB)
                 ) {
                   assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade)
                     ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade)
@@ -471,10 +470,8 @@ export default class ManageCollateralForm extends Component<
           this.props.loan!.collateralAsset
         )
         if (
-          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-            this.props.loan!.collateralAsset === Asset.ETH) ||
-          (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-            this.props.loan!.collateralAsset === Asset.BNB)
+          (appConfig.isMainnet && this.props.loan!.collateralAsset === Asset.ETH) ||
+          (appConfig.isBsc && this.props.loan!.collateralAsset === Asset.BNB)
         ) {
           assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade)
             ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade)

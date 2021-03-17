@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { PreloaderChart } from '../components/PreloaderChart'
-import Asset from 'bzx-common/src/assets/Asset'
-
-import { LendRequest } from '../domain/LendRequest'
-import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import LendTokenSelectorItem, { ILendTokenSelectorItemProps } from './LendTokenSelectorItem'
-
+import '../styles/components/lend-token-selector.scss'
 import { BigNumber } from '@0x/utils'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import '../styles/components/lend-token-selector.scss'
+import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
+import { LendRequest } from '../domain/LendRequest'
+import { PreloaderChart } from '../components/PreloaderChart'
+import appConfig from 'bzx-common/src/config/appConfig'
+import Asset from 'bzx-common/src/assets/Asset'
+import LendTokenSelectorItem, { ILendTokenSelectorItemProps } from './LendTokenSelectorItem'
+import React, { useEffect, useState } from 'react'
 
 export interface ILendTokenSelectorProps {
   onLend: (request: LendRequest) => void
@@ -71,7 +70,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
     let aprs = { data: {}, success: false }
     let liquidities = { data: {}, success: false }
     // TODO: add API endpoints for bsc
-    if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+    if (appConfig.isBsc) {
       setIsLoading(false)
       return
     }
@@ -117,7 +116,7 @@ function LendTokenSelector(props: ILendTokenSelectorProps) {
 
     let aprs = { data: {}, success: false }
     let liquidities = { data: {}, success: false }
-    if (process.env.REACT_APP_ETH_NETWORK === 'bsc') {
+    if (appConfig.isBsc) {
       const assetsAPRs = await Promise.all(
         assets.map((asset) => FulcrumProvider.Instance.getLendTokenInterestRate(asset))
       )

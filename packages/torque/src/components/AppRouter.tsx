@@ -23,7 +23,7 @@ import { NavService } from '../services/NavService'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { ProviderMenu } from './ProviderMenu'
 
-if (appConfig.isMainnetProd) {
+if (appConfig.isGTMEnabled) {
   const tagManagerArgs = {
     gtmId: configProviders.Google_TrackingID,
     dataLayer: {
@@ -117,7 +117,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
           overlayClassName="modal-overlay-div overflow-auto">
           <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
         </Modal>
-        {appConfig.isMainnetProd ? <Intercom appID="dfk4n5ut" /> : null}
+        {appConfig.isProduction ? <Intercom appID="dfk4n5ut" /> : null}
         <div className="pages-container">
           {siteConfig.MaintenanceMode ? (
             <MaintenancePage />
@@ -160,7 +160,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 />
                 <Route path="*" render={() => <Redirect to="/" />} />
               </Switch>
-              {appConfig.isMainnetProd ? (
+              {appConfig.isGTMEnabled ? (
                 <Route
                   path="/"
                   render={({ location }) => {
