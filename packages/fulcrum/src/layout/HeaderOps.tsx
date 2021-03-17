@@ -1,11 +1,13 @@
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
-import { OnChainIndicator } from '../components/OnChainIndicator'
+import OnChainIndicator from 'bzx-common/src/shared-components/OnChainIndicator'
 import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
 import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
 import { SwitchButtonInput } from '../components/SwitchButtonInput'
 import appConfig from 'bzx-common/src/config/appConfig'
 import Footer from './Footer'
 import HeaderLogo from './HeaderLogo'
+import { FulcrumProvider } from '../services/FulcrumProvider'
+import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import ic_close from '../assets/images/ic_close.svg'
 import menu_icon from '../assets/images/ic_menu.svg'
 import React, { Component } from 'react'
@@ -130,7 +132,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
                 Help Center
               </a>
             </div>
-            <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            <OnChainIndicator
+              doNetworkConnect={this.props.doNetworkConnect}
+              provider={FulcrumProvider.Instance}
+              providerIsChanging={FulcrumProviderEvents.ProviderIsChanging}
+              providerChanged={FulcrumProviderEvents.ProviderChanged}
+            />
             <SwitchButtonInput onSwitch={this.onSwitchTheme} type="theme" />
           </div>
         </div>
@@ -190,7 +197,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         {this.state.isMenuOpen ? (
           <div className={sidebarClass}>
             <div className="header_btn">
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              <OnChainIndicator
+                doNetworkConnect={this.props.doNetworkConnect}
+                provider={FulcrumProvider.Instance}
+                providerIsChanging={FulcrumProviderEvents.ProviderIsChanging}
+                providerChanged={FulcrumProviderEvents.ProviderChanged}
+              />
               <div className="theme-switch-wrapper">
                 <label className="theme-switch" htmlFor="checkbox">
                   <input

@@ -2,7 +2,7 @@ import React from 'react'
 import { TorqueProvider } from '../services/TorqueProvider'
 import Web3Utils from 'web3-utils'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 
 function ImpersonateInput() {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {

@@ -4,7 +4,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 
 import { ReserveDetails } from '../domain/ReserveDetails'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { StatsTokenGridHeader } from './StatsTokenGridHeader'
 import { IStatsTokenGridRowProps, StatsTokenGridRow } from './StatsTokenGridRow'

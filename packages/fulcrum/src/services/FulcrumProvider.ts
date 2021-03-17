@@ -1,13 +1,41 @@
-import { Web3ProviderEngine } from '@0x/subproviders'
-import { BigNumber } from '@0x/utils'
-import { Web3Wrapper } from '@0x/web3-wrapper'
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import { BigNumber } from '@0x/utils'
+import { EventEmitter } from 'events'
+import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
+import { FulcrumProviderEvents } from './events/FulcrumProviderEvents'
+import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
+import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
+import { ICollateralManagementParams } from '../domain/ICollateralManagementParams'
+import { IExtendEstimate } from '../domain/IExtendEstimate'
+import { IExtendState } from '../domain/IExtendState'
+import { ILoanParams } from '../domain/ILoanParams'
+import { IPriceDataPoint } from '../domain/IPriceDataPoint'
+import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
+import { LendRequest } from '../domain/LendRequest'
+import { LendTransactionMinedEvent } from './events/LendTransactionMinedEvent'
+import { LendType } from '../domain/LendType'
+import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { PositionType } from '../domain/PositionType'
+import { ProviderType } from '../domain/ProviderType'
 import { RequestStatus, RequestTask, TasksQueue, TasksQueueEvents } from 'app-lib/tasksQueue'
+import { ReserveDetails } from '../domain/ReserveDetails'
+import { RolloverRequest } from '../domain/RolloverRequest'
+import { TradeRequest } from '../domain/TradeRequest'
+import { TradeTokenKey } from '../domain/TradeTokenKey'
+import { TradeType } from '../domain/TradeType'
+import { Web3ProviderEngine } from '@0x/subproviders'
+import { Web3Wrapper } from '@0x/web3-wrapper'
+import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import appConfig from 'bzx-common/src/config/appConfig'
 import configProviders from 'bzx-common/src/config/providers'
 import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
+import TagManager from 'react-gtm-module'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
+import Web3Utils from 'web3-utils'
+
 import {
   CloseWithSwapEvent,
   DepositCollateralEvent,
@@ -19,8 +47,6 @@ import {
   TradeEvent,
   WithdrawCollateralEvent,
 } from 'bzx-common/src/domain/events'
-import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
-import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import {
   getCloseWithSwapHistory,
   getDepositCollateralHistory,
@@ -32,31 +58,6 @@ import {
   getTradeHistory,
   getWithdrawCollateralHistory,
 } from 'bzx-common/src/utils'
-import { EventEmitter } from 'events'
-import TagManager from 'react-gtm-module'
-import Web3Utils from 'web3-utils'
-import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
-import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
-import { ICollateralManagementParams } from '../domain/ICollateralManagementParams'
-import { IExtendEstimate } from '../domain/IExtendEstimate'
-import { IExtendState } from '../domain/IExtendState'
-import { ILoanParams } from '../domain/ILoanParams'
-import { IPriceDataPoint } from '../domain/IPriceDataPoint'
-import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
-import { LendRequest } from '../domain/LendRequest'
-import { LendType } from '../domain/LendType'
-import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
-import { PositionType } from '../domain/PositionType'
-import { ProviderType } from '../domain/ProviderType'
-import { ReserveDetails } from '../domain/ReserveDetails'
-import { RolloverRequest } from '../domain/RolloverRequest'
-import { TradeRequest } from '../domain/TradeRequest'
-import { TradeTokenKey } from '../domain/TradeTokenKey'
-import { TradeType } from '../domain/TradeType'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
-import { FulcrumProviderEvents } from './events/FulcrumProviderEvents'
-import { LendTransactionMinedEvent } from './events/LendTransactionMinedEvent'
 
 const networkName = process.env.REACT_APP_ETH_NETWORK
 const initialNetworkId = appConfig.appNetworkId

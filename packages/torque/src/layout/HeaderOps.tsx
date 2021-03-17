@@ -1,12 +1,13 @@
 import { HeaderLogo } from './HeaderLogo'
 import { HeaderMenu, IHeaderMenuProps } from './HeaderMenu'
-import { OnChainIndicator } from '../components/OnChainIndicator'
 import { ReactComponent as MenuIconClose } from '../assets/images/ic_close.svg'
 import { ReactComponent as MenuIconOpen } from '../assets/images/ic_menu.svg'
 import { Tab } from '../domain/Tab'
 import { TorqueProvider } from '../services/TorqueProvider'
+import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
 import appConfig from 'bzx-common/src/config/appConfig'
 import Footer from './Footer'
+import OnChainIndicator from 'bzx-common/src/shared-components/OnChainIndicator'
 import React, { Component } from 'react'
 import siteConfig from '../config/SiteConfig.json'
 
@@ -114,7 +115,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
                 <span>Help Center</span>
               </a>
             </div>
-            <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            <OnChainIndicator
+              doNetworkConnect={this.props.doNetworkConnect}
+              provider={TorqueProvider.Instance}
+              providerIsChanging={TorqueProviderEvents.ProviderIsChanging}
+              providerChanged={TorqueProviderEvents.ProviderChanged}
+            />
           </div>
         </div>
       </header>
@@ -142,7 +148,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           {this.state.isMenuOpen ? (
             <div className={sidebarClass}>
               <div className="header_btn">
-                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+                <OnChainIndicator
+                  doNetworkConnect={this.props.doNetworkConnect}
+                  provider={TorqueProvider.Instance}
+                  providerIsChanging={TorqueProviderEvents.ProviderIsChanging}
+                  providerChanged={TorqueProviderEvents.ProviderChanged}
+                />
               </div>
               <div className="header_nav_menu">
                 <HeaderMenu items={this.MenuMobile.items} />

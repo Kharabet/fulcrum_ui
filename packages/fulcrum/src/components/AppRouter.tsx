@@ -17,7 +17,7 @@ import siteConfig from '../config/SiteConfig.json'
 import Footer from '../layout/Footer'
 import { HeaderOps } from '../layout/HeaderOps'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { ProviderMenu } from './ProviderMenu'
 

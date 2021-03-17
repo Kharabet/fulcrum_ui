@@ -1,14 +1,22 @@
 import React, { Component } from 'react'
-import { ProviderType } from '../domain/ProviderType'
-import { ProviderTypeDetails } from '../domain/ProviderTypeDetails'
-import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
-import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
-import { FulcrumProvider } from '../services/FulcrumProvider'
-import { ReactComponent as GenericWalletShort } from 'bzx-common/src/assets/images/providers/logo_short___genericwallet.svg'
+import ProviderType from '../../domain/ProviderType'
+import ProviderTypeDetails from '../../domain/ProviderTypeDetails'
+import ProviderTypeDictionary from '../../domain/ProviderTypeDictionary'
+import ProviderChangedEvent from '../../services/ProviderChangedEvent'
+import { ReactComponent as GenericWalletShort } from '../../assets/images/providers/logo_short___genericwallet.svg'
+import { FulcrumProvider } from '../../../../fulcrum/src/services/FulcrumProvider'
+import { TorqueProvider } from '../../../../torque/src/services/TorqueProvider'
+import { ExplorerProvider } from '../../../../protocol-explorer/src/services/ExplorerProvider'
+import { TorqueProviderEvents } from '../../../../torque/src/services/events/TorqueProviderEvents'
+import { FulcrumProviderEvents } from '../../../../fulcrum/src/services/events/FulcrumProviderEvents'
+import { ExplorerProviderEvents } from '../../../../protocol-explorer/src/services/events/ExplorerProviderEvents'
+import './OnChainIndicator.scss'
 
 export interface IOnChainIndicatorProps {
   doNetworkConnect: () => void
+  provider: TorqueProvider | FulcrumProvider | ExplorerProvider
+  providerIsChanging: TorqueProviderEvents | FulcrumProviderEvents | ExplorerProviderEvents
+  providerChanged: TorqueProviderEvents | FulcrumProviderEvents | ExplorerProviderEvents
 }
 
 interface IOnChainIndicatorState {
@@ -16,10 +24,10 @@ interface IOnChainIndicatorState {
   isSupportedNetwork: boolean
   etherscanURL: string
   accountText: string
-  providerTypeDetails: ProviderTypeDetails | null
+  providerTypeDetails: ProviderTypeDetails
 }
 
-export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicatorState> {
+class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicatorState> {
   constructor(props: IOnChainIndicatorProps) {
     super(props)
 
@@ -28,17 +36,11 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       isSupportedNetwork: true,
       etherscanURL: '',
       accountText: '',
-      providerTypeDetails: null,
+      providerTypeDetails: ProviderTypeDictionary.providerTypes.get(ProviderType.None)!,
     }
 
-    FulcrumProvider.Instance.eventEmitter.on(
-      FulcrumProviderEvents.ProviderIsChanging,
-      this.onProviderIsChanging
-    )
-    FulcrumProvider.Instance.eventEmitter.on(
-      FulcrumProviderEvents.ProviderChanged,
-      this.onProviderChanged
-    )
+    props.provider.eventEmitter.on(props.providerIsChanging, this.onProviderIsChanging)
+    props.provider.eventEmitter.on(props.providerChanged, this.onProviderChanged)
   }
 
   private onProviderIsChanging = async () => {
@@ -49,11 +51,11 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
-    await this.derivedUpdate()
     this.setState({
       ...this.state,
-      isLoading: false,
+      isLoading: true,
     })
+    await this.derivedUpdate()
   }
 
   public async componentDidMount() {
@@ -61,40 +63,39 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   public componentWillUnmount(): void {
-    FulcrumProvider.Instance.eventEmitter.removeListener(
-      FulcrumProviderEvents.ProviderIsChanging,
-      this.onProviderIsChanging
-    )
-    FulcrumProvider.Instance.eventEmitter.removeListener(
-      FulcrumProviderEvents.ProviderChanged,
+    this.props.provider.eventEmitter.removeListener(
+      this.props.providerChanged,
       this.onProviderChanged
     )
   }
 
   private async derivedUpdate() {
     const accountText =
-      FulcrumProvider.Instance.accounts.length > 0 && FulcrumProvider.Instance.accounts[0]
-        ? FulcrumProvider.Instance.accounts[0].toLowerCase()
+      this.props.provider.accounts.length > 0 && this.props.provider.accounts[0]
+        ? this.props.provider.accounts[0].toLowerCase()
         : ''
 
     let providerTypeDetails = null
-    if (accountText && FulcrumProvider.Instance.providerType !== ProviderType.None) {
+    if (accountText && this.props.provider.providerType !== ProviderType.None) {
       providerTypeDetails = ProviderTypeDictionary.providerTypes.get(
-        FulcrumProvider.Instance.providerType
+        this.props.provider.providerType
       )
     }
 
-    const isSupportedNetwork = !FulcrumProvider.Instance.unsupportedNetwork
-    const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings
-      ? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
+    const isLoading = this.props.provider.isLoading
+    const isSupportedNetwork = !this.props.provider.unsupportedNetwork
+    const etherscanURL = this.props.provider.web3ProviderSettings
+      ? this.props.provider.web3ProviderSettings.etherscanURL
       : ''
 
     this.setState({
       ...this.state,
+      isLoading,
       isSupportedNetwork,
       etherscanURL,
       accountText,
-      providerTypeDetails: providerTypeDetails || null,
+      providerTypeDetails:
+        providerTypeDetails || ProviderTypeDictionary.providerTypes.get(ProviderType.None)!,
     })
   }
 
@@ -108,7 +109,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     } = this.state
 
     let walletAddressText: string
-    if (FulcrumProvider.Instance.unsupportedNetwork) {
+    if (this.props.provider.unsupportedNetwork) {
       walletAddressText = 'Wrong Network!'
     } else if (accountText) {
       walletAddressText = `${accountText.slice(0, 6)}...${accountText.slice(
@@ -116,7 +117,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
         accountText.length
       )}`
     } else {
-      walletAddressText = '' // "...";
+      walletAddressText = ''
     }
 
     return (
@@ -143,25 +144,34 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     accountText: string | null,
     walletAddressText: string
   ) {
-    if (isLoading) {
+    if (isLoading && providerTypeDetails) {
+      const ProviderIcon = providerTypeDetails.reactLogoSvgShort
+
       return (
         <React.Fragment>
-          <span className="on-chain-indicator__provider-txt">Loading Wallet...</span>
-          {/*<span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
-            ...
-          </span>*/}
+          <div className="on-chain-indicator__svg">
+            <ProviderIcon />
+          </div>
+          <div className="on-chain-indicator__description">
+            <span className="on-chain-indicator__provider-txt">Loading Wallet...</span>
+          </div>
         </React.Fragment>
       )
     } else {
       if (providerTypeDetails !== null && providerTypeDetails.reactLogoSvgShort !== undefined) {
-        const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
+        const ProviderIcon = providerTypeDetails.reactLogoSvgShort
         return (
           <React.Fragment>
             <div className="on-chain-indicator__svg">
-              <ProviderLogoIcon />
+              <ProviderIcon />
             </div>
             <div className="on-chain-indicator__description">
-              <span>{providerTypeDetails.displayName}</span>
+              <span>
+                {providerTypeDetails !==
+                ProviderTypeDictionary.providerTypes.get(ProviderType.None)!
+                  ? providerTypeDetails.displayName
+                  : 'Connect Wallet'}
+              </span>
               {walletAddressText ? (
                 isSupportedNetwork && accountText && etherscanURL ? (
                   <a
@@ -184,15 +194,17 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       } else {
         return (
           <React.Fragment>
-            {FulcrumProvider.Instance.unsupportedNetwork ? (
+            {this.props.provider.unsupportedNetwork ? (
               <span className="on-chain-indicator__wallet-address">{walletAddressText}</span>
             ) : (
-              <span className="on-chain-indicator__provider-txt">
+              <React.Fragment>
                 <div className="on-chain-indicator__svg">
                   <GenericWalletShort />
                 </div>
-                Connect Wallet
-              </span>
+                <div className="on-chain-indicator__description">
+                  <span className="on-chain-indicator__wallet-address">Connect Wallet</span>
+                </div>
+              </React.Fragment>
             )}
           </React.Fragment>
         )
@@ -200,3 +212,5 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     }
   }
 }
+
+export default OnChainIndicator

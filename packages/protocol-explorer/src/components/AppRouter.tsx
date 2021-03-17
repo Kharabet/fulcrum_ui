@@ -6,7 +6,7 @@ import { NavService } from '../services/NavService'
 
 import Modal from 'react-modal'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
