@@ -9,8 +9,7 @@ import TradeTokenGridHeader from './TradeTokenGridHeader'
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from './TradeTokenGridRow'
 
 import '../styles/components/trade-token-grid.scss'
-import { RolloverRequest } from '../domain/RolloverRequest'
-
+import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
 export interface ITradeTokenGridProps {
   isMobileMedia: boolean
   tokenRowsData: ITradeTokenGridRowProps[]
@@ -26,7 +25,7 @@ export interface ITradeTokenGridProps {
   changeGridPositionType: (activePositionType: PositionType) => void
   activePositionType: PositionType
 }
-interface ITradeTokenGridState {}
+interface ITradeTokenGridState { }
 export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
   constructor(props: ITradeTokenGridProps) {
     super(props)
@@ -42,11 +41,11 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   public render() {
     const tokenRows = this.props.isMobileMedia
       ? this.props.tokenRowsData
-          .filter((e) => e.positionType === this.props.activePositionType)
-          .map((e) => <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />)
+        .filter((e) => e.positionType === this.props.activePositionType)
+        .map((e) => <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />)
       : this.props.tokenRowsData.map((e) => (
-          <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />
-        ))
+        <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />
+      ))
 
     const quoteToken = this.props.tokenRowsData.length
       ? this.props.tokenRowsData[0].quoteToken

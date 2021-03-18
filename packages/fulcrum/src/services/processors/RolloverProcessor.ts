@@ -4,8 +4,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 
 
 import { RequestTask } from 'app-lib/tasksQueue'
-import { RolloverRequest } from '../../domain/RolloverRequest'
-
+import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
 
 export class RolloverProcessor {

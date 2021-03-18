@@ -36,7 +36,7 @@ import { ProviderType } from '../domain/ProviderType'
 import { proxyRegistryContract } from 'bzx-common/src/contracts/typescript-wrappers/proxyRegistry'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
 import { RequestStatus, RequestTask, TasksQueue, TasksQueueEvents } from 'app-lib/tasksQueue'
-import { RolloverRequest } from '../domain/RolloverRequest'
+import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
 import { saiToDAIBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/saiToDaiBridge'
 import { SoloBridgeContract } from 'bzx-common/src/contracts/typescript-wrappers/SoloBridge'
 import { SoloContract } from 'bzx-common/src/contracts/typescript-wrappers/solo'
@@ -152,8 +152,8 @@ export class TorqueProvider {
     return this.impersonateAddress
       ? this.impersonateAddress
       : this.accounts.length > 0 && this.accounts[0]
-      ? this.accounts[0].toLowerCase()
-      : undefined
+        ? this.accounts[0].toLowerCase()
+        : undefined
   }
 
   public static getLocalstorageItem(item: string): string {
@@ -1587,16 +1587,16 @@ export class TorqueProvider {
           ? appConfig.isMainnet
             ? Asset.ETH
             : appConfig.isBsc
-            ? Asset.BNB
-            : loanAsset
+              ? Asset.BNB
+              : loanAsset
           : loanAsset
         let collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
         collateralAsset = this.isETHAsset(collateralAsset)
           ? appConfig.isMainnet
             ? Asset.ETH
             : appConfig.isBsc
-            ? Asset.BNB
-            : collateralAsset
+              ? Asset.BNB
+              : collateralAsset
           : collateralAsset
 
         const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18
@@ -1750,11 +1750,10 @@ export class TorqueProvider {
     loanValue: BigNumber,
     selectedValue: BigNumber
   ): Promise<string | null> => {
-    return `${
-      loanValue > selectedValue
+    return `${loanValue > selectedValue
         ? `withdraw.${asset.toLowerCase()}.tokenloan.eth`
         : `topup.${asset.toLowerCase()}.tokenloan.eth`
-    }`
+      }`
   }
 
   //
@@ -2583,13 +2582,11 @@ export class TorqueProvider {
       networkName === 'bsc'
         ? 'https://bscscan.com'
         : networkName === 'kovan'
-        ? 'https://api-kovan.etherscan.io'
-        : 'https://api.etherscan.io'
-    const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${
-      blockNumber - days * blocksPerDay
-    }&toBlock=latest&address=${bzxContractAddress}&topic0=${
-      LiquidationEvent.topic0
-    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+          ? 'https://api-kovan.etherscan.io'
+          : 'https://api.etherscan.io'
+    const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${blockNumber - days * blocksPerDay
+      }&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0
+      }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
 
     const liquidationEventResponse = await fetch(blockExplorerApiUrl)
     const liquidationEventResponseJson = await liquidationEventResponse.json()
@@ -2639,39 +2636,39 @@ export class TorqueProvider {
       gasAmount =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
           ? await iTokenContract
-              .borrowWithGasToken(
-                request.loanId,
-                borrowAmountInBaseUnits,
-                new BigNumber(7884000), // approximately 3 months
-                depositAmountInBaseUnits,
-                isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
-                account,
-                account,
-                account,
-                '0x'
-              )
-              .estimateGasAsync({
-                from: account,
-                value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
-                gas: TorqueProvider.Instance.gasLimit,
-              })
+            .borrowWithGasToken(
+              request.loanId,
+              borrowAmountInBaseUnits,
+              new BigNumber(7884000), // approximately 3 months
+              depositAmountInBaseUnits,
+              isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+              account,
+              account,
+              account,
+              '0x'
+            )
+            .estimateGasAsync({
+              from: account,
+              value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
+              gas: TorqueProvider.Instance.gasLimit,
+            })
           : await iTokenContract
-              .borrow(
-                request.loanId,
-                borrowAmountInBaseUnits,
-                new BigNumber(7884000), // approximately 3 months
-                depositAmountInBaseUnits,
-                isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
-                account,
-                account,
-                '0x'
-              )
-              .estimateGasAsync({
-                from: account,
-                value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
-                gas: TorqueProvider.Instance.gasLimit,
-              })
-    } catch (e) {}
+            .borrow(
+              request.loanId,
+              borrowAmountInBaseUnits,
+              new BigNumber(7884000), // approximately 3 months
+              depositAmountInBaseUnits,
+              isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+              account,
+              account,
+              '0x'
+            )
+            .estimateGasAsync({
+              from: account,
+              value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
+              gas: TorqueProvider.Instance.gasLimit,
+            })
+    } catch (e) { }
 
     return new BigNumber(gasAmount || 0)
       .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)
