@@ -6,7 +6,7 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import { LendRequest } from '../../domain/LendRequest'
 import { RequestTask } from '../../domain/RequestTask'
-import { FulcrumProviderEvents } from '../events/FulcrumProviderEvents'
+import { getErc20AddressOfAsset } from 'bzx-common/src/utils'
 import { FulcrumProvider } from '../FulcrumProvider'
 import Asset from 'bzx-common/src/assets/Asset'
 
@@ -49,7 +49,7 @@ export class LendErcProcessor {
 
     // init erc20 contract for base token
     let tokenErc20Contract: erc20Contract | null = null
-    const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(taskRequest.asset)
+    const assetErc20Address = getErc20AddressOfAsset(taskRequest.asset)
     if (assetErc20Address) {
       tokenErc20Contract = await FulcrumProvider.Instance.contractsSource.getErc20Contract(
         assetErc20Address

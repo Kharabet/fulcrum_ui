@@ -10,6 +10,7 @@ import { RepayLoanRequest } from '../domain/RepayLoanRequest'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { ChiSwitch } from './ChiSwitch'
 import { InputAmount } from './InputAmount'
+import { getCurrentAccount, getEthBalance } from 'bzx-common/src/utils'
 
 export interface IRepayLoanFormProps {
   loanOrderState: IBorrowedFundsState
@@ -100,7 +101,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         })
       }
     )
-    TorqueProvider.Instance.getEthBalance().then((ethBalance) => {
+    TorqueProvider.Instance.web3Wrapper && getEthBalance(TorqueProvider.Instance.web3Wrapper, getCurrentAccount(TorqueProvider.Instance.accounts)).then((ethBalance) => {
       this.setState({
         ...this.state,
         ethBalance: ethBalance,

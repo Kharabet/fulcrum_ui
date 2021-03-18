@@ -28,6 +28,11 @@ import {
   getBurnHistory,
   getCloseWithDepositHistory,
   getCloseWithSwapHistory,
+  getCurrentAccount,
+  getErc20AddressOfAsset,
+  getErc20BalanceOfUser,
+  getEthBalance,
+  getGoodSourceAmountOfAsset,
   getLiquidationHistory,
   getLogsFromEtherscan,
   getMintHistory,
@@ -39,7 +44,7 @@ import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
 
 import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'
-import configProviders from 'bzx-common/src/config/providers.ts'
+import configProviders from 'bzx-common/src/config/providers'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
@@ -287,7 +292,7 @@ export class ExplorerProvider {
   ): Promise<string> => {
     const resetRequiredAssets = [Asset.USDT, Asset.KNC] // these assets require to set approve to 0 before approve larger amount than the current spend limit
     let result = ''
-    const assetErc20Address = this.getErc20AddressOfAsset(asset)
+    const assetErc20Address = getErc20AddressOfAsset(asset)
 
     if (
       !this.web3Wrapper ||
@@ -298,8 +303,7 @@ export class ExplorerProvider {
       return result
     }
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = getCurrentAccount(this.accounts)
     const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
 
     if (!account || !tokenErc20Contract) {
@@ -696,15 +700,7 @@ export class ExplorerProvider {
 
     return result
   }
-  public getErc20AddressOfAsset(asset: Asset): string | null {
-    let result: string | null = null
 
-    const assetDetails = AssetsDictionary.assets.get(asset)
-    if (this.web3ProviderSettings && assetDetails) {
-      result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || ''
-    }
-    return result
-  }
 
   public getLargeApprovalAmount = (
     asset: Asset,
@@ -755,18 +751,6 @@ export class ExplorerProvider {
         return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
-  private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
-    switch (asset) {
-      case Asset.WBTC:
-        return new BigNumber(10 ** 6)
-      case Asset.USDC:
-      case Asset.USDT:
-        return new BigNumber(10 ** 4)
-      default:
-        return new BigNumber(10 ** 16)
-    }
-  }
-
   public async getSwapToUsdRateBatch(
     assets: Asset[],
     usdToken: Asset
@@ -775,9 +759,9 @@ export class ExplorerProvider {
 
     if (this.contractsSource) {
       const oracleAddress = this.contractsSource.getOracleAddress()
-      const usdTokenAddress = this.getErc20AddressOfAsset(usdToken)!
-      const underlyings: string[] = assets.map((e) => this.getErc20AddressOfAsset(e)!)
-      const amounts: BigNumber[] = assets.map((e) => this.getGoodSourceAmountOfAsset(e))
+      const usdTokenAddress = getErc20AddressOfAsset(usdToken)!
+      const underlyings: string[] = assets.map((e) => getErc20AddressOfAsset(e)!)
+      const amounts: BigNumber[] = assets.map((e) => getGoodSourceAmountOfAsset(e))
 
       const helperContract = await this.contractsSource.getDAppHelperContract()
       if (helperContract) {
@@ -819,8 +803,8 @@ export class ExplorerProvider {
       return new BigNumber(1)
     }
     let result: BigNumber = new BigNumber(0)
-    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
-    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
+    const srcAssetErc20Address = getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = getErc20AddressOfAsset(destAsset)
     if (!srcAmount) {
       srcAmount = ExplorerProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS
     } else {
@@ -1068,7 +1052,7 @@ export class ExplorerProvider {
         this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
       if (account) {
-        const assetAddress = this.getErc20AddressOfAsset(Asset.CHI)
+        const assetAddress = getErc20AddressOfAsset(Asset.CHI)
         if (assetAddress) {
           const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
           if (tokenContract) {
@@ -1083,55 +1067,22 @@ export class ExplorerProvider {
     return result
   }
 
-  private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
-    let result = new BigNumber(0)
-
-    if (this.web3Wrapper && this.contractsSource) {
-      if (!account && this.contractsSource.canWrite) {
-        account =
-          this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
-      }
-
-      if (account) {
-        const tokenContract = await this.contractsSource.getErc20Contract(addressErc20)
-        if (tokenContract) {
-          result = await tokenContract.balanceOf(account).callAsync()
-        }
-      }
-    }
-
-    return result
-  }
-
-  public async getEthBalance(): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0)
-
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
-      if (account) {
-        const balance = await this.web3Wrapper.getBalanceInWeiAsync(account)
-        result = new BigNumber(balance)
-      }
-    }
-
-    return result
-  }
 
   public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0)
-    if (asset === Asset.UNKNOWN) {
+
+    if (asset === Asset.UNKNOWN || !this.web3Wrapper || !this.contractsSource) {
       // always 0
       result = new BigNumber(0)
     } else if (asset === Asset.ETH) {
       // get eth (wallet) balance
-      result = (await this.getEthBalance()).div(10 ** 18)
+      result = (await getEthBalance(this.web3Wrapper, account)).div(10 ** 18)
     } else {
       // get erc20 token balance
       const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
-      const assetErc20Address = this.getErc20AddressOfAsset(asset)
+      const assetErc20Address = getErc20AddressOfAsset(asset)
       if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address, account)
+        result = await getErc20BalanceOfUser(this.contractsSource, assetErc20Address, account)
         result = result.div(10 ** decimals)
       }
     }

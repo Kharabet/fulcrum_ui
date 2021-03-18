@@ -5,7 +5,7 @@ import { RequestTask } from '../../domain/RequestTask'
 import { FulcrumProvider } from '../FulcrumProvider'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 import { ExtendLoanRequest } from '../../domain/ExtendLoanRequest'
-import Asset from 'bzx-common/src/assets/Asset'
+import { getErc20AddressOfAsset } from 'bzx-common/src/utils'
 
 export class ExtendLoanProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -57,7 +57,7 @@ export class ExtendLoanProcessor {
       let tokenErc20Contract: erc20Contract | null = null
       let assetErc20Address: string | null = ''
       let erc20allowance = new BigNumber(0)
-      assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(taskRequest.borrowAsset)
+      assetErc20Address = getErc20AddressOfAsset(taskRequest.borrowAsset)
       if (assetErc20Address) {
         tokenErc20Contract = await FulcrumProvider.Instance.contractsSource.getErc20Contract(
           assetErc20Address

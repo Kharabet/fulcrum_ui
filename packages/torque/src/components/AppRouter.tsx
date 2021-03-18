@@ -1,10 +1,10 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
-import React, { Component } from 'react'
+import { Component } from 'react'
 import TagManager from 'react-gtm-module'
 // import ReactGA from "react-ga";
 import Intercom from 'react-intercom'
 import { Redirect, Route, Router, Switch } from 'react-router-dom'
-import configProviders from 'bzx-common/src/config/providers.ts'
+import configProviders from 'bzx-common/src/config/providers'
 import { ProviderType } from '../domain/ProviderType'
 import TabContainer from '../layout/TabContainer'
 
@@ -25,6 +25,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import { errors } from 'ethers'
 import { NavService } from '../services/NavService'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
+import { getLocalstorageItem } from 'bzx-common/src/utils'
 
 const isMainnetProd =
   process.env.NODE_ENV &&
@@ -65,7 +66,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper,
       isMobileMedia: window.innerWidth <= 959,
-      isChiEnabled: TorqueProvider.getLocalstorageItem('isChiEnabled') === 'true',
+      isChiEnabled: getLocalstorageItem('isChiEnabled') === 'true',
     }
 
     TorqueProvider.Instance.eventEmitter.on(

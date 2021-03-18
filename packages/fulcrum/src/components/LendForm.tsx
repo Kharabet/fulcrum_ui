@@ -18,6 +18,7 @@ import { FulcrumProvider } from '../services/FulcrumProvider'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { AssetDropdown } from './AssetDropdown'
 import { Preloader } from './Preloader'
+import { getCurrentAccount, getEthBalance } from 'bzx-common/src/utils'
 
 import '../styles/components/input-amount.scss'
 import '../styles/components/lend-form.scss'
@@ -172,7 +173,11 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     const lendRequest = new LendRequest(this.props.lendType, assetOrWrapped, maxLendAmount)
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest)
-    const ethBalance = await FulcrumProvider.Instance.getEthBalance()
+
+    const ethBalance = FulcrumProvider.Instance.web3Wrapper
+      ? await getEthBalance(FulcrumProvider.Instance.web3Wrapper, getCurrentAccount(FulcrumProvider.Instance.accounts))
+      : new BigNumber(0)
+
     const address = FulcrumProvider.Instance.contractsSource
       ? FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || ''
       : ''
@@ -274,19 +279,19 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForLend)
         ? 'Insufficient funds for gas'
         : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
-        ? 'Your wallet is empty'
-        : this.state.infoMessage
-        ? this.state.infoMessage
-        : this.state.isExpired
-        ? 'Price has changed'
-        : ''
+          ? 'Your wallet is empty'
+          : this.state.infoMessage
+            ? this.state.infoMessage
+            : this.state.isExpired
+              ? 'Price has changed'
+              : ''
 
     const lendedAmountEstimateText =
       !this.state.lendedAmountEstimate || this.state.lendedAmountEstimate.eq(0)
         ? '0'
         : this.state.lendedAmountEstimate.gte(new BigNumber('0.000001'))
-        ? this.state.lendedAmountEstimate.toFixed(6)
-        : this.state.lendedAmountEstimate.toExponential(3)
+          ? this.state.lendedAmountEstimate.toFixed(6)
+          : this.state.lendedAmountEstimate.toExponential(3)
 
     const needsApprovalMessage =
       (!this.state.maxLendAmount || this.state.maxLendAmount.gt(0)) &&
@@ -301,12 +306,11 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
         onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
         <div
-          className={`lend-form__image ${
-            this.props.asset === Asset.ETH || this.props.asset === Asset.BNB ? 'notice' : ''
-          }`}>
+          className={`lend-form__image ${this.props.asset === Asset.ETH || this.props.asset === Asset.BNB ? 'notice' : ''
+            }`}>
           {this.state.iTokenAddress &&
-          FulcrumProvider.Instance.web3ProviderSettings &&
-          FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+            FulcrumProvider.Instance.web3ProviderSettings &&
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
             <a
               className="lend-form__info_block"
               title={this.state.iTokenAddress}
@@ -405,8 +409,8 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                 }
                 className="lend-form__value lend-estimate">
                 {this.state.iTokenAddress &&
-                FulcrumProvider.Instance.web3ProviderSettings &&
-                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+                  FulcrumProvider.Instance.web3ProviderSettings &&
+                  FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
                   <a
                     className="lend-form__value lend-estimate"
                     title={this.state.iTokenAddress}

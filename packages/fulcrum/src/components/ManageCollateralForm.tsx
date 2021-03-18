@@ -2,25 +2,22 @@ import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { TradeRequest } from '../domain/TradeRequest'
 import Slider from 'rc-slider'
 import { BigNumber } from '@0x/utils'
-import React, { ChangeEvent, Component, FormEvent } from 'react'
+import { ChangeEvent, Component, FormEvent } from 'react'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import Asset from 'bzx-common/src/assets/Asset'
-
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
-
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { InputAmount } from './InputAmount'
-import { TradeType } from '../domain/TradeType'
 import { LiquidationDropdown } from './LiquidationDropdown'
 
 import '../styles/components/manage-collateral-form.scss'
 import { PositionType } from '../domain/PositionType'
+import { getCurrentAccount, getEthBalance } from 'bzx-common/src/utils'
 
 export interface IManageCollateralFormProps {
   loan: IBorrowedFundsState
@@ -149,120 +146,122 @@ export default class ManageCollateralForm extends Component<
         assetDetails: AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null,
       })
 
-      FulcrumProvider.Instance.getManageCollateralGasAmount().then((gasAmountNeeded) => {
-        FulcrumProvider.Instance.getEthBalance().then((ethBalance) => {
-          FulcrumProvider.Instance.getManageCollateralExcessAmount(this.props.loan!).then(
-            (collateralExcess) => {
-              FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
-                this.props.loan!.collateralAsset
-              ).then(async (assetBalance) => {
-                const collateralizedPercent = this.props.loan!.collateralizedPercent.multipliedBy(
-                  100
-                )
+      FulcrumProvider.Instance.getManageCollateralGasAmount().then(async (gasAmountNeeded) => {
+        FulcrumProvider.Instance.web3Wrapper
+          && await getEthBalance(FulcrumProvider.Instance.web3Wrapper, getCurrentAccount(FulcrumProvider.Instance.accounts)).then(
+            (ethBalance) => {
+              FulcrumProvider.Instance.getManageCollateralExcessAmount(this.props.loan!).then(
+                (collateralExcess) => {
+                  FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+                    this.props.loan!.collateralAsset
+                  ).then(async (assetBalance) => {
+                    const collateralizedPercent = this.props.loan!.collateralizedPercent.multipliedBy(
+                      100
+                    )
 
-                let minCollateral
-                let maxCollateral
+                    let minCollateral
+                    let maxCollateral
 
-                minCollateral = this.props
-                  .loan!.collateralAmount.minus(collateralExcess)
-                  .times(collateralState.minValue)
+                    minCollateral = this.props
+                      .loan!.collateralAmount.minus(collateralExcess)
+                      .times(collateralState.minValue)
 
-                maxCollateral = minCollateral
-                  .times(collateralState.maxValue - collateralState.minValue)
-                  .dividedBy(10 ** 20)
+                    maxCollateral = minCollateral
+                      .times(collateralState.maxValue - collateralState.minValue)
+                      .dividedBy(10 ** 20)
 
-                // set range for case when loan has zero margin. Actually it don't affect slider range.
-                // TODO: review the logic of the component
-                if (this.props.loan!.loanData!.collateral.isZero()) {
-                  minCollateral = new BigNumber(
-                    this.props.loan!.loanData.maintenanceMargin.div(10 ** 18).plus(5)
-                  )
-                  maxCollateral = new BigNumber(
-                    this.props.loan!.loanData.maintenanceMargin.div(10 ** 18).plus(50)
-                  )
-                }
-
-                const currentCollateral = this.props.loan!.collateralAmount.times(10 ** 18)
-
-                if (maxCollateral.lt(currentCollateral)) {
-                  maxCollateral = currentCollateral
-                }
-
-                // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
-                let currentCollateralNormalizedBN = new BigNumber(
-                  collateralState.maxValue - collateralState.minValue
-                )
-                  .dividedBy(maxCollateral.minus(minCollateral))
-                  .times(currentCollateral.minus(minCollateral))
-                  .plus(collateralState.minValue)
-
-                if (
-                  currentCollateralNormalizedBN
-                    .dividedBy(collateralState.maxValue - collateralState.minValue)
-                    .lte(0.01)
-                ) {
-                  currentCollateralNormalizedBN = new BigNumber(collateralState.minValue)
-                }
-
-                // check balance
-                if (
-                  (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-                    this.props.loan!.collateralAsset === Asset.ETH) ||
-                  (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-                    this.props.loan!.collateralAsset === Asset.BNB)
-                ) {
-                  assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade)
-                    ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade)
-                    : new BigNumber(0)
-                }
-                let assetBalanceNormalizedBN = new BigNumber(
-                  collateralState.maxValue - collateralState.minValue
-                )
-                  .dividedBy(maxCollateral.minus(minCollateral))
-                  .times(assetBalance.minus(minCollateral))
-                  .plus(collateralState.minValue)
-
-                if (
-                  assetBalanceNormalizedBN
-                    .dividedBy(collateralState.maxValue - collateralState.minValue)
-                    .lte(0.01)
-                ) {
-                  assetBalanceNormalizedBN = new BigNumber(collateralState.minValue)
-                }
-                const collateralToLoanRate = await FulcrumProvider.Instance.getKyberSwapRate(
-                  this.props.loan!.collateralAsset,
-                  this.props.loan!.loanAsset
-                )
-
-                this.setState(
-                  {
-                    ...this.state,
-                    collateralToLoanRate,
-                    assetDetails:
-                      AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null,
-                    loanValue: currentCollateralNormalizedBN.toNumber(),
-                    selectedValue: currentCollateralNormalizedBN.toNumber(),
-                    gasAmountNeeded: gasAmountNeeded,
-                    collateralizedPercent: collateralizedPercent,
-                    collateralExcess: collateralExcess,
-                    assetBalanceValue: assetBalance.div(10 ** 18),
-                    ethBalanceValue: ethBalance,
-                  },
-                  () => {
-                    if (this.props.isOpenModal) {
-                      window.history.pushState(
-                        null,
-                        'Manage Collateral Modal Opened',
-                        `/trade/manage-collateral/`
+                    // set range for case when loan has zero margin. Actually it don't affect slider range.
+                    // TODO: review the logic of the component
+                    if (this.props.loan!.loanData!.collateral.isZero()) {
+                      minCollateral = new BigNumber(
+                        this.props.loan!.loanData.maintenanceMargin.div(10 ** 18).plus(5)
                       )
-                      this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue))
+                      maxCollateral = new BigNumber(
+                        this.props.loan!.loanData.maintenanceMargin.div(10 ** 18).plus(50)
+                      )
                     }
-                  }
-                )
-              })
-            }
-          )
-        })
+
+                    const currentCollateral = this.props.loan!.collateralAmount.times(10 ** 18)
+
+                    if (maxCollateral.lt(currentCollateral)) {
+                      maxCollateral = currentCollateral
+                    }
+
+                    // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
+                    let currentCollateralNormalizedBN = new BigNumber(
+                      collateralState.maxValue - collateralState.minValue
+                    )
+                      .dividedBy(maxCollateral.minus(minCollateral))
+                      .times(currentCollateral.minus(minCollateral))
+                      .plus(collateralState.minValue)
+
+                    if (
+                      currentCollateralNormalizedBN
+                        .dividedBy(collateralState.maxValue - collateralState.minValue)
+                        .lte(0.01)
+                    ) {
+                      currentCollateralNormalizedBN = new BigNumber(collateralState.minValue)
+                    }
+
+                    // check balance
+                    if (
+                      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
+                        this.props.loan!.collateralAsset === Asset.ETH) ||
+                      (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
+                        this.props.loan!.collateralAsset === Asset.BNB)
+                    ) {
+                      assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade)
+                        ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade)
+                        : new BigNumber(0)
+                    }
+                    let assetBalanceNormalizedBN = new BigNumber(
+                      collateralState.maxValue - collateralState.minValue
+                    )
+                      .dividedBy(maxCollateral.minus(minCollateral))
+                      .times(assetBalance.minus(minCollateral))
+                      .plus(collateralState.minValue)
+
+                    if (
+                      assetBalanceNormalizedBN
+                        .dividedBy(collateralState.maxValue - collateralState.minValue)
+                        .lte(0.01)
+                    ) {
+                      assetBalanceNormalizedBN = new BigNumber(collateralState.minValue)
+                    }
+                    const collateralToLoanRate = await FulcrumProvider.Instance.getKyberSwapRate(
+                      this.props.loan!.collateralAsset,
+                      this.props.loan!.loanAsset
+                    )
+
+                    this.setState(
+                      {
+                        ...this.state,
+                        collateralToLoanRate,
+                        assetDetails:
+                          AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null,
+                        loanValue: currentCollateralNormalizedBN.toNumber(),
+                        selectedValue: currentCollateralNormalizedBN.toNumber(),
+                        gasAmountNeeded: gasAmountNeeded,
+                        collateralizedPercent: collateralizedPercent,
+                        collateralExcess: collateralExcess,
+                        assetBalanceValue: assetBalance.div(10 ** 18),
+                        ethBalanceValue: ethBalance,
+                      },
+                      () => {
+                        if (this.props.isOpenModal) {
+                          window.history.pushState(
+                            null,
+                            'Manage Collateral Modal Opened',
+                            `/trade/manage-collateral/`
+                          )
+                          this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue))
+                        }
+                      }
+                    )
+                  })
+                }
+              )
+            })
       })
     })
   }
@@ -321,10 +320,10 @@ export default class ManageCollateralForm extends Component<
       this.state.ethBalanceValue && this.state.ethBalanceValue.lte(this.state.gasAmountNeeded)
         ? 'Insufficient funds for gas'
         : this.state.balanceTooLow
-        ? 'Your wallet is empty'
-        : this.state.assetBalanceValue.lt(this.state.inputAmountText)
-        ? `Insufficient ${this.props.loan.collateralAsset} balance in your wallet!`
-        : ''
+          ? 'Your wallet is empty'
+          : this.state.assetBalanceValue.lt(this.state.inputAmountText)
+            ? `Insufficient ${this.props.loan.collateralAsset} balance in your wallet!`
+            : ''
     const liquidationPrice =
       this.state.activeTokenLiquidation === this.props.loan.collateralAsset
         ? this.state.liquidationPrice
@@ -535,18 +534,18 @@ export default class ManageCollateralForm extends Component<
         .div(this.state.collateralToLoanRate)
       let selectedValue = (Number(value) > 0
         ? collateralAmount
-            .dividedBy(
-              this.props.loan!.collateralAmount.isZero()
-                ? maxCollateralForZeroMarginLoan
-                : this.props.loan!.collateralAmount
-            )
-            .multipliedBy(this.state.maxValue - this.state.loanValue)
-            .plus(this.state.loanValue)
-        : new BigNumber(this.state.loanValue).minus(
-            collateralAmount
-              .dividedBy(this.state.collateralExcess)
-              .multipliedBy(this.state.loanValue)
+          .dividedBy(
+            this.props.loan!.collateralAmount.isZero()
+              ? maxCollateralForZeroMarginLoan
+              : this.props.loan!.collateralAmount
           )
+          .multipliedBy(this.state.maxValue - this.state.loanValue)
+          .plus(this.state.loanValue)
+        : new BigNumber(this.state.loanValue).minus(
+          collateralAmount
+            .dividedBy(this.state.collateralExcess)
+            .multipliedBy(this.state.loanValue)
+        )
       ).toNumber()
 
       if (selectedValue < this.state.minValue) {

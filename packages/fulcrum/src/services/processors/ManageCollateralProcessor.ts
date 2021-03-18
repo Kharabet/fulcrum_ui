@@ -7,6 +7,7 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import { FulcrumProvider } from '../FulcrumProvider'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
+import { getErc20AddressOfAsset } from 'bzx-common/src/utils'
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -66,7 +67,7 @@ export class ManageCollateralProcessor {
       let tokenErc20Contract: erc20Contract | null = null
       let assetErc20Address: string | null = ''
       let erc20allowance = new BigNumber(0)
-      assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(
+      assetErc20Address = getErc20AddressOfAsset(
         taskRequest.collateralAsset
       )
       if (assetErc20Address) {

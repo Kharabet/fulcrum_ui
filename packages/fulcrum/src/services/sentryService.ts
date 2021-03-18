@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/browser'
 import type { EventEmitter } from 'events'
 import appConfig from 'bzx-common/src/config/appConfig'
 import regexUtils from '../lib/regexUtils'
+import { getCurrentAccount } from 'bzx-common/src/utils'
 
 /**
  * Filter some events that should not be reported in Sentry
@@ -31,7 +32,7 @@ function setWalletAddressAsId(address?: string) {
  * @param provider Pass the provider instance (Fulcrum/Staking Provider)
  */
 function init(provider: {
-  getCurrentAccount: () => string | undefined
+  accounts: string[]
   eventEmitter: EventEmitter
 }) {
   Sentry.init({
@@ -48,7 +49,7 @@ function init(provider: {
   })
 
   provider.eventEmitter.on('ProviderChanged', () => {
-    setWalletAddressAsId(provider.getCurrentAccount())
+    setWalletAddressAsId(getCurrentAccount(provider.accounts))
   })
 }
 

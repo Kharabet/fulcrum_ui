@@ -16,6 +16,7 @@ import { CollateralTokenSelectorToggle } from './CollateralTokenSelectorToggle'
 
 import ExpectedResult from './ExpectedResult'
 import { Loader } from './Loader'
+import { getCurrentAccount, getEthBalance } from 'bzx-common/src/utils'
 
 const isMainnet = process.env.NODE_ENV && process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
@@ -153,7 +154,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   private async setInputDefaults() {
-    const ethBalance = await TorqueProvider.Instance.getEthBalance()
+    const ethBalance = TorqueProvider.Instance.web3Wrapper
+      ? await getEthBalance(TorqueProvider.Instance.web3Wrapper, getCurrentAccount(TorqueProvider.Instance.accounts))
+      : new BigNumber(0)
 
     const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
       this.props.borrowAsset,
@@ -280,8 +283,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     const loanStatus = this.state.borrowAmount.eq(0)
       ? ''
       : this.state.minValue.plus(10).gt(this.state.collaterizationPercents)
-      ? 'risky'
-      : 'safe'
+        ? 'risky'
+        : 'safe'
 
     const minSliderValue = -this.inverseCurve(this.state.maxValue)
     const maxSliderValue = -this.inverseCurve(this.state.minValue)
@@ -291,12 +294,12 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         : new BigNumber(this.state.borrowAmountValue).gt(this.state.maxAvailableLiquidity) ||
           this.state.borrowAmount.gt(this.state.maxAvailableLiquidity) ||
           (this.state.isLoading && this.state.borrowAmount.eq(0) && this.state.depositAmount.gt(0))
-        ? 'There is insufficient liquidity available for this loan'
-        : this.state.balanceTooLow || this.state.balanceValue.isZero()
-        ? `Insufficient ${this.state.collateralAsset} balance in your wallet!`
-        : this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0)
-        ? `Loan is too large`
-        : undefined
+          ? 'There is insufficient liquidity available for this loan'
+          : this.state.balanceTooLow || this.state.balanceValue.isZero()
+            ? `Insufficient ${this.state.collateralAsset} balance in your wallet!`
+            : this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0)
+              ? `Loan is too large`
+              : undefined
     const TokenIcon = this.state.assetDetails.reactLogoSvg
     return (
       <form className="borrow-form" onSubmit={this.onSubmit}>
@@ -421,11 +424,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 type="submit">
                 {this.state.didSubmit
                   ? 'Submitting...'
-                  : `Borrow${
-                      this.state.borrowAmount.eq(0)
-                        ? ''
-                        : ` ${this.state.borrowAmount.toFixed(2)} ${this.props.borrowAsset}`
-                    }`}
+                  : `Borrow${this.state.borrowAmount.eq(0)
+                    ? ''
+                    : ` ${this.state.borrowAmount.toFixed(2)} ${this.props.borrowAsset}`
+                  }`}
               </button>
             </div>
           </div>
