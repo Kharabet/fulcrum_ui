@@ -1,4 +1,4 @@
-export class RolloverRequest {
+export default class RolloverRequest {
   public id: number
   public loanId: string
 

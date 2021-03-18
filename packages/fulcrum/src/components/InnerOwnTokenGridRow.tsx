@@ -10,7 +10,7 @@ import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
-import { RolloverRequest } from '../domain/RolloverRequest'
+import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
@@ -322,10 +322,10 @@ export class InnerOwnTokenGridRow extends Component<
                     <span
                       title={this.state.valueChange.toFixed()}
                       className={`inner-own-token-grid-row__col-asset-price-small ${this.state.valueChange.gt(0)
-                          ? 'positive'
-                          : this.state.valueChange.lt(0)
-                            ? 'negative'
-                            : ''
+                        ? 'positive'
+                        : this.state.valueChange.lt(0)
+                          ? 'negative'
+                          : ''
                         }`}>
                       {this.state.valueChange.gt(0) ? '+' : ''}
                       {this.state.valueChange.toFixed(2)}%
@@ -348,8 +348,8 @@ export class InnerOwnTokenGridRow extends Component<
                       {this.props.collateral.toFixed(2)}
                       <div
                         className={`inner-own-token-grid-row__open-manage-collateral ${this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)
-                            ? 'danger'
-                            : ''
+                          ? 'danger'
+                          : ''
                           }`}
                         onClick={this.onManageClick}>
                         <OpenManageCollateral />
@@ -359,8 +359,8 @@ export class InnerOwnTokenGridRow extends Component<
                       className={`inner-own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(
                         this.props.maintenanceMargin.plus(0.1)
                       )
-                          ? 'danger'
-                          : ''
+                        ? 'danger'
+                        : ''
                         }`}
                       title={collateralizedPercent.toFixed(18)}>
                       {collateralizedPercent.toFixed(2)}%

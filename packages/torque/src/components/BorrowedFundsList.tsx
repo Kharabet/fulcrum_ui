@@ -1,7 +1,6 @@
 import React, { Component, RefObject } from 'react'
 import { BorrowRequestAwaiting } from '../domain/BorrowRequestAwaiting'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { RolloverRequest } from '../domain/RolloverRequest'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { BorrowedFundsAwaitingListItem } from './BorrowedFundsAwaitingListItem'
 import { BorrowedFundsListItem } from './BorrowedFundsListItem'
@@ -20,7 +19,7 @@ export interface IBorrowedFundsListProps {
   isLoading: boolean
 }
 
-interface IBorrowedFundsListState {}
+interface IBorrowedFundsListState { }
 
 export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorrowedFundsListState> {
   constructor(props: IBorrowedFundsListProps) {

@@ -47,7 +47,7 @@ import { IRolloverData } from '../domain/IRolloverData'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { Platform } from '../domain/Platform'
 import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
-import { RolloverRequest } from '../domain/RolloverRequest'
+import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
 import ethereumUtils from 'app-lib/ethereumUtils'
 
 let configAddress: any

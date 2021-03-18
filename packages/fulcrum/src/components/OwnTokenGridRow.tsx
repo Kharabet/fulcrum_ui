@@ -17,7 +17,7 @@ import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { Preloader } from './Preloader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
 import { NotificationRollover } from './NotificationRollover'
-import { RolloverRequest } from '../domain/RolloverRequest'
+import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
 import ReactTooltip from 'react-tooltip'
 import { ReactComponent as IconInfo } from '../assets/images/icon_info.svg'
 
