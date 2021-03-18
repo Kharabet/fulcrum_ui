@@ -6,23 +6,18 @@ import { NavService } from '../services/NavService'
 
 import Modal from 'react-modal'
 import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { Web3ReactProvider } from '@web3-react/core'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
 import { errors } from 'ethers'
-import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import { ProviderMenu } from './ProviderMenu'
 import { Tab } from '../domain/Tab'
 import TabContainer from './TabContainer'
-
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 interface IAppRouterState {
   isProviderMenuModalOpen: boolean

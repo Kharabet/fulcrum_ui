@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react'
 import React from 'react'
 import AppVM from '../AppVM'
-import { ReactComponent as GenericWalletShort } from 'app-images/logo_short___genericwallet.svg'
+import { ReactComponent as GenericWalletShort } from 'bzx-common/src/assets/images/providers/logo_short___genericwallet.svg'
 
 export function OnChainIndicator({ appVM }: { appVM: AppVM }) {
   const { etherscanURL, web3Connection } = appVM.rootStore

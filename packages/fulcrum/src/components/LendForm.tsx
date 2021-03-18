@@ -1,32 +1,23 @@
 import { BigNumber } from '@0x/utils'
+import '../styles/components/input-amount.scss'
+import '../styles/components/lend-form.scss'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import appConfig from 'bzx-common/src/config/appConfig'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import Asset from 'bzx-common/src/assets/Asset'
-
-import AssetDetails from 'bzx-common/src/assets/AssetDetails'
-
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
+import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-
-import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import { AssetDropdown } from './AssetDropdown'
 import { Preloader } from './Preloader'
 import { getCurrentAccount, getEthBalance } from 'bzx-common/src/utils'
-
-import '../styles/components/input-amount.scss'
-import '../styles/components/lend-form.scss'
-
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean
@@ -368,13 +359,13 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                 </div>
               )}
 
-              {process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH ? (
+              {appConfig.isMainnet && this.props.asset === Asset.ETH ? (
                 <AssetDropdown
                   selectedAsset={this.state.useWrapped ? Asset.WETH : Asset.ETH}
                   onAssetChange={this.onChangeUseWrapped}
                   assets={[Asset.WETH, Asset.ETH]}
                 />
-              ) : process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB ? (
+              ) : appConfig.isBsc && this.props.asset === Asset.BNB ? (
                 <AssetDropdown
                   selectedAsset={this.state.useWrapped ? Asset.WBNB : Asset.BNB}
                   onAssetChange={this.onChangeUseWrapped}
@@ -472,14 +463,14 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
   public onChangeUseWrapped = (asset: Asset) => {
     if (
       this.state.useWrapped &&
-      ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) ||
-        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB))
+      ((appConfig.isMainnet && this.props.asset === Asset.ETH) ||
+        (appConfig.isBsc && this.props.asset === Asset.BNB))
     ) {
       this._isMounted && this.setState({ useWrapped: false })
     } else if (
       !this.state.useWrapped &&
-      ((process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) ||
-        (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB))
+      ((appConfig.isMainnet && this.props.asset === Asset.ETH) ||
+        (appConfig.isBsc && this.props.asset === Asset.BNB))
     ) {
       this._isMounted && this.setState({ useWrapped: true })
     }
@@ -573,7 +564,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     const usdPrice = sendAmount.multipliedBy(usdAmount)
 
-    if (isMainnetProd && LendType.LEND) {
+    if (appConfig.isGTMEnabled && LendType.LEND) {
       const randomNumber = Math.floor(Math.random() * 100000) + 1
       const tagManagerArgs = {
         dataLayer: {
@@ -611,9 +602,9 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
   private getAssetOrWrapped = (): Asset => {
     let assetOrWrapped: Asset
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && this.props.asset === Asset.ETH) {
+    if (appConfig.isMainnet && this.props.asset === Asset.ETH) {
       assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.asset === Asset.BNB) {
+    } else if (appConfig.isBsc && this.props.asset === Asset.BNB) {
       assetOrWrapped = this.state.useWrapped ? Asset.WBNB : Asset.BNB
     } else if (this.props.asset === Asset.DAI) {
       assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI

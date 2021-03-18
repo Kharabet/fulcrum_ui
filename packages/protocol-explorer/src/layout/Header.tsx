@@ -2,13 +2,15 @@ import React, { Component } from 'react'
 import { ReactComponent as LogoExplorer } from '../assets/images/logo-explorer.svg'
 import { ReactComponent as LogoSign } from '../assets/images/logo-sign.svg'
 import { HeaderMenu } from './HeaderMenu'
-import { OnChainIndicator } from '../components/OnChainIndicator'
+import OnChainIndicator from 'bzx-common/src/shared-components/OnChainIndicator'
 import { FooterSocial } from '../layout/FooterSocial'
 import { ReactComponent as MenuIconClose } from '../assets/images/menu-close.svg'
 import { ReactComponent as MenuIconOpen } from '../assets/images/menu-open.svg'
 import { NavService } from '../services/NavService'
 import { Tab } from '../domain/Tab'
 import Tabs from '../components/Tabs'
+import { ExplorerProvider } from '../services/ExplorerProvider'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 
 interface IHeaderProps {
   doNetworkConnect: () => void
@@ -60,7 +62,12 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
                 rel="noopener noreferrer">
                 Help Center
               </a>
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              <OnChainIndicator
+                doNetworkConnect={this.props.doNetworkConnect}
+                provider={ExplorerProvider.Instance}
+                providerIsChanging={ExplorerProviderEvents.ProviderIsChanging}
+                providerChanged={ExplorerProviderEvents.ProviderChanged}
+              />
             </div>
           </div>
         </div>
@@ -91,7 +98,12 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
             </div>
             <div className={`mobile-menu ${this.state.isMenuOpen ? `shown` : `hidden`}`}>
               <div className="w-100">
-                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+                <OnChainIndicator
+                  doNetworkConnect={this.props.doNetworkConnect}
+                  provider={ExplorerProvider.Instance}
+                  providerIsChanging={ExplorerProviderEvents.ProviderIsChanging}
+                  providerChanged={ExplorerProviderEvents.ProviderChanged}
+                />
                 <HeaderMenu />
                 <div className="header-menu">
                   <a

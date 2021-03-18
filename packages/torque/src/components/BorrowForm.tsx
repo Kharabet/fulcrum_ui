@@ -1,24 +1,22 @@
-import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import { BigNumber } from '@0x/utils'
+import { BorrowRequest } from '../domain/BorrowRequest'
+import { CollateralTokenSelectorToggle } from './CollateralTokenSelectorToggle'
+import { debounceTime, switchMap } from 'rxjs/operators'
+import { IBorrowEstimate } from '../domain/IBorrowEstimate'
+import { IDepositEstimate } from '../domain/IDepositEstimate'
+import { Loader } from './Loader'
+import { merge, Observable, Subject } from 'rxjs'
+import { TorqueProvider } from '../services/TorqueProvider'
+import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import Slider from 'rc-slider'
-import React, { ChangeEvent, Component, FormEvent } from 'react'
-import TagManager from 'react-gtm-module'
-import { merge, Observable, Subject } from 'rxjs'
-import { debounceTime, switchMap } from 'rxjs/operators'
-import { BorrowRequest } from '../domain/BorrowRequest'
-import { IBorrowEstimate } from '../domain/IBorrowEstimate'
-import { IDepositEstimate } from '../domain/IDepositEstimate'
-import { TorqueProvider } from '../services/TorqueProvider'
-import { CollateralTokenSelectorToggle } from './CollateralTokenSelectorToggle'
-
+import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import ExpectedResult from './ExpectedResult'
-import { Loader } from './Loader'
+import { ChangeEvent, Component, FormEvent } from 'react'
+import Slider from 'rc-slider'
+import TagManager from 'react-gtm-module'
 import { getCurrentAccount, getEthBalance } from 'bzx-common/src/utils'
-
-const isMainnet = process.env.NODE_ENV && process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export interface IBorrowFormProps {
   assetsShown: Asset[]
@@ -216,7 +214,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
     const gasPrice = await ethGasStation.getGasPrice()
     const rate = await TorqueProvider.Instance.getSwapToUsdRate(
-      process.env.REACT_APP_ETH_NETWORK === 'bsc' ? Asset.BNB : Asset.ETH
+      appConfig.isBsc ? Asset.BNB : Asset.ETH
     )
     const estimatedFee = await TorqueProvider.Instance.getBorrowEstimatedGas(
       tradeRequest,
@@ -495,7 +493,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       let usdPrice = this.state.borrowAmount
       usdPrice = usdPrice.multipliedBy(usdAmount)
 
-      if (isMainnet) {
+      if (appConfig.isGTMEnabled) {
         const tagManagerArgs = {
           dataLayer: {
             event: 'purchase',
@@ -589,8 +587,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     const collateralAsset = this.state.collateralAsset
     let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(collateralAsset)
     if (
-      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' && collateralAsset === Asset.ETH) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && collateralAsset === Asset.BNB)
+      (appConfig.isMainnet && collateralAsset === Asset.ETH) ||
+      (appConfig.isBsc && collateralAsset === Asset.BNB)
     ) {
       assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
         ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
@@ -663,9 +661,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset).then(
       async (balance) => {
         if (
-          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-            this.state.collateralAsset === Asset.ETH) ||
-          (process.env.REACT_APP_ETH_NETWORK === 'bsc' && Asset.BNB)
+          (appConfig.isMainnet && this.state.collateralAsset === Asset.ETH) ||
+          (appConfig.isBsc && Asset.BNB)
         ) {
           balance = balance.gt(TorqueProvider.Instance.gasBufferForTxn)
             ? balance.minus(TorqueProvider.Instance.gasBufferForTxn)

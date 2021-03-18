@@ -31,7 +31,7 @@ export default function App({ vm }: { vm: AppVM }) {
       </Router>
       <AppError rootStore={vm.rootStore} />
       <Footer />
-      {appConfig.isMainnetProd ? <Intercom appID="dfk4n5ut" /> : null}
+      {appConfig.isProduction ? <Intercom appID="dfk4n5ut" /> : null}
     </React.Fragment>
   )
 }

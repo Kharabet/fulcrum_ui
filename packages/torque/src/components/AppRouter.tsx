@@ -1,38 +1,30 @@
-import { Web3Wrapper } from '@0x/web3-wrapper'
-import { Component } from 'react'
-import TagManager from 'react-gtm-module'
-// import ReactGA from "react-ga";
-import Intercom from 'react-intercom'
-import { Redirect, Route, Router, Switch } from 'react-router-dom'
-import configProviders from 'bzx-common/src/config/providers'
-import { ProviderType } from '../domain/ProviderType'
-import TabContainer from '../layout/TabContainer'
-
-import { MaintenancePage } from '../pages/MaintenancePage'
-//import { RefinancePage } from "../pages/RefinancePage";
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
-import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
-import { TorqueProvider } from '../services/TorqueProvider'
-import siteConfig from '../config/SiteConfig.json'
-import RiskDisclosure from 'bzx-common/src/shared-components/RiskDisclosure'
-import Modal from 'react-modal'
-
-import { ProviderMenu } from './ProviderMenu'
-import { Web3ReactProvider } from '@web3-react/core'
-import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
-import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary'
 import { AbstractConnector } from '@web3-react/abstract-connector'
-import { errors } from 'ethers'
-import { NavService } from '../services/NavService'
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
+import { errors } from 'ethers'
+import { MaintenancePage } from '../pages/MaintenancePage'
+import { NavService } from '../services/NavService'
+import { ProviderMenu } from './ProviderMenu'
+import { ProviderType } from '../domain/ProviderType'
+import { Redirect, Route, Router, Switch } from 'react-router-dom'
+import { TorqueProvider } from '../services/TorqueProvider'
+import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
+import { Web3ReactProvider } from '@web3-react/core'
+import { Web3Wrapper } from '@0x/web3-wrapper'
+import appConfig from 'bzx-common/src/config/appConfig'
+import configProviders from 'bzx-common/src/config/providers'
+import Intercom from 'react-intercom'
+import Modal from 'react-modal'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
+import { Component } from 'react'
+import RiskDisclosure from 'bzx-common/src/shared-components/RiskDisclosure'
+import siteConfig from '../config/SiteConfig.json'
+import TabContainer from '../layout/TabContainer'
+import TagManager from 'react-gtm-module'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import { getLocalstorageItem } from 'bzx-common/src/utils'
 
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-
-if (isMainnetProd) {
+if (appConfig.isGTMEnabled) {
   const tagManagerArgs = {
     gtmId: configProviders.Google_TrackingID,
     dataLayer: {
@@ -126,7 +118,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
           overlayClassName="modal-overlay-div overflow-auto">
           <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
         </Modal>
-        {isMainnetProd ? <Intercom appID="dfk4n5ut" /> : null}
+        {appConfig.isProduction ? <Intercom appID="dfk4n5ut" /> : null}
         <div className="pages-container">
           {siteConfig.MaintenanceMode ? (
             <MaintenancePage />
@@ -169,7 +161,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 />
                 <Route path="*" render={() => <Redirect to="/" />} />
               </Switch>
-              {isMainnetProd ? (
+              {appConfig.isGTMEnabled ? (
                 <Route
                   path="/"
                   render={({ location }) => {

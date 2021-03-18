@@ -1,18 +1,22 @@
 {
-    "extends": "../../tsconfig",
-    "include": [
-      "src",
-      "../bzx-common"
-    ],
-    "exclude": [
-        "node_modules",
-        "**/*.spec.ts"
-    ],
-    "compilerOptions": {
-      "baseUrl": ".",
-      "paths": {
-        "bzx-common/*": ["../bzx-common/*"]
-      }
+  "extends": "../../tsconfig",
+  "include": [
+    "src",
+    "../bzx-common"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "bzx-common/*": [
+        "../bzx-common/*"
+      ],
+      "app-lib/*": [
+        "../bzx-common/src/lib/*",
+      ]
     }
   }
-  
+}

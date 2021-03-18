@@ -10,11 +10,9 @@ import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { RepayLoanRequest } from '../domain/RepayLoanRequest'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
+import { TasksQueue, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import { RolloverRequest } from '../domain/RolloverRequest'
 import { TorqueProviderEvents } from '../services/events/TorqueProviderEvents'
-import { TasksQueue } from '../services/TasksQueue'
 import { TorqueProvider } from '../services/TorqueProvider'
 import { BorrowMoreDlg } from './BorrowMoreDlg'
 import { ExtendLoanDlg } from './ExtendLoanDlg'
@@ -49,11 +47,6 @@ interface IBorrowedFundsListItemState {
     | undefined
   activeTokenLiquidation: Asset
 }
-
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 export class BorrowedFundsListItem extends Component<
   IBorrowedFundsListItemProps,

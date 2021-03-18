@@ -1,28 +1,28 @@
-import { BigNumber } from '@0x/utils'
-import React, { Component } from 'react'
 import { Bar } from 'react-chartjs-2'
-import ReactModal from 'react-modal'
-import LiquidationForm from '../components/LiquidationForm'
-import { LoanGrid } from '../components/LoanGrid'
-import { Search } from '../components/Search'
-import { TxGrid } from '../components/TxGrid'
-import { ITxRowProps } from '../components/TxRow'
-import { UnhealthyChart } from '../components/UnhealthyChart'
-import Asset from 'bzx-common/src/assets/Asset'
-import { LiquidationEvent } from 'bzx-common/src/domain/events'
-import { LiquidationRequest } from '../domain/LiquidationRequest'
-import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
+import { BigNumber } from '@0x/utils'
 import { ExplorerProvider } from '../services/ExplorerProvider'
-import { NavService } from '../services/NavService'
-
-import { Loader } from '../components/Loader'
+import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvents'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { ILoanRowProps } from '../components/LoanRow'
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import { RolloversGrid } from '../components/RolloversGrid'
-import { IRolloverRowProps } from '../components/RolloverRow'
 import { IRolloverData } from '../domain/IRolloverData'
+import { IRolloverRowProps } from '../components/RolloverRow'
+import { ITxRowProps } from '../components/TxRow'
+import { LiquidationEvent } from 'bzx-common/src/domain/events'
+import { LiquidationRequest } from '../domain/LiquidationRequest'
+import { Loader } from '../components/Loader'
+import { LoanGrid } from '../components/LoanGrid'
+import { NavService } from '../services/NavService'
+import { RolloversGrid } from '../components/RolloversGrid'
+import { Search } from '../components/Search'
 import { Tab } from '../domain/Tab'
+import { TxGrid } from '../components/TxGrid'
+import { UnhealthyChart } from '../components/UnhealthyChart'
+import appConfig from 'bzx-common/src/config/appConfig'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import LiquidationForm from '../components/LiquidationForm'
+import React, { Component } from 'react'
+import ReactModal from 'react-modal'
 
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void
@@ -56,7 +56,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   constructor(props: any) {
     super(props)
-    if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+    if (appConfig.isKovan) {
       this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
     } else {
       this.assetsShown = [

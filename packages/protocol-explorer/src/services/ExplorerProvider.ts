@@ -1,7 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { EventEmitter } from 'events'
-
+import appConfig from 'bzx-common/src/config/appConfig'
 import Web3Utils from 'web3-utils'
 
 import constantAddress from '../config/constant.json'
@@ -40,7 +40,7 @@ import {
   getTradeHistory,
 } from 'bzx-common/src/utils'
 
-import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 
 import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'
@@ -51,40 +51,18 @@ import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { IRolloverData } from '../domain/IRolloverData'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { Platform } from '../domain/Platform'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
+import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import { RolloverRequest } from '../domain/RolloverRequest'
-import { TasksQueue } from '../services/TasksQueue'
-import { TasksQueueEvents } from './events/TasksQueueEvents'
-
-const isMainnetProd =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+import ethereumUtils from 'app-lib/ethereumUtils'
 
 let configAddress: any
-if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+if (appConfig.isMainnet) {
   configAddress = constantAddress.mainnet
 } else {
   configAddress = constantAddress.kovan
 }
 
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1
-    case 'ropsten':
-      return 3
-    case 'rinkeby':
-      return 4
-    case 'kovan':
-      return 42
-    default:
-      return 0
-  }
-}
 const networkName = process.env.REACT_APP_ETH_NETWORK
-const initialNetworkId = getNetworkIdByString(networkName)
 
 export class ExplorerProvider {
   public static Instance: ExplorerProvider
@@ -117,7 +95,7 @@ export class ExplorerProvider {
     this.eventEmitter = new EventEmitter()
     this.eventEmitter.setMaxListeners(1000)
 
-    if (process.env.REACT_APP_ETH_NETWORK === 'mainnet') {
+    if (appConfig.isMainnet) {
       this.assetsShown = [
         Asset.ETH,
         Asset.DAI,
@@ -134,7 +112,7 @@ export class ExplorerProvider {
         Asset.LRC,
         Asset.COMP,
       ]
-    } else if (process.env.REACT_APP_ETH_NETWORK === 'kovan') {
+    } else if (appConfig.isKovan) {
       this.assetsShown = [Asset.USDC, Asset.fWETH, Asset.WBTC]
     } else if (process.env.REACT_APP_ETH_NETWORK === 'ropsten') {
       this.assetsShown = [Asset.DAI, Asset.ETH]
@@ -151,11 +129,9 @@ export class ExplorerProvider {
 
     const storedProvider: any = ExplorerProvider.getLocalstorageItem('providerType')
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
-
-    this.web3ProviderSettings = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId)
     // ExplorerProvider.Instance.isLoading = true;
     // setting up readonly provider
-    this.web3ProviderSettings = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId)
+    this.web3ProviderSettings = appConfig.web3ProviderSettings
     Web3ConnectionFactory.setReadonlyProvider().then(() => {
       const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper
       const engine = Web3ConnectionFactory.currentWeb3Engine
@@ -220,7 +196,7 @@ export class ExplorerProvider {
     const networkId = Web3ConnectionFactory.networkId
     this.accounts = Web3ConnectionFactory.userAccount ? [Web3ConnectionFactory.userAccount] : []
 
-    if (this.web3Wrapper && networkId !== initialNetworkId) {
+    if (this.web3Wrapper && networkId !== appConfig.appNetworkId) {
       // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
       this.unsupportedNetwork = true
       canWrite = false // revert back to read-only
@@ -250,39 +226,6 @@ export class ExplorerProvider {
     this.providerType = canWrite ? providerType : ProviderType.None
 
     ExplorerProvider.setLocalstorageItem('providerType', this.providerType)
-  }
-
-  public static getWeb3ProviderSettings(networkId: number | null): IWeb3ProviderSettings {
-    // tslint:disable-next-line:one-variable-per-declaration
-    let networkName, etherscanURL
-    switch (networkId) {
-      case 1:
-        networkName = 'mainnet'
-        etherscanURL = 'https://etherscan.io/'
-        break
-      case 3:
-        networkName = 'ropsten'
-        etherscanURL = 'https://ropsten.etherscan.io/'
-        break
-      case 4:
-        networkName = 'rinkeby'
-        etherscanURL = 'https://rinkeby.etherscan.io/'
-        break
-      case 42:
-        networkName = 'kovan'
-        etherscanURL = 'https://kovan.etherscan.io/'
-        break
-      default:
-        networkId = 0
-        networkName = 'local'
-        etherscanURL = ''
-        break
-    }
-    return {
-      networkId,
-      networkName,
-      etherscanURL,
-    }
   }
 
   public setApproval = async (
@@ -566,10 +509,13 @@ export class ExplorerProvider {
       | RolloverEvent
     )[]
   ): ITxRowProps[] => {
-    if (events.length === 0) return []
-    if (!ExplorerProvider.Instance.contractsSource) return []
-    let initialNetworkId = ExplorerProvider.Instance.contractsSource.networkId
-    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId).etherscanURL
+    if (events.length === 0) {
+      return []
+    }
+    if (!ExplorerProvider.Instance.contractsSource) {
+      return []
+    }
+    const etherscanUrl = appConfig.web3ProviderSettings.etherscanURL
     return events.map((e) => {
       if (e instanceof TradeEvent) {
         const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18
@@ -787,7 +733,7 @@ export class ExplorerProvider {
       return this.getSwapToUsdRateOffChain(asset)
     }
 
-    return this.getSwapRate(asset, isMainnetProd ? Asset.DAI : Asset.USDC)
+    return this.getSwapRate(asset, appConfig.tokenForUsdSwapRate)
   }
 
   public async getSwapRate(

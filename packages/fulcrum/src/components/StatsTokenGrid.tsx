@@ -4,12 +4,13 @@ import Asset from 'bzx-common/src/assets/Asset'
 
 import { ReserveDetails } from '../domain/ReserveDetails'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import { ProviderChangedEvent } from '../services/events/ProviderChangedEvent'
+import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { StatsTokenGridHeader } from './StatsTokenGridHeader'
 import { IStatsTokenGridRowProps, StatsTokenGridRow } from './StatsTokenGridRow'
 
 import { PreloaderChart } from '../components/PreloaderChart'
+import appConfig from 'bzx-common/src/config/appConfig'
 
 import '../styles/components/stats-grid.scss'
 
@@ -23,28 +24,27 @@ interface IStatsTokenGridState {
 }
 
 export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenGridState> {
-  private static readonly assets: Asset[] =
-    process.env.REACT_APP_ETH_NETWORK === 'mainnet'
-      ? [
-          Asset.ETHv1,
-          Asset.ETH,
-          Asset.DAI,
-          Asset.USDC,
-          Asset.USDT,
-          Asset.WBTC,
-          Asset.LINK,
-          Asset.YFI,
-          Asset.BZRX,
-          Asset.MKR,
-          Asset.KNC,
-          Asset.UNI,
-          Asset.AAVE,
-          Asset.LRC,
-          Asset.COMP,
-        ]
-      : process.env.REACT_APP_ETH_NETWORK === 'bsc'
-      ? [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTC, Asset.USDT]
-      : [Asset.fWETH, Asset.USDC, Asset.WBTC]
+  private static readonly assets: Asset[] = appConfig.isMainnet
+    ? [
+        Asset.ETHv1,
+        Asset.ETH,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.KNC,
+        Asset.UNI,
+        Asset.AAVE,
+        Asset.LRC,
+        Asset.COMP,
+      ]
+    : appConfig.isBsc
+    ? [Asset.BNB, Asset.ETH, Asset.BUSD, Asset.BTC, Asset.USDT]
+    : [Asset.fWETH, Asset.USDC, Asset.WBTC]
 
   private static readonly apiUrl: string = 'https://api.bzx.network/v1'
   constructor(props: IStatsTokenGridProps) {

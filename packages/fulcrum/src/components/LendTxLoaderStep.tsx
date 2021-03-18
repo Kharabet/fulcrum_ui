@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
-import { RequestTask } from '../domain/RequestTask'
-import { TasksQueueEvents } from '../services/events/TasksQueueEvents'
-import { TasksQueue } from '../services/TasksQueue'
+import { TasksQueue, TasksQueueEvents, RequestTask } from 'app-lib/tasksQueue'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 
 export interface ILendTxLoaderStepProps {
@@ -118,9 +116,8 @@ export class LendTxLoaderStep extends Component<ILendTxLoaderStepProps, ILendTxL
     if (!title) return null
     return this.state.requestTask && this.state.requestTask.txHash ? (
       <a
-        href={`${FulcrumProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${
-          this.state.requestTask!.txHash
-        }`}
+        href={`${FulcrumProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash
+          }`}
         target="_blank"
         rel="noopener noreferrer">
         <div
@@ -152,7 +149,7 @@ export class LendTxLoaderStep extends Component<ILendTxLoaderStepProps, ILendTxL
       div.classList.add('animation-out')
     }
     window.setTimeout(async () => {
-      ;(await this._isMounted) &&
+      ; (await this._isMounted) &&
         this.setState({
           ...this.state,
           requestTask: task,

@@ -16,3 +16,11 @@ $breakpoint-laptop-min: 1140px;
 
 $breakpoint-mobile-max: 959px;
 $breakpoint-mobile-min: 960px;
+
+:root {
+  --primary-text: #283049;
+}
+
+[data-theme='dark'] {
+  --primary-text: #ffffff;
+}

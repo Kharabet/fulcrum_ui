@@ -1,15 +1,11 @@
 import React from 'react'
 import { ProviderType } from '../domain/ProviderType'
-import ProviderTypeDictionary from '../domain/ProviderTypeDictionary'
+import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import { useWeb3React } from '@web3-react/core'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { Loader } from './Loader'
 import TagManager from 'react-gtm-module'
-
-const isMainnet =
-  process.env.NODE_ENV &&
-  process.env.NODE_ENV !== 'development' &&
-  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
+import appConfig from 'bzx-common/src/config/appConfig'
 
 export interface IProviderMenuListItemProps {
   providerType: ProviderType
@@ -30,7 +26,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
   const onClick = () => {
     // if (props.isConnected) return;
     props.onSelect(props.providerType)
-    if (isMainnet) {
+    if (appConfig.isGTMEnabled) {
       const tagManagerArgs = {
         dataLayer: {
           event: 'select-provider',

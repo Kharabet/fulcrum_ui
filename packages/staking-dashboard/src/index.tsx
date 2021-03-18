@@ -1,18 +1,18 @@
+import './styles/index.scss'
+import appConfig from 'bzx-common/src/config/appConfig'
+import configProviders from 'bzx-common/src/config/providers'
 import { Provider } from 'mobx-react'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TagManager from 'react-gtm-module'
 import App from './App'
-import appConfig from 'bzx-common/src/config/appConfig'
-import configProviders from 'bzx-common/src/config/providers.ts'
 import stakingProvider from './services/StakingProvider'
 import RootStore from './stores/RootStore'
-import './styles/index.scss'
 
 const rootStore = new RootStore({ stakingProvider })
 rootStore.init()
 
-if (appConfig.isMainnetProd) {
+if (appConfig.isGTMEnabled) {
   const tagManagerArgs = {
     gtmId: configProviders.Google_TrackingID,
     dataLayer: {

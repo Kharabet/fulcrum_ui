@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
+import { RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import { TasksListItemDetails } from './TasksListItemDetails'
 
 export interface ITasksListItemProps {

@@ -41,7 +41,6 @@ $breakpoint-mobile-min: 960px;
   --leverage-color-hover: #5b88ff;
   --lend-item-before: #8992a4;
   --lend-item-before-hover: #a9b5c7;
-  --indicator-border: #b9c7d6;
   --loader-slider: #b9c7d6;
   --eth-bg: #e0e0e0;
   --wbtc-svg: #282237;
@@ -87,6 +86,7 @@ $breakpoint-mobile-min: 960px;
   --dropdown-select-bg: #e9f4ff;
   --dropdown-select-text: #282f36;
   --separator-color: #c4c4c4;
+  --wallet-fill: #495460;
 }
 
 [data-theme='dark'] {
@@ -113,7 +113,6 @@ $breakpoint-mobile-min: 960px;
   --leverage-color-hover: #5b88ff;
   --lend-item-before: #29323d;
   --lend-item-before-hover: #343d49;
-  --indicator-border: #a2abb8;
   --loader-slider: #3d4651;
   --eth-bg: #ffffff;
   --wbtc-svg: #ffffff;
@@ -159,4 +158,5 @@ $breakpoint-mobile-min: 960px;
   --dropdown-select-bg: #758295;
   --dropdown-select-text: #e9f4ff;
   --separator-color: #333c46;
+  --wallet-fill: #ffffff;
 }

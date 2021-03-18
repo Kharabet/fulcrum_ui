@@ -6,11 +6,9 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import { TasksQueue } from '../services/TasksQueue'
+import { TasksQueue, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { LendTxLoaderStep } from './LendTxLoaderStep'
 
@@ -177,9 +175,8 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
   const TokenIcon = assetDetails.reactLogoSvg
   return (
     <div
-      className={`token-selector-item ${
-        balanceWithProfit.eq(0) ? '' : 'token-selector-item_active'
-      } ${isLoadingTransaction ? 'loading-transaction' : ''}`}>
+      className={`token-selector-item ${balanceWithProfit.eq(0) ? '' : 'token-selector-item_active'
+        } ${isLoadingTransaction ? 'loading-transaction' : ''}`}>
       <div className="token-selector-item__image">
         {props.isLoading || isLoadingTransaction ? (
           <CircleLoader>
@@ -197,8 +194,8 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
           <div className="token-selector-item__descriptions">
             <div className="token-selector-item__description">
               {iTokenAddress &&
-              FulcrumProvider.Instance.web3ProviderSettings &&
-              FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+                FulcrumProvider.Instance.web3ProviderSettings &&
+                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
                 <div className="token-selector-item__name">
                   <a
                     className="token-selector-item__name"
@@ -217,9 +214,8 @@ function LendTokenSelectorItem(props: ILendTokenSelectorItemProps) {
               <div className="token-selector-item__interest-rate-container">
                 <div className="token-selector-item__interest-rate-title">Interest APR:</div>
                 <div
-                  title={`${
-                    props.interestRate && props.interestRate.toFixed(assetDetails.decimals)
-                  }%`}
+                  title={`${props.interestRate && props.interestRate.toFixed(assetDetails.decimals)
+                    }%`}
                   className="token-selector-item__interest-rate-value">
                   {props.interestRate.toFixed(2)}
                   <span className="sign-currency">%</span>

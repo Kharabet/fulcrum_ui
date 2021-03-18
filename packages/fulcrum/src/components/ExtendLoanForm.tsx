@@ -12,6 +12,7 @@ import { FulcrumProvider } from '../services/FulcrumProvider'
 import { InputAmount } from './InputAmount'
 import { TradeRequest } from '../domain/TradeRequest'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
+import appConfig from 'bzx-common/src/config/appConfig'
 
 export interface IExtendLoanFormProps {
   loan: IBorrowedFundsState
@@ -225,9 +226,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       this.props.loan.loanAsset
     )
     if (
-      (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-        this.props.loan.loanAsset === Asset.ETH) ||
-      (process.env.REACT_APP_ETH_NETWORK === 'bsc' && this.props.loan.loanAsset === Asset.BNB)
+      (appConfig.isMainnet && this.props.loan.loanAsset === Asset.ETH) ||
+      (appConfig.isBsc && this.props.loan.loanAsset === Asset.BNB)
     ) {
       assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTxn)
         ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTxn)

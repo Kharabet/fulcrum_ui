@@ -1,17 +1,18 @@
 import { BigNumber } from '@0x/utils'
-import React, { ChangeEvent, Component, FormEvent } from 'react'
-import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
+import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
+import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
+import { LiquidationDropdown } from './LiquidationDropdown'
+import { Loader } from './Loader'
+import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
+import { merge, Observable, Subject } from 'rxjs'
+import { TorqueProvider } from '../services/TorqueProvider'
+import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
-import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
-import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
-import { TorqueProvider } from '../services/TorqueProvider'
+import React, { ChangeEvent, Component, FormEvent } from 'react'
 import Slider from 'rc-slider'
-import { Loader } from './Loader'
-import { LiquidationDropdown } from './LiquidationDropdown'
 
 export interface IManageCollateralFormWeb3Props {
   loanOrderState: IBorrowedFundsState
@@ -176,10 +177,8 @@ export class ManageCollateralFormWeb3 extends Component<
 
                 // check balance
                 if (
-                  (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-                    this.props.loanOrderState.loanAsset === Asset.ETH) ||
-                  (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-                    this.props.loanOrderState.loanAsset === Asset.BNB)
+                  (appConfig.isMainnet && this.props.loanOrderState.loanAsset === Asset.ETH) ||
+                  (appConfig.isBsc && this.props.loanOrderState.loanAsset === Asset.BNB)
                 ) {
                   assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
                     ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
@@ -489,10 +488,8 @@ export class ManageCollateralFormWeb3 extends Component<
           this.props.loanOrderState.collateralAsset
         )
         if (
-          (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-            this.props.loanOrderState.loanAsset === Asset.ETH) ||
-          (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-            this.props.loanOrderState.loanAsset === Asset.BNB)
+          (appConfig.isMainnet && this.props.loanOrderState.loanAsset === Asset.ETH) ||
+          (appConfig.isBsc && this.props.loanOrderState.loanAsset === Asset.BNB)
         ) {
           assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
             ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)

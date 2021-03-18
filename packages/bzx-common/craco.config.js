@@ -77,7 +77,7 @@ module.exports = {
             src: './src',
             'bzx-common': '../bzx-common',
             'app-images': './src/assets/images',
-            'app-lib': './src/lib',
+            'app-lib': '../bzx-common/src/lib',
             'app-services': './src/services',
             'shared-components': './src/shared-components',
             'ui-framework': './src/ui-framework',

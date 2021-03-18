@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { RequestTask } from '../domain/RequestTask'
+import { Component } from 'react'
+import { RequestTask } from 'app-lib/tasksQueue'
 import { TasksListItem } from './TasksListItem'
 
 export interface ITasksListProps {

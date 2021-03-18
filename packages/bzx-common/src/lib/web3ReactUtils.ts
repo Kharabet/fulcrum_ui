@@ -1,38 +1,21 @@
-import { InjectedConnector } from '@web3-react/injected-connector'
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
-import { WalletLinkConnector } from '@web3-react/walletlink-connector'
-import { LedgerConnector } from '@web3-react/ledger-connector'
-import { TrezorConnector } from '@web3-react/trezor-connector'
 // import { FrameConnector } from '@web3-react/frame-connector'
 import { AuthereumConnector } from '@web3-react/authereum-connector'
+import { BitskiConnector } from '@web3-react/bitski-connector'
 import { FortmaticConnector } from '@web3-react/fortmatic-connector'
+import { InjectedConnector } from '@web3-react/injected-connector'
+import { LedgerConnector } from '@web3-react/ledger-connector'
 import { PortisConnector } from '@web3-react/portis-connector'
 import { SquarelinkConnector } from '@web3-react/squarelink-connector'
-import { BitskiConnector } from '@web3-react/bitski-connector'
 import { TorusConnector } from '@web3-react/torus-connector'
+import { TrezorConnector } from '@web3-react/trezor-connector'
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
+import { WalletLinkConnector } from '@web3-react/walletlink-connector'
+import appConfig from '../config/appConfig'
+import configProviders from '../config/providers'
+import Web3ConnectionFactory from '../services/Web3ConnectionFactory'
 
-import configProviders from 'bzx-common/src/config/providers'
-import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
-
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1
-    case 'ropsten':
-      return 3
-    case 'rinkeby':
-      return 4
-    case 'kovan':
-      return 42
-    case 'bsc':
-      return 56
-    default:
-      return 0
-  }
-}
-
-const networkName = process.env.REACT_APP_ETH_NETWORK
-const networkId = getNetworkIdByString(networkName)
+const networkName = appConfig.appNetwork
+const networkId = appConfig.appNetworkId
 
 const RPC_URL = Web3ConnectionFactory.getRPCUrl()
 

@@ -8,13 +8,11 @@ import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { PositionType } from '../domain/PositionType'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
 import { TradeRequest } from '../domain/TradeRequest'
 import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import { TasksQueue } from '../services/TasksQueue'
+import { TasksQueue, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { Preloader } from './Preloader'
 import { TradeTxLoaderStep } from './TradeTxLoaderStep'
@@ -215,8 +213,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             ? `${this.props.profitCollateralToken.toFixed()}`
             : `${this.props.profitLoanToken.toFixed()}`
           : this.state.activeTokenProfit === this.props.baseToken
-          ? `${this.props.profitLoanToken.toFixed()}`
-          : `${this.props.profitCollateralToken.toFixed()}`
+            ? `${this.props.profitLoanToken.toFixed()}`
+            : `${this.props.profitCollateralToken.toFixed()}`
       profitValue =
         this.props.positionType === PositionType.LONG ? (
           <React.Fragment>
@@ -331,11 +329,10 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
                   <span className="value-currency">
                     {this.props.collateral.toFixed(2)}
                     <div
-                      className={`own-token-grid-row__open-manage-collateral ${
-                        this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)
-                          ? 'danger'
-                          : ''
-                      }`}
+                      className={`own-token-grid-row__open-manage-collateral ${this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)
+                        ? 'danger'
+                        : ''
+                        }`}
                       onClick={this.onManageClick}>
                       <OpenManageCollateral />
                     </div>
@@ -345,13 +342,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
                       <OpenExtendLoan />
                     </div>
                     <span
-                      className={`own-token-grid-row__col-asset-collateral-small ${
-                        this.props.loan.collateralizedPercent.lte(
-                          this.props.maintenanceMargin.plus(0.1)
-                        )
-                          ? 'danger'
-                          : ''
-                      }`}>
+                      className={`own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(
+                        this.props.maintenanceMargin.plus(0.1)
+                      )
+                        ? 'danger'
+                        : ''
+                        }`}>
                       {this.props.loan.collateralizedPercent.multipliedBy(100).toFixed(2)}%
                     </span>
                   </span>
@@ -402,18 +398,16 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               {Number(profitTitle) ? (
                 <div className="own-token-grid-row__col-profit-switch">
                   <label
-                    className={`${
-                      this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''
-                    }`}
+                    className={`${this.props.baseToken === this.state.activeTokenProfit ? 'active' : ''
+                      }`}
                     onClick={() => {
                       this.setActiveTokenProfit(this.props.baseToken)
                     }}>
                     {this.props.baseToken}
                   </label>
                   <label
-                    className={`${
-                      this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
-                    }`}
+                    className={`${this.props.quoteToken === this.state.activeTokenProfit ? 'active' : ''
+                      }`}
                     onClick={() => {
                       this.setActiveTokenProfit(this.props.quoteToken)
                     }}>
@@ -430,9 +424,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
           <button
-            className={`own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half ${
-              isRollover && 'rollover-warning'
-            }`}
+            className={`own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half ${isRollover && 'rollover-warning'
+              }`}
             onClick={isRollover ? this.onRolloverClick : this.onSellClick}
             disabled={this.props.loan.collateralizedPercent.lte(this.props.maintenanceMargin)}>
             {isRollover ? 'Rollover' : 'CLOSE POSITION'}

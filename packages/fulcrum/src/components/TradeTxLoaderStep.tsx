@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import { RequestTask } from '../domain/RequestTask'
-import { TasksQueueEvents } from '../services/events/TasksQueueEvents'
+import { TasksQueue, TasksQueueEvents, RequestTask } from 'app-lib/tasksQueue'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import { TasksQueue } from '../services/TasksQueue'
 
 export interface ITitle {
   message: string
@@ -175,7 +173,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       div.classList.add('animation-out')
     }
     window.setTimeout(async () => {
-      ;(await this._isMounted) &&
+      ; (await this._isMounted) &&
         this.setState({
           ...this.state,
           requestTask: task,

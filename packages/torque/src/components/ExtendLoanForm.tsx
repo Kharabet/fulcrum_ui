@@ -1,16 +1,17 @@
 import { BigNumber } from '@0x/utils'
-import Slider from 'rc-slider'
-import React, { ChangeEvent, Component, FormEvent } from 'react'
-import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import Asset from 'bzx-common/src/assets/Asset'
-import AssetDetails from 'bzx-common/src/assets/AssetDetails'
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { ExtendLoanRequest } from '../domain/ExtendLoanRequest'
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { IExtendEstimate } from '../domain/IExtendEstimate'
-import { TorqueProvider } from '../services/TorqueProvider'
 import { InputAmount } from './InputAmount'
+import { merge, Observable, Subject } from 'rxjs'
+import { TorqueProvider } from '../services/TorqueProvider'
+import appConfig from 'bzx-common/src/config/appConfig'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetDetails from 'bzx-common/src/assets/AssetDetails'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import React, { ChangeEvent, Component, FormEvent } from 'react'
+import Slider from 'rc-slider'
 
 export interface IExtendLoanFormProps {
   loanOrderState: IBorrowedFundsState
@@ -258,10 +259,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         this.props.loanOrderState.loanAsset
       )
       if (
-        (process.env.REACT_APP_ETH_NETWORK === 'mainnet' &&
-          this.props.loanOrderState.loanAsset === Asset.ETH) ||
-        (process.env.REACT_APP_ETH_NETWORK === 'bsc' &&
-          this.props.loanOrderState.loanAsset === Asset.BNB)
+        (appConfig.isMainnet && this.props.loanOrderState.loanAsset === Asset.ETH) ||
+        (appConfig.isBsc && this.props.loanOrderState.loanAsset === Asset.BNB)
       ) {
         assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
           ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 
 import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
@@ -26,13 +26,12 @@ import { ReactComponent as Placeholder } from '../assets/images/history_placehol
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
-import { RequestStatus } from '../domain/RequestStatus'
-import { RequestTask } from '../domain/RequestTask'
+import { RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import { TradeRequest } from '../domain/TradeRequest'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import '../styles/components/history-token-grid.scss'
-import { TRADE_PAIRS } from 'bzx-common/src/config/appConfig'
+import { tradePairs } from 'bzx-common/src/config/appConfig'
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean
@@ -212,12 +211,12 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       const tradeEvent = events[0] as TradeEvent
 
       let positionType
-      const possiblePairs = TRADE_PAIRS.filter(
+      const possiblePairs = tradePairs.filter(
         (p) =>
           (p.baseToken === tradeEvent.loanToken && p.quoteToken === tradeEvent.collateralToken) ||
           (p.baseToken === tradeEvent.collateralToken && p.quoteToken === tradeEvent.loanToken)
       )
-      if (TRADE_PAIRS.length > 0 && possiblePairs && possiblePairs.length > 0) {
+      if (tradePairs.length > 0 && possiblePairs && possiblePairs.length > 0) {
         if (possiblePairs.length > 1) {
           console.error(
             "The position fits to more than one pair. Couldn't treat it exactly as LONG/SHORT"

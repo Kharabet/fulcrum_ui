@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { RequestTask } from '../../domain/RequestTask'
+import { RequestTask } from 'app-lib/tasksQueue'
 import { TorqueProvider } from '../TorqueProvider'
 import { RefinanceCompoundRequest } from '../../domain/RefinanceCompoundRequest'
 
