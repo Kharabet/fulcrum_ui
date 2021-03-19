@@ -5,7 +5,7 @@ import { RequestTask } from 'app-lib/tasksQueue'
 import { FulcrumProvider } from '../FulcrumProvider'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 import { ExtendLoanRequest } from '../../domain/ExtendLoanRequest'
-import { getErc20AddressOfAsset } from 'bzx-common/src/utils'
+import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
 
 export class ExtendLoanProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {

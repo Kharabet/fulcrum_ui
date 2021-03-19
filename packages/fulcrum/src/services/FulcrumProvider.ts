@@ -57,14 +57,17 @@ import {
   getRolloverHistory,
   getTradeHistory,
   getWithdrawCollateralHistory,
-  getErc20AddressOfAsset,
-  getEthBalance,
-  getErc20BalanceOfUser,
+} from 'bzx-common/src/lib/blockchainEventsUtils'
+
+import {
   getGoodSourceAmountOfAsset,
   getLocalstorageItem,
   setLocalstorageItem,
   getCurrentAccount,
-} from 'bzx-common/src/utils'
+  getErc20AddressOfAsset,
+  getErc20BalanceOfUser,
+  getEthBalance,
+} from 'bzx-common/src/lib/providerUtils'
 
 const networkName = process.env.REACT_APP_ETH_NETWORK
 const initialNetworkId = appConfig.appNetworkId

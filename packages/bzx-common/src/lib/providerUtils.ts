@@ -1,7 +1,5 @@
 import { BigNumber } from '@0x/utils'
-import { Web3Wrapper } from '@0x/web3-wrapper'
 import Asset from '../assets/Asset'
-import ContractsSource from '../contracts/ContractsSource'
 import AssetsDictionary from '../assets/AssetsDictionary'
 import appConfig from '../config/appConfig'
 import { TorqueProvider } from '../../../torque/src/services/TorqueProvider'
@@ -99,4 +97,3 @@ export {
   setLocalstorageItem,
   getCurrentAccount,
 }
-export * from './blockchainEventsUtils'

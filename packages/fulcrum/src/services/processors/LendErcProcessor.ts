@@ -5,7 +5,7 @@ import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTo
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import { LendRequest } from '../../domain/LendRequest'
-import { getErc20AddressOfAsset } from 'bzx-common/src/utils'
+import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
 import { RequestTask } from 'app-lib/tasksQueue'
 import { FulcrumProvider } from '../FulcrumProvider'
 import Asset from 'bzx-common/src/assets/Asset'

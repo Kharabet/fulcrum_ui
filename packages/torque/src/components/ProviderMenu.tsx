@@ -11,7 +11,7 @@ import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import Asset from 'bzx-common/src/assets/Asset'
 import { BigNumber } from '@0x/utils'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import { getLocalstorageItem } from 'bzx-common/src/utils'
+import { getLocalstorageItem } from 'bzx-common/src/lib/providerUtils'
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[]

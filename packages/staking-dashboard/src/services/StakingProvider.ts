@@ -31,7 +31,7 @@ import {
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import stakingApi from 'bzx-common/src/lib/stakingApi'
 
-import { getCurrentAccount } from 'bzx-common/src/utils'
+import { getCurrentAccount } from 'bzx-common/src/lib/providerUtils'
 // @ts-ignore
 import web3EthAbiUntyped, { AbiCoder } from 'web3-eth-abi'
 // Fix necessary due to wrong type exports in web3-eth-abi

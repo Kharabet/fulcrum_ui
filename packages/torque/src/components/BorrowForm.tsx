@@ -16,7 +16,7 @@ import ExpectedResult from './ExpectedResult'
 import { ChangeEvent, Component, FormEvent } from 'react'
 import Slider from 'rc-slider'
 import TagManager from 'react-gtm-module'
-import { getEthBalance } from 'bzx-common/src/utils'
+import { getEthBalance } from 'bzx-common/src/lib/providerUtils'
 
 export interface IBorrowFormProps {
   assetsShown: Asset[]

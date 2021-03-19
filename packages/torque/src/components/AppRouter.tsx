@@ -22,7 +22,7 @@ import siteConfig from '../config/SiteConfig.json'
 import TabContainer from '../layout/TabContainer'
 import TagManager from 'react-gtm-module'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
-import { getLocalstorageItem } from 'bzx-common/src/utils'
+import { getLocalstorageItem } from 'bzx-common/src/lib/providerUtils'
 
 if (appConfig.isGTMEnabled) {
   const tagManagerArgs = {

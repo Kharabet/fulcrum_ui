@@ -22,7 +22,7 @@ import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import TradeExpectedResult from './TradeExpectedResult'
-import { getEthBalance } from 'bzx-common/src/utils'
+import { getEthBalance } from 'bzx-common/src/lib/providerUtils'
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber

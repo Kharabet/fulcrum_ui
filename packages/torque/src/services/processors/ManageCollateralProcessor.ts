@@ -6,7 +6,7 @@ import { RequestTask } from 'app-lib/tasksQueue'
 import { TorqueProvider } from '../TorqueProvider'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 import Asset from 'bzx-common/src/assets/Asset'
-import { getErc20AddressOfAsset } from 'bzx-common/src/utils'
+import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {

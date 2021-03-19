@@ -28,17 +28,20 @@ import {
   getBurnHistory,
   getCloseWithDepositHistory,
   getCloseWithSwapHistory,
-  getCurrentAccount,
-  getErc20AddressOfAsset,
-  getErc20BalanceOfUser,
-  getEthBalance,
-  getGoodSourceAmountOfAsset,
   getLiquidationHistory,
   getLogsFromEtherscan,
   getMintHistory,
   getRolloverHistory,
   getTradeHistory,
-} from 'bzx-common/src/utils'
+} from 'bzx-common/src/lib/blockchainEventsUtils'
+
+import {
+  getGoodSourceAmountOfAsset,
+  getCurrentAccount,
+  getErc20AddressOfAsset,
+  getErc20BalanceOfUser,
+  getEthBalance,
+} from 'bzx-common/src/lib/providerUtils'
 
 import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 

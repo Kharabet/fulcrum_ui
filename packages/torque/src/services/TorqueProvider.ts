@@ -61,7 +61,7 @@ import {
   getGoodSourceAmountOfAsset,
   getLocalstorageItem,
   setLocalstorageItem,
-} from 'bzx-common/src/utils'
+} from 'bzx-common/src/lib/providerUtils'
 
 let configAddress: any
 if (appConfig.isMainnet) {

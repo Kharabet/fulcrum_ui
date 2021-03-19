@@ -7,7 +7,7 @@ import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
-import { getErc20AddressOfAsset } from 'bzx-common/src/utils'
+import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 export class TradeBuyProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {

@@ -17,7 +17,7 @@ import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { AssetDropdown } from './AssetDropdown'
 import { Preloader } from './Preloader'
-import { getEthBalance } from 'bzx-common/src/utils'
+import { getEthBalance } from 'bzx-common/src/lib/providerUtils'
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean
