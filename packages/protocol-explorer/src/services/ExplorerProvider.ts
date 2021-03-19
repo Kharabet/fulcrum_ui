@@ -81,7 +81,11 @@ export class ExplorerProvider {
   public web3Wrapper: Web3Wrapper | null = null
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
+  public impersonateAddress = ''
   public accounts: string[] = []
+  public get currentAccount() {
+    return getCurrentAccount(this)
+  }
   public isLoading: boolean = false
   public unsupportedNetwork: boolean = false
   private isProcessing: boolean = false
@@ -246,7 +250,7 @@ export class ExplorerProvider {
       return result
     }
 
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
 
     if (!account || !tokenErc20Contract) {
@@ -647,7 +651,6 @@ export class ExplorerProvider {
     return result
   }
 
-
   public getLargeApprovalAmount = (
     asset: Asset,
     neededAmount: BigNumber = new BigNumber(0)
@@ -1013,7 +1016,6 @@ export class ExplorerProvider {
     return result
   }
 
-
   public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0)
 
@@ -1022,13 +1024,13 @@ export class ExplorerProvider {
       result = new BigNumber(0)
     } else if (asset === Asset.ETH) {
       // get eth (wallet) balance
-      result = (await getEthBalance(this.web3Wrapper, account)).div(10 ** 18)
+      result = (await getEthBalance(this)).div(10 ** 18)
     } else {
       // get erc20 token balance
       const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
       const assetErc20Address = getErc20AddressOfAsset(asset)
       if (assetErc20Address) {
-        result = await getErc20BalanceOfUser(this.contractsSource, assetErc20Address, account)
+        result = await getErc20BalanceOfUser(this, assetErc20Address, account)
         result = result.div(10 ** decimals)
       }
     }

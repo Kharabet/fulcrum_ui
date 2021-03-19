@@ -11,7 +11,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { ChangeEvent, Component, FormEvent } from 'react'
-import { getCurrentAccount, getEthBalance } from 'bzx-common/src/utils'
+import { getEthBalance } from 'bzx-common/src/utils'
 
 export interface IRepayLoanFormProps {
   loanOrderState: IBorrowedFundsState
@@ -102,12 +102,13 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         })
       }
     )
-    TorqueProvider.Instance.web3Wrapper && getEthBalance(TorqueProvider.Instance.web3Wrapper, getCurrentAccount(TorqueProvider.Instance.accounts)).then((ethBalance) => {
-      this.setState({
-        ...this.state,
-        ethBalance: ethBalance,
+    TorqueProvider.Instance.web3Wrapper &&
+      getEthBalance(TorqueProvider.Instance).then((ethBalance) => {
+        this.setState({
+          ...this.state,
+          ethBalance: ethBalance,
+        })
       })
-    })
   }
 
   public componentDidUpdate(

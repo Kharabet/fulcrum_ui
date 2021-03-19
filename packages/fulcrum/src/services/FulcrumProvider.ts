@@ -35,7 +35,6 @@ import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary
 import TagManager from 'react-gtm-module'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import Web3Utils from 'web3-utils'
-
 import {
   CloseWithSwapEvent,
   DepositCollateralEvent,
@@ -47,6 +46,7 @@ import {
   TradeEvent,
   WithdrawCollateralEvent,
 } from 'bzx-common/src/domain/events'
+
 import {
   getCloseWithSwapHistory,
   getDepositCollateralHistory,
@@ -63,7 +63,7 @@ import {
   getGoodSourceAmountOfAsset,
   getLocalstorageItem,
   setLocalstorageItem,
-  getCurrentAccount
+  getCurrentAccount,
 } from 'bzx-common/src/utils'
 
 const networkName = process.env.REACT_APP_ETH_NETWORK
@@ -98,6 +98,9 @@ export class FulcrumProvider {
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
   public accounts: string[] = []
+  public get currentAccount() {
+    return getCurrentAccount(this)
+  }
   public isLoading: boolean = false
   public unsupportedNetwork: boolean = false
 
@@ -528,7 +531,7 @@ export class FulcrumProvider {
       return result
     }
 
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
 
     if (!account || !tokenErc20Contract) {
@@ -605,7 +608,7 @@ export class FulcrumProvider {
       //console.log(e);
     }
 
-    //const vBZRXBalance = await getErc20BalanceOfUser(this.contractsSource,assetErc20Address, this.contractsSource.getBZxVaultAddress());
+    //const vBZRXBalance = await getErc20BalanceOfUser(this, this.contractsSource,assetErc20Address, this.contractsSource.getBZxVaultAddress());
 
     const reserveData = await helperContract.reserveDetails(tokens).callAsync()
     let usdSupplyAll = new BigNumber(0)
@@ -733,9 +736,9 @@ export class FulcrumProvider {
           .addressErc20.get(this.web3ProviderSettings.networkId)!
         const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
 
-        const bptBalanceOfStaking = await getErc20BalanceOfUser(this.contractsSource, bptAddress, stakingV1Address)
+        const bptBalanceOfStaking = await getErc20BalanceOfUser(this, bptAddress, stakingV1Address)
         const bptTotalSupply = await bptErc20Contract.totalSupply().callAsync()
-        const wethBalanceOfBpt = await getErc20BalanceOfUser(this.contractsSource, wethAddress, bptAddress)
+        const wethBalanceOfBpt = await getErc20BalanceOfUser(this, wethAddress, bptAddress)
 
         // share of weth liquidity that belongs to staking contract from all weth tokens in pool
         const wethShareOfBptStakedLockedAmount = wethBalanceOfBpt
@@ -777,23 +780,23 @@ export class FulcrumProvider {
         const vbzrxWorthPart = new BigNumber(1).minus(vbzrxTotalVested.div(vbzrxTotalSupply))
         // vBZRX locked in bZx protocol
         const vbzrxProtocolLockedAmount = (
-          await getErc20BalanceOfUser(this.contractsSource, vbzrxAddress, ibzxAddress)
+          await getErc20BalanceOfUser(this, vbzrxAddress, ibzxAddress)
         ).times(vbzrxWorthPart)
 
         // vBZRX locked in Staking protocol
         const vbzrxStakedLockedAmount = (
-          await getErc20BalanceOfUser(this.contractsSource, vbzrxAddress, stakingV1Address)
+          await getErc20BalanceOfUser(this, vbzrxAddress, stakingV1Address)
         ).times(vbzrxWorthPart)
         const bzrxStakedLockedAmount = await getErc20BalanceOfUser(
-          this.contractsSource,
+          this,
           bzrxAddress,
           stakingV1Address
         )
 
-        const bptBalanceOfStaking = await getErc20BalanceOfUser(this.contractsSource, bptAddress, stakingV1Address)
+        const bptBalanceOfStaking = await getErc20BalanceOfUser(this, bptAddress, stakingV1Address)
         const bptTotalSupply = await bptErc20Contract.totalSupply().callAsync()
 
-        const bzrxBalanceOfBpt = await getErc20BalanceOfUser(this.contractsSource, bzrxAddress, bptAddress)
+        const bzrxBalanceOfBpt = await getErc20BalanceOfUser(this, bzrxAddress, bptAddress)
         // share of bzrx liquidity that belongs to staking contract from all bzrx tokens in pool
         const bzrxShareOfBptStakedLockedAmount = bzrxBalanceOfBpt
           .div(bptTotalSupply)
@@ -938,7 +941,7 @@ export class FulcrumProvider {
 
         const assetErc20Address = this.getErc20AddressOfAsset(asset);
         if (assetErc20Address) {
-          lockedAssets = await getErc20BalanceOfUser(this.contractsSource,assetErc20Address, this.contractsSource.getBZxVaultAddress());
+          lockedAssets = await getErc20BalanceOfUser(this, this.contractsSource,assetErc20Address, this.contractsSource.getBZxVaultAddress());
         }
 
         result = new ReserveDetails(
@@ -972,7 +975,7 @@ export class FulcrumProvider {
     if (this.unsupportedNetwork) {
       return result
     }
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
 
     if (account && this.web3Wrapper && this.contractsSource) {
       const assetContract = this.contractsSource.getITokenContract(asset)
@@ -1007,7 +1010,7 @@ export class FulcrumProvider {
   //   let account: string | null = null;
 
   //   if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-  //     account = getCurrentAccount(this.accounts)
+  //     account = this.currentAccount
   //   }
 
   //   if (account && this.contractsSource && this.contractsSource.canWrite) {
@@ -1188,7 +1191,7 @@ export class FulcrumProvider {
 
   //   if (this.web3Wrapper && this.contractsSource) {
   //     if (!account && this.contractsSource.canWrite) {
-  //       account = getCurrentAccount(this.accounts)
+  //       account = this.currentAccount
   //     }
 
   //     if (account) {
@@ -1328,7 +1331,7 @@ export class FulcrumProvider {
       return result
     }
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
       const bZxContract = await this.contractsSource.getiBZxContract()
       if (account && bZxContract) {
         // console.log(bZxContract.address, borrowedFundsState.loanId, account);
@@ -1360,7 +1363,7 @@ export class FulcrumProvider {
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       if (!account) {
-        account = getCurrentAccount(this.accounts)
+        account = this.currentAccount
       }
 
       if (account) {
@@ -1392,7 +1395,7 @@ export class FulcrumProvider {
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       if (!account) {
-        account = getCurrentAccount(this.accounts)
+        account = this.currentAccount
       }
       const iTokenContract = this.contractsSource.getITokenContract(request.depositToken)
 
@@ -1485,7 +1488,7 @@ export class FulcrumProvider {
 
   //   let tradeAmountActual = new BigNumber(0);
   //   if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-  //     const account = getCurrentAccount(this.accounts)
+  //     const account = this.currentAccount
 
   //     if (account) {
   //       const key = new TradeTokenKey(
@@ -1649,7 +1652,7 @@ export class FulcrumProvider {
       request.amount.multipliedBy(10 ** decimals).toFixed(0, 1)
     )
 
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
 
     if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const tokenContract = this.contractsSource.getITokenContract(loanToken)
@@ -1667,7 +1670,7 @@ export class FulcrumProvider {
       //const depositTokenAddress = getErc20AddressOfAsset(depositToken);
       const collateralTokenAddress =
         (networkName === 'mainnet' && collateralToken === Asset.ETH) ||
-          (networkName === 'bsc' && collateralToken === Asset.BNB)
+        (networkName === 'bsc' && collateralToken === Asset.BNB)
           ? FulcrumProvider.ZERO_ADDRESS
           : getErc20AddressOfAsset(collateralToken)
 
@@ -1745,14 +1748,14 @@ export class FulcrumProvider {
     ) {
       // get eth (wallet) balance
       if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-        result = await getEthBalance(this.web3Wrapper, account)
+        result = await getEthBalance(this)
       }
     } else {
       // get erc20 token balance
       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
       const assetErc20Address = getErc20AddressOfAsset(asset)
       if (this.web3Wrapper && this.contractsSource && assetErc20Address) {
-        result = await getErc20BalanceOfUser(this.contractsSource, assetErc20Address, account)
+        result = await getErc20BalanceOfUser(this, assetErc20Address, account)
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
@@ -1770,7 +1773,7 @@ export class FulcrumProvider {
         )!.decimals || 18
       const address = await this.contractsSource.getITokenErc20Address(asset)
       if (address) {
-        result = await getErc20BalanceOfUser(this.contractsSource, address)
+        result = await getErc20BalanceOfUser(this, address)
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
@@ -1784,7 +1787,7 @@ export class FulcrumProvider {
       return result
     }
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
 
       if (account) {
         const assetAddress = getErc20AddressOfAsset(Asset.CHI)
@@ -1808,7 +1811,7 @@ export class FulcrumProvider {
       return result
     }
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
 
       if (account) {
         const assetContract = this.contractsSource.getITokenContract(asset)
@@ -1831,7 +1834,7 @@ export class FulcrumProvider {
       return result
     }
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
       const iBZxContract = await this.contractsSource.getiBZxContract()
       if (account && iBZxContract) {
         const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans()).find(
@@ -1889,30 +1892,30 @@ export class FulcrumProvider {
           result =
             isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
               ? await iBZxContract
-                .closeWithSwapWithGasToken(
-                  request.loanId,
-                  account,
-                  account,
-                  amountInBaseUnits,
-                  request.returnTokenIsCollateral, // returnTokenIsCollateral
-                  request.loanDataBytes
-                )
-                .callAsync({
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit,
-                })
+                  .closeWithSwapWithGasToken(
+                    request.loanId,
+                    account,
+                    account,
+                    amountInBaseUnits,
+                    request.returnTokenIsCollateral, // returnTokenIsCollateral
+                    request.loanDataBytes
+                  )
+                  .callAsync({
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit,
+                  })
               : await iBZxContract
-                .closeWithSwap(
-                  request.loanId,
-                  account,
-                  amountInBaseUnits,
-                  request.returnTokenIsCollateral, // returnTokenIsCollateral
-                  request.loanDataBytes
-                )
-                .callAsync({
-                  from: account,
-                  gas: FulcrumProvider.Instance.gasLimit,
-                })
+                  .closeWithSwap(
+                    request.loanId,
+                    account,
+                    amountInBaseUnits,
+                    request.returnTokenIsCollateral, // returnTokenIsCollateral
+                    request.loanDataBytes
+                  )
+                  .callAsync({
+                    from: account,
+                    gas: FulcrumProvider.Instance.gasLimit,
+                  })
         } catch (e) {
           console.error(e)
         }
@@ -1972,7 +1975,7 @@ export class FulcrumProvider {
     if (!this.contractsSource) return result
 
     const iBZxContract = await this.contractsSource.getiBZxContract()
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
 
     if (!iBZxContract || !account) return result
 
@@ -2041,7 +2044,7 @@ export class FulcrumProvider {
     if (!this.contractsSource) return result
 
     const iBZxContract = await this.contractsSource.getiBZxContract()
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
 
     const baseTokenAddress =
       AssetsDictionary.assets
@@ -2243,7 +2246,7 @@ export class FulcrumProvider {
 
   public getEarnRewardHistory = async (): Promise<Array<EarnRewardEvent | EarnRewardEventNew>> => {
     let result: Array<EarnRewardEvent | EarnRewardEventNew> = []
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
 
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
     return getEarnRewardHistory(this.web3Wrapper, this.contractsSource, account)
@@ -2251,7 +2254,7 @@ export class FulcrumProvider {
 
   public getPayTradingFeeHistory = async (): Promise<PayTradingFeeEvent[]> => {
     let result: PayTradingFeeEvent[] = []
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
 
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
     return getPayTradingFeeHistory(this.web3Wrapper, this.contractsSource, account)
@@ -2259,35 +2262,35 @@ export class FulcrumProvider {
 
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = []
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
     return getTradeHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
     let result: RolloverEvent[] = []
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
     return getRolloverHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = []
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
     return getCloseWithSwapHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = []
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
     return getLiquidationHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
     const result: number = 0
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     const blocksPerDay = 10000 // 7-8k per day with a buffer
     if (!account || !this.contractsSource || !this.web3Wrapper) return result
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -2319,14 +2322,14 @@ export class FulcrumProvider {
 
   public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
     let result: DepositCollateralEvent[] = []
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
     return getDepositCollateralHistory(this.web3Wrapper, this.contractsSource, account)
   }
 
   public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
     let result: WithdrawCollateralEvent[] = []
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
     return getWithdrawCollateralHistory(this.web3Wrapper, this.contractsSource, account)
   }
@@ -2471,7 +2474,7 @@ console.log(err, added);
         throw new Error('No provider available!')
       }
 
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
@@ -2536,7 +2539,7 @@ console.log(err, added);
         throw new Error('No provider available!')
       }
 
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
@@ -2574,7 +2577,7 @@ console.log(err, added);
         throw new Error('No provider available!')
       }
 
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
@@ -2592,7 +2595,6 @@ console.log(err, added);
 
       srcTokenAddress = getErc20AddressOfAsset(taskRequest.quoteToken)!
       destTokenAddress = getErc20AddressOfAsset(taskRequest.asset)!
-
 
       if (taskRequest.tradeType === TradeType.BUY) {
         const { TradeBuyProcessor } = await import('./processors/TradeBuyProcessor')
@@ -2624,7 +2626,7 @@ console.log(err, added);
         throw new Error('No provider available!')
       }
 
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
@@ -2655,7 +2657,7 @@ console.log(err, added);
         throw new Error('No provider available!')
       }
 
-      const account = getCurrentAccount(this.accounts)
+      const account = this.currentAccount
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
@@ -2772,7 +2774,7 @@ console.log(err, added);
 
   public async getTradeEstimatedGas(request: TradeRequest, isGasTokenEnabled: boolean) {
     let result = new BigNumber(0)
-    const account = getCurrentAccount(this.accounts)
+    const account = this.currentAccount
     if (!this.contractsSource || !account || !request.amount) return result
 
     const isLong = request.positionType === PositionType.LONG
@@ -2816,69 +2818,69 @@ console.log(err, added);
       try {
         gasAmount = isGasTokenEnabled
           ? await tokenContract
-            .marginTradeWithGasToken(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              new BigNumber(leverageAmount),
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              account,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              value: sendAmountForValue,
-              gas: FulcrumProvider.Instance.gasLimit,
-            })
+              .marginTradeWithGasToken(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(leverageAmount),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                account,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                value: sendAmountForValue,
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
           : await tokenContract
-            .marginTrade(
-              '0x0000000000000000000000000000000000000000000000000000000000000000',
-              new BigNumber(leverageAmount),
-              loanTokenSent,
-              collateralTokenSent,
-              collateralTokenAddress!,
-              account,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              value: sendAmountForValue,
-              gas: FulcrumProvider.Instance.gasLimit,
-            })
-      } catch (e) { }
+              .marginTrade(
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
+                new BigNumber(leverageAmount),
+                loanTokenSent,
+                collateralTokenSent,
+                collateralTokenAddress!,
+                account,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                value: sendAmountForValue,
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
+      } catch (e) {}
     } else {
       const tokenContract = await this.contractsSource.getiBZxContract()
       if (!tokenContract) return result
       try {
         gasAmount = isGasTokenEnabled
           ? await tokenContract
-            .closeWithSwapWithGasToken(
-              request.loanId,
-              account,
-              account,
-              amountInBaseUnits,
+              .closeWithSwapWithGasToken(
+                request.loanId,
+                account,
+                account,
+                amountInBaseUnits,
 
-              request.returnTokenIsCollateral,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              gas: FulcrumProvider.Instance.gasLimit,
-            })
+                request.returnTokenIsCollateral,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
           : await tokenContract
-            .closeWithSwap(
-              request.loanId,
-              account,
-              amountInBaseUnits,
-              request.returnTokenIsCollateral,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              gas: FulcrumProvider.Instance.gasLimit,
-            })
-      } catch (e) { }
+              .closeWithSwap(
+                request.loanId,
+                account,
+                amountInBaseUnits,
+                request.returnTokenIsCollateral,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                gas: FulcrumProvider.Instance.gasLimit,
+              })
+      } catch (e) {}
     }
     return new BigNumber(gasAmount || 0)
       .multipliedBy(this.gasBufferCoeffForTrade)

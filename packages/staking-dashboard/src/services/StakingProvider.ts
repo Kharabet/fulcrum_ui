@@ -9,8 +9,8 @@ import GovernanceProposal, {
   IGovernanceProposalProposer,
   IGovernanceProposalReturnData,
   IGovernanceProposalsEvents,
-} from 'src/domain/GovernanceProposal'
-import ProposalCreated from 'src/domain/ProposalCreated'
+} from '../domain/GovernanceProposal'
+import ProposalCreated from '../domain/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
 import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from '../domain/Asset'
@@ -20,7 +20,7 @@ import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
-import { stakeableToken } from 'src/domain/stakingTypes'
+import { stakeableToken } from '../domain/stakingTypes'
 import { LogWithDecodedArgs } from 'ethereum-types'
 import {
   CompoundGovernorAlphaProposalCanceledEventArgs,
@@ -31,6 +31,7 @@ import {
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import stakingApi from 'bzx-common/src/lib/stakingApi'
 
+import { getCurrentAccount } from 'bzx-common/src/utils'
 // @ts-ignore
 import web3EthAbiUntyped, { AbiCoder } from 'web3-eth-abi'
 // Fix necessary due to wrong type exports in web3-eth-abi
@@ -64,6 +65,9 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   public web3Wrapper: Web3Wrapper | null = null
   public contractsSource: ContractsSource | null = null
   public accounts: string[] = []
+  public get currentAccount() {
+    return getCurrentAccount(this)
+  }
   public unsupportedNetwork: boolean = false
   public impersonateAddress = ''
 
@@ -85,14 +89,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
   public setLocalstorageItem(item: string, val: string) {
     localStorage.setItem(item, val)
-  }
-
-  public getCurrentAccount(): string | undefined {
-    return this.impersonateAddress
-      ? this.impersonateAddress
-      : this.accounts.length > 0 && this.accounts[0]
-      ? this.accounts[0].toLowerCase()
-      : undefined
   }
 
   public setWeb3Provider = async (connector: AbstractConnector, account?: string) => {
@@ -184,7 +180,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    */
   public async checkErc20Allowance(asset: keyof typeof Asset, contractAddress: string) {
     const erc20Address = this.getErc20AddressOfAsset(asset)
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!account || !erc20Address || !this.contractsSource) {
       throw new Error('Missing account, erc20address, contract source')
@@ -214,7 +210,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    */
   public async setStakingAllowance(asset: keyof typeof Asset, amount: BigNumber) {
     const erc20Address = this.getErc20AddressOfAsset(asset)
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!erc20Address || !account || !this.contractsSource) {
       throw new Error('setStakingAllowance: Missing account, erc20address or contract source')
@@ -567,7 +563,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   }
 
   public async getVestedBzrxBalance() {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!this.contractsSource || !account) {
       throw new Error('Missing contract source or account')
@@ -582,7 +578,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    * Mostly for users who hold vbzrx in their wallet and just want to claim their bzrx
    */
   public async claimVestedBZRX() {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!this.contractsSource || !account) {
       throw new Error('Missing contract source or account')
@@ -715,7 +711,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     }>
   > => {
     const stakingContract = await this.getStakingContract()
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!stakingContract || !account) {
       return []
@@ -748,7 +744,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    */
   public async changeDelegate(delegateAddress: string) {
     // TODO: changeDelegate was removed in the contract, need to add back later
-    // const account = this.getCurrentAccount()
+    // const account = this.currentAccount
     // const staking = await this.getStakingContract()
 
     // if (!account || !staking) {
@@ -782,7 +778,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     bzrxVesting: BigNumber
     stableCoinVesting: BigNumber
   }> => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     const stakingContract = await this.getStakingContract()
 
     if (!account || !stakingContract) {
@@ -806,7 +802,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    * Part of the staking rewards that are actually vested BZRX coming from staked vbzrx
    */
   public async getVestedVbzrxInRewards(vbzrxStaked: BigNumber) {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     const stakingContract = await this.getStakingContract()
 
     if (!account || !stakingContract || !this.web3Wrapper) {
@@ -860,7 +856,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    * Returns delegate for current account
    */
   public getDelegateAddress = async (): Promise<string> => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     const staking = await this.getStakingContract()
 
     if (!account || !staking) {
@@ -873,7 +869,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   }
 
   public getRebateRewards = async (): Promise<BigNumber> => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!this.contractsSource || !account) {
       throw new Error('Missing contract or account')
@@ -925,7 +921,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    * @param tokenAmounts amount of bzrx, vbzrx, ibzrx and bpt to stake
    */
   public _stake = async (tokenAmounts: Map<stakeableToken, BigNumber>, opId?: string) => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     const stakingContract = await this.getStakingContract()
     const stakeableAddresses = this.getStakeableAddresses()
 
@@ -968,7 +964,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    * @param tokens amount of bzrx, vbzrx and bpt to stake
    */
   public unstakeTokens = async (tokenAmounts: Map<stakeableToken, BigNumber>) => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     const stakingContract = await this.getStakingContract()
     const stakeableAddresses = this.getStakeableAddresses()
 
@@ -1001,7 +997,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   }
 
   public claimStakingRewards = async (shouldRestake: boolean = false) => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     const stakingContract = await this.getStakingContract()
 
     if (!account || !stakingContract) {
@@ -1028,7 +1024,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
    * User gets back half of the fees in VBZRX
    */
   public async claimRebateRewards() {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     const bZxContract = await this.contractsSource!.getiBZxContract()
     if (!account || !bZxContract) {
       throw new Error('No account/ibzx contract available!')

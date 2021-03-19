@@ -4,7 +4,10 @@ import Asset from '../assets/Asset'
 import ContractsSource from '../contracts/ContractsSource'
 import AssetsDictionary from '../assets/AssetsDictionary'
 import appConfig from '../config/appConfig'
-
+import { TorqueProvider } from '../../../torque/src/services/TorqueProvider'
+import { ExplorerProvider } from '../../../protocol-explorer/src/services/ExplorerProvider'
+import { StakingProvider } from '../../../staking-dashboard/src/services/StakingProvider'
+import { FulcrumProvider } from '../../../fulcrum/src/services/FulcrumProvider'
 
 function getErc20AddressOfAsset(asset: Asset): string | null {
   let result: string | null = null
@@ -17,27 +20,28 @@ function getErc20AddressOfAsset(asset: Asset): string | null {
 }
 
 async function getEthBalance(
-  web3Wrapper: Web3Wrapper,
-  account?: string
+  provider: FulcrumProvider | TorqueProvider | ExplorerProvider | StakingProvider
 ): Promise<BigNumber> {
   let result: BigNumber = new BigNumber(0)
-
-  if (account) {
-    const balance = await web3Wrapper.getBalanceInWeiAsync(account)
-    result = new BigNumber(balance)
+  const account = provider.currentAccount
+  if (!account || !provider.web3Wrapper) {
+    return result
   }
+  const balance = await provider.web3Wrapper.getBalanceInWeiAsync(account)
+  result = new BigNumber(balance)
 
   return result
 }
 
 async function getErc20BalanceOfUser(
-  contractsSource: ContractsSource,
+  provider: FulcrumProvider | TorqueProvider | ExplorerProvider | StakingProvider,
   addressErc20: string,
-  account?: string): Promise<BigNumber> {
+  account?: string
+): Promise<BigNumber> {
   let result = new BigNumber(0)
 
-  if (account) {
-    const tokenContract = await contractsSource.getErc20Contract(addressErc20)
+  if (account && provider.contractsSource) {
+    const tokenContract = await provider.contractsSource.getErc20Contract(addressErc20)
     if (tokenContract) {
       result = await tokenContract.balanceOf(account).callAsync()
     }
@@ -76,12 +80,14 @@ const setLocalstorageItem = (item: string, val: string) => {
   }
 }
 
-const getCurrentAccount = (accounts: string[], impersonateAddress?: string) => {
-  return impersonateAddress
-    ? impersonateAddress
-    : accounts.length > 0 && accounts[0]
-      ? accounts[0].toLowerCase()
-      : undefined
+const getCurrentAccount = (
+  provider: FulcrumProvider | TorqueProvider | ExplorerProvider | StakingProvider
+) => {
+  return provider.impersonateAddress
+    ? provider.impersonateAddress
+    : provider.accounts.length > 0 && provider.accounts[0]
+    ? provider.accounts[0].toLowerCase()
+    : undefined
 }
 
 export {
@@ -91,6 +97,6 @@ export {
   getGoodSourceAmountOfAsset,
   getLocalstorageItem,
   setLocalstorageItem,
-  getCurrentAccount
+  getCurrentAccount,
 }
 export * from './blockchainEventsUtils'
