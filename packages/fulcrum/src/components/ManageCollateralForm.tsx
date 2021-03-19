@@ -18,7 +18,7 @@ import { LiquidationDropdown } from './LiquidationDropdown'
 import '../styles/components/manage-collateral-form.scss'
 import { PositionType } from '../domain/PositionType'
 import appConfig from 'bzx-common/src/config/appConfig'
-import { getEthBalance } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export interface IManageCollateralFormProps {
   loan: IBorrowedFundsState
@@ -148,7 +148,7 @@ export default class ManageCollateralForm extends Component<
       })
 
       FulcrumProvider.Instance.getManageCollateralGasAmount().then(async (gasAmountNeeded) => {
-        await getEthBalance(FulcrumProvider.Instance).then((ethBalance) => {
+        await providerUtils.getEthBalance(FulcrumProvider.Instance).then((ethBalance) => {
           FulcrumProvider.Instance.getManageCollateralExcessAmount(this.props.loan!).then(
             (collateralExcess) => {
               FulcrumProvider.Instance.getAssetTokenBalanceOfUser(

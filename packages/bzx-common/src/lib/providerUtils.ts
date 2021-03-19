@@ -88,7 +88,7 @@ const getCurrentAccount = (
     : undefined
 }
 
-export {
+export default {
   getErc20AddressOfAsset,
   getEthBalance,
   getErc20BalanceOfUser,

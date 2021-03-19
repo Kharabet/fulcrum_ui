@@ -7,7 +7,7 @@ import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
-import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 export class TradeBuyProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -72,7 +72,7 @@ export class TradeBuyProcessor {
         'Transaction completed',
       ])
 
-      assetErc20Address = getErc20AddressOfAsset(taskRequest.depositToken)
+      assetErc20Address = providerUtils.getErc20AddressOfAsset(taskRequest.depositToken)
       if (assetErc20Address) {
         tokenErc20Contract = await FulcrumProvider.Instance.contractsSource.getErc20Contract(
           assetErc20Address
@@ -129,12 +129,12 @@ export class TradeBuyProcessor {
     const collateralTokenSent =
       depositToken === collateralToken ? amountInBaseUnits : new BigNumber(0)
 
-    //const depositTokenAddress = getErc20AddressOfAsset(depositToken);
+    //const depositTokenAddress = providerUtils.getErc20AddressOfAsset(depositToken);
     const collateralTokenAddress =
       (appConfig.isMainnet && collateralToken === Asset.ETH) ||
       (appConfig.isBsc && collateralToken === Asset.BNB)
         ? FulcrumProvider.ZERO_ADDRESS
-        : getErc20AddressOfAsset(collateralToken)
+        : providerUtils.getErc20AddressOfAsset(collateralToken)
     const loanData = '0x'
 
     const sendAmountForValue =

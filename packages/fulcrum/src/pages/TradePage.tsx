@@ -43,7 +43,7 @@ import { RolloverRequest } from '../domain/RolloverRequest'
 import InfoBlock from 'bzx-common/src/shared-components/InfoBlock'
 import { StatsTokenGrid } from '../components/StatsTokenGrid'
 import TVChartComingSoon from '../components/TVChartComingSoon'
-import { getLocalstorageItem } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 const networkName = process.env.REACT_APP_ETH_NETWORK
 
@@ -187,7 +187,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     this._isMounted = true
     const isSupportedNetwork = FulcrumProvider.Instance.unsupportedNetwork
     this.setState({ ...this.state, isSupportNetwork: isSupportedNetwork })
-    const provider = getLocalstorageItem('providerType')
+    const provider = providerUtils.getLocalstorageItem('providerType')
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === 'None')) {
       this.props.doNetworkConnect()
     }

@@ -6,7 +6,7 @@ import { RequestTask } from 'app-lib/tasksQueue'
 import { TorqueProvider } from '../TorqueProvider'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 import Asset from 'bzx-common/src/assets/Asset'
-import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export class RepayLoanProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -56,7 +56,7 @@ export class RepayLoanProcessor {
         let tokenErc20Contract: erc20Contract | null = null
         let assetErc20Address: string | null = ''
         let erc20allowance = new BigNumber(0)
-        assetErc20Address = getErc20AddressOfAsset(taskRequest.borrowAsset)
+        assetErc20Address = providerUtils.getErc20AddressOfAsset(taskRequest.borrowAsset)
         if (assetErc20Address) {
           tokenErc20Contract = await TorqueProvider.Instance.contractsSource.getErc20Contract(
             assetErc20Address

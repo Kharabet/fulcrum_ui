@@ -22,7 +22,7 @@ import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import TradeExpectedResult from './TradeExpectedResult'
-import { getEthBalance } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber
@@ -257,7 +257,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     }
 
     const ethBalance = FulcrumProvider.Instance.web3Wrapper
-      ? await getEthBalance(FulcrumProvider.Instance)
+      ? await providerUtils.getEthBalance(FulcrumProvider.Instance)
       : new BigNumber(0)
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.state.depositToken

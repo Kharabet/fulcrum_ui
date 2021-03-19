@@ -5,7 +5,7 @@ import { iTokenContract } from 'bzx-common/src/contracts/typescript-wrappers/iTo
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import { LendRequest } from '../../domain/LendRequest'
-import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 import { RequestTask } from 'app-lib/tasksQueue'
 import { FulcrumProvider } from '../FulcrumProvider'
 
@@ -48,7 +48,7 @@ export class LendChaiProcessor {
 
     // init erc20 contract for base token
     let tokenErc20Contract: erc20Contract | null = null
-    const assetErc20Address = getErc20AddressOfAsset(taskRequest.asset)
+    const assetErc20Address = providerUtils.getErc20AddressOfAsset(taskRequest.asset)
     if (assetErc20Address) {
       tokenErc20Contract = await FulcrumProvider.Instance.contractsSource.getErc20Contract(
         assetErc20Address

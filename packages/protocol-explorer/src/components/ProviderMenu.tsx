@@ -11,6 +11,7 @@ import { injected } from 'bzx-common/src/lib/web3ReactUtils'
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import { ProviderMenuListItem } from './ProviderMenuListItem'
 import { SwitchButtonInput } from './SwitchButtonInput'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[]
@@ -68,7 +69,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     activate(injected)
   }
 
-  const storedProvider: any = ExplorerProvider.getLocalstorageItem('providerType')
+  const storedProvider: any = providerUtils.getLocalstorageItem('providerType')
   const providerType: ProviderType | null = (storedProvider as ProviderType) || null
   if (
     !activatingConnector &&

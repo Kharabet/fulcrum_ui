@@ -22,7 +22,7 @@ import siteConfig from '../config/SiteConfig.json'
 import TabContainer from '../layout/TabContainer'
 import TagManager from 'react-gtm-module'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
-import { getLocalstorageItem } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 if (appConfig.isGTMEnabled) {
   const tagManagerArgs = {
@@ -58,7 +58,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper,
       isMobileMedia: window.innerWidth <= 959,
-      isChiEnabled: getLocalstorageItem('isChiEnabled') === 'true',
+      isChiEnabled: providerUtils.getLocalstorageItem('isChiEnabled') === 'true',
     }
 
     TorqueProvider.Instance.eventEmitter.on(

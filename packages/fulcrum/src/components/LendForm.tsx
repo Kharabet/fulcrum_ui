@@ -17,7 +17,7 @@ import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { AssetDropdown } from './AssetDropdown'
 import { Preloader } from './Preloader'
-import { getEthBalance } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean
@@ -166,7 +166,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest)
 
     const ethBalance = FulcrumProvider.Instance.web3Wrapper
-      ? await getEthBalance(FulcrumProvider.Instance)
+      ? await providerUtils.getEthBalance(FulcrumProvider.Instance)
       : new BigNumber(0)
 
     const address = FulcrumProvider.Instance.contractsSource

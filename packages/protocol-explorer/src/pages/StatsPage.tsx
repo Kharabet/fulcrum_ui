@@ -19,6 +19,7 @@ import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvent
 import { NavService } from '../services/NavService'
 import { Loader } from '../components/Loader'
 import { Tab } from '../domain/Tab'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 interface IStatsPageProps {
   doNetworkConnect: () => void
@@ -74,7 +75,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       return
     }
 
-    const provider = ExplorerProvider.getLocalstorageItem('providerType')
+    const provider = providerUtils.getLocalstorageItem('providerType')
 
     if (
       !provider ||

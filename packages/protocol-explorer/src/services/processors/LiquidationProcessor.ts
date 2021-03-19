@@ -4,7 +4,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 import { LiquidationRequest } from '../../domain/LiquidationRequest'
 import { RequestTask } from 'app-lib/tasksQueue'
 import { ExplorerProvider } from '../ExplorerProvider'
-import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export class LiquidationProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -52,7 +52,7 @@ export class LiquidationProcessor {
       let tokenErc20Contract: erc20Contract | null = null
       let assetErc20Address: string | null = ''
       let erc20allowance = new BigNumber(0)
-      assetErc20Address = getErc20AddressOfAsset(taskRequest.loanToken)
+      assetErc20Address = providerUtils.getErc20AddressOfAsset(taskRequest.loanToken)
       if (assetErc20Address) {
         tokenErc20Contract = await ExplorerProvider.Instance.contractsSource.getErc20Contract(
           assetErc20Address

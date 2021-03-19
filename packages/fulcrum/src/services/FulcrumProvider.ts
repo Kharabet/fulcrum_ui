@@ -59,15 +59,7 @@ import {
   getWithdrawCollateralHistory,
 } from 'bzx-common/src/lib/blockchainEventsUtils'
 
-import {
-  getGoodSourceAmountOfAsset,
-  getLocalstorageItem,
-  setLocalstorageItem,
-  getCurrentAccount,
-  getErc20AddressOfAsset,
-  getErc20BalanceOfUser,
-  getEthBalance,
-} from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 const networkName = process.env.REACT_APP_ETH_NETWORK
 const initialNetworkId = appConfig.appNetworkId
@@ -102,7 +94,7 @@ export class FulcrumProvider {
   public contractsSource: ContractsSource | null = null
   public accounts: string[] = []
   public get currentAccount() {
-    return getCurrentAccount(this)
+    return providerUtils.getCurrentAccount(this)
   }
   public isLoading: boolean = false
   public unsupportedNetwork: boolean = false
@@ -145,7 +137,7 @@ export class FulcrumProvider {
       FulcrumProvider.Instance = this
     }
 
-    const storedProvider: any = getLocalstorageItem('providerType')
+    const storedProvider: any = providerUtils.getLocalstorageItem('providerType')
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = appConfig.web3ProviderSettings
@@ -230,7 +222,7 @@ export class FulcrumProvider {
     this.providerType =
       canWrite || (!canWrite && this.unsupportedNetwork) ? providerType : ProviderType.None
 
-    setLocalstorageItem('providerType', this.providerType)
+    providerUtils.setLocalstorageItem('providerType', this.providerType)
 
     this.eventEmitter.emit(
       FulcrumProviderEvents.ProviderChanged,
@@ -286,7 +278,7 @@ export class FulcrumProvider {
       } else {
         this.providerType = ProviderType.None
       }
-      setLocalstorageItem('providerType', this.providerType)
+      providerUtils.setLocalstorageItem('providerType', this.providerType)
     } else {
       this.contractsSource = null
     }
@@ -523,7 +515,7 @@ export class FulcrumProvider {
   ): Promise<string> => {
     const resetRequiredAssets = [Asset.USDT, Asset.KNC] // these assets require to set approve to 0 before approve larger amount than the current spend limit
     let result = ''
-    const assetErc20Address = getErc20AddressOfAsset(asset)
+    const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
 
     if (
       !this.web3Wrapper ||
@@ -611,7 +603,7 @@ export class FulcrumProvider {
       //console.log(e);
     }
 
-    //const vBZRXBalance = await getErc20BalanceOfUser(this, this.contractsSource,assetErc20Address, this.contractsSource.getBZxVaultAddress());
+    //const vBZRXBalance = await providerUtils.getErc20BalanceOfUser(this, this.contractsSource,assetErc20Address, this.contractsSource.getBZxVaultAddress());
 
     const reserveData = await helperContract.reserveDetails(tokens).callAsync()
     let usdSupplyAll = new BigNumber(0)
@@ -739,9 +731,17 @@ export class FulcrumProvider {
           .addressErc20.get(this.web3ProviderSettings.networkId)!
         const bptErc20Contract = await this.contractsSource.getErc20Contract(bptAddress)
 
-        const bptBalanceOfStaking = await getErc20BalanceOfUser(this, bptAddress, stakingV1Address)
+        const bptBalanceOfStaking = await providerUtils.getErc20BalanceOfUser(
+          this,
+          bptAddress,
+          stakingV1Address
+        )
         const bptTotalSupply = await bptErc20Contract.totalSupply().callAsync()
-        const wethBalanceOfBpt = await getErc20BalanceOfUser(this, wethAddress, bptAddress)
+        const wethBalanceOfBpt = await providerUtils.getErc20BalanceOfUser(
+          this,
+          wethAddress,
+          bptAddress
+        )
 
         // share of weth liquidity that belongs to staking contract from all weth tokens in pool
         const wethShareOfBptStakedLockedAmount = wethBalanceOfBpt
@@ -783,23 +783,31 @@ export class FulcrumProvider {
         const vbzrxWorthPart = new BigNumber(1).minus(vbzrxTotalVested.div(vbzrxTotalSupply))
         // vBZRX locked in bZx protocol
         const vbzrxProtocolLockedAmount = (
-          await getErc20BalanceOfUser(this, vbzrxAddress, ibzxAddress)
+          await providerUtils.getErc20BalanceOfUser(this, vbzrxAddress, ibzxAddress)
         ).times(vbzrxWorthPart)
 
         // vBZRX locked in Staking protocol
         const vbzrxStakedLockedAmount = (
-          await getErc20BalanceOfUser(this, vbzrxAddress, stakingV1Address)
+          await providerUtils.getErc20BalanceOfUser(this, vbzrxAddress, stakingV1Address)
         ).times(vbzrxWorthPart)
-        const bzrxStakedLockedAmount = await getErc20BalanceOfUser(
+        const bzrxStakedLockedAmount = await providerUtils.getErc20BalanceOfUser(
           this,
           bzrxAddress,
           stakingV1Address
         )
 
-        const bptBalanceOfStaking = await getErc20BalanceOfUser(this, bptAddress, stakingV1Address)
+        const bptBalanceOfStaking = await providerUtils.getErc20BalanceOfUser(
+          this,
+          bptAddress,
+          stakingV1Address
+        )
         const bptTotalSupply = await bptErc20Contract.totalSupply().callAsync()
 
-        const bzrxBalanceOfBpt = await getErc20BalanceOfUser(this, bzrxAddress, bptAddress)
+        const bzrxBalanceOfBpt = await providerUtils.getErc20BalanceOfUser(
+          this,
+          bzrxAddress,
+          bptAddress
+        )
         // share of bzrx liquidity that belongs to staking contract from all bzrx tokens in pool
         const bzrxShareOfBptStakedLockedAmount = bzrxBalanceOfBpt
           .div(bptTotalSupply)
@@ -942,9 +950,9 @@ export class FulcrumProvider {
           (torqueBorrowInterestRate = await assetContract.nextBorrowInterestRateWithOption.callAsync(new BigNumber(0), true)), // nextBorrowInterestRateWithOption
         ]);
 
-        const assetErc20Address = this.getErc20AddressOfAsset(asset);
+        const assetErc20Address = this.providerUtils.getErc20AddressOfAsset(asset);
         if (assetErc20Address) {
-          lockedAssets = await getErc20BalanceOfUser(this, this.contractsSource,assetErc20Address, this.contractsSource.getBZxVaultAddress());
+          lockedAssets = await providerUtils.getErc20BalanceOfUser(this, this.contractsSource,assetErc20Address, this.contractsSource.getBZxVaultAddress());
         }
 
         result = new ReserveDetails(
@@ -1370,7 +1378,7 @@ export class FulcrumProvider {
       }
 
       if (account) {
-        const assetAddress = getErc20AddressOfAsset(asset)
+        const assetAddress = providerUtils.getErc20AddressOfAsset(asset)
         if (assetAddress) {
           const iTokenAddress = await this.contractsSource.getITokenErc20Address(asset)
           const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
@@ -1403,7 +1411,7 @@ export class FulcrumProvider {
       const iTokenContract = this.contractsSource.getITokenContract(request.depositToken)
 
       if (account && iTokenContract) {
-        const collateralErc20Address = getErc20AddressOfAsset(request.depositToken)
+        const collateralErc20Address = providerUtils.getErc20AddressOfAsset(request.depositToken)
         if (collateralErc20Address) {
           const tokenContract = await this.contractsSource.getErc20Contract(collateralErc20Address)
           if (tokenContract) {
@@ -1433,8 +1441,8 @@ export class FulcrumProvider {
       return new BigNumber(0)
     }
 
-    const srcAssetErc20Address = getErc20AddressOfAsset(srcToken)
-    const destAssetErc20Address = getErc20AddressOfAsset(destToken)
+    const srcAssetErc20Address = providerUtils.getErc20AddressOfAsset(srcToken)
+    const destAssetErc20Address = providerUtils.getErc20AddressOfAsset(destToken)
 
     if (!srcAssetErc20Address || !destAssetErc20Address) {
       return new BigNumber(0)
@@ -1509,7 +1517,7 @@ export class FulcrumProvider {
   //         if (request.tradeType === TradeType.BUY) {
   //           if (request.collateral !== Asset.ETH) {
   //             try {
-  //               const assetErc20Address = getErc20AddressOfAsset(request.collateral);
+  //               const assetErc20Address = providerUtils.getErc20AddressOfAsset(request.collateral);
   //               if (assetErc20Address) {
   //                 const srcDecimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
   //                 tradeAmountActual = await assetContract.mintWithToken.callAsync(
@@ -1560,7 +1568,7 @@ export class FulcrumProvider {
   //         } else {
   //           if (request.collateral !== Asset.ETH) {
   //             try {
-  //               const assetErc20Address = getErc20AddressOfAsset(request.collateral);
+  //               const assetErc20Address = providerUtils.getErc20AddressOfAsset(request.collateral);
   //               if (assetErc20Address) {
   //                 const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
   //                 if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
@@ -1670,12 +1678,12 @@ export class FulcrumProvider {
       const collateralTokenSent =
         depositToken === collateralToken ? amountInBaseUnits : new BigNumber(0)
 
-      //const depositTokenAddress = getErc20AddressOfAsset(depositToken);
+      //const depositTokenAddress = providerUtils.getErc20AddressOfAsset(depositToken);
       const collateralTokenAddress =
         (networkName === 'mainnet' && collateralToken === Asset.ETH) ||
         (networkName === 'bsc' && collateralToken === Asset.BNB)
           ? FulcrumProvider.ZERO_ADDRESS
-          : getErc20AddressOfAsset(collateralToken)
+          : providerUtils.getErc20AddressOfAsset(collateralToken)
 
       const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18
       const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18
@@ -1751,14 +1759,14 @@ export class FulcrumProvider {
     ) {
       // get eth (wallet) balance
       if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-        result = await getEthBalance(this)
+        result = await providerUtils.getEthBalance(this)
       }
     } else {
       // get erc20 token balance
       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
-      const assetErc20Address = getErc20AddressOfAsset(asset)
+      const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
       if (this.web3Wrapper && this.contractsSource && assetErc20Address) {
-        result = await getErc20BalanceOfUser(this, assetErc20Address, account)
+        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, account)
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
@@ -1776,7 +1784,7 @@ export class FulcrumProvider {
         )!.decimals || 18
       const address = await this.contractsSource.getITokenErc20Address(asset)
       if (address) {
-        result = await getErc20BalanceOfUser(this, address)
+        result = await providerUtils.getErc20BalanceOfUser(this, address)
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
@@ -1793,7 +1801,7 @@ export class FulcrumProvider {
       const account = this.currentAccount
 
       if (account) {
-        const assetAddress = getErc20AddressOfAsset(Asset.CHI)
+        const assetAddress = providerUtils.getErc20AddressOfAsset(Asset.CHI)
         if (assetAddress) {
           const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
           if (tokenContract) {
@@ -2124,9 +2132,9 @@ export class FulcrumProvider {
     }
     if (this.contractsSource) {
       const oracleAddress = this.contractsSource.getOracleAddress()
-      const usdTokenAddress = getErc20AddressOfAsset(usdToken)!
-      const underlyings: string[] = assets.map((e) => getErc20AddressOfAsset(e)!)
-      const amounts: BigNumber[] = assets.map((e) => getGoodSourceAmountOfAsset(e))
+      const usdTokenAddress = providerUtils.getErc20AddressOfAsset(usdToken)!
+      const underlyings: string[] = assets.map((e) => providerUtils.getErc20AddressOfAsset(e)!)
+      const amounts: BigNumber[] = assets.map((e) => providerUtils.getGoodSourceAmountOfAsset(e))
 
       const helperContract = await this.contractsSource.getDAppHelperContract()
       if (helperContract) {
@@ -2170,8 +2178,8 @@ export class FulcrumProvider {
     if (this.unsupportedNetwork) {
       return result
     }
-    const srcAssetErc20Address = getErc20AddressOfAsset(srcAsset)
-    const destAssetErc20Address = getErc20AddressOfAsset(destAsset)
+    const srcAssetErc20Address = providerUtils.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = providerUtils.getErc20AddressOfAsset(destAsset)
 
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const oracleContract = await this.contractsSource.getOracleContract()
@@ -2209,13 +2217,13 @@ export class FulcrumProvider {
       return this.getSwapRate(srcAsset, destAsset)
     }
     let result: BigNumber = new BigNumber(0)
-    const srcAssetErc20Address = getErc20AddressOfAsset(srcAsset)
-    const destAssetErc20Address = getErc20AddressOfAsset(destAsset)
+    const srcAssetErc20Address = providerUtils.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = providerUtils.getErc20AddressOfAsset(destAsset)
 
     if (srcAssetErc20Address && destAssetErc20Address) {
       const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
       if (!srcAmount) {
-        srcAmount = getGoodSourceAmountOfAsset(srcAsset)
+        srcAmount = providerUtils.getGoodSourceAmountOfAsset(srcAsset)
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
       }
@@ -2596,8 +2604,8 @@ console.log(err, added);
       let srcTokenAddress = ''
       let destTokenAddress = ''
 
-      srcTokenAddress = getErc20AddressOfAsset(taskRequest.quoteToken)!
-      destTokenAddress = getErc20AddressOfAsset(taskRequest.asset)!
+      srcTokenAddress = providerUtils.getErc20AddressOfAsset(taskRequest.quoteToken)!
+      destTokenAddress = providerUtils.getErc20AddressOfAsset(taskRequest.asset)!
 
       if (taskRequest.tradeType === TradeType.BUY) {
         const { TradeBuyProcessor } = await import('./processors/TradeBuyProcessor')
@@ -2802,7 +2810,7 @@ console.log(err, added);
 
     const collateralTokenAddress =
       //  collateralToken !== Asset.ETH
-      getErc20AddressOfAsset(collateralToken)
+      providerUtils.getErc20AddressOfAsset(collateralToken)
     //: FulcrumProvider.ZERO_ADDRESS
 
     const sendAmountForValue =

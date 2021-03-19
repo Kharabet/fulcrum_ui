@@ -31,7 +31,7 @@ import {
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import stakingApi from 'bzx-common/src/lib/stakingApi'
 
-import { getCurrentAccount } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 // @ts-ignore
 import web3EthAbiUntyped, { AbiCoder } from 'web3-eth-abi'
 // Fix necessary due to wrong type exports in web3-eth-abi
@@ -66,7 +66,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   public contractsSource: ContractsSource | null = null
   public accounts: string[] = []
   public get currentAccount() {
-    return getCurrentAccount(this)
+    return providerUtils.getCurrentAccount(this)
   }
   public unsupportedNetwork: boolean = false
   public impersonateAddress = ''
@@ -79,16 +79,6 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     this.setMaxListeners(1000)
 
     // TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
-  }
-
-  public getLocalstorageItem(item: string): string {
-    let response = ''
-    response = localStorage.getItem(item) || ''
-    return response
-  }
-
-  public setLocalstorageItem(item: string, val: string) {
-    localStorage.setItem(item, val)
   }
 
   public setWeb3Provider = async (connector: AbstractConnector, account?: string) => {
@@ -157,7 +147,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
 
     this.providerType = canWrite ? providerType : ProviderType.None
     this.emit('ProviderChanged', new ProviderChangedEvent(this.providerType, this.web3Wrapper))
-    this.setLocalstorageItem('providerType', this.providerType)
+    providerUtils.setLocalstorageItem('providerType', this.providerType)
   }
 
   public async preloadIBZXContract() {

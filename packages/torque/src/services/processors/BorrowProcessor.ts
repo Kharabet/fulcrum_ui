@@ -7,7 +7,7 @@ import { RequestTask } from 'app-lib/tasksQueue'
 import { TorqueProvider } from '../TorqueProvider'
 import { BorrowRequestAwaiting } from '../../domain/BorrowRequestAwaiting'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
-import { getErc20AddressOfAsset } from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export class BorrowProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -43,7 +43,8 @@ export class BorrowProcessor {
     const iTokenContract = await TorqueProvider.Instance.contractsSource.getITokenContract(
       taskRequest.borrowAsset
     )
-    const collateralAssetErc20Address = getErc20AddressOfAsset(taskRequest.collateralAsset) || ''
+    const collateralAssetErc20Address =
+      providerUtils.getErc20AddressOfAsset(taskRequest.collateralAsset) || ''
 
     if (!iTokenContract) {
       throw new Error('No iToken contract available!')
@@ -63,7 +64,7 @@ export class BorrowProcessor {
       let tokenErc20Contract: erc20Contract | null = null
       let assetErc20Address: string | null = ''
       let erc20allowance = new BigNumber(0)
-      assetErc20Address = getErc20AddressOfAsset(taskRequest.collateralAsset)
+      assetErc20Address = providerUtils.getErc20AddressOfAsset(taskRequest.collateralAsset)
       if (assetErc20Address) {
         tokenErc20Contract = await TorqueProvider.Instance.contractsSource.getErc20Contract(
           assetErc20Address
