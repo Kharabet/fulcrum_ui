@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Muli:wght@200;600;800;900&display=swap');
-
+@import './../../../bzx-common/src/styles/index.scss';
+@import url('https://fonts.googleapis.com/css?family=Muli:=400,600,800,900&display=swap');
 @import 'base/variables';
 
 @import 'components/asset-selector';
@@ -9,7 +9,6 @@
 @import 'components/tabs';
 @import 'components/tvl';
 @import 'components/chart';
-@import 'components/provider-menu';
 @import 'components/loader';
 @import 'components/circle-loader';
 @import 'components/tooltip';

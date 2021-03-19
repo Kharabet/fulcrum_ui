@@ -10,6 +10,9 @@
 .on-chain-indicator {
   display: inline-block;
   height: 49px;
+  .provider-icon {
+    fill: var(--fill-provider-icon);
+  }
 }
 
 .on-chain-indicator__container {

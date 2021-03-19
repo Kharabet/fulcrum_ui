@@ -3,7 +3,7 @@ import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
 import { errors } from 'ethers'
 import { MaintenancePage } from '../pages/MaintenancePage'
 import { NavService } from '../services/NavService'
-import { ProviderMenu } from './ProviderMenu'
+import ProviderMenu from 'bzx-common/src/shared-components/ProviderMenu'
 import { ProviderType } from '../domain/ProviderType'
 import { Redirect, Route, Router, Switch } from 'react-router-dom'
 import { TorqueProvider } from '../services/TorqueProvider'
@@ -106,7 +106,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
             onSelect={this.onProviderTypeSelect}
             onDeactivate={this.onDeactivate}
             onProviderMenuClose={this.onRequestClose}
-            onChiSwitch={this.onChiSwitch}
+            provider={TorqueProvider.Instance}
+            getLocalstorageItem={TorqueProvider.getLocalstorageItem}
           />
         </Modal>
 

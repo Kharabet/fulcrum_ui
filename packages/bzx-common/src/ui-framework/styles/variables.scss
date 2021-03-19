@@ -19,8 +19,22 @@ $breakpoint-mobile-min: 960px;
 
 :root {
   --primary-text: #283049;
+  --trade-header-color: #8992a4;
+  --switch-bg: #283049;
+  --switch-bg-pro: #e9f4ff;
+  --chi-link-color: #444e5a;
+  --chi-token-title: #283049;
+  --chi-token-description: #586473;
+  --fill-provider-icon: #000000;
 }
 
 [data-theme='dark'] {
   --primary-text: #ffffff;
+  --trade-header-color: #a2abb8;
+  --switch-bg: #ffffff;
+  --switch-bg-pro: #333c46;
+  --chi-link-color: #ffffff;
+  --chi-token-title: #e9f3ff;
+  --chi-token-description: #8992a4;
+  --fill-provider-icon: #ffffff;
 }

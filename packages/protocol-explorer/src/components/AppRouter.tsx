@@ -15,7 +15,7 @@ import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types'
 import { errors } from 'ethers'
 import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
-import { ProviderMenu } from './ProviderMenu'
+import ProviderMenu from 'bzx-common/src/shared-components/ProviderMenu'
 import { Tab } from '../domain/Tab'
 import TabContainer from './TabContainer'
 
@@ -92,6 +92,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
             onSelect={this.onProviderTypeSelect}
             onDeactivate={this.onDeactivate}
             onProviderMenuClose={this.onRequestClose}
+            provider={ExplorerProvider.Instance}
+            getLocalstorageItem={ExplorerProvider.getLocalstorageItem}
           />
         </Modal>
 

@@ -1,10 +1,16 @@
 import React from 'react'
-import { ProviderType } from '../domain/ProviderType'
-import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
+import ProviderType from '../../domain/ProviderType'
+import ProviderTypeDictionary from '../../domain/ProviderTypeDictionary'
 import { useWeb3React } from '@web3-react/core'
-import { FulcrumProvider } from '../services/FulcrumProvider'
+import { FulcrumProvider } from '../../../../fulcrum/src/services/FulcrumProvider'
+import { TorqueProvider } from '../../../../torque/src/services/TorqueProvider'
+import { ExplorerProvider } from '../../../../protocol-explorer/src/services/ExplorerProvider'
 import TagManager from 'react-gtm-module'
-import appConfig from 'bzx-common/src/config/appConfig'
+
+const isMainnet =
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV !== 'development' &&
+  process.env.REACT_APP_ETH_NETWORK === 'mainnet'
 
 const Loader = () => {
   return (
@@ -24,6 +30,7 @@ export interface IProviderMenuListItemProps {
   providerType: ProviderType
   isConnected: boolean
   isActivating: boolean
+  provider: FulcrumProvider | TorqueProvider | ExplorerProvider
   onSelect: (providerType: ProviderType) => void
 }
 
@@ -39,7 +46,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
   const onClick = () => {
     // if (props.isConnected) return;
     props.onSelect(props.providerType)
-    if (appConfig.isGTMEnabled) {
+    if (isMainnet) {
       const tagManagerArgs = {
         dataLayer: {
           event: 'select-provider',
@@ -50,7 +57,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
     }
   }
   if (props.isConnected) {
-    const isUnSupportedNetwork = FulcrumProvider.Instance.unsupportedNetwork
+    const isUnSupportedNetwork = props.provider.unsupportedNetwork
 
     const walletAddressText = isUnSupportedNetwork
       ? 'Wrong Network!'
@@ -58,8 +65,8 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       ? `${account.slice(0, 6)}...${account.slice(account.length - 4, account.length)}`
       : ''
 
-    const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings
-      ? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
+    const etherscanURL = props.provider.web3ProviderSettings
+      ? props.provider.web3ProviderSettings.etherscanURL
       : ''
     const ProviderLogoIcon = providerTypeDetails.reactLogoSvgShort
     if (!ProviderLogoIcon) {

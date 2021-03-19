@@ -1,51 +1,56 @@
-import { BigNumber } from '@0x/utils'
-import { AbstractConnector } from '@web3-react/abstract-connector'
-import { useWeb3React } from '@web3-react/core'
-import React, { useEffect, useState } from 'react'
-import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
-import Asset from 'bzx-common/src/assets/Asset'
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import { ProviderType } from '../domain/ProviderType'
-import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
-import { injected } from 'bzx-common/src/lib/web3ReactUtils'
-import { ExplorerProvider } from '../services/ExplorerProvider'
+import React, { Component, useEffect, useState } from 'react'
+import ProviderType from '../../domain/ProviderType'
 import { ProviderMenuListItem } from './ProviderMenuListItem'
+import { useWeb3React } from '@web3-react/core'
+import ProviderTypeDictionary from '../../domain/ProviderTypeDictionary'
+import { FulcrumProvider } from '../../../../fulcrum/src/services/FulcrumProvider'
+import { TorqueProvider } from '../../../../torque/src/services/TorqueProvider'
+import { ExplorerProvider } from '../../../../protocol-explorer/src/services/ExplorerProvider'
+import { injected } from '../../lib/web3ReactUtils'
+import { AbstractConnector } from '@web3-react/abstract-connector'
 import { SwitchButtonInput } from './SwitchButtonInput'
+import Asset from '../../assets/Asset'
+
+import { BigNumber } from '@0x/utils'
+import AssetsDictionary from '../../assets/AssetsDictionary'
+import './ProviderMenu.scss'
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[]
   isMobileMedia: boolean
   onSelect: (selectedConnector: AbstractConnector, account?: string) => void
   onDeactivate: () => void
+  provider: FulcrumProvider | TorqueProvider | ExplorerProvider
+  getLocalstorageItem: (item: string) => void
   onProviderMenuClose: () => void
 }
 
-export const ProviderMenu = (props: IProviderMenuProps) => {
+const ProviderMenu = (props: IProviderMenuProps) => {
   const [isEnabledChi, setChi] = useState(false)
   useEffect(() => {
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
     const switchButton = document.querySelector<HTMLInputElement>(
-      '.provider-menu__gas-token-switch input[type="checkbox"]'
+      '.provider-menu .gas-switch input[type="checkbox"]'
     )
     if (switchButton) {
       if (isGasTokenEnabled) {
+        setChi(true)
         switchButton.setAttribute('data-isgastokenenabled', 'true')
         localStorage.setItem('isGasTokenEnabled', 'true')
         switchButton.checked = true
-        setChi(true)
       } else {
+        setChi(false)
         switchButton.setAttribute('data-isgastokenenabled', 'false')
         localStorage.setItem('isGasTokenEnabled', 'false')
         switchButton.checked = false
-        setChi(false)
       }
     }
   })
   const context = useWeb3React()
-  const { connector, account, activate, deactivate, active, error } = context
+  const { connector, library, chainId, account, activate, deactivate, active, error } = context
 
   // handle logic to recognize the connector currently being activated
-  // @ts-ignore
+  //@ts-ignore
   const [activatingConnector, setActivatingConnector] = React.useState()
   useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
@@ -61,23 +66,20 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     !activatingConnector &&
     connector !== injected &&
     props.isMobileMedia &&
-    ExplorerProvider.Instance.providerType !== ProviderType.MetaMask
+    props.provider.providerType !== ProviderType.MetaMask
   ) {
-    // @ts-ignore
+    //@ts-ignore
     setActivatingConnector(injected)
     activate(injected)
   }
-
-  const storedProvider: any = ExplorerProvider.getLocalstorageItem('providerType')
+  const storedProvider: any = props.getLocalstorageItem('providerType')
   const providerType: ProviderType | null = (storedProvider as ProviderType) || null
-  if (
-    !activatingConnector &&
-    providerType &&
-    providerType !== ExplorerProvider.Instance.providerType
-  ) {
-    // @ts-ignore
-    setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!)
-    activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!)
+  const newConnector = ProviderTypeDictionary.getConnectorByProviderType(providerType)
+  if (!activatingConnector && providerType && newConnector && connector !== newConnector) {
+    if (!newConnector) return null
+    //@ts-ignore
+    setActivatingConnector(newConnector)
+    activate(newConnector)
   }
 
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
@@ -87,17 +89,22 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       const currentConnector = ProviderTypeDictionary.getConnectorByProviderType(e)
       const activating = currentConnector === activatingConnector
       const connected = currentConnector === connector && active
+      const disabled = !!activatingConnector || connected || !!error
       return (
         <ProviderMenuListItem
           key={e}
           providerType={e}
           isConnected={connected}
           isActivating={activating}
+          provider={props.provider}
           onSelect={() => {
             if (!currentConnector) return
             //@ts-ignore
             setActivatingConnector(currentConnector)
-            activate(currentConnector, (err) => console.error(err))
+            activate(currentConnector, (err) => {
+              console.error(err)
+              props.onDeactivate()
+            })
           }}
         />
       )
@@ -106,10 +113,10 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
   const onChiSwitch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const switchButton = e.currentTarget
-    if (!ExplorerProvider.Instance.contractsSource) return
+    if (!props.provider.contractsSource) return
     if (switchButton.checked) {
-      await ExplorerProvider.Instance.setApproval(
-        ExplorerProvider.Instance.contractsSource.getTokenHolderAddress(),
+      await props.provider.setApproval(
+        props.provider.contractsSource.getTokenHolderAddress(),
         Asset.CHI,
         new BigNumber(10 ** 18)
       )
@@ -117,8 +124,8 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       localStorage.setItem('isGasTokenEnabled', 'true')
       setChi(true)
     } else {
-      await ExplorerProvider.Instance.setApproval(
-        ExplorerProvider.Instance.contractsSource.getTokenHolderAddress(),
+      await props.provider.setApproval(
+        props.provider.contractsSource.getTokenHolderAddress(),
         Asset.CHI,
         new BigNumber(0)
       )
@@ -131,10 +138,8 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   return (
     <div className="provider-menu">
       <div className="provider-menu__title">
-        Select Wallet
-        <div onClick={props.onProviderMenuClose}>
-          <CloseIcon className="disclosure__close" />
-        </div>
+        <span>Select Wallet</span>
+        <div className="provider-menu__title__close" onClick={props.onProviderMenuClose}></div>
       </div>
       {account && (
         <div className="provider-menu__gas-token">
@@ -146,7 +151,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
               CHI {isEnabledChi ? `Enabled` : `Disabled`}
             </div>
             <div className="provider-menu__gas-token-switch">
-              <SwitchButtonInput onSwitch={onChiSwitch} />
+              <SwitchButtonInput onSwitch={onChiSwitch} type="gas" />
             </div>
           </div>
           <div className="provider-menu__gas-token-right">
@@ -181,7 +186,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
           deactivate()
           props.onDeactivate()
         }}>
-        Disconnect
+        DISCONNECT
       </button>
       <div className="provider-menu__footer">
         By connecting, you agree to the&nbsp;
@@ -191,3 +196,4 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     </div>
   )
 }
+export default ProviderMenu

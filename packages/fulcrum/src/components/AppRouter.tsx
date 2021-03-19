@@ -19,7 +19,7 @@ import { HeaderOps } from '../layout/HeaderOps'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
-import { ProviderMenu } from './ProviderMenu'
+import ProviderMenu from 'bzx-common/src/shared-components/ProviderMenu'
 
 const Intercom = React.lazy(() => import('react-intercom'))
 const LendPage = React.lazy(() => import('../pages/LendPage'))
@@ -125,6 +125,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
             isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}
             onDeactivate={this.onDeactivate}
+            provider={FulcrumProvider.Instance}
+            getLocalstorageItem={FulcrumProvider.getLocalstorageItem}
+            onProviderMenuClose={this.onRequestClose}
           />
         </Modal>
         <Modal
