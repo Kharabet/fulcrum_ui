@@ -8,6 +8,7 @@ import { Loader } from '../components/Loader'
 import { NavService } from '../services/NavService'
 import { ProviderType } from '../domain/ProviderType'
 import { Tab } from 'src/domain/Tab'
+import blockchainEventsUtils from 'bzx-common/src/lib/blockchainEventsUtils'
 
 interface ISearchResultPageProps {
   doNetworkConnect: () => void
@@ -73,22 +74,22 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
     }
     this.setState({ isLoading: true })
     const liquidationEvents = ExplorerProvider.Instance.getGridItems(
-      await ExplorerProvider.Instance.getLiquidationHistory()
+      await blockchainEventsUtils.getLiquidationHistory(ExplorerProvider.Instance)
     )
     const tradeEvents = ExplorerProvider.Instance.getGridItems(
-      await ExplorerProvider.Instance.getTradeHistory()
+      await blockchainEventsUtils.getTradeHistory(ExplorerProvider.Instance)
     )
     const rolloverEvents = ExplorerProvider.Instance.getGridItems(
-      await ExplorerProvider.Instance.getRolloverHistory()
+      await blockchainEventsUtils.getRolloverHistory(ExplorerProvider.Instance)
     )
     const closeEvents = ExplorerProvider.Instance.getGridItems(
-      await ExplorerProvider.Instance.getCloseWithSwapHistory()
+      await blockchainEventsUtils.getCloseWithSwapHistory(ExplorerProvider.Instance)
     )
     const closeWithDepositEvents = ExplorerProvider.Instance.getGridItems(
-      await ExplorerProvider.Instance.getCloseWithDepositHistory()
+      await blockchainEventsUtils.getCloseWithDepositHistory(ExplorerProvider.Instance)
     )
     const borrowEvents = ExplorerProvider.Instance.getGridItems(
-      await ExplorerProvider.Instance.getBorrowHistory()
+      await blockchainEventsUtils.getBorrowHistory(ExplorerProvider.Instance)
     )
     const events: ITxRowProps[] = liquidationEvents
       .concat(closeEvents)

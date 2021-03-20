@@ -47,17 +47,7 @@ import {
   WithdrawCollateralEvent,
 } from 'bzx-common/src/domain/events'
 
-import {
-  getCloseWithSwapHistory,
-  getDepositCollateralHistory,
-  getEarnRewardHistory,
-  getLiquidationHistory,
-  getLogsFromEtherscan,
-  getPayTradingFeeHistory,
-  getRolloverHistory,
-  getTradeHistory,
-  getWithdrawCollateralHistory,
-} from 'bzx-common/src/lib/blockchainEventsUtils'
+import blockchainEventsUtils from 'bzx-common/src/lib/blockchainEventsUtils'
 
 import providerUtils from 'bzx-common/src/lib/providerUtils'
 
@@ -2260,7 +2250,7 @@ export class FulcrumProvider {
     const account = this.currentAccount
 
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return getEarnRewardHistory(this.web3Wrapper, this.contractsSource, account)
+    return blockchainEventsUtils.getEarnRewardHistory(this, account)
   }
 
   public getPayTradingFeeHistory = async (): Promise<PayTradingFeeEvent[]> => {
@@ -2268,35 +2258,35 @@ export class FulcrumProvider {
     const account = this.currentAccount
 
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return getPayTradingFeeHistory(this.web3Wrapper, this.contractsSource, account)
+    return blockchainEventsUtils.getPayTradingFeeHistory(this, account)
   }
 
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = []
     const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return getTradeHistory(this.web3Wrapper, this.contractsSource, account)
+    return blockchainEventsUtils.getTradeHistory(this, account)
   }
 
   public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
     let result: RolloverEvent[] = []
     const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return getRolloverHistory(this.web3Wrapper, this.contractsSource, account)
+    return blockchainEventsUtils.getRolloverHistory(this, account)
   }
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = []
     const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return getCloseWithSwapHistory(this.web3Wrapper, this.contractsSource, account)
+    return blockchainEventsUtils.getCloseWithSwapHistory(this, account)
   }
 
   public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = []
     const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return getLiquidationHistory(this.web3Wrapper, this.contractsSource, account)
+    return blockchainEventsUtils.getLiquidationHistory(this, account)
   }
 
   public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
@@ -2308,7 +2298,7 @@ export class FulcrumProvider {
     if (!bzxContractAddress) return result
     const blockNumber = await this.web3Wrapper.getBlockNumberAsync()
     const events =
-      (await getLogsFromEtherscan(
+      (await blockchainEventsUtils.getLogsFromEtherscan(
         (blockNumber - days * blocksPerDay).toString(),
         'latest',
         bzxContractAddress,
@@ -2335,14 +2325,14 @@ export class FulcrumProvider {
     let result: DepositCollateralEvent[] = []
     const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return getDepositCollateralHistory(this.web3Wrapper, this.contractsSource, account)
+    return blockchainEventsUtils.getDepositCollateralHistory(this, account)
   }
 
   public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
     let result: WithdrawCollateralEvent[] = []
     const account = this.currentAccount
     if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return getWithdrawCollateralHistory(this.web3Wrapper, this.contractsSource, account)
+    return blockchainEventsUtils.getWithdrawCollateralHistory(this, account)
   }
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {

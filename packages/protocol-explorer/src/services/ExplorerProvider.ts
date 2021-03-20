@@ -23,17 +23,7 @@ import {
   RolloverEvent,
   TradeEvent,
 } from 'bzx-common/src/domain/events'
-import {
-  getBorrowHistory,
-  getBurnHistory,
-  getCloseWithDepositHistory,
-  getCloseWithSwapHistory,
-  getLiquidationHistory,
-  getLogsFromEtherscan,
-  getMintHistory,
-  getRolloverHistory,
-  getTradeHistory,
-} from 'bzx-common/src/lib/blockchainEventsUtils'
+import blockchainEventsUtils from 'bzx-common/src/lib/blockchainEventsUtils'
 
 import providerUtils from 'bzx-common/src/lib/providerUtils'
 
@@ -279,7 +269,7 @@ export class ExplorerProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
 
     const eventsBatch0 =
-      (await getLogsFromEtherscan(
+      (await blockchainEventsUtils.getLogsFromEtherscan(
         '10500001',
         '11000000',
         bzxContractAddress,
@@ -288,7 +278,7 @@ export class ExplorerProvider {
         configProviders.Etherscan_Api
       )) || []
     const eventsBatch1 =
-      (await getLogsFromEtherscan(
+      (await blockchainEventsUtils.getLogsFromEtherscan(
         '11000001',
         '11500000',
         bzxContractAddress,
@@ -297,7 +287,7 @@ export class ExplorerProvider {
         configProviders.Etherscan_Api
       )) || []
     const eventsBatch2 =
-      (await getLogsFromEtherscan(
+      (await blockchainEventsUtils.getLogsFromEtherscan(
         '11500001',
         'latest',
         bzxContractAddress,
@@ -352,37 +342,37 @@ export class ExplorerProvider {
   public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = []
     if (!this.contractsSource || !this.web3Wrapper) return result
-    return getLiquidationHistory(this.web3Wrapper, this.contractsSource)
+    return blockchainEventsUtils.getLiquidationHistory(this)
   }
 
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = []
     if (!this.contractsSource || !this.web3Wrapper) return result
-    return getTradeHistory(this.web3Wrapper, this.contractsSource)
+    return blockchainEventsUtils.getTradeHistory(this)
   }
 
   public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
     let result: RolloverEvent[] = []
     if (!this.contractsSource || !this.web3Wrapper) return result
-    return getRolloverHistory(this.web3Wrapper, this.contractsSource)
+    return blockchainEventsUtils.getRolloverHistory(this)
   }
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = []
     if (!this.contractsSource || !this.web3Wrapper) return result
-    return getCloseWithSwapHistory(this.web3Wrapper, this.contractsSource)
+    return blockchainEventsUtils.getCloseWithSwapHistory(this)
   }
 
   public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
     let result: CloseWithDepositEvent[] = []
     if (!this.contractsSource || !this.web3Wrapper) return result
-    return getCloseWithDepositHistory(this.web3Wrapper, this.contractsSource)
+    return blockchainEventsUtils.getCloseWithDepositHistory(this)
   }
 
   public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
     let result: BorrowEvent[] = []
     if (!this.contractsSource || !this.web3Wrapper) return result
-    return getBorrowHistory(this.web3Wrapper, this.contractsSource)
+    return blockchainEventsUtils.getBorrowHistory(this)
   }
 
   public getBzxLoans = async (
@@ -479,13 +469,13 @@ export class ExplorerProvider {
   public getBurnHistory = async (asset: Asset): Promise<BurnEvent[]> => {
     let result: BurnEvent[] = []
     if (!this.contractsSource || !this.web3Wrapper) return result
-    return getBurnHistory(asset, this.web3Wrapper, this.contractsSource)
+    return blockchainEventsUtils.getBurnHistory(this, asset)
   }
 
   public getMintHistory = async (asset: Asset): Promise<MintEvent[]> => {
     let result: MintEvent[] = []
     if (!this.contractsSource || !this.web3Wrapper) return result
-    return getMintHistory(asset, this.web3Wrapper, this.contractsSource)
+    return blockchainEventsUtils.getMintHistory(this, asset)
   }
 
   public getGridItems = (
