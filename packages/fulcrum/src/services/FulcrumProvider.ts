@@ -2245,50 +2245,6 @@ export class FulcrumProvider {
     return result
   }
 
-  public getEarnRewardHistory = async (): Promise<Array<EarnRewardEvent | EarnRewardEventNew>> => {
-    let result: Array<EarnRewardEvent | EarnRewardEventNew> = []
-    const account = this.currentAccount
-
-    if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return blockchainEventsUtils.getEarnRewardHistory(this, account)
-  }
-
-  public getPayTradingFeeHistory = async (): Promise<PayTradingFeeEvent[]> => {
-    let result: PayTradingFeeEvent[] = []
-    const account = this.currentAccount
-
-    if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return blockchainEventsUtils.getPayTradingFeeHistory(this, account)
-  }
-
-  public getTradeHistory = async (): Promise<TradeEvent[]> => {
-    let result: TradeEvent[] = []
-    const account = this.currentAccount
-    if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return blockchainEventsUtils.getTradeHistory(this, account)
-  }
-
-  public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
-    let result: RolloverEvent[] = []
-    const account = this.currentAccount
-    if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return blockchainEventsUtils.getRolloverHistory(this, account)
-  }
-
-  public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
-    let result: CloseWithSwapEvent[] = []
-    const account = this.currentAccount
-    if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return blockchainEventsUtils.getCloseWithSwapHistory(this, account)
-  }
-
-  public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
-    let result: LiquidationEvent[] = []
-    const account = this.currentAccount
-    if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return blockchainEventsUtils.getLiquidationHistory(this, account)
-  }
-
   public getLiquidationsInPastNDays = async (days: number): Promise<number> => {
     const result: number = 0
     const account = this.currentAccount
@@ -2319,20 +2275,6 @@ export class FulcrumProvider {
       return true
     })
     return (liquidationEvents && liquidationEvents.length) || result
-  }
-
-  public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
-    let result: DepositCollateralEvent[] = []
-    const account = this.currentAccount
-    if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return blockchainEventsUtils.getDepositCollateralHistory(this, account)
-  }
-
-  public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
-    let result: WithdrawCollateralEvent[] = []
-    const account = this.currentAccount
-    if (!this.contractsSource || !this.web3Wrapper || !account) return result
-    return blockchainEventsUtils.getWithdrawCollateralHistory(this, account)
   }
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {

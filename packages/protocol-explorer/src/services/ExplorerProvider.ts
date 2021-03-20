@@ -339,42 +339,6 @@ export class ExplorerProvider {
     return result
   }
 
-  public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
-    let result: LiquidationEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return blockchainEventsUtils.getLiquidationHistory(this)
-  }
-
-  public getTradeHistory = async (): Promise<TradeEvent[]> => {
-    let result: TradeEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return blockchainEventsUtils.getTradeHistory(this)
-  }
-
-  public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
-    let result: RolloverEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return blockchainEventsUtils.getRolloverHistory(this)
-  }
-
-  public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
-    let result: CloseWithSwapEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return blockchainEventsUtils.getCloseWithSwapHistory(this)
-  }
-
-  public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
-    let result: CloseWithDepositEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return blockchainEventsUtils.getCloseWithDepositHistory(this)
-  }
-
-  public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
-    let result: BorrowEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return blockchainEventsUtils.getBorrowHistory(this)
-  }
-
   public getBzxLoans = async (
     start: number,
     count: number,
@@ -464,18 +428,6 @@ export class ExplorerProvider {
       }
     }
     return rollovers
-  }
-
-  public getBurnHistory = async (asset: Asset): Promise<BurnEvent[]> => {
-    let result: BurnEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return blockchainEventsUtils.getBurnHistory(this, asset)
-  }
-
-  public getMintHistory = async (asset: Asset): Promise<MintEvent[]> => {
-    let result: MintEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return blockchainEventsUtils.getMintHistory(this, asset)
   }
 
   public getGridItems = (
