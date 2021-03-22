@@ -1,18 +1,13 @@
 import { BigNumber } from '@0x/utils'
 import { Web3Wrapper } from '@0x/web3-wrapper'
-import { EventEmitter } from 'events'
-import appConfig from 'bzx-common/src/config/appConfig'
-import Web3Utils from 'web3-utils'
-
-import constantAddress from '../config/constant.json'
-
-import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
-import { ProviderType } from '../domain/ProviderType'
-import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
-import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
-import { ExplorerProviderEvents } from './events/ExplorerProviderEvents'
-
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import { RequestStatus, RequestTask, TasksQueue, TasksQueueEvents } from 'app-lib/tasksQueue'
+import Asset from 'bzx-common/src/assets/Asset'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import appConfig from 'bzx-common/src/config/appConfig'
+import constantAddress from 'bzx-common/src/config/constant.json'
+import configProviders from 'bzx-common/src/config/providers'
+import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import {
   BorrowEvent,
   BurnEvent,
@@ -23,24 +18,22 @@ import {
   RolloverEvent,
   TradeEvent,
 } from 'bzx-common/src/domain/events'
-import blockchainEventsUtils from 'bzx-common/src/lib/blockchainEventsUtils'
-
-import providerUtils from 'bzx-common/src/lib/providerUtils'
-
 import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
-
+import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
+import blockchainEventsUtils from 'bzx-common/src/lib/blockchainEventsUtils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
+import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
+import { EventEmitter } from 'events'
+import Web3Utils from 'web3-utils'
 import { IParamRowProps } from '../components/ParamRow'
 import { ITxRowProps } from '../components/TxRow'
-import configProviders from 'bzx-common/src/config/providers'
-import Asset from 'bzx-common/src/assets/Asset'
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import { IActiveLoanData } from '../domain/IActiveLoanData'
 import { IRolloverData } from '../domain/IRolloverData'
+import { IWeb3ProviderSettings } from '../domain/IWeb3ProviderSettings'
 import { LiquidationRequest } from '../domain/LiquidationRequest'
 import { Platform } from '../domain/Platform'
-import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
-import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
-import ethereumUtils from 'app-lib/ethereumUtils'
+import { ProviderType } from '../domain/ProviderType'
+import { ExplorerProviderEvents } from './events/ExplorerProviderEvents'
 
 let configAddress: any
 if (appConfig.isMainnet) {
