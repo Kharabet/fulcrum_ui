@@ -20,7 +20,7 @@ import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import ContractsSource from 'bzx-common/src/contracts/ContractsSource'
 import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
-import { stakeableToken } from '../domain/stakingTypes'
+import { stakeableToken } from 'bzx-common/src/domain/staking/stakingTypes'
 import { LogWithDecodedArgs } from 'ethereum-types'
 import {
   CompoundGovernorAlphaProposalCanceledEventArgs,

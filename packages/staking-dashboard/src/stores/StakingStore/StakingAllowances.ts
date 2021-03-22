@@ -2,7 +2,7 @@ import * as mobx from 'mobx'
 import RootStore from '../RootStore'
 import SpendingAllowance from './SpendingAllowance'
 import UserBalances from './UserBalances'
-import { stakeableToken } from 'src/domain/stakingTypes'
+import { stakeableToken } from 'bzx-common/src/domain/staking/stakingTypes'
 
 export default class StakingAllowances {
   [name: string]: any
