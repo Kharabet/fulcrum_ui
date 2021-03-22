@@ -1,5 +1,5 @@
 import * as mobx from 'mobx'
-import GovernanceProposal from 'src/domain/GovernanceProposal'
+import GovernanceProposal from 'bzx-common/src/domain/staking/GovernanceProposal'
 import { StakingProvider } from 'src/services/StakingProvider'
 import RootStore from 'src/stores/RootStore'
 

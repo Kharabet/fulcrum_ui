@@ -9,8 +9,8 @@ import GovernanceProposal, {
   IGovernanceProposalProposer,
   IGovernanceProposalReturnData,
   IGovernanceProposalsEvents,
-} from '../domain/GovernanceProposal'
-import ProposalCreated from '../domain/ProposalCreated'
+} from 'bzx-common/src/domain/staking/GovernanceProposal'
+import ProposalCreated from 'bzx-common/src/domain/staking/ProposalCreated'
 import { TypedEmitter } from 'tiny-typed-emitter'
 import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from '../domain/Asset'
@@ -68,7 +68,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   public get currentAccount() {
     return providerUtils.getCurrentAccount(this)
   }
-  public unsupportedNetwork: boolean = false
+  public unsupportedNetwork = false
   public impersonateAddress = ''
 
   public readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1)
@@ -986,7 +986,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
     await this.waitForTransactionMined(txHash)
   }
 
-  public claimStakingRewards = async (shouldRestake: boolean = false) => {
+  public claimStakingRewards = async (shouldRestake = false) => {
     const account = this.currentAccount
     const stakingContract = await this.getStakingContract()
 

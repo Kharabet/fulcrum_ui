@@ -1,5 +1,5 @@
 import * as mobx from 'mobx'
-import GovernanceProposal from 'src/domain/GovernanceProposal'
+import GovernanceProposal from 'bzx-common/src/domain/staking/GovernanceProposal'
 
 import { RootStore, GovernanceStore } from 'src/stores'
 import { DialogVM } from 'ui-framework'
