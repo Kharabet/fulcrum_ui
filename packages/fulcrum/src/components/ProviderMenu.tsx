@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ProviderType } from '../domain/ProviderType'
 import { ProviderMenuListItem } from './ProviderMenuListItem'
 import { useWeb3React } from '@web3-react/core'
@@ -11,6 +11,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 
 import { BigNumber } from '@0x/utils'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[]
@@ -67,7 +68,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     activate(injected)
   }
 
-  const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType')
+  const storedProvider: any = providerUtils.getLocalstorageItem('providerType')
   const providerType: ProviderType | null = (storedProvider as ProviderType) || null
   const newConnector = ProviderTypeDictionary.getConnectorByProviderType(providerType)
   if (!activatingConnector && providerType && newConnector && connector !== newConnector) {

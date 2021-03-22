@@ -23,17 +23,9 @@ import {
   RolloverEvent,
   TradeEvent,
 } from 'bzx-common/src/domain/events'
-import {
-  getBorrowHistory,
-  getBurnHistory,
-  getCloseWithDepositHistory,
-  getCloseWithSwapHistory,
-  getLiquidationHistory,
-  getLogsFromEtherscan,
-  getMintHistory,
-  getRolloverHistory,
-  getTradeHistory,
-} from 'bzx-common/src/utils'
+import blockchainEventsUtils from 'bzx-common/src/lib/blockchainEventsUtils'
+
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 
@@ -76,7 +68,11 @@ export class ExplorerProvider {
   public web3Wrapper: Web3Wrapper | null = null
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
+  public impersonateAddress = ''
   public accounts: string[] = []
+  public get currentAccount() {
+    return providerUtils.getCurrentAccount(this)
+  }
   public isLoading: boolean = false
   public unsupportedNetwork: boolean = false
   private isProcessing: boolean = false
@@ -122,7 +118,7 @@ export class ExplorerProvider {
       ExplorerProvider.Instance = this
     }
 
-    const storedProvider: any = ExplorerProvider.getLocalstorageItem('providerType')
+    const storedProvider: any = providerUtils.getLocalstorageItem('providerType')
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
     // ExplorerProvider.Instance.isLoading = true;
     // setting up readonly provider
@@ -148,16 +144,6 @@ export class ExplorerProvider {
     })
 
     return ExplorerProvider.Instance
-  }
-
-  public static getLocalstorageItem(item: string): string {
-    let response = ''
-    response = localStorage.getItem(item) || ''
-    return response
-  }
-
-  public static setLocalstorageItem(item: string, val: string) {
-    localStorage.setItem(item, val)
   }
 
   public async setWeb3Provider(connector: AbstractConnector, account?: string) {
@@ -220,7 +206,7 @@ export class ExplorerProvider {
 
     this.providerType = canWrite ? providerType : ProviderType.None
 
-    ExplorerProvider.setLocalstorageItem('providerType', this.providerType)
+    providerUtils.setLocalstorageItem('providerType', this.providerType)
   }
 
   public setApproval = async (
@@ -230,7 +216,7 @@ export class ExplorerProvider {
   ): Promise<string> => {
     const resetRequiredAssets = [Asset.USDT, Asset.KNC] // these assets require to set approve to 0 before approve larger amount than the current spend limit
     let result = ''
-    const assetErc20Address = this.getErc20AddressOfAsset(asset)
+    const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
 
     if (
       !this.web3Wrapper ||
@@ -241,8 +227,7 @@ export class ExplorerProvider {
       return result
     }
 
-    const account =
-      this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
+    const account = this.currentAccount
     const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
 
     if (!account || !tokenErc20Contract) {
@@ -284,7 +269,7 @@ export class ExplorerProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
 
     const eventsBatch0 =
-      (await getLogsFromEtherscan(
+      (await blockchainEventsUtils.getLogsFromEtherscan(
         '10500001',
         '11000000',
         bzxContractAddress,
@@ -293,7 +278,7 @@ export class ExplorerProvider {
         configProviders.Etherscan_Api
       )) || []
     const eventsBatch1 =
-      (await getLogsFromEtherscan(
+      (await blockchainEventsUtils.getLogsFromEtherscan(
         '11000001',
         '11500000',
         bzxContractAddress,
@@ -302,7 +287,7 @@ export class ExplorerProvider {
         configProviders.Etherscan_Api
       )) || []
     const eventsBatch2 =
-      (await getLogsFromEtherscan(
+      (await blockchainEventsUtils.getLogsFromEtherscan(
         '11500001',
         'latest',
         bzxContractAddress,
@@ -352,42 +337,6 @@ export class ExplorerProvider {
       })
       .filter((e: any) => e)
     return result
-  }
-
-  public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
-    let result: LiquidationEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return getLiquidationHistory(this.web3Wrapper, this.contractsSource)
-  }
-
-  public getTradeHistory = async (): Promise<TradeEvent[]> => {
-    let result: TradeEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return getTradeHistory(this.web3Wrapper, this.contractsSource)
-  }
-
-  public getRolloverHistory = async (): Promise<RolloverEvent[]> => {
-    let result: RolloverEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return getRolloverHistory(this.web3Wrapper, this.contractsSource)
-  }
-
-  public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
-    let result: CloseWithSwapEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return getCloseWithSwapHistory(this.web3Wrapper, this.contractsSource)
-  }
-
-  public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
-    let result: CloseWithDepositEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return getCloseWithDepositHistory(this.web3Wrapper, this.contractsSource)
-  }
-
-  public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
-    let result: BorrowEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return getBorrowHistory(this.web3Wrapper, this.contractsSource)
   }
 
   public getBzxLoans = async (
@@ -479,18 +428,6 @@ export class ExplorerProvider {
       }
     }
     return rollovers
-  }
-
-  public getBurnHistory = async (asset: Asset): Promise<BurnEvent[]> => {
-    let result: BurnEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return getBurnHistory(asset, this.web3Wrapper, this.contractsSource)
-  }
-
-  public getMintHistory = async (asset: Asset): Promise<MintEvent[]> => {
-    let result: MintEvent[] = []
-    if (!this.contractsSource || !this.web3Wrapper) return result
-    return getMintHistory(asset, this.web3Wrapper, this.contractsSource)
   }
 
   public getGridItems = (
@@ -642,15 +579,6 @@ export class ExplorerProvider {
 
     return result
   }
-  public getErc20AddressOfAsset(asset: Asset): string | null {
-    let result: string | null = null
-
-    const assetDetails = AssetsDictionary.assets.get(asset)
-    if (this.web3ProviderSettings && assetDetails) {
-      result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || ''
-    }
-    return result
-  }
 
   public getLargeApprovalAmount = (
     asset: Asset,
@@ -701,18 +629,6 @@ export class ExplorerProvider {
         return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
-  private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
-    switch (asset) {
-      case Asset.WBTC:
-        return new BigNumber(10 ** 6)
-      case Asset.USDC:
-      case Asset.USDT:
-        return new BigNumber(10 ** 4)
-      default:
-        return new BigNumber(10 ** 16)
-    }
-  }
-
   public async getSwapToUsdRateBatch(
     assets: Asset[],
     usdToken: Asset
@@ -721,9 +637,9 @@ export class ExplorerProvider {
 
     if (this.contractsSource) {
       const oracleAddress = this.contractsSource.getOracleAddress()
-      const usdTokenAddress = this.getErc20AddressOfAsset(usdToken)!
-      const underlyings: string[] = assets.map((e) => this.getErc20AddressOfAsset(e)!)
-      const amounts: BigNumber[] = assets.map((e) => this.getGoodSourceAmountOfAsset(e))
+      const usdTokenAddress = providerUtils.getErc20AddressOfAsset(usdToken)!
+      const underlyings: string[] = assets.map((e) => providerUtils.getErc20AddressOfAsset(e)!)
+      const amounts: BigNumber[] = assets.map((e) => providerUtils.getGoodSourceAmountOfAsset(e))
 
       const helperContract = await this.contractsSource.getDAppHelperContract()
       if (helperContract) {
@@ -765,8 +681,8 @@ export class ExplorerProvider {
       return new BigNumber(1)
     }
     let result: BigNumber = new BigNumber(0)
-    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
-    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
+    const srcAssetErc20Address = providerUtils.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = providerUtils.getErc20AddressOfAsset(destAsset)
     if (!srcAmount) {
       srcAmount = ExplorerProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS
     } else {
@@ -1014,7 +930,7 @@ export class ExplorerProvider {
         this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
 
       if (account) {
-        const assetAddress = this.getErc20AddressOfAsset(Asset.CHI)
+        const assetAddress = providerUtils.getErc20AddressOfAsset(Asset.CHI)
         if (assetAddress) {
           const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
           if (tokenContract) {
@@ -1029,55 +945,21 @@ export class ExplorerProvider {
     return result
   }
 
-  private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
-    let result = new BigNumber(0)
-
-    if (this.web3Wrapper && this.contractsSource) {
-      if (!account && this.contractsSource.canWrite) {
-        account =
-          this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
-      }
-
-      if (account) {
-        const tokenContract = await this.contractsSource.getErc20Contract(addressErc20)
-        if (tokenContract) {
-          result = await tokenContract.balanceOf(account).callAsync()
-        }
-      }
-    }
-
-    return result
-  }
-
-  public async getEthBalance(): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0)
-
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account =
-        this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null
-      if (account) {
-        const balance = await this.web3Wrapper.getBalanceInWeiAsync(account)
-        result = new BigNumber(balance)
-      }
-    }
-
-    return result
-  }
-
   public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0)
-    if (asset === Asset.UNKNOWN) {
+
+    if (asset === Asset.UNKNOWN || !this.web3Wrapper || !this.contractsSource) {
       // always 0
       result = new BigNumber(0)
     } else if (asset === Asset.ETH) {
       // get eth (wallet) balance
-      result = (await this.getEthBalance()).div(10 ** 18)
+      result = (await providerUtils.getEthBalance(this)).div(10 ** 18)
     } else {
       // get erc20 token balance
       const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
-      const assetErc20Address = this.getErc20AddressOfAsset(asset)
+      const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
       if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address, account)
+        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, account)
         result = result.div(10 ** decimals)
       }
     }

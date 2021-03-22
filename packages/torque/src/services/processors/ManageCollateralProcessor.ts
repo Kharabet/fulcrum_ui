@@ -6,6 +6,7 @@ import { RequestTask } from 'app-lib/tasksQueue'
 import { TorqueProvider } from '../TorqueProvider'
 import { erc20Contract } from 'bzx-common/src/contracts/typescript-wrappers/erc20'
 import Asset from 'bzx-common/src/assets/Asset'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export class ManageCollateralProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -59,9 +60,7 @@ export class ManageCollateralProcessor {
       let tokenErc20Contract: erc20Contract | null = null
       let assetErc20Address: string | null = ''
       let erc20allowance = new BigNumber(0)
-      assetErc20Address = TorqueProvider.Instance.getErc20AddressOfAsset(
-        taskRequest.collateralAsset
-      )
+      assetErc20Address = providerUtils.getErc20AddressOfAsset(taskRequest.collateralAsset)
       if (assetErc20Address) {
         tokenErc20Contract = await TorqueProvider.Instance.contractsSource.getErc20Contract(
           assetErc20Address

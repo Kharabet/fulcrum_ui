@@ -43,6 +43,8 @@ import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
 import InfoBlock from 'bzx-common/src/shared-components/InfoBlock'
 import { StatsTokenGrid } from '../components/StatsTokenGrid'
 import TVChartComingSoon from '../components/TVChartComingSoon'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
+import blockchainEventsUtils from 'bzx-common/src/lib/blockchainEventsUtils'
 
 const networkName = process.env.REACT_APP_ETH_NETWORK
 
@@ -186,7 +188,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     this._isMounted = true
     const isSupportedNetwork = FulcrumProvider.Instance.unsupportedNetwork
     this.setState({ ...this.state, isSupportNetwork: isSupportedNetwork })
-    const provider = FulcrumProvider.getLocalstorageItem('providerType')
+    const provider = providerUtils.getLocalstorageItem('providerType')
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === 'None')) {
       this.props.doNetworkConnect()
     }
@@ -948,14 +950,26 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     //   ;(await this._isMounted) && this.setState({ historyEvents: undefined })
     //   return null
     // }
-    const tradeEvents = await FulcrumProvider.Instance.getTradeHistory()
-    const rolloverEvents = await FulcrumProvider.Instance.getRolloverHistory()
-    const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory()
-    const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory()
-    const depositCollateralEvents = await FulcrumProvider.Instance.getDepositCollateralHistory()
-    const withdrawCollateralEvents = await FulcrumProvider.Instance.getWithdrawCollateralHistory()
-    const earnRewardEvents = await FulcrumProvider.Instance.getEarnRewardHistory()
-    const payTradingFeeEvents = await FulcrumProvider.Instance.getPayTradingFeeHistory()
+    const tradeEvents = await blockchainEventsUtils.getTradeHistory(FulcrumProvider.Instance)
+    const rolloverEvents = await blockchainEventsUtils.getRolloverHistory(FulcrumProvider.Instance)
+    const closeWithSwapEvents = await blockchainEventsUtils.getCloseWithSwapHistory(
+      FulcrumProvider.Instance
+    )
+    const liquidationEvents = await blockchainEventsUtils.getLiquidationHistory(
+      FulcrumProvider.Instance
+    )
+    const depositCollateralEvents = await blockchainEventsUtils.getDepositCollateralHistory(
+      FulcrumProvider.Instance
+    )
+    const withdrawCollateralEvents = await blockchainEventsUtils.getWithdrawCollateralHistory(
+      FulcrumProvider.Instance
+    )
+    const earnRewardEvents = await blockchainEventsUtils.getEarnRewardHistory(
+      FulcrumProvider.Instance
+    )
+    const payTradingFeeEvents = await blockchainEventsUtils.getPayTradingFeeHistory(
+      FulcrumProvider.Instance
+    )
     // const tokens = Array.from(new Set(this.baseTokens.concat(this.quoteTokens)));
 
     // tokens.forEach(async (token) => {

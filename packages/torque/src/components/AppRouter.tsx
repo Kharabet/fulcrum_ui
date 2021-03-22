@@ -16,12 +16,13 @@ import Intercom from 'react-intercom'
 import Modal from 'react-modal'
 import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
-import React, { Component } from 'react'
+import { Component } from 'react'
 import RiskDisclosure from 'bzx-common/src/shared-components/RiskDisclosure'
 import siteConfig from '../config/SiteConfig.json'
 import TabContainer from '../layout/TabContainer'
 import TagManager from 'react-gtm-module'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 if (appConfig.isGTMEnabled) {
   const tagManagerArgs = {
@@ -57,7 +58,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper,
       isMobileMedia: window.innerWidth <= 959,
-      isChiEnabled: TorqueProvider.getLocalstorageItem('isChiEnabled') === 'true',
+      isChiEnabled: providerUtils.getLocalstorageItem('isChiEnabled') === 'true',
     }
 
     TorqueProvider.Instance.eventEmitter.on(

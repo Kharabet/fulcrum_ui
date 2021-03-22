@@ -158,7 +158,7 @@ export default class Web3Connection {
         this.supportedNetwork = !sp.unsupportedNetwork
         this.providerType = event.providerType
         this.activatingProvider = null
-        this.walletAddress = sp.getCurrentAccount() || ''
+        this.walletAddress = sp.currentAccount || ''
       })
     )
     mobx.when(

@@ -53,6 +53,7 @@ import ethereumUtils from 'app-lib/ethereumUtils'
 import ProviderTypeDictionary from 'bzx-common/src/domain/ProviderTypeDictionary'
 import Web3ConnectionFactory from 'bzx-common/src/services/Web3ConnectionFactory'
 import Web3Utils from 'web3-utils'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 let configAddress: any
 if (appConfig.isMainnet) {
@@ -92,6 +93,9 @@ export class TorqueProvider {
   public contractsSource: ContractsSource | null = null
   public borrowRequestAwaitingStore: BorrowRequestAwaitingStore | null = null
   public accounts: string[] = []
+  public get currentAccount() {
+    return providerUtils.getCurrentAccount(this)
+  }
   public compoundDeposits: IRefinanceLoan[] = []
   public soloDeposits: IRefinanceLoan[] = []
   public isLoading: boolean = false
@@ -112,7 +116,7 @@ export class TorqueProvider {
       TorqueProvider.Instance = this
     }
 
-    const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType')
+    const storedProvider: any = providerUtils.getLocalstorageItem('providerType')
     const providerType: ProviderType | null = (storedProvider as ProviderType) || null
 
     this.web3ProviderSettings = appConfig.web3ProviderSettings
@@ -146,24 +150,6 @@ export class TorqueProvider {
     }
 
     return TorqueProvider.Instance
-  }
-
-  public getCurrentAccount(): string | undefined {
-    return this.impersonateAddress
-      ? this.impersonateAddress
-      : this.accounts.length > 0 && this.accounts[0]
-        ? this.accounts[0].toLowerCase()
-        : undefined
-  }
-
-  public static getLocalstorageItem(item: string): string {
-    let response = ''
-    response = localStorage.getItem(item) || ''
-    return response
-  }
-
-  public static setLocalstorageItem(item: string, val: string) {
-    localStorage.setItem(item, val)
   }
 
   public async setWeb3Provider(connector: AbstractConnector, account?: string) {
@@ -226,7 +212,7 @@ export class TorqueProvider {
 
     this.providerType = canWrite ? providerType : ProviderType.None
 
-    TorqueProvider.setLocalstorageItem('providerType', this.providerType)
+    providerUtils.setLocalstorageItem('providerType', this.providerType)
   }
 
   public async setWeb3ProviderMobileFinalize(
@@ -285,7 +271,7 @@ export class TorqueProvider {
         this.providerType = ProviderType.None
       }
 
-      TorqueProvider.setLocalstorageItem('providerType', providerType)
+      providerUtils.setLocalstorageItem('providerType', providerType)
     } else {
       this.contractsSource = null
     }
@@ -298,18 +284,20 @@ export class TorqueProvider {
 
   public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0)
-    if (asset === Asset.UNKNOWN) {
+    const account = this.currentAccount
+    if (asset === Asset.UNKNOWN || !this.contractsSource || !this.web3Wrapper || !account) {
       // always 0
       result = new BigNumber(0)
     } else if (this.isETHAsset(asset)) {
       // get eth (wallet) balance
-      result = await this.getEthBalance()
+      result = await providerUtils.getEthBalance(this)
     } else {
       // get erc20 token balance
       // const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-      const assetErc20Address = this.getErc20AddressOfAsset(asset)
-      if (assetErc20Address) {
-        result = await this.getErc20BalanceOfUser(assetErc20Address)
+      const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
+
+      if (account && assetErc20Address) {
+        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, account)
         // result = result.multipliedBy(10 ** (18 - precision));
       }
     }
@@ -321,7 +309,7 @@ export class TorqueProvider {
     let result: BigNumber = new BigNumber(0)
 
     if (this.contractsSource && this.web3Wrapper) {
-      const assetAddress = this.getErc20AddressOfAsset(asset)
+      const assetAddress = providerUtils.getErc20AddressOfAsset(asset)
       if (assetAddress) {
         const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
         const iBZxAddress = this.contractsSource.getiBZxAddress()
@@ -340,10 +328,10 @@ export class TorqueProvider {
     let result = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
 
       if (account) {
-        const assetAddress = this.getErc20AddressOfAsset(Asset.CHI)
+        const assetAddress = providerUtils.getErc20AddressOfAsset(Asset.CHI)
         if (assetAddress) {
           const tokenContract = await this.contractsSource.getErc20Contract(assetAddress)
           if (tokenContract) {
@@ -369,7 +357,8 @@ export class TorqueProvider {
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getITokenContract(borrowAsset)
       const iBZxContract = await this.contractsSource.getiBZxContract()
-      const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || ''
+      const collateralAssetErc20Address =
+        providerUtils.getErc20AddressOfAsset(collateralAsset) || ''
       if (amount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
         const loanPrecision = AssetsDictionary.assets.get(borrowAsset)!.decimals || 18
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
@@ -404,7 +393,8 @@ export class TorqueProvider {
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getITokenContract(borrowAsset)
       const iBZxContract = await this.contractsSource.getiBZxContract()
-      const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || ''
+      const collateralAssetErc20Address =
+        providerUtils.getErc20AddressOfAsset(collateralAsset) || ''
       if (depositAmount.gt(0) && iTokenContract && iBZxContract && collateralAssetErc20Address) {
         const collateralToLoanRate = await this.getSwapRate(collateralAsset, borrowAsset)
         const liquidity = await this.getAvailableLiquidity(borrowAsset)
@@ -465,8 +455,8 @@ export class TorqueProvider {
       return new BigNumber(1)
     }
     let result: BigNumber = new BigNumber(0)
-    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
-    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
+    const srcAssetErc20Address = providerUtils.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = providerUtils.getErc20AddressOfAsset(destAsset)
     if (!srcAmount) {
       srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS
     } else {
@@ -493,48 +483,6 @@ export class TorqueProvider {
     neededAmount: BigNumber = new BigNumber(0)
   ): BigNumber => {
     return TorqueProvider.MAX_UINT
-    /*let amount = new BigNumber(0);
-
-    switch (asset) {
-      case Asset.ETH:
-      case Asset.WETH:
-      case Asset.fWETH:
-        amount = new BigNumber(10 ** 18).multipliedBy(1500);
-      case Asset.WBTC:
-      case Asset.YFI:
-        amount = new BigNumber(10 ** 8).multipliedBy(25);
-      case Asset.BZRX:
-        amount = new BigNumber(10 ** 18).multipliedBy(400000);
-      case Asset.LINK:
-        amount = new BigNumber(10 ** 18).multipliedBy(60000);
-      case Asset.ZRX:
-        amount = new BigNumber(10 ** 18).multipliedBy(750000);
-      case Asset.KNC:
-        amount = new BigNumber(10 ** 18).multipliedBy(550000);
-      case Asset.BAT:
-        amount = new BigNumber(10 ** 18).multipliedBy(750000);
-      case Asset.DAI:
-      case Asset.SAI:
-      case Asset.SUSD:
-        amount = new BigNumber(10 ** 18).multipliedBy(375000);
-      case Asset.USDC:
-      case Asset.USDT:
-        amount = new BigNumber(10 ** 6).multipliedBy(375000);
-      case Asset.REP:
-        amount = new BigNumber(10 ** 18).multipliedBy(15000);
-      case Asset.MKR:
-        amount = new BigNumber(10 ** 18).multipliedBy(1250);
-      case Asset.CHI:
-        amount = new BigNumber(10 ** 18);
-      default:
-        break;
-    }
-
-    if (amount.eq(0)) {
-      throw new Error("Invalid approval asset!");
-    }
-    
-    return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
   public setApproval = async (
@@ -544,7 +492,7 @@ export class TorqueProvider {
   ): Promise<string> => {
     const resetRequiredAssets = [Asset.USDT, Asset.KNC] // these assets require to set approve to 0 before approve larger amount than the current spend limit
     let result = ''
-    const assetErc20Address = this.getErc20AddressOfAsset(asset)
+    const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
 
     if (
       !this.web3Wrapper ||
@@ -555,7 +503,7 @@ export class TorqueProvider {
       return result
     }
 
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
 
     if (!account || !tokenErc20Contract) {
@@ -588,13 +536,13 @@ export class TorqueProvider {
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       let tokenErc20Contract: erc20Contract | null = null
-      const assetErc20Address = this.getErc20AddressOfAsset(asset)
+      const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
       if (assetErc20Address) {
         tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address)
       } else {
         throw new Error('No ERC20 contract available!')
       }
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
       if (account && tokenErc20Contract) {
         const erc20allowance = await tokenErc20Contract.allowance(account, spender).callAsync()
         if (amountInBaseUnits.gt(erc20allowance)) {
@@ -707,7 +655,7 @@ export class TorqueProvider {
   }
 
   public getCompoundLoans = async (): Promise<IRefinanceLoan[]> => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     if (!this.contractsSource || !account) {
       return []
     }
@@ -805,7 +753,7 @@ export class TorqueProvider {
   }
 
   public getSoloLoans = async (): Promise<IRefinanceLoan[]> => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     if (!this.contractsSource || !account) {
       return []
     }
@@ -876,7 +824,7 @@ export class TorqueProvider {
   }
 
   public migrateCompoundLoan = async (loan: IRefinanceLoan, amount: BigNumber) => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return
     }
@@ -951,7 +899,7 @@ export class TorqueProvider {
   }
 
   public migrateSoloLoan = async (loan: IRefinanceLoan, amount: BigNumber) => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return
     }
@@ -1029,7 +977,7 @@ export class TorqueProvider {
   public getMakerLoans = async (): Promise<RefinanceCdpData[]> => {
     let result: RefinanceCdpData[] = []
 
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (this.web3Wrapper && this.contractsSource && account) {
       const cdps: GetCdpsContract = await this.contractsSource.getCdpContract(
@@ -1400,7 +1348,7 @@ export class TorqueProvider {
       const bridge: saiToDAIBridgeContract = await this.contractsSource.getSaiToDaiBridge(
         configAddress.SAI_TO_DAI_BRIDGE
       )
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
       try {
         return await bridge.migrateLoan(loanId, new BigNumber(0)).sendTransactionAsync({
           from: account,
@@ -1423,9 +1371,9 @@ export class TorqueProvider {
     }
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
       const iTokenContract = await this.contractsSource.getITokenContract(borrowRequest.borrowAsset);
-      const collateralAssetErc20Address = this.getErc20AddressOfAsset(borrowRequest.collateralAsset) || "";
+      const collateralAssetErc20Address = this.providerUtils.getErc20AddressOfAsset(borrowRequest.collateralAsset) || "";
       if (account && iTokenContract && collateralAssetErc20Address) {
         const loanPrecision = AssetsDictionary.assets.get(borrowRequest.borrowAsset)!.decimals || 18;
         const collateralPrecision = AssetsDictionary.assets.get(borrowRequest.collateralAsset)!.decimals || 18;
@@ -1551,7 +1499,7 @@ export class TorqueProvider {
     if (!this.contractsSource) return result
 
     const iBZxContract = await this.contractsSource.getiBZxContract()
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!iBZxContract || !account) return result
 
@@ -1587,16 +1535,16 @@ export class TorqueProvider {
           ? appConfig.isMainnet
             ? Asset.ETH
             : appConfig.isBsc
-              ? Asset.BNB
-              : loanAsset
+            ? Asset.BNB
+            : loanAsset
           : loanAsset
         let collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
         collateralAsset = this.isETHAsset(collateralAsset)
           ? appConfig.isMainnet
             ? Asset.ETH
             : appConfig.isBsc
-              ? Asset.BNB
-              : collateralAsset
+            ? Asset.BNB
+            : collateralAsset
           : collateralAsset
 
         const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18
@@ -1628,7 +1576,7 @@ export class TorqueProvider {
 
   public getLoansAwaitingList = async (): Promise<ReadonlyArray<BorrowRequestAwaiting>> => {
     let result: ReadonlyArray<BorrowRequestAwaiting> = []
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!this.borrowRequestAwaitingStore || !account) return result
 
@@ -1639,7 +1587,7 @@ export class TorqueProvider {
 
   // noinspection JSUnusedGlobalSymbols
   public getLoansListTest = async (): Promise<IBorrowedFundsState[]> => {
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
     // noinspection SpellCheckingInspection
     return [
       {
@@ -1750,10 +1698,11 @@ export class TorqueProvider {
     loanValue: BigNumber,
     selectedValue: BigNumber
   ): Promise<string | null> => {
-    return `${loanValue > selectedValue
+    return `${
+      loanValue > selectedValue
         ? `withdraw.${asset.toLowerCase()}.tokenloan.eth`
         : `topup.${asset.toLowerCase()}.tokenloan.eth`
-      }`
+    }`
   }
 
   //
@@ -1878,7 +1827,7 @@ export class TorqueProvider {
   /*public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
     let receipt;
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
       const bZxContract = await this.contractsSource.getiBZxContract();
       if (account && bZxContract) {
         const loanPrecision = AssetsDictionary.assets.get(repayLoanRequest.borrowAsset)!.decimals || 18;
@@ -1968,7 +1917,7 @@ export class TorqueProvider {
     }
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
       const bZxContract = await this.contractsSource.getiBZxContract();
       if (account && bZxContract) {
         const collateralPrecision = AssetsDictionary.assets.get(manageCollateralRequest.loanOrderState.collateralAsset)!.decimals || 18;
@@ -2110,7 +2059,7 @@ export class TorqueProvider {
     let receipt;
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
       const bZxContract = await this.contractsSource.getiBZxContract();
       if (account && bZxContract) {
         const loanPrecision = AssetsDictionary.assets.get(extendLoanRequest.borrowAsset)!.decimals || 18;
@@ -2171,7 +2120,7 @@ export class TorqueProvider {
     let result = new BigNumber(0)
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
       const bZxContract = await this.contractsSource.getiBZxContract()
       if (account && bZxContract) {
         result = await bZxContract
@@ -2242,66 +2191,12 @@ export class TorqueProvider {
     return result
   }
 
-  public getErc20AddressOfAsset(asset: Asset): string | null {
-    let result: string | null = null
-
-    const assetDetails = AssetsDictionary.assets.get(asset)
-    if (this.web3ProviderSettings && assetDetails) {
-      result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || ''
-    }
-    return result
-  }
-
-  public async getEthBalance(): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0)
-
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.getCurrentAccount()
-      if (account) {
-        const balance = await this.web3Wrapper.getBalanceInWeiAsync(account)
-        result = new BigNumber(balance)
-      }
-    }
-
-    return result
-  }
-
-  private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
-    let result = new BigNumber(0)
-
-    if (this.web3Wrapper && this.contractsSource) {
-      if (!account && this.contractsSource.canWrite) {
-        account =
-          this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined
-      }
-
-      if (account) {
-        const tokenContract = await this.contractsSource.getErc20Contract(addressErc20)
-        if (tokenContract) {
-          result = await tokenContract.balanceOf(account).callAsync()
-        }
-      }
-    }
-
-    return result
-  }
-
-  private static getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
-    switch (asset) {
-      case Asset.WBTC:
-        return new BigNumber(10 ** 6)
-      case Asset.USDC:
-        return new BigNumber(10 ** 4)
-      default:
-        return new BigNumber(10 ** 16)
-    }
-  }
-
   public onDoBorrow = async (request: BorrowRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
     }
   }
+
   public onDoRepayLoan = async (request: RepayLoanRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request))
@@ -2421,7 +2316,7 @@ export class TorqueProvider {
         throw new Error('No provider available!')
       }
 
-      const account = this.getCurrentAccount()
+      const account = this.currentAccount
       if (!account) {
         throw new Error('Unable to get wallet address!')
       }
@@ -2502,18 +2397,6 @@ export class TorqueProvider {
     }
   }
 
-  private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
-    switch (asset) {
-      case Asset.WBTC:
-        return new BigNumber(10 ** 6)
-      case Asset.USDC:
-      case Asset.USDT:
-        return new BigNumber(10 ** 4)
-      default:
-        return new BigNumber(10 ** 16)
-    }
-  }
-
   // Returns swap rate from Kyber
   public async getKyberSwapRate(
     srcAsset: Asset,
@@ -2525,13 +2408,13 @@ export class TorqueProvider {
       return this.getSwapRate(srcAsset, destAsset)
     }
     let result: BigNumber = new BigNumber(0)
-    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset)
-    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset)
+    const srcAssetErc20Address = providerUtils.getErc20AddressOfAsset(srcAsset)
+    const destAssetErc20Address = providerUtils.getErc20AddressOfAsset(destAsset)
 
     if (srcAssetErc20Address && destAssetErc20Address) {
       const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18
       if (!srcAmount) {
-        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset)
+        srcAmount = providerUtils.getGoodSourceAmountOfAsset(srcAsset)
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1))
       }
@@ -2582,11 +2465,13 @@ export class TorqueProvider {
       networkName === 'bsc'
         ? 'https://bscscan.com'
         : networkName === 'kovan'
-          ? 'https://api-kovan.etherscan.io'
-          : 'https://api.etherscan.io'
-    const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${blockNumber - days * blocksPerDay
-      }&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0
-      }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
+        ? 'https://api-kovan.etherscan.io'
+        : 'https://api.etherscan.io'
+    const blockExplorerApiUrl = `${blockExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${
+      blockNumber - days * blocksPerDay
+    }&toBlock=latest&address=${bzxContractAddress}&topic0=${
+      LiquidationEvent.topic0
+    }&topic1=0x000000000000000000000000${account.replace('0x', '')}&apikey=${etherscanApiKey}`
 
     const liquidationEventResponse = await fetch(blockExplorerApiUrl)
     const liquidationEventResponseJson = await liquidationEventResponse.json()
@@ -2609,13 +2494,13 @@ export class TorqueProvider {
 
   public async getBorrowEstimatedGas(request: BorrowRequest, isGasTokenEnabled: boolean) {
     let result = new BigNumber(0)
-    const account = this.getCurrentAccount()
+    const account = this.currentAccount
 
     if (!this.contractsSource || !account || !request.borrowAmount) return result
 
     const isETHCollateralAsset = TorqueProvider.Instance.isETHAsset(request.collateralAsset)
     const collateralAssetErc20Address =
-      TorqueProvider.Instance.getErc20AddressOfAsset(request.collateralAsset) || ''
+      providerUtils.getErc20AddressOfAsset(request.collateralAsset) || ''
     const loanPrecision = AssetsDictionary.assets.get(request.borrowAsset)!.decimals || 18
     const collateralPrecision = AssetsDictionary.assets.get(request.collateralAsset)!.decimals || 18
     const borrowAmountInBaseUnits = new BigNumber(
@@ -2636,39 +2521,39 @@ export class TorqueProvider {
       gasAmount =
         isGasTokenEnabled && ChiTokenBalance.gt(0)
           ? await iTokenContract
-            .borrowWithGasToken(
-              request.loanId,
-              borrowAmountInBaseUnits,
-              new BigNumber(7884000), // approximately 3 months
-              depositAmountInBaseUnits,
-              isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
-              account,
-              account,
-              account,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
-              gas: TorqueProvider.Instance.gasLimit,
-            })
+              .borrowWithGasToken(
+                request.loanId,
+                borrowAmountInBaseUnits,
+                new BigNumber(7884000), // approximately 3 months
+                depositAmountInBaseUnits,
+                isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+                account,
+                account,
+                account,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
+                gas: TorqueProvider.Instance.gasLimit,
+              })
           : await iTokenContract
-            .borrow(
-              request.loanId,
-              borrowAmountInBaseUnits,
-              new BigNumber(7884000), // approximately 3 months
-              depositAmountInBaseUnits,
-              isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
-              account,
-              account,
-              '0x'
-            )
-            .estimateGasAsync({
-              from: account,
-              value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
-              gas: TorqueProvider.Instance.gasLimit,
-            })
-    } catch (e) { }
+              .borrow(
+                request.loanId,
+                borrowAmountInBaseUnits,
+                new BigNumber(7884000), // approximately 3 months
+                depositAmountInBaseUnits,
+                isETHCollateralAsset ? TorqueProvider.ZERO_ADDRESS : collateralAssetErc20Address,
+                account,
+                account,
+                '0x'
+              )
+              .estimateGasAsync({
+                from: account,
+                value: isETHCollateralAsset ? depositAmountInBaseUnits : undefined,
+                gas: TorqueProvider.Instance.gasLimit,
+              })
+    } catch (e) {}
 
     return new BigNumber(gasAmount || 0)
       .multipliedBy(TorqueProvider.Instance.gasBufferCoeff)

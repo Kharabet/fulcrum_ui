@@ -219,7 +219,7 @@ export default class ContractsSource {
     }
     return address
   }
-  
+
   public getTokenHolderAddress() {
     const address = tokenHolderAddresses.get(this.networkId)
     if (!address) {
@@ -493,7 +493,7 @@ export default class ContractsSource {
     return address
   }
 
-  private async getiBZxContractRaw() {
+  private getiBZxContractRaw(): iBZxContract {
     const address = ibzxAddresses.get(this.networkId) || ''
     return new iBZxContract(address.toLowerCase(), this.provider)
   }

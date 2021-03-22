@@ -2,26 +2,23 @@ import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { TradeRequest } from '../domain/TradeRequest'
 import Slider from 'rc-slider'
 import { BigNumber } from '@0x/utils'
-import React, { ChangeEvent, Component, FormEvent } from 'react'
+import { ChangeEvent, Component, FormEvent } from 'react'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import Asset from 'bzx-common/src/assets/Asset'
-
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
-
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
 import { IBorrowedFundsState } from '../domain/IBorrowedFundsState'
 import { ICollateralChangeEstimate } from '../domain/ICollateralChangeEstimate'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { InputAmount } from './InputAmount'
-import { TradeType } from '../domain/TradeType'
 import { LiquidationDropdown } from './LiquidationDropdown'
 
 import '../styles/components/manage-collateral-form.scss'
 import { PositionType } from '../domain/PositionType'
 import appConfig from 'bzx-common/src/config/appConfig'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export interface IManageCollateralFormProps {
   loan: IBorrowedFundsState
@@ -150,8 +147,8 @@ export default class ManageCollateralForm extends Component<
         assetDetails: AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null,
       })
 
-      FulcrumProvider.Instance.getManageCollateralGasAmount().then((gasAmountNeeded) => {
-        FulcrumProvider.Instance.getEthBalance().then((ethBalance) => {
+      FulcrumProvider.Instance.getManageCollateralGasAmount().then(async (gasAmountNeeded) => {
+        await providerUtils.getEthBalance(FulcrumProvider.Instance).then((ethBalance) => {
           FulcrumProvider.Instance.getManageCollateralExcessAmount(this.props.loan!).then(
             (collateralExcess) => {
               FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
@@ -214,6 +211,7 @@ export default class ManageCollateralForm extends Component<
                     ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade)
                     : new BigNumber(0)
                 }
+
                 let assetBalanceNormalizedBN = new BigNumber(
                   collateralState.maxValue - collateralState.minValue
                 )

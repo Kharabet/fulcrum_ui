@@ -5,7 +5,7 @@ import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import appConfig from 'bzx-common/src/config/appConfig'
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
-import React, { ChangeEvent, Component, FormEvent } from 'react'
+import { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
@@ -22,6 +22,7 @@ import InputReceive from './InputReceive'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import TradeExpectedResult from './TradeExpectedResult'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber
@@ -255,7 +256,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       interestRate = estimatedMargin.interestRate
     }
 
-    const ethBalance = await FulcrumProvider.Instance.getEthBalance()
+    const ethBalance = FulcrumProvider.Instance.web3Wrapper
+      ? await providerUtils.getEthBalance(FulcrumProvider.Instance)
+      : new BigNumber(0)
     const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
       this.state.depositToken
     )

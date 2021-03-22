@@ -10,6 +10,7 @@ import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvent
 import { ExplorerProvider } from '../services/ExplorerProvider'
 import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
 import { TxLoaderStep } from './TxLoaderStep'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 import Clipboard from 'clipboard'
 import ReactTooltip from 'react-tooltip'
@@ -70,7 +71,7 @@ export const RolloverRow = (props: IRolloverRowProps) => {
   })
 
   const onRolloverClick = async () => {
-    const provider = ExplorerProvider.getLocalstorageItem('providerType')
+    const provider = providerUtils.getLocalstorageItem('providerType')
 
     if (
       !provider ||

@@ -13,9 +13,10 @@ import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
 import ExpectedResult from './ExpectedResult'
-import React, { ChangeEvent, Component, FormEvent } from 'react'
+import { ChangeEvent, Component, FormEvent } from 'react'
 import Slider from 'rc-slider'
 import TagManager from 'react-gtm-module'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export interface IBorrowFormProps {
   assetsShown: Asset[]
@@ -151,7 +152,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   private async setInputDefaults() {
-    const ethBalance = await TorqueProvider.Instance.getEthBalance()
+    const ethBalance = TorqueProvider.Instance.web3Wrapper
+      ? await providerUtils.getEthBalance(TorqueProvider.Instance)
+      : new BigNumber(0)
 
     const minInitialMargin = await TorqueProvider.Instance.getMinInitialMargin(
       this.props.borrowAsset,

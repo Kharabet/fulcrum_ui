@@ -4,6 +4,7 @@ import Asset from 'bzx-common/src/assets/Asset'
 import { LiquidationRequest } from '../../domain/LiquidationRequest'
 import { RequestTask } from 'app-lib/tasksQueue'
 import { ExplorerProvider } from '../ExplorerProvider'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export class LiquidationProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -51,7 +52,7 @@ export class LiquidationProcessor {
       let tokenErc20Contract: erc20Contract | null = null
       let assetErc20Address: string | null = ''
       let erc20allowance = new BigNumber(0)
-      assetErc20Address = ExplorerProvider.Instance.getErc20AddressOfAsset(taskRequest.loanToken)
+      assetErc20Address = providerUtils.getErc20AddressOfAsset(taskRequest.loanToken)
       if (assetErc20Address) {
         tokenErc20Contract = await ExplorerProvider.Instance.contractsSource.getErc20Contract(
           assetErc20Address
@@ -98,19 +99,19 @@ export class LiquidationProcessor {
       const gasAmount =
         isGasTokenEnabled && chiTokenBalance.gt(0)
           ? await iBZxContract
-            .liquidateWithGasToken(taskRequest.loanId, account, account, taskRequest.closeAmount)
-            .estimateGasAsync({
-              from: account,
-              value: sendAmountForValue,
-              gas: ExplorerProvider.Instance.gasLimit,
-            })
+              .liquidateWithGasToken(taskRequest.loanId, account, account, taskRequest.closeAmount)
+              .estimateGasAsync({
+                from: account,
+                value: sendAmountForValue,
+                gas: ExplorerProvider.Instance.gasLimit,
+              })
           : await iBZxContract
-            .liquidate(taskRequest.loanId, account, taskRequest.closeAmount)
-            .estimateGasAsync({
-              from: account,
-              value: sendAmountForValue,
-              gas: ExplorerProvider.Instance.gasLimit,
-            })
+              .liquidate(taskRequest.loanId, account, taskRequest.closeAmount)
+              .estimateGasAsync({
+                from: account,
+                value: sendAmountForValue,
+                gas: ExplorerProvider.Instance.gasLimit,
+              })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(ExplorerProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
@@ -122,21 +123,21 @@ export class LiquidationProcessor {
       txHash =
         isGasTokenEnabled && chiTokenBalance.gt(0)
           ? await iBZxContract
-            .liquidateWithGasToken(taskRequest.loanId, account, account, taskRequest.closeAmount)
-            .sendTransactionAsync({
-              from: account,
-              value: sendAmountForValue,
-              gas: gasAmountBN.toString(),
-              gasPrice: await ExplorerProvider.Instance.gasPrice(),
-            })
+              .liquidateWithGasToken(taskRequest.loanId, account, account, taskRequest.closeAmount)
+              .sendTransactionAsync({
+                from: account,
+                value: sendAmountForValue,
+                gas: gasAmountBN.toString(),
+                gasPrice: await ExplorerProvider.Instance.gasPrice(),
+              })
           : await iBZxContract
-            .liquidate(taskRequest.loanId, account, taskRequest.closeAmount)
-            .sendTransactionAsync({
-              from: account,
-              value: sendAmountForValue,
-              gas: gasAmountBN.toString(),
-              gasPrice: await ExplorerProvider.Instance.gasPrice(),
-            })
+              .liquidate(taskRequest.loanId, account, taskRequest.closeAmount)
+              .sendTransactionAsync({
+                from: account,
+                value: sendAmountForValue,
+                gas: gasAmountBN.toString(),
+                gasPrice: await ExplorerProvider.Instance.gasPrice(),
+              })
 
       task.setTxHash(txHash)
     } catch (e) {

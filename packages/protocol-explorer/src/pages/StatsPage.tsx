@@ -19,6 +19,8 @@ import { ExplorerProviderEvents } from '../services/events/ExplorerProviderEvent
 import { NavService } from '../services/NavService'
 import { Loader } from '../components/Loader'
 import { Tab } from '../domain/Tab'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
+import blockchainEventsUtils from 'bzx-common/src/lib/blockchainEventsUtils'
 
 interface IStatsPageProps {
   doNetworkConnect: () => void
@@ -74,7 +76,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       return
     }
 
-    const provider = ExplorerProvider.getLocalstorageItem('providerType')
+    const provider = providerUtils.getLocalstorageItem('providerType')
 
     if (
       !provider ||
@@ -91,40 +93,40 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     }
 
     const liquidationEvents = ExplorerProvider.Instance.getGridItems(
-      (await ExplorerProvider.Instance.getLiquidationHistory()).filter(
+      (await blockchainEventsUtils.getLiquidationHistory(ExplorerProvider.Instance)).filter(
         (e: LiquidationEvent) => e.loanToken === this.state.asset
       )
     )
     const tradeEvents = ExplorerProvider.Instance.getGridItems(
-      (await ExplorerProvider.Instance.getTradeHistory()).filter(
+      (await blockchainEventsUtils.getTradeHistory(ExplorerProvider.Instance)).filter(
         (e: TradeEvent) => e.loanToken === this.state.asset
       )
     )
     const rolloverEvents = ExplorerProvider.Instance.getGridItems(
-      (await ExplorerProvider.Instance.getRolloverHistory()).filter(
+      (await blockchainEventsUtils.getRolloverHistory(ExplorerProvider.Instance)).filter(
         (e: RolloverEvent) => e.loanToken === this.state.asset
       )
     )
     const closeEvents = ExplorerProvider.Instance.getGridItems(
-      (await ExplorerProvider.Instance.getCloseWithSwapHistory()).filter(
+      (await blockchainEventsUtils.getCloseWithSwapHistory(ExplorerProvider.Instance)).filter(
         (e: CloseWithSwapEvent) => e.loanToken === this.state.asset
       )
     )
     const closeWithDepositEvents = ExplorerProvider.Instance.getGridItems(
-      (await ExplorerProvider.Instance.getCloseWithDepositHistory()).filter(
+      (await blockchainEventsUtils.getCloseWithDepositHistory(ExplorerProvider.Instance)).filter(
         (e: CloseWithDepositEvent) => e.loanToken === this.state.asset
       )
     )
     const borrowEvents = ExplorerProvider.Instance.getGridItems(
-      (await ExplorerProvider.Instance.getBorrowHistory()).filter(
+      (await blockchainEventsUtils.getBorrowHistory(ExplorerProvider.Instance)).filter(
         (e: BorrowEvent) => e.loanToken === this.state.asset
       )
     )
     const mintEvents = ExplorerProvider.Instance.getGridItems(
-      await ExplorerProvider.Instance.getMintHistory(this.state.asset)
+      await blockchainEventsUtils.getMintHistory(ExplorerProvider.Instance, this.state.asset)
     )
     const burnEvents = ExplorerProvider.Instance.getGridItems(
-      await ExplorerProvider.Instance.getBurnHistory(this.state.asset)
+      await blockchainEventsUtils.getBurnHistory(ExplorerProvider.Instance, this.state.asset)
     )
     const events: ITxRowProps[] = liquidationEvents
       .concat(closeEvents)
