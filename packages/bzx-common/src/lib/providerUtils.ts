@@ -34,10 +34,10 @@ async function getEthBalance(
 async function getErc20BalanceOfUser(
   provider: FulcrumProvider | TorqueProvider | ExplorerProvider | StakingProvider,
   addressErc20: string,
-  account?: string
+  address?: string
 ): Promise<BigNumber> {
   let result = new BigNumber(0)
-
+  const account = address || provider.currentAccount
   if (account && provider.contractsSource) {
     const tokenContract = await provider.contractsSource.getErc20Contract(addressErc20)
     if (tokenContract) {
@@ -80,12 +80,12 @@ const setLocalstorageItem = (item: string, val: string) => {
 
 const getCurrentAccount = (
   provider: FulcrumProvider | TorqueProvider | ExplorerProvider | StakingProvider
-) => {
+): string => {
   return provider.impersonateAddress
     ? provider.impersonateAddress
     : provider.accounts.length > 0 && provider.accounts[0]
     ? provider.accounts[0].toLowerCase()
-    : undefined
+    : ''
 }
 
 export default {

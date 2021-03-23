@@ -65,7 +65,7 @@ export class StakingProvider extends TypedEmitter<IStakingProviderEvents> {
   public web3Wrapper: Web3Wrapper | null = null
   public contractsSource: ContractsSource | null = null
   public accounts: string[] = []
-  public get currentAccount() {
+  public get currentAccount(): string {
     return providerUtils.getCurrentAccount(this)
   }
   public unsupportedNetwork: boolean = false

@@ -83,7 +83,7 @@ export class FulcrumProvider {
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
   public accounts: string[] = []
-  public get currentAccount() {
+  public get currentAccount(): string {
     return providerUtils.getCurrentAccount(this)
   }
   public isLoading: boolean = false
