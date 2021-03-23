@@ -17,7 +17,7 @@ export class RepayLoanProcessor {
     }
 
     const taskRequest: RepayLoanRequest = task.request as RepayLoanRequest
-    const isETHBorrowAsset = TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset)
+    const isETHBorrowAsset = providerUtils.isETHAsset(taskRequest.borrowAsset)
 
     if (isETHBorrowAsset) {
       //Initializing
@@ -49,7 +49,9 @@ export class RepayLoanProcessor {
       const closeAmountInBaseUnitsValue = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1))
 
       // don't allow 0 payback if more is owed
-      if (closeAmountInBaseUnits.eq(0)) throw new Error('Close amount is 0')
+      if (closeAmountInBaseUnits.eq(0)) {
+        throw new Error('Close amount is 0')
+      }
       closeAmountInBaseUnits = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1))
 
       if (!isETHBorrowAsset) {
@@ -99,7 +101,9 @@ export class RepayLoanProcessor {
       if (taskRequest.repayAmount.gte(taskRequest.amountOwed)) {
         // send a large amount to close entire loan
         closeAmountInBaseUnits = closeAmountInBaseUnits.multipliedBy(10 ** 50)
-        if (closeAmountInBaseUnits.eq(0)) closeAmountInBaseUnits = new BigNumber(10 ** 50)
+        if (closeAmountInBaseUnits.eq(0)) {
+          closeAmountInBaseUnits = new BigNumber(10 ** 50)
+        }
       }
 
       const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'

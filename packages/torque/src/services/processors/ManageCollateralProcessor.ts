@@ -18,7 +18,7 @@ export class ManageCollateralProcessor {
 
     // Initializing loan
     const taskRequest: ManageCollateralRequest = task.request as ManageCollateralRequest
-    const isETHCollateralAsset = TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+    const isETHCollateralAsset = providerUtils.isETHAsset(taskRequest.collateralAsset)
 
     if (isETHCollateralAsset) {
       task.processingStart([
@@ -40,7 +40,7 @@ export class ManageCollateralProcessor {
     }
 
     // Initializing loan
-    let bZxContract = await TorqueProvider.Instance.contractsSource.getiBZxContract()
+    const bZxContract = await TorqueProvider.Instance.contractsSource.getiBZxContract()
 
     if (!bZxContract) {
       throw new Error('No bzxContract contract available!')
@@ -104,7 +104,7 @@ export class ManageCollateralProcessor {
     task.processingStepNext()
 
     let gasAmountBN
-    let txHash: string = ''
+    let txHash = ''
 
     if (!taskRequest.isWithdrawal) {
       try {

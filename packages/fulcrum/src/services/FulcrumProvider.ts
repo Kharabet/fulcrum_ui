@@ -2725,10 +2725,6 @@ console.log(err, added);
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
-  public isETHAsset = (asset: Asset): boolean => {
-    return (appConfig.isMainnet && asset === Asset.ETH) || (appConfig.isBsc && asset === Asset.BNB) // || asset === Asset.WETH;
-  }
-
   public getLoanExtendParams = async (
     borrowedFundsState: IBorrowedFundsState
   ): Promise<IExtendState> => {

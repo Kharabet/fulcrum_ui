@@ -1008,10 +1008,6 @@ export class ExplorerProvider {
     return Promise.all(params)
   }
 
-  public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
-  }
-
   public wethToEth = (asset: Asset): Asset => {
     return asset === Asset.ETH || asset === Asset.WETH ? Asset.ETH : asset
   }

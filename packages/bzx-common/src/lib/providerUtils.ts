@@ -88,6 +88,10 @@ const getCurrentAccount = (
     : ''
 }
 
+const isETHAsset = (asset: Asset): boolean => {
+  return (appConfig.isMainnet && asset === Asset.ETH) || (appConfig.isBsc && asset === Asset.BNB) // || asset === Asset.WETH;
+}
+
 export default {
   getErc20AddressOfAsset,
   getEthBalance,
@@ -96,4 +100,5 @@ export default {
   getLocalstorageItem,
   setLocalstorageItem,
   getCurrentAccount,
+  isETHAsset,
 }

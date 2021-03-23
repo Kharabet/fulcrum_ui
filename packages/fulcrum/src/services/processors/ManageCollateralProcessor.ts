@@ -26,7 +26,7 @@ export class ManageCollateralProcessor {
 
     // Initializing loan
     const taskRequest: ManageCollateralRequest = task.request as ManageCollateralRequest
-    const isETHCollateralAsset = FulcrumProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+    const isETHCollateralAsset = providerUtils.isETHAsset(taskRequest.collateralAsset)
 
     if (isETHCollateralAsset) {
       task.processingStart([
@@ -48,7 +48,7 @@ export class ManageCollateralProcessor {
     }
 
     // Initializing loan
-    let bZxContract = await FulcrumProvider.Instance.contractsSource.getiBZxContract()
+    const bZxContract = await FulcrumProvider.Instance.contractsSource.getiBZxContract()
 
     if (!bZxContract) {
       throw new Error('No bzxContract contract available!')

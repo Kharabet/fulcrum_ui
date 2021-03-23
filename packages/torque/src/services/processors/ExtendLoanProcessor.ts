@@ -16,7 +16,7 @@ export class ExtendLoanProcessor {
     }
 
     const taskRequest: ExtendLoanRequest = task.request as ExtendLoanRequest
-    const isETHBorrowAsset = TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset)
+    const isETHBorrowAsset = providerUtils.isETHAsset(taskRequest.borrowAsset)
 
     if (isETHBorrowAsset) {
       //Initializing
@@ -98,7 +98,7 @@ export class ExtendLoanProcessor {
     task.processingStepNext()
 
     let gasAmountBN = new BigNumber(0)
-    let txHash: string = ''
+    let txHash = ''
     const loanData = '0x'
 
     try {

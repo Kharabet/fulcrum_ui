@@ -18,7 +18,7 @@ export class BorrowProcessor {
     }
 
     const taskRequest: BorrowRequest = task.request as BorrowRequest
-    const isETHCollateralAsset = TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+    const isETHCollateralAsset = providerUtils.isETHAsset(taskRequest.collateralAsset)
     if (isETHCollateralAsset) {
       //Initializing
       task.processingStart([
@@ -105,7 +105,7 @@ export class BorrowProcessor {
     task.processingStepNext()
 
     let gasAmountBN = new BigNumber(0)
-    let txHash: string = ''
+    let txHash = ''
 
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
     const ChiTokenBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
