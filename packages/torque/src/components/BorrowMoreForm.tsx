@@ -1,6 +1,7 @@
 import { BigNumber } from '@0x/utils'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 import appConfig from 'bzx-common/src/config/appConfig'
+import oracleApi from 'app-lib/apis/oracleApi'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { Subject } from 'rxjs'
@@ -194,7 +195,8 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       this.setState({ ...this.state, didSubmit: true })
 
       const randomNumber = Math.floor(Math.random() * 100000) + 1
-      const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(
+      const usdAmount = await oracleApi.getSwapToUsdRate(
+        TorqueProvider.Instance,
         this.props.loanOrderState.loanAsset
       )
       let usdPrice = this.state.borrowAmount
@@ -239,7 +241,9 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : ''
-    if (parseFloat(amountText) < 0) return
+    if (parseFloat(amountText) < 0) {
+      return
+    }
     this.setState(
       {
         ...this.state,

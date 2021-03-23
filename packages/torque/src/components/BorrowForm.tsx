@@ -1,3 +1,4 @@
+import React from 'react'
 import { BigNumber } from '@0x/utils'
 import { BorrowRequest } from '../domain/BorrowRequest'
 import { CollateralTokenSelectorToggle } from './CollateralTokenSelectorToggle'
@@ -11,12 +12,13 @@ import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-import ethGasStation from 'bzx-common/src/lib/apis/ethGasStation'
+import ethGasStation from 'app-lib/apis/ethGasStation'
+import providerUtils from 'app-lib/providerUtils'
+import oracleApi from 'app-lib/apis/oracleApi'
 import ExpectedResult from './ExpectedResult'
 import { ChangeEvent, Component, FormEvent } from 'react'
 import Slider from 'rc-slider'
 import TagManager from 'react-gtm-module'
-import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export interface IBorrowFormProps {
   assetsShown: Asset[]
@@ -125,7 +127,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       ),
       this._collateralChange.pipe(
         debounceTime(100),
-        switchMap((value) => this.rxConvertToBigNumber(this.state.depositAmountValue))
+        switchMap(() => this.rxConvertToBigNumber(this.state.depositAmountValue))
       )
     )
       .pipe(switchMap((value) => this.rxGetBorrowEstimate(value)))
@@ -213,7 +215,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     )
 
     const gasPrice = await ethGasStation.getGasPrice()
-    const rate = await TorqueProvider.Instance.getSwapToUsdRate(
+    const rate = await oracleApi.getSwapToUsdRate(
+      TorqueProvider.Instance,
       appConfig.isBsc ? Asset.BNB : Asset.ETH
     )
     const estimatedFee = await TorqueProvider.Instance.getBorrowEstimatedGas(
@@ -258,9 +261,15 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public formatLiquidity(value: BigNumber): string {
-    if (value.lt(1000)) return value.toFixed(2)
-    if (value.lt(10 ** 6)) return `${Number(value.dividedBy(1000).toFixed(2)).toString()}k`
-    if (value.lt(10 ** 9)) return `${Number(value.dividedBy(10 ** 6).toFixed(2)).toString()}m`
+    if (value.lt(1000)) {
+      return value.toFixed(2)
+    }
+    if (value.lt(10 ** 6)) {
+      return `${Number(value.dividedBy(1000).toFixed(2)).toString()}k`
+    }
+    if (value.lt(10 ** 9)) {
+      return `${Number(value.dividedBy(10 ** 6).toFixed(2)).toString()}m`
+    }
     return `${Number(value.dividedBy(10 ** 9).toFixed(2)).toString()}b`
   }
 
@@ -490,7 +499,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         return
       }
       const randomNumber = Math.floor(Math.random() * 100000) + 1
-      const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset)
+      const usdAmount = await oracleApi.getSwapToUsdRate(
+        TorqueProvider.Instance,
+        this.props.borrowAsset
+      )
       let usdPrice = this.state.borrowAmount
       usdPrice = usdPrice.multipliedBy(usdAmount)
 
@@ -544,7 +556,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const inputAmountText = event.target.value ? event.target.value : ''
-    if (parseFloat(inputAmountText) < 0) return
+    if (parseFloat(inputAmountText) < 0) {
+      return
+    }
     // setting inputAmountText to update display at the same time
     this.setState(
       {
@@ -627,7 +641,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   public changeStateLoading = () => {
-    if (this.state.depositAmount) this.setState({ isLoading: false })
+    if (this.state.depositAmount) {
+      this.setState({ isLoading: false })
+    }
   }
 
   private onChange = async (value: number) => {
