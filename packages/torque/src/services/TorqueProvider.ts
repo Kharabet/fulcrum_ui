@@ -93,7 +93,7 @@ export class TorqueProvider {
   public contractsSource: ContractsSource | null = null
   public borrowRequestAwaitingStore: BorrowRequestAwaitingStore | null = null
   public accounts: string[] = []
-  public get currentAccount() {
+  public get currentAccount(): string {
     return providerUtils.getCurrentAccount(this)
   }
   public compoundDeposits: IRefinanceLoan[] = []

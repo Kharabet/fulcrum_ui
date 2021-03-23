@@ -73,7 +73,7 @@ export class FulcrumProvider {
   public web3ProviderSettings: IWeb3ProviderSettings
   public contractsSource: ContractsSource | null = null
   public accounts: string[] = []
-  public get currentAccount() {
+  public get currentAccount(): string {
     return providerUtils.getCurrentAccount(this)
   }
   public isLoading = false
@@ -1745,11 +1745,12 @@ export class FulcrumProvider {
         result = await providerUtils.getEthBalance(this)
       }
     } else {
+      const currentAccount = account ?? this.currentAccount
       // get erc20 token balance
       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
       const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
       if (this.web3Wrapper && this.contractsSource && assetErc20Address) {
-        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, account)
+        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, currentAccount)
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
