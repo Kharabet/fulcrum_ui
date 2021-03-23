@@ -16,5 +16,13 @@
     "jsx": "preserve",
     "typeRoots": ["node_modules/@0x/typescript-typings/types", "node_modules/@types"]
   },
-  "exclude": ["node_modules", "**/*.spec.ts", "alchemy-web3", "web3-react-6"]
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts",
+    "**/alchemy-web3",
+    "**/web3-react-6",
+    "**/charting_library",
+    "**/dist/*",
+    "**/node_modules/*"
+  ]
 }
