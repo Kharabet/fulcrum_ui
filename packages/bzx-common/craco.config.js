@@ -88,7 +88,7 @@ module.exports = {
             'app-lib': '../bzx-common/src/lib',
             'app-services': './src/services',
             'shared-components': './src/shared-components',
-            'ui-framework': './src/ui-framework',
+            'ui-framework': '../bzx-common/src/ui-framework',
           },
         },
       ],
