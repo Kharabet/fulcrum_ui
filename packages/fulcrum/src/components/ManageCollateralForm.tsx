@@ -2,10 +2,10 @@ import { ManageCollateralRequest } from '../domain/ManageCollateralRequest'
 import { TradeRequest } from '../domain/TradeRequest'
 import Slider from 'rc-slider'
 import { BigNumber } from '@0x/utils'
-import { ChangeEvent, Component, FormEvent } from 'react'
+import React, { ChangeEvent, Component, FormEvent } from 'react'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
+import { ReactComponent as CloseIcon } from 'bzx-common/src/assets/images/ic__close.svg'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
@@ -18,7 +18,8 @@ import { LiquidationDropdown } from './LiquidationDropdown'
 import '../styles/components/manage-collateral-form.scss'
 import { PositionType } from '../domain/PositionType'
 import appConfig from 'bzx-common/src/config/appConfig'
-import providerUtils from 'bzx-common/src/lib/providerUtils'
+import providerUtils from 'app-lib/providerUtils'
+import { getKyberSwapRate } from 'app-lib/apis/kyberApi'
 
 export interface IManageCollateralFormProps {
   loan: IBorrowedFundsState
@@ -73,8 +74,8 @@ export default class ManageCollateralForm extends Component<
   private readonly _inputChange: Subject<string>
   private readonly _selectedValueUpdate: Subject<BigNumber>
 
-  constructor(props: IManageCollateralFormProps, context?: any) {
-    super(props, context)
+  constructor(props: IManageCollateralFormProps) {
+    super(props)
 
     this.state = {
       minValue: 0,
@@ -226,7 +227,8 @@ export default class ManageCollateralForm extends Component<
                 ) {
                   assetBalanceNormalizedBN = new BigNumber(collateralState.minValue)
                 }
-                const collateralToLoanRate = await FulcrumProvider.Instance.getKyberSwapRate(
+                const collateralToLoanRate = await getKyberSwapRate(
+                  FulcrumProvider.Instance,
                   this.props.loan!.collateralAsset,
                   this.props.loan!.loanAsset
                 )
@@ -266,8 +268,7 @@ export default class ManageCollateralForm extends Component<
 
   public async componentDidUpdate(
     prevProps: Readonly<IManageCollateralFormProps>,
-    prevState: Readonly<IManageCollateralFormState>,
-    snapshot?: any
+    prevState: Readonly<IManageCollateralFormState>
   ): Promise<void> {
     if (prevState.assetDetails !== this.state.assetDetails) {
       this.getLiquidationPrice()
@@ -328,88 +329,90 @@ export default class ManageCollateralForm extends Component<
         : new BigNumber(1).div(this.state.liquidationPrice)
 
     return (
-      <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
-        <div>
-          {' '}
-          <CloseIcon className="close-icon" onClick={this.props.onCancel} />
-          <div className="manage-collateral-form__title">Manage Collateral</div>
-          <div className="manage-collateral-form__text">Your position is collateralized</div>
-          <div className="manage-collateral-form__collaterized">
-            <span className={`${this.state.collateralTooLow && `text-danger`}`}>
-              {this.state.collateralizedPercent.toFixed(2)}
-            </span>
-            %
-          </div>
-          <Slider
-            step={0.01}
-            min={this.state.minValue}
-            max={this.state.maxValue}
-            value={this.state.selectedValue}
-            onChange={this.onChange}
-            onAfterChange={this.onAfterChange}
-          />
-          <div className="manage-collateral-form__tips">
-            <div className="manage-collateral-form__tip">Withdraw</div>
-            <div className="manage-collateral-form__tip">Top Up</div>
-          </div>
-          <div className="manage-collateral-form__liquidation-price">
-            <span>{this.props.isMobileMedia ? 'Liq.' : 'Liquidation'} price</span>
-            <div className="manage-collateral-form__liquidation-price-container">
-              <span title={liquidationPrice.toFixed()}>
-                {this.formatPrecision(liquidationPrice.toFixed(), false)}
+      <React.Fragment>
+        <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
+          <div>
+            {' '}
+            <CloseIcon className="close-icon" onClick={this.props.onCancel} />
+            <div className="manage-collateral-form__title">Manage Collateral</div>
+            <div className="manage-collateral-form__text">Your position is collateralized</div>
+            <div className="manage-collateral-form__collaterized">
+              <span className={`${this.state.collateralTooLow && `text-danger`}`}>
+                {this.state.collateralizedPercent.toFixed(2)}
               </span>
-              <LiquidationDropdown
-                selectedAsset={this.state.activeTokenLiquidation}
-                loanAsset={this.props.loan.loanAsset}
-                collateralAsset={this.props.loan.collateralAsset}
-                onAssetChange={(activeTokenLiquidation) =>
-                  this.setState({ activeTokenLiquidation })
-                }
-              />
+              %
             </div>
-          </div>
-          <div className="manage-collateral-form__text">
-            You will {this.state.loanValue > this.state.selectedValue ? 'withdraw' : 'top up'}
-          </div>
-          <div className="manage-collateral-form__input-amount-form">
-            <div className={`manage-collateral-form__form-container`}>
-              <div className="manage-collateral-form__form-values-container">
-                <div className="manage-collateral-form__kv-container">
-                  <div className="manage-collateral-form__label">
-                    {!this.state.isLoading && amountMsg}
-                  </div>
-                </div>
-
-                <InputAmount
-                  inputAmountText={this.state.inputAmountText}
-                  isLoading={this.state.isLoading}
-                  selectedAsset={this.props.loan!.collateralAsset}
-                  buttonValue={this.state.buttonValue}
-                  onInsertMaxValue={this.onInsertMaxValue}
-                  onTradeAmountChange={this.onTradeAmountChange}
-                  onCollateralChange={this.onCollateralChange}
-                  withSlider={false}
-                  maxSliderValue={100}
+            <Slider
+              step={0.01}
+              min={this.state.minValue}
+              max={this.state.maxValue}
+              value={this.state.selectedValue}
+              onChange={this.onChange}
+              onAfterChange={this.onAfterChange}
+            />
+            <div className="manage-collateral-form__tips">
+              <div className="manage-collateral-form__tip">Withdraw</div>
+              <div className="manage-collateral-form__tip">Top Up</div>
+            </div>
+            <div className="manage-collateral-form__liquidation-price">
+              <span>{this.props.isMobileMedia ? 'Liq.' : 'Liquidation'} price</span>
+              <div className="manage-collateral-form__liquidation-price-container">
+                <span title={liquidationPrice.toFixed()}>
+                  {this.formatPrecision(liquidationPrice.toFixed(), false)}
+                </span>
+                <LiquidationDropdown
+                  selectedAsset={this.state.activeTokenLiquidation}
+                  loanAsset={this.props.loan.loanAsset}
+                  collateralAsset={this.props.loan.collateralAsset}
+                  onAssetChange={(activeTokenLiquidation) =>
+                    this.setState({ activeTokenLiquidation })
+                  }
                 />
               </div>
             </div>
+            <div className="manage-collateral-form__text">
+              You will {this.state.loanValue > this.state.selectedValue ? 'withdraw' : 'top up'}
+            </div>
+            <div className="manage-collateral-form__input-amount-form">
+              <div className={`manage-collateral-form__form-container`}>
+                <div className="manage-collateral-form__form-values-container">
+                  <div className="manage-collateral-form__kv-container">
+                    <div className="manage-collateral-form__label">
+                      {!this.state.isLoading && amountMsg}
+                    </div>
+                  </div>
+
+                  <InputAmount
+                    inputAmountText={this.state.inputAmountText}
+                    isLoading={this.state.isLoading}
+                    selectedAsset={this.props.loan!.collateralAsset}
+                    buttonValue={this.state.buttonValue}
+                    onInsertMaxValue={this.onInsertMaxValue}
+                    onTradeAmountChange={this.onTradeAmountChange}
+                    onCollateralChange={this.onCollateralChange}
+                    withSlider={false}
+                    maxSliderValue={100}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="manage-collateral-form__actions-container">
+              {this.state.loanValue > this.state.selectedValue ? (
+                <button type="submit" className="manage-collateral-form__action-withdraw">
+                  Withdraw
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="manage-collateral-form__action-top-up"
+                  disabled={!!amountMsg}>
+                  Top Up
+                </button>
+              )}
+            </div>
           </div>
-          <div className="manage-collateral-form__actions-container">
-            {this.state.loanValue > this.state.selectedValue ? (
-              <button type="submit" className="manage-collateral-form__action-withdraw">
-                Withdraw
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="manage-collateral-form__action-top-up"
-                disabled={!!amountMsg}>
-                Top Up
-              </button>
-            )}
-          </div>
-        </div>
-      </form>
+        </form>
+      </React.Fragment>
     )
   }
 
@@ -422,7 +425,7 @@ export default class ManageCollateralForm extends Component<
     })
   }
 
-  private onAfterChange = (value: number) => {
+  private onAfterChange = () => {
     this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue))
   }
 
@@ -453,7 +456,7 @@ export default class ManageCollateralForm extends Component<
     )
   }
 
-  public onCollateralChange = async (asset: Asset) => {
+  public onCollateralChange = async () => {
     this._selectedValueUpdate.next()
   }
 
@@ -520,7 +523,7 @@ export default class ManageCollateralForm extends Component<
 
   private rxFromInputAmount = (value: string): Observable<number> => {
     return new Observable<number>((observer) => {
-      let collateralAmount = new BigNumber(Math.abs(Number(value)))
+      const collateralAmount = new BigNumber(Math.abs(Number(value)))
 
       const decimals = AssetsDictionary.assets.get(this.props.loan!.loanAsset)!.decimals || 18
       // collateral amount enough to get maintenance margin + 200%
@@ -603,12 +606,18 @@ export default class ManageCollateralForm extends Component<
   public formatPrecision(outputText: string, isNecessarySign: boolean): string {
     const output = Number(outputText)
     let sign = ''
-    if (this.state.loanValue > this.state.selectedValue) sign = '-'
-    let n = Math.log(Math.abs(output)) / Math.LN10
+    if (this.state.loanValue > this.state.selectedValue) {
+      sign = '-'
+    }
+    const n = Math.log(Math.abs(output)) / Math.LN10
     let x = 4 - n
-    if (x < 0) x = 0
-    if (x > 5) x = 5
-    let result = new Number(output.toFixed(x)).toString()
+    if (x < 0) {
+      x = 0
+    }
+    if (x > 5) {
+      x = 5
+    }
+    const result = new Number(output.toFixed(x)).toString()
     return isNecessarySign && result != '0' ? sign + result : result
   }
 }

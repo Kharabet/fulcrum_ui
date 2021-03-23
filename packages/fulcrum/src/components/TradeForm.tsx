@@ -23,6 +23,8 @@ import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 import { Preloader } from './Preloader'
 import TradeExpectedResult from './TradeExpectedResult'
 import providerUtils from 'bzx-common/src/lib/providerUtils'
+import { getKyberSwapRate } from 'bzx-common/src/lib/apis/kyberApi'
+import oracleApi from 'bzx-common/src/lib/apis/oracleApi'
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber
@@ -203,11 +205,13 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     const collateralToPrincipalRate =
       this.props.positionType === PositionType.LONG
-        ? await FulcrumProvider.Instance.getKyberSwapRate(
+        ? await getKyberSwapRate(
+            FulcrumProvider.Instance,
             this.props.baseToken,
             this.props.quoteToken
           )
-        : await FulcrumProvider.Instance.getKyberSwapRate(
+        : await getKyberSwapRate(
+            FulcrumProvider.Instance,
             this.props.quoteToken,
             this.props.baseToken
           )
@@ -334,11 +338,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   private async setEstimatedFee() {
-    if (this.state.tradeAmountValue.eq(0))
+    if (this.state.tradeAmountValue.eq(0)) {
       return (
         this._isMounted &&
         this.setState({ estimatedFee: new BigNumber(0), estimatedFeeChi: new BigNumber(0) })
       )
+    }
 
     const tradeRequest = new TradeRequest(
       this.props.loan?.loanId ||
@@ -353,7 +358,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.returnTokenIsCollateral
     )
     const gasPrice = await ethGasStation.getGasPrice()
-    const rate = await FulcrumProvider.Instance.getSwapToUsdRate(
+    const rate = await oracleApi.getSwapToUsdRate(
+      FulcrumProvider.Instance,
       appConfig.isBsc ? Asset.BNB : Asset.ETH
     )
     const estimatedFee = await FulcrumProvider.Instance.getTradeEstimatedGas(
@@ -662,7 +668,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    const rateUSD = await FulcrumProvider.Instance.getSwapToUsdRate(this.state.depositToken)
+    const rateUSD = await oracleApi.getSwapToUsdRate(
+      FulcrumProvider.Instance,
+      this.state.depositToken
+    )
 
     if (!this.state.assetDetails) {
       this.props.onCancel()
@@ -777,7 +786,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     limitedAmount: IInputAmountLimited,
     maxTradeValue: BigNumber
   ): Promise<ITradeAmountChangeEvent | null> => {
-    if (limitedAmount.tradeAmountValue.isNaN()) return null
+    if (limitedAmount.tradeAmountValue.isNaN()) {
+      return null
+    }
     const tradeRequest = new TradeRequest(
       this.props.loan?.loanId ||
         '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -795,7 +806,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       collateral,
       interestRate,
     } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest)
-    if (this.props.tradeType === TradeType.BUY) this.setState({ ...this.state, interestRate })
+    if (this.props.tradeType === TradeType.BUY) {
+      this.setState({ ...this.state, interestRate })
+    }
 
     return {
       inputAmountText: limitedAmount.inputAmountText,
@@ -902,8 +915,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private formatPrecision(output: number): string {
     const n = Math.log(output) / Math.LN10
     let x = 3 - n
-    if (x < 0) x = 0
-    if (x > 5) x = 5
+    if (x < 0) {
+      x = 0
+    }
+    if (x > 5) {
+      x = 5
+    }
     const result = Number(output.toFixed(x)).toString()
     return result
   }

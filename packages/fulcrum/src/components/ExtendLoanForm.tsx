@@ -11,7 +11,8 @@ import { IExtendEstimate } from '../domain/IExtendEstimate'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { InputAmount } from './InputAmount'
 import { TradeRequest } from '../domain/TradeRequest'
-import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
+import { ReactComponent as CloseIcon } from 'bzx-common/src/assets/images/ic__close.svg'
+
 import appConfig from 'bzx-common/src/config/appConfig'
 
 export interface IExtendLoanFormProps {

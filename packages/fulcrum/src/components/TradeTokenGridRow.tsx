@@ -9,10 +9,10 @@ import { TradeType } from '../domain/TradeType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { TasksQueue, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
+import { getKyberSwapRate } from 'app-lib/apis/kyberApi'
 import { PositionTypeMarkerAlt } from './PositionTypeMarkerAlt'
 
 import { LeverageSelector } from './LeverageSelector'
-import { PositionTypeMarker } from './PositionTypeMarker'
 import { Preloader } from './Preloader'
 
 import CircleLoader from 'bzx-common/src/shared-components/CircleLoader'
@@ -53,8 +53,8 @@ interface ITradeTokenGridRowState {
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
-  constructor(props: ITradeTokenGridRowProps, context?: any) {
-    super(props, context)
+  constructor(props: ITradeTokenGridRowProps) {
+    super(props)
 
     this._isMounted = false
     this.state = {
@@ -91,14 +91,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private async derivedUpdate() {
     const collateralToPrincipalRate =
       this.props.positionType === PositionType.LONG
-        ? await FulcrumProvider.Instance.getKyberSwapRate(
-          this.props.baseToken,
-          this.props.quoteToken
-        )
-        : await FulcrumProvider.Instance.getKyberSwapRate(
-          this.props.quoteToken,
-          this.props.baseToken
-        )
+        ? await getKyberSwapRate(
+            FulcrumProvider.Instance,
+            this.props.baseToken,
+            this.props.quoteToken
+          )
+        : await getKyberSwapRate(
+            FulcrumProvider.Instance,
+            this.props.quoteToken,
+            this.props.baseToken
+          )
 
     const baseTokenPrice =
       this.props.positionType === PositionType.LONG
@@ -148,12 +150,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private onAskToOpenProgressDlg = (taskId: number) => {
-    if (!this.state.request || taskId !== this.state.request.id) return
+    if (!this.state.request || taskId !== this.state.request.id) {
+      return
+    }
     this._isMounted && this.setState({ ...this.state, isLoadingTransaction: true })
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request)
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
-    if (!this.state.request || task.request.id !== this.state.request.id) return
+    if (!this.state.request || task.request.id !== this.state.request.id) {
+      return
+    }
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(async () => {
         await FulcrumProvider.Instance.onTaskCancel(task)
@@ -173,7 +179,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const activeTasks = TasksQueue.Instance.getTasksList().filter(
       (item) => item.status !== RequestStatus.FAILED && item.status !== RequestStatus.FAILED_SKIPGAS
     ).length
-    if (activeTasks < 2) this.props.onTransactionsCompleted()
+    if (activeTasks < 2) {
+      this.props.onTransactionsCompleted()
+    }
   }
 
   public componentWillUnmount(): void {
@@ -217,8 +225,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   public async componentDidUpdate(
     prevProps: Readonly<ITradeTokenGridRowProps>,
-    prevState: Readonly<ITradeTokenGridRowState>,
-    snapshot?: any
+    prevState: Readonly<ITradeTokenGridRowState>
   ) {
     if (
       prevState.leverage !== this.state.leverage ||
@@ -303,8 +310,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               </React.Fragment>
             )}
             {this.state.baseTokenPrice.gt(0) &&
-              this.state.baseTokenPrice.toFixed() !== 'Infinity' &&
-              !this.state.isLoading ? (
+            this.state.baseTokenPrice.toFixed() !== 'Infinity' &&
+            !this.state.isLoading ? (
               <React.Fragment>
                 <div title={`${this.state.baseTokenPrice.toFixed(18)}`}>
                   {this.state.baseTokenPrice.toFixed(precisionDigits)}
@@ -346,10 +353,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           </div>
           <div className="trade-token-grid-row__col-action">
             <button
-              className={`trade-token-grid-row__button ${this.props.positionType === PositionType.LONG
-                ? ''
-                : 'trade-token-grid-row__button-short'
-                } trade-token-grid-row__button--size-half`}
+              className={`trade-token-grid-row__button ${
+                this.props.positionType === PositionType.LONG
+                  ? ''
+                  : 'trade-token-grid-row__button-short'
+              } trade-token-grid-row__button--size-half`}
               disabled={siteConfig.TradeBuyDisabled || this.state.isLoadingTransaction}
               onClick={this.onBuyClick}>
               {this.props.positionType === PositionType.LONG ? 'Buy' : 'Sell'} /{' '}
@@ -358,9 +366,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           </div>
         </div>
         {this.state.isLoadingTransaction &&
-          this.state.request &&
-          this.props.positionType === this.state.request.positionType &&
-          this.state.request.tradeType === TradeType.BUY ? (
+        this.state.request &&
+        this.props.positionType === this.state.request.positionType &&
+        this.state.request.tradeType === TradeType.BUY ? (
           <div className={`token-selector-item__image open-tab-tx`}>
             <CircleLoader />
             <TradeTxLoaderStep taskId={this.state.request.id} />

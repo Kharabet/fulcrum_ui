@@ -8,7 +8,8 @@ import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
 
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 
-import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
+import { ReactComponent as CloseIcon } from 'bzx-common/src/assets/images/ic__close.svg'
+
 import { ReactComponent as SearchIcon } from '../assets/images/ic__search.svg'
 
 import '../styles/components/dropdown-select.scss'

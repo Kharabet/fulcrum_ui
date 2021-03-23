@@ -9,15 +9,16 @@ import React, { ChangeEvent, Component, FormEvent } from 'react'
 import TagManager from 'react-gtm-module'
 import { merge, Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
+import { ReactComponent as CloseIcon } from 'bzx-common/src/assets/images/ic__close.svg'
+
 import { LendRequest } from '../domain/LendRequest'
 import { LendType } from '../domain/LendType'
 import { FulcrumProviderEvents } from '../services/events/FulcrumProviderEvents'
-import ProviderChangedEvent from 'bzx-common/src/services/ProviderChangedEvent'
 import { FulcrumProvider } from '../services/FulcrumProvider'
 import { AssetDropdown } from './AssetDropdown'
 import { Preloader } from './Preloader'
 import providerUtils from 'bzx-common/src/lib/providerUtils'
+import oracleApi from 'bzx-common/src/lib/apis/oracleApi'
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean
@@ -67,10 +68,10 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
   private readonly _inputSetMax: Subject<BigNumber>
   private _input: HTMLInputElement | null = null
   private _isMounted: boolean
-  private _timer: any
+  private _timer: number | undefined
 
-  constructor(props: ILendFormProps, context?: any) {
-    super(props, context)
+  constructor(props: ILendFormProps) {
+    super(props)
 
     const assetDetails = AssetsDictionary.assets.get(this.props.asset)
 
@@ -199,7 +200,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     this._timer = window.setTimeout(() => this.setState({ isExpired: true }), this._staleDataDelay)
   }
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate()
   }
 
@@ -232,8 +233,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
   public async componentDidUpdate(
     prevProps: Readonly<ILendFormProps>,
-    prevState: Readonly<ILendFormState>,
-    snapshot?: any
+    prevState: Readonly<ILendFormState>
   ) {
     if (
       this.props.lendType !== prevProps.lendType ||
@@ -261,10 +261,6 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     // const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
     const tokenNameSource = tokenNameBase
     const tokenNameDestination = tokenNamePosition
-
-    const isAmountMaxed = this.state.lendAmount
-      ? this.state.lendAmount.eq(this.state.maxLendAmount!)
-      : false
 
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForLend)
@@ -461,7 +457,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
       })
   }
 
-  public onChangeUseWrapped = (asset: Asset) => {
+  public onChangeUseWrapped = () => {
     if (
       this.state.useWrapped &&
       ((appConfig.isMainnet && this.props.asset === Asset.ETH) ||
@@ -523,7 +519,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const usdAmount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset)
+    const usdAmount = await oracleApi.getSwapToUsdRate(FulcrumProvider.Instance, this.props.asset)
     if (!this.state.lendAmount || this.state.lendAmount.isZero()) {
       if (this._input) {
         this._input.focus()
@@ -596,7 +592,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     this.props.onSubmit(new LendRequest(this.props.lendType, assetOrWrapped, sendAmount))
   }
 
-  public onUpdateClick = async (event: any) => {
+  public onUpdateClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault()
     await this.derivedUpdate()
   }
@@ -706,9 +702,15 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     const n = Math.log(Math.abs(outputNumber)) / Math.LN10
     let x = 4 - n
-    if (x < 6) x = 4
-    if (x < -1) x = 0
-    if (x > this._inputPrecision) x = this._inputPrecision
+    if (x < 6) {
+      x = 4
+    }
+    if (x < -1) {
+      x = 0
+    }
+    if (x > this._inputPrecision) {
+      x = this._inputPrecision
+    }
     const m = Math.pow(10, x)
     return (Math.floor(outputNumber * m) / m).toString()
   }
