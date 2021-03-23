@@ -3,7 +3,7 @@ import { observer } from 'mobx-react'
 import {
   IGovernanceProposalHistoryItem,
   GovernanceProposalStates,
-} from 'src/domain/GovernanceProposal'
+} from 'bzx-common/src/domain/staking/GovernanceProposal'
 import ExternalLink from 'shared-components/ExternalLink'
 
 export interface IProviderMenuListItemProps extends IGovernanceProposalHistoryItem {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { IGovernanceProposalActionItem } from 'src/domain/GovernanceProposal'
+import { IGovernanceProposalActionItem } from 'bzx-common/src/domain/staking/GovernanceProposal'
 
 export interface IProposalActionItemProps extends IGovernanceProposalActionItem {
   index: number
