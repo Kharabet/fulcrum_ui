@@ -41,6 +41,7 @@ import { Platform } from '../domain/Platform'
 import { TasksQueue, TasksQueueEvents, RequestStatus, RequestTask } from 'app-lib/tasksQueue'
 import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
 import ethereumUtils from 'app-lib/ethereumUtils'
+import bzxApi from 'app-lib/apis/bzxApi'
 
 let configAddress: any
 if (appConfig.isMainnet) {
@@ -73,10 +74,10 @@ export class ExplorerProvider {
   public get currentAccount(): string {
     return providerUtils.getCurrentAccount(this)
   }
-  public isLoading: boolean = false
-  public unsupportedNetwork: boolean = false
-  private isProcessing: boolean = false
-  private isChecking: boolean = false
+  public isLoading = false
+  public unsupportedNetwork = false
+  private isProcessing = false
+  private isChecking = false
 
   public static readonly MAX_UINT = new BigNumber(2).pow(256).minus(1)
   public readonly assetsShown: Asset[]
@@ -185,8 +186,9 @@ export class ExplorerProvider {
 
     if (this.web3Wrapper && canWrite) {
       const web3EngineAccounts = await this.web3Wrapper.getAvailableAddressesAsync()
-      if (web3EngineAccounts.length > 0 && this.accounts.length === 0)
+      if (web3EngineAccounts.length > 0 && this.accounts.length === 0) {
         this.accounts = web3EngineAccounts
+      }
       if (this.accounts.length === 0) {
         canWrite = false // revert back to read-only
       }
@@ -265,7 +267,9 @@ export class ExplorerProvider {
 
   public getLiquidationHistoryWithTimestamps = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = []
-    if (!this.contractsSource) return result
+    if (!this.contractsSource) {
+      return result
+    }
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
 
     const eventsBatch0 =
@@ -304,14 +308,18 @@ export class ExplorerProvider {
         const loanId = event.topics[3]
         const data = event.data.replace('0x', '')
         const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-        if (!dataSegments) return null
+        if (!dataSegments) {
+          return null
+        }
         const lender = dataSegments[0].replace('000000000000000000000000', '0x')
 
         const loanTokenAddress = dataSegments[1].replace('000000000000000000000000', '0x')
         const collateralTokenAddress = dataSegments[2].replace('000000000000000000000000', '0x')
         const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress)
         const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress)
-        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null
+        if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) {
+          return null
+        }
         const repayAmount = new BigNumber(parseInt(dataSegments[3], 16))
         const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16))
         const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16))
@@ -344,17 +352,21 @@ export class ExplorerProvider {
     count: number,
     isUnhealthy: boolean
   ): Promise<IActiveLoanData[]> => {
-    let result: IActiveLoanData[] = []
-    if (!this.contractsSource) return result
+    const result: IActiveLoanData[] = []
+    if (!this.contractsSource) {
+      return result
+    }
     const iBZxContract = await this.contractsSource.getiBZxContract()
 
-    if (!iBZxContract) return result
+    if (!iBZxContract) {
+      return result
+    }
     const loansData = await iBZxContract
       .getActiveLoans(new BigNumber(start), new BigNumber(count), isUnhealthy)
       .callAsync()
 
     const mappedAssetsShown = this.assetsShown.map((asset) => this.wethToEth(asset))
-    const usdPrices = await this.getSwapToUsdRatesOffChain(mappedAssetsShown)
+    const usdPrices = await bzxApi.getSwapToUsdRatesOffChain(this, mappedAssetsShown)
     loansData.forEach(async (e) => {
       const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
       const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
@@ -399,10 +411,14 @@ export class ExplorerProvider {
 
   public getRollovers = async (start: number, count: number): Promise<IRolloverData[]> => {
     const rollovers: IRolloverData[] = []
-    if (!this.contractsSource) return rollovers
+    if (!this.contractsSource) {
+      return rollovers
+    }
     const iBZxContract = await this.contractsSource.getiBZxContract()
 
-    if (!iBZxContract) return rollovers
+    if (!iBZxContract) {
+      return rollovers
+    }
 
     const activeLoans = await this.getBzxLoans(start, count, false)
     const rolloverPendingLoans = activeLoans.filter(
@@ -662,7 +678,7 @@ export class ExplorerProvider {
     }
 
     if (offChain) {
-      return this.getSwapToUsdRateOffChain(asset)
+      return bzxApi.getSwapToUsdRateOffChain(this, asset)
     }
 
     return this.getSwapRate(asset, appConfig.tokenForUsdSwapRate)
@@ -710,35 +726,6 @@ export class ExplorerProvider {
         console.error(e)
         result = new BigNumber(0)
       }
-    }
-    return result
-  }
-
-  public getSwapToUsdRateOffChain = async (asset: Asset): Promise<BigNumber> => {
-    let result = new BigNumber(0)
-    const token = this.isETHAsset(asset) ? Asset.ETH : asset
-    const swapToUsdHistoryRateRequest = await fetch('https://api.bzx.network/v1/oracle-rates-usd')
-    const swapToUsdHistoryRateResponse = await swapToUsdHistoryRateRequest.json()
-    if (
-      swapToUsdHistoryRateResponse.success &&
-      swapToUsdHistoryRateResponse.data[token.toLowerCase()]
-    ) {
-      result = new BigNumber(swapToUsdHistoryRateResponse.data[token.toLowerCase()])
-    }
-    return result
-  }
-
-  public getSwapToUsdRatesOffChain = async (assets: Asset[]): Promise<BigNumber[]> => {
-    let result = Array<BigNumber>(assets.length).fill(new BigNumber(0))
-    const swapToUsdHistoryRateRequest = await fetch('https://api.bzx.network/v1/oracle-rates-usd')
-    const swapToUsdHistoryRateResponse = await swapToUsdHistoryRateRequest.json()
-    if (swapToUsdHistoryRateResponse.success) {
-      result = assets.map((asset) => {
-        const token = this.isETHAsset(asset) ? Asset.ETH : asset
-        return swapToUsdHistoryRateResponse.data[token.toLowerCase()]
-          ? new BigNumber(swapToUsdHistoryRateResponse.data[token.toLowerCase()])
-          : new BigNumber(0)
-      })
     }
     return result
   }
@@ -885,6 +872,7 @@ export class ExplorerProvider {
     request?: LiquidationRequest | RolloverRequest
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
+      // eslint-disable-next-line no-useless-catch
       try {
         if (!this.web3Wrapper) {
           throw new Error('web3 is not available')
@@ -981,7 +969,9 @@ export class ExplorerProvider {
       AssetsDictionary.assets
         .get(collateralAsset)!
         .addressErc20.get(this.web3ProviderSettings.networkId) || ''
-    if (!iToken || !collateralTokenAddress || !iBZxContract) return null
+    if (!iToken || !collateralTokenAddress || !iBZxContract) {
+      return null
+    }
     // @ts-ignore
     const id = new BigNumber(
       Web3Utils.soliditySha3(collateralTokenAddress, platform === Platform.Torque) || 0
@@ -1016,7 +1006,9 @@ export class ExplorerProvider {
 
     pairs.forEach(async (pair) => {
       const param = await this.getLoanParams(pair.asset, pair.collateralAsset, Platform.Fulcrum)
-      if (param) params.push(param)
+      if (param) {
+        params.push(param)
+      }
     })
     //  const param = await this.getLoanParams(Asset.ETH, Asset.DAI, Platform.Fulcrum)
     // param && params.push(param)
@@ -1026,6 +1018,7 @@ export class ExplorerProvider {
   public isETHAsset = (asset: Asset): boolean => {
     return asset === Asset.ETH || asset === Asset.WETH || asset === Asset.fWETH
   }
+
   public wethToEth = (asset: Asset): Asset => {
     return asset === Asset.ETH || asset === Asset.WETH ? Asset.ETH : asset
   }
