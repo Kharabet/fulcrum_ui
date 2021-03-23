@@ -1752,11 +1752,12 @@ export class FulcrumProvider {
         result = await providerUtils.getEthBalance(this)
       }
     } else {
+      const currentAccount = account ?? this.currentAccount
       // get erc20 token balance
       const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
       const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
       if (this.web3Wrapper && this.contractsSource && assetErc20Address) {
-        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, account)
+        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, currentAccount)
         result = result.multipliedBy(10 ** (18 - precision))
       }
     }
