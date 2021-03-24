@@ -4,7 +4,17 @@ import invariant from 'tiny-invariant';
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
 }
 
 function _assertThisInitialized(self) {
@@ -93,6 +103,8 @@ var PortisConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.activate = function activate() {
     try {
+      var _this3 = this;
+
       var _temp3 = function _temp3() {
         _this3.portis.onLogout(_this3.handleOnLogout);
 
@@ -110,12 +122,13 @@ var PortisConnector = /*#__PURE__*/function (_AbstractConnector) {
         });
       };
 
-      var _this3 = this;
-
       var _temp4 = function () {
         if (!_this3.portis) {
-          return Promise.resolve(import('@portis/web3')).then(function (_ref2) {
-            var Portis = _ref2["default"];
+          return Promise.resolve(import('@portis/web3').then(function (m) {
+            var _m$default;
+
+            return (_m$default = m == null ? void 0 : m["default"]) != null ? _m$default : m;
+          })).then(function (Portis) {
             _this3.portis = new Portis(_this3.dAppId, typeof _this3.networks[0] === 'number' ? chainIdToNetwork[_this3.networks[0]] : _this3.networks[0], _this3.config);
           });
         }

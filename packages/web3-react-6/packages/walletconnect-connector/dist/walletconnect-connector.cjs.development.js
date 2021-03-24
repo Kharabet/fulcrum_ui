@@ -27,7 +27,8 @@ var invariant = _interopDefault(require('tiny-invariant'));
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
+
+  _setPrototypeOf(subClass, superClass);
 }
 
 function _getPrototypeOf(o) {
@@ -52,7 +53,7 @@ function _isNativeReflectConstruct() {
   if (typeof Proxy === "function") return true;
 
   try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
     return true;
   } catch (e) {
     return false;
@@ -204,18 +205,26 @@ var WalletConnectConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.activate = function activate() {
     try {
+      var _this4 = this;
+
       var _temp5 = function _temp5() {
         function _temp2() {
-          return Promise.resolve(_this4.walletConnectProvider.enable()["catch"](function (error) {
+          return Promise.resolve(_this4.walletConnectProvider.enable().then(function (accounts) {
+            return accounts[0];
+          })["catch"](function (error) {
             // TODO ideally this would be a better check
-            if (error.message === 'User closed WalletConnect modal') {
+            if (error.message === 'User closed modal') {
               throw new UserRejectedRequestError();
             }
 
             throw error;
-          }).then(function (accounts) {
-            return accounts[0];
           })).then(function (account) {
+            _this4.walletConnectProvider.on('disconnect', _this4.handleDisconnect);
+
+            _this4.walletConnectProvider.on('chainChanged', _this4.handleChainChanged);
+
+            _this4.walletConnectProvider.on('accountsChanged', _this4.handleAccountsChanged);
+
             return {
               provider: _this4.walletConnectProvider,
               account: account
@@ -223,38 +232,33 @@ var WalletConnectConnector = /*#__PURE__*/function (_AbstractConnector) {
           });
         }
 
-        _this4.walletConnectProvider.on('chainChanged', _this4.handleChainChanged);
-
-        _this4.walletConnectProvider.on('accountsChanged', _this4.handleAccountsChanged); // ensure that the uri is going to be available, and emit an event if there's a new uri
-
-
         var _temp = function () {
           if (!_this4.walletConnectProvider.wc.connected) {
             return Promise.resolve(_this4.walletConnectProvider.wc.createSession({
-              chainId: _this4.walletConnectProvider.chainId
+              chainId: Number(Object.keys(_this4.rpc)[0])
             })).then(function () {
               _this4.emit(URI_AVAILABLE, _this4.walletConnectProvider.wc.uri);
             });
           }
         }();
 
+        // ensure that the uri is going to be available, and emit an event if there's a new uri
         return _temp && _temp.then ? _temp.then(_temp2) : _temp2(_temp);
       };
 
-      var _this4 = this;
-
       var _temp6 = function () {
         if (!_this4.walletConnectProvider) {
-          return Promise.resolve(new Promise(function (resolve) { resolve(_interopNamespace(require('@walletconnect/web3-provider'))); })).then(function (_ref2) {
-            var WalletConnectProvider = _ref2["default"];
+          return Promise.resolve(new Promise(function (resolve) { resolve(_interopNamespace(require('@walletconnect/web3-provider'))); }).then(function (m) {
+            var _m$default;
+
+            return (_m$default = m == null ? void 0 : m["default"]) != null ? _m$default : m;
+          })).then(function (WalletConnectProvider) {
             _this4.walletConnectProvider = new WalletConnectProvider({
               bridge: _this4.bridge,
               rpc: _this4.rpc,
               qrcode: _this4.qrcode,
               pollingInterval: _this4.pollingInterval
-            }); // only doing this here because this.walletConnectProvider.wc doesn't have a removeListener function...
-
-            _this4.walletConnectProvider.wc.on('disconnect', _this4.handleDisconnect);
+            });
           });
         }
       }();
@@ -300,6 +304,7 @@ var WalletConnectConnector = /*#__PURE__*/function (_AbstractConnector) {
   _proto.deactivate = function deactivate() {
     if (this.walletConnectProvider) {
       this.walletConnectProvider.stop();
+      this.walletConnectProvider.removeListener('disconnect', this.handleDisconnect);
       this.walletConnectProvider.removeListener('chainChanged', this.handleChainChanged);
       this.walletConnectProvider.removeListener('accountsChanged', this.handleAccountsChanged);
     }
@@ -307,11 +312,11 @@ var WalletConnectConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.close = function close() {
     try {
+      var _this12$walletConnect;
+
       var _this12 = this;
 
-      _this12.walletConnectProvider.wc.killSession();
-
-      return Promise.resolve();
+      return Promise.resolve((_this12$walletConnect = _this12.walletConnectProvider) == null ? void 0 : _this12$walletConnect.close()).then(function () {});
     } catch (e) {
       return Promise.reject(e);
     }

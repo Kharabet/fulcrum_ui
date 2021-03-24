@@ -12,7 +12,7 @@ const chainIdToNetwork: { [network: number]: string } = {
   100: 'xdai'
 }
 
-type Network = number | { chainId: number;[key: string]: any }
+type Network = number | { chainId: number; [key: string]: any }
 
 interface SquarelinkConnectorArguments {
   clientId: string
@@ -42,7 +42,7 @@ export class SquarelinkConnector extends AbstractConnector {
 
   public async activate(): Promise<ConnectorUpdate> {
     if (!this.squarelink) {
-      const { default: Squarelink } = await import('squarelink')
+      const Squarelink = await import('squarelink').then(m => m?.default ?? m)
       this.squarelink = new Squarelink(
         this.clientId,
         typeof this.networks[0] === 'number' ? chainIdToNetwork[this.networks[0]] : this.networks[0],
@@ -50,29 +50,26 @@ export class SquarelinkConnector extends AbstractConnector {
       )
     }
 
-
     const provider = await this.squarelink.getProvider()
 
     const account = await provider.enable().then((accounts: string[]): string => accounts[0])
 
-    const chainId = await provider.send('eth_chainId');
-
-    return { provider, account, chainId }
+    return { provider, account }
   }
 
   public async getProvider(): Promise<any> {
-    return await this.squarelink.getProvider()
+    return this.squarelink.getProvider()
   }
 
   public async getChainId(): Promise<number | string> {
-    const provider = await this.squarelink.getProvider();
-    return await provider.send('eth_chainId');
+    return this.squarelink.getProvider().then((provider: any) => provider.send('eth_chainId'))
   }
 
   public async getAccount(): Promise<null | string> {
-    const provider = await this.squarelink.getProvider();
-    return await provider.send('eth_accounts').then((accounts: string[]): string => accounts[0]);
+    return this.squarelink
+      .getProvider()
+      .then((provider: any) => provider.send('eth_accounts').then((accounts: string[]): string => accounts[0]))
   }
 
-  public deactivate() { }
+  public deactivate() {}
 }

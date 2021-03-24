@@ -22,7 +22,8 @@ function _extends() {
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
+
+  _setPrototypeOf(subClass, superClass);
 }
 
 function _getPrototypeOf(o) {
@@ -47,7 +48,7 @@ function _isNativeReflectConstruct() {
   if (typeof Proxy === "function") return true;
 
   try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
     return true;
   } catch (e) {
     return false;
@@ -210,7 +211,7 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.handleClose = function handleClose(code, reason) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Handling 'disconnect' event with payload", code, reason);
+      console.log("Handling 'close' event with payload", code, reason);
     }
 
     this.emitDeactivate();
@@ -218,7 +219,7 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.handleNetworkChanged = function handleNetworkChanged(networkId) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Handling 'chainChanged' event with payload", networkId);
+      console.log("Handling 'networkChanged' event with payload", networkId);
     }
 
     this.emitUpdate({
@@ -229,6 +230,10 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.activate = function activate() {
     try {
+      var _exit2 = false;
+
+      var _this5 = this;
+
       var _temp5 = function _temp5(_result) {
         if (_exit2) return _result;
 
@@ -255,10 +260,6 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
         return _temp && _temp.then ? _temp.then(_temp2) : _temp2(_temp);
       };
 
-      var _exit2 = false;
-
-      var _this5 = this;
-
       if (!window.ethereum) {
         throw new NoEthereumProviderError();
       }
@@ -266,8 +267,8 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
       if (window.ethereum.on) {
         window.ethereum.on('chainChanged', _this5.handleChainChanged);
         window.ethereum.on('accountsChanged', _this5.handleAccountsChanged);
-        window.ethereum.on('disconnect', _this5.handleClose);
-        window.ethereum.on('chainChanged', _this5.handleNetworkChanged);
+        window.ethereum.on('close', _this5.handleClose);
+        window.ethereum.on('networkChanged', _this5.handleNetworkChanged);
       }
 
       if (window.ethereum.isMetaMask) {
@@ -279,12 +280,10 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
       var account;
 
       var _temp6 = _catch(function () {
-        return Promise.resolve(window.ethereum.request({
-          method: 'eth_requestAccounts'
-        }).then(function (sendReturn) {
+        return Promise.resolve(window.ethereum.send('eth_requestAccounts').then(function (sendReturn) {
           return parseSendReturn(sendReturn)[0];
-        })).then(function (_window$ethereum$requ) {
-          account = _window$ethereum$requ;
+        })).then(function (_window$ethereum$send) {
+          account = _window$ethereum$send;
         });
       }, function (error) {
         if (error.code === 4001) {
@@ -310,7 +309,7 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.getChainId = function getChainId() {
     try {
-      var _temp12 = function _temp12() {
+      var _temp13 = function _temp13() {
         function _temp9() {
           if (!chainId) {
             try {
@@ -335,17 +334,15 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
         var _temp8 = function () {
           if (!chainId) {
-            var _temp14 = _catch(function () {
-              return Promise.resolve(window.ethereum.request({
-                method: 'net_version'
-              }).then(parseSendReturn)).then(function (_window$ethereum$requ3) {
-                chainId = _window$ethereum$requ3;
+            var _temp12 = _catch(function () {
+              return Promise.resolve(window.ethereum.send('net_version').then(parseSendReturn)).then(function (_window$ethereum$send3) {
+                chainId = _window$ethereum$send3;
               });
             }, function () {
               process.env.NODE_ENV !== "production" ? warning(false, 'net_version was unsuccessful, falling back to net version v2') : void 0;
             });
 
-            if (_temp14 && _temp14.then) return _temp14.then(function () {});
+            if (_temp12 && _temp12.then) return _temp12.then(function () {});
           }
         }();
 
@@ -358,23 +355,15 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
       var chainId;
 
-      try {
-        chainId = window.ethereum.chainId;
-      } catch (_unused2) {
-        process.env.NODE_ENV !== "production" ? warning(false, 'ethereum.chainId was unsuccessful, falling back to eth_chainId') : void 0;
-      }
-
-      var _temp13 = _catch(function () {
-        return Promise.resolve(window.ethereum.request({
-          method: 'eth_chainId'
-        }).then(parseSendReturn)).then(function (_window$ethereum$requ2) {
-          chainId = _window$ethereum$requ2;
+      var _temp14 = _catch(function () {
+        return Promise.resolve(window.ethereum.send('eth_chainId').then(parseSendReturn)).then(function (_window$ethereum$send2) {
+          chainId = _window$ethereum$send2;
         });
       }, function () {
         process.env.NODE_ENV !== "production" ? warning(false, 'eth_chainId was unsuccessful, falling back to net_version') : void 0;
       });
 
-      return Promise.resolve(_temp13 && _temp13.then ? _temp13.then(_temp12) : _temp12(_temp13));
+      return Promise.resolve(_temp14 && _temp14.then ? _temp14.then(_temp13) : _temp13(_temp14));
     } catch (e) {
       return Promise.reject(e);
     }
@@ -382,7 +371,7 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.getAccount = function getAccount() {
     try {
-      var _temp20 = function _temp20() {
+      var _temp21 = function _temp21() {
         function _temp17() {
           if (!account) {
             account = parseSendReturn(window.ethereum.send({
@@ -395,7 +384,7 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
         var _temp16 = function () {
           if (!account) {
-            var _temp22 = _catch(function () {
+            var _temp20 = _catch(function () {
               return Promise.resolve(window.ethereum.enable().then(function (sendReturn) {
                 return parseSendReturn(sendReturn)[0];
               })).then(function (_window$ethereum$enab2) {
@@ -405,7 +394,7 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
               process.env.NODE_ENV !== "production" ? warning(false, 'enable was unsuccessful, falling back to eth_accounts v2') : void 0;
             });
 
-            if (_temp22 && _temp22.then) return _temp22.then(function () {});
+            if (_temp20 && _temp20.then) return _temp20.then(function () {});
           }
         }();
 
@@ -418,19 +407,17 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
 
       var account;
 
-      var _temp21 = _catch(function () {
-        return Promise.resolve(window.ethereum.request({
-          method: 'eth_accounts'
-        }).then(function (sendReturn) {
+      var _temp22 = _catch(function () {
+        return Promise.resolve(window.ethereum.send('eth_accounts').then(function (sendReturn) {
           return parseSendReturn(sendReturn)[0];
-        })).then(function (_window$ethereum$requ4) {
-          account = _window$ethereum$requ4;
+        })).then(function (_window$ethereum$send4) {
+          account = _window$ethereum$send4;
         });
       }, function () {
         process.env.NODE_ENV !== "production" ? warning(false, 'eth_accounts was unsuccessful, falling back to enable') : void 0;
       });
 
-      return Promise.resolve(_temp21 && _temp21.then ? _temp21.then(_temp20) : _temp20(_temp21));
+      return Promise.resolve(_temp22 && _temp22.then ? _temp22.then(_temp21) : _temp21(_temp22));
     } catch (e) {
       return Promise.reject(e);
     }
@@ -440,8 +427,8 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
     if (window.ethereum && window.ethereum.removeListener) {
       window.ethereum.removeListener('chainChanged', this.handleChainChanged);
       window.ethereum.removeListener('accountsChanged', this.handleAccountsChanged);
-      window.ethereum.removeListener('disconnect', this.handleClose);
-      window.ethereum.removeListener('chainChanged', this.handleNetworkChanged);
+      window.ethereum.removeListener('close', this.handleClose);
+      window.ethereum.removeListener('networkChanged', this.handleNetworkChanged);
     }
   };
 
@@ -452,9 +439,7 @@ var InjectedConnector = /*#__PURE__*/function (_AbstractConnector) {
       }
 
       return Promise.resolve(_catch(function () {
-        return Promise.resolve(window.ethereum.request({
-          method: 'eth_accounts'
-        }).then(function (sendReturn) {
+        return Promise.resolve(window.ethereum.send('eth_accounts').then(function (sendReturn) {
           if (parseSendReturn(sendReturn).length > 0) {
             return true;
           } else {

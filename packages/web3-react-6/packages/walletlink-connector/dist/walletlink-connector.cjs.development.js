@@ -42,7 +42,17 @@ function _extends() {
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
 }
 
 var CHAIN_ID = 1;
@@ -70,6 +80,8 @@ var WalletLinkConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.activate = function activate() {
     try {
+      var _this3 = this;
+
       var _temp3 = function _temp3() {
         return Promise.resolve(_this3.provider.send('eth_requestAccounts').then(function (accounts) {
           return accounts[0];
@@ -82,12 +94,13 @@ var WalletLinkConnector = /*#__PURE__*/function (_AbstractConnector) {
         });
       };
 
-      var _this3 = this;
-
       var _temp4 = function () {
         if (!_this3.walletLink) {
-          return Promise.resolve(new Promise(function (resolve) { resolve(_interopNamespace(require('walletlink'))); })).then(function (_ref2) {
-            var WalletLink = _ref2["default"];
+          return Promise.resolve(new Promise(function (resolve) { resolve(_interopNamespace(require('walletlink'))); }).then(function (m) {
+            var _m$default;
+
+            return (_m$default = m == null ? void 0 : m["default"]) != null ? _m$default : m;
+          })).then(function (WalletLink) {
             _this3.walletLink = new WalletLink(_extends({
               appName: _this3.appName,
               darkMode: _this3.darkMode

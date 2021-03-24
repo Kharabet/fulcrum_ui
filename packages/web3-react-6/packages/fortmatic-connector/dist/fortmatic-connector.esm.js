@@ -4,7 +4,17 @@ import invariant from 'tiny-invariant';
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
 }
 
 var chainIdToNetwork = {
@@ -35,6 +45,8 @@ var FortmaticConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.activate = function activate() {
     try {
+      var _this3 = this;
+
       var _temp3 = function _temp3() {
         return Promise.resolve(_this3.fortmatic.getProvider().enable().then(function (accounts) {
           return accounts[0];
@@ -47,12 +59,13 @@ var FortmaticConnector = /*#__PURE__*/function (_AbstractConnector) {
         });
       };
 
-      var _this3 = this;
-
       var _temp4 = function () {
         if (!_this3.fortmatic) {
-          return Promise.resolve(import('fortmatic')).then(function (_ref2) {
-            var Fortmatic = _ref2["default"];
+          return Promise.resolve(import('fortmatic').then(function (m) {
+            var _m$default;
+
+            return (_m$default = m == null ? void 0 : m["default"]) != null ? _m$default : m;
+          })).then(function (Fortmatic) {
             _this3.fortmatic = new Fortmatic(_this3.apiKey, _this3.chainId === 1 || _this3.chainId === 4 ? undefined : chainIdToNetwork[_this3.chainId]);
           });
         }

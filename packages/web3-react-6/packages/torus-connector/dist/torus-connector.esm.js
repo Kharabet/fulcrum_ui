@@ -3,7 +3,17 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
 }
 
 var TorusConnector = /*#__PURE__*/function (_AbstractConnector) {
@@ -33,6 +43,8 @@ var TorusConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.activate = function activate() {
     try {
+      var _this3 = this;
+
       var _temp3 = function _temp3() {
         return Promise.resolve(_this3.torus.login(_this3.loginOptions).then(function (accounts) {
           return accounts[0];
@@ -43,8 +55,6 @@ var TorusConnector = /*#__PURE__*/function (_AbstractConnector) {
           };
         });
       };
-
-      var _this3 = this;
 
       var _temp4 = function () {
         if (!_this3.torus) {

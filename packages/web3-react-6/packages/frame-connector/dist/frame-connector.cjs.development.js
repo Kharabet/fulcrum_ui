@@ -9,7 +9,8 @@ var invariant = _interopDefault(require('tiny-invariant'));
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
+
+  _setPrototypeOf(subClass, superClass);
 }
 
 function _getPrototypeOf(o) {
@@ -34,7 +35,7 @@ function _isNativeReflectConstruct() {
   if (typeof Proxy === "function") return true;
 
   try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
     return true;
   } catch (e) {
     return false;
@@ -137,7 +138,7 @@ var FrameConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.handleNetworkChanged = function handleNetworkChanged(networkId) {
     {
-      console.log("Handling 'chainChanged' event with payload", networkId);
+      console.log("Handling 'networkChanged' event with payload", networkId);
     }
 
     this.emitUpdate({
@@ -168,7 +169,7 @@ var FrameConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.handleClose = function handleClose(code, reason) {
     {
-      console.log("Handling 'disconnect' event with payload", code, reason);
+      console.log("Handling 'close' event with payload", code, reason);
     }
 
     this.emitDeactivate();
@@ -182,7 +183,7 @@ var FrameConnector = /*#__PURE__*/function (_AbstractConnector) {
         _this4.provider = ethProvider('frame');
       }
 
-      _this4.provider.on('chainChanged', _this4.handleNetworkChanged).on('chainChanged', _this4.handleChainChanged).on('accountsChanged', _this4.handleAccountsChanged).on('disconnect', _this4.handleClose);
+      _this4.provider.on('networkChanged', _this4.handleNetworkChanged).on('chainChanged', _this4.handleChainChanged).on('accountsChanged', _this4.handleAccountsChanged).on('close', _this4.handleClose);
 
       return Promise.resolve(_this4.provider.enable().then(function (accounts) {
         return accounts[0];
@@ -236,7 +237,7 @@ var FrameConnector = /*#__PURE__*/function (_AbstractConnector) {
   };
 
   _proto.deactivate = function deactivate() {
-    this.provider.removeListener('chainChanged', this.handleNetworkChanged).removeListener('chainChanged', this.handleChainChanged).removeListener('accountsChanged', this.handleAccountsChanged).removeListener('disconnect', this.handleClose);
+    this.provider.removeListener('networkChanged', this.handleNetworkChanged).removeListener('chainChanged', this.handleChainChanged).removeListener('accountsChanged', this.handleAccountsChanged).removeListener('close', this.handleClose);
   };
 
   return FrameConnector;

@@ -1,15 +1,14 @@
 {
-    "version": "6.0.8",
-    "npmClient": "yarn",
-    "command": {
-      "publish": {
-        "ignoreChanges": [
-          "*.md"
-        ]
-      }
-    },
-    "packages": [
-      "packages/*"
-    ]
-  }
-  
+  "version": "6.1.9-bzx",
+  "npmClient": "yarn",
+  "command": {
+    "publish": {
+      "ignoreChanges": [
+        "*.md"
+      ]
+    }
+  },
+  "packages": [
+    "packages/*"
+  ]
+}

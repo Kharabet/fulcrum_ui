@@ -7,7 +7,7 @@ const chainIdToNetwork: { [network: number]: string } = {
   3: 'ropsten',
   4: 'rinkeby',
   42: 'kovan',
-  56: 'bsc'
+  56: 'bsc',
 }
 
 interface FortmaticConnectorArguments {
@@ -31,7 +31,7 @@ export class FortmaticConnector extends AbstractConnector {
 
   public async activate(): Promise<ConnectorUpdate> {
     if (!this.fortmatic) {
-      const { default: Fortmatic } = await import('fortmatic')
+      const Fortmatic = await import('fortmatic').then(m => m?.default ?? m)
       this.fortmatic = new Fortmatic(
         this.apiKey,
         this.chainId === 1 || this.chainId === 4 ? undefined : chainIdToNetwork[this.chainId]

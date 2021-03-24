@@ -17,7 +17,7 @@ export declare class WalletConnectConnector extends AbstractConnector {
     private readonly bridge?;
     private readonly qrcode?;
     private readonly pollingInterval?;
-    walletConnectProvider: any;
+    walletConnectProvider?: any;
     constructor({ rpc, bridge, qrcode, pollingInterval }: WalletConnectConnectorArguments);
     private handleChainChanged;
     private handleAccountsChanged;

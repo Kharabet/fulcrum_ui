@@ -31,7 +31,8 @@ function _extends() {
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
+
+  _setPrototypeOf(subClass, superClass);
 }
 
 function _getPrototypeOf(o) {
@@ -56,7 +57,7 @@ function _isNativeReflectConstruct() {
   if (typeof Proxy === "function") return true;
 
   try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
     return true;
   } catch (e) {
     return false;
@@ -272,11 +273,11 @@ function reducer(state, _ref) {
         var _provider = payload.provider,
             _chainId2 = payload.chainId,
             _account2 = payload.account;
-        return _extends({}, state, {}, _provider === undefined ? {} : {
+        return _extends({}, state, _provider === undefined ? {} : {
           provider: _provider
-        }, {}, _chainId2 === undefined ? {} : {
+        }, _chainId2 === undefined ? {} : {
           chainId: _chainId2
-        }, {}, _account2 === undefined ? {} : {
+        }, _account2 === undefined ? {} : {
           account: _account2
         });
       }
@@ -286,11 +287,11 @@ function reducer(state, _ref) {
         var _provider2 = payload.provider,
             _chainId3 = payload.chainId,
             _account3 = payload.account;
-        return _extends({}, state, {}, _provider2 === undefined ? {} : {
+        return _extends({}, state, _provider2 === undefined ? {} : {
           provider: _provider2
-        }, {}, _chainId3 === undefined ? {} : {
+        }, _chainId3 === undefined ? {} : {
           chainId: _chainId3
-        }, {}, _account3 === undefined ? {} : {
+        }, _account3 === undefined ? {} : {
           account: _account3
         }, {
           error: undefined
