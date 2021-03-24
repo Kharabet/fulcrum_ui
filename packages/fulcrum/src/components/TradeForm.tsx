@@ -263,7 +263,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const ethBalance = FulcrumProvider.Instance.web3Wrapper
       ? await providerUtils.getEthBalance(FulcrumProvider.Instance)
       : new BigNumber(0)
-    const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+    const depositTokenBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      FulcrumProvider.Instance,
       this.state.depositToken
     )
     this._isMounted &&
@@ -331,7 +332,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   }
 
   private async setDepositTokenBalance(depositToken: Asset) {
-    const depositTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+    const depositTokenBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      FulcrumProvider.Instance,
       depositToken
     )
     this._isMounted && this.setState({ depositTokenBalance })

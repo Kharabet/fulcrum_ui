@@ -2,6 +2,7 @@ import { BigNumber } from '@0x/utils'
 import Asset from 'bzx-common/src/assets/Asset'
 import { RequestTask } from 'app-lib/tasksQueue'
 import RolloverRequest from 'bzx-common/src/domain/RolloverRequest'
+import providerUtils from 'app-lib/providerUtils'
 import { ExplorerProvider } from '../ExplorerProvider'
 
 export class RolloverProcessor {
@@ -35,24 +36,27 @@ export class RolloverProcessor {
     task.processingStepNext()
 
     let gasAmountBN = new BigNumber(0)
-    let txHash: string = ''
+    let txHash = ''
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-    const chiTokenBalance = await ExplorerProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+    const chiTokenBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      ExplorerProvider.Instance,
+      Asset.CHI
+    )
 
     const loanData = '0x'
     try {
       const gasAmount =
         isGasTokenEnabled && chiTokenBalance.gt(0)
           ? await iBZxContract
-            .rolloverWithGasToken(taskRequest.loanId, account, loanData)
-            .estimateGasAsync({
+              .rolloverWithGasToken(taskRequest.loanId, account, loanData)
+              .estimateGasAsync({
+                from: account,
+                gas: ExplorerProvider.Instance.gasLimit,
+              })
+          : await iBZxContract.rollover(taskRequest.loanId, loanData).estimateGasAsync({
               from: account,
               gas: ExplorerProvider.Instance.gasLimit,
             })
-          : await iBZxContract.rollover(taskRequest.loanId, loanData).estimateGasAsync({
-            from: account,
-            gas: ExplorerProvider.Instance.gasLimit,
-          })
       gasAmountBN = new BigNumber(gasAmount)
         .multipliedBy(ExplorerProvider.Instance.gasBufferCoeff)
         .integerValue(BigNumber.ROUND_UP)
@@ -64,17 +68,17 @@ export class RolloverProcessor {
       txHash =
         isGasTokenEnabled && chiTokenBalance.gt(0)
           ? await iBZxContract
-            .rolloverWithGasToken(taskRequest.loanId, account, loanData)
-            .sendTransactionAsync({
+              .rolloverWithGasToken(taskRequest.loanId, account, loanData)
+              .sendTransactionAsync({
+                from: account,
+                gas: gasAmountBN.toString(),
+                gasPrice: await ExplorerProvider.Instance.gasPrice(),
+              })
+          : await iBZxContract.rollover(taskRequest.loanId, loanData).sendTransactionAsync({
               from: account,
               gas: gasAmountBN.toString(),
               gasPrice: await ExplorerProvider.Instance.gasPrice(),
             })
-          : await iBZxContract.rollover(taskRequest.loanId, loanData).sendTransactionAsync({
-            from: account,
-            gas: gasAmountBN.toString(),
-            gasPrice: await ExplorerProvider.Instance.gasPrice(),
-          })
 
       task.setTxHash(txHash)
     } catch (e) {

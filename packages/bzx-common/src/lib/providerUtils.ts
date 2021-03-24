@@ -48,6 +48,58 @@ async function getErc20BalanceOfUser(
   return result
 }
 
+async function getAssetTokenBalanceOfUser(
+  provider: FulcrumProvider | TorqueProvider | ExplorerProvider | StakingProvider,
+  asset: Asset,
+  account?: string
+): Promise<BigNumber> {
+  let result: BigNumber = new BigNumber(0)
+  if (asset === Asset.UNKNOWN) {
+    // always 0
+    result = new BigNumber(0)
+  } else if (
+    (appConfig.appNetwork === 'mainnet' && asset === Asset.ETH) ||
+    (appConfig.appNetwork === 'bsc' && asset === Asset.BNB)
+  ) {
+    // get eth (wallet) balance
+    if (provider.web3Wrapper && provider.contractsSource && provider.contractsSource.canWrite) {
+      result = await getEthBalance(provider)
+    }
+  } else {
+    const currentAccount = account ?? provider.currentAccount
+    // get erc20 token balance
+    const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
+    const assetErc20Address = getErc20AddressOfAsset(asset)
+    if (provider.web3Wrapper && provider.contractsSource && assetErc20Address) {
+      result = await getErc20BalanceOfUser(provider, assetErc20Address, currentAccount)
+      result = result.multipliedBy(10 ** (18 - precision))
+    }
+  }
+  // to get human-readable amount result should be divided always by 10**18
+  return result
+}
+
+async function getITokenBalanceOfUser(
+  provider: FulcrumProvider | TorqueProvider | ExplorerProvider | StakingProvider,
+  asset: Asset
+): Promise<BigNumber> {
+  let result = new BigNumber(0)
+
+  if (provider.contractsSource) {
+    const precision =
+      AssetsDictionary.assets.get(
+        (asset.includes('v1') ? asset.replace('v1', '') : asset) as Asset
+      )!.decimals || 18
+    const address = await provider.contractsSource.getITokenErc20Address(asset)
+    if (address) {
+      result = await getErc20BalanceOfUser(provider, address)
+      result = result.multipliedBy(10 ** (18 - precision))
+    }
+  }
+
+  return result
+}
+
 function getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
   switch (asset) {
     case Asset.WBTC:
@@ -96,6 +148,8 @@ export default {
   getErc20AddressOfAsset,
   getEthBalance,
   getErc20BalanceOfUser,
+  getAssetTokenBalanceOfUser,
+  getITokenBalanceOfUser,
   getGoodSourceAmountOfAsset,
   getLocalstorageItem,
   setLocalstorageItem,

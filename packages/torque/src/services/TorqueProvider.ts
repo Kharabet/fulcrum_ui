@@ -285,29 +285,6 @@ export class TorqueProvider {
     TorqueProvider.Instance.isLoading = false
   }
 
-  public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0)
-    const account = this.currentAccount
-    if (asset === Asset.UNKNOWN || !this.contractsSource || !this.web3Wrapper || !account) {
-      // always 0
-      result = new BigNumber(0)
-    } else if (providerUtils.isETHAsset(asset)) {
-      // get eth (wallet) balance
-      result = await providerUtils.getEthBalance(this)
-    } else {
-      // get erc20 token balance
-      // const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-      const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
-
-      if (account && assetErc20Address) {
-        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, account)
-        // result = result.multipliedBy(10 ** (18 - precision));
-      }
-    }
-    // to get human-readable amount result should be divided by asset decimals
-    return result
-  }
-
   public async getBalanceOf(asset: Asset): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0)
 
@@ -2479,7 +2456,10 @@ export class TorqueProvider {
       request.depositAmount.multipliedBy(10 ** collateralPrecision).toFixed(0, 1)
     )
     let gasAmount = 0
-    const ChiTokenBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+    const ChiTokenBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      TorqueProvider.Instance,
+      Asset.CHI
+    )
     const iTokenContract = TorqueProvider.Instance.contractsSource!.getITokenContract(
       request.borrowAsset
     )

@@ -600,7 +600,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   private checkBalanceTooLow = async () => {
     const collateralAsset = this.state.collateralAsset
-    let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(collateralAsset)
+    let assetBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      TorqueProvider.Instance,
+      collateralAsset
+    )
     if (
       (appConfig.isMainnet && collateralAsset === Asset.ETH) ||
       (appConfig.isBsc && collateralAsset === Asset.BNB)
@@ -675,8 +678,9 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   }
 
   private setMaxBorrow = async () => {
-    await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset).then(
-      async (balance) => {
+    await providerUtils
+      .getAssetTokenBalanceOfUser(TorqueProvider.Instance, this.state.collateralAsset)
+      .then(async (balance) => {
         if (
           (appConfig.isMainnet && this.state.collateralAsset === Asset.ETH) ||
           (appConfig.isBsc && Asset.BNB)
@@ -705,7 +709,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           depositAmountValue,
           depositAmount,
         })
-      }
-    )
+      })
   }
 }

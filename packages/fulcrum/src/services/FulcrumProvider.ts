@@ -609,7 +609,8 @@ export class FulcrumProvider {
       let usdTotalLocked = new BigNumber(0)
 
       if (asset === Asset.ETHv1) {
-        vaultBalance = await this.getAssetTokenBalanceOfUser(
+        vaultBalance = await providerUtils.getAssetTokenBalanceOfUser(
+          this,
           Asset.WETH,
           '0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633'
         )
@@ -1065,7 +1066,7 @@ export class FulcrumProvider {
           marketLiquidity = marketLiquidity.multipliedBy(swapPrice)
         }
 
-        const balance = await this.getAssetTokenBalanceOfUser(depositToken)
+        const balance = await providerUtils.getAssetTokenBalanceOfUser(this, depositToken)
 
         result = BigNumber.min(marketLiquidity, balance)
 
@@ -1108,7 +1109,7 @@ export class FulcrumProvider {
     let chaiPrice = new BigNumber(0)
     let infoMessage = ''
     if (request.lendType === LendType.LEND) {
-      maxLendAmount = await this.getAssetTokenBalanceOfUser(request.asset)
+      maxLendAmount = await providerUtils.getAssetTokenBalanceOfUser(this, request.asset)
       if (
         (networkName === 'mainnet' && request.asset === Asset.ETH) ||
         (networkName === 'bsc' && request.asset === Asset.BNB)
@@ -1130,7 +1131,7 @@ export class FulcrumProvider {
             chaiPrice = await assetContract.chaiPrice().callAsync()
           }
           tokenPrice = await assetContract.tokenPrice().callAsync()
-          maxTokenAmount = await this.getITokenBalanceOfUser(request.asset)
+          maxTokenAmount = await providerUtils.getITokenBalanceOfUser(this, request.asset)
           let freeSupply = await assetContract.marketLiquidity().callAsync() // .multipliedBy(0.95);
           let userBalance = maxTokenAmount
             .multipliedBy(tokenPrice)
@@ -1731,51 +1732,6 @@ export class FulcrumProvider {
   //   return requestAmount.multipliedBy(request.leverage);
   // }
 
-  public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0)
-    if (asset === Asset.UNKNOWN) {
-      // always 0
-      result = new BigNumber(0)
-    } else if (
-      (networkName === 'mainnet' && asset === Asset.ETH) ||
-      (networkName === 'bsc' && asset === Asset.BNB)
-    ) {
-      // get eth (wallet) balance
-      if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-        result = await providerUtils.getEthBalance(this)
-      }
-    } else {
-      const currentAccount = account ?? this.currentAccount
-      // get erc20 token balance
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18
-      const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
-      if (this.web3Wrapper && this.contractsSource && assetErc20Address) {
-        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, currentAccount)
-        result = result.multipliedBy(10 ** (18 - precision))
-      }
-    }
-    // to get human-readable amount result should be divided always by 10**18
-    return result
-  }
-
-  public async getITokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
-    let result = new BigNumber(0)
-
-    if (this.contractsSource) {
-      const precision =
-        AssetsDictionary.assets.get(
-          (asset.includes('v1') ? asset.replace('v1', '') : asset) as Asset
-        )!.decimals || 18
-      const address = await this.contractsSource.getITokenErc20Address(asset)
-      if (address) {
-        result = await providerUtils.getErc20BalanceOfUser(this, address)
-        result = result.multipliedBy(10 ** (18 - precision))
-      }
-    }
-
-    return result
-  }
-
   public async getGasTokenAllowance(): Promise<BigNumber> {
     let result = new BigNumber(0)
     if (this.unsupportedNetwork) {
@@ -1887,7 +1843,10 @@ export class FulcrumProvider {
         try {
           //@ts-ignore
           result =
-            isGasTokenEnabled && (await this.getAssetTokenBalanceOfUser(Asset.CHI)).gt(0)
+            isGasTokenEnabled &&
+            (
+              await providerUtils.getAssetTokenBalanceOfUser(FulcrumProvider.Instance, Asset.CHI)
+            ).gt(0)
               ? await iBZxContract
                   .closeWithSwapWithGasToken(
                     request.loanId,

@@ -93,7 +93,10 @@ export class LiquidationProcessor {
     let txHash: string = ''
 
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-    const chiTokenBalance = await ExplorerProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+    const chiTokenBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      ExplorerProvider.Instance,
+      Asset.CHI
+    )
 
     try {
       const gasAmount =

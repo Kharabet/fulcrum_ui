@@ -3,13 +3,11 @@ import { BigNumber } from '@0x/utils'
 import { RequestTask } from 'app-lib/tasksQueue'
 import { TradeRequest } from '../../domain/TradeRequest'
 import { FulcrumProvider } from '../FulcrumProvider'
-
 import { PositionType } from '../../domain/PositionType'
-import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
-
-import Asset from 'bzx-common/src/assets/Asset'
-
 import { TradeType } from '../../domain/TradeType'
+import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import Asset from 'bzx-common/src/assets/Asset'
+import providerUtils from 'app-lib/providerUtils'
 
 export class TradeSellProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -33,7 +31,9 @@ export class TradeSellProcessor {
       (l) => l.loanId === taskRequest.loanId
     )
 
-    if (!loan || !loan.loanData) throw new Error('No loan available!')
+    if (!loan || !loan.loanData) {
+      throw new Error('No loan available!')
+    }
 
     let amountInBaseUnits = new BigNumber(0)
     if (isLong) {
@@ -82,7 +82,10 @@ export class TradeSellProcessor {
     let gasAmountBN
 
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-    const ChiTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+    const ChiTokenBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      FulcrumProvider.Instance,
+      Asset.CHI
+    )
 
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit)

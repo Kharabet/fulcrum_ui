@@ -145,7 +145,10 @@ export class TradeBuyProcessor {
         : new BigNumber(0)
 
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-    const ChiTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+    const ChiTokenBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      FulcrumProvider.Instance,
+      Asset.CHI
+    )
     // Waiting for token allowance
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit)

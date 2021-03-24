@@ -10,6 +10,7 @@ import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import providerUtils from 'app-lib/providerUtils'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import Slider from 'rc-slider'
 
@@ -255,7 +256,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     if (!this.state.didSubmit) {
       this.setState({ ...this.state, didSubmit: true })
 
-      let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(
+      let assetBalance = await providerUtils.getAssetTokenBalanceOfUser(
+        TorqueProvider.Instance,
         this.props.loanOrderState.loanAsset
       )
       if (
@@ -338,8 +340,12 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     const output = Number(outputText)
     const n = Math.log(Math.abs(output)) / Math.LN10
     let x = 4 - n
-    if (x < 0) x = 0
-    if (x > this._inputDecimals) x = this._inputDecimals + 1
+    if (x < 0) {
+      x = 0
+    }
+    if (x > this._inputDecimals) {
+      x = this._inputDecimals + 1
+    }
 
     return Number(output.toFixed(x)).toString()
   }

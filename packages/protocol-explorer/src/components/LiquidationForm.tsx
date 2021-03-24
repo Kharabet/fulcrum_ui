@@ -9,6 +9,7 @@ import { InputAmount } from './InputAmount'
 
 import { ReactComponent as CloseIcon } from '../assets/images/ic__close.svg'
 import Asset from 'bzx-common/src/assets/Asset'
+import providerUtils from 'app-lib/providerUtils'
 import { useWeb3React } from '@web3-react/core'
 export interface ILiquidationFormProps {
   request: LiquidationRequest
@@ -39,8 +40,9 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
     }
     setIsLoading(true)
     Promise.all([
-      ExplorerProvider.Instance.getAssetTokenBalanceOfUser(Asset.ETH, account),
-      ExplorerProvider.Instance.getAssetTokenBalanceOfUser(
+      providerUtils.getAssetTokenBalanceOfUser(ExplorerProvider.Instance, Asset.ETH, account),
+      providerUtils.getAssetTokenBalanceOfUser(
+        ExplorerProvider.Instance,
         ExplorerProvider.Instance.wethToEth(props.request.loanToken),
         account
       ),
@@ -111,9 +113,15 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
     const outputNumber = Number(output)
     const n = Math.log(Math.abs(outputNumber)) / Math.LN10
     let x = 4 - n
-    if (x < 6) x = 4
-    if (x < -1) x = 0
-    if (x > inputPrecision) x = inputPrecision
+    if (x < 6) {
+      x = 4
+    }
+    if (x < -1) {
+      x = 0
+    }
+    if (x > inputPrecision) {
+      x = inputPrecision
+    }
     const m = Math.pow(10, x)
     return (Math.floor(outputNumber * m) / m).toString()
   }

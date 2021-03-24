@@ -14,6 +14,7 @@ import { TradeRequest } from '../domain/TradeRequest'
 import { ReactComponent as CloseIcon } from 'bzx-common/src/assets/images/ic__close.svg'
 
 import appConfig from 'bzx-common/src/config/appConfig'
+import providerUtils from 'bzx-common/src/lib/providerUtils'
 
 export interface IExtendLoanFormProps {
   loan: IBorrowedFundsState
@@ -223,7 +224,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   private checkBalance = async (): Promise<boolean> => {
     const precision = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18
 
-    let assetBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(
+    let assetBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      FulcrumProvider.Instance,
       this.props.loan.loanAsset
     )
     if (
@@ -294,8 +296,12 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     const output = Number(outputText)
     const n = Math.log(Math.abs(output)) / Math.LN10
     let x = 4 - n
-    if (x < 0) x = 0
-    if (x > this._inputDecimals) x = this._inputDecimals + 1
+    if (x < 0) {
+      x = 0
+    }
+    if (x > this._inputDecimals) {
+      x = this._inputDecimals + 1
+    }
 
     return Number(output.toFixed(x)).toString()
   }

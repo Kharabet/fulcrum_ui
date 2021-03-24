@@ -11,6 +11,7 @@ import appConfig from 'bzx-common/src/config/appConfig'
 import Asset from 'bzx-common/src/assets/Asset'
 import AssetDetails from 'bzx-common/src/assets/AssetDetails'
 import AssetsDictionary from 'bzx-common/src/assets/AssetsDictionary'
+import providerUtils from 'app-lib/providerUtils'
 import React, { ChangeEvent, Component, FormEvent } from 'react'
 import Slider from 'rc-slider'
 
@@ -118,28 +119,31 @@ export class ManageCollateralFormWeb3 extends Component<
         TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then((gasAmountNeeded) => {
           TorqueProvider.Instance.getCollateralExcessAmount(this.props.loanOrderState).then(
             (collateralExcess) => {
-              TorqueProvider.Instance.getAssetTokenBalanceOfUser(
-                this.props.loanOrderState.collateralAsset
-              ).then((assetBalance) => {
-                const collateralizedPercent = this.props.loanOrderState.collateralizedPercent
-                  .multipliedBy(100)
-                  .plus(100)
-                const collateralAssetDecimals =
-                  AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!
-                    .decimals || 18
-                // const marginPremium = TorqueProvider.Instance.getMarginPremiumAmount(this.props.loanOrderState.collateralAsset);
+              providerUtils
+                .getAssetTokenBalanceOfUser(
+                  TorqueProvider.Instance,
+                  this.props.loanOrderState.collateralAsset
+                )
+                .then((assetBalance) => {
+                  const collateralizedPercent = this.props.loanOrderState.collateralizedPercent
+                    .multipliedBy(100)
+                    .plus(100)
+                  const collateralAssetDecimals =
+                    AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!
+                      .decimals || 18
+                  // const marginPremium = TorqueProvider.Instance.getMarginPremiumAmount(this.props.loanOrderState.collateralAsset);
 
-                /*const expectedMinCollateral = this.props.loanOrderState.collateralAmount
+                  /*const expectedMinCollateral = this.props.loanOrderState.collateralAmount
               //.multipliedBy(150 + marginPremium)
               .multipliedBy(150)
               .dividedBy(collateralizedPercent);*/
 
-                let minCollateral
-                let maxCollateral
+                  let minCollateral
+                  let maxCollateral
 
-                minCollateral = this.props.loanOrderState.collateralAmount.minus(collateralExcess)
+                  minCollateral = this.props.loanOrderState.collateralAmount.minus(collateralExcess)
 
-                /*if (minCollateral.lt(expectedMinCollateral)) {
+                  /*if (minCollateral.lt(expectedMinCollateral)) {
               collateralExcess = this.props.loanOrderState.collateralAmount > expectedMinCollateral ?
                 this.props.loanOrderState.collateralAmount
                   .minus(expectedMinCollateral) :
@@ -147,76 +151,78 @@ export class ManageCollateralFormWeb3 extends Component<
               minCollateral = expectedMinCollateral;
             }*/
 
-                minCollateral = minCollateral.times(10 ** 18)
+                  minCollateral = minCollateral.times(10 ** 18)
 
-                maxCollateral = minCollateral
-                  .times(collateralState.maxValue - collateralState.minValue)
-                  .dividedBy(10 ** 20)
+                  maxCollateral = minCollateral
+                    .times(collateralState.maxValue - collateralState.minValue)
+                    .dividedBy(10 ** 20)
 
-                const currentCollateral = this.props.loanOrderState.collateralAmount.times(10 ** 18)
+                  const currentCollateral = this.props.loanOrderState.collateralAmount.times(
+                    10 ** 18
+                  )
 
-                if (maxCollateral.lt(currentCollateral)) {
-                  maxCollateral = currentCollateral.times(1.1)
-                }
-
-                // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
-                let currentCollateralNormalizedBN = new BigNumber(
-                  collateralState.maxValue - collateralState.minValue
-                )
-                  .dividedBy(maxCollateral.minus(minCollateral))
-                  .times(currentCollateral.minus(minCollateral))
-                  .plus(collateralState.minValue)
-
-                if (
-                  currentCollateralNormalizedBN
-                    .dividedBy(collateralState.maxValue - collateralState.minValue)
-                    .lte(0.01)
-                ) {
-                  currentCollateralNormalizedBN = new BigNumber(collateralState.minValue)
-                }
-
-                // check balance
-                if (
-                  (appConfig.isMainnet && this.props.loanOrderState.loanAsset === Asset.ETH) ||
-                  (appConfig.isBsc && this.props.loanOrderState.loanAsset === Asset.BNB)
-                ) {
-                  assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
-                    ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
-                    : new BigNumber(0)
-                }
-                let assetBalanceNormalizedBN = new BigNumber(
-                  collateralState.maxValue - collateralState.minValue
-                )
-                  .dividedBy(maxCollateral.minus(minCollateral))
-                  .times(assetBalance.minus(minCollateral))
-                  .plus(collateralState.minValue)
-
-                if (
-                  assetBalanceNormalizedBN
-                    .dividedBy(collateralState.maxValue - collateralState.minValue)
-                    .lte(0.01)
-                ) {
-                  assetBalanceNormalizedBN = new BigNumber(collateralState.minValue)
-                }
-
-                this.setState(
-                  {
-                    ...this.state,
-                    assetDetails:
-                      AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) ||
-                      null,
-                    loanValue: currentCollateralNormalizedBN.toNumber(),
-                    selectedValue: currentCollateralNormalizedBN.toNumber(),
-                    gasAmountNeeded: gasAmountNeeded,
-                    collateralizedPercent: collateralizedPercent,
-                    collateralExcess: collateralExcess,
-                    assetBalanceValue: assetBalance.div(10 ** collateralAssetDecimals).toNumber(),
-                  },
-                  () => {
-                    this._selectedValueUpdate.next(this.state.selectedValue)
+                  if (maxCollateral.lt(currentCollateral)) {
+                    maxCollateral = currentCollateral.times(1.1)
                   }
-                )
-              })
+
+                  // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
+                  let currentCollateralNormalizedBN = new BigNumber(
+                    collateralState.maxValue - collateralState.minValue
+                  )
+                    .dividedBy(maxCollateral.minus(minCollateral))
+                    .times(currentCollateral.minus(minCollateral))
+                    .plus(collateralState.minValue)
+
+                  if (
+                    currentCollateralNormalizedBN
+                      .dividedBy(collateralState.maxValue - collateralState.minValue)
+                      .lte(0.01)
+                  ) {
+                    currentCollateralNormalizedBN = new BigNumber(collateralState.minValue)
+                  }
+
+                  // check balance
+                  if (
+                    (appConfig.isMainnet && this.props.loanOrderState.loanAsset === Asset.ETH) ||
+                    (appConfig.isBsc && this.props.loanOrderState.loanAsset === Asset.BNB)
+                  ) {
+                    assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn)
+                      ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
+                      : new BigNumber(0)
+                  }
+                  let assetBalanceNormalizedBN = new BigNumber(
+                    collateralState.maxValue - collateralState.minValue
+                  )
+                    .dividedBy(maxCollateral.minus(minCollateral))
+                    .times(assetBalance.minus(minCollateral))
+                    .plus(collateralState.minValue)
+
+                  if (
+                    assetBalanceNormalizedBN
+                      .dividedBy(collateralState.maxValue - collateralState.minValue)
+                      .lte(0.01)
+                  ) {
+                    assetBalanceNormalizedBN = new BigNumber(collateralState.minValue)
+                  }
+
+                  this.setState(
+                    {
+                      ...this.state,
+                      assetDetails:
+                        AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) ||
+                        null,
+                      loanValue: currentCollateralNormalizedBN.toNumber(),
+                      selectedValue: currentCollateralNormalizedBN.toNumber(),
+                      gasAmountNeeded: gasAmountNeeded,
+                      collateralizedPercent: collateralizedPercent,
+                      collateralExcess: collateralExcess,
+                      assetBalanceValue: assetBalance.div(10 ** collateralAssetDecimals).toNumber(),
+                    },
+                    () => {
+                      this._selectedValueUpdate.next(this.state.selectedValue)
+                    }
+                  )
+                })
             }
           )
         })
@@ -484,7 +490,8 @@ export class ManageCollateralFormWeb3 extends Component<
       this.setState({ ...this.state, didSubmit: true })
 
       if (this.state.loanValue < this.state.selectedValue) {
-        let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(
+        let assetBalance = await providerUtils.getAssetTokenBalanceOfUser(
+          TorqueProvider.Instance,
           this.props.loanOrderState.collateralAsset
         )
         if (
@@ -561,11 +568,17 @@ export class ManageCollateralFormWeb3 extends Component<
   public formatPrecision(outputText: string, isNecessarySign: boolean): string {
     const output = Number(outputText)
     let sign = ''
-    if (this.state.loanValue > this.state.selectedValue) sign = '-'
+    if (this.state.loanValue > this.state.selectedValue) {
+      sign = '-'
+    }
     const n = Math.log(Math.abs(output)) / Math.LN10
     let x = 4 - n
-    if (x < 0) x = 0
-    if (x > 5) x = 5
+    if (x < 0) {
+      x = 0
+    }
+    if (x > 5) {
+      x = 5
+    }
     const result = Number(output.toFixed(x)).toString()
     return isNecessarySign && result !== '0' ? sign + result : result
   }

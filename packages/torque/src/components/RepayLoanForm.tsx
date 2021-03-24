@@ -1,3 +1,4 @@
+import React from 'react'
 import { BigNumber } from '@0x/utils'
 import { ChiSwitch } from './ChiSwitch'
 import { debounceTime } from 'rxjs/operators'
@@ -84,8 +85,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         )
       }
     )
-    TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset).then(
-      (balance) => {
+    providerUtils
+      .getAssetTokenBalanceOfUser(TorqueProvider.Instance, this.props.loanOrderState.loanAsset)
+      .then((balance) => {
         const precision = this.state.assetDetails!.decimals || 18
         const amountOwed = this.props.loanOrderState.amountOwed.multipliedBy(10 ** precision)
         const isBalanceTooLow = amountOwed.gt(balance) ? true : false
@@ -100,8 +102,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           repayAmountText: repayAmountText,
           balanceTooLow: isBalanceTooLow,
         })
-      }
-    )
+      })
     TorqueProvider.Instance.web3Wrapper &&
       providerUtils.getEthBalance(TorqueProvider.Instance).then((ethBalance) => {
         this.setState({
@@ -142,7 +143,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   }
 
   public render() {
-    if (this.state.assetDetails === null) return null
+    if (this.state.assetDetails === null) {
+      return null
+    }
 
     const ratio = this.state.assetBalance.div(
       this.props.loanOrderState.amountOwed.times(10 ** this.state.assetDetails.decimals)
@@ -268,7 +271,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   }
 
   public updateRepayAmount = (value: number) => {
-    if (value === 0) return
+    if (value === 0) {
+      return
+    }
     const repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(this.state.interestAmount)
     const repayAmountText = repayAmount.toString()
 

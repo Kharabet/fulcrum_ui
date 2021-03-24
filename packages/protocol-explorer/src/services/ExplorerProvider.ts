@@ -926,28 +926,6 @@ export class ExplorerProvider {
     return result
   }
 
-  public async getAssetTokenBalanceOfUser(asset: Asset, account?: string): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0)
-
-    if (asset === Asset.UNKNOWN || !this.web3Wrapper || !this.contractsSource) {
-      // always 0
-      result = new BigNumber(0)
-    } else if (asset === Asset.ETH) {
-      // get eth (wallet) balance
-      result = (await providerUtils.getEthBalance(this)).div(10 ** 18)
-    } else {
-      // get erc20 token balance
-      const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18
-      const assetErc20Address = providerUtils.getErc20AddressOfAsset(asset)
-      if (assetErc20Address) {
-        result = await providerUtils.getErc20BalanceOfUser(this, assetErc20Address, account)
-        result = result.div(10 ** decimals)
-      }
-    }
-
-    return result
-  }
-
   private getLoanParams = async (
     asset: Asset,
     collateralAsset: Asset,

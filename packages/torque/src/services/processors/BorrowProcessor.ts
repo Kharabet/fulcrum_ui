@@ -108,7 +108,10 @@ export class BorrowProcessor {
     let txHash = ''
 
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === 'true'
-    const ChiTokenBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI)
+    const ChiTokenBalance = await providerUtils.getAssetTokenBalanceOfUser(
+      TorqueProvider.Instance,
+      Asset.CHI
+    )
 
     try {
       const gasAmount =
