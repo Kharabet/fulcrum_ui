@@ -359,7 +359,7 @@ export class ExplorerProvider {
       .callAsync()
 
     const mappedAssetsShown = this.assetsShown.map((asset) => this.wethToEth(asset))
-    const usdPrices = await bzxApi.getSwapToUsdRatesOffChain(this, mappedAssetsShown)
+    const usdPrices = await bzxApi.getSwapToUsdRatesOffChain(mappedAssetsShown)
     loansData.forEach(async (e) => {
       const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
       const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
@@ -671,7 +671,7 @@ export class ExplorerProvider {
     }
 
     if (offChain) {
-      return bzxApi.getSwapToUsdRateOffChain(this, asset)
+      return bzxApi.getSwapToUsdRateOffChain(asset)
     }
 
     return this.getSwapRate(asset, appConfig.tokenForUsdSwapRate)
