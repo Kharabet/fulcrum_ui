@@ -957,25 +957,27 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     //   ;(await this._isMounted) && this.setState({ historyEvents: undefined })
     //   return null
     // }
-    const tradeEvents = await blockchainEventsUtils.getTradeHistory(FulcrumProvider.Instance)
-    const rolloverEvents = await blockchainEventsUtils.getRolloverHistory(FulcrumProvider.Instance)
+    const provider = FulcrumProvider.Instance
+    const account = provider.currentAccount
+    const tradeEvents = await blockchainEventsUtils.getTradeHistory(provider, account)
+    const rolloverEvents = await blockchainEventsUtils.getRolloverHistory(provider, account)
     const closeWithSwapEvents = await blockchainEventsUtils.getCloseWithSwapHistory(
-      FulcrumProvider.Instance
+      provider,
+      account
     )
-    const liquidationEvents = await blockchainEventsUtils.getLiquidationHistory(
-      FulcrumProvider.Instance
-    )
+    const liquidationEvents = await blockchainEventsUtils.getLiquidationHistory(provider, account)
     const depositCollateralEvents = await blockchainEventsUtils.getDepositCollateralHistory(
-      FulcrumProvider.Instance
+      provider,
+      account
     )
     const withdrawCollateralEvents = await blockchainEventsUtils.getWithdrawCollateralHistory(
-      FulcrumProvider.Instance
+      provider,
+      account
     )
-    const earnRewardEvents = await blockchainEventsUtils.getEarnRewardHistory(
-      FulcrumProvider.Instance
-    )
+    const earnRewardEvents = await blockchainEventsUtils.getEarnRewardHistory(provider, account)
     const payTradingFeeEvents = await blockchainEventsUtils.getPayTradingFeeHistory(
-      FulcrumProvider.Instance
+      provider,
+      account
     )
     // const tokens = Array.from(new Set(this.baseTokens.concat(this.quoteTokens)));
 
