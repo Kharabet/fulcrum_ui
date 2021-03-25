@@ -268,10 +268,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
           ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
           : new BigNumber(0)
       }
-      const precision =
-        AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18
       const amountInBaseUnits = new BigNumber(
-        this.state.depositAmount.multipliedBy(10 ** precision).toFixed(0, 1)
+        this.state.depositAmount.multipliedBy(10 ** 18).toFixed(0, 1)
       )
       if (assetBalance.lt(amountInBaseUnits)) {
         this.setState({

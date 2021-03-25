@@ -612,9 +612,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
         ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
         : new BigNumber(0)
     }
-    const decimals = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18
 
-    const balance = assetBalance.dividedBy(10 ** decimals)
+    const balance = assetBalance.dividedBy(10 ** 18)
     this.setState({ balanceTooLow: balance.lt(this.state.depositAmount) })
   }
 
@@ -690,9 +689,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             : new BigNumber(0)
         }
 
-        const decimals = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18
-
-        const depositAmount = balance.dividedBy(10 ** decimals)
+        const depositAmount = balance.dividedBy(10 ** 18)
         const precisionDigits = TorqueProvider.Instance.isStableAsset(this.state.collateralAsset)
           ? 2
           : 5

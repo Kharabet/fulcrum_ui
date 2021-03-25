@@ -128,9 +128,7 @@ export class ManageCollateralFormWeb3 extends Component<
                   const collateralizedPercent = this.props.loanOrderState.collateralizedPercent
                     .multipliedBy(100)
                     .plus(100)
-                  const collateralAssetDecimals =
-                    AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!
-                      .decimals || 18
+
                   // const marginPremium = TorqueProvider.Instance.getMarginPremiumAmount(this.props.loanOrderState.collateralAsset);
 
                   /*const expectedMinCollateral = this.props.loanOrderState.collateralAmount
@@ -216,7 +214,7 @@ export class ManageCollateralFormWeb3 extends Component<
                       gasAmountNeeded: gasAmountNeeded,
                       collateralizedPercent: collateralizedPercent,
                       collateralExcess: collateralExcess,
-                      assetBalanceValue: assetBalance.div(10 ** collateralAssetDecimals).toNumber(),
+                      assetBalanceValue: assetBalance.div(10 ** 18).toNumber(),
                     },
                     () => {
                       this._selectedValueUpdate.next(this.state.selectedValue)
@@ -502,10 +500,9 @@ export class ManageCollateralFormWeb3 extends Component<
             ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn)
             : new BigNumber(0)
         }
-        const precision =
-          AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!.decimals || 18
+
         const amountInBaseUnits = new BigNumber(
-          this.state.collateralAmount.multipliedBy(10 ** precision).toFixed(0, 1)
+          this.state.collateralAmount.multipliedBy(10 ** 18).toFixed(0, 1)
         )
         if (assetBalance.lt(amountInBaseUnits)) {
           this.setState({

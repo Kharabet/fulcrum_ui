@@ -88,11 +88,10 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     providerUtils
       .getAssetTokenBalanceOfUser(TorqueProvider.Instance, this.props.loanOrderState.loanAsset)
       .then((balance) => {
-        const precision = this.state.assetDetails!.decimals || 18
-        const amountOwed = this.props.loanOrderState.amountOwed.multipliedBy(10 ** precision)
+        const amountOwed = this.props.loanOrderState.amountOwed.multipliedBy(10 ** 18)
         const isBalanceTooLow = amountOwed.gt(balance) ? true : false
         const repayAmount = amountOwed.gt(balance)
-          ? balance.div(10 ** precision)
+          ? balance.div(10 ** 18)
           : this.props.loanOrderState.amountOwed
         const repayAmountText = repayAmount.toString()
         this.setState({
