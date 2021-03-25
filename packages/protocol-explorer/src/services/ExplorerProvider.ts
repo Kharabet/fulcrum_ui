@@ -418,7 +418,7 @@ export class ExplorerProvider {
       (loan) => loan && loan.loanData && loan.loanData.interestDepositRemaining.eq(0)
     )
     for (const i in rolloverPendingLoans) {
-      if (!rolloverPendingLoans[i]) {
+      if (!rolloverPendingLoans[i] || rolloverPendingLoans[i].loanData.collateral.eq(0)) {
         continue
       }
       const loan = rolloverPendingLoans[i]
