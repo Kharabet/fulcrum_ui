@@ -48,8 +48,8 @@ export default function LiquidationForm(props: ILiquidationFormProps) {
       ),
     ])
       .then(([ethBalanceResp, repayAssetBalanceResp]) => {
-        setEthBalance(ethBalanceResp)
-        setRepayAssetBalance(repayAssetBalanceResp)
+        setEthBalance(ethBalanceResp.div(10 ** 18))
+        setRepayAssetBalance(repayAssetBalanceResp.div(10 ** 18))
         setIsLoading(false)
       })
       .catch(console.error)
