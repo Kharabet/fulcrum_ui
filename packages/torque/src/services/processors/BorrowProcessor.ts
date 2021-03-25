@@ -18,7 +18,7 @@ export class BorrowProcessor {
     }
 
     const taskRequest: BorrowRequest = task.request as BorrowRequest
-    const isETHCollateralAsset = providerUtils.isETHAsset(taskRequest.collateralAsset)
+    const isETHCollateralAsset = providerUtils.isNativeToken(taskRequest.collateralAsset)
     if (isETHCollateralAsset) {
       //Initializing
       task.processingStart([

@@ -16,7 +16,7 @@ export class ExtendLoanProcessor {
     }
 
     const taskRequest: ExtendLoanRequest = task.request as ExtendLoanRequest
-    const isETHBorrowAsset = providerUtils.isETHAsset(taskRequest.borrowAsset)
+    const isETHBorrowAsset = providerUtils.isNativeToken(taskRequest.borrowAsset)
 
     if (isETHBorrowAsset) {
       //Initializing

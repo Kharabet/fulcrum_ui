@@ -17,7 +17,7 @@ export class RepayLoanProcessor {
     }
 
     const taskRequest: RepayLoanRequest = task.request as RepayLoanRequest
-    const isETHBorrowAsset = providerUtils.isETHAsset(taskRequest.borrowAsset)
+    const isETHBorrowAsset = providerUtils.isNativeToken(taskRequest.borrowAsset)
 
     if (isETHBorrowAsset) {
       //Initializing

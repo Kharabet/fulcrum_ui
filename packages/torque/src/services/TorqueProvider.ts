@@ -1313,7 +1313,7 @@ export class TorqueProvider {
         const depositAmountInBaseUnits = new BigNumber(borrowRequest.depositAmount.multipliedBy(10 ** collateralPrecision).toFixed(0, 1));
 
         let gasAmountBN;
-        if (providerUtils.isETHAsset(borrowRequest.collateralAsset)) {
+        if (providerUtils.isNativeToken(borrowRequest.collateralAsset)) {
           try {
             const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
               borrowRequest.loanId,
@@ -1467,7 +1467,7 @@ export class TorqueProvider {
       )
       .map((e) => {
         let loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken)
-        loanAsset = providerUtils.isETHAsset(loanAsset)
+        loanAsset = providerUtils.isNativeToken(loanAsset)
           ? appConfig.isMainnet
             ? Asset.ETH
             : appConfig.isBsc
@@ -1475,7 +1475,7 @@ export class TorqueProvider {
             : loanAsset
           : loanAsset
         let collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken)
-        collateralAsset = providerUtils.isETHAsset(collateralAsset)
+        collateralAsset = providerUtils.isNativeToken(collateralAsset)
           ? appConfig.isMainnet
             ? Asset.ETH
             : appConfig.isBsc
@@ -1648,8 +1648,8 @@ export class TorqueProvider {
   public getPositionSafetyText = (borrowedFundsState: IBorrowedFundsState): string => {
     const liquidationZone = borrowedFundsState.loanData!.maintenanceMargin.div(10 ** 20).toNumber()
     const dangerZone = liquidationZone + 0.1
-    /*if ((this.isStableAsset(borrowedFundsState.loanAsset) && providerUtils.isETHAsset(borrowedFundsState.collateralAsset)) ||
-      (this.isStableAsset(borrowedFundsState.collateralAsset) && providerUtils.isETHAsset(borrowedFundsState.loanAsset))) {
+    /*if ((this.isStableAsset(borrowedFundsState.loanAsset) && providerUtils.isNativeToken(borrowedFundsState.collateralAsset)) ||
+      (this.isStableAsset(borrowedFundsState.collateralAsset) && providerUtils.isNativeToken(borrowedFundsState.loanAsset))) {
       dangerZone = 0.25;
       liquidationZone = 0.15;
     } else if (this.isStableAsset(borrowedFundsState.collateralAsset) && this.isStableAsset(borrowedFundsState.loanAsset)) {
@@ -1805,13 +1805,13 @@ export class TorqueProvider {
             repayLoanRequest.loanId,
             account,
             account,
-            providerUtils.isETHAsset(repayLoanRequest.collateralAsset) ?
+            providerUtils.isNativeToken(repayLoanRequest.collateralAsset) ?
               TorqueProvider.ZERO_ADDRESS : // will refund with ETH
               account,
             closeAmountInBaseUnits,
             {
               from: account,
-              value: providerUtils.isETHAsset(repayLoanRequest.borrowAsset) ?
+              value: providerUtils.isNativeToken(repayLoanRequest.borrowAsset) ?
                 closeAmountInBaseUnitsValue :
                 undefined,
               gas: this.gasLimit
@@ -1827,13 +1827,13 @@ export class TorqueProvider {
           repayLoanRequest.loanId,                       // loanId
           account,                                              // borrower
           account,                                              // payer
-          providerUtils.isETHAsset(repayLoanRequest.collateralAsset) ?   // receiver
+          providerUtils.isNativeToken(repayLoanRequest.collateralAsset) ?   // receiver
             TorqueProvider.ZERO_ADDRESS :                        // will refund with ETH
             account,
           closeAmountInBaseUnits,                               // closeAmount
           {
             from: account,
-            value: providerUtils.isETHAsset(repayLoanRequest.borrowAsset) ?
+            value: providerUtils.isNativeToken(repayLoanRequest.borrowAsset) ?
               closeAmountInBaseUnitsValue :
               undefined,
             gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
@@ -1881,7 +1881,7 @@ export class TorqueProvider {
               collateralAmountInBaseUnits,
               {
                 from: account,
-                value: providerUtils.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
+                value: providerUtils.isNativeToken(manageCollateralRequest.loanOrderState.collateralAsset) ?
                   collateralAmountInBaseUnitsValue :
                   undefined,
                 gas: this.gasLimit
@@ -1898,7 +1898,7 @@ export class TorqueProvider {
             collateralAmountInBaseUnits,                                              // depositAmount
             {
               from: account,
-              value: providerUtils.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
+              value: providerUtils.isNativeToken(manageCollateralRequest.loanOrderState.collateralAsset) ?
                 collateralAmountInBaseUnitsValue :
                 undefined,
               gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
@@ -1913,7 +1913,7 @@ export class TorqueProvider {
               manageCollateralRequest.loanOrderState.loanData!.loanId,
               collateralAmountInBaseUnits,
               account,
-              providerUtils.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
+              providerUtils.isNativeToken(manageCollateralRequest.loanOrderState.collateralAsset) ?
                 TorqueProvider.ZERO_ADDRESS :
                 account,
               {
@@ -1930,7 +1930,7 @@ export class TorqueProvider {
             manageCollateralRequest.loanOrderState.loanData!.loanId,             // loanId
             collateralAmountInBaseUnits,                                                // depositAmount
             account,                                                                    // trader
-            providerUtils.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?   // receiver
+            providerUtils.isNativeToken(manageCollateralRequest.loanOrderState.collateralAsset) ?   // receiver
               TorqueProvider.ZERO_ADDRESS :                                             // will receive ETH back
               account,                                                                  // will receive ERC20 back
             {
@@ -2012,7 +2012,7 @@ export class TorqueProvider {
             false,
             {
               from: account,
-              value: providerUtils.isETHAsset(extendLoanRequest.borrowAsset) ?
+              value: providerUtils.isNativeToken(extendLoanRequest.borrowAsset) ?
                 depositAmountInBaseUnits :
                 undefined,
               gas: this.gasLimit
@@ -2031,7 +2031,7 @@ export class TorqueProvider {
           false,                                                // useCollateral
           {
             from: account,
-            value: providerUtils.isETHAsset(extendLoanRequest.borrowAsset) ?
+            value: providerUtils.isNativeToken(extendLoanRequest.borrowAsset) ?
               depositAmountInBaseUnits :
               undefined,
             gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
@@ -2444,7 +2444,7 @@ export class TorqueProvider {
       return result
     }
 
-    const isETHCollateralAsset = providerUtils.isETHAsset(request.collateralAsset)
+    const isETHCollateralAsset = providerUtils.isNativeToken(request.collateralAsset)
     const collateralAssetErc20Address =
       providerUtils.getErc20AddressOfAsset(request.collateralAsset) || ''
     const loanPrecision = AssetsDictionary.assets.get(request.borrowAsset)!.decimals || 18

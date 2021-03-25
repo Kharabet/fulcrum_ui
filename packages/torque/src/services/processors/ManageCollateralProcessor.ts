@@ -18,7 +18,7 @@ export class ManageCollateralProcessor {
 
     // Initializing loan
     const taskRequest: ManageCollateralRequest = task.request as ManageCollateralRequest
-    const isETHCollateralAsset = providerUtils.isETHAsset(taskRequest.collateralAsset)
+    const isETHCollateralAsset = providerUtils.isNativeToken(taskRequest.collateralAsset)
 
     if (isETHCollateralAsset) {
       task.processingStart([

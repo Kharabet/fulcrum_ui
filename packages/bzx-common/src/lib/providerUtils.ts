@@ -140,7 +140,7 @@ const getCurrentAccount = (
     : ''
 }
 
-const isETHAsset = (asset: Asset): boolean => {
+const isNativeToken = (asset: Asset): boolean => {
   return (appConfig.isMainnet && asset === Asset.ETH) || (appConfig.isBsc && asset === Asset.BNB) // || asset === Asset.WETH;
 }
 
@@ -154,5 +154,5 @@ export default {
   getLocalstorageItem,
   setLocalstorageItem,
   getCurrentAccount,
-  isETHAsset,
+  isNativeToken,
 }
